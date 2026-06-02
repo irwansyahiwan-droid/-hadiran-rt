@@ -35,11 +35,11 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-lg mx-auto bg-white rounded-t-3xl p-5 pb-10 space-y-4"
+        className="relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-2" />
-        <h3 className="text-base font-bold text-gray-900">Tambah Transaksi Kas RT</h3>
+        <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-2" />
+        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Transaksi Kas RT</h3>
 
         <form onSubmit={submit} className="space-y-3">
           {/* Tipe toggle */}
@@ -54,7 +54,7 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
                     ? t === 'masuk'
                       ? 'bg-emerald-500 text-white border-emerald-500'
                       : 'bg-red-500 text-white border-red-500'
-                    : 'bg-gray-50 text-gray-500 border-gray-200'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-gray-200 dark:border-gray-700'
                 }`}
               >
                 {t === 'masuk' ? '↓ Pemasukan' : '↑ Pengeluaran'}
@@ -63,20 +63,20 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Keterangan</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
             <input
               type="text"
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
               required
               placeholder="Contoh: Iuran warga bulan Juni"
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Nominal</label>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                 <input
@@ -85,18 +85,18 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
                   onChange={(e) => setNominal(Number(e.target.value))}
                   required
                   min={1}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal</label>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
               <input
                 type="date"
                 value={tanggal}
                 onChange={(e) => setTanggal(e.target.value)}
                 required
-                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
               />
             </div>
           </div>
@@ -116,7 +116,7 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               Batal
             </button>
@@ -186,16 +186,16 @@ export default function KasRTPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Kas RT</h1>
+            <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Kas RT</h1>
             <p className="text-xs text-gray-400 mt-0.5">Per {today}</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={() => generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal })}
-              className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold px-3 py-2 rounded-xl hover:bg-gray-50 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
             >
               <FileText className="w-4 h-4" />
               PDF
@@ -203,7 +203,7 @@ export default function KasRTPage() {
             {isBendahara && (
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-1.5 bg-amber-500 text-white text-sm font-semibold px-3 py-2 rounded-xl hover:bg-amber-600 active:scale-95 transition-all shadow-md shadow-amber-200"
+                className="flex items-center gap-1.5 bg-teal-600 text-white text-sm font-semibold px-3 py-2 rounded-xl hover:bg-teal-700 active:scale-95 transition-all shadow-md shadow-teal-200"
               >
                 <Plus className="w-4 h-4" />
                 Tambah
@@ -212,17 +212,14 @@ export default function KasRTPage() {
           </div>
         </div>
 
-        {/* Saldo Card */}
-        <div
-          className="relative rounded-3xl overflow-hidden shadow-xl"
-          style={{ background: 'linear-gradient(135deg, #78350f 0%, #d97706 55%, #fbbf24 100%)' }}
-        >
+        {/* Saldo Card — always teal */}
+        <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-teal-800 to-teal-700">
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-5">
             <div className="flex items-center gap-2 mb-1">
-              <Landmark className="w-4 h-4 text-amber-200" />
-              <p className="text-amber-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
+              <Landmark className="w-4 h-4 text-teal-200" />
+              <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
             </div>
             <p className="text-4xl font-black tracking-tight text-white mb-4">
               Rp{saldo.toLocaleString('id-ID')}
@@ -232,10 +229,10 @@ export default function KasRTPage() {
             {saldoAwal > 0 && (
               <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 border border-white/15 mb-2">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-amber-200 text-sm">🏦</span>
-                  <p className="text-amber-100 text-[10px] font-semibold uppercase tracking-wide">Saldo Awal</p>
+                  <span className="text-teal-200 text-sm">🏦</span>
+                  <p className="text-teal-100 text-[10px] font-semibold uppercase tracking-wide">Saldo Awal</p>
                   {saldoAwalEntry && (
-                    <p className="text-amber-200/70 text-[10px]">
+                    <p className="text-teal-200/70 text-[10px]">
                       · {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                   )}
@@ -248,14 +245,14 @@ export default function KasRTPage() {
               <div className="bg-white/15 rounded-2xl p-3 border border-white/20">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
-                  <p className="text-amber-100 text-[9px] font-semibold uppercase tracking-wide">Total Masuk</p>
+                  <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Masuk</p>
                 </div>
                 <p className="text-sm font-bold text-white">+{formatRupiahPlain(totalMasuk)}</p>
               </div>
               <div className="bg-white/15 rounded-2xl p-3 border border-white/20">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-red-300" />
-                  <p className="text-amber-100 text-[9px] font-semibold uppercase tracking-wide">Total Keluar</p>
+                  <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Keluar</p>
                 </div>
                 <p className="text-sm font-bold text-red-300">-{formatRupiahPlain(totalKeluar)}</p>
               </div>
@@ -264,7 +261,7 @@ export default function KasRTPage() {
         </div>
 
         {/* Mutasi list — terbaru di atas */}
-        <h2 className="text-sm font-semibold text-gray-700 px-1">Mutasi Kas Besar RT</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 px-1">Mutasi Kas Besar RT</h2>
 
         {loading ? (
           <div className="flex items-center justify-center h-48">
@@ -276,14 +273,14 @@ export default function KasRTPage() {
             <p className="text-sm text-gray-400">Belum ada transaksi</p>
           </div>
         ) : (
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
             {[...list].reverse().map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === list.length - 1;
               return (
                 <div
                   key={k.id}
-                  className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50' : ''}`}
+                  className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
                 >
                   <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
                     isMasuk ? 'bg-emerald-100' : 'bg-red-100'
@@ -294,7 +291,7 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">

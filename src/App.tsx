@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
+import { useTheme } from './hooks/useTheme';
 import { AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
 import Header from './components/layout/Header';
@@ -15,12 +16,13 @@ import KasRTPage from './pages/KasRT';
 
 export default function App() {
   const auth = useAuth();
+  const { isDark, toggle: toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<TabName>('beranda');
   const [wargaMode, setWargaMode] = useState(false);
 
   if (auth.loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
       </div>
     );
@@ -46,10 +48,12 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={ctxValue}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <Header
           role={isWargaMode ? 'warga' : auth.role}
           onLogout={isWargaMode ? ctxValue.exitWargaMode : auth.signOut}
+          isDark={isDark}
+          onToggleTheme={toggleTheme}
         />
         <main className="max-w-lg mx-auto px-4 pt-4 pb-24">
           {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}

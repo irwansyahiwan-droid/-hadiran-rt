@@ -98,17 +98,17 @@ export default function TalanganPage() {
     const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
 
     return (
-      <div key={g.warga_id} className="border border-gray-100 rounded-2xl overflow-hidden mb-2">
+      <div key={g.warga_id} className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden mb-2">
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
-          className="w-full flex items-center gap-3 p-3.5 bg-white hover:bg-gray-50 transition-colors text-left"
+          className="w-full flex items-center gap-3 p-3.5 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
         >
           <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 text-sm font-bold text-amber-700">
             {g.nama.charAt(0)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">{g.nama}</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
             {g.countBelum > 0 && (
               <p className="text-xs text-amber-600 mt-0.5">
                 {g.countBelum} belum lunas · {formatRupiahPlain(g.totalBelum)}
@@ -124,20 +124,20 @@ export default function TalanganPage() {
 
         {/* Detail entries */}
         {isExpanded && (
-          <div className="border-t border-gray-100 divide-y divide-gray-50">
+          <div className="border-t border-gray-100 dark:border-gray-800 divide-y divide-gray-50 dark:divide-gray-800">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
-              <div key={t.id} className="flex items-center gap-3 px-4 py-3 bg-gray-50/50">
-                <div className="w-8 h-8 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
+              <div key={t.id} className="flex items-center gap-3 px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50">
+                <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-800 truncate">{g.nama}</p>
+                  <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{g.nama}</p>
                   <p className="text-[10px] text-gray-400">
                     Tarikan #{t.tarikan?.nomor} · {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-bold text-gray-700">{formatRupiahPlain(t.nominal)}</span>
+                  <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{formatRupiahPlain(t.nominal)}</span>
                   {t.status_lunas ? (
                     <span className="px-2 py-0.5 text-[9px] font-bold text-blue-600 bg-blue-50 rounded-full border border-blue-200">
                       LUNAS
@@ -186,9 +186,9 @@ export default function TalanganPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white/70 rounded-3xl border border-white shadow-sm p-5 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 rounded-3xl border border-white dark:border-gray-700 shadow-sm p-5 text-center">
           <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-gray-700">Semua Talangan Lunas</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Semua Talangan Lunas</p>
           <p className="text-xs text-gray-400">{countLunas} talangan tercatat</p>
         </div>
       )}
@@ -200,7 +200,7 @@ export default function TalanganPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama warga..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -233,7 +233,7 @@ export default function TalanganPage() {
           {/* Single belum lunas */}
           {single.length > 0 && (
             <div>
-              <p className="text-sm font-semibold text-gray-700 mb-2">Daftar Talangan</p>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Daftar Talangan</p>
               <div>{single.map(g => renderGroup(g))}</div>
             </div>
           )}

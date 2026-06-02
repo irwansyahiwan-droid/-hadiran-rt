@@ -36,14 +36,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl shadow-emerald-100 border border-white p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">Masuk</h2>
+      <div className="w-full max-w-sm bg-white/80 dark:bg-gray-900 backdrop-blur-sm rounded-3xl shadow-xl shadow-emerald-100 border border-white dark:border-gray-700 p-6">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Masuk</h2>
         <p className="text-sm text-gray-400 mb-6">Silakan login untuk melanjutkan</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Email</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -52,14 +52,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="contoh@email.com"
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Password</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -68,7 +68,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full pl-10 pr-10 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                className="w-full pl-10 pr-10 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
               />
               <button
                 type="button"

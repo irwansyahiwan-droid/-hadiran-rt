@@ -12,11 +12,11 @@ function StatCard({ label, value, icon: Icon, color }: {
   color: string;
 }) {
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 border border-white shadow-sm">
+    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-4 border border-white dark:border-gray-700 shadow-sm">
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2 ${color}`}>
         <Icon className="w-4 h-4 text-white" />
       </div>
-      <p className="text-xl font-bold text-gray-900">{value}</p>
+      <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
       <p className="text-xs text-gray-500 mt-0.5">{label}</p>
     </div>
   );
@@ -125,9 +125,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   return (
     <div className="space-y-4 pb-2">
-      {/* Main Kas Card */}
-      <div className="relative rounded-3xl overflow-hidden shadow-xl"
-        style={{ background: 'linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)' }}>
+      {/* Main Kas Card — always green (kasHadiran always positive) */}
+      <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-emerald-800 to-emerald-700">
         <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
         <div className="absolute top-6 -right-4 w-20 h-20 bg-white/5 rounded-full" />
         <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -237,18 +236,18 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Jadwal Berikutnya */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-700 mb-3 px-1">Jadwal Berikutnya</h2>
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 px-1">Jadwal Berikutnya</h2>
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
           {jadwalList.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
           ) : (
             jadwalList.map((j, idx) => (
-              <div key={j.id} className={`flex items-center gap-3 p-4 ${idx < jadwalList.length - 1 ? 'border-b border-gray-50' : ''}`}>
+              <div key={j.id} className={`flex items-center gap-3 p-4 ${idx < jadwalList.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}>
                 <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-200">
                   <span className="text-white text-sm font-black">{j.nomor}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{j.sohibul_bait?.nama ?? '-'}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{j.sohibul_bait?.nama ?? '-'}</p>
                   <p className="text-xs text-gray-400">{formatTanggal(j.tanggal)}</p>
                 </div>
                 <span className="px-3 py-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200">
@@ -262,13 +261,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Transaksi Terakhir */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-700 mb-3 px-1">Transaksi Terakhir</h2>
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 px-1">Transaksi Terakhir</h2>
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
           {trxItems.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
           ) : (
             trxItems.map((trx, idx) => (
-              <div key={trx.id} className={`flex items-start gap-3 p-4 ${idx < trxItems.length - 1 ? 'border-b border-gray-50' : ''}`}>
+              <div key={trx.id} className={`flex items-start gap-3 p-4 ${idx < trxItems.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}>
                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'
                     ? <ArrowUpRight className="w-4 h-4 text-orange-500" />
@@ -276,7 +275,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 leading-snug">{trx.keterangan}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug">{trx.keterangan}</p>
                   <p className="text-xs text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
                   <p className="text-xs text-gray-400">
                     Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}

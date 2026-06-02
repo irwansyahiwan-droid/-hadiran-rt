@@ -32,39 +32,39 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div className="relative w-full max-w-lg mx-auto bg-white rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()}>
-        <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-2" />
+      <div className="relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-2" />
         <div>
-          <h3 className="text-base font-bold text-gray-900">Setor ke Kas Besar RT</h3>
+          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Setor ke Kas Besar RT</h3>
           <p className="text-xs text-gray-400 mt-0.5">
             Saldo hadiran: <span className="font-semibold text-emerald-600">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
         </div>
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Keterangan</label>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
             <input type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
               placeholder="Setoran bulan Mei 2026"
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Nominal</label>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                 <input type="number" value={nominal || ''} onChange={e => setNominal(Number(e.target.value))} required min={1}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal</label>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
               <input type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
-                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
             </div>
           </div>
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600">Batal</button>
+              className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300">Batal</button>
             <button type="submit" disabled={saving || !nominal}
               className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 disabled:opacity-60 active:scale-[0.98] transition-all">
               {saving ? 'Menyimpan...' : 'Setor'}
@@ -171,17 +171,18 @@ export default function KasHadiranPage() {
     load();
   }
 
+  const heroGradient = saldo < 0 ? 'from-slate-800 to-slate-700' : 'from-emerald-800 to-emerald-700';
+
   return (
     <>
       <div className="space-y-4 pb-2">
         {/* Header Card */}
-        <div className="relative rounded-3xl overflow-hidden shadow-xl"
-          style={{ background: 'linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)' }}>
+        <div className={`relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br ${heroGradient}`}>
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-5">
             <p className="text-emerald-200 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
-            <p className={`text-4xl font-black tracking-tight mb-1 ${saldo < 0 ? 'text-red-300' : 'text-white'}`}>
+            <p className="text-4xl font-black tracking-tight mb-1 text-white">
               {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
             </p>
             <p className="text-emerald-200 text-xs mb-4">{tarikanSelesai.length} tarikan terlaksana</p>
@@ -207,37 +208,37 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm p-4">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm p-4">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-bold text-gray-900">Alur Kas Hadiran</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span className="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
               {tarikanSelesai.length}
             </span>
           </div>
           <div className="space-y-2.5">
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
+            <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-2">
                 <span className="text-base">💰</span>
-                <span className="text-sm text-gray-700">Kas Hadiran Terkumpul</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Kas Hadiran Terkumpul</span>
               </div>
               <span className="text-sm font-semibold text-emerald-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
+            <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-2">
                 <span className="text-base">🔴</span>
-                <span className="text-sm text-gray-700">Talangan Belum Lunas</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Talangan Belum Lunas</span>
               </div>
               <span className="text-sm font-semibold text-red-500">-{formatRupiahPlain(totalTalanganBelum)}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
+            <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-2">
                 <span className="text-base">🔵</span>
-                <span className="text-sm text-gray-700">Setoran ke Kas Besar</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">Setoran ke Kas Besar</span>
               </div>
               <span className="text-sm font-semibold text-red-500">-{formatRupiahPlain(totalSetor)}</span>
             </div>
-            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-red-50' : 'bg-gray-50'}`}>
-              <p className="text-sm font-bold text-gray-900">Total Bersih Kas Hadiran</p>
+            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-red-50 dark:bg-red-950/30' : 'bg-gray-50 dark:bg-gray-700'}`}>
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Total Bersih Kas Hadiran</p>
               <span className={`text-base font-bold ${saldo < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                 {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
               </span>
@@ -248,7 +249,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <p className="text-sm font-bold text-gray-700 mb-3 px-1">🧾 Rekap Per Tarikan</p>
+            <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 px-1">🧾 Rekap Per Tarikan</p>
             <div className="space-y-3">
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -263,9 +264,9 @@ export default function KasHadiranPage() {
                   const pctHadir = Math.round((t.total_hadir / t.total_warga) * 100);
 
                   return (
-                    <div key={t.id} className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+                    <div key={t.id} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
                       {/* Header */}
-                      <div className="flex items-center justify-between p-4 border-b border-gray-50">
+                      <div className="flex items-center justify-between p-4 border-b border-gray-50 dark:border-gray-800">
                         <div>
                           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
                             Tarikan ke-{t.nomor}
@@ -273,19 +274,19 @@ export default function KasHadiranPage() {
                           <p className="text-xs text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-base font-black text-gray-900">{formatRupiahPlain(iuranHadir)}</p>
+                          <p className="text-base font-black text-gray-900 dark:text-gray-100">{formatRupiahPlain(iuranHadir)}</p>
                           <p className="text-xs text-gray-400">{t.total_hadir}/{t.total_warga} hadir</p>
                         </div>
                       </div>
 
                       {/* Sohibul Bait */}
-                      <div className="flex items-center gap-3 p-4 border-b border-gray-50">
+                      <div className="flex items-center gap-3 p-4 border-b border-gray-50 dark:border-gray-800">
                         <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0 text-sm font-bold text-emerald-700">
                           {t.sohibul_bait?.nama?.charAt(0) ?? '?'}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{t.sohibul_bait?.nama ?? '—'}</p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{t.sohibul_bait?.nama ?? '—'}</p>
                             <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200 shrink-0">
                               SOHIBUL BAIT
                             </span>
@@ -313,7 +314,7 @@ export default function KasHadiranPage() {
                       <div className="px-4 pb-3">
                         <div className="flex items-center justify-between text-xs mb-1.5">
                           <span className="text-gray-500">
-                            Kas <span className="font-semibold text-gray-700">{formatRupiahPlain(kasHadiran)}</span>
+                            Kas <span className="font-semibold text-gray-700 dark:text-gray-300">{formatRupiahPlain(kasHadiran)}</span>
                           </span>
                           <span className="text-gray-500">
                             Sisa{' '}
@@ -322,7 +323,7 @@ export default function KasHadiranPage() {
                             </span>
                           </span>
                         </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                           <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pctHadir}%` }} />
                         </div>
                         <p className="text-[10px] text-gray-400 mt-1 text-right">{pctHadir}% hadir</p>

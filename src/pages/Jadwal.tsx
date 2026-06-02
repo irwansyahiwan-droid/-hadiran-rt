@@ -139,11 +139,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
     <div className="space-y-3 pb-20">
       {/* Back header */}
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+        <button onClick={onBack} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
         <div>
-          <p className="text-base font-bold text-gray-900">
+          <p className="text-base font-bold text-gray-900 dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
           </p>
           <p className="text-xs text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
@@ -158,7 +158,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
           { label: 'Kas', value: `Rp${(kasTotal / 1000).toFixed(0)}k`, color: 'text-blue-600' },
           { label: 'Talangan', value: `Rp${(talanganTotal / 1000).toFixed(0)}k`, color: 'text-amber-600' },
         ].map(s => (
-          <div key={s.label} className="bg-white/70 rounded-2xl border border-white shadow-sm p-2.5 text-center">
+          <div key={s.label} className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-2.5 text-center">
             <p className={`text-base font-black ${s.color}`}>{s.value}</p>
             <p className="text-[9px] text-gray-400 mt-0.5">{s.label}</p>
           </div>
@@ -167,7 +167,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
 
       {/* Title + count */}
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-gray-700">Daftar Hadir</p>
+        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir</p>
         <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
           {wargaList.length}
         </span>
@@ -191,7 +191,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
         </button>
         <button
           onClick={() => setAll('tidak_hadir')}
-          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset
@@ -207,7 +207,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
             className={`py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               filter === f
                 ? 'bg-emerald-500 text-white border-emerald-500'
-                : 'bg-white text-gray-500 border-gray-200'
+                : 'bg-white dark:bg-gray-900 text-gray-500 border-gray-200 dark:border-gray-700'
             }`}
           >
             {f === 'semua' ? 'Semua' : f === 'hadir' ? 'Sudah Hadir' : 'Belum Hadir'}
@@ -222,7 +222,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama..."
-          className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white border border-gray-200 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -232,7 +232,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
       </div>
 
       {/* Warga list */}
-      <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
         {filtered.map((w, idx) => {
           const isHadir = map[w.id] === 'hadir';
           return (
@@ -240,7 +240,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
               key={w.id}
               onClick={() => toggle(w.id)}
               className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
-                idx < filtered.length - 1 ? 'border-b border-gray-50' : ''
+                idx < filtered.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''
               } ${isHadir ? 'hover:bg-emerald-50/50' : 'hover:bg-red-50/30'}`}
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
@@ -249,13 +249,13 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
                 {w.nama.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">{w.nama}</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
                 <p className={`text-xs ${isHadir ? 'text-emerald-600' : 'text-red-400'}`}>
                   {isHadir ? 'Hadir' : 'Tidak hadir → Talangan'}
                 </p>
               </div>
               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                isHadir ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300'
+                isHadir ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 dark:border-gray-600'
               }`}>
                 {isHadir && <CheckCircle2 className="w-4 h-4 text-white" />}
               </div>
@@ -330,11 +330,11 @@ export default function JadwalPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-gray-900">Jadwal Tarikan</h1>
+          <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Jadwal Tarikan</h1>
           <p className="text-xs text-gray-400 mt-0.5">{selesaiCount} selesai · {dijadwalCount} terjadwal</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+          <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
@@ -342,16 +342,16 @@ export default function JadwalPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white/70 rounded-2xl border border-white shadow-sm p-3 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-3 text-center">
           <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
         </div>
-        <div className="bg-white/70 rounded-2xl border border-white shadow-sm p-3 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-3 text-center">
           <p className="text-xl font-black text-emerald-600">{dijadwalCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
         </div>
-        <div className="bg-white/70 rounded-2xl border border-white shadow-sm p-3 text-center">
-          <p className="text-xl font-black text-gray-900">{tarikanList.length}</p>
+        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-3 text-center">
+          <p className="text-xl font-black text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
           <p className="text-[10px] text-gray-400 font-medium">Total</p>
         </div>
       </div>
@@ -367,7 +367,7 @@ export default function JadwalPage() {
           <p className="text-sm text-gray-400">Belum ada jadwal</p>
         </div>
       ) : (
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
           {tarikanList.map((t, idx) => {
             const isLast    = idx === tarikanList.length - 1;
             const isSelesai = t.status === 'selesai';
@@ -376,18 +376,18 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50' : ''}`}
+                className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
               >
                 {/* Nomor badge */}
                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-black text-sm ${
-                  isSelesai ? 'bg-gray-100 text-gray-400' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
+                  isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
                 }`}>
                   {t.nomor}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold truncate ${isSelesai ? 'text-gray-500' : 'text-gray-900'}`}>
+                  <p className={`text-sm font-semibold truncate ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
                     {t.sohibul_bait?.nama ?? '—'}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">{formatTanggal(t.tanggal)}</p>
@@ -397,7 +397,7 @@ export default function JadwalPage() {
                 {isBendahara && isSelesai ? (
                   <button
                     onClick={() => setSelectedTarikan(t)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-100 text-gray-600 text-[10px] font-semibold hover:bg-gray-200 transition-colors shrink-0"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shrink-0"
                   >
                     <RefreshCw className="w-3 h-3" />
                     Hitung Ulang
@@ -413,7 +413,7 @@ export default function JadwalPage() {
                 ) : (
                   <span className={`px-2.5 py-1 text-[10px] font-semibold rounded-full border shrink-0 ${
                     isSelesai
-                      ? 'text-gray-400 bg-gray-50 border-gray-200'
+                      ? 'text-gray-400 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                       : 'text-emerald-700 bg-emerald-50 border-emerald-200'
                   }`}>
                     {isSelesai ? 'Selesai' : 'Terjadwal'}
