@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { LOGO_DATA_URL } from './logoBase64';
 import type { KasRT } from './types';
 
 interface KasRTStats {
@@ -28,13 +29,8 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   doc.setFillColor(6, 78, 59);
   doc.rect(0, 0, W, 36, 'F');
 
-  // Badge "46"
-  doc.setFillColor(251, 191, 36);
-  doc.roundedRect(M, 7, 14, 14, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text('46', M + 7, 16, { align: 'center' });
+  // Logo RT
+  doc.addImage(LOGO_DATA_URL, 'JPEG', M, 6, 15, 15);
 
   // RT name
   doc.setFontSize(11);
