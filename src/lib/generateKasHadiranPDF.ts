@@ -117,7 +117,7 @@ export function generateKasHadiranPDF(
   });
 
   // ── Ringkasan ─────────────────────────────────────────────
-  const afterY: number = (doc as any).lastAutoTable.finalY + 8;
+  const afterY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
   const sumX = W - M - 75; const sumW = 75;
 
   doc.setDrawColor(229, 231, 235); doc.setLineWidth(0.3);

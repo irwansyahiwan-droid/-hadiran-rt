@@ -11,6 +11,7 @@ interface AuthContextValue extends AuthState {
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuthContext() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuthContext must be used inside AuthProvider');

@@ -67,17 +67,20 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     ]);
 
     // Merge setor + talangan lunas → sort tanggal DESC → limit 20
-    const setorItems = (setorRes.data ?? []).map((t: any) => ({
+    type SetorRow = { id: string; keterangan: string; tanggal: string; nominal: number };
+    type TalanganLunasRow = { id: string; nominal: number; tanggal_lunas: string | null; warga: { nama: string } | null; tarikan: { nomor: number } | null };
+
+    const setorItems = (setorRes.data as SetorRow[] ?? []).map(t => ({
       id: t.id,
       tipe: 'setor' as const,
-      keterangan: t.keterangan as string,
-      tanggal: t.tanggal as string,
-      nominal: -(t.nominal as number),
+      keterangan: t.keterangan,
+      tanggal: t.tanggal,
+      nominal: -t.nominal,
     }));
 
-    const talanganItems = (talanganLunasRes.data ?? [])
-      .filter((t: any) => t.tanggal_lunas)
-      .map((t: any) => ({
+    const talanganItems = (talanganLunasRes.data as unknown as TalanganLunasRow[] ?? [])
+      .filter(t => t.tanggal_lunas)
+      .map(t => ({
         id: t.id,
         tipe: 'talangan_lunas' as const,
         keterangan: `Talangan lunas oleh ${t.warga?.nama ?? '-'} — Tarikan #${t.tarikan?.nomor ?? '-'}`,

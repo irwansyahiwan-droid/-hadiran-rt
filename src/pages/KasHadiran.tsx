@@ -132,8 +132,11 @@ export default function KasHadiranPage() {
       supabase.from('talangan').select('warga_id').eq('tarikan_id', tarikan.id).eq('status_lunas', true),
     ]);
     const absensiMap: Record<string, 'hadir' | 'tidak_hadir'> = {};
-    (absensiRes.data ?? []).forEach((a: any) => { absensiMap[a.warga_id] = a.status; });
-    const lunasSet = new Set((talanganRes.data ?? []).map((t: any) => t.warga_id as string));
+    (absensiRes.data as { warga_id: string; status: 'hadir' | 'tidak_hadir' }[] ?? [])
+      .forEach(a => { absensiMap[a.warga_id] = a.status; });
+    const lunasSet = new Set(
+      (talanganRes.data as { warga_id: string }[] ?? []).map(t => t.warga_id),
+    );
     generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
     setPdfLoading(null);
   }

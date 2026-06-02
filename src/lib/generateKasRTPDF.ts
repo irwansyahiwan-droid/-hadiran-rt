@@ -158,7 +158,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   });
 
   // ── Ringkasan ────────────────────────────────────────────────
-  const afterTableY: number = (doc as any).lastAutoTable.finalY + 8;
+  const afterTableY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
   const sumX = W - M - 72;
   const sumW = 72;
 

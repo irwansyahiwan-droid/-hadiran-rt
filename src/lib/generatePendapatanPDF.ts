@@ -140,7 +140,7 @@ export function generatePendapatanPDF(
   });
 
   // ── Footer: Rincian Pendapatan Sohibul Bait ───────────────
-  const afterY: number = (doc as any).lastAutoTable.finalY + 8;
+  const afterY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
   const footW = 85; const footX = W - M - footW;
 
   doc.setFillColor(249, 250, 251);
