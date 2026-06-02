@@ -159,25 +159,25 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               onClick={() => onNavigate('kas')}
               className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
             >
-              <p className="text-emerald-100 text-[9px] font-semibold uppercase tracking-wide mb-1">Saldo Aktif</p>
-              <p className={`text-sm font-bold ${saldo < 0 ? 'text-red-300' : 'text-white'}`}>
-                {saldo < 0 ? '-' : '+'}Rp{Math.abs(saldo).toLocaleString('id-ID')}
+              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-1">Saldo Aktif</p>
+              <p className="text-sm font-bold text-white">
+                Rp{Math.abs(saldo).toLocaleString('id-ID')}
               </p>
             </button>
             <button
               onClick={() => onNavigate('talangan')}
               className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
             >
-              <p className="text-emerald-100 text-[9px] font-semibold uppercase tracking-wide mb-1">Talangan</p>
-              <p className="text-sm font-bold text-amber-300">
-                -{formatRupiahPlain(talangan)}
+              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-1">Talangan</p>
+              <p className="text-sm font-bold text-white">
+                {formatRupiahPlain(talangan)}
               </p>
             </button>
             <button
               onClick={() => onNavigate('kas-rt')}
               className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
             >
-              <p className="text-emerald-100 text-[9px] font-semibold uppercase tracking-wide mb-1">Setor Kas RT</p>
+              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-1">Setor Kas RT</p>
               <p className="text-sm font-bold text-white">
                 -{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}
               </p>

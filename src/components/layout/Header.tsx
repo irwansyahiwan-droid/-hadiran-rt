@@ -17,10 +17,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
       <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
           <img src={logoRT} alt="Logo RT 004/006" className="h-9 w-9 object-contain rounded-full shadow-sm" />
-          <div>
-            <h1 className="font-bold text-gray-900 dark:text-gray-100 text-base leading-tight">Hadiran RT</h1>
-            <p className="text-xs text-gray-400">Manajemen Kas & Iuran</p>
-          </div>
+          <h1 className="font-bold text-gray-900 dark:text-gray-100 text-base">Hadiran RT</h1>
         </div>
         <div className="flex items-center gap-2">
           <div className={`px-3 py-1.5 rounded-full border ${

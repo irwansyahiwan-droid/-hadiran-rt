@@ -254,7 +254,7 @@ export default function KasRTPage() {
                   <TrendingDown className="w-3.5 h-3.5 text-red-300" />
                   <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Keluar</p>
                 </div>
-                <p className="text-sm font-bold text-red-300">-{formatRupiahPlain(totalKeluar)}</p>
+                <p className="text-sm font-bold text-white">-{formatRupiahPlain(totalKeluar)}</p>
               </div>
             </div>
           </div>

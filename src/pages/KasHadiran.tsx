@@ -200,7 +200,7 @@ export default function KasHadiranPage() {
                   className="flex-1 flex items-center justify-center gap-1.5 bg-white rounded-xl py-2.5 text-emerald-700 text-xs font-semibold hover:bg-emerald-50 transition-all shadow-md"
                 >
                   <ArrowUpRight className="w-3.5 h-3.5" />
-                  Setor ke Kas Besar
+                  Setor Kas RT
                 </button>
               )}
             </div>

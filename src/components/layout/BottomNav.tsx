@@ -20,7 +20,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
   const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-t border-gray-100 safe-area-pb dark:bg-gray-900/90 dark:border-gray-800">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 safe-area-pb dark:bg-gray-900 dark:border-gray-800">
       <div className="max-w-lg mx-auto flex items-center justify-around px-1 py-2">
         {visibleTabs.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
