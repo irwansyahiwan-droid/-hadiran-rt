@@ -34,10 +34,11 @@ export default function Header({ role, onLogout }: HeaderProps) {
           </div>
           <button
             onClick={onLogout}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors border border-gray-200"
             title="Keluar"
           >
-            <LogOut className="w-5 h-5 text-gray-500" />
+            <LogOut className="w-3.5 h-3.5" />
+            Keluar
           </button>
         </div>
       </div>

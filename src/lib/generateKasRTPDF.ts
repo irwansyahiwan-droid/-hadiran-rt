@@ -81,9 +81,10 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   const masukList     = sorted.filter(k => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT');
   const keluarList    = sorted.filter(k => k.tipe === 'keluar');
 
-  // Draw section banner — returns new Y position
-  const banner = (y: number, label: string, extra?: string): number => {
-    doc.setFillColor(6, 78, 59);
+  // Draw section banner (color: hijau gelap default, atau custom)
+  type RGB = [number, number, number];
+  const banner = (y: number, label: string, extra?: string, fill: RGB = [6, 78, 59]): number => {
+    doc.setFillColor(...fill);
     doc.rect(M, y, W - 2 * M, 8, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255, 255, 255);
     doc.text(label, M + 4, y + 5.5);
@@ -91,7 +92,8 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     return y + 8;
   };
 
-  const headStyles = { fillColor: [5, 95, 60] as [number,number,number], textColor: [255,255,255] as [number,number,number], fontStyle: 'bold' as const, fontSize: 7 };
+  const headGreen: object = { fillColor: [5, 95, 60],  textColor: [255,255,255], fontStyle: 'bold', fontSize: 7 };
+  const headRed:   object = { fillColor: [153, 27, 27], textColor: [255,255,255], fontStyle: 'bold', fontSize: 7 };
 
   // ── BAGIAN 1: SALDO AWAL ──────────────────────────────────────
   let Y = banner(cardY + cardH + 6, 'SALDO AWAL');
@@ -103,13 +105,13 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       String(i + 1), fmtDate(k.tanggal), k.keterangan, rp(k.nominal), rp(k.saldo_setelah),
     ]),
     margin: { left: M, right: M },
-    headStyles,
+    headStyles: headGreen,
     bodyStyles: { fontSize: 7.5, textColor: [31, 41, 55] },
     columnStyles: COL,
   });
   Y = getY(doc) + 5;
 
-  // ── BAGIAN 2: PEMASUKAN ───────────────────────────────────────
+  // ── BAGIAN 2: PEMASUKAN (hijau) ───────────────────────────────
   Y = banner(Y, 'PEMASUKAN', `+${rp(stats.totalMasuk)}`);
 
   autoTable(doc, {
@@ -119,7 +121,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       String(i + 1), fmtDate(k.tanggal), k.keterangan, `+${rp(k.nominal)}`, rp(k.saldo_setelah),
     ]),
     margin: { left: M, right: M },
-    headStyles,
+    headStyles: headGreen,
     bodyStyles: { fontSize: 7.5, textColor: [31, 41, 55] },
     alternateRowStyles: { fillColor: [240, 253, 244] },
     columnStyles: COL,
@@ -132,8 +134,8 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   });
   Y = getY(doc) + 5;
 
-  // ── BAGIAN 3: PENGELUARAN ─────────────────────────────────────
-  Y = banner(Y, 'PENGELUARAN', `-${rp(stats.totalKeluar)}`);
+  // ── BAGIAN 3: PENGELUARAN (merah) ─────────────────────────────
+  Y = banner(Y, 'PENGELUARAN', `-${rp(stats.totalKeluar)}`, [153, 27, 27]);
 
   autoTable(doc, {
     startY: Y,
@@ -142,7 +144,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       String(i + 1), fmtDate(k.tanggal), k.keterangan, `-${rp(k.nominal)}`, rp(k.saldo_setelah),
     ]),
     margin: { left: M, right: M },
-    headStyles,
+    headStyles: headRed,
     bodyStyles: { fontSize: 7.5, textColor: [31, 41, 55] },
     alternateRowStyles: { fillColor: [254, 242, 242] },
     columnStyles: COL,
