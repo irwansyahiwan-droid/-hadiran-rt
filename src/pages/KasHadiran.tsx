@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, ArrowUpRight, X, Building2 } from 'lucide-react';
+import { FileText, RefreshCw, ArrowUpRight, X, Building2, Users, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -81,6 +81,7 @@ export default function KasHadiranPage() {
   const [transaksi, setTransaksi] = useState<TransaksiKas[]>([]);
   const [tarikanSelesai, setTarikanSelesai] = useState<Tarikan[]>([]);
   const [totalTalanganBelum, setTotalTalanganBelum] = useState(0);
+  const [talanganMap, setTalanganMap] = useState<Record<string, { count: number; total: number }>>({});
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
@@ -92,13 +93,23 @@ export default function KasHadiranPage() {
         .from('tarikan')
         .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
         .eq('status', 'selesai')
-        .order('nomor', { ascending: false }),
-      supabase.from('talangan').select('nominal, status_lunas').eq('status_lunas', false),
+        .order('nomor', { ascending: true }),
+      supabase.from('talangan').select('tarikan_id, nominal').eq('status_lunas', false),
     ]);
     setTransaksi((txRes.data as TransaksiKas[]) ?? []);
     setTarikanSelesai((tarRes.data as Tarikan[]) ?? []);
-    const total = (talRes.data ?? []).reduce((s: number, t: { nominal: number }) => s + t.nominal, 0);
+
+    const talData = (talRes.data ?? []) as { tarikan_id: string; nominal: number }[];
+    const total = talData.reduce((s, t) => s + t.nominal, 0);
     setTotalTalanganBelum(total);
+
+    const map = talData.reduce<Record<string, { count: number; total: number }>>((acc, t) => {
+      if (!acc[t.tarikan_id]) acc[t.tarikan_id] = { count: 0, total: 0 };
+      acc[t.tarikan_id].count += 1;
+      acc[t.tarikan_id].total += t.nominal;
+      return acc;
+    }, {});
+    setTalanganMap(map);
     setLoading(false);
   }
 
@@ -212,7 +223,12 @@ export default function KasHadiranPage() {
                 </div>
               ) : (
                 tarikanSelesai.map(t => {
-                  const iuranHadir  = t.total_hadir * 50000;
+                  const iuranHadir = t.total_hadir * 50000;
+                  const kasHadiran = t.total_terkumpul ?? 0;
+                  const talanganInfo = talanganMap[t.id] ?? { count: 0, total: 0 };
+                  const sisaKas = kasHadiran - talanganInfo.total;
+                  const pctHadir = Math.round((t.total_hadir / t.total_warga) * 100);
+
                   return (
                     <div key={t.id} className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
                       {/* Header */}
@@ -230,12 +246,12 @@ export default function KasHadiranPage() {
                       </div>
 
                       {/* Sohibul Bait */}
-                      <div className="flex items-center gap-3 p-4">
+                      <div className="flex items-center gap-3 p-4 border-b border-gray-50">
                         <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0 text-sm font-bold text-emerald-700">
                           {t.sohibul_bait?.nama?.charAt(0) ?? '?'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <p className="text-sm font-semibold text-gray-900 truncate">{t.sohibul_bait?.nama ?? '—'}</p>
                             <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200 shrink-0">
                               SOHIBUL BAIT
@@ -245,6 +261,56 @@ export default function KasHadiranPage() {
                             Terima: <span className="font-semibold text-emerald-600">{formatRupiahPlain(iuranHadir)}</span>
                           </p>
                         </div>
+                      </div>
+
+                      {/* Talangan keluar (kuning) — hanya jika ada */}
+                      {talanganInfo.count > 0 && (
+                        <div className="mx-4 my-3 rounded-2xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-2.5">
+                          <span className="text-amber-500 text-base shrink-0">⚠️</span>
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-amber-800">Talangan Keluar</p>
+                            <p className="text-xs text-amber-600">
+                              {talanganInfo.count} anggota belum bayar · {formatRupiahPlain(talanganInfo.total)}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Stats + progress bar */}
+                      <div className="px-4 pb-3">
+                        <div className="flex items-center justify-between text-xs mb-1.5">
+                          <span className="text-gray-500">
+                            Kas <span className="font-semibold text-gray-700">{formatRupiahPlain(kasHadiran)}</span>
+                          </span>
+                          <span className="text-gray-500">
+                            Sisa{' '}
+                            <span className={`font-semibold ${sisaKas < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                              {sisaKas < 0 ? '-' : ''}Rp{Math.abs(sisaKas).toLocaleString('id-ID')}
+                            </span>
+                          </span>
+                        </div>
+                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pctHadir}%` }} />
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-1 text-right">{pctHadir}% hadir</p>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex gap-2 px-4 pb-4">
+                        <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
+                          <Users className="w-3.5 h-3.5" />
+                          Absensi
+                        </button>
+                        <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
+                          <FileText className="w-3.5 h-3.5" />
+                          Pendapatan
+                        </button>
+                        {isBendahara && (
+                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors">
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Hapus
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
