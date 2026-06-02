@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, Users, Zap, Calendar, FileText, Building2, TrendingUp, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { fetchDashboardSummary, formatRupiahPlain, formatTanggalShort } from '../lib/utils';
+import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 
