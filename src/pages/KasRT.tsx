@@ -156,9 +156,11 @@ export default function KasRTPage() {
 
   useEffect(() => { load(); }, []);
 
-  const totalMasuk  = list.filter((k) => k.tipe === 'masuk').reduce((s, k) => s + k.nominal, 0);
+  const saldoAwalEntry = list.find((k) => k.keterangan === 'Saldo Awal Kas RT');
+  const saldoAwal   = saldoAwalEntry?.nominal ?? 0;
+  const totalMasuk  = list.filter((k) => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT').reduce((s, k) => s + k.nominal, 0);
   const totalKeluar = list.filter((k) => k.tipe === 'keluar').reduce((s, k) => s + k.nominal, 0);
-  const saldo       = totalMasuk - totalKeluar;
+  const saldo       = saldoAwal + totalMasuk - totalKeluar;
 
   const today = new Date().toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
@@ -214,9 +216,25 @@ export default function KasRTPage() {
               <Landmark className="w-4 h-4 text-amber-200" />
               <p className="text-amber-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
             </div>
-            <p className="text-4xl font-black tracking-tight text-white mb-5">
+            <p className="text-4xl font-black tracking-tight text-white mb-4">
               Rp{saldo.toLocaleString('id-ID')}
             </p>
+
+            {/* Saldo Awal row */}
+            {saldoAwal > 0 && (
+              <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 border border-white/15 mb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-amber-200 text-sm">🏦</span>
+                  <p className="text-amber-100 text-[10px] font-semibold uppercase tracking-wide">Saldo Awal</p>
+                  {saldoAwalEntry && (
+                    <p className="text-amber-200/70 text-[10px]">
+                      · {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  )}
+                </div>
+                <p className="text-sm font-bold text-white">{formatRupiahPlain(saldoAwal)}</p>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-2">
               <div className="bg-white/15 rounded-2xl p-3 border border-white/20">
