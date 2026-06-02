@@ -43,8 +43,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         .from('tarikan')
         .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
         .eq('status', 'dijadwalkan')
-        .order('nomor', { ascending: true })
-        .limit(6),
+        .order('tanggal', { ascending: true })
+        .limit(5),
     ]);
 
     setSummary(summaryData);
@@ -249,7 +249,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">{j.sohibul_bait?.nama ?? '-'}</p>
-                  <p className="text-xs text-gray-400">{formatTanggalShort(j.tanggal)}</p>
+                  <p className="text-xs text-gray-400">{formatTanggal(j.tanggal)}</p>
                 </div>
                 <span className="px-3 py-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200">
                   Terjadwal
