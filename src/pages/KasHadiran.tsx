@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, ArrowUpRight, X, Building2, Users, Trash2 } from 'lucide-react';
+import { FileText, RefreshCw, ArrowUpRight, Users, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';

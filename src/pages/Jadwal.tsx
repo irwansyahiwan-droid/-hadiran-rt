@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, RefreshCw,
-  RotateCcw, Search, UserCheck, UserX, X,
+  RotateCcw, Search, UserCheck, X,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggal, formatRupiahPlain } from '../lib/utils';
+import { formatTanggal } from '../lib/utils';
 import type { Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;

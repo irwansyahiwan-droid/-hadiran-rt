@@ -23,7 +23,7 @@ interface BuatTarikanModalProps {
   onClose: () => void;
 }
 
-function BuatTarikanModal({ wargaList, nextNomor, currentSaldo, onSave, onClose }: BuatTarikanModalProps) {
+function BuatTarikanModal({ wargaList, nextNomor, onSave, onClose }: BuatTarikanModalProps) {
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [jumlahPerOrang, setJumlahPerOrang] = useState(50000);
   const [absenIds, setAbsenIds] = useState<Set<string>>(new Set());
