@@ -104,11 +104,9 @@ export default function KasHadiranPage() {
 
   useEffect(() => { load(); }, []);
 
-  const totalMasuk   = transaksi.filter(t => t.tipe === 'kas_masuk').reduce((s, t) => s + t.nominal, 0);
-  const totalTalMasuk = transaksi.filter(t => t.tipe === 'talangan_masuk').reduce((s, t) => s + t.nominal, 0);
-  const totalSetor   = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
-  const totalKasTerkumpul = totalMasuk + totalTalMasuk;
-  const saldo = totalKasTerkumpul - totalSetor;
+  const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
+  const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
+  const saldo = totalKasTerkumpul - totalTalanganBelum - totalSetor;
 
   async function handleSetor(data: { nominal: number; keterangan: string; tanggal: string }) {
     const saldoBaru = saldo - data.nominal;
