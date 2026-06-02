@@ -296,22 +296,22 @@ export default function KasHadiranPage() {
                       </div>
 
                       {/* Action buttons */}
-                      <div className="flex gap-2 px-4 pb-4">
-                        <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
-                          <Users className="w-3.5 h-3.5" />
-                          Absensi
-                        </button>
-                        <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
-                          <FileText className="w-3.5 h-3.5" />
-                          Pendapatan
-                        </button>
-                        {isBendahara && (
+                      {isBendahara && (
+                        <div className="flex gap-2 px-4 pb-4">
+                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
+                            <Users className="w-3.5 h-3.5" />
+                            Absensi
+                          </button>
+                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
+                            <FileText className="w-3.5 h-3.5" />
+                            Pendapatan
+                          </button>
                           <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors">
                             <Trash2 className="w-3.5 h-3.5" />
                             Hapus
                           </button>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })

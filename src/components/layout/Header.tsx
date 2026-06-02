@@ -10,8 +10,8 @@ export default function Header({ role, onLogout }: HeaderProps) {
   const isBendahara = role === 'bendahara';
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3">
-      <div className="flex items-center justify-between max-w-lg mx-auto">
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center font-bold text-white text-sm shadow-md">
             46
@@ -42,6 +42,13 @@ export default function Header({ role, onLogout }: HeaderProps) {
           </button>
         </div>
       </div>
+      {!isBendahara && (
+        <div className="border-t border-blue-100 bg-blue-50 py-1.5 px-4">
+          <p className="text-xs text-blue-600 text-center font-medium max-w-lg mx-auto">
+            👁 Mode Warga — hanya bisa melihat data
+          </p>
+        </div>
+      )}
     </header>
   );
 }

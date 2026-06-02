@@ -5,6 +5,7 @@ export type TabName = 'beranda' | 'jadwal' | 'talangan' | 'kas' | 'kas-rt';
 interface BottomNavProps {
   active: TabName;
   onChange: (tab: TabName) => void;
+  isWargaMode?: boolean;
 }
 
 const tabs: { id: TabName; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -15,11 +16,13 @@ const tabs: { id: TabName; label: string; icon: React.ComponentType<{ className?
   { id: 'kas-rt',   label: 'Kas RT',   icon: Landmark },
 ];
 
-export default function BottomNav({ active, onChange }: BottomNavProps) {
+export default function BottomNav({ active, onChange, isWargaMode }: BottomNavProps) {
+  const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-t border-gray-100 safe-area-pb">
       <div className="max-w-lg mx-auto flex items-center justify-around px-1 py-2">
-        {tabs.map(({ id, label, icon: Icon }) => {
+        {visibleTabs.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
             <button

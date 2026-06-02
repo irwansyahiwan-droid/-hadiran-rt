@@ -8,6 +8,7 @@ import BottomNav from './components/layout/BottomNav';
 import type { TabName } from './components/layout/BottomNav';
 import Beranda from './pages/Beranda';
 import JadwalPage from './pages/Jadwal';
+import JadwalWargaPage from './pages/JadwalWarga';
 import TalanganPage from './pages/Talangan';
 import KasHadiranPage from './pages/KasHadiran';
 import KasRTPage from './pages/KasRT';
@@ -15,6 +16,7 @@ import KasRTPage from './pages/KasRT';
 export default function App() {
   const auth = useAuth();
   const [activeTab, setActiveTab] = useState<TabName>('beranda');
+  const [wargaMode, setWargaMode] = useState(false);
 
   if (auth.loading) {
     return (
@@ -24,24 +26,39 @@ export default function App() {
     );
   }
 
-  if (!auth.user) {
-    return <Login onLogin={auth.signIn} />;
+  if (!auth.user && !wargaMode) {
+    return (
+      <Login
+        onLogin={auth.signIn}
+        onWargaMode={() => { setWargaMode(true); setActiveTab('beranda'); }}
+      />
+    );
   }
 
-  const ctxValue = { ...auth, isBendahara: auth.role === 'bendahara' };
+  const isWargaMode = wargaMode && !auth.user;
+
+  const ctxValue = {
+    ...auth,
+    isBendahara: auth.role === 'bendahara',
+    isWargaMode,
+    exitWargaMode: () => { setWargaMode(false); setActiveTab('beranda'); },
+  };
 
   return (
     <AuthContext.Provider value={ctxValue}>
       <div className="min-h-screen bg-gray-50">
-        <Header role={auth.role} onLogout={auth.signOut} />
+        <Header
+          role={isWargaMode ? 'warga' : auth.role}
+          onLogout={isWargaMode ? ctxValue.exitWargaMode : auth.signOut}
+        />
         <main className="max-w-lg mx-auto px-4 pt-4 pb-24">
           {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
-          {activeTab === 'jadwal'   && <JadwalPage />}
-          {activeTab === 'talangan' && <TalanganPage />}
+          {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
+          {activeTab === 'talangan' && !isWargaMode && <TalanganPage />}
           {activeTab === 'kas'      && <KasHadiranPage />}
           {activeTab === 'kas-rt'   && <KasRTPage />}
         </main>
-        <BottomNav active={activeTab} onChange={setActiveTab} />
+        <BottomNav active={activeTab} onChange={setActiveTab} isWargaMode={isWargaMode} />
       </div>
     </AuthContext.Provider>
   );

@@ -3,9 +3,10 @@ import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
+  onWargaMode: () => void;
 }
 
-export default function Login({ onLogin }: LoginProps) {
+export default function Login({ onLogin, onWargaMode }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -93,6 +94,14 @@ export default function Login({ onLogin }: LoginProps) {
             className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200 hover:from-emerald-600 hover:to-emerald-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
           >
             {loading ? 'Memproses...' : 'Masuk'}
+          </button>
+
+          <button
+            type="button"
+            onClick={onWargaMode}
+            className="w-full mt-2 py-3 rounded-xl border-2 border-blue-300 text-blue-700 font-semibold text-sm hover:bg-blue-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            👁 Mode Warga (tanpa password)
           </button>
         </form>
       </div>

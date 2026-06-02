@@ -5,6 +5,8 @@ interface AuthContextValue extends AuthState {
   signIn: (email: string, password: string) => Promise<string | null>;
   signOut: () => Promise<void>;
   isBendahara: boolean;
+  isWargaMode: boolean;
+  exitWargaMode: () => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
