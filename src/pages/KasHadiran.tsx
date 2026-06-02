@@ -125,6 +125,15 @@ export default function KasHadiranPage() {
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const saldo = totalKasTerkumpul - totalTalanganBelum - totalSetor;
 
+  // Setor per tarikan — untuk kolom SETOR di PDF
+  const setorMap = transaksi
+    .filter(t => t.tipe === 'setor_kas_rt' && t.tarikan_id)
+    .reduce<Record<string, number>>((acc, t) => {
+      const tid = t.tarikan_id!;
+      acc[tid] = (acc[tid] ?? 0) + t.nominal;
+      return acc;
+    }, {});
+
   async function handlePendapatanPDF(tarikan: Tarikan) {
     setPdfLoading(tarikan.id);
     const [absensiRes, talanganRes] = await Promise.all([
@@ -179,7 +188,7 @@ export default function KasHadiranPage() {
             <p className="text-emerald-200 text-xs mb-4">{tarikanSelesai.length} tarikan terlaksana</p>
             <div className="flex gap-2">
               <button
-                onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
+                onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
                 className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 border border-white/25 rounded-xl py-2.5 text-white text-xs font-semibold hover:bg-white/25 transition-all"
               >
                 <FileText className="w-3.5 h-3.5" />

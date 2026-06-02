@@ -1,4 +1,5 @@
 import { LogOut } from 'lucide-react';
+import logoRT from '../../assets/logo-rt.jpg';
 import type { Role } from '../../hooks/useAuth';
 
 interface HeaderProps {
@@ -13,9 +14,7 @@ export default function Header({ role, onLogout }: HeaderProps) {
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center font-bold text-white text-sm shadow-md">
-            46
-          </div>
+          <img src={logoRT} alt="Logo RT 004/006" className="h-9 w-9 object-contain rounded-full shadow-sm" />
           <div>
             <h1 className="font-bold text-gray-900 text-base leading-tight">Hadiran RT</h1>
             <p className="text-xs text-gray-400">Manajemen Kas & Iuran</p>

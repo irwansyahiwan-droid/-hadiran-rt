@@ -17,6 +17,7 @@ function rp(n: number) { return `Rp${n.toLocaleString('id-ID')}`; }
 export function generateKasHadiranPDF(
   tarikanList: Tarikan[],
   talanganMap: Record<string, TalanganInfo>,
+  setorMap: Record<string, number>,
   stats: Stats,
 ) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -65,10 +66,17 @@ export function generateKasHadiranPDF(
   // ── Table ─────────────────────────────────────────────────
   const sorted = [...tarikanList].sort((a, b) => a.nomor - b.nomor);
 
+  // Totals untuk baris TOTAL
+  const totalKas  = sorted.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
+  const totalTal  = Object.values(talanganMap).reduce((s, v) => s + v.total, 0);
+  const totalSetor = Object.values(setorMap).reduce((s, v) => s + v, 0);
+  const totalNet  = totalKas - totalTal - totalSetor;
+
   const rows = sorted.map((t, i) => {
     const tal = talanganMap[t.id] ?? { count: 0, total: 0 };
     const kasIn = t.total_terkumpul ?? 0;
-    const net   = kasIn - tal.total;
+    const setor = setorMap[t.id] ?? 0;
+    const net   = kasIn - tal.total - setor;
     return [
       String(i + 1),
       `#${t.nomor} · ${new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}`,
@@ -76,7 +84,7 @@ export function generateKasHadiranPDF(
       `${t.total_hadir}/${t.total_warga}`,
       rp(kasIn),
       tal.total > 0 ? `-${rp(tal.total)}` : 'Rp0',
-      'Rp0',
+      setor > 0 ? `-${rp(setor)}` : 'Rp0',
       net < 0 ? `-${rp(Math.abs(net))}` : rp(net),
     ];
   });
@@ -85,10 +93,19 @@ export function generateKasHadiranPDF(
     startY: cardY + cardH + 6,
     head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'HADIR', 'KAS MASUK', 'TALANGAN', 'SETOR', 'NET KAS']],
     body: rows,
+    foot: [[
+      'TOTAL', '', '', '',
+      rp(totalKas),
+      totalTal > 0 ? `-${rp(totalTal)}` : 'Rp0',
+      totalSetor > 0 ? `-${rp(totalSetor)}` : 'Rp0',
+      totalNet < 0 ? `-${rp(Math.abs(totalNet))}` : rp(totalNet),
+    ]],
+    showFoot: 'lastPage',
     margin: { left: M, right: M },
     headStyles: { fillColor: [6, 78, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7 },
     bodyStyles: { fontSize: 7.5, textColor: [31, 41, 55] },
     alternateRowStyles: { fillColor: [249, 250, 251] },
+    footStyles: { fillColor: [17, 24, 39], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.5 },
     columnStyles: {
       0: { cellWidth: 8,  halign: 'center' },
       1: { cellWidth: 30 },
@@ -100,16 +117,31 @@ export function generateKasHadiranPDF(
       7: { cellWidth: 22, halign: 'right' },
     },
     didParseCell(data) {
+      if (data.section === 'foot') {
+        // Warnai kolom numerik di baris TOTAL
+        if (data.column.index === 5 && totalTal > 0) data.cell.styles.textColor = [252, 165, 165];
+        if (data.column.index === 6 && totalSetor > 0) data.cell.styles.textColor = [253, 186, 116];
+        if (data.column.index === 7) {
+          data.cell.styles.textColor = totalNet < 0 ? [252, 165, 165] : [134, 239, 172];
+          data.cell.styles.fontSize = 8;
+        }
+        return;
+      }
       if (data.section !== 'body') return;
       const row = sorted[data.row.index];
       if (!row) return;
       const tal = talanganMap[row.id] ?? { count: 0, total: 0 };
+      const setor = setorMap[row.id] ?? 0;
       if (data.column.index === 5 && tal.total > 0) {
         data.cell.styles.textColor = [185, 28, 28];
         data.cell.styles.fontStyle = 'bold';
       }
+      if (data.column.index === 6 && setor > 0) {
+        data.cell.styles.textColor = [120, 53, 15];
+        data.cell.styles.fontStyle = 'bold';
+      }
       if (data.column.index === 7) {
-        const net = (row.total_terkumpul ?? 0) - tal.total;
+        const net = (row.total_terkumpul ?? 0) - tal.total - setor;
         data.cell.styles.textColor = net < 0 ? [185, 28, 28] : [5, 150, 105];
         data.cell.styles.fontStyle = 'bold';
       }
