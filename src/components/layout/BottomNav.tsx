@@ -1,6 +1,6 @@
-import { Home, Calendar, ClipboardList, ArrowLeftRight, Wallet, Landmark, Users } from 'lucide-react';
+import { Home, Calendar, ArrowLeftRight, Wallet, Landmark } from 'lucide-react';
 
-export type TabName = 'beranda' | 'jadwal' | 'absensi' | 'talangan' | 'kas' | 'kas-rt' | 'warga';
+export type TabName = 'beranda' | 'jadwal' | 'talangan' | 'kas' | 'kas-rt';
 
 interface BottomNavProps {
   active: TabName;
@@ -8,13 +8,11 @@ interface BottomNavProps {
 }
 
 const tabs: { id: TabName; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: 'beranda', label: 'Beranda', icon: Home },
-  { id: 'jadwal', label: 'Jadwal', icon: Calendar },
-  { id: 'absensi', label: 'Absensi', icon: ClipboardList },
+  { id: 'beranda',  label: 'Beranda',  icon: Home },
+  { id: 'jadwal',   label: 'Jadwal',   icon: Calendar },
   { id: 'talangan', label: 'Talangan', icon: ArrowLeftRight },
-  { id: 'kas', label: 'Kas', icon: Wallet },
-  { id: 'kas-rt', label: 'Kas RT', icon: Landmark },
-  { id: 'warga', label: 'Anggota', icon: Users },
+  { id: 'kas',      label: 'Kas',      icon: Wallet },
+  { id: 'kas-rt',   label: 'Kas RT',   icon: Landmark },
 ];
 
 export default function BottomNav({ active, onChange }: BottomNavProps) {
@@ -27,13 +25,11 @@ export default function BottomNav({ active, onChange }: BottomNavProps) {
             <button
               key={id}
               onClick={() => onChange(id)}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all duration-200 ${
+              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all duration-200 ${
                 isActive ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              <div className={`relative p-1.5 rounded-xl transition-all duration-200 ${
-                isActive ? 'bg-emerald-100' : ''
-              }`}>
+              <div className={`relative p-1.5 rounded-xl transition-all duration-200 ${isActive ? 'bg-emerald-100' : ''}`}>
                 <Icon className={`w-[18px] h-[18px] transition-all ${isActive ? 'scale-110' : ''}`} />
                 {isActive && (
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-emerald-500 rounded-full" />

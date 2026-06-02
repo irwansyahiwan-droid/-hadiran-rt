@@ -96,7 +96,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </span>
           </div>
           <p className="text-emerald-200 text-xs mb-5">
-            {summary?.jumlah_tarikan ?? 0} tarikan terlaksana
+            Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
           </p>
 
           {/* Sub Cards Row */}
@@ -154,8 +154,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
-        <StatCard label="Jumlah Anggota" value={summary?.jumlah_anggota ?? 0} icon={Users} color="bg-blue-500" />
-        <StatCard label="Tarikan Selesai" value={summary?.jumlah_tarikan ?? 0} icon={Zap} color="bg-emerald-500" />
+        <StatCard label="Anggota" value={summary?.jumlah_anggota ?? 0} icon={Users} color="bg-blue-500" />
+        <StatCard label="Tarikan" value={summary?.jumlah_tarikan ?? 0} icon={Zap} color="bg-emerald-500" />
         <StatCard label="Terjadwal" value={summary?.jumlah_dijadwalkan ?? 0} icon={Calendar} color="bg-amber-500" />
       </div>
 
@@ -243,12 +243,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           ) : (
             jadwalList.map((j, idx) => (
               <div key={j.id} className={`flex items-center gap-3 p-4 ${idx < jadwalList.length - 1 ? 'border-b border-gray-50' : ''}`}>
-                <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg">👤</span>
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-200">
+                  <span className="text-white text-sm font-black">{j.nomor}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">{j.sohibul_bait?.nama ?? '-'}</p>
-                  <p className="text-xs text-gray-400">{formatTanggalShort(j.tanggal)} · Tarikan #{j.nomor}</p>
+                  <p className="text-xs text-gray-400">{formatTanggalShort(j.tanggal)}</p>
                 </div>
                 <span className="px-3 py-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200">
                   Terjadwal

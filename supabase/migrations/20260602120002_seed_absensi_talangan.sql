@@ -6,7 +6,7 @@
 -- Hadir (57 orang)
 INSERT INTO absensi (tarikan_id, warga_id, status)
 SELECT
-  (SELECT id FROM tarikan WHERE nomor = 5),
+  (SELECT id FROM tarikan WHERE nomor = 5 LIMIT 1),
   w.id,
   'hadir'
 FROM warga w
@@ -31,7 +31,7 @@ WHERE w.nama IN (
 -- Tidak hadir (12 orang)
 INSERT INTO absensi (tarikan_id, warga_id, status)
 SELECT
-  (SELECT id FROM tarikan WHERE nomor = 5),
+  (SELECT id FROM tarikan WHERE nomor = 5 LIMIT 1),
   w.id,
   'tidak_hadir'
 FROM warga w
@@ -48,7 +48,7 @@ WHERE w.nama IN (
 INSERT INTO talangan (warga_id, tarikan_id, nominal, status_lunas)
 SELECT
   w.id,
-  (SELECT id FROM tarikan WHERE nomor = 5),
+  (SELECT id FROM tarikan WHERE nomor = 5 LIMIT 1),
   50000,
   false
 FROM warga w

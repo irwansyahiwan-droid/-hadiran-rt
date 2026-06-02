@@ -8,11 +8,9 @@ import BottomNav from './components/layout/BottomNav';
 import type { TabName } from './components/layout/BottomNav';
 import Beranda from './pages/Beranda';
 import JadwalPage from './pages/Jadwal';
-import AbsensiPage from './pages/Absensi';
 import TalanganPage from './pages/Talangan';
 import KasHadiranPage from './pages/KasHadiran';
 import KasRTPage from './pages/KasRT';
-import WargaPage from './pages/Warga';
 
 export default function App() {
   const auth = useAuth();
@@ -37,15 +35,11 @@ export default function App() {
       <div className="min-h-screen bg-gray-50">
         <Header role={auth.role} onLogout={auth.signOut} />
         <main className="max-w-lg mx-auto px-4 pt-4 pb-24">
-          {activeTab === 'beranda' && (
-            <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />
-          )}
-          {activeTab === 'jadwal' && <JadwalPage />}
-          {activeTab === 'absensi' && <AbsensiPage />}
+          {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
+          {activeTab === 'jadwal'   && <JadwalPage />}
           {activeTab === 'talangan' && <TalanganPage />}
-          {activeTab === 'kas' && <KasHadiranPage />}
-          {activeTab === 'kas-rt' && <KasRTPage />}
-          {activeTab === 'warga' && <WargaPage />}
+          {activeTab === 'kas'      && <KasHadiranPage />}
+          {activeTab === 'kas-rt'   && <KasRTPage />}
         </main>
         <BottomNav active={activeTab} onChange={setActiveTab} />
       </div>

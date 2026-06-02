@@ -1,135 +1,71 @@
 import { useEffect, useState } from 'react';
-import {
-  RefreshCw, Plus, TrendingUp, TrendingDown, ArrowUpRight,
-  ArrowDownLeft, Building2, Wallet,
-} from 'lucide-react';
+import { FileText, RefreshCw, ArrowUpRight, X, Building2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
-import type { TransaksiKas } from '../lib/types';
+import type { Tarikan, TransaksiKas } from '../lib/types';
 
-type TipeFilter = 'semua' | 'kas_masuk' | 'talangan_masuk' | 'kas_keluar' | 'setor_kas_rt';
+// ── Setor Modal ────────────────────────────────────────────
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
-const TIPE_META: Record<string, { label: string; color: string; bg: string; sign: 1 | -1 }> = {
-  kas_masuk:      { label: 'Kas Masuk',     color: 'text-emerald-600', bg: 'bg-emerald-100', sign: 1 },
-  talangan_masuk: { label: 'Talangan Masuk', color: 'text-blue-600',   bg: 'bg-blue-100',    sign: 1 },
-  kas_keluar:     { label: 'Kas Keluar',    color: 'text-red-500',    bg: 'bg-red-100',     sign: -1 },
-  setor_kas_rt:   { label: 'Setor Kas RT',  color: 'text-amber-600',  bg: 'bg-amber-100',   sign: -1 },
-  talangan_keluar:{ label: 'Talangan Keluar', color: 'text-red-500',  bg: 'bg-red-100',     sign: -1 },
-};
-
-function TipeIcon({ tipe }: { tipe: string }) {
-  const icons: Record<string, React.ReactNode> = {
-    kas_masuk:       <ArrowDownLeft className="w-4 h-4" />,
-    talangan_masuk:  <ArrowDownLeft className="w-4 h-4" />,
-    kas_keluar:      <ArrowUpRight  className="w-4 h-4" />,
-    setor_kas_rt:    <Building2     className="w-4 h-4" />,
-    talangan_keluar: <ArrowUpRight  className="w-4 h-4" />,
-  };
-  return <>{icons[tipe] ?? <Wallet className="w-4 h-4" />}</>;
-}
-
-// ── Add Kas Keluar Modal ────────────────────────────────────────────────────────
-
-interface ModalProps {
-  currentSaldo: number;
-  onSave: (data: { keterangan: string; nominal: number; tanggal: string }) => Promise<void>;
+interface SetorModalProps {
+  saldoHadiran: number;
+  onSave: (data: { nominal: number; keterangan: string; tanggal: string }) => Promise<void>;
   onClose: () => void;
 }
 
-function KasKeluarModal({ currentSaldo, onSave, onClose }: ModalProps) {
-  const [keterangan, setKeterangan] = useState('');
+function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   const [nominal, setNominal] = useState(0);
+  const [keterangan, setKeterangan] = useState('');
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!nominal) return;
     setSaving(true);
-    await onSave({ keterangan, nominal, tanggal });
+    await onSave({ nominal, keterangan, tanggal });
     setSaving(false);
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div
-        className="relative w-full max-w-lg mx-auto bg-white rounded-t-3xl p-5 pb-8 space-y-4"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative w-full max-w-lg mx-auto bg-white rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-2" />
         <div>
-          <h3 className="text-base font-bold text-gray-900">Tambah Kas Keluar</h3>
+          <h3 className="text-base font-bold text-gray-900">Setor ke Kas Besar RT</h3>
           <p className="text-xs text-gray-400 mt-0.5">
-            Saldo saat ini: <span className="font-semibold text-emerald-600">{formatRupiahPlain(currentSaldo)}</span>
+            Saldo hadiran: <span className="font-semibold text-emerald-600">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={submit} className="space-y-3">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1.5">Keterangan</label>
-            <input
-              type="text"
-              value={keterangan}
-              onChange={(e) => setKeterangan(e.target.value)}
-              placeholder="Contoh: Beli snack, konsumsi hadiran"
-              required
-              className="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-            />
+            <input type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
+              placeholder="Setoran bulan Mei 2026"
+              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
           </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Nominal</label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">Rp</span>
-              <input
-                type="number"
-                value={nominal || ''}
-                onChange={(e) => setNominal(Number(e.target.value))}
-                placeholder="0"
-                required
-                min={1}
-                className="w-full pl-9 pr-3 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-              />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Nominal</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
+                <input type="number" value={nominal || ''} onChange={e => setNominal(Number(e.target.value))} required min={1}
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal</label>
+              <input type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
+                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" />
             </div>
           </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal</label>
-            <input
-              type="date"
-              value={tanggal}
-              onChange={(e) => setTanggal(e.target.value)}
-              required
-              className="w-full px-3 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-            />
-          </div>
-
-          {nominal > 0 && (
-            <div className="bg-red-50 border border-red-100 rounded-2xl px-4 py-3">
-              <p className="text-xs text-red-600">
-                Saldo setelah transaksi:{' '}
-                <span className="font-bold">{formatRupiahPlain(Math.max(0, currentSaldo - nominal))}</span>
-              </p>
-            </div>
-          )}
-
           <div className="flex gap-3 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex-1 py-3 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 active:scale-[0.98] transition-all disabled:opacity-60"
-            >
-              {saving ? 'Menyimpan...' : 'Catat Pengeluaran'}
+            <button type="button" onClick={onClose}
+              className="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600">Batal</button>
+            <button type="submit" disabled={saving || !nominal}
+              className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 disabled:opacity-60 active:scale-[0.98] transition-all">
+              {saving ? 'Menyimpan...' : 'Setor'}
             </button>
           </div>
         </form>
@@ -138,66 +74,60 @@ function KasKeluarModal({ currentSaldo, onSave, onClose }: ModalProps) {
   );
 }
 
-// ── Main Page ──────────────────────────────────────────────────────────────────
+// ── Main Page ────────────────────────────────────────────────
 
 export default function KasHadiranPage() {
   const { isBendahara } = useAuthContext();
-  const [list, setList] = useState<TransaksiKas[]>([]);
-  const [filter, setFilter] = useState<TipeFilter>('semua');
+  const [transaksi, setTransaksi] = useState<TransaksiKas[]>([]);
+  const [tarikanSelesai, setTarikanSelesai] = useState<Tarikan[]>([]);
+  const [totalTalanganBelum, setTotalTalanganBelum] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase
-      .from('transaksi_kas')
-      .select('*, warga(*), tarikan(*)')
-      .order('tanggal', { ascending: false })
-      .order('created_at', { ascending: false });
-    setList((data as TransaksiKas[]) ?? []);
+    const [txRes, tarRes, talRes] = await Promise.all([
+      supabase.from('transaksi_kas').select('*').order('tanggal', { ascending: true }),
+      supabase
+        .from('tarikan')
+        .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
+        .eq('status', 'selesai')
+        .order('nomor', { ascending: false }),
+      supabase.from('talangan').select('nominal, status_lunas').eq('status_lunas', false),
+    ]);
+    setTransaksi((txRes.data as TransaksiKas[]) ?? []);
+    setTarikanSelesai((tarRes.data as Tarikan[]) ?? []);
+    const total = (talRes.data ?? []).reduce((s: number, t: { nominal: number }) => s + t.nominal, 0);
+    setTotalTalanganBelum(total);
     setLoading(false);
   }
 
   useEffect(() => { load(); }, []);
 
-  // Saldo breakdown
-  const total = (tipe: string) =>
-    list.filter((t) => t.tipe === tipe).reduce((s, t) => s + t.nominal, 0);
+  const totalMasuk   = transaksi.filter(t => t.tipe === 'kas_masuk').reduce((s, t) => s + t.nominal, 0);
+  const totalTalMasuk = transaksi.filter(t => t.tipe === 'talangan_masuk').reduce((s, t) => s + t.nominal, 0);
+  const totalSetor   = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
+  const totalKasTerkumpul = totalMasuk + totalTalMasuk;
+  const saldo = totalKasTerkumpul - totalSetor;
 
-  const kasMasuk     = total('kas_masuk');
-  const talanganMasuk = total('talangan_masuk');
-  const kasKeluar    = total('kas_keluar');
-  const setorRT      = total('setor_kas_rt');
-  const saldo        = kasMasuk + talanganMasuk - kasKeluar - setorRT;
-
-  const FILTERS: { id: TipeFilter; label: string }[] = [
-    { id: 'semua',          label: 'Semua' },
-    { id: 'kas_masuk',      label: 'Kas Masuk' },
-    { id: 'talangan_masuk', label: 'Talangan' },
-    { id: 'kas_keluar',     label: 'Keluar' },
-    { id: 'setor_kas_rt',   label: 'Setor RT' },
-  ];
-
-  const filtered = filter === 'semua' ? list : list.filter((t) => t.tipe === filter);
-
-  const counts: Record<TipeFilter, number> = {
-    semua:          list.length,
-    kas_masuk:      list.filter((t) => t.tipe === 'kas_masuk').length,
-    talangan_masuk: list.filter((t) => t.tipe === 'talangan_masuk').length,
-    kas_keluar:     list.filter((t) => t.tipe === 'kas_keluar').length,
-    setor_kas_rt:   list.filter((t) => t.tipe === 'setor_kas_rt').length,
-  };
-
-  async function handleKasKeluar(data: { keterangan: string; nominal: number; tanggal: string }) {
-    await supabase.from('transaksi_kas').insert({
-      tipe: 'kas_keluar',
-      nominal: data.nominal,
-      keterangan: data.keterangan,
-      tanggal: data.tanggal,
-      warga_id: null,
-      tarikan_id: null,
-      saldo_setelah: saldo - data.nominal,
-    });
+  async function handleSetor(data: { nominal: number; keterangan: string; tanggal: string }) {
+    const saldoBaru = saldo - data.nominal;
+    await Promise.all([
+      supabase.from('transaksi_kas').insert({
+        tipe: 'setor_kas_rt',
+        nominal: data.nominal,
+        keterangan: data.keterangan,
+        tanggal: data.tanggal,
+        saldo_setelah: saldoBaru,
+      }),
+      supabase.from('kas_rt').insert({
+        tipe: 'masuk',
+        nominal: data.nominal,
+        keterangan: data.keterangan,
+        tanggal: data.tanggal,
+        saldo_setelah: 0,
+      }),
+    ]);
     setShowModal(false);
     load();
   }
@@ -205,140 +135,132 @@ export default function KasHadiranPage() {
   return (
     <>
       <div className="space-y-4 pb-2">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">Kas Hadiran</h1>
-            <p className="text-xs text-gray-400 mt-0.5">{list.length} transaksi tercatat</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => load()} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
-              <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
-            </button>
-            {isBendahara && (
-              <button
-                onClick={() => setShowModal(true)}
-                className="flex items-center gap-1.5 bg-red-500 text-white text-sm font-semibold px-3 py-2 rounded-xl hover:bg-red-600 active:scale-95 transition-all shadow-md shadow-red-200"
-              >
-                <Plus className="w-4 h-4" />
-                Kas Keluar
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Saldo Card */}
+        {/* Header Card */}
         <div className="relative rounded-3xl overflow-hidden shadow-xl"
           style={{ background: 'linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)' }}>
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-5">
-            <p className="text-emerald-200 text-xs font-semibold tracking-widest uppercase mb-1">
-              Saldo Kas Hadiran
-            </p>
-            <p className={`text-4xl font-black tracking-tight mb-4 ${saldo < 0 ? 'text-red-300' : 'text-white'}`}>
+            <p className="text-emerald-200 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
+            <p className={`text-4xl font-black tracking-tight mb-1 ${saldo < 0 ? 'text-red-300' : 'text-white'}`}>
               {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
             </p>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-white/15 rounded-2xl p-3 border border-white/20">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
-                  <p className="text-emerald-100 text-[9px] font-semibold uppercase tracking-wide">Pemasukan</p>
-                </div>
-                <p className="text-sm font-bold text-white">+{formatRupiahPlain(kasMasuk + talanganMasuk)}</p>
-                <p className="text-[10px] text-emerald-200 mt-0.5">
-                  Tarikan {formatRupiahPlain(kasMasuk)} · Talangan {formatRupiahPlain(talanganMasuk)}
-                </p>
-              </div>
-              <div className="bg-white/15 rounded-2xl p-3 border border-white/20">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <TrendingDown className="w-3.5 h-3.5 text-red-300" />
-                  <p className="text-emerald-100 text-[9px] font-semibold uppercase tracking-wide">Pengeluaran</p>
-                </div>
-                <p className="text-sm font-bold text-red-300">-{formatRupiahPlain(kasKeluar + setorRT)}</p>
-                <p className="text-[10px] text-emerald-200 mt-0.5">
-                  Keluar {formatRupiahPlain(kasKeluar)} · Setor {formatRupiahPlain(setorRT)}
-                </p>
-              </div>
+            <p className="text-emerald-200 text-xs mb-4">{tarikanSelesai.length} tarikan terlaksana</p>
+            <div className="flex gap-2">
+              <button className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 border border-white/25 rounded-xl py-2.5 text-white text-xs font-semibold hover:bg-white/25 transition-all">
+                <FileText className="w-3.5 h-3.5" />
+                Cetak PDF
+              </button>
+              {isBendahara && (
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-white rounded-xl py-2.5 text-emerald-700 text-xs font-semibold hover:bg-emerald-50 transition-all shadow-md"
+                >
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                  Setor ke Kas Besar
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-          {FILTERS.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                filter === f.id
-                  ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              {f.label}
-              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                filter === f.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
-              }`}>
-                {counts[f.id]}
+        {/* Alur Kas */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm p-4">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-bold text-gray-900">Alur Kas Hadiran</p>
+            <span className="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+              {tarikanSelesai.length}
+            </span>
+          </div>
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between py-2 border-b border-gray-50">
+              <div className="flex items-center gap-2">
+                <span className="text-base">💰</span>
+                <span className="text-sm text-gray-700">Kas Hadiran Terkumpul</span>
+              </div>
+              <span className="text-sm font-semibold text-emerald-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
+            </div>
+            <div className="flex items-center justify-between py-2 border-b border-gray-50">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🔴</span>
+                <span className="text-sm text-gray-700">Talangan Belum Lunas</span>
+              </div>
+              <span className="text-sm font-semibold text-red-500">-{formatRupiahPlain(totalTalanganBelum)}</span>
+            </div>
+            <div className="flex items-center justify-between py-2 border-b border-gray-50">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🔵</span>
+                <span className="text-sm text-gray-700">Setoran ke Kas Besar</span>
+              </div>
+              <span className="text-sm font-semibold text-red-500">-{formatRupiahPlain(totalSetor)}</span>
+            </div>
+            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-red-50' : 'bg-gray-50'}`}>
+              <p className="text-sm font-bold text-gray-900">Total Bersih Kas Hadiran</p>
+              <span className={`text-base font-bold ${saldo < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
               </span>
-            </button>
-          ))}
+            </div>
+          </div>
         </div>
 
-        {/* Transaction List */}
-        {loading ? (
-          <div className="flex items-center justify-center h-48">
-            <RefreshCw className="w-7 h-7 text-emerald-500 animate-spin" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-2">
-            <Wallet className="w-10 h-10 text-gray-200" />
-            <p className="text-sm text-gray-400">Belum ada transaksi</p>
-          </div>
-        ) : (
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
-            {filtered.map((t, idx) => {
-              const meta = TIPE_META[t.tipe] ?? TIPE_META['kas_masuk'];
-              const isLast = idx === filtered.length - 1;
-
-              return (
-                <div
-                  key={t.id}
-                  className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50' : ''}`}
-                >
-                  {/* Icon */}
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${meta.bg} ${meta.color}`}>
-                    <TipeIcon tipe={t.tipe} />
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{t.keterangan || meta.label}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-400">{formatTanggal(t.tanggal)}</span>
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${meta.bg} ${meta.color}`}>
-                        {meta.label}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Amount */}
-                  <p className={`text-sm font-bold flex-shrink-0 ${meta.sign === 1 ? 'text-emerald-600' : 'text-red-500'}`}>
-                    {meta.sign === 1 ? '+' : '-'}{formatRupiahPlain(t.nominal)}
-                  </p>
+        {/* Rekap Per Tarikan */}
+        {tarikanSelesai.length > 0 && (
+          <div>
+            <p className="text-sm font-bold text-gray-700 mb-3 px-1">🧾 Rekap Per Tarikan</p>
+            <div className="space-y-3">
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" />
                 </div>
-              );
-            })}
+              ) : (
+                tarikanSelesai.map(t => {
+                  const iuranHadir  = t.total_hadir * 50000;
+                  return (
+                    <div key={t.id} className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+                      {/* Header */}
+                      <div className="flex items-center justify-between p-4 border-b border-gray-50">
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                            Tarikan ke-{t.nomor}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-base font-black text-gray-900">{formatRupiahPlain(iuranHadir)}</p>
+                          <p className="text-xs text-gray-400">{t.total_hadir}/{t.total_warga} hadir</p>
+                        </div>
+                      </div>
+
+                      {/* Sohibul Bait */}
+                      <div className="flex items-center gap-3 p-4">
+                        <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0 text-sm font-bold text-emerald-700">
+                          {t.sohibul_bait?.nama?.charAt(0) ?? '?'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold text-gray-900 truncate">{t.sohibul_bait?.nama ?? '—'}</p>
+                            <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200 shrink-0">
+                              SOHIBUL BAIT
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            Terima: <span className="font-semibold text-emerald-600">{formatRupiahPlain(iuranHadir)}</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
       </div>
 
       {showModal && (
-        <KasKeluarModal
-          currentSaldo={saldo}
-          onSave={handleKasKeluar}
+        <SetorModal
+          saldoHadiran={saldo}
+          onSave={handleSetor}
           onClose={() => setShowModal(false)}
         />
       )}

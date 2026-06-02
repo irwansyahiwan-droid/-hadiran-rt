@@ -82,7 +82,7 @@ INSERT INTO kas_rt (tipe, nominal, keterangan, tanggal, tarikan_id, saldo_setela
 ('masuk', 1710000,
  'Setor ke Kas Besar RT — Iuran Hadiran bulan Mei 2026',
  '2026-05-31',
- (SELECT id FROM tarikan WHERE nomor = 5),
+ (SELECT id FROM tarikan WHERE nomor = 5 LIMIT 1),
  14932000),
 
 -- Juni
