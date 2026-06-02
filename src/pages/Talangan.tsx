@@ -71,7 +71,8 @@ export default function TalanganPage() {
       seen.set(id, g);
       groups.push(g);
     }
-    const g = seen.get(id)!;
+    const g = seen.get(id);
+    if (!g) return;
     g.entries.push(t);
     if (!t.status_lunas) {
       g.totalBelum += t.nominal;

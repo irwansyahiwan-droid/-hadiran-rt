@@ -129,8 +129,7 @@ export default function KasHadiranPage() {
   const setorMap = transaksi
     .filter(t => t.tipe === 'setor_kas_rt' && t.tarikan_id)
     .reduce<Record<string, number>>((acc, t) => {
-      const tid = t.tarikan_id!;
-      acc[tid] = (acc[tid] ?? 0) + t.nominal;
+      if (t.tarikan_id) acc[t.tarikan_id] = (acc[t.tarikan_id] ?? 0) + t.nominal;
       return acc;
     }, {});
 
