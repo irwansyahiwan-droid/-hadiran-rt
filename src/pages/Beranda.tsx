@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Users, Zap, Calendar, FileText, Building2, TrendingUp, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Users, Zap, Calendar, FileText, Building2, TrendingUp, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
@@ -22,6 +22,15 @@ function StatCard({ label, value, icon: Icon, color }: {
   );
 }
 
+interface TrxItem {
+  id: string;
+  tipe: 'setor' | 'talangan_lunas';
+  keterangan: string;
+  tanggal: string;
+  nominal: number;
+  saldoSetelah: number;
+}
+
 interface BerandaProps {
   onNavigate: (tab: string) => void;
 }
@@ -30,6 +39,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const { isBendahara } = useAuthContext();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
+  const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -37,7 +47,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     if (showRefreshing) setRefreshing(true);
     else setLoading(true);
 
-    const [summaryData, jadwalRes] = await Promise.all([
+    const [summaryData, jadwalRes, setorRes, talanganLunasRes] = await Promise.all([
       fetchDashboardSummary(),
       supabase
         .from('tarikan')
@@ -45,10 +55,51 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         .eq('status', 'dijadwalkan')
         .order('tanggal', { ascending: true })
         .limit(5),
+      supabase
+        .from('transaksi_kas')
+        .select('id, keterangan, tanggal, nominal')
+        .eq('tipe', 'setor_kas_rt'),
+      supabase
+        .from('talangan')
+        .select('id, nominal, tanggal_lunas, warga:warga_id(nama), tarikan:tarikan_id(nomor)')
+        .eq('status_lunas', true)
+        .not('tanggal_lunas', 'is', null),
     ]);
+
+    // Merge setor + talangan lunas → sort tanggal DESC → limit 20
+    const setorItems = (setorRes.data ?? []).map((t: any) => ({
+      id: t.id,
+      tipe: 'setor' as const,
+      keterangan: t.keterangan as string,
+      tanggal: t.tanggal as string,
+      nominal: -(t.nominal as number),
+    }));
+
+    const talanganItems = (talanganLunasRes.data ?? [])
+      .filter((t: any) => t.tanggal_lunas)
+      .map((t: any) => ({
+        id: t.id,
+        tipe: 'talangan_lunas' as const,
+        keterangan: `Talangan lunas oleh ${t.warga?.nama ?? '-'} — Tarikan #${t.tarikan?.nomor ?? '-'}`,
+        tanggal: t.tanggal_lunas as string,
+        nominal: t.nominal as number,
+      }));
+
+    const sorted = [...setorItems, ...talanganItems]
+      .sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime())
+      .slice(0, 20);
+
+    // Hitung running saldo mundur dari saldo_aktif saat ini
+    let saldoCurrent = summaryData.saldo_aktif;
+    const withSaldo: TrxItem[] = sorted.map(item => {
+      const saldoSetelah = saldoCurrent;
+      saldoCurrent = saldoCurrent - item.nominal;
+      return { ...item, saldoSetelah };
+    });
 
     setSummary(summaryData);
     setJadwalList((jadwalRes.data as Tarikan[]) ?? []);
+    setTrxItems(withSaldo);
     setLoading(false);
     setRefreshing(false);
   }
@@ -232,6 +283,37 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Transaksi Terakhir */}
+      <div>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3 px-1">Transaksi Terakhir</h2>
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+          {trxItems.length === 0 ? (
+            <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
+          ) : (
+            trxItems.map((trx, idx) => (
+              <div key={trx.id} className={`flex items-center gap-3 p-4 ${idx < trxItems.length - 1 ? 'border-b border-gray-50' : ''}`}>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
+                  {trx.tipe === 'setor'
+                    ? <ArrowUpRight className="w-4 h-4 text-orange-500" />
+                    : <ArrowDownLeft className="w-4 h-4 text-emerald-500" />
+                  }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{trx.keterangan}</p>
+                  <p className="text-xs text-gray-400">{formatTanggal(trx.tanggal)}</p>
+                  <p className="text-xs text-gray-400">
+                    Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
+                  </p>
+                </div>
+                <span className={`text-sm font-bold shrink-0 ${trx.nominal < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                  {trx.nominal < 0 ? '-' : '+'}Rp{Math.abs(trx.nominal).toLocaleString('id-ID')}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
