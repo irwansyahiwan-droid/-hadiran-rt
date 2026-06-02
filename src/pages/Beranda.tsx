@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Users, Zap, Calendar, FileText, Building2, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { AlertTriangle, Users, Zap, Calendar, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
@@ -36,7 +36,7 @@ interface BerandaProps {
 }
 
 export default function Beranda({ onNavigate }: BerandaProps) {
-  const { isBendahara } = useAuthContext();
+  useAuthContext();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
   const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
@@ -187,25 +187,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </button>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 mt-3">
-            <button
-              onClick={() => onNavigate('cetak')}
-              className="flex-1 flex items-center justify-center gap-2 bg-white/15 border border-white/25 rounded-xl py-2.5 text-white text-sm font-semibold hover:bg-white/25 active:scale-95 transition-all"
-            >
-              <FileText className="w-4 h-4" />
-              Cetak PDF
-            </button>
-            {isBendahara && (
-              <button
-                onClick={() => onNavigate('kas-rt')}
-                className="flex-1 flex items-center justify-center gap-2 bg-white rounded-xl py-2.5 text-emerald-700 text-sm font-semibold hover:bg-emerald-50 active:scale-95 transition-all shadow-md"
-              >
-                <Building2 className="w-4 h-4" />
-                Setor ke Kas RT
-              </button>
-            )}
-          </div>
         </div>
       </div>
 
@@ -246,14 +227,20 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           ) : (
             jadwalList.map((j, idx) => (
               <div key={j.id} className={`flex items-center gap-3 p-4 ${idx < jadwalList.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}>
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-200">
-                  <span className="text-white text-base font-black">{j.nomor}</span>
+                {/* Avatar + badge nomor */}
+                <div className="relative shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-base font-black text-emerald-700 dark:text-emerald-300">
+                    {j.sohibul_bait?.nama?.charAt(0) ?? '?'}
+                  </div>
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-600 text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-sm">
+                    {j.nomor}
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-bold text-gray-900 dark:text-gray-100">{j.sohibul_bait?.nama ?? '-'}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">{j.sohibul_bait?.nama ?? '-'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
-                <span className="px-3 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 rounded-full border border-blue-300 dark:border-blue-600">
+                <span className="px-3 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 rounded-full border border-blue-300 dark:border-blue-600 shrink-0">
                   Terjadwal
                 </span>
               </div>
