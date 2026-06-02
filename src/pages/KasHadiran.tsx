@@ -181,11 +181,11 @@ export default function KasHadiranPage() {
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-5">
-            <p className="text-emerald-200 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
+            <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
             <p className="text-4xl font-black tracking-tight mb-1 text-white">
               {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
             </p>
-            <p className="text-emerald-200 text-xs mb-4">{tarikanSelesai.length} tarikan terlaksana</p>
+            <p className="text-white/60 text-xs mb-4">{tarikanSelesai.length} tarikan terlaksana</p>
             <div className="flex gap-2">
               <button
                 onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
@@ -215,31 +215,26 @@ export default function KasHadiranPage() {
               {tarikanSelesai.length}
             </span>
           </div>
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <div className="flex items-center gap-2">
-                <span className="text-base">💰</span>
-                <span className="text-sm text-gray-700 dark:text-gray-300">Kas Hadiran Terkumpul</span>
-              </div>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
               <span className="text-sm font-semibold text-emerald-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <div className="flex items-center gap-2">
-                <span className="text-base">🔴</span>
-                <span className="text-sm text-gray-700 dark:text-gray-300">Talangan Belum Lunas</span>
-              </div>
-              <span className="text-sm font-semibold text-red-500">-{formatRupiahPlain(totalTalanganBelum)}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Talangan Belum Lunas</span>
+              <span className="px-2.5 py-0.5 text-xs font-bold text-amber-700 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-full">
+                -{formatRupiahPlain(totalTalanganBelum)}
+              </span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <div className="flex items-center gap-2">
-                <span className="text-base">🔵</span>
-                <span className="text-sm text-gray-700 dark:text-gray-300">Setoran ke Kas Besar</span>
-              </div>
-              <span className="text-sm font-semibold text-red-500">-{formatRupiahPlain(totalSetor)}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Setoran ke Kas Besar</span>
+              <span className="px-2.5 py-0.5 text-xs font-bold text-blue-700 bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 rounded-full">
+                -{formatRupiahPlain(totalSetor)}
+              </span>
             </div>
-            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-red-50 dark:bg-red-950/30' : 'bg-gray-50 dark:bg-gray-700'}`}>
-              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Total Bersih Kas Hadiran</p>
-              <span className={`text-base font-bold ${saldo < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-slate-100 dark:bg-slate-800' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
+              <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
+              <span className={`text-base font-black ${saldo < 0 ? 'text-slate-700 dark:text-slate-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
                 {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
               </span>
             </div>
@@ -260,93 +255,93 @@ export default function KasHadiranPage() {
                   const iuranHadir = t.total_hadir * 50000;
                   const kasHadiran = t.total_terkumpul ?? 0;
                   const talanganInfo = talanganMap[t.id] ?? { count: 0, total: 0 };
-                  const sisaKas = kasHadiran - talanganInfo.total;
                   const pctHadir = Math.round((t.total_hadir / t.total_warga) * 100);
 
                   return (
-                    <div key={t.id} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
-                      {/* Header */}
-                      <div className="flex items-center justify-between p-4 border-b border-gray-50 dark:border-gray-800">
-                        <div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                    <div key={t.id} className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+
+                      {/* ── Timeline mini-header ─────────────────────── */}
+                      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
                             Tarikan ke-{t.nomor}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>
+                          </span>
+                          <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
                         </div>
-                        <div className="text-right">
-                          <p className="text-base font-black text-gray-900 dark:text-gray-100">{formatRupiahPlain(iuranHadir)}</p>
-                          <p className="text-xs text-gray-400">{t.total_hadir}/{t.total_warga} hadir</p>
-                        </div>
+                        {talanganInfo.count > 0 ? (
+                          <span className="text-[9px] font-bold text-amber-700 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-700 px-2.5 py-0.5 rounded-full">
+                            {talanganInfo.count} belum bayar
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full">
+                            ✓ Lunas semua
+                          </span>
+                        )}
                       </div>
 
-                      {/* Sohibul Bait */}
-                      <div className="flex items-center gap-3 p-4 border-b border-gray-50 dark:border-gray-800">
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0 text-sm font-bold text-emerald-700">
+                      {/* ── Focal row: penerima + amount ─────────────── */}
+                      <div className="flex items-center gap-3 px-4 pb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0 text-base font-black text-emerald-700 dark:text-emerald-300">
                           {t.sohibul_bait?.nama?.charAt(0) ?? '?'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{t.sohibul_bait?.nama ?? '—'}</p>
-                            <span className="px-2 py-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200 shrink-0">
-                              SOHIBUL BAIT
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-400 mt-0.5">
-                            Terima: <span className="font-semibold text-emerald-600">{formatRupiahPlain(iuranHadir)}</span>
+                          <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                            {t.sohibul_bait?.nama ?? '—'}
+                          </p>
+                          <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
+                            Dapat Arisan
+                          </span>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                            +{formatRupiahPlain(iuranHadir)}
+                          </p>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+                            {t.total_hadir}/{t.total_warga} hadir
                           </p>
                         </div>
                       </div>
 
-                      {/* Talangan keluar (kuning) — hanya jika ada */}
-                      {talanganInfo.count > 0 && (
-                        <div className="mx-4 my-3 rounded-2xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-2.5">
-                          <span className="text-amber-500 text-base shrink-0">⚠️</span>
-                          <div className="min-w-0">
-                            <p className="text-xs font-bold text-amber-800">Talangan Keluar</p>
-                            <p className="text-xs text-amber-600">
-                              {talanganInfo.count} anggota belum bayar · {formatRupiahPlain(talanganInfo.total)}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Stats + progress bar */}
-                      <div className="px-4 pb-3">
-                        <div className="flex items-center justify-between text-xs mb-1.5">
-                          <span className="text-gray-500">
-                            Kas <span className="font-semibold text-gray-700 dark:text-gray-300">{formatRupiahPlain(kasHadiran)}</span>
+                      {/* ── Progress bar + kas info ───────────────────── */}
+                      <div className="px-4 pb-4 border-t border-gray-50 dark:border-gray-800 pt-3">
+                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                          <span>
+                            Kas Hadiran{' '}
+                            <span className="font-semibold text-gray-700 dark:text-gray-300">{formatRupiahPlain(kasHadiran)}</span>
                           </span>
-                          <span className="text-gray-500">
-                            Sisa{' '}
-                            <span className={`font-semibold ${sisaKas < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
-                              {sisaKas < 0 ? '-' : ''}Rp{Math.abs(sisaKas).toLocaleString('id-ID')}
-                            </span>
-                          </span>
+                          <span className="font-medium">{pctHadir}% hadir</span>
                         </div>
-                        <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pctHadir}%` }} />
+                        <div className="w-full h-2 bg-gray-100 dark:bg-gray-700/60 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-400 dark:bg-emerald-500 rounded-full transition-all"
+                            style={{ width: `${pctHadir}%` }}
+                          />
                         </div>
-                        <p className="text-[10px] text-gray-400 mt-1 text-right">{pctHadir}% hadir</p>
+                        {talanganInfo.count > 0 && (
+                          <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1.5 font-medium">
+                            ⚠ {talanganInfo.count} warga belum bayar · {formatRupiahPlain(talanganInfo.total)}
+                          </p>
+                        )}
                       </div>
 
-                      {/* Action buttons */}
+                      {/* ── Admin actions (bendahara only) ────────────── */}
                       {isBendahara && (
-                        <div className="flex gap-2 px-4 pb-4">
-                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors">
+                        <div className="flex items-center gap-2 px-4 pb-4">
+                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
                             <Users className="w-3.5 h-3.5" />
                             Absensi
                           </button>
                           <button
                             onClick={() => handlePendapatanPDF(t)}
                             disabled={pdfLoading === t.id}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-60"
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors disabled:opacity-50"
                           >
                             <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
-                            {pdfLoading === t.id ? 'Loading...' : 'Pendapatan'}
+                            {pdfLoading === t.id ? 'Memuat...' : 'Pendapatan'}
                           </button>
-                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors">
+                          <button className="flex items-center justify-center p-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shrink-0">
                             <Trash2 className="w-3.5 h-3.5" />
-                            Hapus
                           </button>
                         </div>
                       )}
