@@ -79,6 +79,16 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
     const hadirIds  = wargaList.filter(w => map[w.id] === 'hadir').map(w => w.id);
     const tidakIds  = wargaList.filter(w => map[w.id] === 'tidak_hadir').map(w => w.id);
 
+    // Simpan status lunas yang sudah ada sebelum menghapus (agar tidak ter-reset saat Hitung Ulang)
+    const { data: existingLunas } = await supabase
+      .from('talangan')
+      .select('warga_id, tanggal_lunas')
+      .eq('tarikan_id', tarikanId)
+      .eq('status_lunas', true);
+    const lunasMap = new Map<string, string | null>(
+      (existingLunas ?? []).map(t => [t.warga_id, t.tanggal_lunas as string | null])
+    );
+
     await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
 
     if (hadirIds.length)
@@ -89,7 +99,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
     await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
     if (tidakIds.length)
       await supabase.from('talangan').insert(tidakIds.map(warga_id => ({
-        tarikan_id: tarikanId, warga_id, nominal: 50000, status_lunas: false,
+        tarikan_id: tarikanId,
+        warga_id,
+        nominal: 50000,
+        status_lunas: lunasMap.has(warga_id),
+        tanggal_lunas: lunasMap.get(warga_id) ?? null,
       })));
 
     await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk');

@@ -57,6 +57,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     load();
   }, []);
 
+  const kasHadiran = summary?.total_kas_terkumpul ?? 0;
   const saldo = summary?.saldo_aktif ?? 0;
   const talangan = summary?.total_talangan_belum_lunas ?? 0;
 
@@ -92,7 +93,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <div className="flex items-baseline gap-1 mb-1">
             <span className="text-white text-4xl font-black tracking-tight">
-              {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
+              Rp{kasHadiran.toLocaleString('id-ID')}
             </span>
           </div>
           <p className="text-emerald-200 text-xs mb-5">

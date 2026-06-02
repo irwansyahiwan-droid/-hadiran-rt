@@ -49,24 +49,17 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
     .filter((t) => !t.status_lunas)
     .reduce((sum, t) => sum + t.nominal, 0);
 
-  const totalKasMasuk = transaksiList
-    .filter((t) => t.tipe === 'kas_masuk')
-    .reduce((sum, t) => sum + t.nominal, 0);
-
-  const totalTalanganMasuk = transaksiList
-    .filter((t) => t.tipe === 'talangan_masuk')
-    .reduce((sum, t) => sum + t.nominal, 0);
-
   const totalSetor = transaksiList
     .filter((t) => t.tipe === 'setor_kas_rt')
     .reduce((sum, t) => sum + t.nominal, 0);
 
-  const totalKasKeluar = transaksiList
-    .filter((t) => t.tipe === 'kas_keluar')
-    .reduce((sum, t) => sum + t.nominal, 0);
+  // Kas Hadiran Terkumpul = SUM(tarikan.total_terkumpul) tarikan selesai
+  const totalKasTerkumpul = tarikanList
+    .filter((t: { status: string }) => t.status === 'selesai')
+    .reduce((sum: number, t: { total_terkumpul: number }) => sum + (t.total_terkumpul ?? 0), 0);
 
-  const saldoAktif = totalKasMasuk + totalTalanganMasuk - totalSetor - totalKasKeluar;
-  const totalKasTerkumpul = totalKasMasuk + totalTalanganMasuk;
+  // Saldo = kas terkumpul − talangan belum lunas − setoran ke kas RT
+  const saldoAktif = totalKasTerkumpul - totalTalanganBelumLunas - totalSetor;
 
   return {
     saldo_aktif: saldoAktif,

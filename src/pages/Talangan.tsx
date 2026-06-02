@@ -93,8 +93,8 @@ export default function TalanganPage() {
 
   function renderGroup(g: WargaGroup, showAll = false) {
     const isExpanded = expandedId === g.warga_id;
-    const belumEntries = g.entries.filter(e => !e.status_lunas);
-    const lunasEntries = g.entries.filter(e => e.status_lunas);
+    const belumEntries = g.entries.filter(e => !e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
+    const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
 
     return (
       <div key={g.warga_id} className="border border-gray-100 rounded-2xl overflow-hidden mb-2">
