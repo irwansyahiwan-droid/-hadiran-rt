@@ -22,11 +22,11 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
         <div className="flex items-center gap-2">
           <div className={`px-3 py-1.5 rounded-full border ${
             isBendahara
-              ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-900'
-              : 'border-blue-400 bg-blue-50 dark:border-blue-400 dark:bg-blue-900'
+              ? 'border-emerald-500 dark:border-emerald-400'
+              : 'border-blue-400 dark:border-blue-400'
           }`}>
             <span className={`text-xs font-semibold tracking-wide ${
-              isBendahara ? 'text-emerald-700 dark:text-emerald-300' : 'text-blue-700 dark:text-blue-300'
+              isBendahara ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'
             }`}>
               {isBendahara ? 'BENDAHARA' : 'WARGA'}
             </span>

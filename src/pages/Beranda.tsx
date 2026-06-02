@@ -13,11 +13,11 @@ function StatCard({ label, value, icon: Icon, color }: {
 }) {
   return (
     <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-4 border border-white dark:border-gray-700 shadow-sm">
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2 ${color}`}>
-        <Icon className="w-4 h-4 text-white" />
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2.5 ${color}`}>
+        <Icon className="w-5 h-5 text-white" />
       </div>
-      <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
-      <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{label}</p>
     </div>
   );
 }
@@ -159,7 +159,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               onClick={() => onNavigate('kas')}
               className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
             >
-              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-1">Saldo Aktif</p>
+              <span className="text-base mb-1 block">💳</span>
+              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-0.5">Saldo Aktif</p>
               <p className="text-sm font-bold text-white">
                 Rp{Math.abs(saldo).toLocaleString('id-ID')}
               </p>
@@ -168,7 +169,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               onClick={() => onNavigate('talangan')}
               className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
             >
-              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-1">Talangan</p>
+              <span className="text-base mb-1 block">🏦</span>
+              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-0.5">Talangan</p>
               <p className="text-sm font-bold text-white">
                 {formatRupiahPlain(talangan)}
               </p>
@@ -177,9 +179,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               onClick={() => onNavigate('kas-rt')}
               className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
             >
-              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-1">Setor Kas RT</p>
+              <span className="text-base mb-1 block">🏛️</span>
+              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-0.5">Setor Kas RT</p>
               <p className="text-sm font-bold text-white">
-                -{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}
+                {formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}
               </p>
             </button>
           </div>
@@ -243,14 +246,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           ) : (
             jadwalList.map((j, idx) => (
               <div key={j.id} className={`flex items-center gap-3 p-4 ${idx < jadwalList.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}>
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-200">
-                  <span className="text-white text-sm font-black">{j.nomor}</span>
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center flex-shrink-0 shadow-sm shadow-emerald-200">
+                  <span className="text-white text-base font-black">{j.nomor}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{j.sohibul_bait?.nama ?? '-'}</p>
-                  <p className="text-xs text-gray-400">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-base font-bold text-gray-900 dark:text-gray-100">{j.sohibul_bait?.nama ?? '-'}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
-                <span className="px-3 py-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200">
+                <span className="px-3 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 rounded-full border border-blue-300 dark:border-blue-600">
                   Terjadwal
                 </span>
               </div>
