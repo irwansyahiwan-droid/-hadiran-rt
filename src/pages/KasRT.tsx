@@ -213,7 +213,7 @@ export default function KasRTPage() {
         </div>
 
         {/* Saldo Card — always teal */}
-        <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-teal-800 to-teal-700">
+        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-teal-800 to-teal-700">
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-6">
@@ -256,7 +256,7 @@ export default function KasRTPage() {
         </div>
 
         {/* Mutasi list — terbaru di atas */}
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 px-1">Mutasi Kas Besar RT</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
 
         {loading ? (
           <div className="flex items-center justify-center h-48">
@@ -268,7 +268,7 @@ export default function KasRTPage() {
             <p className="text-sm text-gray-400">Belum ada transaksi</p>
           </div>
         ) : (
-          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
             {[...list].reverse().map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === list.length - 1;
@@ -290,7 +290,7 @@ export default function KasRTPage() {
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-xs text-gray-400">{formatTanggal(k.tanggal)}</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-500">{formatTanggal(k.tanggal)}</p>
                       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                         isMasuk ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'
                       }`}>
@@ -300,10 +300,10 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-sm font-bold ${isMasuk ? 'text-emerald-600' : 'text-red-500'}`}>
+                    <p className={`text-sm font-bold ${isMasuk ? 'text-green-600' : 'text-red-500'}`}>
                       {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
                     </p>
-                    <p className="text-[10px] text-gray-400">
+                    <p className="text-sm text-gray-400 dark:text-gray-500">
                       Saldo: {formatRupiahPlain(k.saldo_setelah)}
                     </p>
                   </div>

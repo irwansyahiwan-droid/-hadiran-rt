@@ -13,7 +13,7 @@ function StatCard({ label, value, icon: Icon, color }: {
   color: string;
 }) {
   return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-4 border border-white dark:border-gray-700 shadow-sm">
+    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-4 border border-gray-100 dark:border-gray-800 shadow-sm">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2.5 ${color}`}>
         <Icon className="w-5 h-5 text-white" />
       </div>
@@ -127,7 +127,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   return (
     <div className="space-y-4 pb-2">
       {/* Main Kas Card — always green (kasHadiran always positive) */}
-      <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-emerald-800 to-emerald-700">
+      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-emerald-800 to-emerald-700">
         <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
         <div className="absolute top-6 -right-4 w-20 h-20 bg-white/5 rounded-full" />
         <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -215,8 +215,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Jadwal Berikutnya */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 px-1">Jadwal Berikutnya</h2>
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Jadwal Berikutnya</h2>
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           {jadwalList.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
           ) : (
@@ -230,8 +230,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">{j.sohibul_bait?.nama ?? '-'}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-base font-semibold text-gray-900 dark:text-gray-100 leading-tight">{j.sohibul_bait?.nama ?? '-'}</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
                 <span className="px-3 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 rounded-full border border-blue-300 dark:border-blue-600 shrink-0">
                   Terjadwal
@@ -244,8 +244,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Transaksi Terakhir */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 px-1">Transaksi Terakhir</h2>
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Transaksi Terakhir</h2>
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           {trxItems.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
           ) : (
@@ -259,12 +259,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug">{trx.keterangan}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(trx.tanggal)}</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
                     Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
                   </p>
                 </div>
-                <span className={`text-sm font-bold shrink-0 mt-0.5 ${trx.nominal < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                <span className={`text-sm font-bold shrink-0 mt-0.5 ${trx.nominal < 0 ? 'text-red-500' : 'text-green-600'}`}>
                   {trx.nominal < 0 ? '-' : '+'}Rp{Math.abs(trx.nominal).toLocaleString('id-ID')}
                 </span>
               </div>

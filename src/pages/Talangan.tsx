@@ -130,8 +130,8 @@ export default function TalanganPage() {
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{g.nama}</p>
-                  <p className="text-[10px] text-gray-400">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
                     Tarikan #{t.tarikan?.nomor} · {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>
@@ -232,7 +232,7 @@ export default function TalanganPage() {
           {/* Single belum lunas */}
           {single.length > 0 && (
             <div>
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Daftar Talangan</p>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Daftar Talangan</p>
               <div>{single.map(g => renderGroup(g))}</div>
             </div>
           )}
@@ -240,7 +240,7 @@ export default function TalanganPage() {
           {/* Lunas */}
           {lunas.length > 0 && (
             <div>
-              <p className="text-sm font-semibold text-gray-500 mb-2">Sudah Lunas</p>
+              <p className="text-sm font-semibold text-gray-500 mt-6 mb-3">Sudah Lunas</p>
               <div className="opacity-60">{lunas.map(g => renderGroup(g, true))}</div>
             </div>
           )}

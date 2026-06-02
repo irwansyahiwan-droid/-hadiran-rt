@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FileText, RefreshCw, ArrowUpRight, Users, Trash2 } from 'lucide-react';
+import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -177,7 +178,7 @@ export default function KasHadiranPage() {
     <>
       <div className="space-y-4 pb-2">
         {/* Header Card */}
-        <div className={`relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br ${heroGradient}`}>
+        <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-5">
@@ -208,7 +209,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm p-4">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span className="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
@@ -218,7 +219,7 @@ export default function KasHadiranPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
-              <span className="text-sm font-semibold text-emerald-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
+              <span className="text-sm font-bold text-green-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <span className="text-sm text-gray-600 dark:text-gray-400">Talangan Belum Lunas</span>
@@ -244,7 +245,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 px-1">🧾 Rekap Per Tarikan</p>
+            <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
             <div className="space-y-3">
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -258,7 +259,7 @@ export default function KasHadiranPage() {
                   const pctHadir = Math.round((t.total_hadir / t.total_warga) * 100);
 
                   return (
-                    <div key={t.id} className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div key={t.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
 
                       {/* ── Timeline mini-header ─────────────────────── */}
                       <div className="flex items-center justify-between px-4 pt-4 pb-2">
@@ -282,11 +283,9 @@ export default function KasHadiranPage() {
 
                       {/* ── Focal row: penerima + amount ─────────────── */}
                       <div className="flex items-center gap-3 px-4 pb-4">
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0 text-base font-black text-emerald-700 dark:text-emerald-300">
-                          {t.sohibul_bait?.nama?.charAt(0) ?? '?'}
-                        </div>
+                        <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                          <p className="text-base font-semibold text-gray-900 dark:text-gray-100 leading-tight">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
@@ -294,7 +293,7 @@ export default function KasHadiranPage() {
                           </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                          <p className="text-base font-bold text-green-600 dark:text-green-400">
                             +{formatRupiahPlain(iuranHadir)}
                           </p>
                           <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">

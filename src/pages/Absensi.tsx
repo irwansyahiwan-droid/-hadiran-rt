@@ -147,7 +147,7 @@ function BuatTarikanModal({ wargaList, nextNomor, onSave, onClose }: BuatTarikan
                     key={w.id}
                     type="button"
                     onClick={() => toggleAbsen(w.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-2xl border transition-all text-left ${
+                    className={`w-full flex items-center gap-3 p-4 rounded-2xl border transition-all text-left ${
                       isAbsen
                         ? 'bg-red-50 border-red-200'
                         : 'bg-emerald-50/50 border-emerald-100 hover:bg-emerald-50'
@@ -162,7 +162,7 @@ function BuatTarikanModal({ wargaList, nextNomor, onSave, onClose }: BuatTarikan
                       <p className={`text-sm font-semibold truncate ${isAbsen ? 'text-red-600' : 'text-gray-900'}`}>
                         {w.nama}
                       </p>
-                      <p className="text-xs text-gray-400">No. {w.no_rumah}</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-500">No. {w.no_rumah}</p>
                     </div>
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                       isAbsen ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-700'
@@ -396,7 +396,7 @@ export default function AbsensiPage() {
               const kasTerkumpul = t.total_hadir * t.jumlah_per_orang;
 
               return (
-                <div key={t.id} className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+                <div key={t.id} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
                   {/* Card Header */}
                   <button
                     onClick={() => setExpandedId(isExpanded ? null : t.id)}
@@ -408,9 +408,9 @@ export default function AbsensiPage() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-gray-900">{formatTanggal(t.tanggal)}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{formatTanggal(t.tanggal)}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                        <span className="flex items-center gap-1 text-sm text-gray-400 dark:text-gray-500">
                           <Users className="w-3 h-3" />
                           {t.total_hadir}/{t.total_warga} hadir
                         </span>
@@ -421,8 +421,8 @@ export default function AbsensiPage() {
                     </div>
 
                     <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-bold text-emerald-600">{formatRupiahPlain(kasTerkumpul)}</p>
-                      <p className="text-[10px] text-gray-400">{formatRupiahPlain(t.jumlah_per_orang)}/orang</p>
+                      <p className="text-sm font-bold text-green-600">{formatRupiahPlain(kasTerkumpul)}</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-500">{formatRupiahPlain(t.jumlah_per_orang)}/orang</p>
                     </div>
 
                     {isExpanded

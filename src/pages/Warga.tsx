@@ -122,7 +122,7 @@ export default function WargaPage() {
 
       {/* Progress bar 69 anggota */}
       {!query && list.length > 0 && list.length < 69 && (
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white shadow-sm p-4">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs font-semibold text-gray-600">Progress Input Anggota</p>
             <p className="text-xs font-bold text-emerald-600">{list.length} / 69</p>
@@ -155,7 +155,7 @@ export default function WargaPage() {
           )}
         </div>
       ) : (
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           {filtered.map((w, idx) => (
             <div
               key={w.id}
@@ -178,7 +178,7 @@ export default function WargaPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">
                   No. {w.no_rumah || '—'}
                   {w.no_hp ? ` · ${w.no_hp}` : ''}
                 </p>
