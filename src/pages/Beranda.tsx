@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Users, Zap, Calendar, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { AlertTriangle, Users, Zap, Calendar, RefreshCw, ArrowUpRight, ArrowDownLeft, CreditCard, Building2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
+import AvatarPeci from '../components/AvatarPeci';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 
 function StatCard({ label, value, icon: Icon, color }: {
@@ -153,37 +154,31 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
           </p>
 
-          {/* Sub Cards Row */}
-          <div className="grid grid-cols-3 gap-2">
+          {/* Flat stats row */}
+          <div className="border-t border-white/20 pt-4 grid grid-cols-3">
             <button
               onClick={() => onNavigate('kas')}
-              className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
+              className="flex flex-col items-center gap-1 active:opacity-70 transition-opacity pr-4 border-r border-white/20"
             >
-              <span className="text-base mb-1 block">💳</span>
-              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-0.5">Saldo Aktif</p>
-              <p className="text-sm font-bold text-white">
-                Rp{Math.abs(saldo).toLocaleString('id-ID')}
-              </p>
+              <CreditCard className="w-5 h-5 text-white" />
+              <p className="text-white/60 text-[10px] font-semibold uppercase tracking-wide">Saldo Aktif</p>
+              <p className="text-sm font-bold text-white">Rp{Math.abs(saldo).toLocaleString('id-ID')}</p>
             </button>
             <button
               onClick={() => onNavigate('talangan')}
-              className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
+              className="flex flex-col items-center gap-1 active:opacity-70 transition-opacity border-r border-white/20"
             >
-              <span className="text-base mb-1 block">🏦</span>
-              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-0.5">Talangan</p>
-              <p className="text-sm font-bold text-white">
-                {formatRupiahPlain(talangan)}
-              </p>
+              <AlertTriangle className="w-5 h-5 text-white" />
+              <p className="text-white/60 text-[10px] font-semibold uppercase tracking-wide">Talangan</p>
+              <p className="text-sm font-bold text-white">{formatRupiahPlain(talangan)}</p>
             </button>
             <button
               onClick={() => onNavigate('kas-rt')}
-              className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 border border-white/20 text-left hover:bg-white/25 active:scale-95 transition-all"
+              className="flex flex-col items-center gap-1 active:opacity-70 transition-opacity pl-4"
             >
-              <span className="text-base mb-1 block">🏛️</span>
-              <p className="text-white/70 text-[9px] font-semibold uppercase tracking-wide mb-0.5">Setor Kas RT</p>
-              <p className="text-sm font-bold text-white">
-                {formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}
-              </p>
+              <Building2 className="w-5 h-5 text-white" />
+              <p className="text-white/60 text-[10px] font-semibold uppercase tracking-wide">Setor Kas RT</p>
+              <p className="text-sm font-bold text-white">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</p>
             </button>
           </div>
 
@@ -229,9 +224,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <div key={j.id} className={`flex items-center gap-3 p-4 ${idx < jadwalList.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-base font-black text-emerald-700 dark:text-emerald-300">
-                    {j.sohibul_bait?.nama?.charAt(0) ?? '?'}
-                  </div>
+                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-600 text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-sm">
                     {j.nomor}
                   </span>

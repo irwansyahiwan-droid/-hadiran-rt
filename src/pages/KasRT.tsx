@@ -216,40 +216,35 @@ export default function KasRTPage() {
         <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-teal-800 to-teal-700">
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
-          <div className="relative p-5">
+          <div className="relative p-6">
             <div className="flex items-center gap-2 mb-1">
               <Landmark className="w-4 h-4 text-teal-200" />
               <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
             </div>
-            <p className="text-4xl font-black tracking-tight text-white mb-4">
+            <p className="text-4xl font-black tracking-tight text-white mb-3">
               Rp{saldo.toLocaleString('id-ID')}
             </p>
 
-            {/* Saldo Awal row */}
-            {saldoAwal > 0 && (
-              <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 border border-white/15 mb-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-teal-200 text-sm">🏦</span>
-                  <p className="text-teal-100 text-[10px] font-semibold uppercase tracking-wide">Saldo Awal</p>
-                  {saldoAwalEntry && (
-                    <p className="text-teal-200/70 text-[10px]">
-                      · {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
-                  )}
-                </div>
-                <p className="text-sm font-bold text-white">{formatRupiahPlain(saldoAwal)}</p>
-              </div>
+            {/* Saldo Awal inline info */}
+            {saldoAwal > 0 && saldoAwalEntry && (
+              <p className="text-teal-200/80 text-xs mb-4">
+                Saldo Awal
+                {' · '}
+                {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                {' · '}
+                {formatRupiahPlain(saldoAwal)}
+              </p>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-white/15 rounded-2xl p-3 border border-white/20">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
                   <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Masuk</p>
                 </div>
                 <p className="text-sm font-bold text-white">+{formatRupiahPlain(totalMasuk)}</p>
               </div>
-              <div className="bg-white/15 rounded-2xl p-3 border border-white/20">
+              <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-red-300" />
                   <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Keluar</p>

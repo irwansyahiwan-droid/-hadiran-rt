@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, RefreshCw, Search, X } from 'lucide-react'
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggalShort, formatRupiahPlain } from '../lib/utils';
+import AvatarPeci from '../components/AvatarPeci';
 import type { Talangan } from '../lib/types';
 
 interface WargaGroup {
@@ -104,9 +105,7 @@ export default function TalanganPage() {
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
           className="w-full flex items-center gap-3 p-3.5 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
         >
-          <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 text-sm font-bold text-amber-700">
-            {g.nama.charAt(0)}
-          </div>
+          <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
             {g.countBelum > 0 && (
