@@ -3,7 +3,9 @@ import { FileText, RefreshCw, ArrowUpRight, X, Building2, Users, Trash2 } from '
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
-import type { Tarikan, TransaksiKas } from '../lib/types';
+import { generateKasHadiranPDF } from '../lib/generateKasHadiranPDF';
+import { generatePendapatanPDF } from '../lib/generatePendapatanPDF';
+import type { Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
 
@@ -80,14 +82,16 @@ export default function KasHadiranPage() {
   const { isBendahara } = useAuthContext();
   const [transaksi, setTransaksi] = useState<TransaksiKas[]>([]);
   const [tarikanSelesai, setTarikanSelesai] = useState<Tarikan[]>([]);
+  const [wargaList, setWargaList] = useState<Warga[]>([]);
   const [totalTalanganBelum, setTotalTalanganBelum] = useState(0);
   const [talanganMap, setTalanganMap] = useState<Record<string, { count: number; total: number }>>({});
+  const [pdfLoading, setPdfLoading] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
   async function load() {
     setLoading(true);
-    const [txRes, tarRes, talRes] = await Promise.all([
+    const [txRes, tarRes, talRes, wargaRes] = await Promise.all([
       supabase.from('transaksi_kas').select('*').order('tanggal', { ascending: true }),
       supabase
         .from('tarikan')
@@ -95,9 +99,11 @@ export default function KasHadiranPage() {
         .eq('status', 'selesai')
         .order('nomor', { ascending: true }),
       supabase.from('talangan').select('tarikan_id, nominal').eq('status_lunas', false),
+      supabase.from('warga').select('*').eq('status_aktif', true).order('nama', { ascending: true }),
     ]);
     setTransaksi((txRes.data as TransaksiKas[]) ?? []);
     setTarikanSelesai((tarRes.data as Tarikan[]) ?? []);
+    setWargaList((wargaRes.data as Warga[]) ?? []);
 
     const talData = (talRes.data ?? []) as { tarikan_id: string; nominal: number }[];
     const total = talData.reduce((s, t) => s + t.nominal, 0);
@@ -118,6 +124,19 @@ export default function KasHadiranPage() {
   const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const saldo = totalKasTerkumpul - totalTalanganBelum - totalSetor;
+
+  async function handlePendapatanPDF(tarikan: Tarikan) {
+    setPdfLoading(tarikan.id);
+    const [absensiRes, talanganRes] = await Promise.all([
+      supabase.from('absensi').select('warga_id, status').eq('tarikan_id', tarikan.id),
+      supabase.from('talangan').select('warga_id').eq('tarikan_id', tarikan.id).eq('status_lunas', true),
+    ]);
+    const absensiMap: Record<string, 'hadir' | 'tidak_hadir'> = {};
+    (absensiRes.data ?? []).forEach((a: any) => { absensiMap[a.warga_id] = a.status; });
+    const lunasSet = new Set((talanganRes.data ?? []).map((t: any) => t.warga_id as string));
+    generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
+    setPdfLoading(null);
+  }
 
   async function handleSetor(data: { nominal: number; keterangan: string; tanggal: string }) {
     const saldoBaru = saldo - data.nominal;
@@ -156,7 +175,10 @@ export default function KasHadiranPage() {
             </p>
             <p className="text-emerald-200 text-xs mb-4">{tarikanSelesai.length} tarikan terlaksana</p>
             <div className="flex gap-2">
-              <button className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 border border-white/25 rounded-xl py-2.5 text-white text-xs font-semibold hover:bg-white/25 transition-all">
+              <button
+                onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
+                className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 border border-white/25 rounded-xl py-2.5 text-white text-xs font-semibold hover:bg-white/25 transition-all"
+              >
                 <FileText className="w-3.5 h-3.5" />
                 Cetak PDF
               </button>
@@ -302,9 +324,13 @@ export default function KasHadiranPage() {
                             <Users className="w-3.5 h-3.5" />
                             Absensi
                           </button>
-                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
-                            <FileText className="w-3.5 h-3.5" />
-                            Pendapatan
+                          <button
+                            onClick={() => handlePendapatanPDF(t)}
+                            disabled={pdfLoading === t.id}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-60"
+                          >
+                            <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
+                            {pdfLoading === t.id ? 'Loading...' : 'Pendapatan'}
                           </button>
                           <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors">
                             <Trash2 className="w-3.5 h-3.5" />
