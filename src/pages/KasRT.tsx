@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
+import { generateKasRTPDF } from '../lib/generateKasRTPDF';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -191,6 +192,13 @@ export default function KasRTPage() {
           <div className="flex items-center gap-2">
             <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={() => generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal })}
+              className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold px-3 py-2 rounded-xl hover:bg-gray-50 active:scale-95 transition-all"
+            >
+              <FileText className="w-4 h-4" />
+              PDF
             </button>
             {isBendahara && (
               <button
