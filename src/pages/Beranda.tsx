@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Users, Zap, Calendar, FileText, Building2, TrendingUp, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { AlertTriangle, Users, Zap, Calendar, FileText, Building2, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
@@ -232,91 +232,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       )}
 
-      {/* Kas Flow Summary */}
-      <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900 text-sm">Alur Kas Hadiran</p>
-              <p className="text-xs text-gray-400">{summary?.jumlah_tarikan ?? 0} tarikan terlaksana</p>
-            </div>
-          </div>
-          <div className="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs font-bold">{summary?.jumlah_tarikan ?? 0}</span>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex items-center justify-between py-2 border-b border-gray-50">
-            <div className="flex items-center gap-2">
-              <span className="text-base">💰</span>
-              <span className="text-sm text-gray-700">Kas Hadiran Terkumpul</span>
-            </div>
-            <span className="text-sm font-semibold text-emerald-600">
-              +{formatRupiahPlain(summary?.total_kas_terkumpul ?? 0)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b border-gray-50">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🏦</span>
-              <span className="text-sm text-gray-700">Talangan Belum Lunas</span>
-            </div>
-            <span className="text-sm font-semibold text-red-500">
-              -{formatRupiahPlain(talangan)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b border-gray-50">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🏛️</span>
-              <span className="text-sm text-gray-700">Setoran ke Kas Besar</span>
-            </div>
-            <span className="text-sm font-semibold text-red-500">
-              -{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}
-            </span>
-          </div>
-          <div className="flex items-center justify-between bg-gray-50 rounded-2xl p-3 mt-1">
-            <p className="text-sm font-semibold text-gray-900">Total Bersih Kas Hadiran</p>
-            <span className={`text-base font-bold ${saldo < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
-              {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Transaksi Terakhir */}
-      <div>
-        <h2 className="text-sm font-semibold text-gray-700 mb-3 px-1">Transaksi Terakhir</h2>
-        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
-          {trxItems.length === 0 ? (
-            <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
-          ) : (
-            trxItems.map((trx, idx) => (
-              <div key={trx.id} className={`flex items-center gap-3 p-4 ${idx < trxItems.length - 1 ? 'border-b border-gray-50' : ''}`}>
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
-                  {trx.tipe === 'setor'
-                    ? <ArrowUpRight className="w-4 h-4 text-orange-500" />
-                    : <ArrowDownLeft className="w-4 h-4 text-emerald-500" />
-                  }
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{trx.keterangan}</p>
-                  <p className="text-xs text-gray-400">{formatTanggal(trx.tanggal)}</p>
-                  <p className="text-xs text-gray-400">
-                    Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
-                  </p>
-                </div>
-                <span className={`text-sm font-bold shrink-0 ${trx.nominal < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
-                  {trx.nominal < 0 ? '-' : '+'}Rp{Math.abs(trx.nominal).toLocaleString('id-ID')}
-                </span>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
       {/* Jadwal Berikutnya */}
       <div>
         <h2 className="text-sm font-semibold text-gray-700 mb-3 px-1">Jadwal Berikutnya</h2>
@@ -335,6 +250,37 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 </div>
                 <span className="px-3 py-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200">
                   Terjadwal
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Transaksi Terakhir */}
+      <div>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3 px-1">Transaksi Terakhir</h2>
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl border border-white shadow-sm overflow-hidden">
+          {trxItems.length === 0 ? (
+            <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
+          ) : (
+            trxItems.map((trx, idx) => (
+              <div key={trx.id} className={`flex items-start gap-3 p-4 ${idx < trxItems.length - 1 ? 'border-b border-gray-50' : ''}`}>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
+                  {trx.tipe === 'setor'
+                    ? <ArrowUpRight className="w-4 h-4 text-orange-500" />
+                    : <ArrowDownLeft className="w-4 h-4 text-emerald-500" />
+                  }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 leading-snug">{trx.keterangan}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
+                  <p className="text-xs text-gray-400">
+                    Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
+                  </p>
+                </div>
+                <span className={`text-sm font-bold shrink-0 mt-0.5 ${trx.nominal < 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                  {trx.nominal < 0 ? '-' : '+'}Rp{Math.abs(trx.nominal).toLocaleString('id-ID')}
                 </span>
               </div>
             ))
