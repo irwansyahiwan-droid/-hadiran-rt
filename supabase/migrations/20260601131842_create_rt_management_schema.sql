@@ -61,6 +61,10 @@ CREATE TABLE IF NOT EXISTS warga (
 
 ALTER TABLE warga ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read warga" ON warga;
+DROP POLICY IF EXISTS "Public can insert warga" ON warga;
+DROP POLICY IF EXISTS "Public can update warga" ON warga;
+
 CREATE POLICY "Public can read warga"
   ON warga FOR SELECT
   TO anon, authenticated
@@ -92,6 +96,10 @@ CREATE TABLE IF NOT EXISTS tarikan (
 
 ALTER TABLE tarikan ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read tarikan" ON tarikan;
+DROP POLICY IF EXISTS "Public can insert tarikan" ON tarikan;
+DROP POLICY IF EXISTS "Public can update tarikan" ON tarikan;
+
 CREATE POLICY "Public can read tarikan"
   ON tarikan FOR SELECT
   TO anon, authenticated
@@ -122,6 +130,10 @@ CREATE TABLE IF NOT EXISTS talangan (
 );
 
 ALTER TABLE talangan ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can read talangan" ON talangan;
+DROP POLICY IF EXISTS "Public can insert talangan" ON talangan;
+DROP POLICY IF EXISTS "Public can update talangan" ON talangan;
 
 CREATE POLICY "Public can read talangan"
   ON talangan FOR SELECT
@@ -156,6 +168,10 @@ CREATE TABLE IF NOT EXISTS transaksi_kas (
 
 ALTER TABLE transaksi_kas ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read transaksi_kas" ON transaksi_kas;
+DROP POLICY IF EXISTS "Public can insert transaksi_kas" ON transaksi_kas;
+DROP POLICY IF EXISTS "Public can update transaksi_kas" ON transaksi_kas;
+
 CREATE POLICY "Public can read transaksi_kas"
   ON transaksi_kas FOR SELECT
   TO anon, authenticated
@@ -187,6 +203,10 @@ CREATE TABLE IF NOT EXISTS jadwal (
 );
 
 ALTER TABLE jadwal ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can read jadwal" ON jadwal;
+DROP POLICY IF EXISTS "Public can insert jadwal" ON jadwal;
+DROP POLICY IF EXISTS "Public can update jadwal" ON jadwal;
 
 CREATE POLICY "Public can read jadwal"
   ON jadwal FOR SELECT

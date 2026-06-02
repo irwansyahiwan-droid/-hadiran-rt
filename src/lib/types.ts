@@ -15,7 +15,11 @@ export interface Tarikan {
   jumlah_per_orang: number;
   total_hadir: number;
   total_warga: number;
+  sohibul_bait_id: string | null;
+  status: 'dijadwalkan' | 'berlangsung' | 'selesai';
+  total_terkumpul: number;
   created_at: string;
+  sohibul_bait?: Warga;
 }
 
 export interface Talangan {
@@ -44,15 +48,15 @@ export interface TransaksiKas {
   tarikan?: Tarikan;
 }
 
-export interface Jadwal {
+export interface KasRT {
   id: string;
-  warga_id: string;
-  tanggal: string;
-  keterangan: string;
-  status: 'terjadwal' | 'selesai' | 'dibatalkan';
+  tipe: 'masuk' | 'keluar';
   nominal: number;
+  keterangan: string;
+  tanggal: string;
+  tarikan_id: string | null;
+  saldo_setelah: number;
   created_at: string;
-  warga?: Warga;
 }
 
 export interface DashboardSummary {
@@ -62,6 +66,6 @@ export interface DashboardSummary {
   total_kas_terkumpul: number;
   jumlah_anggota: number;
   jumlah_tarikan: number;
-  jumlah_jadwal: number;
+  jumlah_dijadwalkan: number;
   tarikan_terakhir: Tarikan | null;
 }

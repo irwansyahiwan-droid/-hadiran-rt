@@ -41,6 +41,11 @@ CREATE TABLE IF NOT EXISTS absensi (
 
 ALTER TABLE absensi ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read absensi" ON absensi;
+DROP POLICY IF EXISTS "Public can insert absensi" ON absensi;
+DROP POLICY IF EXISTS "Public can update absensi" ON absensi;
+DROP POLICY IF EXISTS "Public can delete absensi" ON absensi;
+
 CREATE POLICY "Public can read absensi"
   ON absensi FOR SELECT TO anon, authenticated USING (true);
 
@@ -70,6 +75,10 @@ CREATE TABLE IF NOT EXISTS kas_rt (
 );
 
 ALTER TABLE kas_rt ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can read kas_rt" ON kas_rt;
+DROP POLICY IF EXISTS "Public can insert kas_rt" ON kas_rt;
+DROP POLICY IF EXISTS "Public can update kas_rt" ON kas_rt;
 
 CREATE POLICY "Public can read kas_rt"
   ON kas_rt FOR SELECT TO anon, authenticated USING (true);

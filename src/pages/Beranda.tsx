@@ -3,7 +3,7 @@ import { AlertTriangle, Users, Zap, Calendar, FileText, Building2, TrendingUp, R
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggalShort } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
-import type { DashboardSummary, Jadwal } from '../lib/types';
+import type { DashboardSummary, Tarikan } from '../lib/types';
 
 function StatCard({ label, value, icon: Icon, color }: {
   label: string;
@@ -29,7 +29,7 @@ interface BerandaProps {
 export default function Beranda({ onNavigate }: BerandaProps) {
   const { isBendahara } = useAuthContext();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [jadwalList, setJadwalList] = useState<Jadwal[]>([]);
+  const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -40,15 +40,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     const [summaryData, jadwalRes] = await Promise.all([
       fetchDashboardSummary(),
       supabase
-        .from('jadwal')
-        .select('*, warga(*)')
-        .eq('status', 'terjadwal')
-        .order('tanggal', { ascending: true })
+        .from('tarikan')
+        .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
+        .eq('status', 'dijadwalkan')
+        .order('nomor', { ascending: true })
         .limit(6),
     ]);
 
     setSummary(summaryData);
-    setJadwalList((jadwalRes.data as Jadwal[]) ?? []);
+    setJadwalList((jadwalRes.data as Tarikan[]) ?? []);
     setLoading(false);
     setRefreshing(false);
   }
@@ -155,8 +155,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">
         <StatCard label="Jumlah Anggota" value={summary?.jumlah_anggota ?? 0} icon={Users} color="bg-blue-500" />
-        <StatCard label="Jumlah Tarikan" value={summary?.jumlah_tarikan ?? 0} icon={Zap} color="bg-emerald-500" />
-        <StatCard label="Terjadwal" value={summary?.jumlah_jadwal ?? 0} icon={Calendar} color="bg-amber-500" />
+        <StatCard label="Tarikan Selesai" value={summary?.jumlah_tarikan ?? 0} icon={Zap} color="bg-emerald-500" />
+        <StatCard label="Terjadwal" value={summary?.jumlah_dijadwalkan ?? 0} icon={Calendar} color="bg-amber-500" />
       </div>
 
       {/* Alert Banner */}
@@ -247,8 +247,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   <span className="text-lg">👤</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{j.warga?.nama ?? '-'}</p>
-                  <p className="text-xs text-gray-400">{formatTanggalShort(j.tanggal)} · {formatRupiahPlain(j.nominal)}</p>
+                  <p className="text-sm font-semibold text-gray-900 truncate">{j.sohibul_bait?.nama ?? '-'}</p>
+                  <p className="text-xs text-gray-400">{formatTanggalShort(j.tanggal)} · Tarikan #{j.nomor}</p>
                 </div>
                 <span className="px-3 py-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-100 rounded-full border border-emerald-200">
                   Terjadwal
