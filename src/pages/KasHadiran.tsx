@@ -71,7 +71,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
             <button type="button" onClick={onClose}
               className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300">Batal</button>
             <button type="submit" disabled={saving || !nominal}
-              className="flex-1 py-3 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold disabled:opacity-70 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+              className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-semibold disabled:opacity-70 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
               {saving ? 'Menyimpan...' : 'Setor'}
             </button>
@@ -305,11 +305,11 @@ export default function KasHadiranPage() {
                           <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
-                          <span className="text-[9px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-700 px-2.5 py-0.5 rounded-full">
+                          <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(255,59,48,0.10)', color: '#FF3B30' }}>
                             {talanganInfo.count} belum bayar
                           </span>
                         ) : (
-                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full">
+                          <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#248A3D' }}>
                             ✓ Lunas semua
                           </span>
                         )}

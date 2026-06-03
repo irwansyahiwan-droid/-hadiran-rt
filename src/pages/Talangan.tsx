@@ -143,11 +143,11 @@ export default function TalanganPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{formatRupiahPlain(t.nominal)}</span>
                   {t.status_lunas ? (
-                    <span className="px-2 py-0.5 text-[9px] font-bold text-blue-600 bg-blue-50 rounded-full border border-blue-200">
+                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#248A3D' }}>
                       LUNAS
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 text-[9px] font-bold text-amber-600 bg-amber-50 rounded-full border border-amber-200">
+                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(255,59,48,0.10)', color: '#FF3B30' }}>
                       BELUM
                     </span>
                   )}

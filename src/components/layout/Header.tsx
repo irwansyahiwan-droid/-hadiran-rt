@@ -14,8 +14,8 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
 
   return (
     <header
-      className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/90 dark:border-gray-800"
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      className="sticky top-0 z-40 bg-white/95 backdrop-blur-md dark:bg-gray-900/95"
+      style={{ paddingTop: 'env(safe-area-inset-top)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
     >
       <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -23,15 +23,14 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
           <h1 className="font-semibold text-gray-900 dark:text-gray-100 text-base whitespace-nowrap">Hadiran RT</h1>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className={`px-2 py-0.5 rounded-full border ${
-            isBendahara ? 'border-emerald-500 dark:border-emerald-400' : 'border-blue-400'
-          }`}>
-            <span className={`text-xs font-semibold ${
-              isBendahara ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'
-            }`}>
-              {isBendahara ? 'BENDAHARA' : 'WARGA'}
-            </span>
-          </div>
+          <span
+            className="text-[0.7rem] font-semibold px-[10px] py-[3px] rounded-[6px]"
+            style={isBendahara
+              ? { background: 'rgba(52,199,89,0.12)', color: '#248A3D' }
+              : { background: 'rgba(0,122,255,0.10)', color: '#0071E3' }}
+          >
+            {isBendahara ? 'BENDAHARA' : 'WARGA'}
+          </span>
           <button
             onClick={onToggleTheme}
             className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-base leading-none"

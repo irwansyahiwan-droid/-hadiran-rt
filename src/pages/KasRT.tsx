@@ -128,7 +128,7 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
               type="submit"
               disabled={saving || !nominal}
               className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.98] disabled:opacity-70 transition-all flex items-center justify-center gap-2 ${
-                tipe === 'masuk' ? 'bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86]' : 'bg-red-500 hover:bg-red-600'
+                tipe === 'masuk' ? 'bg-[#0F6039]' : 'bg-red-500 hover:bg-red-600'
               }`}
             >
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
@@ -209,7 +209,7 @@ export default function KasRTPage() {
             {isBendahara && (
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-1.5 bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold px-4 py-2 rounded-full active:scale-95 transition-all shadow-sm"
+                className="flex items-center gap-1.5 bg-[#0F6039] text-white text-sm font-semibold px-4 py-2 rounded-full active:scale-95 transition-all shadow-sm"
               >
                 <Plus className="w-4 h-4" />
                 Tambah
