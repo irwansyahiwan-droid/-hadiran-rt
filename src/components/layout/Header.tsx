@@ -13,19 +13,20 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
   const isBendahara = role === 'bendahara';
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/80 dark:border-gray-800">
-      <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
-        <div className="flex items-center gap-3">
-          <img src={logoRT} alt="Logo RT 004/006" className="h-9 w-9 object-contain rounded-full shadow-sm" />
-          <h1 className="font-bold text-gray-900 dark:text-gray-100 text-base whitespace-nowrap">Hadiran RT</h1>
+    <header
+      className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/90 dark:border-gray-800"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
+      <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-2.5">
+        <div className="flex items-center gap-2.5">
+          <img src={logoRT} alt="Logo RT" className="h-8 w-8 object-contain rounded-full shadow-sm" />
+          <h1 className="font-semibold text-gray-900 dark:text-gray-100 text-base whitespace-nowrap">Hadiran RT</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <div className={`px-3 py-1.5 rounded-full border ${
-            isBendahara
-              ? 'border-emerald-500 dark:border-emerald-400'
-              : 'border-blue-400 dark:border-blue-400'
+        <div className="flex items-center gap-1.5">
+          <div className={`px-2 py-0.5 rounded-full border ${
+            isBendahara ? 'border-emerald-500 dark:border-emerald-400' : 'border-blue-400'
           }`}>
-            <span className={`text-xs font-semibold tracking-wide ${
+            <span className={`text-xs font-semibold ${
               isBendahara ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'
             }`}>
               {isBendahara ? 'BENDAHARA' : 'WARGA'}
@@ -33,18 +34,17 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
           </div>
           <button
             onClick={onToggleTheme}
-            className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-lg"
+            className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-base leading-none"
             title={isDark ? 'Mode Terang' : 'Mode Gelap'}
           >
             {isDark ? '☀️' : '🌙'}
           </button>
           <button
             onClick={onLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors border border-gray-200 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+            className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title="Keluar"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            Keluar
+            <LogOut className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
       </div>

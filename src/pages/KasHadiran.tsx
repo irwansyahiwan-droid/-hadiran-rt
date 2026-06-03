@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, ArrowUpRight, Users, Trash2 } from 'lucide-react';
+import { FileText, RefreshCw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle } from 'lucide-react';
 import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -218,20 +218,25 @@ export default function KasHadiranPage() {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
+              <div className="flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
+              </div>
               <span className="text-sm font-bold text-green-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Talangan Belum Lunas</span>
-              <span className="px-2.5 py-0.5 text-xs font-bold text-amber-700 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 rounded-full">
-                -{formatRupiahPlain(totalTalanganBelum)}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">Talangan Belum Lunas</span>
+              </div>
+              <span className="text-sm font-semibold text-amber-600">-{formatRupiahPlain(totalTalanganBelum)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Setoran ke Kas Besar</span>
-              <span className="px-2.5 py-0.5 text-xs font-bold text-blue-700 bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300 rounded-full">
-                -{formatRupiahPlain(totalSetor)}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">Setoran ke Kas Besar</span>
+              </div>
+              <span className="text-sm font-semibold text-blue-600">-{formatRupiahPlain(totalSetor)}</span>
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-slate-100 dark:bg-slate-800' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>

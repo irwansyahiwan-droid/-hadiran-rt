@@ -275,9 +275,9 @@ export default function KasRTPage() {
               return (
                 <div
                   key={k.id}
-                  className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
+                  className={`flex items-start gap-3 p-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
                 >
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
                     isMasuk ? 'bg-emerald-100' : 'bg-red-100'
                   }`}>
                     {isMasuk
@@ -286,12 +286,12 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-2">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-sm text-gray-400 dark:text-gray-500">{formatTanggal(k.tanggal)}</p>
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{formatTanggal(k.tanggal)}</p>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                         isMasuk ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'
                       }`}>
                         {isMasuk ? 'Masuk' : 'Keluar'}
@@ -303,7 +303,7 @@ export default function KasRTPage() {
                     <p className={`text-sm font-bold ${isMasuk ? 'text-green-600' : 'text-red-500'}`}>
                       {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
                     </p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                       Saldo: {formatRupiahPlain(k.saldo_setelah)}
                     </p>
                   </div>

@@ -387,7 +387,7 @@ export default function JadwalPage() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-base font-semibold ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
+                  <p className={`text-sm font-semibold ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
                     {t.sohibul_bait?.nama ?? '—'}
                   </p>
                   <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>

@@ -55,7 +55,7 @@ export default function App() {
           isDark={isDark}
           onToggleTheme={toggleTheme}
         />
-        <main className="max-w-lg mx-auto px-4 pt-4 pb-24">
+        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
           {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
           {activeTab === 'talangan' && !isWargaMode && <TalanganPage />}

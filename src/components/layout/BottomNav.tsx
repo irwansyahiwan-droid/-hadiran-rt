@@ -20,27 +20,23 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
   const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 safe-area-pb dark:bg-gray-900 dark:border-gray-800 h-16">
-      <div className="max-w-lg mx-auto flex items-center justify-around h-full px-2">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-gray-100 dark:bg-gray-900/95 dark:border-gray-800"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
+      <div className="max-w-lg mx-auto flex items-center justify-around h-14 px-2">
         {visibleTabs.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
             <button
               key={id}
               onClick={() => onChange(id)}
-              className="flex items-center justify-center flex-1 h-full transition-all duration-200"
+              className="flex flex-col items-center gap-0.5 flex-1 py-2 transition-all duration-200"
             >
-              {isActive ? (
-                <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/30 px-3 py-1.5 rounded-full transition-all duration-200">
-                  <Icon className="w-[18px] h-[18px] text-green-600 dark:text-green-400" />
-                  <span className="text-[11px] font-semibold text-green-600 dark:text-green-400 whitespace-nowrap">{label}</span>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-0.5 transition-all duration-200">
-                  <Icon className="w-[18px] h-[18px] text-gray-400 dark:text-gray-500" />
-                  <span className="text-[9px] font-medium text-gray-400 dark:text-gray-500 leading-none">{label}</span>
-                </div>
-              )}
+              <Icon className={`w-[22px] h-[22px] transition-colors duration-200 ${isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`} />
+              <span className={`text-[10px] font-medium leading-none transition-colors duration-200 ${isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>
+                {label}
+              </span>
             </button>
           );
         })}
