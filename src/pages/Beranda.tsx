@@ -210,7 +210,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Alert Banner */}
       {talangan > 0 && (
-        <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-2xl p-4">
+        <div className="flex items-start gap-3 bg-amber-50/90 border border-amber-200/60 rounded-2xl p-4 shadow-[0_4px_12px_rgba(245,158,11,0.08)]">
           <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-4 h-4 text-amber-600" />
           </div>

@@ -193,7 +193,7 @@ export default function KasHadiranPage() {
 
           <div className="relative p-5">
             <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
-            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-red-100' : 'text-white'}`}>
+            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
