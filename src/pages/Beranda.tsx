@@ -105,8 +105,29 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
+      <div className="space-y-4 pb-2">
+        <div className="rounded-2xl h-44 bg-gray-200 animate-pulse" />
+        <div className="bg-white rounded-2xl border border-gray-100 py-4">
+          <div className="grid grid-cols-3 divide-x divide-gray-100">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-2 px-3">
+                <div className="h-7 w-12 bg-gray-200 animate-pulse rounded-md" />
+                <div className="h-3 w-10 bg-gray-100 animate-pulse rounded-md" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-[#F0F0F0]' : ''}`}>
+              <div className="w-12 h-12 rounded-2xl bg-gray-200 animate-pulse shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 animate-pulse rounded-md w-3/5" />
+                <div className="h-3 bg-gray-100 animate-pulse rounded-md w-2/5" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

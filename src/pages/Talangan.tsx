@@ -20,6 +20,7 @@ export default function TalanganPage() {
   const [list, setList] = useState<Talangan[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -37,6 +38,7 @@ export default function TalanganPage() {
 
   async function bayar(t: Talangan) {
     setProcessingId(t.id);
+    setConfirmId(null);
     try {
       const today = new Date().toISOString().split('T')[0];
       await supabase
@@ -55,6 +57,15 @@ export default function TalanganPage() {
       load();
     } finally {
       setProcessingId(null);
+    }
+  }
+
+  function handleBayarClick(t: Talangan) {
+    if (confirmId === t.id) {
+      bayar(t);
+    } else {
+      setConfirmId(t.id);
+      setTimeout(() => setConfirmId(prev => prev === t.id ? null : prev), 3000);
     }
   }
 
@@ -156,16 +167,15 @@ export default function TalanganPage() {
                 </div>
                 {isBendahara && !t.status_lunas && (
                   <button
-                    onClick={() => bayar(t)}
+                    onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 active:scale-95 transition-all disabled:opacity-70 shrink-0"
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 ${
+                      confirmId === t.id ? 'bg-rose-600' : 'bg-[#0F6039]'
+                    }`}
                   >
                     {processingId === t.id ? (
-                      <>
-                        <RefreshCw className="w-3 h-3 animate-spin" />
-                        Memproses...
-                      </>
-                    ) : 'Bayar'}
+                      <><RefreshCw className="w-3 h-3 animate-spin" />Memproses...</>
+                    ) : confirmId === t.id ? 'Yakin?' : 'Bayar'}
                   </button>
                 )}
               </div>
@@ -219,8 +229,17 @@ export default function TalanganPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <RefreshCw className="w-7 h-7 text-emerald-500 animate-spin" />
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0]">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3.5">
+              <div className="w-9 h-9 rounded-xl bg-gray-200 animate-pulse shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 animate-pulse rounded-md w-2/3" />
+                <div className="h-3 bg-gray-100 animate-pulse rounded-md w-1/2" />
+              </div>
+              <div className="h-5 w-20 bg-gray-100 animate-pulse rounded-[6px] shrink-0" />
+            </div>
+          ))}
         </div>
       ) : (
         <>
@@ -260,8 +279,16 @@ export default function TalanganPage() {
           )}
 
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-gray-400 text-sm">
-              {search ? 'Tidak ditemukan' : 'Belum ada talangan'}
+            <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+              <Search className="w-10 h-10 text-gray-200 mb-3" />
+              <p className="text-gray-700 font-medium">
+                {search ? 'Data tidak ditemukan' : 'Belum ada talangan'}
+              </p>
+              <p className="text-gray-400 text-sm mt-1">
+                {search
+                  ? 'Silakan periksa kembali kata kunci atau ejaan nama warga.'
+                  : 'Semua warga sudah memenuhi kehadiran.'}
+              </p>
             </div>
           )}
         </>

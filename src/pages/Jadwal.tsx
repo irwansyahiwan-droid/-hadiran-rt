@@ -462,13 +462,23 @@ export default function JadwalPage() {
 
       {/* List */}
       {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <RefreshCw className="w-7 h-7 text-emerald-500 animate-spin" />
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i < 4 ? 'border-b border-[#F0F0F0]' : ''}`}>
+              <div className="w-7 h-4 bg-gray-200 animate-pulse rounded-md shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 animate-pulse rounded-md w-3/5" />
+                <div className="h-3 bg-gray-100 animate-pulse rounded-md w-2/5" />
+              </div>
+              <div className="h-6 w-16 bg-gray-100 animate-pulse rounded-[6px] shrink-0" />
+            </div>
+          ))}
         </div>
       ) : tarikanList.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 gap-2">
-          <Calendar className="w-10 h-10 text-gray-200" />
-          <p className="text-sm text-gray-400">Belum ada jadwal</p>
+        <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+          <Calendar className="w-10 h-10 text-gray-200 mb-3" />
+          <p className="text-gray-700 font-medium">Belum ada jadwal</p>
+          <p className="text-gray-400 text-sm mt-1">Jadwal tarikan akan muncul setelah dibuat oleh bendahara.</p>
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
