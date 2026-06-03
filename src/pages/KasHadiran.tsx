@@ -186,26 +186,33 @@ export default function KasHadiranPage() {
             <p className="text-4xl font-black tracking-tight mb-1 text-white">
               {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
             </p>
-            <p className="text-white/60 text-xs mb-4">{tarikanSelesai.length} tarikan terlaksana</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 border border-white/25 rounded-xl py-2.5 text-white text-xs font-semibold hover:bg-white/25 transition-all"
-              >
-                <FileText className="w-3.5 h-3.5" />
-                Cetak PDF
-              </button>
-              {isBendahara && (
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 bg-white rounded-xl py-2.5 text-emerald-700 text-xs font-semibold hover:bg-emerald-50 transition-all shadow-md"
-                >
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                  Setor Kas RT
-                </button>
-              )}
-            </div>
+            <p className="text-white/60 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
+            {saldo <= 0 && totalSetor > 0 && (
+              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-green-400/20 border border-green-300/30 rounded-full text-green-200 text-xs font-semibold">
+                ✓ Sudah disetor ke Kas RT
+              </span>
+            )}
           </div>
+        </div>
+
+        {/* Action buttons — outside hero */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
+            className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
+          >
+            <FileText className="w-4 h-4" />
+            Cetak PDF
+          </button>
+          {isBendahara && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
+            >
+              <ArrowUpRight className="w-4 h-4" />
+              Setor Kas RT
+            </button>
+          )}
         </div>
 
         {/* Alur Kas */}
@@ -290,7 +297,7 @@ export default function KasHadiranPage() {
                       <div className="flex items-center gap-3 px-4 pb-4">
                         <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-base font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+                          <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 leading-tight">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
@@ -298,10 +305,10 @@ export default function KasHadiranPage() {
                           </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-base font-bold text-green-600 dark:text-green-400">
+                          <p className="text-[17px] font-semibold text-green-600 dark:text-green-400">
                             +{formatRupiahPlain(iuranHadir)}
                           </p>
-                          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                             {t.total_hadir}/{t.total_warga} hadir
                           </p>
                         </div>

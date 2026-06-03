@@ -286,7 +286,7 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-2">
+                    <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-2">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -300,7 +300,7 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-sm font-bold ${isMasuk ? 'text-green-600' : 'text-red-500'}`}>
+                    <p className={`text-[17px] font-semibold ${isMasuk ? 'text-green-600' : 'text-red-500'}`}>
                       {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">

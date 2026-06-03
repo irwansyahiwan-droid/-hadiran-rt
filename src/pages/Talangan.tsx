@@ -103,11 +103,11 @@ export default function TalanganPage() {
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
-          className="w-full flex items-center gap-3 p-3.5 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+          className="w-full flex items-center gap-3 p-3.5 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.98] transition-all text-left cursor-pointer"
         >
           <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
+            <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
             {g.countBelum > 0 && (
               <p className="text-xs text-amber-600 mt-0.5">
                 {g.countBelum} belum lunas · {formatRupiahPlain(g.totalBelum)}
@@ -130,7 +130,7 @@ export default function TalanganPage() {
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
+                  <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
                   <p className="text-sm text-gray-400 dark:text-gray-500">
                     Tarikan #{t.tarikan?.nomor} · {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>

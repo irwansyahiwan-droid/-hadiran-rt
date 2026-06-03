@@ -43,6 +43,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
 
   async function load(showRefreshing = false) {
     if (showRefreshing) setRefreshing(true);
@@ -125,6 +126,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   }
 
   return (
+    <>
     <div className="space-y-4 pb-2">
       {/* Main Kas Card — always green (kasHadiran always positive) */}
       <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-emerald-800 to-emerald-700">
@@ -230,8 +232,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-semibold text-gray-900 dark:text-gray-100 leading-tight">{j.sohibul_bait?.nama ?? '-'}</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 leading-tight">{j.sohibul_bait?.nama ?? '-'}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
                 <span className="px-3 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 rounded-full border border-blue-300 dark:border-blue-600 shrink-0">
                   Terjadwal
@@ -250,28 +252,73 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
           ) : (
             trxItems.map((trx, idx) => (
-              <div key={trx.id} className={`flex items-start gap-3 p-4 ${idx < trxItems.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}>
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
+              <button
+                key={trx.id}
+                onClick={() => setSelectedTrx(trx)}
+                className={`w-full flex items-start gap-3 p-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
+              >
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'
                     ? <ArrowUpRight className="w-4 h-4 text-orange-500" />
                     : <ArrowDownLeft className="w-4 h-4 text-emerald-500" />
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug">{trx.keterangan}</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(trx.tanggal)}</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                  <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-1">{trx.keterangan}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(trx.tanggal)}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
                   </p>
                 </div>
-                <span className={`text-sm font-bold shrink-0 mt-0.5 ${trx.nominal < 0 ? 'text-red-500' : 'text-green-600'}`}>
+                <span className={`text-[17px] font-semibold shrink-0 mt-0.5 ${trx.nominal < 0 ? 'text-red-500' : 'text-green-600'}`}>
                   {trx.nominal < 0 ? '-' : '+'}Rp{Math.abs(trx.nominal).toLocaleString('id-ID')}
                 </span>
-              </div>
+              </button>
             ))
           )}
         </div>
       </div>
     </div>
+
+    {/* Transaksi detail bottom sheet */}
+    {selectedTrx !== null && (
+      <div className="fixed inset-0 z-50 flex items-end" onClick={() => setSelectedTrx(null)}>
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div
+          className="relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
+            {selectedTrx.tipe === 'setor'
+              ? <ArrowUpRight className="w-5 h-5 text-orange-500" />
+              : <ArrowDownLeft className="w-5 h-5 text-emerald-500" />}
+          </div>
+          <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
+          <p className="text-xs text-gray-400 mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Jumlah</span>
+              <span className={`text-[17px] font-semibold ${selectedTrx.nominal < 0 ? 'text-red-500' : 'text-green-600'}`}>
+                {selectedTrx.nominal < 0 ? '-' : '+'}Rp{Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Saldo Setelah</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Tipe</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {selectedTrx.tipe === 'setor' ? 'Setor ke Kas RT' : 'Talangan Lunas'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

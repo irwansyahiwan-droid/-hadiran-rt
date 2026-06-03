@@ -376,7 +376,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-3 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
+                className={`flex items-center gap-3 px-4 py-3 min-h-[56px] ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
               >
                 {/* Nomor badge */}
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 font-black text-base ${
@@ -387,20 +387,21 @@ export default function JadwalPage() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
+                  <p className={`text-[15px] font-medium ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
                     {t.sohibul_bait?.nama ?? '—'}
                   </p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>
                 </div>
 
                 {/* Action */}
                 {isBendahara && isSelesai ? (
                   <button
                     onClick={() => setSelectedTarikan(t)}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shrink-0"
+                    title="Hitung Ulang"
+                    aria-label="Hitung Ulang"
+                    className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all shrink-0 cursor-pointer"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    Hitung Ulang
+                    <RefreshCw className="w-4 h-4" />
                   </button>
                 ) : isBendahara && isNext ? (
                   <button
