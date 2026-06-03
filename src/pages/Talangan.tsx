@@ -104,7 +104,7 @@ export default function TalanganPage() {
     const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
 
     return (
-      <div key={g.warga_id} className="bg-white dark:bg-gray-900 rounded-2xl card-elevated overflow-hidden mb-2">
+      <div key={g.warga_id} className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden mb-2">
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
@@ -128,7 +128,7 @@ export default function TalanganPage() {
 
         {/* Detail entries */}
         {isExpanded && (
-          <div className="border-t border-gray-100 dark:border-gray-800 divide-y divide-gray-50 dark:divide-gray-800">
+          <div className="border-t border-gray-100 dark:border-gray-800 divide-y divide-[#F0F0F0]">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-3 px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50">
                 <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">

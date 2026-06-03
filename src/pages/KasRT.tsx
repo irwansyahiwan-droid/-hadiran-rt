@@ -261,7 +261,7 @@ export default function KasRTPage() {
         </div>
 
         {/* Mutasi list — terbaru di atas */}
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
+        <h2 className="text-base font-extrabold text-[#111111] mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
 
         {loading ? (
           <div className="flex items-center justify-center h-48">
@@ -273,14 +273,14 @@ export default function KasRTPage() {
             <p className="text-sm text-gray-400">Belum ada transaksi</p>
           </div>
         ) : (
-          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl card-elevated overflow-hidden">
+          <div className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
             {[...list].reverse().map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === list.length - 1;
               return (
                 <div
                   key={k.id}
-                  className={`flex items-start gap-3 p-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
+                  className={`flex items-start gap-3 px-4 py-[14px] ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
                 >
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
                     isMasuk ? 'bg-emerald-100' : 'bg-red-100'
@@ -291,11 +291,11 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug">
+                    <p className="text-[15px] font-semibold text-[#111111] line-clamp-2 leading-snug">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
+                      <p className="text-xs text-[#555555] font-medium whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
                       <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                         isMasuk ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'
                       }`}>
@@ -305,10 +305,10 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-[17px] font-semibold ${isMasuk ? 'text-emerald-600' : 'text-red-500'}`}>
+                    <p className={`text-[17px] font-extrabold ${isMasuk ? 'text-green-700' : 'text-red-600'}`}>
                       {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                    <p className="text-xs text-[#555555] font-medium mt-0.5">
                       Saldo: {formatRupiahPlain(k.saldo_setelah)}
                     </p>
                   </div>

@@ -3,10 +3,17 @@
 @tailwind utilities;
 
 body {
-  background-color: #F0F4F3;
+  background-color: #FFFFFF;
+}
+
+.card-clean {
+  background: #FFFFFF;
+  border: 1px solid #E8E8E8;
+  border-radius: 16px;
 }
 
 .card-elevated {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  border: 0.5px solid rgba(0,0,0,0.06);
+  background: #FFFFFF;
+  border: 1px solid #E8E8E8;
+  box-shadow: none;
 }

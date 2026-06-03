@@ -226,7 +226,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl card-elevated p-4">
+        <div className="bg-white rounded-2xl border border-[#E8E8E8] p-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span
@@ -271,7 +271,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
+            <p className="text-base font-extrabold text-[#111111] mt-6 mb-3 px-1">Rekap Per Tarikan</p>
             <div className="space-y-3">
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -287,7 +287,7 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className="bg-white dark:bg-gray-900 rounded-2xl card-elevated overflow-hidden"
+                      className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden"
                       style={talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : undefined}
                     >
 

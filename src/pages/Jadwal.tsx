@@ -260,7 +260,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
       </div>
 
       {/* Warga list */}
-      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl card-elevated overflow-hidden">
+      <div className="bg-white rounded-3xl border border-[#E8E8E8] overflow-hidden">
         {filtered.map((w, idx) => {
           const isHadir = map[w.id] === 'hadir';
           return (
@@ -268,7 +268,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
               key={w.id}
               onClick={() => toggle(w.id)}
               className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
-                idx < filtered.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''
+                idx < filtered.length - 1 ? 'border-b border-[#F0F0F0]' : ''
               } ${isHadir ? 'hover:bg-emerald-50/50' : 'hover:bg-red-50/30'}`}
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
@@ -446,15 +446,15 @@ export default function JadwalPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl card-elevated p-3 text-center">
+        <div className="bg-white rounded-2xl border border-[#E8E8E8] p-3 text-center">
           <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
         </div>
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl card-elevated p-3 text-center">
+        <div className="bg-white rounded-2xl border border-[#E8E8E8] p-3 text-center">
           <p className="text-xl font-black text-emerald-600">{dijadwalCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
         </div>
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl card-elevated p-3 text-center">
+        <div className="bg-white rounded-2xl border border-[#E8E8E8] p-3 text-center">
           <p className="text-xl font-black text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
           <p className="text-[10px] text-gray-400 font-medium">Total</p>
         </div>
@@ -471,7 +471,7 @@ export default function JadwalPage() {
           <p className="text-sm text-gray-400">Belum ada jadwal</p>
         </div>
       ) : (
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl card-elevated overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
           {tarikanList.map((t, idx) => {
             const isLast    = idx === tarikanList.length - 1;
             const isSelesai = t.status === 'selesai';
@@ -480,7 +480,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-3 min-h-[56px] ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
+                className={`flex items-center gap-3 px-4 py-3 min-h-[56px] ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
               >
                 {/* Nomor badge */}
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 font-black text-base ${
