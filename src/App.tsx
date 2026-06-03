@@ -58,7 +58,7 @@ export default function App() {
         <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
           {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
-          {activeTab === 'talangan' && !isWargaMode && <TalanganPage />}
+          {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => setActiveTab('beranda') : undefined} />}
           {activeTab === 'kas'      && <KasHadiranPage />}
           {activeTab === 'kas-rt'   && <KasRTPage />}
         </main>

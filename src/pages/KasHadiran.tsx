@@ -358,26 +358,30 @@ export default function KasHadiranPage() {
                         )}
                       </div>
 
-                      {/* ── Admin actions (bendahara only) ────────────── */}
-                      {isBendahara && (
-                        <div className="flex items-center gap-5 px-4 pb-3 pt-3 border-t border-gray-100">
+                      {/* ── Actions ──────────────────────────────────
+                          PDF pendapatan tersedia untuk semua (termasuk warga);
+                          Absensi & hapus tetap khusus bendahara. */}
+                      <div className="flex items-center gap-5 px-4 pb-3 pt-3 border-t border-gray-100">
+                        {isBendahara && (
                           <button className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-blue-600 transition-colors">
                             <Users className="w-3.5 h-3.5" />
                             Absensi
                           </button>
-                          <button
-                            onClick={() => handlePendapatanPDF(t)}
-                            disabled={pdfLoading === t.id}
-                            className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
-                          >
-                            <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
-                            {pdfLoading === t.id ? 'Memuat...' : 'PDF'}
-                          </button>
+                        )}
+                        <button
+                          onClick={() => handlePendapatanPDF(t)}
+                          disabled={pdfLoading === t.id}
+                          className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
+                        >
+                          <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
+                          {pdfLoading === t.id ? 'Memuat...' : 'PDF Pendapatan'}
+                        </button>
+                        {isBendahara && (
                           <button className="flex items-center gap-1 text-xs text-gray-300 hover:text-red-400 transition-colors ml-auto">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   );
                 })

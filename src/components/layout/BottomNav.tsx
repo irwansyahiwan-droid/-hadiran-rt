@@ -17,6 +17,7 @@ const tabs: { id: TabName; label: string; icon: React.ComponentType<{ className?
 ];
 
 export default function BottomNav({ active, onChange, isWargaMode }: BottomNavProps) {
+  // Warga tidak punya tab Talangan — diakses lewat tombol "Lihat" di Beranda
   const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
 
   return (

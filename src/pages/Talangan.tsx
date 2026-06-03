@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle2, RefreshCw, Search, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, X } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -15,7 +15,7 @@ interface WargaGroup {
   countBelum: number;
 }
 
-export default function TalanganPage() {
+export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const { isBendahara } = useAuthContext();
   const [list, setList] = useState<Talangan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -188,6 +188,17 @@ export default function TalanganPage() {
 
   return (
     <div className="space-y-4 pb-2 page-enter">
+      {/* Back header — hanya muncul saat dibuka dari Beranda (mode warga) */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1.5 -ml-1 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 active:opacity-70 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Kembali
+        </button>
+      )}
+
       {/* Header card */}
       {totalBelumLunas > 0 ? (
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
