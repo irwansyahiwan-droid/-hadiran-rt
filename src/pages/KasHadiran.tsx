@@ -179,8 +179,7 @@ export default function KasHadiranPage() {
       <div className="space-y-4 pb-2">
         {/* Header Card */}
         <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b ${heroGradient}`}>
-          <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
+
           <div className="relative p-5">
             <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
             <p className="text-5xl font-black tracking-tighter mb-1 text-white">

@@ -169,8 +169,7 @@ export default function TalanganPage() {
       {/* Header card */}
       {totalBelumLunas > 0 ? (
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]">
-          <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/5 rounded-full" />
+
           <div className="relative p-5">
             <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-widest mb-1">
               Total Talangan Belum Lunas

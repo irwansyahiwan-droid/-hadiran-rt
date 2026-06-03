@@ -114,9 +114,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <div className="space-y-4 pb-2">
       {/* Main Kas Card — always green (kasHadiran always positive) */}
       <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]">
-        <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
-        <div className="absolute top-6 -right-4 w-20 h-20 bg-white/5 rounded-full" />
-        <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
+
 
         <div className="relative p-5">
           <div className="flex items-center justify-between mb-1">
