@@ -231,9 +231,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   <p className="text-[15px] font-semibold text-[#111111] leading-tight">{j.sohibul_bait?.nama ?? '-'}</p>
                   <p className="text-xs text-[#555555] font-medium mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
-                <span className="px-3 py-1.5 text-[10px] font-semibold text-blue-600 dark:text-blue-400 rounded-full border border-blue-300 dark:border-blue-600 shrink-0">
-                  Terjadwal
-                </span>
+                <span className="text-xs text-gray-400 shrink-0">Terjadwal</span>
               </div>
             ))
           )}

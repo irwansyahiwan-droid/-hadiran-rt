@@ -104,15 +104,15 @@ export default function TalanganPage() {
     const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
 
     return (
-      <div key={g.warga_id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-2">
+      <div key={g.warga_id}>
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
-          className="w-full flex items-center gap-3 p-3.5 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.98] transition-all text-left cursor-pointer"
+          className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 active:bg-gray-50 transition-colors text-left cursor-pointer"
         >
           <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
           <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
+            <p className="text-[15px] font-semibold text-[#111111] truncate">{g.nama}</p>
             {g.countBelum > 0 && (
               <p className="text-xs text-amber-600 mt-0.5">
                 {g.countBelum} belum lunas · total {formatRupiahPlain(g.totalBelum)}
@@ -128,9 +128,9 @@ export default function TalanganPage() {
 
         {/* Detail entries */}
         {isExpanded && (
-          <div className="border-t border-gray-100 dark:border-gray-800 divide-y divide-[#F0F0F0]">
+          <div className="border-t border-[#F0F0F0] divide-y divide-[#F0F0F0]">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
-              <div key={t.id} className="flex items-center gap-3 px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50">
+              <div key={t.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
                   #{t.tarikan?.nomor}
                 </div>
@@ -231,7 +231,7 @@ export default function TalanganPage() {
                   Warga dengan Tunggakan Berganda
                 </p>
               </div>
-              <div>
+              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0]">
                 {berganda.map(g => renderGroup(g))}
               </div>
             </div>
@@ -240,16 +240,20 @@ export default function TalanganPage() {
           {/* Single belum lunas */}
           {single.length > 0 && (
             <div>
-              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3">Daftar Talangan</p>
-              <div>{single.map(g => renderGroup(g))}</div>
+              <p className="text-base font-extrabold text-[#111111] mt-6 mb-3">Daftar Talangan</p>
+              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0]">
+                {single.map(g => renderGroup(g))}
+              </div>
             </div>
           )}
 
           {/* Lunas */}
           {lunas.length > 0 && (
             <div>
-              <p className="text-sm font-semibold text-gray-500 mt-6 mb-3">Sudah Lunas</p>
-              <div className="opacity-60">{lunas.map(g => renderGroup(g, true))}</div>
+              <p className="text-base font-extrabold text-[#555555] mt-6 mb-3">Sudah Lunas</p>
+              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0] opacity-60">
+                {lunas.map(g => renderGroup(g, true))}
+              </div>
             </div>
           )}
 

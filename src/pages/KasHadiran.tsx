@@ -180,9 +180,9 @@ export default function KasHadiranPage() {
 
   const sudahSetor = totalSetor > 0;
   const heroGradient = sudahSetor
-    ? 'from-[#0A3D5C] via-[#0D5578] to-[#1A7EA8]'
+    ? 'from-[#0A2A5C] via-[#0D4A8C] to-[#1A6EC4]'
     : saldo < 0
-      ? 'from-slate-700 to-slate-600'
+      ? 'from-slate-800 via-slate-700 to-slate-500'
       : 'from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]';
 
   return (
@@ -193,7 +193,7 @@ export default function KasHadiranPage() {
 
           <div className="relative p-5">
             <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
-            <p className="text-5xl font-black tracking-tighter mb-1 text-white">
+            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-red-200' : 'text-white'}`}>
               {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
