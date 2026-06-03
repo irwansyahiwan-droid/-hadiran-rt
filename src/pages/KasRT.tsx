@@ -269,12 +269,12 @@ export default function KasRTPage() {
               <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
                 <div className="w-9 h-9 rounded-xl bg-gray-200 animate-pulse shrink-0" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 animate-pulse rounded-md w-3/4" />
-                  <div className="h-3 bg-gray-100 animate-pulse rounded-md w-1/3" />
+                  <div className="h-4 bg-gray-200/60 animate-pulse rounded-lg w-3/4" />
+                  <div className="h-3 bg-gray-100/70 animate-pulse rounded-lg w-1/3" />
                 </div>
                 <div className="text-right space-y-1.5">
-                  <div className="h-4 w-20 bg-gray-200 animate-pulse rounded-md" />
-                  <div className="h-3 w-16 bg-gray-100 animate-pulse rounded-md" />
+                  <div className="h-4 w-20 bg-gray-200/60 animate-pulse rounded-lg" />
+                  <div className="h-3 w-16 bg-gray-100/70 animate-pulse rounded-lg" />
                 </div>
               </div>
             ))}
@@ -293,7 +293,7 @@ export default function KasRTPage() {
               return (
                 <div
                   key={k.id}
-                  className={`flex items-center gap-3 px-4 py-4 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                  className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 transition-colors duration-200 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100">
                     {isMasuk

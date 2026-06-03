@@ -465,10 +465,10 @@ export default function JadwalPage() {
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {[...Array(5)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
-              <div className="w-7 h-4 bg-gray-200 animate-pulse rounded-md shrink-0" />
+              <div className="w-7 h-4 bg-gray-200/60 animate-pulse rounded-lg shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 animate-pulse rounded-md w-3/5" />
-                <div className="h-3 bg-gray-100 animate-pulse rounded-md w-2/5" />
+                <div className="h-4 bg-gray-200/60 animate-pulse rounded-lg w-3/5" />
+                <div className="h-3 bg-gray-100/70 animate-pulse rounded-lg w-2/5" />
               </div>
               <div className="h-6 w-16 bg-gray-100 animate-pulse rounded-[6px] shrink-0" />
             </div>
@@ -490,7 +490,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-4 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 transition-colors duration-200 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : undefined}
               >
                 {/* Nomor kecil */}

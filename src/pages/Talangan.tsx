@@ -219,7 +219,7 @@ export default function TalanganPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama warga..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all"
+          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-green-600/10 focus:border-green-600 transition-all duration-200"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -234,8 +234,8 @@ export default function TalanganPage() {
             <div key={i} className="flex items-center gap-3 px-4 py-3.5">
               <div className="w-9 h-9 rounded-xl bg-gray-200 animate-pulse shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 animate-pulse rounded-md w-2/3" />
-                <div className="h-3 bg-gray-100 animate-pulse rounded-md w-1/2" />
+                <div className="h-4 bg-gray-200/60 animate-pulse rounded-lg w-2/3" />
+                <div className="h-3 bg-gray-100/70 animate-pulse rounded-lg w-1/2" />
               </div>
               <div className="h-5 w-20 bg-gray-100 animate-pulse rounded-[6px] shrink-0" />
             </div>

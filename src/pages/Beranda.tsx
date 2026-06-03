@@ -111,8 +111,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="grid grid-cols-3 divide-x divide-gray-100">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2 px-3">
-                <div className="h-7 w-12 bg-gray-200 animate-pulse rounded-md" />
-                <div className="h-3 w-10 bg-gray-100 animate-pulse rounded-md" />
+                <div className="h-7 w-12 bg-gray-200/60 animate-pulse rounded-lg" />
+                <div className="h-3 w-10 bg-gray-100/70 animate-pulse rounded-lg" />
               </div>
             ))}
           </div>
@@ -122,8 +122,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
               <div className="w-12 h-12 rounded-2xl bg-gray-200 animate-pulse shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 animate-pulse rounded-md w-3/5" />
-                <div className="h-3 bg-gray-100 animate-pulse rounded-md w-2/5" />
+                <div className="h-4 bg-gray-200/60 animate-pulse rounded-lg w-3/5" />
+                <div className="h-3 bg-gray-100/70 animate-pulse rounded-lg w-2/5" />
               </div>
             </div>
           ))}
