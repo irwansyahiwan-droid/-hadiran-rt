@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, RefreshCw, Search, X } from 'lucide-react';
+import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggalShort, formatRupiahPlain } from '../lib/utils';
@@ -95,6 +96,7 @@ export default function TalanganPage() {
   const totalBelumLunas = list.filter(t => !t.status_lunas).reduce((s, t) => s + t.nominal, 0);
   const countBelum = list.filter(t => !t.status_lunas).length;
   const countLunas = list.filter(t => t.status_lunas).length;
+  const animatedTotal = useCountUp(totalBelumLunas);
 
   function renderGroup(g: WargaGroup, showAll = false) {
     const isExpanded = expandedId === g.warga_id;
@@ -183,7 +185,7 @@ export default function TalanganPage() {
               Total Talangan Belum Lunas
             </p>
             <p className="text-white text-5xl font-black tracking-tighter mb-1">
-              Rp {totalBelumLunas.toLocaleString('id-ID')}
+              Rp {animatedTotal.toLocaleString('id-ID')}
             </p>
             <p className="text-emerald-300 text-xs">
               {countBelum} belum lunas · {countLunas} sudah lunas

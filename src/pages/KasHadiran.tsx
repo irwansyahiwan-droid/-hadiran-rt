@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FileText, RefreshCw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -129,6 +130,7 @@ export default function KasHadiranPage() {
   const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const saldo = totalKasTerkumpul - totalTalanganBelum - totalSetor;
+  const animatedSaldo = useCountUp(saldo);
 
   // Setor per tarikan — untuk kolom SETOR di PDF
   const setorMap = transaksi
@@ -187,7 +189,7 @@ export default function KasHadiranPage() {
           <div className="relative p-5">
             <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
             <p className="text-5xl font-black tracking-tighter mb-1 text-white">
-              {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
+              {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </p>
             <p className="text-white/60 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (

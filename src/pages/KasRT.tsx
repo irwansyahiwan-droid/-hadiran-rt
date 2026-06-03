@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText } from 'lucide-react';
+import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -166,6 +167,7 @@ export default function KasRTPage() {
   const totalMasuk  = list.filter((k) => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT').reduce((s, k) => s + k.nominal, 0);
   const totalKeluar = list.filter((k) => k.tipe === 'keluar').reduce((s, k) => s + k.nominal, 0);
   const saldo       = saldoAwal + totalMasuk - totalKeluar;
+  const animatedSaldo = useCountUp(saldo);
 
   const today = new Date().toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
@@ -225,7 +227,7 @@ export default function KasRTPage() {
               <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
             </div>
             <p className="text-5xl font-black tracking-tighter text-white mb-3">
-              Rp{saldo.toLocaleString('id-ID')}
+              Rp{animatedSaldo.toLocaleString('id-ID')}
             </p>
 
             {/* Saldo Awal inline info */}

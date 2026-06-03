@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
@@ -100,6 +101,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const kasHadiran = summary?.total_kas_terkumpul ?? 0;
   const saldo = summary?.saldo_aktif ?? 0;
   const talangan = summary?.total_talangan_belum_lunas ?? 0;
+  const animatedKasHadiran = useCountUp(kasHadiran);
 
   if (loading) {
     return (
@@ -131,7 +133,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <div className="flex items-baseline gap-1 mb-1">
             <span className="text-white text-5xl font-black tracking-tighter">
-              Rp{kasHadiran.toLocaleString('id-ID')}
+              Rp{animatedKasHadiran.toLocaleString('id-ID')}
             </span>
           </div>
           <p className="text-emerald-200 text-xs mb-5">
