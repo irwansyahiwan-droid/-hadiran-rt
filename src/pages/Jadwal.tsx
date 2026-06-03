@@ -494,14 +494,14 @@ export default function JadwalPage() {
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : undefined}
               >
                 {/* Nomor kecil */}
-                <span className="text-sm font-bold text-gray-400 w-7 shrink-0 text-right tabular-nums">
+                <span className="text-base font-bold text-gray-400 w-7 shrink-0 text-right tabular-nums">
                   {String(t.nomor).padStart(2, '0')}.
                 </span>
 
                 {/* Info + action inline */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className={`text-[15px] font-semibold truncate ${isSelesai ? 'text-[#555555] dark:text-gray-400' : 'text-[#111111] dark:text-gray-100'}`}>
+                    <p className={`text-base font-semibold truncate ${isSelesai ? 'text-[#555555] dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
                       {t.sohibul_bait?.nama ?? '—'}
                     </p>
                     {isBendahara && isSelesai ? (
@@ -532,7 +532,7 @@ export default function JadwalPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-[#555555] dark:text-gray-400 mt-0.5">{formatTanggal(t.tanggal)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{formatTanggal(t.tanggal)}</p>
                 </div>
               </div>
             );

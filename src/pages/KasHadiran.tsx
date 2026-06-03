@@ -319,7 +319,7 @@ export default function KasHadiranPage() {
                       <div className="flex items-center gap-3 px-4 pb-4">
                         <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 leading-tight">
+                          <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
@@ -330,7 +330,7 @@ export default function KasHadiranPage() {
                           <p className="text-[17px] font-semibold text-emerald-600 dark:text-emerald-400">
                             +{formatRupiahPlain(iuranHadir)}
                           </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5">
                             {t.total_hadir}/{t.total_warga} hadir
                           </p>
                         </div>
@@ -338,12 +338,12 @@ export default function KasHadiranPage() {
 
                       {/* ── Progress bar + kas info ───────────────────── */}
                       <div className="px-4 pb-4 border-t border-gray-50 dark:border-gray-800 pt-3">
-                        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <span>
                             Kas Hadiran{' '}
-                            <span className="font-semibold text-gray-700 dark:text-gray-300">{formatRupiahPlain(kasHadiran)}</span>
+                            <span className="font-semibold text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
                           </span>
-                          <span className="font-medium">{pctHadir}% hadir</span>
+                          <span className="font-semibold">{pctHadir}% hadir</span>
                         </div>
                         <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
                           <div
