@@ -22,7 +22,7 @@ export default function App() {
 
   if (auth.loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-[#F5F6F8] dark:bg-gray-950">
         <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
       </div>
     );
@@ -48,7 +48,7 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={ctxValue}>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="min-h-screen bg-[#F5F6F8] dark:bg-gray-950">
         <Header
           role={isWargaMode ? 'warga' : auth.role}
           onLogout={isWargaMode ? ctxValue.exitWargaMode : auth.signOut}
