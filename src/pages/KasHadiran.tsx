@@ -281,14 +281,22 @@ export default function KasHadiranPage() {
                   const pctHadir = Math.round((t.total_hadir / t.total_warga) * 100);
 
                   return (
-                    <div key={t.id} className="bg-white dark:bg-gray-900 rounded-2xl card-elevated overflow-hidden">
+                    <div
+                      key={t.id}
+                      className="bg-white dark:bg-gray-900 rounded-2xl card-elevated overflow-hidden"
+                      style={talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : undefined}
+                    >
 
                       {/* ── Timeline mini-header ─────────────────────── */}
                       <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-                            Tarikan ke-{t.nomor}
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                            talanganInfo.count === 0
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                          }`}>
+                            {t.nomor}
+                          </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
                           <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
                         </div>
