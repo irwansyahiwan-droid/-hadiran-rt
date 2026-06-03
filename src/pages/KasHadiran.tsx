@@ -187,7 +187,7 @@ export default function KasHadiranPage() {
 
   return (
     <>
-      <div className="space-y-4 pb-2">
+      <div className="space-y-4 pb-2 overflow-x-hidden">
         {/* Header Card */}
         <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
 
@@ -226,7 +226,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span
@@ -239,21 +239,21 @@ export default function KasHadiranPage() {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
               <span className="text-sm font-bold text-emerald-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
               <span className="text-sm font-semibold text-amber-600">-{formatRupiahPlain(totalTalanganBelum)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
