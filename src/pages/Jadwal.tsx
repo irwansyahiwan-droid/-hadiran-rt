@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, RefreshCw,
   RotateCcw, Search, UserCheck, X,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggal } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain } from '../lib/utils';
 import type { Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;
@@ -22,11 +22,20 @@ function formatKompak(n: number): string {
 
 // ── Absensi View ────────────────────────────────────────────
 
+interface AbsensiResult {
+  tarikanNomor: number;
+  hadirCount: number;
+  tidakCount: number;
+  kasTotal: number;
+  talanganTotal: number;
+  sohibulBaitTerima: number;
+}
+
 interface AbsensiViewProps {
   tarikan: Tarikan;
   wargaList: Warga[];
   onBack: () => void;
-  onSaved: () => void;
+  onSaved: (result: AbsensiResult) => void;
 }
 
 function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) {
@@ -133,7 +142,14 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
         total_terkumpul: hadirIds.length * 5000,
       }).eq('id', tarikanId);
 
-      onSaved();
+      onSaved({
+        tarikanNomor: tarikan.nomor,
+        hadirCount: hadirIds.length,
+        tidakCount: tidakIds.length,
+        kasTotal: hadirIds.length * 5000,
+        talanganTotal: tidakIds.length * 50000,
+        sohibulBaitTerima: hadirIds.length * 50000,
+      });
     } finally {
       setSaving(false);
     }
@@ -293,6 +309,77 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
   );
 }
 
+// ── Result Card ─────────────────────────────────────────────
+
+function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: () => void }) {
+  const [visible, setVisible] = useState(false);
+  const [progress, setProgress] = useState(100);
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
+  const hasTalangan = result.talanganTotal > 0;
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setVisible(true), 10);
+    const startTime = Date.now();
+    const DURATION = 5000;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.max(0, 100 - (elapsed / DURATION) * 100);
+      setProgress(pct);
+      if (pct <= 0) {
+        clearInterval(interval);
+        setVisible(false);
+        setTimeout(() => onDismissRef.current(), 300);
+      }
+    }, 100);
+    return () => { clearTimeout(t1); clearInterval(interval); };
+  }, []);
+
+  function dismiss() {
+    setVisible(false);
+    setTimeout(() => onDismissRef.current(), 300);
+  }
+
+  return (
+    <div className={`transition-all duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
+      <div className={`rounded-2xl p-4 shadow-md overflow-hidden ${hasTalangan ? 'bg-amber-50 border border-amber-200' : 'bg-green-50 border border-green-200'}`}>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <p className="text-sm font-bold text-gray-900">
+            ✅ Absensi Tarikan #{result.tarikanNomor} berhasil disimpan
+          </p>
+          <button onClick={dismiss} className="p-0.5 text-gray-400 hover:text-gray-600 shrink-0 -mt-0.5">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="space-y-0.5">
+          <p className="text-xs text-gray-600">
+            Hadir: <span className="font-semibold text-emerald-700">{result.hadirCount} warga</span>
+            {' · '}
+            Tidak hadir: <span className="font-semibold text-red-600">{result.tidakCount} warga</span>
+          </p>
+          <p className="text-xs text-gray-600">
+            Kas terkumpul: <span className="font-semibold">{formatRupiahPlain(result.kasTotal)}</span>
+          </p>
+          {hasTalangan && (
+            <p className="text-xs text-amber-700 font-medium">
+              ⚠ Talangan keluar: {formatRupiahPlain(result.talanganTotal)} ({result.tidakCount} warga tidak hadir)
+            </p>
+          )}
+          <p className="text-xs text-gray-600">
+            Sohibul Bait terima: <span className="font-semibold text-emerald-700">{formatRupiahPlain(result.sohibulBaitTerima)}</span>
+          </p>
+        </div>
+        <div className="mt-3 h-0.5 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full ${hasTalangan ? 'bg-amber-400' : 'bg-green-400'}`}
+            style={{ width: `${progress}%`, transition: 'width 0.1s linear' }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────
 
 export default function JadwalPage() {
@@ -302,6 +389,7 @@ export default function JadwalPage() {
   const [loading, setLoading] = useState(true);
   const [selectedTarikan, setSelectedTarikan] = useState<Tarikan | null>(null);
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
+  const [lastResult, setLastResult] = useState<AbsensiResult | null>(null);
 
   async function load() {
     setLoading(true);
@@ -333,13 +421,16 @@ export default function JadwalPage() {
         tarikan={selectedTarikan}
         wargaList={wargaList}
         onBack={() => setSelectedTarikan(null)}
-        onSaved={() => { setSelectedTarikan(null); load(); }}
+        onSaved={(result) => { setLastResult(result); setSelectedTarikan(null); load(); }}
       />
     );
   }
 
   return (
     <div className="space-y-3 pb-2">
+      {lastResult && (
+        <ResultCard result={lastResult} onDismiss={() => setLastResult(null)} />
+      )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
