@@ -11,6 +11,15 @@ import type { Tarikan, Warga } from '../lib/types';
 type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;
 type AbsensiFilter = 'semua' | 'hadir' | 'belum';
 
+function formatKompak(n: number): string {
+  if (n === 0) return 'Rp0';
+  if (n >= 1_000_000) {
+    const val = (n / 1_000_000).toFixed(2).replace(/\.?0+$/, '').replace('.', ',');
+    return `Rp${val} jt`;
+  }
+  return `Rp${Math.round(n / 1000)}rb`;
+}
+
 // ── Absensi View ────────────────────────────────────────────
 
 interface AbsensiViewProps {
@@ -155,8 +164,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
         {[
           { label: 'Hadir', value: hadirCount, color: 'text-emerald-600' },
           { label: 'Tdk Hadir', value: tidakCount, color: 'text-red-500' },
-          { label: 'Kas', value: `Rp${(kasTotal / 1000).toFixed(0)}k`, color: 'text-blue-600' },
-          { label: 'Talangan', value: `Rp${(talanganTotal / 1000).toFixed(0)}k`, color: 'text-amber-600' },
+          { label: 'Kas', value: formatKompak(kasTotal), color: 'text-blue-600' },
+          { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-amber-600' },
         ].map(s => (
           <div key={s.label} className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-2.5 text-center">
             <p className={`text-base font-black ${s.color}`}>{s.value}</p>

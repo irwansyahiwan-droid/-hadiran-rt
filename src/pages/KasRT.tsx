@@ -286,11 +286,11 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-2">
+                    <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-xs text-gray-400 dark:text-gray-500">{formatTanggal(k.tanggal)}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
                       <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                         isMasuk ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'
                       }`}>
