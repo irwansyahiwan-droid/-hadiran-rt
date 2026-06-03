@@ -31,12 +31,13 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
             <button
               key={id}
               onClick={() => onChange(id)}
-              className="flex flex-col items-center gap-0.5 flex-1 py-2 transition-all duration-200"
+              className="flex flex-col items-center flex-1 py-2 transition-all duration-200"
             >
               <Icon className={`w-[22px] h-[22px] transition-colors duration-200 ${isActive ? 'text-[#0D6B5E] dark:text-[#1A9B86]' : 'text-gray-400 dark:text-gray-500'}`} />
-              <span className={`text-[10px] leading-none transition-colors duration-200 ${isActive ? 'font-semibold text-[#0D6B5E] dark:text-[#1A9B86]' : 'font-medium text-gray-400 dark:text-gray-500'}`}>
+              <span className={`text-xs leading-none mt-0.5 transition-colors duration-200 ${isActive ? 'font-semibold text-[#0D6B5E] dark:text-[#1A9B86]' : 'font-medium text-gray-400 dark:text-gray-500'}`}>
                 {label}
               </span>
+              {isActive && <div className="w-1 h-1 rounded-full bg-[#0D6B5E] dark:bg-[#1A9B86] mx-auto mt-0.5" />}
             </button>
           );
         })}

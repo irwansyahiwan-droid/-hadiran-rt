@@ -104,7 +104,7 @@ export default function TalanganPage() {
     const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
 
     return (
-      <div key={g.warga_id} className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden mb-2 shadow-sm">
+      <div key={g.warga_id} className="bg-white dark:bg-gray-900 rounded-2xl card-elevated overflow-hidden mb-2">
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}

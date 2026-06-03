@@ -187,11 +187,11 @@ export default function KasHadiranPage() {
         <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b ${heroGradient}`}>
 
           <div className="relative p-5">
-            <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
+            <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
             <p className="text-5xl font-black tracking-tighter mb-1 text-white">
               {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </p>
-            <p className="text-white/60 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
+            <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
               <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-green-400/20 border border-green-300/30 rounded-full text-green-200 text-xs font-semibold">
                 ✓ Sudah disetor ke Kas RT
@@ -221,7 +221,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl card-elevated p-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span className="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
@@ -234,7 +234,7 @@ export default function KasHadiranPage() {
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="text-sm font-bold text-green-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
+              <span className="text-sm font-bold text-emerald-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-1.5">
@@ -276,7 +276,7 @@ export default function KasHadiranPage() {
                   const pctHadir = Math.round((t.total_hadir / t.total_warga) * 100);
 
                   return (
-                    <div key={t.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div key={t.id} className="bg-white dark:bg-gray-900 rounded-2xl card-elevated overflow-hidden">
 
                       {/* ── Timeline mini-header ─────────────────────── */}
                       <div className="flex items-center justify-between px-4 pt-4 pb-2">
@@ -288,11 +288,11 @@ export default function KasHadiranPage() {
                           <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
-                          <span className="text-[9px] font-bold text-amber-700 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-700 px-2.5 py-0.5 rounded-full">
+                          <span className="text-[9px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-700 px-2.5 py-0.5 rounded-full">
                             {talanganInfo.count} belum bayar
                           </span>
                         ) : (
-                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full">
+                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full">
                             ✓ Lunas semua
                           </span>
                         )}
@@ -310,7 +310,7 @@ export default function KasHadiranPage() {
                           </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-[17px] font-semibold text-green-600 dark:text-green-400">
+                          <p className="text-[17px] font-semibold text-emerald-600 dark:text-emerald-400">
                             +{formatRupiahPlain(iuranHadir)}
                           </p>
                           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">

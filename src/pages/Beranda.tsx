@@ -147,21 +147,21 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               onClick={() => onNavigate('kas')}
               className="flex flex-col py-3 pr-3 border-r border-white/20 active:opacity-70 transition-opacity"
             >
-              <p className="text-[10px] uppercase tracking-widest text-white/60 font-medium">Saldo Aktif</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/75 font-medium">Saldo Aktif</p>
               <p className="text-sm font-bold text-white mt-1">Rp{Math.abs(saldo).toLocaleString('id-ID')}</p>
             </button>
             <button
               onClick={() => onNavigate('talangan')}
               className="flex flex-col py-3 px-3 border-r border-white/20 active:opacity-70 transition-opacity"
             >
-              <p className="text-[10px] uppercase tracking-widest text-white/60 font-medium">Talangan</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/75 font-medium">Talangan</p>
               <p className="text-sm font-bold text-white mt-1">{formatRupiahPlain(talangan)}</p>
             </button>
             <button
               onClick={() => onNavigate('kas-rt')}
               className="flex flex-col py-3 pl-3 active:opacity-70 transition-opacity"
             >
-              <p className="text-[10px] uppercase tracking-widest text-white/60 font-medium">Setor Kas RT</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/75 font-medium">Setor Kas RT</p>
               <p className="text-sm font-bold text-white mt-1">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</p>
             </button>
           </div>

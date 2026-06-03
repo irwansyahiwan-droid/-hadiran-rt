@@ -260,7 +260,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
       </div>
 
       {/* Warga list */}
-      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl card-elevated overflow-hidden">
         {filtered.map((w, idx) => {
           const isHadir = map[w.id] === 'hadir';
           return (
@@ -446,15 +446,15 @@ export default function JadwalPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-3 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl card-elevated p-3 text-center">
           <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
         </div>
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-3 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl card-elevated p-3 text-center">
           <p className="text-xl font-black text-emerald-600">{dijadwalCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
         </div>
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-3 text-center">
+        <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl card-elevated p-3 text-center">
           <p className="text-xl font-black text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
           <p className="text-[10px] text-gray-400 font-medium">Total</p>
         </div>
@@ -471,7 +471,7 @@ export default function JadwalPage() {
           <p className="text-sm text-gray-400">Belum ada jadwal</p>
         </div>
       ) : (
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl card-elevated overflow-hidden">
           {tarikanList.map((t, idx) => {
             const isLast    = idx === tarikanList.length - 1;
             const isSelesai = t.status === 'selesai';
@@ -521,7 +521,7 @@ export default function JadwalPage() {
                   <span className={`px-3 py-1.5 text-[10px] font-semibold rounded-full border shrink-0 ${
                     isSelesai
                       ? 'text-gray-400 border-gray-200 dark:border-gray-700'
-                      : 'text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600'
+                      : 'bg-blue-50 text-blue-600 border-blue-200'
                   }`}>
                     {isSelesai ? 'Selesai' : 'Terjadwal'}
                   </span>

@@ -5,3 +5,8 @@
 body {
   background-color: #F0F4F3;
 }
+
+.card-elevated {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 0.5px solid rgba(0,0,0,0.06);
+}

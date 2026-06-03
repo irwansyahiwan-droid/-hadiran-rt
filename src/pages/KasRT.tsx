@@ -273,7 +273,7 @@ export default function KasRTPage() {
             <p className="text-sm text-gray-400">Belum ada transaksi</p>
           </div>
         ) : (
-          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl card-elevated overflow-hidden">
             {[...list].reverse().map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === list.length - 1;
@@ -305,7 +305,7 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-[17px] font-semibold ${isMasuk ? 'text-green-600' : 'text-red-500'}`}>
+                    <p className={`text-[17px] font-semibold ${isMasuk ? 'text-emerald-600' : 'text-red-500'}`}>
                       {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
