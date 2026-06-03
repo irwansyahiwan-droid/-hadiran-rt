@@ -172,7 +172,7 @@ export default function KasHadiranPage() {
     load();
   }
 
-  const heroGradient = saldo < 0 ? 'from-slate-700 to-slate-600' : 'from-[#0D6B5E] to-[#1A9B86]';
+  const heroGradient = saldo < 0 ? 'from-slate-700 to-slate-600' : 'from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]';
 
   return (
     <>
@@ -183,7 +183,7 @@ export default function KasHadiranPage() {
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-5">
             <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
-            <p className="text-4xl font-black tracking-tight mb-1 text-white">
+            <p className="text-5xl font-black tracking-tighter mb-1 text-white">
               {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
             </p>
             <p className="text-white/60 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
