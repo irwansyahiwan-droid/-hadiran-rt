@@ -181,7 +181,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <Wallet className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Saldo Aktif</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">Rp{Math.abs(saldo).toLocaleString('id-ID')}</span>
+            <span className={`text-[15px] font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+              {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
+            </span>
           </button>
           <button
             onClick={() => onNavigate('talangan')}
