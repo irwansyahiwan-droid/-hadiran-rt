@@ -36,13 +36,16 @@ interface AbsensiViewProps {
   wargaList: Warga[];
   onBack: () => void;
   onSaved: (result: AbsensiResult) => void;
+  onCancelled: () => void;
 }
 
-function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) {
+function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: AbsensiViewProps) {
   const [map, setMap] = useState<AbsensiMap>({});
   const [filter, setFilter] = useState<AbsensiFilter>('semua');
   const [search, setSearch] = useState('');
   const [saving, setSaving] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
   const [loadingAbsensi, setLoadingAbsensi] = useState(true);
 
   useEffect(() => {
@@ -152,6 +155,37 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
       });
     } finally {
       setSaving(false);
+    }
+  }
+
+  // Batalkan hasil "Simpan & Hitung" — kembalikan tarikan ke status terjadwal
+  // dan hapus SEMUA data turunannya (absensi, talangan, transaksi kas tarikan ini).
+  async function batalkan() {
+    setCancelling(true);
+    setConfirmCancel(false);
+    try {
+      const tarikanId = tarikan.id;
+      await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
+      await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
+      // Hapus kas masuk + talangan masuk yang terkait tarikan ini
+      await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId);
+      await supabase.from('tarikan').update({
+        status: 'dijadwalkan',
+        total_hadir: 0,
+        total_terkumpul: 0,
+      }).eq('id', tarikanId);
+      onCancelled();
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  function handleBatalkanClick() {
+    if (confirmCancel) {
+      batalkan();
+    } else {
+      setConfirmCancel(true);
+      setTimeout(() => setConfirmCancel(false), 3500);
     }
   }
 
@@ -292,17 +326,38 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
         })}
       </div>
 
-      {/* Sticky save button */}
+      {/* Sticky action buttons */}
       <div className="fixed bottom-16 left-0 right-0 px-4 z-30">
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-lg mx-auto space-y-2">
           <button
             onClick={simpan}
-            disabled={saving}
+            disabled={saving || cancelling}
             className="w-full py-3.5 rounded-full bg-[#0F6039] text-white font-bold text-sm shadow-sm active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
-            {saving ? 'Menghitung...' : 'Simpan & Hitung Iuran'}
+            {saving ? 'Menghitung...' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
           </button>
+
+          {/* Batalkan — hanya untuk tarikan yang sudah selesai (undo simpan & hitung) */}
+          {tarikan.status === 'selesai' && (
+            <button
+              onClick={handleBatalkanClick}
+              disabled={saving || cancelling}
+              className={`w-full py-3 rounded-full font-bold text-sm shadow-sm active:scale-[0.97] transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2 ${
+                confirmCancel
+                  ? 'bg-rose-600 text-white'
+                  : 'bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400'
+              }`}
+            >
+              {cancelling ? (
+                <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan...</>
+              ) : confirmCancel ? (
+                'Yakin? Data tarikan ini akan dihapus'
+              ) : (
+                <><RotateCcw className="w-4 h-4" />Batalkan Hasil Tarikan</>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -514,6 +569,7 @@ export default function JadwalPage() {
         wargaList={wargaList}
         onBack={() => setSelectedTarikan(null)}
         onSaved={(result) => { setLastResult(result); setSelectedTarikan(null); load(); }}
+        onCancelled={() => { setSelectedTarikan(null); load(); }}
       />
     );
   }

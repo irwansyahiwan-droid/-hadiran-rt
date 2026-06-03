@@ -21,6 +21,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -66,6 +67,36 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     } else {
       setConfirmId(t.id);
       setTimeout(() => setConfirmId(prev => prev === t.id ? null : prev), 3000);
+    }
+  }
+
+  // Batalkan pembayaran talangan — kembalikan ke "belum lunas" & hapus transaksi kasnya
+  async function batalkanBayar(t: Talangan) {
+    setProcessingId(t.id);
+    setCancelConfirmId(null);
+    try {
+      await supabase
+        .from('talangan')
+        .update({ status_lunas: false, tanggal_lunas: null })
+        .eq('id', t.id);
+      await supabase
+        .from('transaksi_kas')
+        .delete()
+        .eq('tipe', 'talangan_masuk')
+        .eq('warga_id', t.warga_id)
+        .eq('tarikan_id', t.tarikan_id);
+      load();
+    } finally {
+      setProcessingId(null);
+    }
+  }
+
+  function handleBatalClick(t: Talangan) {
+    if (cancelConfirmId === t.id) {
+      batalkanBayar(t);
+    } else {
+      setCancelConfirmId(t.id);
+      setTimeout(() => setCancelConfirmId(prev => prev === t.id ? null : prev), 3000);
     }
   }
 
@@ -176,6 +207,21 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     {processingId === t.id ? (
                       <><RefreshCw className="w-3 h-3 animate-spin" />Memproses...</>
                     ) : confirmId === t.id ? 'Yakin?' : 'Bayar'}
+                  </button>
+                )}
+                {isBendahara && t.status_lunas && (
+                  <button
+                    onClick={() => handleBatalClick(t)}
+                    disabled={processingId === t.id}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 ${
+                      cancelConfirmId === t.id
+                        ? 'bg-rose-600 text-white'
+                        : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    {processingId === t.id ? (
+                      <><RefreshCw className="w-3 h-3 animate-spin" />Memproses...</>
+                    ) : cancelConfirmId === t.id ? 'Yakin batal?' : 'Batalkan'}
                   </button>
                 )}
               </div>
