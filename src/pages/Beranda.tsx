@@ -263,7 +263,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-1">{trx.keterangan}</p>
+                  <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug">{trx.keterangan}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{formatTanggal(trx.tanggal)}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">
                     Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}

@@ -291,7 +291,7 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
+                    <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
