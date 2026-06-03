@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, CreditCard, Building2 } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
@@ -113,7 +113,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <>
     <div className="space-y-4 pb-2">
       {/* Main Kas Card — always green (kasHadiran always positive) */}
-      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]">
+      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]">
         <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
         <div className="absolute top-6 -right-4 w-20 h-20 bg-white/5 rounded-full" />
         <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -140,31 +140,29 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
           </p>
 
-          {/* Flat stats row */}
-          <div className="border-t border-white/20 pt-4 grid grid-cols-3">
+          {/* Stat row — no icons, divider only */}
+          <div className="border-t border-white/20 mb-3" />
+          <div className="grid grid-cols-3">
             <button
               onClick={() => onNavigate('kas')}
-              className="flex flex-col items-center gap-1 active:opacity-70 transition-opacity pr-4 border-r border-white/20"
+              className="flex flex-col py-3 pr-3 border-r border-white/20 active:opacity-70 transition-opacity"
             >
-              <CreditCard className="w-5 h-5 text-white" />
-              <p className="text-white/60 text-[10px] font-semibold uppercase tracking-wide">Saldo Aktif</p>
-              <p className="text-sm font-bold text-white">Rp{Math.abs(saldo).toLocaleString('id-ID')}</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/60 font-medium">Saldo Aktif</p>
+              <p className="text-sm font-bold text-white mt-1">Rp{Math.abs(saldo).toLocaleString('id-ID')}</p>
             </button>
             <button
               onClick={() => onNavigate('talangan')}
-              className="flex flex-col items-center gap-1 active:opacity-70 transition-opacity border-r border-white/20"
+              className="flex flex-col py-3 px-3 border-r border-white/20 active:opacity-70 transition-opacity"
             >
-              <AlertTriangle className="w-5 h-5 text-white" />
-              <p className="text-white/60 text-[10px] font-semibold uppercase tracking-wide">Talangan</p>
-              <p className="text-sm font-bold text-white">{formatRupiahPlain(talangan)}</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/60 font-medium">Talangan</p>
+              <p className="text-sm font-bold text-white mt-1">{formatRupiahPlain(talangan)}</p>
             </button>
             <button
               onClick={() => onNavigate('kas-rt')}
-              className="flex flex-col items-center gap-1 active:opacity-70 transition-opacity pl-4"
+              className="flex flex-col py-3 pl-3 active:opacity-70 transition-opacity"
             >
-              <Building2 className="w-5 h-5 text-white" />
-              <p className="text-white/60 text-[10px] font-semibold uppercase tracking-wide">Setor Kas RT</p>
-              <p className="text-sm font-bold text-white">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/60 font-medium">Setor Kas RT</p>
+              <p className="text-sm font-bold text-white mt-1">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</p>
             </button>
           </div>
 
