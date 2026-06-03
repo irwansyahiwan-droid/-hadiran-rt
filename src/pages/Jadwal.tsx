@@ -481,10 +481,11 @@ export default function JadwalPage() {
               <div
                 key={t.id}
                 className={`flex items-center gap-3 px-4 py-3 min-h-[56px] ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
+                style={isSelesai ? { borderLeft: '3px solid #10B981' } : undefined}
               >
                 {/* Nomor badge */}
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 font-black text-base ${
-                  isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
+                  isSelesai ? 'bg-emerald-500 text-white' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
                 }`}>
                   {t.nomor}
                 </div>

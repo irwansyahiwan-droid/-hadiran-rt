@@ -22,7 +22,7 @@ export default function App() {
 
   if (auth.loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F0F4F3] dark:bg-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
         <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
       </div>
     );
@@ -48,14 +48,14 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={ctxValue}>
-      <div className="min-h-screen bg-[#F0F4F3] dark:bg-gray-950">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <Header
           role={isWargaMode ? 'warga' : auth.role}
           onLogout={isWargaMode ? ctxValue.exitWargaMode : auth.signOut}
           isDark={isDark}
           onToggleTheme={toggleTheme}
         />
-        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
+        <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
           {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
           {activeTab === 'talangan' && !isWargaMode && <TalanganPage />}
