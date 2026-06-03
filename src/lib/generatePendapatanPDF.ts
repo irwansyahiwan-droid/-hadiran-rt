@@ -28,11 +28,14 @@ export function generatePendapatanPDF(
   const talanganList = wargaList.filter(w => w.id !== sohibulId && absensiMap[w.id] === 'tidak_hadir' && !talanganLunasSet.has(w.id));
   const sohibul    = wargaList.find(w => w.id === sohibulId);
 
-  const payingCount   = hadirList.length + lunaslist.length;
-  const pendapatanKotor = payingCount * 50000;
-  const potonganAdmin  = 60000;
-  const pendapatanBersih = pendapatanKotor - potonganAdmin;
-  const kasHadiran     = tarikan.total_terkumpul ?? 0;
+  // Per pembayar: Rp45.000 → Sohibul, Rp5.000 → Kas (total Rp50.000)
+  const SOHIBUL_PER = 45000, KAS_PER = 5000, TOTAL_PER = 50000;
+  // Pembayar = SEMUA anggota kecuali Sohibul Bait (termasuk yang talangan belum lunas)
+  const payingCount      = wargaList.filter(w => w.id !== sohibulId).length; // mis. 68
+  const pendapatanKotor  = payingCount * SOHIBUL_PER;   // 3.060.000
+  const potonganAdmin    = 60000;                       // ke kantong penulis, bukan kas
+  const pendapatanBersih = pendapatanKotor - potonganAdmin; // 3.000.000
+  const kasHadiran       = tarikan.total_terkumpul ?? 0;    // 340.000 (sinkron alur kas)
 
   // ── Header ────────────────────────────────────────────────
   doc.setFillColor(6, 78, 59);
@@ -81,17 +84,17 @@ export function generatePendapatanPDF(
 
   let rowNum = sohibul ? 2 : 1;
 
-  // Hadir
+  // Hadir (membayar langsung)
   hadirList.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
-    tableRows.push([String(rowNum++), w.nama, '', rp(50000), rp(5000), rp(55000)]);
+    tableRows.push([String(rowNum++), w.nama, '', rp(SOHIBUL_PER), rp(KAS_PER), rp(TOTAL_PER)]);
   });
-  // Lunas talangan
+  // Tidak hadir tapi talangan SUDAH lunas — di bawah, tetap dihitung
   lunaslist.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
-    tableRows.push([String(rowNum++), w.nama, '✓ Lunas', rp(50000), rp(5000), rp(55000)]);
+    tableRows.push([String(rowNum++), w.nama, '✓ Lunas', rp(SOHIBUL_PER), rp(KAS_PER), rp(TOTAL_PER)]);
   });
-  // Talangan belum lunas
+  // Tidak hadir, talangan BELUM lunas — paling bawah, tetap dihitung
   talanganList.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
-    tableRows.push([String(rowNum++), w.nama, 'Talangan', rp(0), rp(0), rp(0)]);
+    tableRows.push([String(rowNum++), w.nama, 'Talangan', rp(SOHIBUL_PER), rp(KAS_PER), rp(TOTAL_PER)]);
   });
 
   autoTable(doc, {

@@ -71,10 +71,16 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
     loadExisting();
   }, [tarikan, wargaList]);
 
+  // Pembayar = semua anggota KECUALI Sohibul Bait (Sohibul tidak bayar)
+  const sohibulId = tarikan.sohibul_bait_id ?? '';
+  const pembayarCount = wargaList.filter(w => w.id !== sohibulId).length;
   const hadirCount = Object.values(map).filter(v => v === 'hadir').length;
   const tidakCount = wargaList.length - hadirCount;
-  const kasTotal = hadirCount * 5000;
-  const talanganTotal = tidakCount * 50000;
+  // Pembayar yang tidak hadir → kena talangan (Sohibul dikecualikan)
+  const talanganCount = wargaList.filter(w => w.id !== sohibulId && map[w.id] !== 'hadir').length;
+  // Kas & Sohibul KONSTAN: berbasis jumlah pembayar (bukan jumlah hadir)
+  const kasTotal = pembayarCount * 5000;       // mis. 68 × 5.000 = 340.000
+  const talanganTotal = talanganCount * 50000; // 50.000 per pembayar absen
 
   function setAll(status: 'hadir' | 'tidak_hadir') {
     const next: AbsensiMap = {};
@@ -101,6 +107,14 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       const hadirIds  = wargaList.filter(w => map[w.id] === 'hadir').map(w => w.id);
       const tidakIds  = wargaList.filter(w => map[w.id] === 'tidak_hadir').map(w => w.id);
 
+      // Pembayar = semua anggota KECUALI Sohibul Bait. Sohibul tidak bayar.
+      // Kas & Sohibul dihitung dari jumlah pembayar (konstan), BUKAN jumlah hadir.
+      const pembayarIds   = wargaList.filter(w => w.id !== sohibulId).map(w => w.id);
+      const pembayarCount = pembayarIds.length;                              // mis. 68
+      const kasTerkumpul  = pembayarCount * 5000;                            // 340.000
+      // Pembayar yang tidak hadir → kena talangan (Sohibul dikecualikan)
+      const talanganIds   = pembayarIds.filter(id => map[id] !== 'hadir');
+
       // Simpan status lunas yang sudah ada sebelum menghapus (agar tidak ter-reset saat Hitung Ulang)
       const { data: existingLunas } = await supabase
         .from('talangan')
@@ -119,8 +133,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         await supabase.from('absensi').insert(tidakIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'tidak_hadir' })));
 
       await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
-      if (tidakIds.length)
-        await supabase.from('talangan').insert(tidakIds.map(warga_id => ({
+      if (talanganIds.length)
+        await supabase.from('talangan').insert(talanganIds.map(warga_id => ({
           tarikan_id: tarikanId,
           warga_id,
           nominal: 50000,
@@ -129,11 +143,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         })));
 
       await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk');
-      if (hadirIds.length)
+      if (pembayarCount)
         await supabase.from('transaksi_kas').insert({
           tipe: 'kas_masuk',
-          nominal: hadirIds.length * 5000,
-          keterangan: `Kas hadiran tarikan #${tarikan.nomor} (${hadirIds.length} hadir × Rp5.000)`,
+          nominal: kasTerkumpul,
+          keterangan: `Kas hadiran tarikan #${tarikan.nomor} (${pembayarCount} pembayar × Rp5.000)`,
           tanggal: tarikan.tanggal,
           tarikan_id: tarikanId,
           saldo_setelah: 0,
@@ -142,16 +156,16 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       await supabase.from('tarikan').update({
         status: 'selesai',
         total_hadir: hadirIds.length,
-        total_terkumpul: hadirIds.length * 5000,
+        total_terkumpul: kasTerkumpul,
       }).eq('id', tarikanId);
 
       onSaved({
         tarikanNomor: tarikan.nomor,
         hadirCount: hadirIds.length,
-        tidakCount: tidakIds.length,
-        kasTotal: hadirIds.length * 5000,
-        talanganTotal: tidakIds.length * 50000,
-        sohibulBaitTerima: hadirIds.length * 50000,
+        tidakCount: talanganIds.length,
+        kasTotal: kasTerkumpul,
+        talanganTotal: talanganIds.length * 50000,
+        sohibulBaitTerima: pembayarCount * 45000,
       });
     } finally {
       setSaving(false);

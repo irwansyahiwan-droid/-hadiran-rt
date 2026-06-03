@@ -89,8 +89,16 @@ const s = h.supabase;
 type Row = Record<string, unknown>;
 
 // ── Transkrip operasi DB (mirror Jadwal.tsx / Talangan.tsx) ──────────────────
+// Pembayar = SEMUA anggota aktif kecuali Sohibul Bait. Kas & Sohibul berbasis
+// jumlah pembayar (konstan), bukan jumlah hadir. hadirIds/tidakIds = absensi semua warga.
 async function prosesTarikan(tarikan: Row, hadirIds: string[], tidakIds: string[]) {
   const tarikanId = tarikan.id;
+  const sohibulId = tarikan.sohibul_bait_id as string;
+  const pembayarIds = h.store.warga.filter(w => w.id !== sohibulId).map(w => w.id as string);
+  const hadirSet = new Set(hadirIds);
+  const talanganIds = pembayarIds.filter(id => !hadirSet.has(id)); // pembayar tidak hadir
+  const kasTerkumpul = pembayarIds.length * 5000;
+
   const { data: existingLunas } = (await s.from('talangan')
     .select('warga_id, tanggal_lunas').eq('tarikan_id', tarikanId).eq('status_lunas', true)) as { data: Row[] };
   const lunasMap = new Map<string, unknown>((existingLunas ?? []).map(t => [t.warga_id, t.tanggal_lunas]));
@@ -100,20 +108,20 @@ async function prosesTarikan(tarikan: Row, hadirIds: string[], tidakIds: string[
   if (tidakIds.length) await s.from('absensi').insert(tidakIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'tidak_hadir' })));
 
   await s.from('talangan').delete().eq('tarikan_id', tarikanId);
-  if (tidakIds.length) await s.from('talangan').insert(tidakIds.map(warga_id => ({
+  if (talanganIds.length) await s.from('talangan').insert(talanganIds.map(warga_id => ({
     tarikan_id: tarikanId, warga_id, nominal: 50000,
     status_lunas: lunasMap.has(warga_id), tanggal_lunas: lunasMap.get(warga_id) ?? null,
   })));
 
   await s.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk');
-  if (hadirIds.length) await s.from('transaksi_kas').insert({
-    tipe: 'kas_masuk', nominal: hadirIds.length * 5000,
+  if (pembayarIds.length) await s.from('transaksi_kas').insert({
+    tipe: 'kas_masuk', nominal: kasTerkumpul,
     keterangan: `Kas hadiran tarikan #${tarikan.nomor}`, tanggal: tarikan.tanggal,
     tarikan_id: tarikanId, saldo_setelah: 0,
   });
 
   await s.from('tarikan').update({
-    status: 'selesai', total_hadir: hadirIds.length, total_terkumpul: hadirIds.length * 5000,
+    status: 'selesai', total_hadir: hadirIds.length, total_terkumpul: kasTerkumpul,
   }).eq('id', tarikanId);
 }
 
@@ -167,44 +175,50 @@ describe('Rumus format (kode asli utils.ts)', () => {
   });
 });
 
-describe('Proses tarikan — rumus iuran/kas/talangan', () => {
-  it('4 hadir + 1 tidak hadir menghitung kas, talangan, sohibul dengan benar', async () => {
-    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4'], ['w5']);
+describe('Proses tarikan — Kas & Sohibul berbasis pembayar (N−1), bukan hadir', () => {
+  // Sohibul = w1. Pembayar = w2,w3,w4,w5 (4). Skenario: w1,w2,w3 hadir; w4,w5 absen.
+  it('kas & sohibul dihitung dari 4 pembayar walau hanya 3 yang membayar langsung', async () => {
+    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3'], ['w4', 'w5']);
 
-    // Kas hadiran = 4 × 5.000 = 20.000
+    // Kas = 4 pembayar × 5.000 = 20.000 (KONSTAN, bukan hadir × 5.000)
     const kasMasuk = h.store.transaksi_kas.find(t => t.tipe === 'kas_masuk')!;
     expect(kasMasuk.nominal).toBe(20000);
     expect(h.store.tarikan[0].total_terkumpul).toBe(20000);
-    expect(h.store.tarikan[0].total_hadir).toBe(4);
-    expect(h.store.tarikan[0].status).toBe('selesai');
+    expect(h.store.tarikan[0].total_hadir).toBe(3);
 
-    // Talangan = 1 × 50.000 (warga tidak hadir)
+    // Sohibul = 4 × 45.000 = 180.000 (turunan: kas × 9)
+    expect((h.store.tarikan[0].total_terkumpul as number) * 9).toBe(180000);
+
+    // Talangan = 2 pembayar absen × 50.000 = 100.000
     const talangan = h.store.talangan.filter(t => !t.status_lunas);
-    expect(talangan).toHaveLength(1);
-    expect(talangan[0].nominal).toBe(50000);
-    expect(talangan[0].warga_id).toBe('w5');
-
-    // Absensi tercatat untuk semua 5 warga
-    expect(h.store.absensi.filter(a => a.status === 'hadir')).toHaveLength(4);
-    expect(h.store.absensi.filter(a => a.status === 'tidak_hadir')).toHaveLength(1);
+    expect(talangan).toHaveLength(2);
+    expect(talangan.every(t => t.nominal === 50000)).toBe(true);
+    expect(talangan.map(t => t.warga_id).sort()).toEqual(['w4', 'w5']);
   });
 
-  it('semua hadir → tidak ada talangan', async () => {
+  it('semua pembayar hadir → tidak ada talangan, kas tetap 20.000', async () => {
     await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4', 'w5'], []);
     expect(h.store.talangan).toHaveLength(0);
-    expect(h.store.tarikan[0].total_terkumpul).toBe(25000);
+    expect(h.store.tarikan[0].total_terkumpul).toBe(20000); // 4 pembayar × 5.000
+  });
+
+  it('Sohibul Bait TIDAK kena talangan walau ditandai tidak hadir', async () => {
+    // w1 (sohibul) absen, sisanya hadir → talangan harus 0
+    await prosesTarikan(h.store.tarikan[0], ['w2', 'w3', 'w4', 'w5'], ['w1']);
+    expect(h.store.talangan).toHaveLength(0);
+    expect(h.store.tarikan[0].total_terkumpul).toBe(20000);
   });
 });
 
 describe('Formula saldo dashboard (kode asli fetchDashboardSummary)', () => {
   it('saldo = kas terkumpul − talangan belum lunas − setor kas RT', async () => {
-    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4'], ['w5']);
+    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3'], ['w4', 'w5']);
     const sum = await fetchDashboardSummary();
-    // 20.000 − 50.000 − 0 = −30.000
+    // 20.000 − 100.000 − 0 = −80.000
     expect(sum.total_kas_terkumpul).toBe(20000);
-    expect(sum.total_talangan_belum_lunas).toBe(50000);
+    expect(sum.total_talangan_belum_lunas).toBe(100000);
     expect(sum.total_setor_kas_rt).toBe(0);
-    expect(sum.saldo_aktif).toBe(-30000);
+    expect(sum.saldo_aktif).toBe(-80000);
     expect(sum.jumlah_tarikan).toBe(1);     // selesai
     expect(sum.jumlah_dijadwalkan).toBe(0);
     expect(sum.jumlah_anggota).toBe(5);
@@ -213,40 +227,40 @@ describe('Formula saldo dashboard (kode asli fetchDashboardSummary)', () => {
 
 describe('Bayar talangan ↔ batalkan (reversibel)', () => {
   it('bayar membuat talangan lunas + transaksi masuk; saldo naik', async () => {
-    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4'], ['w5']);
-    await bayarTalangan(talanganOf('w5'));
+    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3'], ['w4', 'w5']);
+    await bayarTalangan(talanganOf('w4'));
 
-    expect(talanganOf('w5').status_lunas).toBe(true);
+    expect(talanganOf('w4').status_lunas).toBe(true);
     expect(h.store.transaksi_kas.filter(t => t.tipe === 'talangan_masuk')).toHaveLength(1);
 
     const sum = await fetchDashboardSummary();
-    expect(sum.total_talangan_belum_lunas).toBe(0);
-    expect(sum.saldo_aktif).toBe(20000); // 20.000 − 0 − 0
+    expect(sum.total_talangan_belum_lunas).toBe(50000); // sisa w5
+    expect(sum.saldo_aktif).toBe(-30000);               // 20.000 − 50.000
   });
 
   it('batalkan bayar mengembalikan ke BELUM + hapus transaksi; saldo balik', async () => {
-    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4'], ['w5']);
-    await bayarTalangan(talanganOf('w5'));
-    await batalkanBayarTalangan(talanganOf('w5'));
+    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3'], ['w4', 'w5']);
+    await bayarTalangan(talanganOf('w4'));
+    await batalkanBayarTalangan(talanganOf('w4'));
 
-    expect(talanganOf('w5').status_lunas).toBe(false);
-    expect(talanganOf('w5').tanggal_lunas).toBeNull();
+    expect(talanganOf('w4').status_lunas).toBe(false);
+    expect(talanganOf('w4').tanggal_lunas).toBeNull();
     expect(h.store.transaksi_kas.filter(t => t.tipe === 'talangan_masuk')).toHaveLength(0);
 
     const sum = await fetchDashboardSummary();
-    expect(sum.saldo_aktif).toBe(-30000); // kembali seperti sebelum bayar
+    expect(sum.saldo_aktif).toBe(-80000); // kembali seperti sebelum bayar
   });
 });
 
 describe('Hitung ulang mempertahankan status lunas', () => {
   it('warga yang sudah lunas tetap lunas setelah proses ulang', async () => {
-    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4'], ['w5']);
-    await bayarTalangan(talanganOf('w5'));
+    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3'], ['w4', 'w5']);
+    await bayarTalangan(talanganOf('w4'));
     // Hitung ulang dengan kehadiran sama
-    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4'], ['w5']);
+    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3'], ['w4', 'w5']);
 
-    expect(talanganOf('w5').status_lunas).toBe(true);
-    expect(talanganOf('w5').tanggal_lunas).toBe('2026-06-15');
+    expect(talanganOf('w4').status_lunas).toBe(true);
+    expect(talanganOf('w4').tanggal_lunas).toBe('2026-06-15');
   });
 });
 
@@ -254,8 +268,8 @@ describe('Batalkan tarikan — data kembali NOL (round-trip penuh)', () => {
   it('setelah proses lalu dibatalkan, seluruh DB persis seperti kondisi awal', async () => {
     const initial = JSON.parse(JSON.stringify(h.store));
 
-    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3', 'w4'], ['w5']);
-    await bayarTalangan(talanganOf('w5'));        // ada transaksi kas + talangan lunas
+    await prosesTarikan(h.store.tarikan[0], ['w1', 'w2', 'w3'], ['w4', 'w5']);
+    await bayarTalangan(talanganOf('w4'));        // ada transaksi kas + talangan lunas
     await batalkanTarikan('t1');                  // batalkan semuanya
 
     expect(h.store.absensi).toHaveLength(0);

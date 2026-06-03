@@ -335,8 +335,9 @@ export default function KasHadiranPage() {
                 </div>
               ) : (
                 tarikanSelesai.map(t => {
-                  const iuranHadir = t.total_hadir * 50000;
                   const kasHadiran = t.total_terkumpul ?? 0;
+                  // Sohibul Bait = 45.000 per pembayar; kas = 5.000 per pembayar → sohibul = kas × 9
+                  const sohibulTerima = kasHadiran * 9;
                   const talanganInfo = talanganMap[t.id] ?? { count: 0, total: 0 };
                   const pctHadir = Math.round((t.total_hadir / t.total_warga) * 100);
 
@@ -384,7 +385,7 @@ export default function KasHadiranPage() {
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-[17px] font-semibold text-emerald-600 dark:text-emerald-400">
-                            +{formatRupiahPlain(iuranHadir)}
+                            +{formatRupiahPlain(sohibulTerima)}
                           </p>
                           <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 mt-0.5">
                             {t.total_hadir}/{t.total_warga} hadir
