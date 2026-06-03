@@ -229,8 +229,12 @@ export default function KasHadiranPage() {
         <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl card-elevated p-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
-            <span className="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            <span
+              className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 rounded-full text-white text-[10px] font-bold"
+              aria-label={`${tarikanSelesai.length} tarikan selesai`}
+            >
               {tarikanSelesai.length}
+              <span className="font-medium opacity-90">tarikan</span>
             </span>
           </div>
           <div className="space-y-2">
