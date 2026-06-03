@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
@@ -92,6 +92,9 @@ export default function KasHadiranPage() {
   const [totalTalanganBelum, setTotalTalanganBelum] = useState(0);
   const [talanganMap, setTalanganMap] = useState<Record<string, { count: number; total: number }>>({});
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [confirmBatalId, setConfirmBatalId] = useState<string | null>(null);
+  const [confirmHapusId, setConfirmHapusId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
@@ -154,6 +157,59 @@ export default function KasHadiranPage() {
     );
     generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
     setPdfLoading(null);
+  }
+
+  // Batalkan "Simpan & Hitung" — kembalikan tarikan ke status terjadwal
+  // dan hapus data turunannya (absensi, talangan, transaksi kas tarikan ini).
+  async function batalkanTarikan(t: Tarikan) {
+    setProcessingId(t.id);
+    setConfirmBatalId(null);
+    try {
+      await supabase.from('absensi').delete().eq('tarikan_id', t.id);
+      await supabase.from('talangan').delete().eq('tarikan_id', t.id);
+      await supabase.from('transaksi_kas').delete().eq('tarikan_id', t.id);
+      await supabase.from('tarikan').update({
+        status: 'dijadwalkan', total_hadir: 0, total_terkumpul: 0,
+      }).eq('id', t.id);
+      await load();
+    } finally {
+      setProcessingId(null);
+    }
+  }
+
+  function handleBatalkanClick(t: Tarikan) {
+    setConfirmHapusId(null);
+    if (confirmBatalId === t.id) {
+      batalkanTarikan(t);
+    } else {
+      setConfirmBatalId(t.id);
+      setTimeout(() => setConfirmBatalId(prev => (prev === t.id ? null : prev)), 3500);
+    }
+  }
+
+  // Hapus tarikan sepenuhnya (beserta semua data turunannya). Tidak bisa di-undo.
+  async function hapusTarikan(t: Tarikan) {
+    setProcessingId(t.id);
+    setConfirmHapusId(null);
+    try {
+      await supabase.from('absensi').delete().eq('tarikan_id', t.id);
+      await supabase.from('talangan').delete().eq('tarikan_id', t.id);
+      await supabase.from('transaksi_kas').delete().eq('tarikan_id', t.id);
+      await supabase.from('tarikan').delete().eq('id', t.id);
+      await load();
+    } finally {
+      setProcessingId(null);
+    }
+  }
+
+  function handleHapusClick(t: Tarikan) {
+    setConfirmBatalId(null);
+    if (confirmHapusId === t.id) {
+      hapusTarikan(t);
+    } else {
+      setConfirmHapusId(t.id);
+      setTimeout(() => setConfirmHapusId(prev => (prev === t.id ? null : prev)), 3500);
+    }
   }
 
   async function handleSetor(data: { nominal: number; keterangan: string; tanggal: string }) {
@@ -360,8 +416,8 @@ export default function KasHadiranPage() {
 
                       {/* ── Actions ──────────────────────────────────
                           PDF pendapatan tersedia untuk semua (termasuk warga);
-                          Absensi & hapus tetap khusus bendahara. */}
-                      <div className="flex items-center gap-5 px-4 pb-3 pt-3 border-t border-gray-100">
+                          Absensi, Batalkan & Hapus khusus bendahara. */}
+                      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap px-4 pb-3 pt-3 border-t border-gray-100">
                         {isBendahara && (
                           <button className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-blue-600 transition-colors">
                             <Users className="w-3.5 h-3.5" />
@@ -377,8 +433,27 @@ export default function KasHadiranPage() {
                           {pdfLoading === t.id ? 'Memuat...' : 'PDF Pendapatan'}
                         </button>
                         {isBendahara && (
-                          <button className="flex items-center gap-1 text-xs text-gray-300 hover:text-red-400 transition-colors ml-auto">
+                          <button
+                            onClick={() => handleBatalkanClick(t)}
+                            disabled={processingId === t.id}
+                            className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+                              confirmBatalId === t.id ? 'text-amber-600' : 'text-[#555555] hover:text-amber-600'
+                            }`}
+                          >
+                            <RotateCcw className={`w-3.5 h-3.5 ${processingId === t.id ? 'animate-spin' : ''}`} />
+                            {confirmBatalId === t.id ? 'Yakin batalkan?' : 'Batalkan'}
+                          </button>
+                        )}
+                        {isBendahara && (
+                          <button
+                            onClick={() => handleHapusClick(t)}
+                            disabled={processingId === t.id}
+                            className={`flex items-center gap-1 text-xs font-medium ml-auto transition-colors disabled:opacity-50 ${
+                              confirmHapusId === t.id ? 'text-red-600' : 'text-gray-300 hover:text-red-500'
+                            }`}
+                          >
                             <Trash2 className="w-3.5 h-3.5" />
+                            {confirmHapusId === t.id && 'Yakin hapus?'}
                           </button>
                         )}
                       </div>
