@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -135,69 +135,74 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   return (
     <>
     <div className="space-y-4 pb-2 page-enter">
-      {/* Main Kas Card — fintech 2026 hero */}
-      <div className="relative rounded-[28px] overflow-hidden bg-gradient-to-br from-[#0A3A22] via-[#125737] to-[#1C7A4D] shadow-[0_20px_45px_-15px_rgba(10,58,34,0.55)]">
-        {/* Decorative glow orbs */}
-        <div className="pointer-events-none absolute -top-16 -right-12 w-56 h-56 rounded-full bg-emerald-300/25 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-teal-400/15 blur-3xl" />
-        {/* Soft sheen + top highlight */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/[0.06]" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/25" />
-
-        <div className="relative p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.6)]" />
-              <p className="text-emerald-100/90 text-[11px] font-semibold tracking-[0.18em] uppercase">
-                Pendapatan Kas Hadiran
-              </p>
-            </div>
-            <button
-              onClick={() => load(true)}
-              disabled={refreshing}
-              className="p-1.5 rounded-full bg-white/5 hover:bg-white/15 transition-colors"
+      {/* Main Kas Card — clean & premium hero */}
+      <div className="hero-card hero-noise" style={{ padding: '18px 22px 14px' }}>
+        {/* Label row */}
+        <div className="relative flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
+            <p
+              className="text-[12px] font-semibold uppercase text-white/[0.72]"
+              style={{ letterSpacing: '0.16em' }}
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-emerald-200 ${refreshing ? 'animate-spin' : ''}`} />
-            </button>
+              Pendapatan Kas Hadiran
+            </p>
           </div>
-          <div className="flex items-baseline gap-1 mb-1.5">
-            <span className="text-white text-[2.75rem] leading-none font-black tracking-tighter tabular-nums drop-shadow-sm">
-              Rp{animatedKasHadiran.toLocaleString('id-ID')}
-            </span>
-          </div>
-          <p className="text-emerald-100/70 text-xs mb-5">
-            Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
-          </p>
-
-          {/* Glass stat panel */}
-          <div className="rounded-2xl bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-            <div className="grid grid-cols-3 divide-x divide-white/10">
-              <button
-                onClick={() => onNavigate('kas')}
-                className="flex flex-col items-center w-full px-3 py-3.5 min-w-0 rounded-l-2xl active:bg-white/5 transition-colors"
-              >
-                <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/70 font-medium">Saldo Aktif</span>
-                <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">Rp{Math.abs(saldo).toLocaleString('id-ID')}</span>
-              </button>
-              <button
-                onClick={() => onNavigate('talangan')}
-                className="flex flex-col items-center w-full px-3 py-3.5 min-w-0 active:bg-white/5 transition-colors"
-              >
-                <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/70 font-medium">Talangan</span>
-                <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">{formatRupiahPlain(talangan)}</span>
-              </button>
-              <button
-                onClick={() => onNavigate('kas-rt')}
-                className="flex flex-col items-center w-full px-3 py-3.5 min-w-0 rounded-r-2xl active:bg-white/5 transition-colors"
-              >
-                <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/70 font-medium">Setor Kas RT</span>
-                <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</span>
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={() => load(true)}
+            disabled={refreshing}
+            className="p-1.5 -mr-1 rounded-full hover:bg-white/10 transition-colors"
+            aria-label="Muat ulang"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-white/55 ${refreshing ? 'animate-spin' : ''}`} />
+          </button>
         </div>
-        {/* Inset ring for crisp edge */}
-        <div className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-inset ring-white/10" />
+
+        {/* Big amount */}
+        <div className="relative mb-1">
+          <span
+            className="block text-white text-[42px] leading-none tabular-nums"
+            style={{ fontWeight: 800, letterSpacing: '-0.02em' }}
+          >
+            Rp{animatedKasHadiran.toLocaleString('id-ID')}
+          </span>
+        </div>
+
+        {/* Sub-text */}
+        <p className="relative text-[13px] text-white/[0.65] mb-3.5">
+          Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
+        </p>
+
+        {/* Divider */}
+        <div className="relative hero-divider-x mb-1" />
+
+        {/* 3-column stat row */}
+        <div className="relative grid grid-cols-3">
+          <button
+            onClick={() => onNavigate('kas')}
+            className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
+          >
+            <Wallet className="w-[18px] h-[18px] text-white/55" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/60 mt-1.5">Saldo Aktif</span>
+            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">Rp{Math.abs(saldo).toLocaleString('id-ID')}</span>
+          </button>
+          <button
+            onClick={() => onNavigate('talangan')}
+            className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
+          >
+            <ArrowLeftRight className="w-[18px] h-[18px] text-white/55" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/60 mt-1.5">Talangan</span>
+            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{formatRupiahPlain(talangan)}</span>
+          </button>
+          <button
+            onClick={() => onNavigate('kas-rt')}
+            className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
+          >
+            <ArrowUpRight className="w-[18px] h-[18px] text-white/55" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/60 mt-1.5">Setor Kas RT</span>
+            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Row */}

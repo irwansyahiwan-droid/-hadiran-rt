@@ -29,3 +29,40 @@ body {
   border: 1px solid #E8E8E8;
   box-shadow: none;
 }
+
+/* ── Hero card design tokens ─────────────────────────────── */
+:root {
+  --hero-radius: 26px;
+  --hero-gradient: linear-gradient(160deg, #15523c 0%, #0c2e22 100%);
+  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(39, 149, 95, 0.55) 0%, rgba(39, 149, 95, 0) 55%);
+  --hero-shadow: 0 20px 50px -20px rgba(7, 30, 22, 0.7);
+  --hero-divider: rgba(255, 255, 255, 0.12);
+}
+
+.hero-card {
+  position: relative;
+  border-radius: var(--hero-radius);
+  background: var(--hero-glow), var(--hero-gradient);
+  box-shadow: var(--hero-shadow);
+  overflow: hidden;
+}
+
+/* Grain/noise overlay — keeps the gradient from looking flat */
+.hero-noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.hero-divider-x {
+  height: 1px;
+  background: var(--hero-divider);
+}
+
+.hero-col + .hero-col {
+  border-left: 1px solid var(--hero-divider);
+}
