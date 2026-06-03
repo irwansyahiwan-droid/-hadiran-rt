@@ -124,7 +124,7 @@ export default function TalanganPage() {
           <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[15px] font-semibold text-[#111111] truncate flex-1">{g.nama}</p>
+              <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 truncate flex-1">{g.nama}</p>
               {g.countBelum > 0 && (
                 <span className="text-[11px] text-amber-700 font-medium shrink-0">
                   {g.countBelum}× @ Rp50.000
@@ -141,7 +141,7 @@ export default function TalanganPage() {
 
         {/* Detail entries */}
         {isExpanded && (
-          <div className="border-t border-[#F0F0F0] divide-y divide-[#F0F0F0]">
+          <div className="border-t border-[#F0F0F0] divide-y divide-[#F0F0F0] dark:divide-gray-800">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
@@ -190,7 +190,7 @@ export default function TalanganPage() {
     <div className="space-y-4 pb-2 page-enter">
       {/* Header card */}
       {totalBelumLunas > 0 ? (
-        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]">
+        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
 
           <div className="relative p-5">
             <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-widest mb-1">
@@ -229,7 +229,7 @@ export default function TalanganPage() {
       </div>
 
       {loading ? (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0]">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3.5">
               <div className="w-9 h-9 rounded-xl bg-gray-200 animate-pulse shrink-0" />
@@ -252,7 +252,7 @@ export default function TalanganPage() {
                   Warga dengan Tunggakan Berganda
                 </p>
               </div>
-              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0]">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800">
                 {berganda.map(g => renderGroup(g))}
               </div>
             </div>
@@ -261,8 +261,8 @@ export default function TalanganPage() {
           {/* Single belum lunas */}
           {single.length > 0 && (
             <div>
-              <p className="text-base font-extrabold text-[#111111] mt-6 mb-3">Daftar Talangan</p>
-              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0]">
+              <p className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3">Daftar Talangan</p>
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800">
                 {single.map(g => renderGroup(g))}
               </div>
             </div>
@@ -271,8 +271,8 @@ export default function TalanganPage() {
           {/* Lunas */}
           {lunas.length > 0 && (
             <div>
-              <p className="text-base font-extrabold text-[#555555] mt-6 mb-3">Sudah Lunas</p>
-              <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden divide-y divide-[#F0F0F0] opacity-60">
+              <p className="text-base font-extrabold text-[#555555] dark:text-gray-400 mt-6 mb-3">Sudah Lunas</p>
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800 opacity-60">
                 {lunas.map(g => renderGroup(g, true))}
               </div>
             </div>

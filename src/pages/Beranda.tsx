@@ -107,7 +107,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     return (
       <div className="space-y-4 pb-2">
         <div className="rounded-2xl h-44 bg-gray-200 animate-pulse" />
-        <div className="bg-white rounded-2xl border border-gray-100 py-4">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 py-4">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2 px-3">
@@ -117,9 +117,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-[#F0F0F0]' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
               <div className="w-12 h-12 rounded-2xl bg-gray-200 animate-pulse shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 bg-gray-200 animate-pulse rounded-md w-3/5" />
@@ -136,7 +136,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <>
     <div className="space-y-4 pb-2 page-enter">
       {/* Main Kas Card — always green (kasHadiran always positive) */}
-      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]">
+      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
 
 
         <div className="relative p-5">
@@ -191,19 +191,19 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="bg-white rounded-2xl border border-gray-100 py-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 py-4">
         <div className="grid grid-cols-3 divide-x divide-[#E8E8E8]">
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-extrabold text-[#111111]">{summary?.jumlah_anggota ?? 0}</span>
-            <span className="text-xs text-[#555555] font-medium">Anggota</span>
+            <span className="text-2xl font-extrabold text-[#111111] dark:text-gray-100">{summary?.jumlah_anggota ?? 0}</span>
+            <span className="text-xs text-[#555555] dark:text-gray-400 font-medium">Anggota</span>
           </div>
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-extrabold text-[#111111]">{summary?.jumlah_tarikan ?? 0}</span>
-            <span className="text-xs text-[#555555] font-medium">Tarikan</span>
+            <span className="text-2xl font-extrabold text-[#111111] dark:text-gray-100">{summary?.jumlah_tarikan ?? 0}</span>
+            <span className="text-xs text-[#555555] dark:text-gray-400 font-medium">Tarikan</span>
           </div>
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-extrabold text-[#111111]">{summary?.jumlah_dijadwalkan ?? 0}</span>
-            <span className="text-xs text-[#555555] font-medium">Terjadwal</span>
+            <span className="text-2xl font-extrabold text-[#111111] dark:text-gray-100">{summary?.jumlah_dijadwalkan ?? 0}</span>
+            <span className="text-xs text-[#555555] dark:text-gray-400 font-medium">Terjadwal</span>
           </div>
         </div>
       </div>
@@ -232,15 +232,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Jadwal Berikutnya */}
       <div>
         <div className="flex items-center justify-between mt-6 mb-3 px-1">
-          <h2 className="text-base font-extrabold text-[#111111]">Jadwal Berikutnya</h2>
+          <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Jadwal Berikutnya</h2>
           <button onClick={() => onNavigate('jadwal')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {jadwalList.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
           ) : (
             jadwalList.map((j, idx) => (
-              <div key={j.id} className={`flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}>
+              <div key={j.id} className={`flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
                   <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
@@ -250,10 +250,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[15px] font-semibold text-[#111111] leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
+                    <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
                     <span className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-[5px]" style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}>Terjadwal</span>
                   </div>
-                  <p className="text-xs text-[#555555] font-medium mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-xs text-[#555555] dark:text-gray-400 font-medium mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
               </div>
             ))
@@ -264,10 +264,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Transaksi Terakhir */}
       <div>
         <div className="flex items-center justify-between mt-6 mb-3 px-1">
-          <h2 className="text-base font-extrabold text-[#111111]">Transaksi Terakhir</h2>
+          <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Transaksi Terakhir</h2>
           <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {trxItems.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
           ) : (
@@ -275,7 +275,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <button
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
-                className={`w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}
+                className={`w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
               >
                 <div className={`w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'
@@ -284,9 +284,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-semibold text-[#111111] line-clamp-2 leading-snug">{trx.keterangan}</p>
-                  <p className="text-xs text-[#555555] font-medium mt-0.5">{formatTanggal(trx.tanggal)}</p>
-                  <p className="text-xs text-[#555555] font-medium">
+                  <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 line-clamp-2 leading-snug">{trx.keterangan}</p>
+                  <p className="text-xs text-[#555555] dark:text-gray-400 font-medium mt-0.5">{formatTanggal(trx.tanggal)}</p>
+                  <p className="text-xs text-[#555555] dark:text-gray-400 font-medium">
                     Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
                   </p>
                 </div>

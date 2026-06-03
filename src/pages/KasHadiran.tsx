@@ -180,16 +180,16 @@ export default function KasHadiranPage() {
 
   const sudahSetor = totalSetor > 0;
   const heroGradient = sudahSetor
-    ? 'from-[#0A2A5C] via-[#0D4A8C] to-[#1A6EC4]'
+    ? 'from-[#1E40AF] via-[#2563EB] to-[#3B82F6]'
     : saldo < 0
       ? 'from-slate-800 via-slate-700 to-slate-500'
-      : 'from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]';
+      : 'from-[#0F4C2E] via-[#145D39] to-[#1B7249]';
 
   return (
     <>
       <div className="space-y-4 pb-2">
         {/* Header Card */}
-        <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b ${heroGradient}`}>
+        <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
 
           <div className="relative p-5">
             <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>

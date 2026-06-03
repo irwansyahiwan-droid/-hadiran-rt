@@ -268,7 +268,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
               key={w.id}
               onClick={() => toggle(w.id)}
               className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
-                idx < filtered.length - 1 ? 'border-b border-[#F0F0F0]' : ''
+                idx < filtered.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''
               } ${isHadir ? 'hover:bg-emerald-50/50' : 'hover:bg-red-50/30'}`}
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
@@ -446,15 +446,15 @@ export default function JadwalPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white rounded-2xl border border-gray-100 p-3 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 p-3 text-center">
           <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-3 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 p-3 text-center">
           <p className="text-xl font-black text-emerald-600">{dijadwalCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-3 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 p-3 text-center">
           <p className="text-xl font-black text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
           <p className="text-[10px] text-gray-400 font-medium">Total</p>
         </div>
@@ -462,9 +462,9 @@ export default function JadwalPage() {
 
       {/* List */}
       {loading ? (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i < 4 ? 'border-b border-[#F0F0F0]' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 px-4 py-3 ${i < 4 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
               <div className="w-7 h-4 bg-gray-200 animate-pulse rounded-md shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 bg-gray-200 animate-pulse rounded-md w-3/5" />
@@ -481,7 +481,7 @@ export default function JadwalPage() {
           <p className="text-gray-400 text-sm mt-1">Jadwal tarikan akan muncul setelah dibuat oleh bendahara.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {tarikanList.map((t, idx) => {
             const isLast    = idx === tarikanList.length - 1;
             const isSelesai = t.status === 'selesai';
@@ -490,7 +490,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-3 ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
+                className={`flex items-center gap-3 px-4 py-3 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : undefined}
               >
                 {/* Nomor kecil */}
@@ -501,7 +501,7 @@ export default function JadwalPage() {
                 {/* Info + action inline */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className={`text-[15px] font-semibold truncate ${isSelesai ? 'text-[#555555]' : 'text-[#111111]'}`}>
+                    <p className={`text-[15px] font-semibold truncate ${isSelesai ? 'text-[#555555] dark:text-gray-400' : 'text-[#111111] dark:text-gray-100'}`}>
                       {t.sohibul_bait?.nama ?? '—'}
                     </p>
                     {isBendahara && isSelesai ? (
@@ -532,7 +532,7 @@ export default function JadwalPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-[#555555] mt-0.5">{formatTanggal(t.tanggal)}</p>
+                  <p className="text-xs text-[#555555] dark:text-gray-400 mt-0.5">{formatTanggal(t.tanggal)}</p>
                 </div>
               </div>
             );
