@@ -112,18 +112,20 @@ export default function TalanganPage() {
         >
           <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
           <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-semibold text-[#111111] truncate">{g.nama}</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[15px] font-semibold text-[#111111] truncate flex-1">{g.nama}</p>
+              {g.countBelum > 0 && (
+                <span className="text-[11px] text-amber-700 font-medium shrink-0">
+                  {g.countBelum}× @ Rp50.000
+                </span>
+              )}
+            </div>
             {g.countBelum > 0 && (
               <p className="text-xs text-amber-600 mt-0.5">
                 {g.countBelum} belum lunas · total {formatRupiahPlain(g.totalBelum)}
               </p>
             )}
           </div>
-          {g.countBelum > 0 && (
-            <span className="text-[11px] text-amber-700 font-medium shrink-0">
-              {g.countBelum}× @ Rp50.000
-            </span>
-          )}
         </button>
 
         {/* Detail entries */}
