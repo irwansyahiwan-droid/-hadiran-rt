@@ -120,7 +120,7 @@ export default function TalanganPage() {
             )}
           </div>
           {g.countBelum > 0 && (
-            <span className="text-[11px] text-amber-700 font-medium shrink-0">
+            <span className="text-[11px] text-amber-700 font-medium shrink-0 pt-[2px]">
               {g.countBelum}× @ Rp50.000
             </span>
           )}

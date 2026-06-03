@@ -517,7 +517,7 @@ export default function JadwalPage() {
                     {navigatingId === t.id ? 'Memproses...' : 'Proses'}
                   </button>
                 ) : (
-                  <span className="text-xs text-gray-400 shrink-0">
+                  <span className="text-xs text-gray-400 shrink-0 pt-[2px]">
                     {isSelesai ? 'Selesai' : 'Terjadwal'}
                   </span>
                 )}
