@@ -115,13 +115,13 @@ export default function TalanganPage() {
             <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
             {g.countBelum > 0 && (
               <p className="text-xs text-amber-600 mt-0.5">
-                {g.countBelum} belum lunas · {formatRupiahPlain(g.totalBelum)}
+                {g.countBelum} belum lunas · total {formatRupiahPlain(g.totalBelum)}
               </p>
             )}
           </div>
           {g.countBelum > 0 && (
             <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200 shrink-0">
-              {g.countBelum}× {formatRupiahPlain(g.totalBelum)}
+              {g.countBelum}× @ Rp50.000
             </span>
           )}
         </button>
