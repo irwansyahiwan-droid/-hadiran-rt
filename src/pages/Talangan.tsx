@@ -168,8 +168,7 @@ export default function TalanganPage() {
     <div className="space-y-4 pb-2">
       {/* Header card */}
       {totalBelumLunas > 0 ? (
-        <div className="relative rounded-3xl overflow-hidden shadow-lg"
-          style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%)' }}>
+        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0D6B5E] to-[#1A9B86]">
           <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/5 rounded-full" />
           <div className="relative p-5">

@@ -123,8 +123,8 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
             <button
               type="submit"
               disabled={saving || !nominal}
-              className={`flex-1 py-3 rounded-xl text-white text-sm font-semibold active:scale-[0.98] disabled:opacity-60 transition-all ${
-                tipe === 'masuk' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-red-500 hover:bg-red-600'
+              className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.98] disabled:opacity-60 transition-all ${
+                tipe === 'masuk' ? 'bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86]' : 'bg-red-500 hover:bg-red-600'
               }`}
             >
               {saving ? 'Menyimpan...' : 'Simpan'}
@@ -203,7 +203,7 @@ export default function KasRTPage() {
             {isBendahara && (
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-1.5 bg-teal-600 text-white text-sm font-semibold px-3 py-2 rounded-xl hover:bg-teal-700 active:scale-95 transition-all shadow-md shadow-teal-200"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold px-4 py-2 rounded-full active:scale-95 transition-all shadow-sm"
               >
                 <Plus className="w-4 h-4" />
                 Tambah
@@ -213,7 +213,7 @@ export default function KasRTPage() {
         </div>
 
         {/* Saldo Card — always teal */}
-        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-teal-800 to-teal-700">
+        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0D6B5E] to-[#1A9B86]">
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
           <div className="relative p-6">

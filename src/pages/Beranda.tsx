@@ -113,7 +113,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <>
     <div className="space-y-4 pb-2">
       {/* Main Kas Card — always green (kasHadiran always positive) */}
-      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-emerald-800 to-emerald-700">
+      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0D6B5E] to-[#1A9B86]">
         <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
         <div className="absolute top-6 -right-4 w-20 h-20 bg-white/5 rounded-full" />
         <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -212,7 +212,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Jadwal Berikutnya */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Jadwal Berikutnya</h2>
+        <div className="flex items-center justify-between mt-6 mb-3 px-1">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Jadwal Berikutnya</h2>
+          <button onClick={() => onNavigate('jadwal')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
+        </div>
         <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           {jadwalList.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
@@ -241,7 +244,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Transaksi Terakhir */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-6 mb-3 px-1">Transaksi Terakhir</h2>
+        <div className="flex items-center justify-between mt-6 mb-3 px-1">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Transaksi Terakhir</h2>
+          <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
+        </div>
         <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           {trxItems.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>

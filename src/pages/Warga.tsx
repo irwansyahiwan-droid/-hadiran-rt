@@ -96,7 +96,7 @@ export default function WargaPage() {
         {isBendahara && (
           <button
             onClick={openAdd}
-            className="flex items-center gap-1.5 bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-md shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold px-4 py-2 rounded-full shadow-sm active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4" />
             Tambah
@@ -272,7 +272,7 @@ export default function WargaPage() {
               <button
                 onClick={save}
                 disabled={saving}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-sm shadow-md shadow-emerald-200 hover:from-emerald-600 hover:to-emerald-700 active:scale-[0.98] transition-all disabled:opacity-60 mt-1"
+                className="w-full py-3 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white font-semibold text-sm shadow-sm active:scale-[0.98] transition-all disabled:opacity-60 mt-1"
               >
                 {saving ? 'Menyimpan...' : modal === 'edit' ? 'Simpan Perubahan' : 'Tambah Anggota'}
               </button>

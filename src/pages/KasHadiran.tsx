@@ -67,7 +67,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
             <button type="button" onClick={onClose}
               className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300">Batal</button>
             <button type="submit" disabled={saving || !nominal}
-              className="flex-1 py-3 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 disabled:opacity-60 active:scale-[0.98] transition-all">
+              className="flex-1 py-3 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold disabled:opacity-60 active:scale-[0.98] transition-all">
               {saving ? 'Menyimpan...' : 'Setor'}
             </button>
           </div>
@@ -172,7 +172,7 @@ export default function KasHadiranPage() {
     load();
   }
 
-  const heroGradient = saldo < 0 ? 'from-slate-800 to-slate-700' : 'from-emerald-800 to-emerald-700';
+  const heroGradient = saldo < 0 ? 'from-slate-700 to-slate-600' : 'from-[#0D6B5E] to-[#1A9B86]';
 
   return (
     <>

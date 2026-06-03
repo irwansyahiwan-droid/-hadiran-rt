@@ -369,7 +369,7 @@ export default function AbsensiPage() {
             {isBendahara && (
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-1.5 bg-emerald-500 text-white text-sm font-semibold px-3 py-2 rounded-xl hover:bg-emerald-600 active:scale-95 transition-all shadow-md shadow-emerald-200"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold px-4 py-2 rounded-full shadow-sm active:scale-95 transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Buat Tarikan

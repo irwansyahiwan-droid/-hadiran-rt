@@ -279,7 +279,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
           <button
             onClick={simpan}
             disabled={saving}
-            className="w-full py-3.5 rounded-2xl bg-emerald-500 text-white font-bold text-sm shadow-xl shadow-emerald-200/50 hover:bg-emerald-600 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white font-bold text-sm shadow-sm active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             {saving ? 'Menyimpan...' : 'Simpan & Hitung Iuran'}
@@ -415,7 +415,7 @@ export default function JadwalPage() {
                 ) : isBendahara && isNext ? (
                   <button
                     onClick={() => setSelectedTarikan(t)}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-green-600 text-white text-xs font-bold hover:bg-green-700 active:scale-95 transition-all shrink-0 shadow-sm"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-xs font-bold active:scale-95 transition-all shrink-0 shadow-sm"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Proses
