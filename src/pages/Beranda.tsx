@@ -163,24 +163,24 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
           {/* Stat row — no icons, divider only */}
           <div className="border-t border-white/20 mb-3" />
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-3 divide-x divide-white/20">
             <button
               onClick={() => onNavigate('kas')}
-              className="flex flex-col py-3 pr-3 border-r border-white/20 active:opacity-70 transition-opacity"
+              className="flex flex-col items-center text-center px-3 py-3 min-w-0 active:opacity-70 transition-opacity"
             >
               <p className="text-[10px] uppercase tracking-widest text-white/75 font-medium">Saldo Aktif</p>
               <p className="text-sm font-bold text-white mt-1">Rp{Math.abs(saldo).toLocaleString('id-ID')}</p>
             </button>
             <button
               onClick={() => onNavigate('talangan')}
-              className="flex flex-col py-3 px-3 border-r border-white/20 active:opacity-70 transition-opacity"
+              className="flex flex-col items-center text-center px-3 py-3 min-w-0 active:opacity-70 transition-opacity"
             >
               <p className="text-[10px] uppercase tracking-widest text-white/75 font-medium">Talangan</p>
               <p className="text-sm font-bold text-white mt-1">{formatRupiahPlain(talangan)}</p>
             </button>
             <button
               onClick={() => onNavigate('kas-rt')}
-              className="flex flex-col py-3 pl-3 active:opacity-70 transition-opacity"
+              className="flex flex-col items-center text-center px-3 py-3 min-w-0 active:opacity-70 transition-opacity"
             >
               <p className="text-[10px] uppercase tracking-widest text-white/75 font-medium">Setor Kas RT</p>
               <p className="text-sm font-bold text-white mt-1">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</p>
