@@ -219,7 +219,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
           ) : (
             jadwalList.map((j, idx) => (
-              <div key={j.id} className={`flex items-start gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}>
+              <div key={j.id} className={`flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
                   <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
@@ -231,7 +231,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   <p className="text-[15px] font-semibold text-[#111111] leading-tight">{j.sohibul_bait?.nama ?? '-'}</p>
                   <p className="text-xs text-[#555555] font-medium mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
-                <span className="shrink-0 text-[0.75rem] font-medium px-[8px] py-[2px] rounded-[6px] mt-[2px]" style={{ background: 'rgba(142,142,147,0.12)', color: '#8E8E93' }}>Terjadwal</span>
+                <span className="shrink-0 text-[0.75rem] font-medium px-[8px] py-[2px] rounded-[6px]" style={{ background: 'rgba(142,142,147,0.12)', color: '#8E8E93' }}>Terjadwal</span>
               </div>
             ))
           )}
@@ -252,9 +252,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <button
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
-                className={`w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}
+                className={`w-full flex items-center gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0]' : ''}`}
               >
-                <div className={`w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 mt-1 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
+                <div className={`w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'
                     ? <ArrowUpRight className="w-4 h-4 text-orange-500" />
                     : <ArrowDownLeft className="w-4 h-4 text-emerald-500" />
@@ -267,7 +267,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
                   </p>
                 </div>
-                <span className={`text-[17px] font-extrabold shrink-0 mt-0.5 ${trx.nominal < 0 ? 'text-red-600' : 'text-green-700'}`}>
+                <span className={`text-[17px] font-extrabold shrink-0 ${trx.nominal < 0 ? 'text-red-600' : 'text-green-700'}`}>
                   {trx.nominal < 0 ? '-' : '+'}Rp{Math.abs(trx.nominal).toLocaleString('id-ID')}
                 </span>
               </button>

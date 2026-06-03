@@ -108,7 +108,7 @@ export default function TalanganPage() {
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
-          className="w-full flex items-start gap-3 px-4 py-3.5 hover:bg-gray-50 active:bg-gray-50 transition-colors text-left cursor-pointer"
+          className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 active:bg-gray-50 transition-colors text-left cursor-pointer"
         >
           <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
           <div className="flex-1 min-w-0">
@@ -120,7 +120,7 @@ export default function TalanganPage() {
             )}
           </div>
           {g.countBelum > 0 && (
-            <span className="text-[11px] text-amber-700 font-medium shrink-0 pt-[2px]">
+            <span className="text-[11px] text-amber-700 font-medium shrink-0">
               {g.countBelum}× @ Rp50.000
             </span>
           )}

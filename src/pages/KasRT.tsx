@@ -280,9 +280,9 @@ export default function KasRTPage() {
               return (
                 <div
                   key={k.id}
-                  className={`flex items-start gap-3 px-4 py-4 ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
+                  className={`flex items-center gap-3 px-4 py-4 ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
                 >
-                  <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 mt-1 bg-gray-100">
+                  <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100">
                     {isMasuk
                       ? <ArrowDownLeft className="w-4 h-4 text-gray-500" />
                       : <ArrowUpRight  className="w-4 h-4 text-gray-500" />}
