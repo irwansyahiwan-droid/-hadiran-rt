@@ -178,7 +178,12 @@ export default function KasHadiranPage() {
     load();
   }
 
-  const heroGradient = saldo < 0 ? 'from-slate-700 to-slate-600' : 'from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]';
+  const sudahSetor = totalSetor > 0;
+  const heroGradient = sudahSetor
+    ? 'from-[#0A3D5C] via-[#0D5578] to-[#1A7EA8]'
+    : saldo < 0
+      ? 'from-slate-700 to-slate-600'
+      : 'from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]';
 
   return (
     <>
