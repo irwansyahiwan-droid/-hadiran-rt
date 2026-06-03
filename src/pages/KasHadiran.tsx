@@ -26,8 +26,11 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
     e.preventDefault();
     if (!nominal) return;
     setSaving(true);
-    await onSave({ nominal, keterangan, tanggal });
-    setSaving(false);
+    try {
+      await onSave({ nominal, keterangan, tanggal });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -67,7 +70,8 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
             <button type="button" onClick={onClose}
               className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300">Batal</button>
             <button type="submit" disabled={saving || !nominal}
-              className="flex-1 py-3 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold disabled:opacity-60 active:scale-[0.98] transition-all">
+              className="flex-1 py-3 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-sm font-semibold disabled:opacity-70 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+              {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
               {saving ? 'Menyimpan...' : 'Setor'}
             </button>
           </div>

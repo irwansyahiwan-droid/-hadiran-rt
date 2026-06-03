@@ -84,56 +84,59 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
 
   async function simpan() {
     setSaving(true);
-    const tarikanId = tarikan.id;
-    const hadirIds  = wargaList.filter(w => map[w.id] === 'hadir').map(w => w.id);
-    const tidakIds  = wargaList.filter(w => map[w.id] === 'tidak_hadir').map(w => w.id);
+    try {
+      const tarikanId = tarikan.id;
+      const hadirIds  = wargaList.filter(w => map[w.id] === 'hadir').map(w => w.id);
+      const tidakIds  = wargaList.filter(w => map[w.id] === 'tidak_hadir').map(w => w.id);
 
-    // Simpan status lunas yang sudah ada sebelum menghapus (agar tidak ter-reset saat Hitung Ulang)
-    const { data: existingLunas } = await supabase
-      .from('talangan')
-      .select('warga_id, tanggal_lunas')
-      .eq('tarikan_id', tarikanId)
-      .eq('status_lunas', true);
-    const lunasMap = new Map<string, string | null>(
-      (existingLunas ?? []).map(t => [t.warga_id, t.tanggal_lunas as string | null])
-    );
+      // Simpan status lunas yang sudah ada sebelum menghapus (agar tidak ter-reset saat Hitung Ulang)
+      const { data: existingLunas } = await supabase
+        .from('talangan')
+        .select('warga_id, tanggal_lunas')
+        .eq('tarikan_id', tarikanId)
+        .eq('status_lunas', true);
+      const lunasMap = new Map<string, string | null>(
+        (existingLunas ?? []).map(t => [t.warga_id, t.tanggal_lunas as string | null])
+      );
 
-    await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
+      await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
 
-    if (hadirIds.length)
-      await supabase.from('absensi').insert(hadirIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'hadir' })));
-    if (tidakIds.length)
-      await supabase.from('absensi').insert(tidakIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'tidak_hadir' })));
+      if (hadirIds.length)
+        await supabase.from('absensi').insert(hadirIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'hadir' })));
+      if (tidakIds.length)
+        await supabase.from('absensi').insert(tidakIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'tidak_hadir' })));
 
-    await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
-    if (tidakIds.length)
-      await supabase.from('talangan').insert(tidakIds.map(warga_id => ({
-        tarikan_id: tarikanId,
-        warga_id,
-        nominal: 50000,
-        status_lunas: lunasMap.has(warga_id),
-        tanggal_lunas: lunasMap.get(warga_id) ?? null,
-      })));
+      await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
+      if (tidakIds.length)
+        await supabase.from('talangan').insert(tidakIds.map(warga_id => ({
+          tarikan_id: tarikanId,
+          warga_id,
+          nominal: 50000,
+          status_lunas: lunasMap.has(warga_id),
+          tanggal_lunas: lunasMap.get(warga_id) ?? null,
+        })));
 
-    await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk');
-    if (hadirIds.length)
-      await supabase.from('transaksi_kas').insert({
-        tipe: 'kas_masuk',
-        nominal: hadirIds.length * 5000,
-        keterangan: `Kas hadiran tarikan #${tarikan.nomor} (${hadirIds.length} hadir × Rp5.000)`,
-        tanggal: tarikan.tanggal,
-        tarikan_id: tarikanId,
-        saldo_setelah: 0,
-      });
+      await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk');
+      if (hadirIds.length)
+        await supabase.from('transaksi_kas').insert({
+          tipe: 'kas_masuk',
+          nominal: hadirIds.length * 5000,
+          keterangan: `Kas hadiran tarikan #${tarikan.nomor} (${hadirIds.length} hadir × Rp5.000)`,
+          tanggal: tarikan.tanggal,
+          tarikan_id: tarikanId,
+          saldo_setelah: 0,
+        });
 
-    await supabase.from('tarikan').update({
-      status: 'selesai',
-      total_hadir: hadirIds.length,
-      total_terkumpul: hadirIds.length * 5000,
-    }).eq('id', tarikanId);
+      await supabase.from('tarikan').update({
+        status: 'selesai',
+        total_hadir: hadirIds.length,
+        total_terkumpul: hadirIds.length * 5000,
+      }).eq('id', tarikanId);
 
-    setSaving(false);
-    onSaved();
+      onSaved();
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (loadingAbsensi) {
@@ -279,10 +282,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
           <button
             onClick={simpan}
             disabled={saving}
-            className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white font-bold text-sm shadow-sm active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white font-bold text-sm shadow-sm active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
-            {saving ? 'Menyimpan...' : 'Simpan & Hitung Iuran'}
+            {saving ? 'Menghitung...' : 'Simpan & Hitung Iuran'}
           </button>
         </div>
       </div>
@@ -298,6 +301,7 @@ export default function JadwalPage() {
   const [wargaList, setWargaList] = useState<Warga[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTarikan, setSelectedTarikan] = useState<Tarikan | null>(null);
+  const [navigatingId, setNavigatingId] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -405,20 +409,22 @@ export default function JadwalPage() {
                 {/* Action */}
                 {isBendahara && isSelesai ? (
                   <button
-                    onClick={() => setSelectedTarikan(t)}
+                    onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
+                    disabled={navigatingId === t.id}
                     title="Hitung Ulang"
                     aria-label="Hitung Ulang"
-                    className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all shrink-0 cursor-pointer"
+                    className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all shrink-0 cursor-pointer disabled:opacity-70"
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className={`w-4 h-4 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                   </button>
                 ) : isBendahara && isNext ? (
                   <button
-                    onClick={() => setSelectedTarikan(t)}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-xs font-bold active:scale-95 transition-all shrink-0 shadow-sm"
+                    onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
+                    disabled={navigatingId === t.id}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-xs font-bold active:scale-95 transition-all shrink-0 shadow-sm disabled:opacity-70"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Proses
+                    <RefreshCw className={`w-3.5 h-3.5 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
+                    {navigatingId === t.id ? 'Memproses...' : 'Proses'}
                   </button>
                 ) : (
                   <span className={`px-3 py-1.5 text-[10px] font-semibold rounded-full border shrink-0 ${

@@ -36,22 +36,25 @@ export default function TalanganPage() {
 
   async function bayar(t: Talangan) {
     setProcessingId(t.id);
-    const today = new Date().toISOString().split('T')[0];
-    await supabase
-      .from('talangan')
-      .update({ status_lunas: true, tanggal_lunas: today })
-      .eq('id', t.id);
-    await supabase.from('transaksi_kas').insert({
-      tipe: 'talangan_masuk',
-      nominal: t.nominal,
-      keterangan: `Talangan lunas — ${t.warga?.nama ?? ''} (Tarikan #${t.tarikan?.nomor ?? ''})`,
-      tanggal: today,
-      warga_id: t.warga_id,
-      tarikan_id: t.tarikan_id,
-      saldo_setelah: 0,
-    });
-    setProcessingId(null);
-    load();
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      await supabase
+        .from('talangan')
+        .update({ status_lunas: true, tanggal_lunas: today })
+        .eq('id', t.id);
+      await supabase.from('transaksi_kas').insert({
+        tipe: 'talangan_masuk',
+        nominal: t.nominal,
+        keterangan: `Talangan lunas — ${t.warga?.nama ?? ''} (Tarikan #${t.tarikan?.nomor ?? ''})`,
+        tanggal: today,
+        warga_id: t.warga_id,
+        tarikan_id: t.tarikan_id,
+        saldo_setelah: 0,
+      });
+      load();
+    } finally {
+      setProcessingId(null);
+    }
   }
 
   // Group by warga
@@ -151,9 +154,14 @@ export default function TalanganPage() {
                   <button
                     onClick={() => bayar(t)}
                     disabled={processingId === t.id}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 active:scale-95 transition-all disabled:opacity-60 shrink-0"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 active:scale-95 transition-all disabled:opacity-70 shrink-0"
                   >
-                    {processingId === t.id ? <RefreshCw className="w-3 h-3 animate-spin" /> : 'Bayar'}
+                    {processingId === t.id ? (
+                      <>
+                        <RefreshCw className="w-3 h-3 animate-spin" />
+                        Memproses...
+                      </>
+                    ) : 'Bayar'}
                   </button>
                 )}
               </div>

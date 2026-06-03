@@ -25,8 +25,11 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
     e.preventDefault();
     if (!nominal) return;
     setSaving(true);
-    await onSave({ tipe, nominal, keterangan, tanggal });
-    setSaving(false);
+    try {
+      await onSave({ tipe, nominal, keterangan, tanggal });
+    } finally {
+      setSaving(false);
+    }
   }
 
   const saldoPreview = tipe === 'masuk' ? saldoSekarang + nominal : saldoSekarang - nominal;
@@ -123,10 +126,11 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
             <button
               type="submit"
               disabled={saving || !nominal}
-              className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.98] disabled:opacity-60 transition-all ${
+              className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.98] disabled:opacity-70 transition-all flex items-center justify-center gap-2 ${
                 tipe === 'masuk' ? 'bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86]' : 'bg-red-500 hover:bg-red-600'
               }`}
             >
+              {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
               {saving ? 'Menyimpan...' : 'Simpan'}
             </button>
           </div>
