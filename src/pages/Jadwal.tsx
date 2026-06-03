@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ArrowLeft, Calendar, CheckCircle2, RefreshCw,
+  ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
   RotateCcw, Search, UserCheck, X,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -380,6 +380,97 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
   );
 }
 
+// ── Edit Tarikan Modal ──────────────────────────────────────
+
+interface EditTarikanModalProps {
+  tarikan: Tarikan;
+  wargaList: Warga[];
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanModalProps) {
+  const [tanggal, setTanggal] = useState((tarikan.tanggal ?? '').slice(0, 10));
+  const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
+  const [saving, setSaving] = useState(false);
+
+  // Pastikan sohibul saat ini tetap muncul di dropdown walau tidak aktif lagi
+  const options = useMemo(() => {
+    const list = [...wargaList];
+    if (tarikan.sohibul_bait && !list.some(w => w.id === tarikan.sohibul_bait!.id)) {
+      list.unshift(tarikan.sohibul_bait);
+    }
+    return list;
+  }, [wargaList, tarikan.sohibul_bait]);
+
+  async function simpan() {
+    setSaving(true);
+    try {
+      await supabase
+        .from('tarikan')
+        .update({ tanggal, sohibul_bait_id: sohibulId || null })
+        .eq('id', tarikan.id);
+      onSaved();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 shadow-xl animate-[fadeIn_0.2s_ease-out]">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <input
+          type="date"
+          value={tanggal}
+          onChange={e => setTanggal(e.target.value)}
+          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-4"
+        />
+
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <select
+          value={sohibulId}
+          onChange={e => setSohibulId(e.target.value)}
+          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-5"
+        >
+          <option value="">— Belum ditentukan —</option>
+          {options.map(w => (
+            <option key={w.id} value={w.id}>{w.nama}</option>
+          ))}
+        </select>
+
+        <div className="flex gap-2.5">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-full border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            Batal
+          </button>
+          <button
+            onClick={simpan}
+            disabled={saving || !tanggal}
+            className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
+            {saving ? 'Menyimpan...' : 'Simpan Revisi'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────
 
 export default function JadwalPage() {
@@ -390,6 +481,7 @@ export default function JadwalPage() {
   const [selectedTarikan, setSelectedTarikan] = useState<Tarikan | null>(null);
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<AbsensiResult | null>(null);
+  const [editingTarikan, setEditingTarikan] = useState<Tarikan | null>(null);
 
   async function load() {
     setLoading(true);
@@ -491,7 +583,7 @@ export default function JadwalPage() {
               <div
                 key={t.id}
                 className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 transition-colors duration-200 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
-                style={isSelesai ? { borderLeft: '3px solid #10B981' } : undefined}
+                style={isSelesai ? { borderLeft: '3px solid #10B981' } : isNext ? { borderLeft: '3px solid #34D399' } : undefined}
               >
                 {/* Nomor kecil */}
                 <span className="text-base font-bold text-gray-400 w-7 shrink-0 text-right tabular-nums">
@@ -504,25 +596,45 @@ export default function JadwalPage() {
                     <p className={`text-base font-semibold truncate ${isSelesai ? 'text-[#555555] dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
                       {t.sohibul_bait?.nama ?? '—'}
                     </p>
-                    {isBendahara && isSelesai ? (
-                      <button
-                        onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
-                        disabled={navigatingId === t.id}
-                        title="Hitung Ulang"
-                        aria-label="Hitung Ulang"
-                        className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 active:scale-[0.97] transition-all shrink-0 cursor-pointer disabled:opacity-70"
-                      >
-                        <RefreshCw className={`w-3.5 h-3.5 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
-                      </button>
-                    ) : isBendahara && isNext ? (
-                      <button
-                        onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
-                        disabled={navigatingId === t.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0F6039] text-white text-xs font-bold active:scale-[0.97] active:opacity-90 transition-all duration-150 shrink-0 shadow-sm disabled:opacity-70"
-                      >
-                        <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
-                        {navigatingId === t.id ? 'Memproses...' : 'Proses'}
-                      </button>
+
+                    {isBendahara ? (
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {isSelesai ? (
+                          <button
+                            onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
+                            disabled={navigatingId === t.id}
+                            title="Hitung Ulang"
+                            aria-label="Hitung Ulang"
+                            className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-70"
+                          >
+                            <RefreshCw className={`w-3.5 h-3.5 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
+                          </button>
+                        ) : (
+                          // Semua tarikan terjadwal punya tombol Proses — tinggal klik saat pertemuan
+                          <button
+                            onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
+                            disabled={navigatingId === t.id}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition-all duration-150 shadow-sm disabled:opacity-70 ${
+                              isNext
+                                ? 'bg-[#0F6039] text-white'
+                                : 'bg-emerald-50 text-[#0F6039] border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800'
+                            }`}
+                          >
+                            <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
+                            {navigatingId === t.id ? 'Memproses...' : 'Proses'}
+                          </button>
+                        )}
+
+                        {/* Tombol revisi jadwal */}
+                        <button
+                          onClick={() => setEditingTarikan(t)}
+                          title="Revisi jadwal"
+                          aria-label="Revisi jadwal"
+                          className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     ) : (
                       <span
                         className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-[5px]"
@@ -538,6 +650,15 @@ export default function JadwalPage() {
             );
           })}
         </div>
+      )}
+
+      {editingTarikan && (
+        <EditTarikanModal
+          tarikan={editingTarikan}
+          wargaList={wargaList}
+          onClose={() => setEditingTarikan(null)}
+          onSaved={() => { setEditingTarikan(null); load(); }}
+        />
       )}
     </div>
   );

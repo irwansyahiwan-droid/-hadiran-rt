@@ -106,7 +106,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   if (loading) {
     return (
       <div className="space-y-4 pb-2">
-        <div className="rounded-2xl h-44 bg-gray-200 animate-pulse" />
+        <div className="rounded-[28px] h-48 bg-gray-200 animate-pulse" />
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 py-4">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
             {[...Array(3)].map((_, i) => (
@@ -135,59 +135,69 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   return (
     <>
     <div className="space-y-4 pb-2 page-enter">
-      {/* Main Kas Card — always green (kasHadiran always positive) */}
-      <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
+      {/* Main Kas Card — fintech 2026 hero */}
+      <div className="relative rounded-[28px] overflow-hidden bg-gradient-to-br from-[#0A3A22] via-[#125737] to-[#1C7A4D] shadow-[0_20px_45px_-15px_rgba(10,58,34,0.55)]">
+        {/* Decorative glow orbs */}
+        <div className="pointer-events-none absolute -top-16 -right-12 w-56 h-56 rounded-full bg-emerald-300/25 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-teal-400/15 blur-3xl" />
+        {/* Soft sheen + top highlight */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/[0.06]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/25" />
 
-
-        <div className="relative p-5">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-emerald-200 text-xs font-semibold tracking-widest uppercase">
-              Pendapatan Kas Hadiran
-            </p>
+        <div className="relative p-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.6)]" />
+              <p className="text-emerald-100/90 text-[11px] font-semibold tracking-[0.18em] uppercase">
+                Pendapatan Kas Hadiran
+              </p>
+            </div>
             <button
               onClick={() => load(true)}
               disabled={refreshing}
-              className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-full bg-white/5 hover:bg-white/15 transition-colors"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-emerald-300 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-200 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
           </div>
-          <div className="flex items-baseline gap-1 mb-1">
-            <span className="text-white text-5xl font-black tracking-tighter">
+          <div className="flex items-baseline gap-1 mb-1.5">
+            <span className="text-white text-[2.75rem] leading-none font-black tracking-tighter tabular-nums drop-shadow-sm">
               Rp{animatedKasHadiran.toLocaleString('id-ID')}
             </span>
           </div>
-          <p className="text-emerald-200 text-xs mb-5">
+          <p className="text-emerald-100/70 text-xs mb-5">
             Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
           </p>
 
-          {/* Stat row — no icons, divider only */}
-          <div className="border-t border-white/20 mb-3" />
-          <div className="grid grid-cols-3 divide-x divide-white/20">
-            <button
-              onClick={() => onNavigate('kas')}
-              className="flex flex-col items-center w-full px-3 py-3 min-w-0 active:opacity-70 transition-opacity"
-            >
-              <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/75 font-medium">Saldo Aktif</span>
-              <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">Rp{Math.abs(saldo).toLocaleString('id-ID')}</span>
-            </button>
-            <button
-              onClick={() => onNavigate('talangan')}
-              className="flex flex-col items-center w-full px-3 py-3 min-w-0 active:opacity-70 transition-opacity"
-            >
-              <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/75 font-medium">Talangan</span>
-              <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">{formatRupiahPlain(talangan)}</span>
-            </button>
-            <button
-              onClick={() => onNavigate('kas-rt')}
-              className="flex flex-col items-center w-full px-3 py-3 min-w-0 active:opacity-70 transition-opacity"
-            >
-              <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/75 font-medium">Setor Kas RT</span>
-              <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</span>
-            </button>
+          {/* Glass stat panel */}
+          <div className="rounded-2xl bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+            <div className="grid grid-cols-3 divide-x divide-white/10">
+              <button
+                onClick={() => onNavigate('kas')}
+                className="flex flex-col items-center w-full px-3 py-3.5 min-w-0 rounded-l-2xl active:bg-white/5 transition-colors"
+              >
+                <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/70 font-medium">Saldo Aktif</span>
+                <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">Rp{Math.abs(saldo).toLocaleString('id-ID')}</span>
+              </button>
+              <button
+                onClick={() => onNavigate('talangan')}
+                className="flex flex-col items-center w-full px-3 py-3.5 min-w-0 active:bg-white/5 transition-colors"
+              >
+                <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/70 font-medium">Talangan</span>
+                <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">{formatRupiahPlain(talangan)}</span>
+              </button>
+              <button
+                onClick={() => onNavigate('kas-rt')}
+                className="flex flex-col items-center w-full px-3 py-3.5 min-w-0 rounded-r-2xl active:bg-white/5 transition-colors"
+              >
+                <span className="min-h-[2.5rem] flex items-end justify-center text-center text-[11px] uppercase tracking-wide leading-tight text-white/70 font-medium">Setor Kas RT</span>
+                <span className="text-sm font-bold text-white mt-1 text-center whitespace-nowrap tabular-nums">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</span>
+              </button>
+            </div>
           </div>
-
         </div>
+        {/* Inset ring for crisp edge */}
+        <div className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-inset ring-white/10" />
       </div>
 
       {/* Stats Row */}
