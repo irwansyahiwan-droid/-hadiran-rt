@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -22,6 +22,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -97,6 +98,38 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     } else {
       setCancelConfirmId(t.id);
       setTimeout(() => setCancelConfirmId(prev => prev === t.id ? null : prev), 3000);
+    }
+  }
+
+  // Hapus data talangan (beserta transaksi kas pembayarannya bila ada) — kembalikan angka ke awal
+  async function hapusTalangan(t: Talangan) {
+    setProcessingId(t.id);
+    setDeleteConfirmId(null);
+    try {
+      const { error: eTx } = await supabase
+        .from('transaksi_kas')
+        .delete()
+        .eq('tipe', 'talangan_masuk')
+        .eq('warga_id', t.warga_id)
+        .eq('tarikan_id', t.tarikan_id);
+      const { error: eTal } = await supabase.from('talangan').delete().eq('id', t.id);
+      if (eTx || eTal) {
+        alert('Gagal menghapus talangan: ' + ((eTx ?? eTal)?.message ?? 'periksa policy DELETE di Supabase'));
+      }
+      await load();
+    } finally {
+      setProcessingId(null);
+    }
+  }
+
+  function handleHapusClick(t: Talangan) {
+    setConfirmId(null);
+    setCancelConfirmId(null);
+    if (deleteConfirmId === t.id) {
+      hapusTalangan(t);
+    } else {
+      setDeleteConfirmId(t.id);
+      setTimeout(() => setDeleteConfirmId(prev => prev === t.id ? null : prev), 3000);
     }
   }
 
@@ -222,6 +255,21 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     {processingId === t.id ? (
                       <><RefreshCw className="w-3 h-3 animate-spin" />Memproses...</>
                     ) : cancelConfirmId === t.id ? 'Yakin batal?' : 'Batalkan'}
+                  </button>
+                )}
+                {isBendahara && (
+                  <button
+                    onClick={() => handleHapusClick(t)}
+                    disabled={processingId === t.id}
+                    title="Hapus data talangan"
+                    aria-label="Hapus data talangan"
+                    className={`inline-flex items-center justify-center gap-1 h-7 px-2 rounded-lg text-[11px] font-bold transition-colors disabled:opacity-70 shrink-0 ${
+                      deleteConfirmId === t.id
+                        ? 'bg-red-600 text-white'
+                        : 'text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                    }`}
+                  >
+                    {deleteConfirmId === t.id ? 'Hapus?' : <Trash2 className="w-3.5 h-3.5" />}
                   </button>
                 )}
               </div>
