@@ -266,7 +266,7 @@ export default function KasRTPage() {
         {loading ? (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
+              <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}>
                 <div className="w-9 h-9 rounded-xl bg-gray-200 animate-pulse shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 bg-gray-200/60 animate-pulse rounded-lg w-3/4" />
@@ -293,7 +293,7 @@ export default function KasRTPage() {
               return (
                 <div
                   key={k.id}
-                  className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 transition-colors duration-200 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                  className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 transition-colors duration-200 ${!isLast ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100">
                     {isMasuk
@@ -305,7 +305,7 @@ export default function KasRTPage() {
                     <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 line-clamp-2 leading-snug">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
-                    <p className="text-xs text-[#555555] dark:text-gray-400 font-medium mt-0.5 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
+                    <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
                   </div>
 
                   <div className="text-right shrink-0">

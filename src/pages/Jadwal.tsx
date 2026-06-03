@@ -532,7 +532,7 @@ export default function JadwalPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{formatTanggal(t.tanggal)}</p>
+                  <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>
                 </div>
               </div>
             );

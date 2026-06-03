@@ -330,7 +330,7 @@ export default function KasHadiranPage() {
                           <p className="text-[17px] font-semibold text-emerald-600 dark:text-emerald-400">
                             +{formatRupiahPlain(iuranHadir)}
                           </p>
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-0.5">
+                          <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 mt-0.5">
                             {t.total_hadir}/{t.total_warga} hadir
                           </p>
                         </div>

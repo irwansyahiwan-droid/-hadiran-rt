@@ -24,7 +24,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
         </div>
         <div className="flex items-center gap-1.5">
           <span
-            className="text-[0.7rem] font-semibold px-[10px] py-[3px] rounded-[6px]"
+            className="text-[0.7rem] font-semibold px-[10px] py-[3px] rounded-[6px] shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
             style={isBendahara
               ? { background: 'rgba(52,199,89,0.12)', color: '#166534' }
               : { background: 'rgba(0,122,255,0.10)', color: '#0071E3' }}
