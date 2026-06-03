@@ -17,7 +17,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
       className="sticky top-0 z-40 bg-white/95 backdrop-blur-md dark:bg-gray-900/95"
       style={{ paddingTop: 'env(safe-area-inset-top)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
     >
-      <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-2.5">
+      <div className="flex items-center justify-between max-w-lg mx-auto px-4 py-3">
         <div className="flex items-center gap-2.5">
           <img src={logoRT} alt="Logo RT" className="h-8 w-8 object-contain rounded-full shadow-sm" />
           <h1 className="font-semibold text-gray-900 dark:text-gray-100 text-base whitespace-nowrap">Hadiran RT</h1>

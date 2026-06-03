@@ -201,7 +201,7 @@ export default function KasRTPage() {
             </button>
             <button
               onClick={() => generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal })}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
             >
               <FileText className="w-4 h-4" />
               PDF

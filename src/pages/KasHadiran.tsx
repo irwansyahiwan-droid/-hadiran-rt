@@ -193,7 +193,7 @@ export default function KasHadiranPage() {
 
           <div className="relative p-5">
             <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
-            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-red-200' : 'text-white'}`}>
+            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-red-100' : 'text-white'}`}>
               {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
@@ -209,7 +209,7 @@ export default function KasHadiranPage() {
         <div className="flex gap-2">
           <button
             onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
-            className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
+            className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 shadow-sm text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
           >
             <FileText className="w-4 h-4" />
             Cetak PDF
@@ -217,7 +217,7 @@ export default function KasHadiranPage() {
           {isBendahara && (
             <button
               onClick={() => setShowModal(true)}
-              className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 shadow-sm text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
             >
               <ArrowUpRight className="w-4 h-4" />
               Setor Kas RT
