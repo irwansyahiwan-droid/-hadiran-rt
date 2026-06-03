@@ -142,7 +142,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
             <p
-              className="text-[12px] font-semibold uppercase text-white/[0.72]"
+              className="text-[12px] font-semibold uppercase text-white/[0.85]"
               style={{ letterSpacing: '0.16em' }}
             >
               Pendapatan Kas Hadiran
@@ -154,22 +154,19 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             className="p-1.5 -mr-1 rounded-full hover:bg-white/10 transition-colors"
             aria-label="Muat ulang"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-white/55 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-white/65 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
-        {/* Big amount */}
+        {/* Big amount — ukuran konsisten dengan hero Kas RT */}
         <div className="relative mb-1">
-          <span
-            className="block text-white text-[42px] leading-none tabular-nums"
-            style={{ fontWeight: 800, letterSpacing: '-0.02em' }}
-          >
+          <span className="block text-white text-5xl font-black tracking-tighter leading-none tabular-nums">
             Rp{animatedKasHadiran.toLocaleString('id-ID')}
           </span>
         </div>
 
         {/* Sub-text */}
-        <p className="relative text-[13px] text-white/[0.65] mb-3.5">
+        <p className="relative text-[13px] text-white/[0.78] mb-3.5">
           Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
         </p>
 
@@ -182,24 +179,24 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             onClick={() => onNavigate('kas')}
             className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
           >
-            <Wallet className="w-[18px] h-[18px] text-white/55" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/60 mt-1.5">Saldo Aktif</span>
+            <Wallet className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/75 mt-1.5">Saldo Aktif</span>
             <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">Rp{Math.abs(saldo).toLocaleString('id-ID')}</span>
           </button>
           <button
             onClick={() => onNavigate('talangan')}
             className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
           >
-            <ArrowLeftRight className="w-[18px] h-[18px] text-white/55" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/60 mt-1.5">Talangan</span>
+            <ArrowLeftRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/75 mt-1.5">Talangan</span>
             <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{formatRupiahPlain(talangan)}</span>
           </button>
           <button
             onClick={() => onNavigate('kas-rt')}
             className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
           >
-            <ArrowUpRight className="w-[18px] h-[18px] text-white/55" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/60 mt-1.5">Setor Kas RT</span>
+            <ArrowUpRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/75 mt-1.5">Setor Kas RT</span>
             <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</span>
           </button>
         </div>
