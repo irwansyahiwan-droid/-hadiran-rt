@@ -188,7 +188,7 @@ export default function KasRTPage() {
 
   return (
     <>
-      <div className="space-y-4 pb-2">
+      <div className="space-y-4 pb-2 page-enter">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

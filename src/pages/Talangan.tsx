@@ -177,7 +177,7 @@ export default function TalanganPage() {
   }
 
   return (
-    <div className="space-y-4 pb-2">
+    <div className="space-y-4 pb-2 page-enter">
       {/* Header card */}
       {totalBelumLunas > 0 ? (
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-b from-[#0A5C4A] via-[#0D6B5E] to-[#1DB88A]">

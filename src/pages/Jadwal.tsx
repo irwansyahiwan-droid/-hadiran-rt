@@ -427,7 +427,7 @@ export default function JadwalPage() {
   }
 
   return (
-    <div className="space-y-3 pb-2">
+    <div className="space-y-3 pb-2 page-enter">
       {lastResult && (
         <ResultCard result={lastResult} onDismiss={() => setLastResult(null)} />
       )}

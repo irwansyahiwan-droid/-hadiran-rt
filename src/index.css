@@ -3,10 +3,19 @@
 @tailwind utilities;
 
 body {
-  background-color: #FFFFFF;
+  background-color: #F9FAFB;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+.page-enter {
+  animation: fadeIn 0.2s ease-out both;
 }
 
 .card-clean {
