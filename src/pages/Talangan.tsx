@@ -145,11 +145,11 @@ export default function TalanganPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{formatRupiahPlain(t.nominal)}</span>
                   {t.status_lunas ? (
-                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#248A3D' }}>
+                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
                       LUNAS
                     </span>
                   ) : (
-                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(255,59,48,0.10)', color: '#FF3B30' }}>
+                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(255,59,48,0.10)', color: '#9F1239' }}>
                       BELUM
                     </span>
                   )}
@@ -209,7 +209,7 @@ export default function TalanganPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama warga..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">

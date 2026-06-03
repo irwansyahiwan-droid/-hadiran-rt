@@ -230,7 +230,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-[15px] font-semibold text-[#111111] leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
-                    <span className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-[5px]" style={{ background: 'rgba(142,142,147,0.12)', color: '#8E8E93' }}>Terjadwal</span>
+                    <span className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-[5px]" style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}>Terjadwal</span>
                   </div>
                   <p className="text-xs text-[#555555] font-medium mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>

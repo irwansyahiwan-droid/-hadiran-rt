@@ -26,7 +26,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
           <span
             className="text-[0.7rem] font-semibold px-[10px] py-[3px] rounded-[6px]"
             style={isBendahara
-              ? { background: 'rgba(52,199,89,0.12)', color: '#248A3D' }
+              ? { background: 'rgba(52,199,89,0.12)', color: '#166534' }
               : { background: 'rgba(0,122,255,0.10)', color: '#0071E3' }}
           >
             {isBendahara ? 'BENDAHARA' : 'WARGA'}

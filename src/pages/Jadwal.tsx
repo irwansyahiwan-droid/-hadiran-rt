@@ -298,7 +298,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved }: AbsensiViewProps) 
           <button
             onClick={simpan}
             disabled={saving}
-            className="w-full py-3.5 rounded-full bg-[#0F6039] text-white font-bold text-sm shadow-sm active:scale-[0.98] transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-full bg-[#0F6039] text-white font-bold text-sm shadow-sm active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             {saving ? 'Menghitung...' : 'Simpan & Hitung Iuran'}
@@ -508,7 +508,7 @@ export default function JadwalPage() {
                       <button
                         onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
                         disabled={navigatingId === t.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0F6039] text-white text-xs font-bold active:scale-95 transition-all shrink-0 shadow-sm disabled:opacity-70"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0F6039] text-white text-xs font-bold active:scale-[0.97] active:opacity-90 transition-all duration-150 shrink-0 shadow-sm disabled:opacity-70"
                       >
                         <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                         {navigatingId === t.id ? 'Memproses...' : 'Proses'}
@@ -516,7 +516,7 @@ export default function JadwalPage() {
                     ) : (
                       <span
                         className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-[5px]"
-                        style={{ background: 'rgba(142,142,147,0.12)', color: '#8E8E93' }}
+                        style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}
                       >
                         {isSelesai ? 'Selesai' : 'Terjadwal'}
                       </span>
