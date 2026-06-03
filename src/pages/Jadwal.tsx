@@ -480,7 +480,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-3 ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
+                className={`flex items-start gap-3 px-4 py-3 ${!isLast ? 'border-b border-[#F0F0F0]' : ''}`}
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : undefined}
               >
                 {/* Nomor kecil */}
@@ -503,7 +503,7 @@ export default function JadwalPage() {
                     disabled={navigatingId === t.id}
                     title="Hitung Ulang"
                     aria-label="Hitung Ulang"
-                    className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all shrink-0 cursor-pointer disabled:opacity-70"
+                    className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all shrink-0 cursor-pointer disabled:opacity-70 mt-0.5"
                   >
                     <RefreshCw className={`w-4 h-4 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                   </button>
@@ -511,13 +511,13 @@ export default function JadwalPage() {
                   <button
                     onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
                     disabled={navigatingId === t.id}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-xs font-bold active:scale-95 transition-all shrink-0 shadow-sm disabled:opacity-70"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-[#0D6B5E] to-[#1A9B86] text-white text-xs font-bold active:scale-95 transition-all shrink-0 shadow-sm disabled:opacity-70 mt-0.5"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                     {navigatingId === t.id ? 'Memproses...' : 'Proses'}
                   </button>
                 ) : (
-                  <span className="text-xs text-gray-400 shrink-0">
+                  <span className="text-xs text-gray-400 shrink-0 mt-1">
                     {isSelesai ? 'Selesai' : 'Terjadwal'}
                   </span>
                 )}
