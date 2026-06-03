@@ -1,27 +1,11 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Users, Zap, Calendar, RefreshCw, ArrowUpRight, ArrowDownLeft, CreditCard, Building2 } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, CreditCard, Building2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 
-function StatCard({ label, value, icon: Icon, color }: {
-  label: string;
-  value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-}) {
-  return (
-    <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-4 border border-gray-100 dark:border-gray-800 shadow-sm">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2.5 ${color}`}>
-        <Icon className="w-5 h-5 text-white" />
-      </div>
-      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{label}</p>
-    </div>
-  );
-}
 
 interface TrxItem {
   id: string;
@@ -188,10 +172,21 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard label="Anggota" value={summary?.jumlah_anggota ?? 0} icon={Users} color="bg-blue-500" />
-        <StatCard label="Tarikan" value={summary?.jumlah_tarikan ?? 0} icon={Zap} color="bg-emerald-500" />
-        <StatCard label="Terjadwal" value={summary?.jumlah_dijadwalkan ?? 0} icon={Calendar} color="bg-amber-500" />
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 py-4">
+        <div className="grid grid-cols-3 divide-x divide-gray-100 dark:divide-gray-700">
+          <div className="flex flex-col items-center gap-0.5 px-3">
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{summary?.jumlah_anggota ?? 0}</span>
+            <span className="text-xs text-gray-400">Anggota</span>
+          </div>
+          <div className="flex flex-col items-center gap-0.5 px-3">
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{summary?.jumlah_tarikan ?? 0}</span>
+            <span className="text-xs text-gray-400">Tarikan</span>
+          </div>
+          <div className="flex flex-col items-center gap-0.5 px-3">
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{summary?.jumlah_dijadwalkan ?? 0}</span>
+            <span className="text-xs text-gray-400">Terjadwal</span>
+          </div>
+        </div>
       </div>
 
       {/* Alert Banner */}
