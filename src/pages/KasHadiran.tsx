@@ -226,7 +226,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white rounded-2xl border border-[#E8E8E8] p-4">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span
@@ -287,7 +287,7 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden"
+                      className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
                       style={talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : undefined}
                     >
 
@@ -345,7 +345,7 @@ export default function KasHadiranPage() {
                           </span>
                           <span className="font-medium">{pctHadir}% hadir</span>
                         </div>
-                        <div className="w-full h-2 bg-gray-100 dark:bg-gray-700/60 rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-emerald-400 dark:bg-emerald-500 rounded-full transition-all"
                             style={{ width: `${pctHadir}%` }}
@@ -360,20 +360,20 @@ export default function KasHadiranPage() {
 
                       {/* ── Admin actions (bendahara only) ────────────── */}
                       {isBendahara && (
-                        <div className="flex items-center gap-2 px-4 pb-4">
-                          <button className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
+                        <div className="flex items-center gap-5 px-4 pb-3 pt-3 border-t border-gray-100">
+                          <button className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-blue-600 transition-colors">
                             <Users className="w-3.5 h-3.5" />
                             Absensi
                           </button>
                           <button
                             onClick={() => handlePendapatanPDF(t)}
                             disabled={pdfLoading === t.id}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
                           >
                             <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
-                            {pdfLoading === t.id ? 'Memuat...' : 'Pendapatan'}
+                            {pdfLoading === t.id ? 'Memuat...' : 'PDF'}
                           </button>
-                          <button className="flex items-center justify-center p-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shrink-0">
+                          <button className="flex items-center gap-1 text-xs text-gray-300 hover:text-red-400 transition-colors ml-auto">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>

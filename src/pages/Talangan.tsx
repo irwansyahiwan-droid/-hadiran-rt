@@ -104,7 +104,7 @@ export default function TalanganPage() {
     const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
 
     return (
-      <div key={g.warga_id} className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden mb-2">
+      <div key={g.warga_id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-2">
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
@@ -120,7 +120,7 @@ export default function TalanganPage() {
             )}
           </div>
           {g.countBelum > 0 && (
-            <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200 shrink-0">
+            <span className="text-[11px] text-amber-700 font-medium shrink-0">
               {g.countBelum}× @ Rp50.000
             </span>
           )}
@@ -231,7 +231,7 @@ export default function TalanganPage() {
                   Warga dengan Tunggakan Berganda
                 </p>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl overflow-hidden p-2">
+              <div>
                 {berganda.map(g => renderGroup(g))}
               </div>
             </div>

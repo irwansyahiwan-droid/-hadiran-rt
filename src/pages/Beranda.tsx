@@ -170,7 +170,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="bg-white rounded-2xl border border-[#E8E8E8] py-4">
+      <div className="bg-white rounded-2xl border border-gray-100 py-4">
         <div className="grid grid-cols-3 divide-x divide-[#E8E8E8]">
           <div className="flex flex-col items-center gap-0.5 px-3">
             <span className="text-2xl font-extrabold text-[#111111]">{summary?.jumlah_anggota ?? 0}</span>
@@ -214,7 +214,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-extrabold text-[#111111]">Jadwal Berikutnya</h2>
           <button onClick={() => onNavigate('jadwal')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           {jadwalList.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
           ) : (
@@ -246,7 +246,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-extrabold text-[#111111]">Transaksi Terakhir</h2>
           <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           {trxItems.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
           ) : (
