@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import logoRt from '../assets/logo-rt.jpg';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
@@ -28,11 +29,13 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
       {/* Logo area */}
       <div className="mb-8 text-center">
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-emerald-200">
-          <span className="text-white text-3xl font-black">H</span>
-        </div>
+        <img
+          src={logoRt}
+          alt="Logo RT 004/006"
+          className="w-20 h-20 rounded-3xl object-cover mx-auto mb-4 shadow-xl shadow-emerald-200"
+        />
         <h1 className="text-2xl font-black text-gray-900">Hadiran RT</h1>
-        <p className="text-sm text-gray-500 mt-1">RT 004 / RW 006</p>
+        <p className="text-[13px] text-gray-400 mt-1">RT 004/006 · Tanah Baru Beji · Depok</p>
       </div>
 
       {/* Card */}
