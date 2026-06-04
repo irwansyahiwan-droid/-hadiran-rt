@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download } from 'lucide-react';
+import { exportCsv, todayStamp } from '../lib/exportCsv';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -234,6 +235,25 @@ export default function KasRTPage() {
             >
               <FileText className="w-4 h-4" />
               PDF
+            </button>
+            <button
+              onClick={() =>
+                exportCsv(
+                  `Kas-RT-${todayStamp()}.csv`,
+                  ['Tanggal', 'Tipe', 'Keterangan', 'Nominal', 'Saldo Setelah'],
+                  displayList.map((k) => [
+                    formatTanggal(k.tanggal),
+                    k.tipe === 'masuk' ? 'Masuk' : 'Keluar',
+                    k.keterangan ?? '',
+                    k.nominal,
+                    k.saldo_setelah,
+                  ]),
+                )
+              }
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
+            >
+              <Download className="w-4 h-4" />
+              Excel
             </button>
             {isBendahara && (
               <button

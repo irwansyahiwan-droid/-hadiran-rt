@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download } from 'lucide-react';
+import { exportCsv, todayStamp } from '../lib/exportCsv';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
@@ -282,7 +283,7 @@ export default function KasHadiranPage() {
           </div>
         </div>
 
-        {/* Action buttons — outside hero */}
+        {/* Action buttons — PDF, Excel (CSV), Setor */}
         <div className="flex gap-2">
           <button
             onClick={async () => {
@@ -293,6 +294,32 @@ export default function KasHadiranPage() {
           >
             <FileText className="w-4 h-4" />
             Cetak PDF
+          </button>
+          <button
+            onClick={() =>
+              exportCsv(
+                `Kas-Hadiran-${todayStamp()}.csv`,
+                ['Tarikan No', 'Tanggal', 'Sohibul Bait', 'Hadir', 'Total Warga', 'Kas Terkumpul', 'Sohibul Terima', 'Talangan (jml)', 'Talangan (Rp)'],
+                displayTarikan.map((t) => {
+                  const info = talanganMap[t.id] ?? { count: 0, total: 0 };
+                  return [
+                    t.nomor,
+                    formatTanggal(t.tanggal),
+                    t.sohibul_bait?.nama ?? '-',
+                    t.total_hadir,
+                    t.total_warga,
+                    t.total_terkumpul ?? 0,
+                    (t.total_terkumpul ?? 0) * 9,
+                    info.count,
+                    info.total,
+                  ];
+                }),
+              )
+            }
+            className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 shadow-sm text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
+          >
+            <Download className="w-4 h-4" />
+            Excel
           </button>
           {isBendahara && (
             <button
