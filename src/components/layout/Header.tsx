@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LogOut, Sun, Moon, Eye, History, FileText } from 'lucide-react';
+import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.jpg';
 import { haptic } from '../../lib/utils';
 import type { Role } from '../../hooks/useAuth';
@@ -17,6 +17,7 @@ interface HeaderProps {
 export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan }: HeaderProps) {
   const isBendahara = role === 'bendahara';
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 6);
@@ -24,6 +25,21 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Item menu overflow (kebab) — semua aksi dirapikan ke sini agar top bar lega.
+  const MenuItem = ({ icon: Icon, label, onClick, danger }: { icon: LucideIcon; label: string; onClick: () => void; danger?: boolean }) => (
+    <button
+      onClick={() => { haptic(); setMenuOpen(false); onClick(); }}
+      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
+        danger
+          ? 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20'
+          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800'
+      }`}
+    >
+      <Icon className={`w-[18px] h-[18px] ${danger ? 'text-rose-500' : 'text-gray-400'}`} />
+      {label}
+    </button>
+  );
 
   return (
     <header
@@ -63,7 +79,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             Hadiran RT
           </h1>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2 shrink-0">
           <span
             className="text-[0.7rem] font-semibold px-[10px] py-[3px] rounded-[6px] shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
             style={isBendahara
@@ -72,44 +88,44 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           >
             {isBendahara ? 'BENDAHARA' : 'WARGA'}
           </span>
-          {isBendahara && onOpenLaporan && (
+
+          {/* Menu overflow — rapikan semua aksi ke sini agar judul tidak terdesak */}
+          <div className="relative">
             <button
-              onClick={() => { haptic(); onOpenLaporan(); }}
-              className="press p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
-              title="Tutup Buku Triwulan"
-              aria-label="Tutup Buku Triwulan"
+              onClick={() => { haptic(); setMenuOpen((o) => !o); }}
+              className="press p-1.5 -mr-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+              aria-label="Menu"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
             >
-              <FileText className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <MoreVertical className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
-          )}
-          {isBendahara && onOpenRiwayat && (
-            <button
-              onClick={() => { haptic(); onOpenRiwayat(); }}
-              className="press p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
-              title="Riwayat Aktivitas"
-              aria-label="Riwayat Aktivitas"
-            >
-              <History className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            </button>
-          )}
-          <button
-            onClick={() => { haptic(); onToggleTheme(); }}
-            className="press p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
-            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
-            aria-label={isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
-          >
-            {isDark
-              ? <Sun className="w-5 h-5 text-amber-400" />
-              : <Moon className="w-5 h-5 text-gray-500" />}
-          </button>
-          <button
-            onClick={onLogout}
-            className="press p-1.5 -mr-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            title="Keluar"
-            aria-label="Keluar"
-          >
-            <LogOut className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </button>
+
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                <div
+                  role="menu"
+                  className="pop absolute right-0 top-[calc(100%+8px)] z-50 w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right"
+                  style={{ boxShadow: 'var(--shadow-float)' }}
+                >
+                  {isBendahara && onOpenLaporan && (
+                    <MenuItem icon={FileText} label="Tutup Buku Triwulan" onClick={onOpenLaporan} />
+                  )}
+                  {isBendahara && onOpenRiwayat && (
+                    <MenuItem icon={History} label="Riwayat Aktivitas" onClick={onOpenRiwayat} />
+                  )}
+                  {isBendahara && <div className="my-1.5 border-t border-gray-100 dark:border-gray-800" />}
+                  <MenuItem
+                    icon={isDark ? Sun : Moon}
+                    label={isDark ? 'Mode Terang' : 'Mode Gelap'}
+                    onClick={onToggleTheme}
+                  />
+                  <MenuItem icon={LogOut} label="Keluar" onClick={onLogout} danger />
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
       {!isBendahara && (
