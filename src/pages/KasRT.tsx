@@ -166,6 +166,7 @@ export default function KasRTPage() {
   const [editing, setEditing] = useState<KasRT | null>(null);
   const [selectedRow, setSelectedRow] = useState<KasRT | null>(null);
   const [confirmDel, setConfirmDel] = useState(false);
+  const [chartPeriod, setChartPeriod] = useState(6); // bulan terakhir di bar chart
   const rowDrag = useDragDismiss(() => setSelectedRow(null));
 
   async function load() {
@@ -215,13 +216,13 @@ export default function KasRTPage() {
     });
     return [...map.entries()]
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .slice(-6)
+      .slice(-chartPeriod)
       .map(([key, v]) => ({
         label: new Date(`${key}-01`).toLocaleDateString('id-ID', { month: 'short' }),
         masuk: v.masuk,
         keluar: v.keluar,
       }));
-  }, [list]);
+  }, [list, chartPeriod]);
 
   // Seri saldo kronologis untuk area tren.
   const saldoSeries = useMemo(() => list.map((k) => k.saldo_setelah), [list]);
@@ -360,7 +361,7 @@ export default function KasRTPage() {
           </div>
         </div>
 
-        {/* Grafik tren saldo & masuk/keluar per bulan */}
+        {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4">
@@ -371,10 +372,23 @@ export default function KasRTPage() {
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-bold text-[#111111] dark:text-gray-100">Masuk vs Keluar</p>
-                  <div className="flex items-center gap-2 text-[10px] font-medium">
-                    <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-500" />Masuk</span>
-                    <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-rose-400" />Keluar</span>
+                  <div className="flex items-center gap-1">
+                    {[3, 6, 12].map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setChartPeriod(p)}
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors ${
+                          chartPeriod === p ? 'bg-[#0F4C2E] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                        }`}
+                      >
+                        {p}B
+                      </button>
+                    ))}
                   </div>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-medium mb-2">
+                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-500" />Masuk</span>
+                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-rose-400" />Keluar</span>
                 </div>
                 <MonthlyBars data={monthly} />
               </div>

@@ -276,26 +276,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
 
-      {/* Donut komposisi kas */}
+      {/* Donut komposisi kas (interaktif) */}
       {donutTotal > 0 && (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift px-5 py-4">
-          <p className="text-sm font-bold text-[#111111] dark:text-gray-100 mb-1">Komposisi Kas Hadiran</p>
-          <div className="flex items-center gap-5">
-            <DonutChart
-              data={donutData}
-              centerTop="Total"
-              centerBottom={formatRupiahCompact(donutTotal)}
-            />
-            <div className="flex-1 space-y-2.5 min-w-0">
-              {donutData.map((d) => (
-                <div key={d.label} className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
-                  <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{d.label}</span>
-                  <span className="ml-auto text-xs font-bold text-gray-800 dark:text-gray-200 tabular-nums">{formatRupiahPlain(d.value)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <p className="text-sm font-bold text-[#111111] dark:text-gray-100 mb-3">Komposisi Kas Hadiran</p>
+          <DonutChart data={donutData} centerTop="Total" format={formatRupiahCompact} />
         </div>
       )}
 
