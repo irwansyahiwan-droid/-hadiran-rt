@@ -5,6 +5,7 @@ import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import { showToast } from '../lib/toast';
+import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -236,24 +237,31 @@ export default function KasHadiranPage() {
     }
   }
 
+  // Setor dari Kas Hadiran → Kas RT (catat di dua tabel) + recompute saldo kas_rt.
   async function handleSetor(data: { nominal: number; keterangan: string; tanggal: string }) {
     const saldoBaru = saldo - data.nominal;
-    await Promise.all([
+    const ket = data.keterangan || 'Setoran dari Kas Hadiran';
+    const [tx, kr] = await Promise.all([
       supabase.from('transaksi_kas').insert({
         tipe: 'setor_kas_rt',
         nominal: data.nominal,
-        keterangan: data.keterangan,
+        keterangan: ket,
         tanggal: data.tanggal,
         saldo_setelah: saldoBaru,
       }),
       supabase.from('kas_rt').insert({
         tipe: 'masuk',
         nominal: data.nominal,
-        keterangan: data.keterangan,
+        keterangan: ket,
         tanggal: data.tanggal,
-        saldo_setelah: 0,
+        saldo_setelah: 0, // dihitung ulang di bawah
       }),
     ]);
+    if (tx.error || kr.error) {
+      showToast('Gagal menyetor: ' + (tx.error?.message ?? kr.error?.message ?? ''), 'error');
+      return;
+    }
+    await recomputeKasRTSaldo();
     setShowModal(false);
     load();
     showToast('Setoran ke Kas RT tersimpan');

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2 } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -10,21 +10,24 @@ import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast } from '../lib/toast';
 import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
+import { recomputeKasRTSaldo } from '../lib/kasRt';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
 
 interface ModalProps {
   saldoSekarang: number;
+  initial?: KasRT | null;
   onSave: (data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string }) => Promise<void>;
   onClose: () => void;
 }
 
-function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
-  const [tipe, setTipe] = useState<Tipe>('masuk');
-  const [nominal, setNominal] = useState(0);
-  const [keterangan, setKeterangan] = useState('');
-  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
+function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
+  const isEdit = !!initial;
+  const [tipe, setTipe] = useState<Tipe>(initial?.tipe ?? 'masuk');
+  const [nominal, setNominal] = useState(initial?.nominal ?? 0);
+  const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
+  const [tanggal, setTanggal] = useState((initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
 
@@ -52,7 +55,7 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
-        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Transaksi Kas RT</h3>
+        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">{isEdit ? 'Edit Transaksi Kas RT' : 'Tambah Transaksi Kas RT'}</h3>
 
         <form onSubmit={submit} className="space-y-3">
           {/* Tipe toggle */}
@@ -141,7 +144,7 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
               }`}
             >
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
-              {saving ? 'Menyimpan...' : 'Simpan'}
+              {saving ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Simpan'}
             </button>
           </div>
         </form>
@@ -160,6 +163,10 @@ export default function KasRTPage() {
   const [filter, setFilter] = useState<'semua' | 'masuk' | 'keluar'>('semua');
   const [sort, setSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
   const [search, setSearch] = useState('');
+  const [editing, setEditing] = useState<KasRT | null>(null);
+  const [selectedRow, setSelectedRow] = useState<KasRT | null>(null);
+  const [confirmDel, setConfirmDel] = useState(false);
+  const rowDrag = useDragDismiss(() => setSelectedRow(null));
 
   async function load() {
     setLoading(true);
@@ -228,17 +235,38 @@ export default function KasRTPage() {
   });
 
   async function handleSave(data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string }) {
-    const saldoBaru = data.tipe === 'masuk' ? saldo + data.nominal : saldo - data.nominal;
-    await supabase.from('kas_rt').insert({
-      tipe:          data.tipe,
-      nominal:       data.nominal,
-      keterangan:    data.keterangan,
-      tanggal:       data.tanggal,
-      saldo_setelah: saldoBaru,
-    });
+    if (editing) {
+      const { error } = await supabase
+        .from('kas_rt')
+        .update({ tipe: data.tipe, nominal: data.nominal, keterangan: data.keterangan, tanggal: data.tanggal })
+        .eq('id', editing.id);
+      if (error) { showToast('Gagal mengubah: ' + error.message, 'error'); return; }
+    } else {
+      const { error } = await supabase.from('kas_rt').insert({
+        tipe: data.tipe,
+        nominal: data.nominal,
+        keterangan: data.keterangan,
+        tanggal: data.tanggal,
+        saldo_setelah: 0, // sementara; dihitung ulang di bawah
+      });
+      if (error) { showToast('Gagal menyimpan: ' + error.message, 'error'); return; }
+    }
+    await recomputeKasRTSaldo();
     setShowModal(false);
-    load();
-    showToast(data.tipe === 'masuk' ? 'Pemasukan tersimpan' : 'Pengeluaran tersimpan');
+    const wasEdit = !!editing;
+    setEditing(null);
+    await load();
+    showToast(wasEdit ? 'Transaksi diperbarui' : data.tipe === 'masuk' ? 'Pemasukan tersimpan' : 'Pengeluaran tersimpan');
+  }
+
+  async function deleteRow(row: KasRT) {
+    const { error } = await supabase.from('kas_rt').delete().eq('id', row.id);
+    if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); return; }
+    await recomputeKasRTSaldo();
+    setSelectedRow(null);
+    setConfirmDel(false);
+    await load();
+    showToast('Transaksi dihapus');
   }
 
   return (
@@ -277,7 +305,7 @@ export default function KasRTPage() {
             </button>
             {isBendahara && (
               <button
-                onClick={() => setShowModal(true)}
+                onClick={() => { setEditing(null); setShowModal(true); }}
                 className="flex items-center gap-1.5 bg-[#0F6039] text-white text-sm font-semibold px-4 py-2 rounded-full active:scale-[0.97] active:opacity-90 transition-all duration-150 shadow-sm"
               >
                 <Plus className="w-4 h-4" />
@@ -430,11 +458,13 @@ export default function KasRTPage() {
             {displayList.map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === displayList.length - 1;
+              const editable = isBendahara && k.keterangan !== 'Saldo Awal Kas RT';
               return (
                 <div
                   key={k.id}
+                  onClick={editable ? () => { setSelectedRow(k); setConfirmDel(false); } : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 transition-colors duration-200 ${!isLast ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}
+                  className={`rise flex items-center gap-3 px-4 py-4 ${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100">
                     {isMasuk
@@ -470,9 +500,56 @@ export default function KasRTPage() {
       {showModal && (
         <TambahModal
           saldoSekarang={saldo}
+          initial={editing}
           onSave={handleSave}
-          onClose={() => setShowModal(false)}
+          onClose={() => { setShowModal(false); setEditing(null); }}
         />
+      )}
+
+      {/* Aksi baris: detail + Edit + Hapus (bendahara) */}
+      {selectedRow && (
+        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setSelectedRow(null)}>
+          <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div
+            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
+            onClick={(e) => e.stopPropagation()}
+            style={rowDrag.style}
+          >
+            <div className="-mt-2 mb-3 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...rowDrag.handlers}>
+              <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+            </div>
+            <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-snug">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-2.5 mt-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Tipe</span>
+                <span className={`text-sm font-semibold ${selectedRow.tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Nominal</span>
+                <span className={`text-base font-bold ${selectedRow.tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {selectedRow.tipe === 'masuk' ? '+' : '-'}{formatRupiahPlain(selectedRow.nominal)}
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => { setEditing(selectedRow); setSelectedRow(null); setShowModal(true); }}
+                className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-[#0F6039] text-white text-sm font-bold"
+              >
+                <Pencil className="w-4 h-4" /> Edit
+              </button>
+              <button
+                onClick={() => { if (confirmDel) deleteRow(selectedRow); else { setConfirmDel(true); setTimeout(() => setConfirmDel(false), 3000); } }}
+                className={`press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border ${confirmDel ? 'bg-rose-600 text-white border-rose-600' : 'bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900'}`}
+              >
+                <Trash2 className="w-4 h-4" /> {confirmDel ? 'Yakin hapus?' : 'Hapus'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
