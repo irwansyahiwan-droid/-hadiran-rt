@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import logoRt from '../assets/logo-rt.jpg';
+import { haptic } from '../lib/utils';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
@@ -16,6 +17,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    haptic(12);
     setError('');
     setLoading(true);
     const err = await onLogin(email.trim(), password);
@@ -24,22 +26,33 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6"
+    <div className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
       style={{ background: 'linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%)' }}>
 
+      {/* Aurora background — blob mengambang lembut */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="blob absolute -top-24 -left-20 w-72 h-72 rounded-full opacity-50 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #34d399 0%, transparent 70%)' }} />
+        <div className="blob absolute top-1/3 -right-24 w-80 h-80 rounded-full opacity-40 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #10b981 0%, transparent 70%)', animationDelay: '-5s' }} />
+        <div className="blob absolute -bottom-28 left-1/4 w-72 h-72 rounded-full opacity-40 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #6ee7b7 0%, transparent 70%)', animationDelay: '-9s' }} />
+      </div>
+
       {/* Logo area */}
-      <div className="mb-8 text-center">
+      <div className="relative mb-8 text-center">
         <img
           src={logoRt}
           alt="Logo RT 004/006"
-          className="w-20 h-20 rounded-3xl object-cover mx-auto mb-4 shadow-xl shadow-emerald-200"
+          className="pop w-20 h-20 rounded-3xl object-cover mx-auto mb-4 shadow-xl shadow-emerald-300/60 ring-1 ring-white/60"
         />
-        <h1 className="text-2xl font-black text-gray-900">Hadiran RT</h1>
-        <p className="text-[13px] text-gray-400 mt-1">RT 004/006 · Tanah Baru Beji · Depok</p>
+        <h1 className="rise text-2xl font-black text-gray-900" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
+        <p className="rise text-[13px] text-gray-500 mt-1" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white/80 dark:bg-gray-900 backdrop-blur-sm rounded-3xl shadow-xl shadow-emerald-100 border border-white dark:border-gray-700 p-6">
+      <div className="rise relative w-full max-w-sm bg-white/80 dark:bg-gray-900 backdrop-blur-xl rounded-3xl shadow-2xl shadow-emerald-200/50 border border-white/80 dark:border-gray-700 p-6"
+        style={{ animationDelay: '0.22s' }}>
         <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Masuk</h2>
         <p className="text-sm text-gray-400 mb-6">Silakan login untuk melanjutkan</p>
 
@@ -94,17 +107,17 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200 hover:from-emerald-600 hover:to-emerald-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+            className="press w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-300/50 hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
           >
             {loading ? 'Memproses...' : 'Masuk'}
           </button>
 
           <button
             type="button"
-            onClick={onWargaMode}
-            className="w-full mt-2 py-3 rounded-xl border-2 border-blue-300 text-blue-700 font-semibold text-sm hover:bg-blue-50 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            onClick={() => { haptic(); onWargaMode(); }}
+            className="press w-full mt-2 py-3 rounded-xl border-2 border-blue-300 text-blue-700 font-semibold text-sm hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
           >
-            👁 Mode Warga (tanpa password)
+            <Eye className="w-4 h-4" /> Mode Warga (tanpa password)
           </button>
         </form>
       </div>

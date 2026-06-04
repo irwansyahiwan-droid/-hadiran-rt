@@ -101,7 +101,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const kasHadiran = summary?.total_kas_terkumpul ?? 0;
   const saldo = summary?.saldo_aktif ?? 0;
   const talangan = summary?.total_talangan_belum_lunas ?? 0;
+  const setorKasRT = summary?.total_setor_kas_rt ?? 0;
   const animatedKasHadiran = useCountUp(kasHadiran);
+  const animatedSaldo = useCountUp(saldo);
+  const animatedTalangan = useCountUp(talangan);
+  const animatedSetor = useCountUp(setorKasRT);
 
   if (loading) {
     return (
@@ -182,7 +186,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <Wallet className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Saldo Aktif</span>
             <span className={`text-[15px] font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-              {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
+              {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </span>
           </button>
           <button
@@ -191,7 +195,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <ArrowLeftRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Talangan</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{formatRupiahPlain(talangan)}</span>
+            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">Rp{Math.abs(animatedTalangan).toLocaleString('id-ID')}</span>
           </button>
           <button
             onClick={() => onNavigate('kas-rt')}
@@ -199,7 +203,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <ArrowUpRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Setor Kas RT</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{formatRupiahPlain(summary?.total_setor_kas_rt ?? 0)}</span>
+            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">Rp{Math.abs(animatedSetor).toLocaleString('id-ID')}</span>
           </button>
         </div>
       </div>
