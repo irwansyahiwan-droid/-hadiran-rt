@@ -107,7 +107,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     return (
       <div className="space-y-4 pb-2">
         <div className="rounded-3xl h-48 bg-gray-200 animate-pulse" />
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 py-4">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 px-5 py-4">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2 px-3">
@@ -205,7 +205,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 py-4">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 px-5 py-4">
         <div className="grid grid-cols-3 divide-x divide-gray-100 dark:divide-gray-800">
           <div className="flex flex-col items-center gap-0.5 px-3">
             <span className="text-2xl font-extrabold text-[#111111] dark:text-gray-100">{summary?.jumlah_anggota ?? 0}</span>
