@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
@@ -254,7 +254,7 @@ export default function KasHadiranPage() {
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
               <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-green-400/20 border border-green-300/30 rounded-full text-green-200 text-xs font-semibold">
-                ✓ Sudah disetor ke Kas RT
+                <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
               </span>
             )}
           </div>
@@ -368,8 +368,8 @@ export default function KasHadiranPage() {
                             {talanganInfo.count} belum bayar
                           </span>
                         ) : (
-                          <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
-                            ✓ Lunas semua
+                          <span className="inline-flex items-center gap-1 px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
+                            <Check className="w-3 h-3" strokeWidth={2.5} /> Lunas semua
                           </span>
                         )}
                       </div>
@@ -411,8 +411,8 @@ export default function KasHadiranPage() {
                           />
                         </div>
                         {talanganInfo.count > 0 && (
-                          <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1.5 font-medium">
-                            ⚠ {talanganInfo.count} warga belum bayar · {formatRupiahPlain(talanganInfo.total)}
+                          <p className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 mt-1.5 font-medium">
+                            <AlertTriangle className="w-3 h-3" /> {talanganInfo.count} warga belum bayar · {formatRupiahPlain(talanganInfo.total)}
                           </p>
                         )}
                       </div>

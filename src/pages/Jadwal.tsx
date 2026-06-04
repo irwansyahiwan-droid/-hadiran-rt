@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
-  RotateCcw, Search, UserCheck, X,
+  RotateCcw, Search, UserCheck, X, AlertTriangle,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import { supabase } from '../lib/supabase';
@@ -417,29 +417,30 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
     <div className={`transition-all duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
       <div className={`rounded-2xl p-4 shadow-md overflow-hidden ${hasTalangan ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40' : 'bg-green-50 dark:bg-emerald-900/20 border border-green-200 dark:border-emerald-800/40'}`}>
         <div className="flex items-start justify-between gap-2 mb-2">
-          <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
-            ✅ Absensi Tarikan #{result.tarikanNomor} berhasil disimpan
+          <p className="flex items-start gap-1.5 text-sm font-bold text-gray-900 dark:text-gray-100">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+            Absensi Tarikan #{result.tarikanNomor} berhasil disimpan
           </p>
           <button onClick={dismiss} className="p-0.5 text-gray-400 hover:text-gray-600 shrink-0 -mt-0.5">
             <X className="w-4 h-4" />
           </button>
         </div>
         <div className="space-y-0.5">
-          <p className="text-xs text-gray-600">
-            Hadir: <span className="font-semibold text-emerald-700">{result.hadirCount} warga</span>
+          <p className="text-xs text-gray-600 dark:text-gray-300">
+            Hadir: <span className="font-semibold text-emerald-700 dark:text-emerald-400">{result.hadirCount} warga</span>
             {' · '}
-            Tidak hadir: <span className="font-semibold text-red-600">{result.tidakCount} warga</span>
+            Tidak hadir: <span className="font-semibold text-red-600 dark:text-red-400">{result.tidakCount} warga</span>
           </p>
-          <p className="text-xs text-gray-600">
-            Kas terkumpul: <span className="font-semibold">{formatRupiahPlain(result.kasTotal)}</span>
+          <p className="text-xs text-gray-600 dark:text-gray-300">
+            Kas terkumpul: <span className="font-semibold dark:text-gray-100">{formatRupiahPlain(result.kasTotal)}</span>
           </p>
           {hasTalangan && (
-            <p className="text-xs text-amber-700 font-medium">
-              ⚠ Talangan keluar: {formatRupiahPlain(result.talanganTotal)} ({result.tidakCount} warga tidak hadir)
+            <p className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400 font-medium">
+              <AlertTriangle className="w-3 h-3 shrink-0" /> Talangan keluar: {formatRupiahPlain(result.talanganTotal)} ({result.tidakCount} warga tidak hadir)
             </p>
           )}
-          <p className="text-xs text-gray-600">
-            Sohibul Bait terima: <span className="font-semibold text-emerald-700">{formatRupiahPlain(result.sohibulBaitTerima)}</span>
+          <p className="text-xs text-gray-600 dark:text-gray-300">
+            Sohibul Bait terima: <span className="font-semibold text-emerald-700 dark:text-emerald-400">{formatRupiahPlain(result.sohibulBaitTerima)}</span>
           </p>
         </div>
         <div className="mt-3 h-0.5 bg-gray-200 rounded-full overflow-hidden">

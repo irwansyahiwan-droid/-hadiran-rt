@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, Search, X } from 'lucide-react';
+import { FileText, RefreshCw, Search, X, Check, Coins, Users, CalendarDays } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatTanggal, formatRupiahPlain } from '../lib/utils';
 import type { Tarikan, Warga } from '../lib/types';
@@ -143,14 +143,14 @@ export default function JadwalWargaPage() {
 
             {/* Badges */}
             <div className="flex gap-2 flex-wrap">
-              <span className="px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
-                ✓ {hadirCount} Hadir
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
+                <Check className="w-3 h-3" strokeWidth={2.5} /> {hadirCount} Hadir
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
-                ✗ {tidakHadirCount} Tidak Hadir
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
+                <X className="w-3 h-3" strokeWidth={2.5} /> {tidakHadirCount} Tidak Hadir
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
-                🪙 {formatRupiahPlain(iuranTerkumpul)}
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
+                <Coins className="w-3 h-3" /> {formatRupiahPlain(iuranTerkumpul)}
               </span>
             </div>
           </div>
@@ -169,9 +169,9 @@ export default function JadwalWargaPage() {
             subTab === 'anggota'
               ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
               : 'bg-white dark:bg-gray-900 text-gray-500 border-gray-200 dark:border-gray-700'
-          }`}
+          } inline-flex items-center justify-center gap-1.5`}
         >
-          👥 Daftar Anggota
+          <Users className="w-4 h-4" /> Daftar Anggota
         </button>
         <button
           onClick={() => setSubTab('jadwal')}
@@ -179,9 +179,9 @@ export default function JadwalWargaPage() {
             subTab === 'jadwal'
               ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
               : 'bg-white dark:bg-gray-900 text-gray-500 border-gray-200 dark:border-gray-700'
-          }`}
+          } inline-flex items-center justify-center gap-1.5`}
         >
-          📅 Jadwal Hadiran
+          <CalendarDays className="w-4 h-4" /> Jadwal Hadiran
         </button>
       </div>
 
@@ -247,12 +247,13 @@ export default function JadwalWargaPage() {
                     <p className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
                     {/* Badge */}
                     {lastTarikan ? (
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${
                         isHadir
                           ? 'bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50'
                           : 'bg-red-50 dark:bg-red-900/25 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50'
                       }`}>
-                        {isHadir ? '✓ Hadir' : '✗ Tidak'}
+                        {isHadir ? <Check className="w-3 h-3" strokeWidth={2.5} /> : <X className="w-3 h-3" strokeWidth={2.5} />}
+                        {isHadir ? 'Hadir' : 'Tidak'}
                       </span>
                     ) : (
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-gray-50 dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700 shrink-0">
@@ -326,12 +327,13 @@ export default function JadwalWargaPage() {
                     </div>
 
                     {/* Status */}
-                    <span className={`px-2.5 py-1 text-[10px] font-semibold rounded-full border shrink-0 ${
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold rounded-full border shrink-0 ${
                       isSelesai
                         ? 'text-gray-400 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                         : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/25 border-emerald-200 dark:border-emerald-800/50'
                     }`}>
-                      {isSelesai ? '✓ Selesai' : '• Terjadwal'}
+                      {isSelesai ? <Check className="w-3 h-3" strokeWidth={2.5} /> : <span className="w-1.5 h-1.5 rounded-full bg-current" />}
+                      {isSelesai ? 'Selesai' : 'Terjadwal'}
                     </span>
                   </div>
                 );
