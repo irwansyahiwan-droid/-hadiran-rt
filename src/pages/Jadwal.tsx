@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import SuccessOverlay from '../components/SuccessOverlay';
+import CrossFade from '../components/CrossFade';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
@@ -630,8 +631,8 @@ export default function JadwalPage() {
         </div>
       </div>
 
-      {/* List */}
-      {loading ? (
+      {/* List — cross-fade skeleton → konten */}
+      <CrossFade loading={loading} skeleton={(
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(5)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
@@ -644,7 +645,8 @@ export default function JadwalPage() {
             </div>
           ))}
         </div>
-      ) : tarikanList.length === 0 ? (
+      )}>
+        {tarikanList.length === 0 ? (
         <EmptyState icon={Calendar} title="Belum ada jadwal" subtitle="Jadwal tarikan akan muncul setelah dibuat oleh bendahara." />
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
@@ -724,7 +726,8 @@ export default function JadwalPage() {
             );
           })}
         </div>
-      )}
+        )}
+      </CrossFade>
 
       {editingTarikan && (
         <EditTarikanModal

@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
+import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import type { KasRT } from '../lib/types';
 
@@ -268,10 +269,10 @@ export default function KasRTPage() {
           </div>
         </div>
 
-        {/* Mutasi list — terbaru di atas */}
+        {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
         <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
 
-        {loading ? (
+        <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
             {[...Array(5)].map((_, i) => (
               <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}>
@@ -287,7 +288,8 @@ export default function KasRTPage() {
               </div>
             ))}
           </div>
-        ) : list.length === 0 ? (
+        )}>
+          {list.length === 0 ? (
           <EmptyState icon={Landmark} title="Belum ada transaksi" subtitle="Transaksi akan muncul setelah data pertama ditambahkan." />
         ) : (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
@@ -325,7 +327,8 @@ export default function KasRTPage() {
               );
             })}
           </div>
-        )}
+          )}
+        </CrossFade>
       </div>
 
       {showModal && (

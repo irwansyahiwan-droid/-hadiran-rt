@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
@@ -110,8 +111,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const animatedTalangan = useCountUp(talangan);
   const animatedSetor = useCountUp(setorKasRT);
 
-  if (loading) {
-    return (
+  const skeleton = (
       <div className="space-y-6 pb-2">
         <div className="rounded-3xl h-48 skeleton" />
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift px-5 py-4">
@@ -137,11 +137,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
     );
-  }
 
   return (
     <>
-    <div className="space-y-6 pb-2 page-enter">
+    <CrossFade loading={loading} skeleton={skeleton}>
+    <div className="space-y-6 pb-2">
       {/* Main Kas Card — clean & premium hero */}
       <div className="hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
         {/* Label row */}
@@ -321,6 +321,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
     </div>
+    </CrossFade>
 
     {/* Transaksi detail bottom sheet */}
     {selectedTrx !== null && (

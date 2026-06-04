@@ -6,6 +6,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { formatTanggalShort, formatRupiahPlain } from '../lib/utils';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
+import CrossFade from '../components/CrossFade';
 import type { Talangan } from '../lib/types';
 
 interface WargaGroup {
@@ -334,7 +335,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         )}
       </div>
 
-      {loading ? (
+      <CrossFade loading={loading} skeleton={(
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3.5">
@@ -347,7 +348,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             </div>
           ))}
         </div>
-      ) : (
+      )}>
         <>
           {/* Berganda warning */}
           {berganda.length > 0 && (
@@ -394,7 +395,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             />
           )}
         </>
-      )}
+      </CrossFade>
     </div>
   );
 }

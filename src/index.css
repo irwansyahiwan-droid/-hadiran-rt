@@ -131,6 +131,12 @@ body {
 .sheet-backdrop { animation: backdropIn 0.28s ease-out both; }
 .sheet-panel    { animation: sheetUp 0.4s var(--ease-out-expo) both; }
 
+/* Cross-fade skeleton → konten */
+@keyframes cfIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cfOut { from { opacity: 1; } to { opacity: 0; } }
+.cf-in  { animation: cfIn 0.38s ease both; }
+.cf-out { animation: cfOut 0.38s ease forwards; pointer-events: none; }
+
 /* Transisi antar-tab terarah (geser sesuai posisi tab) */
 @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideInLeft  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
