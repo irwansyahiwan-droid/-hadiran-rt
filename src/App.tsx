@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
 import { RefreshCw } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
@@ -28,23 +27,12 @@ export default function App() {
   const [dir, setDir] = useState(1); // arah transisi tab: 1 = ke kanan, -1 = ke kiri
 
   const TAB_ORDER: TabName[] = ['beranda', 'jadwal', 'talangan', 'kas', 'kas-rt'];
-  const vtSupported =
-    typeof document !== 'undefined' && 'startViewTransition' in document;
 
   const changeTab = (tab: TabName) => {
     if (tab === activeTab) return;
-    const forward = TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(activeTab);
-    const apply = () => { setDir(forward ? 1 : -1); setActiveTab(tab); };
-    // View Transitions API — morph direksional native (2026). Fallback: page-in.
-    const doc = document as Document & {
-      startViewTransition?: (cb: () => void) => void;
-    };
-    if (doc.startViewTransition) {
-      document.documentElement.dataset.vtDir = forward ? 'next' : 'prev';
-      doc.startViewTransition(() => flushSync(apply));
-    } else {
-      apply();
-    }
+    // Slide page-in (transform/opacity GPU, satu elemen) — halus di HP.
+    setDir(TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(activeTab) ? 1 : -1);
+    setActiveTab(tab);
   };
 
   // Geser kiri/kanan untuk pindah tab (di antara tab yang terlihat).
@@ -123,8 +111,7 @@ export default function App() {
             <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
               <div
                 key={`${activeTab}-${refreshKey}`}
-                className={vtSupported ? '' : dir > 0 ? 'page-in-right' : 'page-in-left'}
-                style={{ viewTransitionName: 'page' }}
+                className={dir > 0 ? 'page-in-right' : 'page-in-left'}
               >
                 {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} />}
                 {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
