@@ -32,7 +32,7 @@ body {
 
 /* ── Hero card design tokens ─────────────────────────────── */
 :root {
-  --hero-radius: 26px;
+  --hero-radius: 24px;
   /* Samakan warna dengan hero Kas RT: bg-gradient-to-br from-#0F4C2E via-#145D39 to-#1B7249 */
   --hero-gradient: linear-gradient(135deg, #0F4C2E 0%, #145D39 50%, #1B7249 100%);
   --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(39, 149, 95, 0.30) 0%, rgba(39, 149, 95, 0) 55%);

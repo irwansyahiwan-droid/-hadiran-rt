@@ -106,8 +106,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   if (loading) {
     return (
       <div className="space-y-4 pb-2">
-        <div className="rounded-[28px] h-48 bg-gray-200 animate-pulse" />
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 py-4">
+        <div className="rounded-3xl h-48 bg-gray-200 animate-pulse" />
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 py-4">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2 px-3">
@@ -117,7 +117,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             ))}
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {[...Array(4)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
               <div className="w-12 h-12 rounded-2xl bg-gray-200 animate-pulse shrink-0" />
@@ -136,7 +136,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <>
     <div className="space-y-4 pb-2 page-enter">
       {/* Main Kas Card — clean & premium hero */}
-      <div className="hero-card hero-noise" style={{ padding: '18px 22px 14px' }}>
+      <div className="hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
         {/* Label row */}
         <div className="relative flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2">
@@ -205,8 +205,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 py-4">
-        <div className="grid grid-cols-3 divide-x divide-[#E8E8E8]">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 py-4">
+        <div className="grid grid-cols-3 divide-x divide-gray-100 dark:divide-gray-800">
           <div className="flex flex-col items-center gap-0.5 px-3">
             <span className="text-2xl font-extrabold text-[#111111] dark:text-gray-100">{summary?.jumlah_anggota ?? 0}</span>
             <span className="text-xs text-[#555555] dark:text-gray-400 font-medium">Anggota</span>
@@ -224,7 +224,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Alert Banner */}
       {talangan > 0 && (
-        <div className="flex items-start gap-3 bg-amber-50/90 border border-amber-200/60 rounded-2xl p-4 shadow-[0_4px_12px_rgba(245,158,11,0.08)]">
+        <div className="flex items-start gap-3 bg-amber-50/90 border border-amber-200/60 rounded-3xl p-4 shadow-[0_4px_12px_rgba(245,158,11,0.08)]">
           <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-4 h-4 text-amber-600" />
           </div>
@@ -249,7 +249,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Jadwal Berikutnya</h2>
           <button onClick={() => onNavigate('jadwal')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {jadwalList.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
           ) : (
@@ -281,7 +281,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Transaksi Terakhir</h2>
           <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {trxItems.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
           ) : (
