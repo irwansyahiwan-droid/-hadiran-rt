@@ -236,11 +236,13 @@ export default function KasRTPage() {
 
   async function handleSave(data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string }) {
     if (editing) {
-      const { error } = await supabase
+      const { data: upd, error } = await supabase
         .from('kas_rt')
         .update({ tipe: data.tipe, nominal: data.nominal, keterangan: data.keterangan, tanggal: data.tanggal })
-        .eq('id', editing.id);
+        .eq('id', editing.id)
+        .select();
       if (error) { showToast('Gagal mengubah: ' + error.message, 'error'); return; }
+      if (!upd || upd.length === 0) { showToast('Gagal mengubah — policy UPDATE kas_rt belum aktif di database', 'error'); return; }
     } else {
       const { error } = await supabase.from('kas_rt').insert({
         tipe: data.tipe,
@@ -260,8 +262,9 @@ export default function KasRTPage() {
   }
 
   async function deleteRow(row: KasRT) {
-    const { error } = await supabase.from('kas_rt').delete().eq('id', row.id);
+    const { data: del, error } = await supabase.from('kas_rt').delete().eq('id', row.id).select();
     if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); return; }
+    if (!del || del.length === 0) { showToast('Gagal menghapus — policy DELETE kas_rt belum aktif di database', 'error'); return; }
     await recomputeKasRTSaldo();
     setSelectedRow(null);
     setConfirmDel(false);
