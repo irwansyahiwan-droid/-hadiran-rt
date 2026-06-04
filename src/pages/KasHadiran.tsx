@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
@@ -104,6 +104,11 @@ export default function KasHadiranPage() {
   const [showModal, setShowModal] = useState(false);
   const [hadiranFilter, setHadiranFilter] = useState<'semua' | 'talangan' | 'lunas'>('semua');
   const [hadiranSort, setHadiranSort] = useState<'terbaru' | 'terlama' | 'kas'>('terbaru');
+  const [detailTarikan, setDetailTarikan] = useState<Tarikan | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailHadir, setDetailHadir] = useState<{ id: string; nama: string }[]>([]);
+  const [detailTidak, setDetailTidak] = useState<{ id: string; nama: string; lunas: boolean }[]>([]);
+  const detailDrag = useDragDismiss(() => setDetailTarikan(null));
 
   async function load() {
     setLoading(true);
@@ -180,6 +185,34 @@ export default function KasHadiranPage() {
     const { generatePendapatanPDF } = await import('../lib/generatePendapatanPDF');
     generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
     setPdfLoading(null);
+  }
+
+  // Buka sheet detail tarikan: daftar hadir & tidak hadir (+ status bayar talangan).
+  async function openDetail(t: Tarikan) {
+    setDetailTarikan(t);
+    setDetailLoading(true);
+    setDetailHadir([]);
+    setDetailTidak([]);
+    const [absRes, talRes] = await Promise.all([
+      supabase.from('absensi').select('warga_id, status').eq('tarikan_id', t.id),
+      supabase.from('talangan').select('warga_id, status_lunas').eq('tarikan_id', t.id),
+    ]);
+    const namaMap = new Map(wargaList.map((w) => [w.id, w.nama]));
+    const lunasMap = new Map(
+      (talRes.data as { warga_id: string; status_lunas: boolean }[] ?? []).map((x) => [x.warga_id, x.status_lunas]),
+    );
+    const hadir: { id: string; nama: string }[] = [];
+    const tidak: { id: string; nama: string; lunas: boolean }[] = [];
+    (absRes.data as { warga_id: string; status: 'hadir' | 'tidak_hadir' }[] ?? []).forEach((a) => {
+      const nama = namaMap.get(a.warga_id) ?? '—';
+      if (a.status === 'hadir') hadir.push({ id: a.warga_id, nama });
+      else tidak.push({ id: a.warga_id, nama, lunas: lunasMap.get(a.warga_id) ?? false });
+    });
+    hadir.sort((a, b) => a.nama.localeCompare(b.nama));
+    tidak.sort((a, b) => Number(a.lunas) - Number(b.lunas) || a.nama.localeCompare(b.nama)); // belum bayar di atas
+    setDetailHadir(hadir);
+    setDetailTidak(tidak);
+    setDetailLoading(false);
   }
 
   // Batalkan "Simpan & Hitung" — kembalikan tarikan ke status terjadwal
@@ -455,26 +488,30 @@ export default function KasHadiranPage() {
                         )}
                       </div>
 
-                      {/* ── Focal row: penerima + amount ─────────────── */}
-                      <div className="flex items-center gap-3 px-4 pb-4">
+                      {/* ── Focal row: penerima + amount (ketuk → detail) ─ */}
+                      <button
+                        onClick={() => openDetail(t)}
+                        className="w-full flex items-center gap-3 px-4 pb-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
+                      >
                         <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
                         <div className="flex-1 min-w-0">
                           <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
-                          <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
-                            Dapat Arisan
+                          <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                            {t.total_hadir}/{t.total_warga} hadir · Lihat detail
+                            <ChevronRight className="w-3 h-3" />
                           </span>
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-[17px] font-semibold text-emerald-600 dark:text-emerald-400">
                             +{formatRupiahPlain(sohibulTerima)}
                           </p>
-                          <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 mt-0.5">
-                            {t.total_hadir}/{t.total_warga} hadir
-                          </p>
+                          <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
+                            Dapat Arisan
+                          </span>
                         </div>
-                      </div>
+                      </button>
 
                       {/* ── Progress bar + kas info ───────────────────── */}
                       <div className="px-4 pb-4 border-t border-gray-50 dark:border-gray-800 pt-3">
@@ -556,6 +593,91 @@ export default function KasHadiranPage() {
           onSave={handleSetor}
           onClose={() => setShowModal(false)}
         />
+      )}
+
+      {/* Sheet detail tarikan: hadir & tidak hadir + status bayar talangan */}
+      {detailTarikan && (
+        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setDetailTarikan(null)}>
+          <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div
+            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl flex flex-col max-h-[82vh]"
+            onClick={(e) => e.stopPropagation()}
+            style={detailDrag.style}
+          >
+            <div className="pt-3 pb-2 flex justify-center touch-none cursor-grab active:cursor-grabbing shrink-0" {...detailDrag.handlers}>
+              <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+            </div>
+
+            {/* Header */}
+            <div className="px-5 pb-3 shrink-0 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
+                <div className="min-w-0">
+                  <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
+                  <p className="text-xs text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">Hadir {detailHadir.length}</span>
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400">Belum bayar {detailTidak.filter((x) => !x.lunas).length}</span>
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">Lunas {detailTidak.filter((x) => x.lunas).length}</span>
+              </div>
+            </div>
+
+            {/* Lists (scrollable) */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 pb-10 space-y-5">
+              {detailLoading ? (
+                <div className="flex justify-center py-10"><RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" /></div>
+              ) : (
+                <>
+                  {detailTidak.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Tidak Hadir / Talangan</p>
+                      <div className="space-y-1.5">
+                        {detailTidak.map((p) => (
+                          <div key={p.id} className="flex items-center gap-2.5">
+                            <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
+                            <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            {p.lunas ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400"><AlertTriangle className="w-3 h-3" />Belum bayar</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {detailHadir.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Hadir ({detailHadir.length})</p>
+                      <div className="space-y-1.5">
+                        {detailHadir.map((p) => (
+                          <div key={p.id} className="flex items-center gap-2.5">
+                            <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
+                            <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <Check className="w-4 h-4 text-emerald-500 shrink-0" strokeWidth={2.5} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {detailHadir.length === 0 && detailTidak.length === 0 && (
+                    <p className="text-center text-sm text-gray-400 py-8">Belum ada data absensi untuk tarikan ini.</p>
+                  )}
+                </>
+              )}
+            </div>
+
+            <button
+              onClick={() => setDetailTarikan(null)}
+              className="press absolute top-3 right-4 p-1.5 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              aria-label="Tutup"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       )}
     </>
   );
