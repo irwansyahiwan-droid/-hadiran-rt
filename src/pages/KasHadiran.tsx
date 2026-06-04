@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet, Search } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
-import { useRealtime } from '../hooks/useRealtime';
-import Odometer from '../components/Odometer';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import { showToast } from '../lib/toast';
@@ -106,7 +104,6 @@ export default function KasHadiranPage() {
   const [showModal, setShowModal] = useState(false);
   const [hadiranFilter, setHadiranFilter] = useState<'semua' | 'talangan' | 'lunas'>('semua');
   const [hadiranSort, setHadiranSort] = useState<'terbaru' | 'terlama' | 'kas'>('terbaru');
-  const [search, setSearch] = useState('');
   const [detailTarikan, setDetailTarikan] = useState<Tarikan | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailHadir, setDetailHadir] = useState<{ id: string; nama: string }[]>([]);
@@ -144,7 +141,6 @@ export default function KasHadiranPage() {
   }
 
   useEffect(() => { load(); }, []);
-  useRealtime(['transaksi_kas', 'tarikan', 'talangan'], load);
 
   const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
@@ -159,13 +155,8 @@ export default function KasHadiranPage() {
     else if (hadiranSort === 'kas')     arr.sort((a, b) => (b.total_terkumpul ?? 0) - (a.total_terkumpul ?? 0));
     if (hadiranFilter === 'talangan')   arr = arr.filter((t) => (talanganMap[t.id]?.count ?? 0) > 0);
     else if (hadiranFilter === 'lunas') arr = arr.filter((t) => (talanganMap[t.id]?.count ?? 0) === 0);
-    const q = search.trim().toLowerCase();
-    if (q) arr = arr.filter((t) =>
-      String(t.nomor ?? '').includes(q) ||
-      (t.sohibul_bait?.nama ?? '').toLowerCase().includes(q)
-    );
     return arr;
-  }, [tarikanSelesai, talanganMap, hadiranFilter, hadiranSort, search]);
+  }, [tarikanSelesai, talanganMap, hadiranFilter, hadiranSort]);
 
   const hadiranSortLabel = hadiranSort === 'terbaru' ? 'Terbaru' : hadiranSort === 'terlama' ? 'Terlama' : 'Kas';
   const cycleHadiranSort = () =>
@@ -327,11 +318,8 @@ export default function KasHadiranPage() {
               <Wallet className="w-4 h-4 text-blue-200" />
               <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
             </div>
-            <p className="mb-1">
-              <Odometer
-                value={animatedSaldo}
-                className={`text-5xl font-black tracking-tighter ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}
-              />
+            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+              {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
@@ -453,24 +441,6 @@ export default function KasHadiranPage() {
                   <ArrowDownUp className="w-3.5 h-3.5" />
                   {hadiranSortLabel}
                 </button>
-              </div>
-            )}
-
-            {/* Search — nomor tarikan / nama sohibul */}
-            {!loading && tarikanSelesai.length > 4 && (
-              <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari tarikan / sohibul..."
-                  className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                />
-                {search && (
-                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Hapus pencarian">
-                    <X className="w-4 h-4 text-gray-400" />
-                  </button>
-                )}
               </div>
             )}
 

@@ -92,11 +92,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }
 
   function toggle(id: string) {
-    setMap(prev => {
-      const next = prev[id] === 'hadir' ? 'tidak_hadir' : 'hadir';
-      haptic(next === 'hadir' ? 12 : 7); // hadir terasa lebih "mantap"
-      return { ...prev, [id]: next };
-    });
+    setMap(prev => ({ ...prev, [id]: prev[id] === 'hadir' ? 'tidak_hadir' : 'hadir' }));
   }
 
   const filtered = useMemo(() => {
@@ -322,11 +318,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             <button
               key={w.id}
               onClick={() => toggle(w.id)}
-              className={`press w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
+              className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
                 idx < filtered.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''
               } ${isHadir ? 'hover:bg-emerald-50/50' : 'hover:bg-red-50/30'}`}
             >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold transition-colors duration-200 ${
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
                 isHadir ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-400'
               }`}>
                 {w.nama.charAt(0)}
@@ -337,10 +333,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
                   {isHadir ? 'Hadir' : 'Tidak hadir → Talangan'}
                 </p>
               </div>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors duration-200 ${
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
                 isHadir ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 dark:border-gray-600'
               }`}>
-                {isHadir && <CheckCircle2 key="chk" className="pop w-4 h-4 text-white" />}
+                {isHadir && <CheckCircle2 className="w-4 h-4 text-white" />}
               </div>
             </button>
           );

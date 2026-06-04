@@ -4,8 +4,6 @@ import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
-import { useRealtime } from '../hooks/useRealtime';
-import Odometer from '../components/Odometer';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatRupiahCompact, formatTanggal } from '../lib/utils';
 import DonutChart from '../components/charts/DonutChart';
@@ -107,7 +105,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   useEffect(() => {
     load();
   }, []);
-  useRealtime(['transaksi_kas', 'tarikan', 'talangan', 'kas_rt'], () => load());
 
   const kasHadiran = summary?.total_kas_terkumpul ?? 0;
   const saldo = summary?.saldo_aktif ?? 0;
@@ -217,10 +214,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
         {/* Big amount — ukuran konsisten dengan hero Kas RT */}
         <div className="relative mb-1">
-          <Odometer
-            value={animatedKasHadiran}
-            className="text-white text-5xl font-black tracking-tighter leading-none"
-          />
+          <span className="block text-white text-5xl font-black tracking-tighter leading-none tabular-nums">
+            Rp{animatedKasHadiran.toLocaleString('id-ID')}
+          </span>
         </div>
 
         {/* Sub-text */}

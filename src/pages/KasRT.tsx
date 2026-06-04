@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2, Share2 } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2 } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
-import { useRealtime } from '../hooks/useRealtime';
-import Odometer from '../components/Odometer';
-import SmartInsight from '../components/SmartInsight';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -184,7 +181,6 @@ export default function KasRTPage() {
   }
 
   useEffect(() => { load(); }, []);
-  useRealtime(['kas_rt', 'transaksi_kas', 'tarikan', 'talangan'], load);
 
   const saldoAwalEntry = list.find((k) => k.keterangan === 'Saldo Awal Kas RT');
   const saldoAwal   = saldoAwalEntry?.nominal ?? 0;
@@ -230,23 +226,6 @@ export default function KasRTPage() {
 
   // Seri saldo kronologis untuk area tren.
   const saldoSeries = useMemo(() => list.map((k) => k.saldo_setelah), [list]);
-
-  // Insight: pemasukan bulan kalender ini vs bulan lalu.
-  const insight = useMemo(() => {
-    const d = new Date();
-    const key = (y: number, m: number) => `${y}-${String(m + 1).padStart(2, '0')}`;
-    const curKey = key(d.getFullYear(), d.getMonth());
-    const prev = new Date(d.getFullYear(), d.getMonth() - 1, 1);
-    const prevKey = key(prev.getFullYear(), prev.getMonth());
-    let cur = 0, prv = 0;
-    list.forEach((k) => {
-      if (k.keterangan === 'Saldo Awal Kas RT' || k.tipe !== 'masuk') return;
-      const mk = (k.tanggal ?? '').slice(0, 7);
-      if (mk === curKey) cur += k.nominal;
-      else if (mk === prevKey) prv += k.nominal;
-    });
-    return { cur, prv };
-  }, [list]);
 
   const sortLabel = sort === 'terbaru' ? 'Terbaru' : sort === 'terlama' ? 'Terlama' : 'Nominal';
   const cycleSort = () =>
@@ -309,27 +288,6 @@ export default function KasRTPage() {
             </button>
             <button
               onClick={async () => {
-                const { shareReceipt } = await import('../lib/shareReceipt');
-                await shareReceipt({
-                  title: 'Ringkasan Kas RT',
-                  amountLabel: 'Saldo Bersih Kas RT',
-                  amount: `Rp${saldo.toLocaleString('id-ID')}`,
-                  rows: [
-                    { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
-                    { label: 'Total Masuk', value: `+${formatRupiahPlain(totalMasuk)}` },
-                    { label: 'Total Keluar', value: `-${formatRupiahPlain(totalKeluar)}` },
-                  ],
-                  shareText: `Ringkasan Kas RT — Saldo bersih Rp${saldo.toLocaleString('id-ID')} (per ${today}). — Hadiran RT`,
-                });
-              }}
-              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Bagikan ke WhatsApp"
-              title="Bagikan ke WhatsApp"
-            >
-              <Share2 className="w-4 h-4 text-gray-500" />
-            </button>
-            <button
-              onClick={async () => {
                 const { generateKasRTPDF } = await import('../lib/generateKasRTPDF');
                 generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal });
               }}
@@ -369,11 +327,8 @@ export default function KasRTPage() {
               <Landmark className="w-4 h-4 text-teal-200" />
               <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
             </div>
-            <p className="mb-3">
-              <Odometer
-                value={animatedSaldo}
-                className="text-5xl font-black tracking-tighter text-white"
-              />
+            <p className="text-5xl font-black tracking-tighter text-white mb-3">
+              Rp{animatedSaldo.toLocaleString('id-ID')}
             </p>
 
             {/* Saldo Awal inline info */}
@@ -405,11 +360,6 @@ export default function KasRTPage() {
             </div>
           </div>
         </div>
-
-        {/* Smart insight — pemasukan bulan ini vs bulan lalu */}
-        {!loading && (insight.cur > 0 || insight.prv > 0) && (
-          <SmartInsight label="Pemasukan bulan ini" current={insight.cur} previous={insight.prv} />
-        )}
 
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
