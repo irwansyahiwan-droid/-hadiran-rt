@@ -107,13 +107,9 @@ export default function JadwalWargaPage() {
 
   return (
     <div className="space-y-4 pb-2">
-      {/* Hero Card — always green gradient, no dark override */}
+      {/* Hero Card — material/warna disamakan dengan hero Beranda (.hero-card) */}
       {lastTarikan ? (
-        <div
-          className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-emerald-800 to-emerald-700"
-        >
-          <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
+        <div className="hero-card hero-noise">
           <div className="relative p-5 space-y-3">
             <p className="text-emerald-200 text-[10px] font-bold uppercase tracking-widest">
               Tarikan Terakhir
