@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
+import EmptyState from '../components/EmptyState';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -99,6 +100,8 @@ export default function KasHadiranPage() {
   const [confirmHapusId, setConfirmHapusId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [hadiranFilter, setHadiranFilter] = useState<'semua' | 'talangan' | 'lunas'>('semua');
+  const [hadiranSort, setHadiranSort] = useState<'terbaru' | 'terlama' | 'kas'>('terbaru');
 
   async function load() {
     setLoading(true);
@@ -136,6 +139,21 @@ export default function KasHadiranPage() {
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const saldo = totalKasTerkumpul - totalTalanganBelum - totalSetor;
   const animatedSaldo = useCountUp(saldo);
+
+  // Rekap per tarikan difilter (status talangan) & diurutkan.
+  const displayTarikan = useMemo(() => {
+    let arr = [...tarikanSelesai];
+    if (hadiranSort === 'terbaru')      arr.sort((a, b) => (b.nomor ?? 0) - (a.nomor ?? 0));
+    else if (hadiranSort === 'terlama') arr.sort((a, b) => (a.nomor ?? 0) - (b.nomor ?? 0));
+    else if (hadiranSort === 'kas')     arr.sort((a, b) => (b.total_terkumpul ?? 0) - (a.total_terkumpul ?? 0));
+    if (hadiranFilter === 'talangan')   arr = arr.filter((t) => (talanganMap[t.id]?.count ?? 0) > 0);
+    else if (hadiranFilter === 'lunas') arr = arr.filter((t) => (talanganMap[t.id]?.count ?? 0) === 0);
+    return arr;
+  }, [tarikanSelesai, talanganMap, hadiranFilter, hadiranSort]);
+
+  const hadiranSortLabel = hadiranSort === 'terbaru' ? 'Terbaru' : hadiranSort === 'terlama' ? 'Terlama' : 'Kas';
+  const cycleHadiranSort = () =>
+    setHadiranSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'kas' : 'terbaru'));
 
   // Setor per tarikan — untuk kolom SETOR di PDF
   const setorMap = transaksi
@@ -334,13 +352,50 @@ export default function KasHadiranPage() {
         {tarikanSelesai.length > 0 && (
           <div>
             <p className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
+
+            {/* Filter (status talangan) & sort */}
+            {!loading && (
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-1.5">
+                  {([
+                    { id: 'semua',    label: 'Semua' },
+                    { id: 'talangan', label: 'Ada Talangan' },
+                    { id: 'lunas',    label: 'Lunas' },
+                  ] as const).map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => setHadiranFilter(f.id)}
+                      className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                        hadiranFilter === f.id
+                          ? 'bg-[#0F4C2E] text-white'
+                          : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={cycleHadiranSort}
+                  className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+                  aria-label={`Urutkan: ${hadiranSortLabel}`}
+                >
+                  <ArrowDownUp className="w-3.5 h-3.5" />
+                  {hadiranSortLabel}
+                </button>
+              </div>
+            )}
+
             <div className="space-y-3">
               {loading ? (
                 <div className="flex justify-center py-8">
                   <RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" />
                 </div>
+              ) : displayTarikan.length === 0 ? (
+                /* Hasil filter kosong */
+                <EmptyState icon={TrendingUp} title="Tidak ada hasil" subtitle="Tidak ada tarikan pada filter ini." />
               ) : (
-                tarikanSelesai.map((t, idx) => {
+                displayTarikan.map((t, idx) => {
                   const kasHadiran = t.total_terkumpul ?? 0;
                   // Sohibul Bait = 45.000 per pembayar; kas = 5.000 per pembayar → sohibul = kas × 9
                   const sohibulTerima = kasHadiran * 9;

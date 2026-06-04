@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp, Search, X } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -35,6 +35,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const trxDrag = useDragDismiss(() => setSelectedTrx(null));
   const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
   const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
+  const [trxSearch, setTrxSearch] = useState('');
 
   async function load(showRefreshing = false) {
     if (showRefreshing) setRefreshing(true);
@@ -115,12 +116,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
   const displayTrx = useMemo(() => {
+    const q = trxSearch.trim().toLowerCase();
     let arr = [...trxItems];
     if (trxSort === 'terlama') arr.reverse();
     else if (trxSort === 'nominal') arr.sort((a, b) => Math.abs(b.nominal) - Math.abs(a.nominal));
     if (trxFilter !== 'semua') arr = arr.filter((t) => t.tipe === trxFilter);
+    if (q) arr = arr.filter((t) => t.keterangan.toLowerCase().includes(q));
     return arr;
-  }, [trxItems, trxFilter, trxSort]);
+  }, [trxItems, trxFilter, trxSort, trxSearch]);
 
   const trxSortLabel = trxSort === 'terbaru' ? 'Terbaru' : trxSort === 'terlama' ? 'Terlama' : 'Nominal';
   const cycleTrxSort = () =>
@@ -304,7 +307,24 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
         {trxItems.length > 0 && (
-          <div className="flex items-center gap-2 mb-3 px-1">
+          <div className="space-y-2 mb-3">
+          {/* Search + filter + sort */}
+          <div className="relative px-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={trxSearch}
+              onChange={(e) => setTrxSearch(e.target.value)}
+              placeholder="Cari keterangan / nama..."
+              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            />
+            {trxSearch && (
+              <button onClick={() => setTrxSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
+                <X className="w-4 h-4 text-gray-400" />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2 px-1">
             <div className="flex items-center gap-1.5">
               {([
                 { id: 'semua', label: 'Semua' },
@@ -332,6 +352,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <ArrowDownUp className="w-3.5 h-3.5" />
               {trxSortLabel}
             </button>
+          </div>
           </div>
         )}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">

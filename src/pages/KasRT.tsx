@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -156,6 +156,7 @@ export default function KasRTPage() {
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState<'semua' | 'masuk' | 'keluar'>('semua');
   const [sort, setSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
+  const [search, setSearch] = useState('');
 
   async function load() {
     setLoading(true);
@@ -180,13 +181,15 @@ export default function KasRTPage() {
   // Daftar tampil = list difilter (tipe) & diurutkan (sort). saldo_setelah per
   // baris tetap akurat karena dihitung saat insert.
   const displayList = useMemo(() => {
+    const q = search.trim().toLowerCase();
     let arr = [...list];
     if (sort === 'terbaru') arr.reverse();          // list dari DB urut menaik (terlama→terbaru)
     else if (sort === 'nominal') arr.sort((a, b) => b.nominal - a.nominal);
     // 'terlama' = biarkan urutan menaik apa adanya
     if (filter !== 'semua') arr = arr.filter((k) => k.tipe === filter);
+    if (q) arr = arr.filter((k) => (k.keterangan ?? '').toLowerCase().includes(q));
     return arr;
-  }, [list, filter, sort]);
+  }, [list, filter, sort, search]);
 
   const sortLabel = sort === 'terbaru' ? 'Terbaru' : sort === 'terlama' ? 'Terlama' : 'Nominal';
   const cycleSort = () =>
@@ -310,8 +313,24 @@ export default function KasRTPage() {
           <EmptyState icon={Landmark} title="Belum ada transaksi" subtitle="Transaksi akan muncul setelah data pertama ditambahkan." />
         ) : (
           <>
-          {/* Filter (tipe) & sort transaksi */}
-          <div className="flex items-center gap-2 mb-3">
+          {/* Cari + filter tipe + sort mutasi */}
+          <div className="space-y-2 mb-3">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari keterangan..."
+              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
+                <X className="w-4 h-4 text-gray-400" />
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5">
               {([
                 { id: 'semua',  label: 'Semua' },
@@ -339,6 +358,7 @@ export default function KasRTPage() {
               <ArrowDownUp className="w-3.5 h-3.5" />
               {sortLabel}
             </button>
+          </div>
           </div>
 
           {displayList.length === 0 ? (
