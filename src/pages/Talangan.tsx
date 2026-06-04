@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X, ArrowDownUp } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X, ArrowDownUp, MessageCircle } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggalShort, formatRupiahPlain } from '../lib/utils';
+import { formatTanggalShort, formatRupiahPlain, haptic } from '../lib/utils';
+import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
@@ -194,6 +195,16 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const countLunas = list.filter(t => t.status_lunas).length;
   const animatedTotal = useCountUp(totalBelumLunas);
 
+  // Kirim pengingat talangan ke warga via WhatsApp (semua tunggakan belum lunas)
+  function ingatkan(g: WargaGroup) {
+    haptic();
+    const belum = g.entries.filter(e => !e.status_lunas);
+    const items = belum.map(e => ({ nomor: e.tarikan?.nomor, nominal: e.nominal }));
+    const noHp = g.entries[0]?.warga?.no_hp;
+    const ok = openWa(noHp, pesanTalangan(g.nama, items, g.totalBelum));
+    if (!ok) showToast('Nomor HP belum tersimpan — pilih kontak manual di WhatsApp', 'info');
+  }
+
   function renderGroup(g: WargaGroup, showAll = false) {
     const isExpanded = expandedId === g.warga_id;
     const belumEntries = g.entries.filter(e => !e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
@@ -202,27 +213,39 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     return (
       <div key={g.warga_id}>
         {/* Group header */}
-        <button
-          onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
-          className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
-        >
-          <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 truncate flex-1">{g.nama}</p>
+        <div className="flex items-center">
+          <button
+            onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
+            className="flex-1 min-w-0 flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
+          >
+            <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 truncate flex-1">{g.nama}</p>
+                {g.countBelum > 0 && (
+                  <span className="text-[11px] text-amber-700 font-medium shrink-0">
+                    {g.countBelum}× @ Rp50.000
+                  </span>
+                )}
+              </div>
               {g.countBelum > 0 && (
-                <span className="text-[11px] text-amber-700 font-medium shrink-0">
-                  {g.countBelum}× @ Rp50.000
-                </span>
+                <p className="text-xs text-amber-600 mt-0.5">
+                  {g.countBelum} belum lunas · total {formatRupiahPlain(g.totalBelum)}
+                </p>
               )}
             </div>
-            {g.countBelum > 0 && (
-              <p className="text-xs text-amber-600 mt-0.5">
-                {g.countBelum} belum lunas · total {formatRupiahPlain(g.totalBelum)}
-              </p>
-            )}
-          </div>
-        </button>
+          </button>
+          {isBendahara && g.countBelum > 0 && (
+            <button
+              onClick={() => ingatkan(g)}
+              title="Ingatkan via WhatsApp"
+              aria-label={`Ingatkan ${g.nama} via WhatsApp`}
+              className="press shrink-0 w-11 h-11 mr-1.5 inline-flex items-center justify-center rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+            >
+              <MessageCircle className="w-[18px] h-[18px]" />
+            </button>
+          )}
+        </div>
 
         {/* Detail entries */}
         {isExpanded && (

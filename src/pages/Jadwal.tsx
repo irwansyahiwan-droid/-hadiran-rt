@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
-  RotateCcw, Search, UserCheck, X, AlertTriangle,
+  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import SuccessOverlay from '../components/SuccessOverlay';
@@ -9,6 +9,7 @@ import CrossFade from '../components/CrossFade';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
+import { openWa, pesanTarikan } from '../lib/waReminder';
 import type { Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;
@@ -698,6 +699,18 @@ export default function JadwalPage() {
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses...' : 'Proses'}
+                          </button>
+                        )}
+
+                        {/* Bagikan pengingat ke WhatsApp (tarikan terjadwal) */}
+                        {!isSelesai && (
+                          <button
+                            onClick={() => { haptic(); openWa(null, pesanTarikan(t.nomor, t.tanggal, t.sohibul_bait?.nama ?? '—', t.jumlah_per_orang)); }}
+                            title="Bagikan pengingat ke WhatsApp"
+                            aria-label="Bagikan pengingat ke WhatsApp"
+                            className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition-all cursor-pointer"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
                           </button>
                         )}
 
