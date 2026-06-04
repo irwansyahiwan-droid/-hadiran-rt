@@ -4,6 +4,7 @@ import {
   RotateCcw, Search, UserCheck, X, AlertTriangle,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import SuccessOverlay from '../components/SuccessOverlay';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
@@ -555,6 +556,7 @@ export default function JadwalPage() {
   const [selectedTarikan, setSelectedTarikan] = useState<Tarikan | null>(null);
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<AbsensiResult | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [editingTarikan, setEditingTarikan] = useState<Tarikan | null>(null);
 
   async function load() {
@@ -587,7 +589,7 @@ export default function JadwalPage() {
         tarikan={selectedTarikan}
         wargaList={wargaList}
         onBack={() => setSelectedTarikan(null)}
-        onSaved={(result) => { setLastResult(result); setSelectedTarikan(null); load(); }}
+        onSaved={(result) => { setLastResult(result); setShowSuccess(true); setSelectedTarikan(null); load(); }}
         onCancelled={() => { setSelectedTarikan(null); load(); }}
       />
     );
@@ -595,6 +597,7 @@ export default function JadwalPage() {
 
   return (
     <div className="space-y-3 pb-2 page-enter">
+      <SuccessOverlay show={showSuccess} message="Iuran tersimpan & dihitung" onDone={() => setShowSuccess(false)} />
       {lastResult && (
         <ResultCard result={lastResult} onDismiss={() => setLastResult(null)} />
       )}

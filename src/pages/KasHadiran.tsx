@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check } from 'lucide-react';
+import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
@@ -20,6 +21,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   const [keterangan, setKeterangan] = useState('');
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
+  const drag = useDragDismiss(onClose);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,8 +37,10 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()}>
-        <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-2" />
+      <div className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()} style={drag.style}>
+        <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
+          <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+        </div>
         <div>
           <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Setor ke Kas Besar RT</h3>
           <p className="text-xs text-gray-400 mt-0.5">

@@ -21,6 +21,13 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabName>('beranda');
   const [wargaMode, setWargaMode] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [dir, setDir] = useState(1); // arah transisi tab: 1 = ke kanan, -1 = ke kiri
+
+  const TAB_ORDER: TabName[] = ['beranda', 'jadwal', 'talangan', 'kas', 'kas-rt'];
+  const changeTab = (tab: TabName) => {
+    setDir(TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(activeTab) ? 1 : -1);
+    setActiveTab(tab);
+  };
 
   // Pull-to-refresh: remount halaman aktif → useEffect-nya memuat ulang data.
   const handleRefresh = () =>
@@ -66,16 +73,16 @@ export default function App() {
         />
         <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
-            <div key={`${activeTab}-${refreshKey}`} className="page-enter">
-              {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
+            <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>
+              {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} />}
               {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
-              {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => setActiveTab('beranda') : undefined} />}
+              {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => changeTab('beranda') : undefined} />}
               {activeTab === 'kas'      && <KasHadiranPage />}
               {activeTab === 'kas-rt'   && <KasRTPage />}
             </div>
           </PullToRefresh>
         </main>
-        <BottomNav active={activeTab} onChange={setActiveTab} isWargaMode={isWargaMode} />
+        <BottomNav active={activeTab} onChange={changeTab} isWargaMode={isWargaMode} />
       </div>
     </AuthContext.Provider>
   );

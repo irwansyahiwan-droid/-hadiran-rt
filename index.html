@@ -6,10 +6,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="icon" href="/logo-rt.jpg" type="image/jpeg" />
-    <link rel="apple-touch-icon" href="/logo-rt.jpg" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
     <title>Hadiran RT 004/006</title>
-    <meta name="theme-color" content="#0D6B5E" />
+    <!-- Status bar adaptif (di-override dinamis oleh useTheme saat toggle) -->
+    <meta name="theme-color" content="#E8ECF2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)" />
+    <!-- PWA standalone (iOS) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Hadiran RT" />
     <meta property="og:title" content="Hadiran RT 004/006" />
     <meta property="og:description" content="Aplikasi manajemen arisan &amp; kas RT 004/006, Tanah Baru Beji, Depok" />
     <meta property="og:image" content="https://hadiran-rt.vercel.app/logo-rt.jpg" />

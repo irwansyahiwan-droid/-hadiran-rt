@@ -43,4 +43,4 @@ Aplikasi manajemen arisan & kas RT (RT 004/006).
 
 ### Kas RT
 - Sebagian setoran masuk ke Kas Besar RT
-- Kas RT terpisah dari Kas Hadiran 
+- Kas RT terpisah dari Kas Hadiran 1

@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
+import { useDragDismiss } from '../hooks/useDragDismiss';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -21,6 +22,7 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
   const [keterangan, setKeterangan] = useState('');
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
+  const drag = useDragDismiss(onClose);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,8 +43,11 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
       <div
         className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4"
         onClick={(e) => e.stopPropagation()}
+        style={drag.style}
       >
-        <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-2" />
+        <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
+          <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+        </div>
         <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Transaksi Kas RT</h3>
 
         <form onSubmit={submit} className="space-y-3">

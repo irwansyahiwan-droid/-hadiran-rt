@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -30,6 +31,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
+  const trxDrag = useDragDismiss(() => setSelectedTrx(null));
 
   async function load(showRefreshing = false) {
     if (showRefreshing) setRefreshing(true);
@@ -327,6 +329,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <div
           className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 float"
           onClick={e => e.stopPropagation()}
+          style={trxDrag.style}
+          {...trxDrag.handlers}
         >
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
           <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>

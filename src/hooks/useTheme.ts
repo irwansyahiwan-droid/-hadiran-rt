@@ -8,6 +8,12 @@ export function useTheme() {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
     localStorage.setItem('hadiran-theme', isDark ? 'dark' : 'light');
+
+    // Status bar HP ikut tema aktif (override meta theme-color statis).
+    const color = isDark ? '#030712' : '#E8ECF2';
+    document
+      .querySelectorAll('meta[name="theme-color"]')
+      .forEach((m) => m.setAttribute('content', color));
   }, [isDark]);
 
   return { isDark, toggle: () => setIsDark(d => !d) };
