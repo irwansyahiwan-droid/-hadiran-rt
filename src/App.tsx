@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Header from './components/layout/Header';
 import BottomNav from './components/layout/BottomNav';
 import PullToRefresh from './components/PullToRefresh';
+import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import type { TabName } from './components/layout/BottomNav';
 import Beranda from './pages/Beranda';
 import JadwalPage from './pages/Jadwal';
@@ -83,6 +84,8 @@ export default function App() {
           </PullToRefresh>
         </main>
         <BottomNav active={activeTab} onChange={changeTab} isWargaMode={isWargaMode} />
+        {/* Toast "versi baru tersedia" + registrasi service worker */}
+        <PwaUpdatePrompt />
       </div>
     </AuthContext.Provider>
   );

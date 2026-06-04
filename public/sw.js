@@ -9,7 +9,12 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE).then((c) => c.addAll(APP_SHELL)).catch(() => {})
   );
-  self.skipWaiting();
+  // Tidak auto-skipWaiting: tunggu konfirmasi user (update prompt) dulu.
+});
+
+// Aktifkan versi baru saat user menekan "Muat ulang".
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

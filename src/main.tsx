@@ -11,10 +11,3 @@ if (rootEl) {
     </StrictMode>
   );
 }
-
-// Daftarkan service worker (PWA: install ke HP + offline shell).
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
