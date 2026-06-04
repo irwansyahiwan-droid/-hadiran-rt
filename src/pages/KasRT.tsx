@@ -231,25 +231,21 @@ export default function KasRTPage() {
   // Seri saldo kronologis untuk area tren.
   const saldoSeries = useMemo(() => list.map((k) => k.saldo_setelah), [list]);
 
-  // Insight pemasukan: anchor ke bulan TERAKHIR yang ada pemasukan (bukan bulan
-  // kalender perangkat), dibandingkan bulan aktif sebelumnya. Mencegah tampilan
-  // menyesatkan "Rp0 · -100%" saat bulan berjalan belum ada setoran.
+  // Insight: pemasukan bulan kalender ini vs bulan lalu.
   const insight = useMemo(() => {
-    const byMonth = new Map<string, number>(); // 'YYYY-MM' -> total masuk
+    const d = new Date();
+    const key = (y: number, m: number) => `${y}-${String(m + 1).padStart(2, '0')}`;
+    const curKey = key(d.getFullYear(), d.getMonth());
+    const prev = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+    const prevKey = key(prev.getFullYear(), prev.getMonth());
+    let cur = 0, prv = 0;
     list.forEach((k) => {
-      if (k.tipe !== 'masuk' || k.keterangan === 'Saldo Awal Kas RT') return;
+      if (k.keterangan === 'Saldo Awal Kas RT' || k.tipe !== 'masuk') return;
       const mk = (k.tanggal ?? '').slice(0, 7);
-      if (mk.length === 7) byMonth.set(mk, (byMonth.get(mk) ?? 0) + k.nominal);
+      if (mk === curKey) cur += k.nominal;
+      else if (mk === prevKey) prv += k.nominal;
     });
-    if (byMonth.size === 0) return null;
-    const months = [...byMonth.keys()].sort(); // menaik
-    const curMonth = months[months.length - 1];
-    const prevMonth = months[months.length - 2]; // bulan aktif sebelumnya (boleh undefined)
-    return {
-      cur: byMonth.get(curMonth)!,
-      prv: prevMonth ? byMonth.get(prevMonth)! : 0,
-      label: new Date(`${curMonth}-01`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }),
-    };
+    return { cur, prv };
   }, [list]);
 
   const sortLabel = sort === 'terbaru' ? 'Terbaru' : sort === 'terlama' ? 'Terlama' : 'Nominal';
@@ -410,14 +406,9 @@ export default function KasRTPage() {
           </div>
         </div>
 
-        {/* Smart insight — pemasukan bulan terakhir vs bulan aktif sebelumnya */}
-        {!loading && insight && (
-          <SmartInsight
-            label={`Pemasukan ${insight.label}`}
-            current={insight.cur}
-            previous={insight.prv}
-            comparisonLabel="vs bulan sebelumnya"
-          />
+        {/* Smart insight — pemasukan bulan ini vs bulan lalu */}
+        {!loading && (insight.cur > 0 || insight.prv > 0) && (
+          <SmartInsight label="Pemasukan bulan ini" current={insight.cur} previous={insight.prv} />
         )}
 
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}

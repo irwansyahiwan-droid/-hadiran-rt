@@ -2,10 +2,9 @@ import { TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react';
 import { formatRupiahPlain } from '../lib/utils';
 
 interface SmartInsightProps {
-  label: string;             // mis. "Pemasukan Juni 2026"
-  current: number;           // nilai periode sekarang
-  previous: number;          // nilai periode pembanding
-  comparisonLabel?: string;  // teks pembanding, default "vs bulan lalu"
+  label: string;       // mis. "Pemasukan bulan ini"
+  current: number;     // nilai periode sekarang
+  previous: number;    // nilai periode pembanding
   className?: string;
 }
 
@@ -13,7 +12,7 @@ interface SmartInsightProps {
  * Insight ringkas: ubah angka jadi cerita — "naik 12% vs bulan lalu".
  * Tampil hanya bila ada data pembanding yang berarti.
  */
-export default function SmartInsight({ label, current, previous, comparisonLabel = 'vs bulan lalu', className = '' }: SmartInsightProps) {
+export default function SmartInsight({ label, current, previous, className = '' }: SmartInsightProps) {
   const hasBase = previous > 0;
   const pct = hasBase ? Math.round(((current - previous) / previous) * 100) : null;
   const dir = pct === null ? 'flat' : pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat';
@@ -44,7 +43,7 @@ export default function SmartInsight({ label, current, previous, comparisonLabel
               <span className={`font-semibold ${tone.c} tabular-nums`}>
                 {pct > 0 ? '+' : ''}{pct}%
               </span>
-              <span>{comparisonLabel}</span>
+              <span>vs bulan lalu</span>
             </>
           )}
         </p>
