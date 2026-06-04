@@ -1,4 +1,5 @@
 import { Home, CalendarDays, ArrowLeftRight, Wallet, Building2 } from 'lucide-react';
+import { haptic } from '../../lib/utils';
 
 export type TabName = 'beranda' | 'jadwal' | 'talangan' | 'kas' | 'kas-rt';
 
@@ -22,8 +23,8 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-gray-100 dark:bg-gray-900/95 dark:border-gray-800"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-gray-100/70 dark:bg-gray-900/80 dark:border-gray-800/70"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)', boxShadow: '0 -10px 30px -20px rgba(16,24,40,0.35)' }}
     >
       <div className="max-w-lg mx-auto flex items-stretch justify-around h-16 px-2">
         {visibleTabs.map(({ id, label, icon: Icon }) => {
@@ -31,14 +32,22 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
           return (
             <button
               key={id}
-              onClick={() => onChange(id)}
-              className="flex flex-col items-center justify-center flex-1 w-full h-full py-2 transition-all duration-150 active:scale-95 active:opacity-80"
+              onClick={() => { if (!isActive) haptic(); onChange(id); }}
+              className="press flex flex-col items-center justify-center flex-1 w-full h-full py-2"
+              aria-current={isActive ? 'page' : undefined}
             >
-              <Icon className={`w-[26px] h-[26px] transition-colors duration-200 ${isActive ? 'text-[#0D6B5E] dark:text-[#1A9B86]' : 'text-gray-400 dark:text-gray-500'}`} />
-              <span className={`text-[11px] font-semibold leading-none mt-1 transition-colors duration-200 ${isActive ? 'text-[#0D6B5E] dark:text-[#1A9B86]' : 'text-gray-400 dark:text-gray-500'}`}>
+              <span className={`relative flex items-center justify-center transition-transform duration-300 ${isActive ? '-translate-y-0.5' : ''}`}
+                style={{ transitionTimingFunction: 'var(--ease-spring)' }}>
+                {/* Pill highlight di belakang ikon aktif */}
+                <span className={`absolute -inset-x-3.5 -inset-y-1.5 rounded-2xl bg-[#0D6B5E]/10 dark:bg-[#1A9B86]/15 transition-all duration-300 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`} />
+                <Icon
+                  className={`relative w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-[#0D6B5E] dark:text-[#1A9B86]' : 'text-gray-400 dark:text-gray-500'}`}
+                  strokeWidth={isActive ? 2.4 : 2}
+                />
+              </span>
+              <span className={`text-[11px] leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-[#0D6B5E] dark:text-[#1A9B86]' : 'font-semibold text-gray-400 dark:text-gray-500'}`}>
                 {label}
               </span>
-              <div className={`w-1 h-1 rounded-full bg-[#0D6B5E] dark:bg-[#1A9B86] mx-auto mt-0.5 transition-all duration-200 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`} />
             </button>
           );
         })}

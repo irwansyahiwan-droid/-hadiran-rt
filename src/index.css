@@ -126,6 +126,20 @@ body {
 .sheet-backdrop { animation: backdropIn 0.28s ease-out both; }
 .sheet-panel    { animation: sheetUp 0.4s var(--ease-out-expo) both; }
 
+/* One-time specular sheen sweep on hero card when dashboard loads */
+.hero-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 55%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.14) 48%, rgba(255, 255, 255, 0.14) 52%, transparent 100%);
+  transform: translateX(-180%) skewX(-14deg);
+  animation: heroSheen 1.7s var(--ease-out-expo) 0.3s both;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes heroSheen { to { transform: translateX(320%) skewX(-14deg); } }
+
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

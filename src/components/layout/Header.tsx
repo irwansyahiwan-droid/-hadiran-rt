@@ -1,5 +1,6 @@
-import { LogOut } from 'lucide-react';
+import { LogOut, Sun, Moon, Eye } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.jpg';
+import { haptic } from '../../lib/utils';
 import type { Role } from '../../hooks/useAuth';
 
 interface HeaderProps {
@@ -32,16 +33,20 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
             {isBendahara ? 'BENDAHARA' : 'WARGA'}
           </span>
           <button
-            onClick={onToggleTheme}
-            className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-base leading-none"
+            onClick={() => { haptic(); onToggleTheme(); }}
+            className="press p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
             title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+            aria-label={isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
           >
-            {isDark ? '☀️' : '🌙'}
+            {isDark
+              ? <Sun className="w-5 h-5 text-amber-400" />
+              : <Moon className="w-5 h-5 text-gray-500" />}
           </button>
           <button
             onClick={onLogout}
-            className="p-1.5 -mr-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="press p-1.5 -mr-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title="Keluar"
+            aria-label="Keluar"
           >
             <LogOut className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
@@ -49,8 +54,8 @@ export default function Header({ role, onLogout, isDark, onToggleTheme }: Header
       </div>
       {!isBendahara && (
         <div className="border-t border-blue-100 bg-blue-50 py-1.5 px-5 dark:bg-blue-950 dark:border-blue-900">
-          <p className="text-xs text-blue-600 dark:text-blue-300 text-center font-medium max-w-lg mx-auto">
-            👁 Mode Warga — hanya bisa melihat data
+          <p className="text-xs text-blue-600 dark:text-blue-300 text-center font-medium max-w-lg mx-auto flex items-center justify-center gap-1.5">
+            <Eye className="w-3.5 h-3.5" /> Mode Warga — hanya bisa melihat data
           </p>
         </div>
       )}

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggal, formatRupiahPlain } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import type { Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;
@@ -347,7 +347,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       >
         <div className="max-w-lg mx-auto space-y-2">
           <button
-            onClick={simpan}
+            onClick={() => { haptic(12); simpan(); }}
             disabled={saving || cancelling}
             className="w-full py-3.5 rounded-full bg-[#0F6039] text-white font-bold text-sm shadow-sm active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2"
           >
@@ -530,7 +530,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
             Batal
           </button>
           <button
-            onClick={simpan}
+            onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
             className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >

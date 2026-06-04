@@ -13,6 +13,13 @@ export function formatRupiahPlain(amount: number): string {
   return `Rp${Math.abs(amount).toLocaleString('id-ID')}`;
 }
 
+/** Haptic feedback ringan untuk interaksi utama (no-op bila perangkat tak mendukung). */
+export function haptic(pattern: number | number[] = 8): void {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try { navigator.vibrate(pattern); } catch { /* abaikan */ }
+  }
+}
+
 export function formatTanggal(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString('id-ID', {
