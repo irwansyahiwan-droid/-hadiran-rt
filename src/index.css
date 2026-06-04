@@ -10,7 +10,9 @@ html {
 }
 
 body {
-  background-color: #F9FAFB;
+  /* Premium light surface (ala BYOND): abu sejuk lembut agar kartu putih
+     murni "mengambang" dgn bayangan — kontras halus = terasa mahal. */
+  background-color: #EEF1F6;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -84,8 +86,8 @@ body {
 :root {
   --ease-spring:   cubic-bezier(0.34, 1.4, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --shadow-card:   0 1px 2px rgba(16, 24, 40, 0.04), 0 10px 28px -14px rgba(16, 24, 40, 0.16);
-  --shadow-float:  0 10px 34px -10px rgba(16, 24, 40, 0.22);
+  --shadow-card:   0 1px 2px rgba(16, 24, 40, 0.03), 0 14px 32px -16px rgba(16, 24, 40, 0.14);
+  --shadow-float:  0 12px 38px -12px rgba(16, 24, 40, 0.20);
 }
 
 /* Soft layered elevation for surfaces */

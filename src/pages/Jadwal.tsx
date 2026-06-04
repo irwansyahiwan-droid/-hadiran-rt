@@ -613,15 +613,15 @@ export default function JadwalPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 p-3 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-3 text-center">
           <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 p-3 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-3 text-center">
           <p className="text-xl font-black text-emerald-600">{dijadwalCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 p-3 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-3 text-center">
           <p className="text-xl font-black text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
           <p className="text-[10px] text-gray-400 font-medium">Total</p>
         </div>
@@ -629,7 +629,7 @@ export default function JadwalPage() {
 
       {/* List */}
       {loading ? (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(5)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
               <div className="w-7 h-4 skeleton rounded-lg shrink-0" />
@@ -644,7 +644,7 @@ export default function JadwalPage() {
       ) : tarikanList.length === 0 ? (
         <EmptyState icon={Calendar} title="Belum ada jadwal" subtitle="Jadwal tarikan akan muncul setelah dibuat oleh bendahara." />
       ) : (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {tarikanList.map((t, idx) => {
             const isLast    = idx === tarikanList.length - 1;
             const isSelesai = t.status === 'selesai';
