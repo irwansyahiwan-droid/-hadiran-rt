@@ -392,7 +392,7 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 line-clamp-2 leading-snug">
+                    <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 leading-snug break-words">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
@@ -402,8 +402,8 @@ export default function KasRTPage() {
                     <p className={`text-[17px] font-extrabold ${isMasuk ? 'text-green-700' : 'text-red-600'}`}>
                       {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
                     </p>
-                    <p className="text-xs text-[#555555] dark:text-gray-400 font-medium mt-0.5">
-                      Saldo: {formatRupiahPlain(k.saldo_setelah)}
+                    <p className={`text-xs font-medium mt-0.5 ${k.saldo_setelah < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-[#555555] dark:text-gray-400'}`}>
+                      Saldo: {k.saldo_setelah < 0 ? '-' : ''}Rp{Math.abs(k.saldo_setelah).toLocaleString('id-ID')}
                     </p>
                   </div>
                 </div>

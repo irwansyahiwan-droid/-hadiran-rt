@@ -375,9 +375,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 line-clamp-2 leading-snug">{trx.keterangan}</p>
+                  <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 leading-snug break-words">{trx.keterangan}</p>
                   <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 mt-0.5">{formatTanggal(trx.tanggal)}</p>
-                  <p className="text-xs text-[#555555] dark:text-gray-400 font-medium">
+                  <p className={`text-xs font-medium ${trx.saldoSetelah < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-[#555555] dark:text-gray-400'}`}>
                     Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
                   </p>
                 </div>
@@ -419,7 +419,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">Saldo Setelah</span>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className={`text-sm font-semibold ${selectedTrx.saldoSetelah < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-gray-700 dark:text-gray-300'}`}>
                 {selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}
               </span>
             </div>
