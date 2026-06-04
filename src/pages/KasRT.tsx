@@ -10,6 +10,7 @@ import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast, showUndo } from '../lib/toast';
 import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
+import TargetKasRT from '../components/TargetKasRT';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import type { KasRT } from '../lib/types';
 
@@ -367,6 +368,9 @@ export default function KasRTPage() {
             </div>
           </div>
         </div>
+
+        {/* Target & progres Kas RT */}
+        <TargetKasRT saldo={saldo} />
 
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
