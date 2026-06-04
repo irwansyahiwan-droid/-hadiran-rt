@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Search, X, History, Plus, Pencil, Trash2,
-  CheckCircle2, RotateCcw, ArrowRight, RefreshCw,
+  CheckCircle2, RotateCcw, ArrowRight, RefreshCw, Download,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import { useRealtime } from '../hooks/useRealtime';
 import { fetchAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
 import { formatRupiahPlain, haptic } from '../lib/utils';
+import { showToast } from '../lib/toast';
 import type { AktivitasLog } from '../lib/types';
 import type { Accent } from '../lib/aktivitas';
 
@@ -97,6 +98,16 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
     return out;
   }, [rows, filter, search]);
 
+  async function exportPDF() {
+    haptic(12);
+    const flat = grouped.flatMap((g) => g.items);
+    if (flat.length === 0) { showToast('Tidak ada aktivitas untuk diekspor', 'info'); return; }
+    const label = FILTERS.find((f) => f.id === filter)?.label ?? 'Semua';
+    const { generateAktivitasPDF } = await import('../lib/generateAktivitasPDF');
+    generateAktivitasPDF(flat, label);
+    showToast('PDF riwayat dibuat');
+  }
+
   if (!open) return null;
 
   return (
@@ -118,6 +129,14 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
             <History className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <h1 className="text-base font-extrabold text-gray-900 dark:text-gray-100 truncate">Riwayat Aktivitas</h1>
           </div>
+          <button
+            onClick={exportPDF}
+            className="press p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title="Ekspor PDF"
+            aria-label="Ekspor PDF"
+          >
+            <Download className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </button>
           <button
             onClick={() => { haptic(); setLoading(true); load(); }}
             className="press p-2 -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
