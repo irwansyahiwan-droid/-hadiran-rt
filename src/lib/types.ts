@@ -59,6 +59,19 @@ export interface KasRT {
   created_at: string;
 }
 
+export interface AktivitasLog {
+  id: string;
+  table_name: 'transaksi_kas' | 'kas_rt' | 'tarikan' | 'talangan' | string;
+  record_id: string | null;
+  action: 'INSERT' | 'UPDATE' | 'DELETE';
+  actor_id: string | null;
+  actor_email: string | null;
+  actor_name: string | null;
+  old_data: Record<string, unknown> | null;
+  new_data: Record<string, unknown> | null;
+  created_at: string;
+}
+
 export interface DashboardSummary {
   saldo_aktif: number;
   total_talangan_belum_lunas: number;
