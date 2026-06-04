@@ -254,14 +254,14 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => setAll('hadir')}
-          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold hover:bg-emerald-100 transition-colors"
+          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
         >
           <UserCheck className="w-3.5 h-3.5" />
           Semua Hadir
         </button>
         <button
           onClick={() => setAll('hadir')}
-          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold hover:bg-blue-100 transition-colors"
+          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
         >
           <UserCheck className="w-3.5 h-3.5" />
           Semua Titip
@@ -309,7 +309,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       </div>
 
       {/* Warga list */}
-      <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
         {filtered.map((w, idx) => {
           const isHadir = map[w.id] === 'hadir';
           return (
@@ -415,9 +415,9 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
 
   return (
     <div className={`transition-all duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
-      <div className={`rounded-2xl p-4 shadow-md overflow-hidden ${hasTalangan ? 'bg-amber-50 border border-amber-200' : 'bg-green-50 border border-green-200'}`}>
+      <div className={`rounded-2xl p-4 shadow-md overflow-hidden ${hasTalangan ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40' : 'bg-green-50 dark:bg-emerald-900/20 border border-green-200 dark:border-emerald-800/40'}`}>
         <div className="flex items-start justify-between gap-2 mb-2">
-          <p className="text-sm font-bold text-gray-900">
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
             ✅ Absensi Tarikan #{result.tarikanNomor} berhasil disimpan
           </p>
           <button onClick={dismiss} className="p-0.5 text-gray-400 hover:text-gray-600 shrink-0 -mt-0.5">
@@ -652,7 +652,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 transition-colors duration-200 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 transition-colors duration-200 ${!isLast ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : isNext ? { borderLeft: '3px solid #34D399' } : undefined}
               >
                 {/* Nomor kecil */}

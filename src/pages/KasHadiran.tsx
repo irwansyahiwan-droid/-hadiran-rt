@@ -284,7 +284,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span
@@ -329,7 +329,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <p className="text-base font-extrabold text-[#111111] mt-6 mb-3 px-1">Rekap Per Tarikan</p>
+            <p className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
             <div className="space-y-3">
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -346,7 +346,7 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className="rise lift bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                      className="rise lift bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden"
                       style={{ animationDelay: `${Math.min(idx, 10) * 0.05}s`, ...(talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : {}) }}
                     >
 
@@ -404,7 +404,7 @@ export default function KasHadiranPage() {
                           </span>
                           <span className="font-semibold">{pctHadir}% hadir</span>
                         </div>
-                        <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-emerald-400 dark:bg-emerald-500 rounded-full transition-all"
                             style={{ width: `${pctHadir}%` }}
@@ -420,9 +420,9 @@ export default function KasHadiranPage() {
                       {/* ── Actions ──────────────────────────────────
                           PDF pendapatan tersedia untuk semua (termasuk warga);
                           Absensi, Batalkan & Hapus khusus bendahara. */}
-                      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap px-4 pb-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap px-4 pb-3 pt-3 border-t border-gray-100 dark:border-gray-800">
                         {isBendahara && (
-                          <button className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-blue-600 transition-colors">
+                          <button className="flex items-center gap-1.5 text-xs text-[#555555] dark:text-gray-400 font-medium hover:text-blue-600 transition-colors">
                             <Users className="w-3.5 h-3.5" />
                             Absensi
                           </button>
@@ -430,7 +430,7 @@ export default function KasHadiranPage() {
                         <button
                           onClick={() => handlePendapatanPDF(t)}
                           disabled={pdfLoading === t.id}
-                          className="flex items-center gap-1.5 text-xs text-[#555555] font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1.5 text-xs text-[#555555] dark:text-gray-400 font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
                         >
                           <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
                           {pdfLoading === t.id ? 'Memuat...' : 'PDF Pendapatan'}
@@ -440,7 +440,7 @@ export default function KasHadiranPage() {
                             onClick={() => handleBatalkanClick(t)}
                             disabled={processingId === t.id}
                             className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
-                              confirmBatalId === t.id ? 'text-amber-600' : 'text-[#555555] hover:text-amber-600'
+                              confirmBatalId === t.id ? 'text-amber-600' : 'text-[#555555] dark:text-gray-400 hover:text-amber-600'
                             }`}
                           >
                             <RotateCcw className={`w-3.5 h-3.5 ${processingId === t.id ? 'animate-spin' : ''}`} />

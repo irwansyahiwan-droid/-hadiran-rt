@@ -239,7 +239,7 @@ export default function JadwalWargaPage() {
                     </span>
                     {/* Avatar */}
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                      isHadir ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-400'
+                      isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/25 text-red-400 dark:text-red-400'
                     }`}>
                       {w.nama.charAt(0)}
                     </div>
@@ -249,8 +249,8 @@ export default function JadwalWargaPage() {
                     {lastTarikan ? (
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${
                         isHadir
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : 'bg-red-50 text-red-600 border-red-200'
+                          ? 'bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50'
+                          : 'bg-red-50 dark:bg-red-900/25 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50'
                       }`}>
                         {isHadir ? '✓ Hadir' : '✗ Tidak'}
                       </span>
@@ -329,7 +329,7 @@ export default function JadwalWargaPage() {
                     <span className={`px-2.5 py-1 text-[10px] font-semibold rounded-full border shrink-0 ${
                       isSelesai
                         ? 'text-gray-400 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                        : 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                        : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/25 border-emerald-200 dark:border-emerald-800/50'
                     }`}>
                       {isSelesai ? '✓ Selesai' : '• Terjadwal'}
                     </span>

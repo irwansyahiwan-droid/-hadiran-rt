@@ -229,19 +229,19 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Alert Banner */}
       {talangan > 0 && (
-        <div className="flex items-start gap-3 bg-amber-50/90 border border-amber-200/60 rounded-3xl p-4 shadow-[0_4px_12px_rgba(245,158,11,0.08)]">
-          <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
+        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl p-4 shadow-[0_4px_12px_rgba(245,158,11,0.08)]">
+          <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-amber-800">Talangan Belum Lunas</p>
-            <p className="text-xs text-amber-600 mt-0.5">
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400/80 mt-0.5">
               Total {formatRupiahPlain(talangan)} belum diselesaikan
             </p>
           </div>
           <button
             onClick={() => onNavigate('talangan')}
-            className="text-xs text-amber-700 font-semibold bg-amber-100 px-3 py-1.5 rounded-xl hover:bg-amber-200 transition-colors whitespace-nowrap"
+            className="text-xs text-amber-700 dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3 py-1.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
           >
             Lihat
           </button>
@@ -295,7 +295,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
               >
                 <div className={`w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'

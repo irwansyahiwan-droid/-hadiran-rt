@@ -106,10 +106,10 @@ function TambahModal({ saldoSekarang, onSave, onClose }: ModalProps) {
           </div>
 
           {nominal > 0 && (
-            <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
-              <p className="text-xs text-gray-500">
+            <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/40'}`}>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
-                <span className={`font-bold ${saldoPreview < 0 ? 'text-red-600' : tipe === 'masuk' ? 'text-emerald-600' : 'text-gray-700'}`}>
+                <span className={`font-bold ${saldoPreview < 0 ? 'text-red-600 dark:text-red-400' : tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
                   {formatRupiahPlain(Math.abs(saldoPreview))}
                 </span>
               </p>
@@ -293,7 +293,7 @@ export default function KasRTPage() {
                 <div
                   key={k.id}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 transition-colors duration-200 ${!isLast ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}
+                  className={`rise flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 transition-colors duration-200 ${!isLast ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100">
                     {isMasuk

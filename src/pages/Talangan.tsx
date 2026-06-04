@@ -184,7 +184,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         {/* Group header */}
         <button
           onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
-          className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 active:bg-gray-50 transition-colors text-left cursor-pointer"
+          className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
         >
           <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
           <div className="flex-1 min-w-0">
