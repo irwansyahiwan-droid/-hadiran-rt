@@ -8,6 +8,8 @@ import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast } from '../lib/toast';
+import MonthlyBars from '../components/charts/MonthlyBars';
+import AreaTrend from '../components/charts/AreaTrend';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -192,6 +194,31 @@ export default function KasRTPage() {
     return arr;
   }, [list, filter, sort, search]);
 
+  // Agregasi bulanan (masuk vs keluar) — 6 bulan terakhir.
+  const monthly = useMemo(() => {
+    const map = new Map<string, { masuk: number; keluar: number }>();
+    list.forEach((k) => {
+      if (k.keterangan === 'Saldo Awal Kas RT') return;
+      const key = (k.tanggal ?? '').slice(0, 7);
+      if (!key) return;
+      const e = map.get(key) ?? { masuk: 0, keluar: 0 };
+      if (k.tipe === 'masuk') e.masuk += k.nominal;
+      else e.keluar += k.nominal;
+      map.set(key, e);
+    });
+    return [...map.entries()]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-6)
+      .map(([key, v]) => ({
+        label: new Date(`${key}-01`).toLocaleDateString('id-ID', { month: 'short' }),
+        masuk: v.masuk,
+        keluar: v.keluar,
+      }));
+  }, [list]);
+
+  // Seri saldo kronologis untuk area tren.
+  const saldoSeries = useMemo(() => list.map((k) => k.saldo_setelah), [list]);
+
   const sortLabel = sort === 'terbaru' ? 'Terbaru' : sort === 'terlama' ? 'Terlama' : 'Nominal';
   const cycleSort = () =>
     setSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'nominal' : 'terbaru'));
@@ -301,6 +328,28 @@ export default function KasRTPage() {
             </div>
           </div>
         </div>
+
+        {/* Grafik tren saldo & masuk/keluar per bulan */}
+        {!loading && list.length > 1 && (
+          <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4">
+              <p className="text-sm font-bold text-[#111111] dark:text-gray-100 mb-2">Tren Saldo</p>
+              <AreaTrend points={saldoSeries} />
+            </div>
+            {monthly.length > 0 && (
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-bold text-[#111111] dark:text-gray-100">Masuk vs Keluar</p>
+                  <div className="flex items-center gap-2 text-[10px] font-medium">
+                    <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-500" />Masuk</span>
+                    <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-rose-400" />Keluar</span>
+                  </div>
+                </div>
+                <MonthlyBars data={monthly} />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
         <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>

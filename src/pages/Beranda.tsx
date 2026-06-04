@@ -5,7 +5,8 @@ import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
-import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
+import { fetchDashboardSummary, formatRupiahPlain, formatRupiahCompact, formatTanggal } from '../lib/utils';
+import DonutChart from '../components/charts/DonutChart';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import type { DashboardSummary, Tarikan } from '../lib/types';
@@ -113,6 +114,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const hour = new Date().getHours();
   const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
   const roleLabel = isWargaMode ? 'Warga' : isBendahara ? 'Bendahara' : 'Pengguna';
+  const donutData = [
+    { label: 'Saldo Aktif', value: Math.max(0, saldo), color: '#10B981' },
+    { label: 'Talangan', value: talangan, color: '#F59E0B' },
+    { label: 'Setor ke Kas RT', value: setorKasRT, color: '#3B82F6' },
+  ];
+  const donutTotal = donutData.reduce((s, d) => s + d.value, 0);
   const kasStatus =
     saldo < 0
       ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
@@ -268,6 +275,29 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
         </div>
       </div>
+
+      {/* Donut komposisi kas */}
+      {donutTotal > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift px-5 py-4">
+          <p className="text-sm font-bold text-[#111111] dark:text-gray-100 mb-1">Komposisi Kas Hadiran</p>
+          <div className="flex items-center gap-5">
+            <DonutChart
+              data={donutData}
+              centerTop="Total"
+              centerBottom={formatRupiahCompact(donutTotal)}
+            />
+            <div className="flex-1 space-y-2.5 min-w-0">
+              {donutData.map((d) => (
+                <div key={d.label} className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
+                  <span className="text-xs text-gray-500 dark:text-gray-400 truncate">{d.label}</span>
+                  <span className="ml-auto text-xs font-bold text-gray-800 dark:text-gray-200 tabular-nums">{formatRupiahPlain(d.value)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Alert Banner */}
       {talangan > 0 && (

@@ -13,6 +13,15 @@ export function formatRupiahPlain(amount: number): string {
   return `Rp${Math.abs(amount).toLocaleString('id-ID')}`;
 }
 
+/** Rupiah ringkas untuk tempat sempit: Rp1,7jt / Rp850rb / Rp500. */
+export function formatRupiahCompact(amount: number): string {
+  const neg = amount < 0 ? '-' : '';
+  const a = Math.abs(amount);
+  if (a >= 1_000_000) return `${neg}Rp${(a / 1_000_000).toFixed(1).replace('.0', '').replace('.', ',')}jt`;
+  if (a >= 1_000) return `${neg}Rp${Math.round(a / 1_000)}rb`;
+  return `${neg}Rp${a}`;
+}
+
 /** Haptic feedback ringan untuk interaksi utama (no-op bila perangkat tak mendukung). */
 export function haptic(pattern: number | number[] = 8): void {
   if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
