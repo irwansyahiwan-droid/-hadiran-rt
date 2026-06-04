@@ -7,6 +7,7 @@ import { formatRupiahPlain, formatTanggal } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import { showToast } from '../lib/toast';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -210,6 +211,7 @@ export default function KasRTPage() {
     });
     setShowModal(false);
     load();
+    showToast(data.tipe === 'masuk' ? 'Pemasukan tersimpan' : 'Pengeluaran tersimpan');
   }
 
   return (

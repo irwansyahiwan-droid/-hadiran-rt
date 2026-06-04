@@ -4,6 +4,7 @@ import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
+import { showToast } from '../lib/toast';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -193,6 +194,7 @@ export default function KasHadiranPage() {
         status: 'dijadwalkan', total_hadir: 0, total_terkumpul: 0,
       }).eq('id', t.id);
       await load();
+      showToast(`Tarikan #${t.nomor} dibatalkan`, 'info');
     } finally {
       setProcessingId(null);
     }
@@ -208,7 +210,7 @@ export default function KasHadiranPage() {
     }
   }
 
-  // Hapus tarikan sepenuhnya (beserta semua data turunannya). Tidak bisa di-undo.
+  // Hapus tarikan sepenuhnya (semua data turunan). Tidak bisa di-undo.
   async function hapusTarikan(t: Tarikan) {
     setProcessingId(t.id);
     setConfirmHapusId(null);
@@ -218,6 +220,7 @@ export default function KasHadiranPage() {
       await supabase.from('transaksi_kas').delete().eq('tarikan_id', t.id);
       await supabase.from('tarikan').delete().eq('id', t.id);
       await load();
+      showToast(`Tarikan #${t.nomor} dihapus`);
     } finally {
       setProcessingId(null);
     }
@@ -253,6 +256,7 @@ export default function KasHadiranPage() {
     ]);
     setShowModal(false);
     load();
+    showToast('Setoran ke Kas RT tersimpan');
   }
 
   const sudahSetor = totalSetor > 0;

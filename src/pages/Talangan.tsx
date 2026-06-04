@@ -7,6 +7,7 @@ import { formatTanggalShort, formatRupiahPlain } from '../lib/utils';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
+import { showToast } from '../lib/toast';
 import type { Talangan } from '../lib/types';
 
 interface WargaGroup {
@@ -61,6 +62,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         saldo_setelah: 0,
       });
       load();
+      showToast('Ditandai lunas');
     } finally {
       setProcessingId(null);
     }
@@ -91,6 +93,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         .eq('warga_id', t.warga_id)
         .eq('tarikan_id', t.tarikan_id);
       load();
+      showToast('Pelunasan dibatalkan', 'info');
     } finally {
       setProcessingId(null);
     }
@@ -118,7 +121,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         .eq('tarikan_id', t.tarikan_id);
       const { error: eTal } = await supabase.from('talangan').delete().eq('id', t.id);
       if (eTx || eTal) {
-        alert('Gagal menghapus talangan: ' + ((eTx ?? eTal)?.message ?? 'periksa policy DELETE di Supabase'));
+        showToast('Gagal menghapus talangan', 'error');
+      } else {
+        showToast('Talangan dihapus');
       }
       await load();
     } finally {
