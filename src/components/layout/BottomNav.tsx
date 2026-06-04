@@ -1,4 +1,4 @@
-import { Home, CalendarDays, ArrowLeftRight, Wallet, Building2 } from 'lucide-react';
+import { Home, CalendarDays, ArrowLeftRight, Wallet, Building2, type LucideIcon } from 'lucide-react';
 import { haptic } from '../../lib/utils';
 
 export type TabName = 'beranda' | 'jadwal' | 'talangan' | 'kas' | 'kas-rt';
@@ -9,7 +9,7 @@ interface BottomNavProps {
   isWargaMode?: boolean;
 }
 
-const tabs: { id: TabName; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+const tabs: { id: TabName; label: string; icon: LucideIcon }[] = [
   { id: 'beranda',  label: 'Beranda',  icon: Home },
   { id: 'jadwal',   label: 'Jadwal',   icon: CalendarDays },
   { id: 'talangan', label: 'Talangan', icon: ArrowLeftRight },
