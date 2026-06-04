@@ -8,7 +8,7 @@ import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
-import { showToast } from '../lib/toast';
+import { showToast, showUndo } from '../lib/toast';
 import type { Talangan } from '../lib/types';
 
 interface WargaGroup {
@@ -109,27 +109,26 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     }
   }
 
-  // Hapus data talangan (beserta transaksi kas pembayarannya bila ada) — kembalikan angka ke awal
-  async function hapusTalangan(t: Talangan) {
-    setProcessingId(t.id);
+  // Hapus data talangan (beserta transaksi kas pembayarannya bila ada).
+  // Pakai pola undo: sembunyikan dulu, hapus permanen setelah 5 dtk bila tak diurungkan.
+  function hapusTalangan(t: Talangan) {
     setDeleteConfirmId(null);
-    try {
-      const { error: eTx } = await supabase
-        .from('transaksi_kas')
-        .delete()
-        .eq('tipe', 'talangan_masuk')
-        .eq('warga_id', t.warga_id)
-        .eq('tarikan_id', t.tarikan_id);
-      const { error: eTal } = await supabase.from('talangan').delete().eq('id', t.id);
-      if (eTx || eTal) {
-        showToast('Gagal menghapus talangan', 'error');
-      } else {
-        showToast('Talangan dihapus');
-      }
-      await load();
-    } finally {
-      setProcessingId(null);
-    }
+    setList(prev => prev.filter(x => x.id !== t.id)); // optimistik
+    showUndo(
+      'Talangan dihapus',
+      async () => {
+        const { error: eTx } = await supabase
+          .from('transaksi_kas')
+          .delete()
+          .eq('tipe', 'talangan_masuk')
+          .eq('warga_id', t.warga_id)
+          .eq('tarikan_id', t.tarikan_id);
+        const { error: eTal } = await supabase.from('talangan').delete().eq('id', t.id);
+        if (eTx || eTal) showToast('Gagal menghapus talangan', 'error');
+        await load();
+      },
+      { onUndo: () => load() },
+    );
   }
 
   function handleHapusClick(t: Talangan) {

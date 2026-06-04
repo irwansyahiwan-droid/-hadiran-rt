@@ -4,7 +4,7 @@ import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
-import { showToast } from '../lib/toast';
+import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -244,20 +244,22 @@ export default function KasHadiranPage() {
     }
   }
 
-  // Hapus tarikan sepenuhnya (semua data turunan). Tidak bisa di-undo.
-  async function hapusTarikan(t: Tarikan) {
-    setProcessingId(t.id);
+  // Hapus tarikan sepenuhnya (semua data turunan). Pola undo: hapus permanen
+  // baru dijalankan 5 dtk kemudian bila tak diurungkan.
+  function hapusTarikan(t: Tarikan) {
     setConfirmHapusId(null);
-    try {
-      await supabase.from('absensi').delete().eq('tarikan_id', t.id);
-      await supabase.from('talangan').delete().eq('tarikan_id', t.id);
-      await supabase.from('transaksi_kas').delete().eq('tarikan_id', t.id);
-      await supabase.from('tarikan').delete().eq('id', t.id);
-      await load();
-      showToast(`Tarikan #${t.nomor} dihapus`);
-    } finally {
-      setProcessingId(null);
-    }
+    setTarikanSelesai(prev => prev.filter(x => x.id !== t.id)); // optimistik
+    showUndo(
+      `Tarikan #${t.nomor} dihapus`,
+      async () => {
+        await supabase.from('absensi').delete().eq('tarikan_id', t.id);
+        await supabase.from('talangan').delete().eq('tarikan_id', t.id);
+        await supabase.from('transaksi_kas').delete().eq('tarikan_id', t.id);
+        await supabase.from('tarikan').delete().eq('id', t.id);
+        await load();
+      },
+      { onUndo: () => load() },
+    );
   }
 
   function handleHapusClick(t: Tarikan) {

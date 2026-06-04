@@ -16,9 +16,18 @@ export default function Toaster() {
     return subscribeToast((t) => {
       haptic(8);
       setItems((prev) => [...prev, t]);
-      setTimeout(() => setItems((prev) => prev.filter((x) => x.id !== t.id)), 2600);
+      setTimeout(() => {
+        setItems((prev) => prev.filter((x) => x.id !== t.id));
+        t.onExpire?.(); // commit ditunda (guard mencegah jalan bila sudah di-undo)
+      }, t.duration ?? 2600);
     });
   }, []);
+
+  const handleAction = (t: ToastItem) => {
+    haptic(12);
+    setItems((prev) => prev.filter((x) => x.id !== t.id));
+    t.onAction?.();
+  };
 
   if (items.length === 0) return null;
 
@@ -33,13 +42,21 @@ export default function Toaster() {
         return (
           <div
             key={t.id}
-            className={`toast-in flex items-center gap-2.5 w-full px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ${s.ring}`}
+            className={`toast-in pointer-events-auto flex items-center gap-2.5 w-full px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ${s.ring}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${s.dot}`}>
               <Icon className="w-3.5 h-3.5 text-white" strokeWidth={3} />
             </span>
             <p className="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-100">{t.message}</p>
+            {t.actionLabel && (
+              <button
+                onClick={() => handleAction(t)}
+                className="press shrink-0 -mr-1 px-3 py-1.5 rounded-xl text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+              >
+                {t.actionLabel}
+              </button>
+            )}
           </div>
         );
       })}

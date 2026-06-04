@@ -7,7 +7,7 @@ import { formatRupiahPlain, formatTanggal } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
-import { showToast } from '../lib/toast';
+import { showToast, showUndo } from '../lib/toast';
 import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
@@ -262,15 +262,22 @@ export default function KasRTPage() {
     showToast(wasEdit ? 'Transaksi diperbarui' : data.tipe === 'masuk' ? 'Pemasukan tersimpan' : 'Pengeluaran tersimpan');
   }
 
-  async function deleteRow(row: KasRT) {
-    const { data: del, error } = await supabase.from('kas_rt').delete().eq('id', row.id).select();
-    if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); return; }
-    if (!del || del.length === 0) { showToast('Gagal menghapus — policy DELETE kas_rt belum aktif di database', 'error'); return; }
-    await recomputeKasRTSaldo();
+  // Hapus transaksi Kas RT dengan pola undo (hapus permanen setelah 5 dtk bila tak diurungkan).
+  function deleteRow(row: KasRT) {
     setSelectedRow(null);
     setConfirmDel(false);
-    await load();
-    showToast('Transaksi dihapus');
+    setList(prev => prev.filter(x => x.id !== row.id)); // optimistik
+    showUndo(
+      'Transaksi dihapus',
+      async () => {
+        const { data: del, error } = await supabase.from('kas_rt').delete().eq('id', row.id).select();
+        if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); await load(); return; }
+        if (!del || del.length === 0) { showToast('Gagal menghapus — policy DELETE kas_rt belum aktif di database', 'error'); await load(); return; }
+        await recomputeKasRTSaldo();
+        await load();
+      },
+      { onUndo: () => load() },
+    );
   }
 
   return (
