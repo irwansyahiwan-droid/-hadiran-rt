@@ -4,6 +4,7 @@ import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
+import EmptyState from '../components/EmptyState';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -282,11 +283,7 @@ export default function KasRTPage() {
             ))}
           </div>
         ) : list.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-            <Landmark className="w-10 h-10 text-gray-200 mb-3" />
-            <p className="text-gray-700 font-medium">Belum ada transaksi</p>
-            <p className="text-gray-400 text-sm mt-1">Transaksi akan muncul setelah data pertama ditambahkan.</p>
-          </div>
+          <EmptyState icon={Landmark} title="Belum ada transaksi" subtitle="Transaksi akan muncul setelah data pertama ditambahkan." />
         ) : (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
             {[...list].reverse().map((k, idx) => {

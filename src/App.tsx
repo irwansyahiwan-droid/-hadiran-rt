@@ -6,6 +6,7 @@ import { AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
 import Header from './components/layout/Header';
 import BottomNav from './components/layout/BottomNav';
+import PullToRefresh from './components/PullToRefresh';
 import type { TabName } from './components/layout/BottomNav';
 import Beranda from './pages/Beranda';
 import JadwalPage from './pages/Jadwal';
@@ -19,6 +20,14 @@ export default function App() {
   const { isDark, toggle: toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<TabName>('beranda');
   const [wargaMode, setWargaMode] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Pull-to-refresh: remount halaman aktif → useEffect-nya memuat ulang data.
+  const handleRefresh = () =>
+    new Promise<void>((resolve) => {
+      setRefreshKey((k) => k + 1);
+      setTimeout(resolve, 650);
+    });
 
   if (auth.loading) {
     return (
@@ -56,11 +65,15 @@ export default function App() {
           onToggleTheme={toggleTheme}
         />
         <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
-          {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
-          {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
-          {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => setActiveTab('beranda') : undefined} />}
-          {activeTab === 'kas'      && <KasHadiranPage />}
-          {activeTab === 'kas-rt'   && <KasRTPage />}
+          <PullToRefresh onRefresh={handleRefresh}>
+            <div key={`${activeTab}-${refreshKey}`} className="page-enter">
+              {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => setActiveTab(tab as TabName)} />}
+              {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
+              {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => setActiveTab('beranda') : undefined} />}
+              {activeTab === 'kas'      && <KasHadiranPage />}
+              {activeTab === 'kas-rt'   && <KasRTPage />}
+            </div>
+          </PullToRefresh>
         </main>
         <BottomNav active={activeTab} onChange={setActiveTab} isWargaMode={isWargaMode} />
       </div>

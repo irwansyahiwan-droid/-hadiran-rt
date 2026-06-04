@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt } from 'lucide-react';
+import EmptyState from '../components/EmptyState';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -255,7 +256,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {jadwalList.length === 0 ? (
-            <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
+            <EmptyState icon={CalendarDays} title="Belum ada jadwal" subtitle="Jadwal tarikan berikutnya akan tampil di sini." />
           ) : (
             jadwalList.map((j, idx) => (
               <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
@@ -287,7 +288,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {trxItems.length === 0 ? (
-            <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
+            <EmptyState icon={Receipt} title="Belum ada transaksi" subtitle="Setoran & pelunasan talangan akan muncul di sini." />
           ) : (
             trxItems.map((trx, idx) => (
               <button
