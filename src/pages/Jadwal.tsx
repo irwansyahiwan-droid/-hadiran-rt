@@ -490,8 +490,8 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 shadow-xl animate-[fadeIn_0.2s_ease-out]">
+      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
@@ -630,12 +630,12 @@ export default function JadwalPage() {
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
           {[...Array(5)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
-              <div className="w-7 h-4 bg-gray-200/60 animate-pulse rounded-lg shrink-0" />
+              <div className="w-7 h-4 skeleton rounded-lg shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200/60 animate-pulse rounded-lg w-3/5" />
-                <div className="h-3 bg-gray-100/70 animate-pulse rounded-lg w-2/5" />
+                <div className="h-4 skeleton rounded-lg w-3/5" />
+                <div className="h-3 skeleton rounded-lg w-2/5" />
               </div>
-              <div className="h-6 w-16 bg-gray-100 animate-pulse rounded-[6px] shrink-0" />
+              <div className="h-6 w-16 skeleton rounded-[6px] shrink-0" />
             </div>
           ))}
         </div>

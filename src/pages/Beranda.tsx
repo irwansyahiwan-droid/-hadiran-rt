@@ -106,24 +106,24 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   if (loading) {
     return (
       <div className="space-y-6 pb-2">
-        <div className="rounded-3xl h-48 bg-gray-200 animate-pulse" />
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 px-5 py-4">
+        <div className="rounded-3xl h-48 skeleton" />
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift px-5 py-4">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2 px-3">
-                <div className="h-7 w-12 bg-gray-200/60 animate-pulse rounded-lg" />
-                <div className="h-3 w-10 bg-gray-100/70 animate-pulse rounded-lg" />
+                <div className="h-7 w-12 skeleton rounded-lg" />
+                <div className="h-3 w-10 skeleton rounded-lg" />
               </div>
             ))}
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(4)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
-              <div className="w-12 h-12 rounded-2xl bg-gray-200 animate-pulse shrink-0" />
+              <div className="w-12 h-12 rounded-2xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200/60 animate-pulse rounded-lg w-3/5" />
-                <div className="h-3 bg-gray-100/70 animate-pulse rounded-lg w-2/5" />
+                <div className="h-4 skeleton rounded-lg w-3/5" />
+                <div className="h-3 skeleton rounded-lg w-2/5" />
               </div>
             </div>
           ))}
@@ -177,7 +177,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <div className="relative grid grid-cols-3">
           <button
             onClick={() => onNavigate('kas')}
-            className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
+            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
             <Wallet className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Saldo Aktif</span>
@@ -187,7 +187,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </button>
           <button
             onClick={() => onNavigate('talangan')}
-            className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
+            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
             <ArrowLeftRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Talangan</span>
@@ -195,7 +195,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </button>
           <button
             onClick={() => onNavigate('kas-rt')}
-            className="hero-col flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-70 transition-opacity"
+            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
             <ArrowUpRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Setor Kas RT</span>
@@ -205,7 +205,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Stats Row */}
-      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 px-5 py-4">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift px-5 py-4">
         <div className="grid grid-cols-3 divide-x divide-gray-100 dark:divide-gray-800">
           <div className="flex flex-col items-center gap-0.5 px-3">
             <span className="text-2xl font-extrabold text-[#111111] dark:text-gray-100">{summary?.jumlah_anggota ?? 0}</span>
@@ -249,12 +249,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Jadwal Berikutnya</h2>
           <button onClick={() => onNavigate('jadwal')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {jadwalList.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Tidak ada jadwal terjadwal</div>
           ) : (
             jadwalList.map((j, idx) => (
-              <div key={j.id} className={`flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
+              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
                   <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
@@ -281,7 +281,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Transaksi Terakhir</h2>
           <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {trxItems.length === 0 ? (
             <div className="p-6 text-center text-gray-400 text-sm">Belum ada transaksi</div>
           ) : (
@@ -289,7 +289,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <button
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
-                className={`w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
+                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
               >
                 <div className={`w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'
@@ -317,9 +318,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     {/* Transaksi detail bottom sheet */}
     {selectedTrx !== null && (
       <div className="fixed inset-0 z-50 flex items-end" onClick={() => setSelectedTrx(null)}>
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
         <div
-          className="relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
+          className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 float"
           onClick={e => e.stopPropagation()}
         >
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />

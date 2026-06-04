@@ -36,8 +36,8 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div className="relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()}>
+      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-2" />
         <div>
           <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Setor ke Kas Besar RT</h3>
@@ -334,7 +334,7 @@ export default function KasHadiranPage() {
                   <RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" />
                 </div>
               ) : (
-                tarikanSelesai.map(t => {
+                tarikanSelesai.map((t, idx) => {
                   const kasHadiran = t.total_terkumpul ?? 0;
                   // Sohibul Bait = 45.000 per pembayar; kas = 5.000 per pembayar → sohibul = kas × 9
                   const sohibulTerima = kasHadiran * 9;
@@ -344,8 +344,8 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
-                      style={talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : undefined}
+                      className="rise lift bg-white rounded-2xl border border-gray-100 overflow-hidden"
+                      style={{ animationDelay: `${Math.min(idx, 10) * 0.05}s`, ...(talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : {}) }}
                     >
 
                       {/* ── Timeline mini-header ─────────────────────── */}
