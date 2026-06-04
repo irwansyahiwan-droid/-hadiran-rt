@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import { fetchRekapTriwulan } from '../lib/laporan';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -56,6 +57,9 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   useEffect(() => {
     if (open) { setLoading(true); load(); }
   }, [open]);
+
+  // Tombol Back HP menutup overlay
+  useBackDismiss(open, onClose);
 
   async function cetak(r: RekapTriwulan) {
     haptic(12);

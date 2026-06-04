@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import { useRealtime } from '../hooks/useRealtime';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import { fetchAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -75,6 +76,9 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
   // Live: muat ulang saat ada aktivitas baru tercatat
   useRealtime(open ? ['audit_log'] : [], () => { if (open) load(); });
+
+  // Tombol Back HP menutup overlay (bukan keluar app)
+  useBackDismiss(open, onClose);
 
   const grouped = useMemo(() => {
     const q = search.trim().toLowerCase();

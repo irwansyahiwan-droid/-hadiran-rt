@@ -7,6 +7,7 @@ import { formatRupiahPlain, formatTanggal } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import { showToast, showUndo } from '../lib/toast';
 import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
@@ -169,6 +170,8 @@ export default function KasRTPage() {
   const [confirmDel, setConfirmDel] = useState(false);
   const [chartPeriod, setChartPeriod] = useState(6); // bulan terakhir di bar chart
   const rowDrag = useDragDismiss(() => setSelectedRow(null));
+  useBackDismiss(showModal, () => { setEditing(null); setShowModal(false); });
+  useBackDismiss(selectedRow !== null, () => setSelectedRow(null));
 
   async function load() {
     setLoading(true);

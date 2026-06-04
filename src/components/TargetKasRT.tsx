@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Target, Pencil, Trophy, CalendarClock, Plus, Trash2 } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -120,6 +121,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
 // ── Sheet edit/set target ──────────────────────────────────
 function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: () => void; onSaved: () => void }) {
   const drag = useDragDismiss(onClose);
+  useBackDismiss(true, onClose);
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(initial?.tanggal ?? '');

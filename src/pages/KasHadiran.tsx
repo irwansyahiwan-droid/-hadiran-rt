@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
@@ -25,6 +26,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
+  useBackDismiss(true, onClose);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -109,6 +111,7 @@ export default function KasHadiranPage() {
   const [detailHadir, setDetailHadir] = useState<{ id: string; nama: string }[]>([]);
   const [detailTidak, setDetailTidak] = useState<{ id: string; nama: string; lunas: boolean }[]>([]);
   const detailDrag = useDragDismiss(() => setDetailTarikan(null));
+  useBackDismiss(detailTarikan !== null, () => setDetailTarikan(null));
 
   async function load() {
     setLoading(true);

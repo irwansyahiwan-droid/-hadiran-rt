@@ -3,6 +3,7 @@ import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLef
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatRupiahCompact, formatTanggal } from '../lib/utils';
@@ -34,6 +35,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
   const trxDrag = useDragDismiss(() => setSelectedTrx(null));
+  useBackDismiss(selectedTrx !== null, () => setSelectedTrx(null));
   const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
   const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
   const [trxSearch, setTrxSearch] = useState('');

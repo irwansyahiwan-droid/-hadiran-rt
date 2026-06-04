@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { openWa, pesanTarikan } from '../lib/waReminder';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import type { Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;
@@ -51,6 +52,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [loadingAbsensi, setLoadingAbsensi] = useState(true);
+  useBackDismiss(true, onBack); // tombol Back HP keluar dari editor absensi
 
   useEffect(() => {
     async function loadExisting() {
@@ -470,6 +472,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   const [tanggal, setTanggal] = useState((tarikan.tanggal ?? '').slice(0, 10));
   const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
   const [saving, setSaving] = useState(false);
+  useBackDismiss(true, onClose);
 
   // Pastikan sohibul saat ini tetap muncul di dropdown walau tidak aktif lagi
   const options = useMemo(() => {

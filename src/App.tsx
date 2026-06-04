@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
+import { useBackDismiss } from './hooks/useBackDismiss';
 import { AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
 import Header from './components/layout/Header';
@@ -42,6 +43,9 @@ export default function App() {
       setRefreshKey((k) => k + 1);
       setTimeout(resolve, 650);
     });
+
+  // Tombol Back HP di tab non-Beranda → kembali ke Beranda (bukan keluar app).
+  useBackDismiss(activeTab !== 'beranda', () => changeTab('beranda'));
 
   if (auth.loading) {
     return (
