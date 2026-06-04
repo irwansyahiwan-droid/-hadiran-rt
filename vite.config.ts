@@ -7,4 +7,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  build: {
+    // exceljs & html2canvas adalah chunk lazy (hanya dimuat saat ekspor) —
+    // wajar besar; naikkan ambang agar warning tidak menutupi masalah nyata.
+    chunkSizeWarningLimit: 1000,
+  },
 });
