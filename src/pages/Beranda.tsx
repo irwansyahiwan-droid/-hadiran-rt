@@ -105,7 +105,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   if (loading) {
     return (
-      <div className="space-y-4 pb-2">
+      <div className="space-y-6 pb-2">
         <div className="rounded-3xl h-48 bg-gray-200 animate-pulse" />
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 px-5 py-4">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
@@ -134,7 +134,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   return (
     <>
-    <div className="space-y-4 pb-2 page-enter">
+    <div className="space-y-6 pb-2 page-enter">
       {/* Main Kas Card — clean & premium hero */}
       <div className="hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
         {/* Label row */}
@@ -245,7 +245,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Jadwal Berikutnya */}
       <div>
-        <div className="flex items-center justify-between mt-6 mb-3 px-1">
+        <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Jadwal Berikutnya</h2>
           <button onClick={() => onNavigate('jadwal')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
@@ -277,7 +277,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Transaksi Terakhir */}
       <div>
-        <div className="flex items-center justify-between mt-6 mb-3 px-1">
+        <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Transaksi Terakhir</h2>
           <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
