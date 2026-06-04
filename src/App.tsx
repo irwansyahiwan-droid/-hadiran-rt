@@ -18,6 +18,7 @@ import TalanganPage from './pages/Talangan';
 import KasHadiranPage from './pages/KasHadiran';
 import KasRTPage from './pages/KasRT';
 import RiwayatAktivitas from './pages/RiwayatAktivitas';
+import LaporanTriwulan from './pages/LaporanTriwulan';
 
 export default function App() {
   const auth = useAuth();
@@ -27,6 +28,7 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [dir, setDir] = useState(1); // arah transisi tab: 1 = ke kanan, -1 = ke kiri
   const [riwayatOpen, setRiwayatOpen] = useState(false);
+  const [laporanOpen, setLaporanOpen] = useState(false);
 
   const TAB_ORDER: TabName[] = ['beranda', 'jadwal', 'talangan', 'kas', 'kas-rt'];
   const changeTab = (tab: TabName) => {
@@ -76,6 +78,7 @@ export default function App() {
           isDark={isDark}
           onToggleTheme={toggleTheme}
           onOpenRiwayat={ctxValue.isBendahara ? () => setRiwayatOpen(true) : undefined}
+          onOpenLaporan={ctxValue.isBendahara ? () => setLaporanOpen(true) : undefined}
         />
         <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
@@ -97,6 +100,10 @@ export default function App() {
         {/* Riwayat Aktivitas (audit log) — bendahara saja */}
         {ctxValue.isBendahara && (
           <RiwayatAktivitas open={riwayatOpen} onClose={() => setRiwayatOpen(false)} />
+        )}
+        {/* Tutup Buku Triwulan — bendahara saja */}
+        {ctxValue.isBendahara && (
+          <LaporanTriwulan open={laporanOpen} onClose={() => setLaporanOpen(false)} />
         )}
       </div>
     </AuthContext.Provider>

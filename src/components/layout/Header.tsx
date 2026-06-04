@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LogOut, Sun, Moon, Eye, History } from 'lucide-react';
+import { LogOut, Sun, Moon, Eye, History, FileText } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.jpg';
 import { haptic } from '../../lib/utils';
 import type { Role } from '../../hooks/useAuth';
@@ -10,10 +10,11 @@ interface HeaderProps {
   isDark: boolean;
   onToggleTheme: () => void;
   onOpenRiwayat?: () => void;
+  onOpenLaporan?: () => void;
 }
 
 /** Header menyusut + shadow/blur menguat saat halaman di-scroll (ala app fintech). */
-export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat }: HeaderProps) {
+export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan }: HeaderProps) {
   const isBendahara = role === 'bendahara';
   const [scrolled, setScrolled] = useState(false);
 
@@ -71,6 +72,16 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           >
             {isBendahara ? 'BENDAHARA' : 'WARGA'}
           </span>
+          {isBendahara && onOpenLaporan && (
+            <button
+              onClick={() => { haptic(); onOpenLaporan(); }}
+              className="press p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+              title="Tutup Buku Triwulan"
+              aria-label="Tutup Buku Triwulan"
+            >
+              <FileText className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            </button>
+          )}
           {isBendahara && onOpenRiwayat && (
             <button
               onClick={() => { haptic(); onOpenRiwayat(); }}
