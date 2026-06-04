@@ -341,7 +341,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       </div>
 
       {/* Sticky action buttons */}
-      <div className="fixed bottom-16 left-0 right-0 px-4 z-30">
+      <div className="fixed bottom-16 left-0 right-0 px-5 z-30">
         <div className="max-w-lg mx-auto space-y-2">
           <button
             onClick={simpan}
