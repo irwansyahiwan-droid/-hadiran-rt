@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FileText, RefreshCw, Search, X, Check, Coins, Users, CalendarDays } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useRealtime } from '../hooks/useRealtime';
 import { formatTanggal, formatRupiahPlain } from '../lib/utils';
 import type { Tarikan, Warga } from '../lib/types';
 
@@ -15,6 +16,7 @@ export default function JadwalWargaPage() {
   const [absensiMap, setAbsensiMap] = useState<Record<string, 'hadir' | 'tidak_hadir'>>({});
   const [talanganLunasSet, setTalanganLunasSet] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -73,7 +75,10 @@ export default function JadwalWargaPage() {
       setLoading(false);
     }
     load();
-  }, []);
+  }, [reloadKey]);
+
+  // Realtime: muat ulang saat data tarikan/absensi/talangan berubah.
+  useRealtime(['tarikan', 'absensi', 'talangan'], () => setReloadKey((k) => k + 1));
 
   if (loading) {
     return (

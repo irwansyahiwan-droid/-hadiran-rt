@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet, Search } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
+import { useRealtime } from '../hooks/useRealtime';
 import Odometer from '../components/Odometer';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
@@ -143,6 +144,7 @@ export default function KasHadiranPage() {
   }
 
   useEffect(() => { load(); }, []);
+  useRealtime(['transaksi_kas', 'tarikan', 'talangan'], load);
 
   const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);

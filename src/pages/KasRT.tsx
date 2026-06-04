@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2, Share2 } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
+import { useRealtime } from '../hooks/useRealtime';
 import Odometer from '../components/Odometer';
 import SmartInsight from '../components/SmartInsight';
 import { supabase } from '../lib/supabase';
@@ -183,6 +184,7 @@ export default function KasRTPage() {
   }
 
   useEffect(() => { load(); }, []);
+  useRealtime(['kas_rt', 'transaksi_kas', 'tarikan', 'talangan'], load);
 
   const saldoAwalEntry = list.find((k) => k.keterangan === 'Saldo Awal Kas RT');
   const saldoAwal   = saldoAwalEntry?.nominal ?? 0;
