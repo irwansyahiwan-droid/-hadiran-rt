@@ -25,7 +25,7 @@ interface BerandaProps {
 }
 
 export default function Beranda({ onNavigate }: BerandaProps) {
-  useAuthContext();
+  const { isBendahara, isWargaMode } = useAuthContext();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
   const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
@@ -109,6 +109,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const saldo = summary?.saldo_aktif ?? 0;
   const talangan = summary?.total_talangan_belum_lunas ?? 0;
   const setorKasRT = summary?.total_setor_kas_rt ?? 0;
+
+  const hour = new Date().getHours();
+  const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
+  const roleLabel = isWargaMode ? 'Warga' : isBendahara ? 'Bendahara' : 'Pengguna';
+  const kasStatus =
+    saldo < 0
+      ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
+      : talangan > 0
+        ? { label: 'Ada Tunggakan', dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' }
+        : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' };
   const animatedKasHadiran = useCountUp(kasHadiran);
   const animatedSaldo = useCountUp(saldo);
   const animatedTalangan = useCountUp(talangan);
@@ -160,6 +170,18 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <>
     <CrossFade loading={loading} skeleton={skeleton}>
     <div className="space-y-6 pb-2">
+      {/* Sapaan + badge status kas */}
+      <div className="flex items-end justify-between px-1">
+        <div>
+          <p className="text-[13px] text-gray-400 dark:text-gray-500">{greeting},</p>
+          <h1 className="text-xl font-extrabold text-gray-900 dark:text-gray-100 leading-tight">{roleLabel}</h1>
+        </div>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${kasStatus.bg} ${kasStatus.text}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${kasStatus.dot}`} />
+          {kasStatus.label}
+        </span>
+      </div>
+
       {/* Main Kas Card — clean & premium hero */}
       <div className="hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
         {/* Label row */}

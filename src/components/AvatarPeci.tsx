@@ -3,16 +3,27 @@ interface AvatarPeciProps {
   className?: string;
 }
 
-function getColors(nama: string) {
-  const code = (nama || 'A').toUpperCase().charCodeAt(0);
-  if (code >= 65 && code <= 70) return { bg: 'bg-gradient-to-br from-emerald-50 to-teal-100/80', text: 'text-emerald-700' };
-  if (code >= 71 && code <= 76) return { bg: 'bg-gradient-to-br from-blue-50 to-indigo-100/70', text: 'text-blue-700' };
-  if (code >= 77 && code <= 82) return { bg: 'bg-gradient-to-br from-amber-50 to-orange-100/70', text: 'text-amber-700' };
-  return { bg: 'bg-gradient-to-br from-violet-50 to-purple-100/70', text: 'text-purple-700' };
+// Palet gradient lembut — dipilih via hash nama agar konsisten & bervariasi.
+const PALETTE = [
+  { bg: 'bg-gradient-to-br from-emerald-50 to-teal-100/80',  text: 'text-emerald-700' },
+  { bg: 'bg-gradient-to-br from-blue-50 to-indigo-100/70',   text: 'text-blue-700' },
+  { bg: 'bg-gradient-to-br from-amber-50 to-orange-100/70',  text: 'text-amber-700' },
+  { bg: 'bg-gradient-to-br from-violet-50 to-purple-100/70', text: 'text-violet-700' },
+  { bg: 'bg-gradient-to-br from-rose-50 to-pink-100/70',     text: 'text-rose-700' },
+  { bg: 'bg-gradient-to-br from-cyan-50 to-sky-100/70',      text: 'text-cyan-700' },
+  { bg: 'bg-gradient-to-br from-lime-50 to-green-100/70',    text: 'text-lime-700' },
+  { bg: 'bg-gradient-to-br from-fuchsia-50 to-purple-100/70', text: 'text-fuchsia-700' },
+];
+
+function hashName(nama: string): number {
+  let h = 0;
+  const s = nama || 'A';
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
 }
 
 export default function AvatarPeci({ nama, className = 'w-12 h-12 rounded-xl' }: AvatarPeciProps) {
-  const { bg, text } = getColors(nama);
+  const { bg, text } = PALETTE[hashName(nama) % PALETTE.length];
   const initial = (nama || '?').charAt(0).toUpperCase();
 
   return (

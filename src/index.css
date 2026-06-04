@@ -21,6 +21,14 @@ body {
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
 .dark body { background-color: #030712; }
 
+/* A11y: focus ring jelas hanya untuk navigasi keyboard (bukan tap mouse/sentuh) */
+*:focus-visible {
+  outline: 2px solid #0F6039;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.dark *:focus-visible { outline-color: #34D399; }
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0);   }
