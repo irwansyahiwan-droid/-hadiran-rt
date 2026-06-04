@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2 } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2, Share2 } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import Odometer from '../components/Odometer';
 import SmartInsight from '../components/SmartInsight';
@@ -304,6 +304,27 @@ export default function KasRTPage() {
           <div className="flex items-center gap-2">
             <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={async () => {
+                const { shareReceipt } = await import('../lib/shareReceipt');
+                await shareReceipt({
+                  title: 'Ringkasan Kas RT',
+                  amountLabel: 'Saldo Bersih Kas RT',
+                  amount: `Rp${saldo.toLocaleString('id-ID')}`,
+                  rows: [
+                    { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
+                    { label: 'Total Masuk', value: `+${formatRupiahPlain(totalMasuk)}` },
+                    { label: 'Total Keluar', value: `-${formatRupiahPlain(totalKeluar)}` },
+                  ],
+                  shareText: `Ringkasan Kas RT — Saldo bersih Rp${saldo.toLocaleString('id-ID')} (per ${today}). — Hadiran RT`,
+                });
+              }}
+              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Bagikan ke WhatsApp"
+              title="Bagikan ke WhatsApp"
+            >
+              <Share2 className="w-4 h-4 text-gray-500" />
             </button>
             <button
               onClick={async () => {
