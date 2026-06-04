@@ -113,7 +113,9 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
         </div>
       </div>
 
-      <div style={{ transform: `translateY(${pull}px)`, transition: trans }}>
+      {/* transform hanya saat menarik — translateY(0) pun membuat containing block
+          yang merusak posisi modal `position: fixed` di dalamnya. */}
+      <div style={{ transform: pull > 0 ? `translateY(${pull}px)` : undefined, transition: trans }}>
         {children}
       </div>
     </div>

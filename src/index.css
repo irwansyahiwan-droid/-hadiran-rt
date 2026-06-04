@@ -35,7 +35,9 @@ body {
 }
 
 .page-enter {
-  animation: fadeIn 0.2s ease-out both;
+  /* backwards (bukan both): jangan retain transform saat diam → cegah
+     containing block yg merusak posisi modal fixed di dalam halaman. */
+  animation: fadeIn 0.2s ease-out backwards;
 }
 
 .card-clean {
@@ -155,8 +157,8 @@ body {
 /* Transisi antar-tab terarah (geser sesuai posisi tab) */
 @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideInLeft  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-.page-in-right { animation: slideInRight 0.3s var(--ease-out-expo) both; }
-.page-in-left  { animation: slideInLeft 0.3s var(--ease-out-expo) both; }
+.page-in-right { animation: slideInRight 0.3s var(--ease-out-expo) backwards; }
+.page-in-left  { animation: slideInLeft 0.3s var(--ease-out-expo) backwards; }
 
 /* Sukses cinematic — overlay, lingkaran, centang gores, confetti */
 @keyframes successPop {
