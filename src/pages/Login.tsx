@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import logoRt from '../assets/logo-rt.jpg';
 import { haptic } from '../lib/utils';
+
+// Pagar ringan untuk Mode Warga — BUKAN kredensial rahasia, hanya agar warga
+// sadar sedang masuk ke mode lihat-saja. Ganti nilainya di sini bila perlu.
+const WARGA_PASSWORD = 'warga';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
@@ -14,6 +18,29 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Gerbang password Mode Warga (inline, bukan modal)
+  const [wargaOpen, setWargaOpen] = useState(false);
+  const [wargaPassword, setWargaPassword] = useState('');
+  const [showWargaPassword, setShowWargaPassword] = useState(false);
+  const [wargaError, setWargaError] = useState('');
+  const wargaInputRef = useRef<HTMLInputElement>(null);
+
+  // Fokuskan field warga begitu muncul
+  useEffect(() => {
+    if (wargaOpen) wargaInputRef.current?.focus();
+  }, [wargaOpen]);
+
+  function handleWargaSubmit() {
+    haptic(12);
+    if (wargaPassword.trim().toLowerCase() === WARGA_PASSWORD) {
+      setWargaError('');
+      onWargaMode();
+    } else {
+      // Jangan reset field, biarkan warga memperbaiki ketikannya
+      setWargaError('Password warga salah. Silakan ketik: warga');
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -114,11 +141,58 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
           <button
             type="button"
-            onClick={() => { haptic(); onWargaMode(); }}
-            className="press w-full mt-2 py-3 rounded-xl border-2 border-blue-300 text-blue-700 font-semibold text-sm hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+            onClick={() => { haptic(); setWargaOpen(true); }}
+            className="press w-full mt-2 min-h-[44px] py-3 rounded-xl border-2 border-blue-300 text-blue-700 font-semibold text-sm hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
           >
-            <Eye className="w-4 h-4" /> Mode Warga (tanpa password)
+            <Eye className="w-4 h-4" /> Mode Warga
           </button>
+
+          {/* Gerbang password Mode Warga — expand halus */}
+          <div className={`grid transition-all duration-300 ease-out ${wargaOpen ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0'}`}>
+            <div className="overflow-hidden">
+              <label htmlFor="warga-password" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password Warga</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  id="warga-password"
+                  ref={wargaInputRef}
+                  type={showWargaPassword ? 'text' : 'password'}
+                  value={wargaPassword}
+                  onChange={(e) => setWargaPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleWargaSubmit();
+                    }
+                  }}
+                  placeholder="Ketik: warga"
+                  className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowWargaPassword((p) => !p)}
+                  aria-label={showWargaPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showWargaPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+
+              {wargaError && (
+                <div role="alert" className="bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mt-2">
+                  <p className="text-sm text-red-600 font-medium">{wargaError}</p>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleWargaSubmit}
+                className="press w-full mt-2 min-h-[44px] py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold text-sm shadow-lg shadow-blue-300/50 hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2"
+              >
+                <Eye className="w-4 h-4" /> Masuk sebagai Warga
+              </button>
+            </div>
+          </div>
         </form>
       </div>
 
