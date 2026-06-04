@@ -8,6 +8,7 @@ import Header from './components/layout/Header';
 import BottomNav from './components/layout/BottomNav';
 import PullToRefresh from './components/PullToRefresh';
 import PwaUpdatePrompt from './components/PwaUpdatePrompt';
+import InstallPrompt from './components/InstallPrompt';
 import Toaster from './components/Toaster';
 import type { TabName } from './components/layout/BottomNav';
 import Beranda from './pages/Beranda';
@@ -87,6 +88,8 @@ export default function App() {
         <BottomNav active={activeTab} onChange={changeTab} isWargaMode={isWargaMode} />
         {/* Toast "versi baru tersedia" + registrasi service worker */}
         <PwaUpdatePrompt />
+        {/* Banner pasang app (Android prompt / panduan iOS) */}
+        <InstallPrompt />
         <Toaster />
       </div>
     </AuthContext.Provider>
