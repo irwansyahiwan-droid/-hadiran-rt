@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
@@ -313,8 +313,11 @@ export default function KasHadiranPage() {
         {/* Header Card */}
         <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
 
-          <div className="relative p-5">
-            <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest mb-1">Saldo Kas Hadiran</p>
+          <div className="relative p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Wallet className="w-4 h-4 text-blue-200" />
+              <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
+            </div>
             <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
             </p>
