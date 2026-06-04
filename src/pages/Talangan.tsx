@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X, ArrowDownUp } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -27,6 +27,8 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'semua' | 'belum' | 'lunas'>('semua');
+  const [talSort, setTalSort] = useState<'tunggakan' | 'nama'>('tunggakan');
 
   async function load() {
     setLoading(true);
@@ -166,9 +168,21 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     ? groups.filter(g => g.nama.toLowerCase().includes(search.toLowerCase()))
     : groups;
 
-  const berganda = filtered.filter(g => g.countBelum > 1);
-  const single   = filtered.filter(g => g.countBelum === 1);
-  const lunas    = filtered.filter(g => g.countBelum === 0 && g.entries.some(e => e.status_lunas));
+  const sortGroups = (arr: WargaGroup[]) =>
+    talSort === 'nama'
+      ? [...arr].sort((a, b) => a.nama.localeCompare(b.nama))
+      : [...arr].sort((a, b) => b.totalBelum - a.totalBelum);
+
+  const berganda = sortGroups(filtered.filter(g => g.countBelum > 1));
+  const single   = sortGroups(filtered.filter(g => g.countBelum === 1));
+  const lunas    = [...filtered.filter(g => g.countBelum === 0 && g.entries.some(e => e.status_lunas))]
+    .sort((a, b) => a.nama.localeCompare(b.nama));
+
+  const showBelum = statusFilter !== 'lunas';
+  const showLunas = statusFilter !== 'belum';
+  const visibleCount =
+    (showBelum ? berganda.length + single.length : 0) + (showLunas ? lunas.length : 0);
+  const talSortLabel = talSort === 'tunggakan' ? 'Tunggakan' : 'Nama';
 
   const totalBelumLunas = list.filter(t => !t.status_lunas).reduce((s, t) => s + t.nominal, 0);
   const countBelum = list.filter(t => !t.status_lunas).length;
@@ -335,6 +349,37 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         )}
       </div>
 
+      {/* Filter status (semua/belum/lunas) + sort */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {([
+            { id: 'semua', label: 'Semua' },
+            { id: 'belum', label: 'Belum Lunas' },
+            { id: 'lunas', label: 'Lunas' },
+          ] as const).map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setStatusFilter(f.id)}
+              className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                statusFilter === f.id
+                  ? 'bg-[#0F4C2E] text-white'
+                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => setTalSort((s) => (s === 'tunggakan' ? 'nama' : 'tunggakan'))}
+          className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+          aria-label={`Urutkan: ${talSortLabel}`}
+        >
+          <ArrowDownUp className="w-3.5 h-3.5" />
+          {talSortLabel}
+        </button>
+      </div>
+
       <CrossFade loading={loading} skeleton={(
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800">
           {[...Array(4)].map((_, i) => (
@@ -351,7 +396,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       )}>
         <>
           {/* Berganda warning */}
-          {berganda.length > 0 && (
+          {showBelum && berganda.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
@@ -366,7 +411,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           )}
 
           {/* Single belum lunas */}
-          {single.length > 0 && (
+          {showBelum && single.length > 0 && (
             <div>
               <p className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3">Daftar Talangan</p>
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800">
@@ -376,7 +421,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           )}
 
           {/* Lunas */}
-          {lunas.length > 0 && (
+          {showLunas && lunas.length > 0 && (
             <div>
               <p className="text-base font-extrabold text-[#555555] dark:text-gray-400 mt-6 mb-3">Sudah Lunas</p>
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden divide-y divide-[#F0F0F0] dark:divide-gray-800 opacity-60">
@@ -385,13 +430,17 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             </div>
           )}
 
-          {filtered.length === 0 && (
+          {visibleCount === 0 && (
             <EmptyState
               icon={search ? Search : CheckCircle2}
-              title={search ? 'Data tidak ditemukan' : 'Belum ada talangan'}
+              title={search ? 'Data tidak ditemukan' : statusFilter !== 'semua' ? 'Tidak ada hasil' : 'Belum ada talangan'}
               subtitle={search
                 ? 'Silakan periksa kembali kata kunci atau ejaan nama warga.'
-                : 'Semua warga sudah memenuhi kehadiran.'}
+                : statusFilter === 'lunas'
+                  ? 'Belum ada talangan yang lunas.'
+                  : statusFilter === 'belum'
+                    ? 'Tidak ada talangan yang belum lunas.'
+                    : 'Semua warga sudah memenuhi kehadiran.'}
             />
           )}
         </>
