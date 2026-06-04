@@ -172,19 +172,24 @@ export default function KasHadiranPage() {
 
   async function handlePendapatanPDF(tarikan: Tarikan) {
     setPdfLoading(tarikan.id);
-    const [absensiRes, talanganRes] = await Promise.all([
-      supabase.from('absensi').select('warga_id, status').eq('tarikan_id', tarikan.id),
-      supabase.from('talangan').select('warga_id').eq('tarikan_id', tarikan.id).eq('status_lunas', true),
-    ]);
-    const absensiMap: Record<string, 'hadir' | 'tidak_hadir'> = {};
-    (absensiRes.data as { warga_id: string; status: 'hadir' | 'tidak_hadir' }[] ?? [])
-      .forEach(a => { absensiMap[a.warga_id] = a.status; });
-    const lunasSet = new Set(
-      (talanganRes.data as { warga_id: string }[] ?? []).map(t => t.warga_id),
-    );
-    const { generatePendapatanPDF } = await import('../lib/generatePendapatanPDF');
-    generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
-    setPdfLoading(null);
+    try {
+      const [absensiRes, talanganRes] = await Promise.all([
+        supabase.from('absensi').select('warga_id, status').eq('tarikan_id', tarikan.id),
+        supabase.from('talangan').select('warga_id').eq('tarikan_id', tarikan.id).eq('status_lunas', true),
+      ]);
+      const absensiMap: Record<string, 'hadir' | 'tidak_hadir'> = {};
+      (absensiRes.data as { warga_id: string; status: 'hadir' | 'tidak_hadir' }[] ?? [])
+        .forEach(a => { absensiMap[a.warga_id] = a.status; });
+      const lunasSet = new Set(
+        (talanganRes.data as { warga_id: string }[] ?? []).map(t => t.warga_id),
+      );
+      const { generatePendapatanPDF } = await import('../lib/generatePendapatanPDF');
+      generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
+    } catch {
+      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
+    } finally {
+      setPdfLoading(null);
+    }
   }
 
   // Buka sheet detail tarikan: daftar hadir & tidak hadir (+ status bayar talangan).
@@ -336,8 +341,12 @@ export default function KasHadiranPage() {
         <div className="flex gap-2">
           <button
             onClick={async () => {
-              const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
-              generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
+              try {
+                const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
+                generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
+              } catch {
+                showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
+              }
             }}
             className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 shadow-sm text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
           >

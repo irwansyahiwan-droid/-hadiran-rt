@@ -2,7 +2,7 @@
 // Strategi: network-first untuk navigasi (HTML), stale-while-revalidate
 // untuk aset statis. Tidak meng-cache request Supabase (API dinamis).
 
-const CACHE = 'hadiran-rt-v1';
+const CACHE = 'hadiran-rt-v2';
 const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
