@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -154,6 +154,8 @@ export default function KasRTPage() {
   const [list, setList] = useState<KasRT[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [filter, setFilter] = useState<'semua' | 'masuk' | 'keluar'>('semua');
+  const [sort, setSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
 
   async function load() {
     setLoading(true);
@@ -174,6 +176,21 @@ export default function KasRTPage() {
   const totalKeluar = list.filter((k) => k.tipe === 'keluar').reduce((s, k) => s + k.nominal, 0);
   const saldo       = saldoAwal + totalMasuk - totalKeluar;
   const animatedSaldo = useCountUp(saldo);
+
+  // Daftar tampil = list difilter (tipe) & diurutkan (sort). saldo_setelah per
+  // baris tetap akurat karena dihitung saat insert.
+  const displayList = useMemo(() => {
+    let arr = [...list];
+    if (sort === 'terbaru') arr.reverse();          // list dari DB urut menaik (terlama→terbaru)
+    else if (sort === 'nominal') arr.sort((a, b) => b.nominal - a.nominal);
+    // 'terlama' = biarkan urutan menaik apa adanya
+    if (filter !== 'semua') arr = arr.filter((k) => k.tipe === filter);
+    return arr;
+  }, [list, filter, sort]);
+
+  const sortLabel = sort === 'terbaru' ? 'Terbaru' : sort === 'terlama' ? 'Terlama' : 'Nominal';
+  const cycleSort = () =>
+    setSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'nominal' : 'terbaru'));
 
   const today = new Date().toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
@@ -292,10 +309,45 @@ export default function KasRTPage() {
           {list.length === 0 ? (
           <EmptyState icon={Landmark} title="Belum ada transaksi" subtitle="Transaksi akan muncul setelah data pertama ditambahkan." />
         ) : (
+          <>
+          {/* Filter (tipe) & sort transaksi */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1.5">
+              {([
+                { id: 'semua',  label: 'Semua' },
+                { id: 'masuk',  label: 'Masuk' },
+                { id: 'keluar', label: 'Keluar' },
+              ] as const).map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setFilter(f.id)}
+                  className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                    filter === f.id
+                      ? 'bg-[#0F4C2E] text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={cycleSort}
+              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+              aria-label={`Urutkan: ${sortLabel}`}
+            >
+              <ArrowDownUp className="w-3.5 h-3.5" />
+              {sortLabel}
+            </button>
+          </div>
+
+          {displayList.length === 0 ? (
+            <EmptyState icon={Landmark} title="Tidak ada hasil" subtitle="Tidak ada transaksi pada filter ini." />
+          ) : (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
-            {[...list].reverse().map((k, idx) => {
+            {displayList.map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
-              const isLast  = idx === list.length - 1;
+              const isLast  = idx === displayList.length - 1;
               return (
                 <div
                   key={k.id}
@@ -328,6 +380,8 @@ export default function KasRTPage() {
             })}
           </div>
           )}
+          </>
+        )}
         </CrossFade>
       </div>
 
