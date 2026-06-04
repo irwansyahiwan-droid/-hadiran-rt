@@ -4,7 +4,6 @@ import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
-import { generateKasRTPDF } from '../lib/generateKasRTPDF';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -200,7 +199,10 @@ export default function KasRTPage() {
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <button
-              onClick={() => generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal })}
+              onClick={async () => {
+                const { generateKasRTPDF } = await import('../lib/generateKasRTPDF');
+                generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal });
+              }}
               className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
             >
               <FileText className="w-4 h-4" />

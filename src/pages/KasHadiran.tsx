@@ -5,8 +5,6 @@ import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
-import { generateKasHadiranPDF } from '../lib/generateKasHadiranPDF';
-import { generatePendapatanPDF } from '../lib/generatePendapatanPDF';
 import type { Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -155,6 +153,7 @@ export default function KasHadiranPage() {
     const lunasSet = new Set(
       (talanganRes.data as { warga_id: string }[] ?? []).map(t => t.warga_id),
     );
+    const { generatePendapatanPDF } = await import('../lib/generatePendapatanPDF');
     generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
     setPdfLoading(null);
   }
@@ -264,7 +263,10 @@ export default function KasHadiranPage() {
         {/* Action buttons — outside hero */}
         <div className="flex gap-2">
           <button
-            onClick={() => generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo })}
+            onClick={async () => {
+              const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
+              generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
+            }}
             className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl py-3 shadow-sm text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
           >
             <FileText className="w-4 h-4" />
