@@ -284,13 +284,13 @@ export default function KasRTPage() {
   return (
     <>
       <div className="space-y-4 pb-2 page-enter">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
+        {/* Header — di HP: judul di atas, tombol di bawah (anti-kepotong) */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Kas RT</h1>
             <p className="text-xs text-gray-400 mt-0.5">Per {today}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
             </button>
