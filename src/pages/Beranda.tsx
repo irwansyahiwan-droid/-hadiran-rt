@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -33,6 +33,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
   const trxDrag = useDragDismiss(() => setSelectedTrx(null));
+  const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
+  const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
 
   async function load(showRefreshing = false) {
     if (showRefreshing) setRefreshing(true);
@@ -79,9 +81,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         nominal: t.nominal as number,
       }));
 
+    // Semua transaksi (tanpa batas) — terbaru di atas
     const sorted = [...setorItems, ...talanganItems]
-      .sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime())
-      .slice(0, 20);
+      .sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
 
     // Hitung running saldo mundur dari saldo_aktif saat ini
     let saldoCurrent = summaryData.saldo_aktif;
@@ -110,6 +112,19 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const animatedSaldo = useCountUp(saldo);
   const animatedTalangan = useCountUp(talangan);
   const animatedSetor = useCountUp(setorKasRT);
+
+  // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
+  const displayTrx = useMemo(() => {
+    let arr = [...trxItems];
+    if (trxSort === 'terlama') arr.reverse();
+    else if (trxSort === 'nominal') arr.sort((a, b) => Math.abs(b.nominal) - Math.abs(a.nominal));
+    if (trxFilter !== 'semua') arr = arr.filter((t) => t.tipe === trxFilter);
+    return arr;
+  }, [trxItems, trxFilter, trxSort]);
+
+  const trxSortLabel = trxSort === 'terbaru' ? 'Terbaru' : trxSort === 'terlama' ? 'Terlama' : 'Nominal';
+  const cycleTrxSort = () =>
+    setTrxSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'nominal' : 'terbaru'));
 
   const skeleton = (
       <div className="space-y-6 pb-2">
@@ -288,16 +303,49 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100">Transaksi Terakhir</h2>
           <button onClick={() => onNavigate('kas')} className="text-sm text-[#0D6B5E] dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
+        {trxItems.length > 0 && (
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <div className="flex items-center gap-1.5">
+              {([
+                { id: 'semua', label: 'Semua' },
+                { id: 'setor', label: 'Setor' },
+                { id: 'talangan_lunas', label: 'Talangan' },
+              ] as const).map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setTrxFilter(f.id)}
+                  className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                    trxFilter === f.id
+                      ? 'bg-[#0F4C2E] text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={cycleTrxSort}
+              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+              aria-label={`Urutkan: ${trxSortLabel}`}
+            >
+              <ArrowDownUp className="w-3.5 h-3.5" />
+              {trxSortLabel}
+            </button>
+          </div>
+        )}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
           {trxItems.length === 0 ? (
             <EmptyState icon={Receipt} title="Belum ada transaksi" subtitle="Setoran & pelunasan talangan akan muncul di sini." />
+          ) : displayTrx.length === 0 ? (
+            <EmptyState icon={Receipt} title="Tidak ada hasil" subtitle="Tidak ada transaksi pada filter ini." />
           ) : (
-            trxItems.map((trx, idx) => (
+            displayTrx.map((trx, idx) => (
               <button
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < trxItems.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < displayTrx.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
               >
                 <div className={`w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'
