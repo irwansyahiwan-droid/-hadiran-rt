@@ -1,0 +1,75 @@
+import { memo } from 'react';
+
+interface OdometerProps {
+  /** Nilai yang ditampilkan. Biasanya sudah di-animate via useCountUp agar digit berputar. */
+  value: number;
+  prefix?: string;
+  className?: string;
+  /** Durasi roll antar-digit (ms). Pendek agar mengikuti count-up dengan mulus. */
+  duration?: number;
+}
+
+const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+// vertical-align top + lineHeight 1 agar semua bagian (Rp, separator, kolom digit)
+// sejajar; inline-block menjaga letter-spacing (tracking-tighter) tetap berlaku.
+const cell: React.CSSProperties = { lineHeight: 1, verticalAlign: 'top', display: 'inline-block' };
+
+/**
+ * Angka bergaya odometer — tiap digit adalah kolom 0-9 yang bergeser vertikal.
+ * Saat `value` berubah (count-up saat mount, atau update realtime), digit
+ * "berputar" ke posisi barunya. Menghormati prefers-reduced-motion.
+ */
+function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: OdometerProps) {
+  const prefersReduced =
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  const negative = value < 0;
+  const grouped = Math.abs(Math.round(value)).toLocaleString('id-ID');
+
+  return (
+    <span
+      className={`inline-block tabular-nums ${className}`}
+      style={{ whiteSpace: 'nowrap' }}
+    >
+      {negative && <span style={cell}>-</span>}
+      {prefix && <span style={cell}>{prefix}</span>}
+      {grouped.split('').map((c, i) => {
+        if (c < '0' || c > '9') {
+          return (
+            <span key={`s${i}`} style={cell}>
+              {c}
+            </span>
+          );
+        }
+        const d = Number(c);
+        return (
+          <span
+            key={`d${i}`}
+            className="overflow-hidden"
+            style={{ ...cell, height: '1em' }}
+          >
+            <span
+              style={{
+                display: 'block',
+                transform: `translateY(-${d}em)`,
+                transition: prefersReduced
+                  ? 'none'
+                  : `transform ${duration}ms var(--ease-out-expo)`,
+                willChange: 'transform',
+              }}
+            >
+              {DIGITS.map((n) => (
+                <span key={n} style={{ display: 'block', height: '1em', lineHeight: 1 }}>
+                  {n}
+                </span>
+              ))}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+export default memo(Odometer);

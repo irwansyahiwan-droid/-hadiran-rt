@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2 } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
+import Odometer from '../components/Odometer';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal } from '../lib/utils';
@@ -327,8 +328,11 @@ export default function KasRTPage() {
               <Landmark className="w-4 h-4 text-teal-200" />
               <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
             </div>
-            <p className="text-5xl font-black tracking-tighter text-white mb-3">
-              Rp{animatedSaldo.toLocaleString('id-ID')}
+            <p className="mb-3">
+              <Odometer
+                value={animatedSaldo}
+                className="text-5xl font-black tracking-tighter text-white"
+              />
             </p>
 
             {/* Saldo Awal inline info */}

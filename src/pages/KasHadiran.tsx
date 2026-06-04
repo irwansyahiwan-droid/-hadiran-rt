@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useCountUp } from '../lib/hooks';
+import Odometer from '../components/Odometer';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import { showToast } from '../lib/toast';
@@ -318,8 +319,11 @@ export default function KasHadiranPage() {
               <Wallet className="w-4 h-4 text-blue-200" />
               <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
             </div>
-            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-              {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
+            <p className="mb-1">
+              <Odometer
+                value={animatedSaldo}
+                className={`text-5xl font-black tracking-tighter ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}
+              />
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
