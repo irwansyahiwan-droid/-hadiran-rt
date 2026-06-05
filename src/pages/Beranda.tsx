@@ -150,7 +150,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     setTrxSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'nominal' : 'terbaru'));
 
   const skeleton = (
-      <div className="space-y-6 pb-2">
+      <div className="space-y-4 pb-2">
         <div className="rounded-3xl h-48 skeleton" />
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift px-5 py-4">
           <div className="grid grid-cols-3 divide-x divide-gray-100">
@@ -179,7 +179,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   return (
     <>
     <CrossFade loading={loading} skeleton={skeleton}>
-    <div className="space-y-6 pb-2">
+    <div className="space-y-4 pb-2">
       {/* Sapaan + badge status kas */}
       <div className="flex items-end justify-between px-1">
         <div>
