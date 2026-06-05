@@ -16,6 +16,11 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Tabular figures app-wide: tiap digit selebar sama → angka rupiah tidak
+     "goyang/loncat" saat count-up atau saat disusun kolom (terasa seperti
+     running text bank). Kelas tabular-nums per-span jadi redundan tapi aman. */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
