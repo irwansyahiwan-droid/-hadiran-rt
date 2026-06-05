@@ -76,7 +76,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#D7DFEA] dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#DFE5EE] dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}

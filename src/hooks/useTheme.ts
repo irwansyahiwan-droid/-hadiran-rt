@@ -10,7 +10,7 @@ export function useTheme() {
     localStorage.setItem('hadiran-theme', isDark ? 'dark' : 'light');
 
     // Status bar HP ikut tema aktif (override meta theme-color statis).
-    const color = isDark ? '#030712' : '#D7DFEA';
+    const color = isDark ? '#030712' : '#DFE5EE';
     document
       .querySelectorAll('meta[name="theme-color"]')
       .forEach((m) => m.setAttribute('content', color));
