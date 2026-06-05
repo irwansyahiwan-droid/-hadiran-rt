@@ -116,7 +116,7 @@ export default function App() {
           onOpenBackup={ctxValue.isBendahara ? () => setBackupOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
         />
-        <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
+        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
             <div {...swipe}>
               <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>
