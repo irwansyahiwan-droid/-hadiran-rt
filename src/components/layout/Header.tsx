@@ -59,7 +59,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       }}
     >
       <div
-        className={`flex items-center justify-between max-w-lg mx-auto px-4 transition-all duration-300 ${
+        className={`flex items-center justify-between max-w-lg mx-auto px-3 transition-all duration-300 ${
           scrolled ? 'py-2' : 'py-3'
         }`}
         style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
