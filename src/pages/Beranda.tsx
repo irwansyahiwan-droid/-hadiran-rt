@@ -6,7 +6,7 @@ import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
-import { fetchDashboardSummary, formatRupiahPlain, formatRupiahCompact, formatTanggal } from '../lib/utils';
+import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
 import DonutChart from '../components/charts/DonutChart';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
@@ -282,7 +282,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {donutTotal > 0 && (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift px-5 py-4">
           <p className="text-sm font-bold text-[#111111] dark:text-gray-100 mb-3">Komposisi Kas Hadiran</p>
-          <DonutChart data={donutData} centerTop="Total" format={formatRupiahCompact} />
+          <DonutChart data={donutData} centerTop="Total" format={formatRupiahPlain} />
         </div>
       )}
 

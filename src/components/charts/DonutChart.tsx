@@ -39,6 +39,9 @@ export default function DonutChart({
   const centerLabel = active !== null ? data[active].label : centerTop;
   const centerValue = active !== null ? data[active].value : total;
   const centerColor = active !== null ? data[active].color : undefined;
+  // Font tengah adaptif: angka penuh (mis. Rp1.710.000) bisa panjang → kecilkan agar muat
+  const centerStr = format(centerValue);
+  const centerSize = centerStr.length >= 12 ? 'text-[10px]' : centerStr.length >= 9 ? 'text-[12px]' : 'text-sm';
 
   return (
     <div className="flex items-center gap-5">
@@ -71,7 +74,7 @@ export default function DonutChart({
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 pointer-events-none">
           <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 truncate max-w-full">{centerLabel}</span>
-          <span className="text-sm font-extrabold tabular-nums leading-tight" style={{ color: centerColor }}>{format(centerValue)}</span>
+          <span className={`${centerSize} font-extrabold tabular-nums leading-tight whitespace-nowrap`} style={{ color: centerColor }}>{centerStr}</span>
         </div>
       </div>
 
@@ -86,7 +89,7 @@ export default function DonutChart({
           >
             <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
             <span className={`text-xs truncate ${active === i ? 'font-bold text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>{d.label}</span>
-            <span className="ml-auto text-xs font-bold text-gray-800 dark:text-gray-200 tabular-nums">{format(d.value)}</span>
+            <span className="ml-auto shrink-0 text-xs font-bold text-gray-800 dark:text-gray-200 tabular-nums whitespace-nowrap">{format(d.value)}</span>
           </button>
         ))}
       </div>
