@@ -250,25 +250,21 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         {isExpanded && (
           <div className="border-t border-[#F0F0F0] divide-y divide-[#F0F0F0] dark:divide-gray-800">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
-              <div key={t.id} className="flex items-center gap-3 px-4 py-3">
+              <div key={t.id} className="flex items-center gap-2 px-4 py-3">
                 <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 truncate">{g.nama}</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    Tarikan #{t.tarikan?.nomor} · {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
+                  <p className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                    {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{formatRupiahPlain(t.nominal)}</span>
-                  {t.status_lunas ? (
-                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
+                  <span className="text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatRupiahPlain(t.nominal)}</span>
+                  {t.status_lunas && (
+                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px] whitespace-nowrap" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
                       LUNAS
-                    </span>
-                  ) : (
-                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(255,59,48,0.10)', color: '#9F1239' }}>
-                      BELUM
                     </span>
                   )}
                 </div>
@@ -276,7 +272,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 ${
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
                       confirmId === t.id ? 'bg-rose-600' : 'bg-[#0F6039]'
                     }`}
                   >
@@ -289,7 +285,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBatalClick(t)}
                     disabled={processingId === t.id}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 ${
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
                       cancelConfirmId === t.id
                         ? 'bg-rose-600 text-white'
                         : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
