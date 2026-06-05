@@ -1,4 +1,28 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useReducer } from 'react';
+
+/* ── Sembunyikan nominal (privasi, ala bank app) ─────────────────
+ * State global ringan: tersimpan di localStorage & disinkronkan ke semua
+ * komponen yang pakai (hero Beranda & Kas RT) lewat listener — sekali toggle
+ * berlaku app-wide. */
+const HIDE_KEY = 'hadiran-hide-amount';
+let hideAmount =
+  typeof window !== 'undefined' && localStorage.getItem(HIDE_KEY) === '1';
+const hideListeners = new Set<() => void>();
+
+export function toggleHideAmount(): void {
+  hideAmount = !hideAmount;
+  try { localStorage.setItem(HIDE_KEY, hideAmount ? '1' : '0'); } catch { /* abaikan */ }
+  hideListeners.forEach((l) => l());
+}
+
+export function useHideAmount(): boolean {
+  const [, force] = useReducer((x: number) => x + 1, 0);
+  useEffect(() => {
+    hideListeners.add(force);
+    return () => { hideListeners.delete(force); };
+  }, []);
+  return hideAmount;
+}
 
 /**
  * Menganimasikan angka menuju `target`.

@@ -22,6 +22,14 @@ export function formatRupiahCompact(amount: number): string {
   return `${neg}Rp${a}`;
 }
 
+/** Sensor nominal saat mode privasi aktif: ganti angka dgn bullet, "Rp" tetap.
+ *  `dots` mengatur lebar sensor agar proporsional dgn ukuran teks aslinya. */
+export function maskRp(rendered: string, hidden: boolean, dots = 6): string {
+  if (!hidden) return rendered;
+  const neg = rendered.trimStart().startsWith('-') ? '-' : '';
+  return `${neg}Rp${'•'.repeat(dots)}`;
+}
+
 /** Haptic feedback ringan untuk interaksi utama (no-op bila perangkat tak mendukung). */
 export function haptic(pattern: number | number[] = 8): void {
   if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {

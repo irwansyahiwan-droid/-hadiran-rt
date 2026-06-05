@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2 } from 'lucide-react';
-import { useCountUp } from '../lib/hooks';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -195,6 +195,7 @@ export default function KasRTPage() {
   const totalKeluar = list.filter((k) => k.tipe === 'keluar').reduce((s, k) => s + k.nominal, 0);
   const saldo       = saldoAwal + totalMasuk - totalKeluar;
   const animatedSaldo = useCountUp(saldo);
+  const hidden = useHideAmount();
 
   // Daftar tampil = list difilter (tipe) & diurutkan (sort). saldo_setelah per
   // baris tetap akurat karena dihitung saat insert.
@@ -341,12 +342,23 @@ export default function KasRTPage() {
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
 
           <div className="relative p-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Landmark className="w-4 h-4 text-teal-200" />
-              <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-2">
+                <Landmark className="w-4 h-4 text-teal-200" />
+                <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
+              </div>
+              <button
+                onClick={() => { haptic(); toggleHideAmount(); }}
+                className="press p-1.5 -mr-1.5 rounded-full hover:bg-white/10 transition-colors"
+                aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+              >
+                {hidden
+                  ? <EyeOff className="w-4 h-4 text-teal-100/80" />
+                  : <Eye className="w-4 h-4 text-teal-100/80" />}
+              </button>
             </div>
-            <p className="text-5xl font-black tracking-tighter text-white mb-3">
-              Rp{animatedSaldo.toLocaleString('id-ID')}
+            <p className="text-5xl font-black tracking-tighter text-white mb-3 tabular-nums">
+              {maskRp(`Rp${animatedSaldo.toLocaleString('id-ID')}`, hidden, 7)}
             </p>
 
             {/* Saldo Awal inline info */}

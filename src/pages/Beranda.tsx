@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp, Search, X } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp, Search, X, Eye, EyeOff } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
-import { useCountUp } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
-import { fetchDashboardSummary, formatRupiahPlain, formatTanggal } from '../lib/utils';
+import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import DonutChart from '../components/charts/DonutChart';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
@@ -132,6 +132,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const animatedSaldo = useCountUp(saldo);
   const animatedTalangan = useCountUp(talangan);
   const animatedSetor = useCountUp(setorKasRT);
+  const hidden = useHideAmount();
 
   // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
   const displayTrx = useMemo(() => {
@@ -204,20 +205,31 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               Pendapatan Kas Hadiran
             </p>
           </div>
-          <button
-            onClick={() => load(true)}
-            disabled={refreshing}
-            className="p-1.5 -mr-1 rounded-full hover:bg-white/10 transition-colors"
-            aria-label="Muat ulang"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-white/65 ${refreshing ? 'animate-spin' : ''}`} />
-          </button>
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={() => { haptic(); toggleHideAmount(); }}
+              className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+              aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+            >
+              {hidden
+                ? <EyeOff className="w-3.5 h-3.5 text-white/65" />
+                : <Eye className="w-3.5 h-3.5 text-white/65" />}
+            </button>
+            <button
+              onClick={() => load(true)}
+              disabled={refreshing}
+              className="p-1.5 -mr-1 rounded-full hover:bg-white/10 transition-colors"
+              aria-label="Muat ulang"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-white/65 ${refreshing ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
         </div>
 
         {/* Big amount — ukuran konsisten dengan hero Kas RT */}
         <div className="relative mb-1">
           <span className="block text-white text-5xl font-black tracking-tighter leading-none tabular-nums">
-            Rp{animatedKasHadiran.toLocaleString('id-ID')}
+            {maskRp(`Rp${animatedKasHadiran.toLocaleString('id-ID')}`, hidden, 7)}
           </span>
         </div>
 
@@ -238,7 +250,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <Wallet className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Saldo Aktif</span>
             <span className={`text-[15px] font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-              {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
+              {maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 4)}
             </span>
           </button>
           <button
@@ -247,7 +259,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <ArrowLeftRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Talangan</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">Rp{Math.abs(animatedTalangan).toLocaleString('id-ID')}</span>
+            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
           <button
             onClick={() => onNavigate('kas-rt')}
@@ -255,7 +267,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <ArrowUpRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
             <span className="text-[11px] text-white/75 mt-1.5">Setor Kas RT</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">Rp{Math.abs(animatedSetor).toLocaleString('id-ID')}</span>
+            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
         </div>
       </div>
