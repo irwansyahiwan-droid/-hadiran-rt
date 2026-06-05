@@ -21,6 +21,7 @@ import KasHadiranPage from './pages/KasHadiran';
 import KasRTPage from './pages/KasRT';
 import RiwayatAktivitas from './pages/RiwayatAktivitas';
 import LaporanTriwulan from './pages/LaporanTriwulan';
+import BackupRestore from './pages/BackupRestore';
 
 export default function App() {
   const auth = useAuth();
@@ -31,6 +32,7 @@ export default function App() {
   const [dir, setDir] = useState(1); // arah transisi tab: 1 = ke kanan, -1 = ke kiri
   const [riwayatOpen, setRiwayatOpen] = useState(false);
   const [laporanOpen, setLaporanOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
 
   const TAB_ORDER: TabName[] = ['beranda', 'jadwal', 'talangan', 'kas', 'kas-rt'];
   const scrollPos = useRef<Record<string, number>>({});
@@ -109,6 +111,7 @@ export default function App() {
           onToggleTheme={toggleTheme}
           onOpenRiwayat={ctxValue.isBendahara ? () => setRiwayatOpen(true) : undefined}
           onOpenLaporan={ctxValue.isBendahara ? () => setLaporanOpen(true) : undefined}
+          onOpenBackup={ctxValue.isBendahara ? () => setBackupOpen(true) : undefined}
         />
         <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
@@ -136,6 +139,10 @@ export default function App() {
         {/* Tutup Buku Triwulan — bendahara saja */}
         {ctxValue.isBendahara && (
           <LaporanTriwulan open={laporanOpen} onClose={() => setLaporanOpen(false)} />
+        )}
+        {/* Backup & Restore — bendahara saja */}
+        {ctxValue.isBendahara && (
+          <BackupRestore open={backupOpen} onClose={() => setBackupOpen(false)} />
         )}
       </div>
     </AuthContext.Provider>

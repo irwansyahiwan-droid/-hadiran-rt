@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.jpg';
 import { haptic } from '../../lib/utils';
 import type { Role } from '../../hooks/useAuth';
@@ -11,10 +11,11 @@ interface HeaderProps {
   onToggleTheme: () => void;
   onOpenRiwayat?: () => void;
   onOpenLaporan?: () => void;
+  onOpenBackup?: () => void;
 }
 
 /** Header menyusut + shadow/blur menguat saat halaman di-scroll (ala app fintech). */
-export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan }: HeaderProps) {
+export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan, onOpenBackup }: HeaderProps) {
   const isBendahara = role === 'bendahara';
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -114,6 +115,9 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                   )}
                   {isBendahara && onOpenRiwayat && (
                     <MenuItem icon={History} label="Riwayat Aktivitas" onClick={onOpenRiwayat} />
+                  )}
+                  {isBendahara && onOpenBackup && (
+                    <MenuItem icon={DatabaseBackup} label="Backup & Restore" onClick={onOpenBackup} />
                   )}
                   {isBendahara && <div className="my-1.5 border-t border-gray-100 dark:border-gray-800" />}
                   <MenuItem
