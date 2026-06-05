@@ -71,7 +71,11 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   }
 
   useEffect(() => {
-    if (open) { setLoading(true); load(); }
+    if (open) {
+      setLoading(true);
+      load();
+      import('../lib/generateAktivitasPDF').catch(() => {}); // preload (gesture share HP)
+    }
   }, [open]);
 
   // Live: muat ulang saat ada aktivitas baru tercatat

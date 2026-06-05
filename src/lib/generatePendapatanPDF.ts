@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LOGO_DATA_URL } from './logoBase64';
+import { outputPdf } from './pdfOut';
 import type { Tarikan, Warga } from './types';
 
 function rp(n: number) { return `Rp${n.toLocaleString('id-ID')}`; }
@@ -191,5 +192,5 @@ export function generatePendapatanPDF(
   doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(156, 163, 175);
   doc.text(`Dicetak: ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
 
-  doc.save(`Rincian-Pendapatan-Tarikan-${tarikan.nomor}-${now.getFullYear()}.pdf`);
+  return outputPdf(doc, `Rincian-Pendapatan-Tarikan-${tarikan.nomor}-${now.getFullYear()}.pdf`);
 }

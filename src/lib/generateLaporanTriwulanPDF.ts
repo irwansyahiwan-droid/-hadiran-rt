@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { LOGO_DATA_URL } from './logoBase64';
+import { outputPdf } from './pdfOut';
 import type { RekapTriwulan } from './laporan';
 
 function rp(n: number) {
@@ -139,5 +140,5 @@ export function generateLaporanTriwulanPDF(r: RekapTriwulan) {
   doc.setFontSize(6.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(156, 163, 175);
   doc.text(`Dicetak ${tanggalCetak}`, W / 2, H - 5, { align: 'center' });
 
-  doc.save(`Laporan-Keuangan-TW${r.triwulan}-${r.tahun}.pdf`);
+  return outputPdf(doc, `Laporan-Keuangan-TW${r.triwulan}-${r.tahun}.pdf`);
 }

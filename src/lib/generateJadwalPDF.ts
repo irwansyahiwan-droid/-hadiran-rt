@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LOGO_DATA_URL } from './logoBase64';
+import { outputPdf } from './pdfOut';
 import type { Tarikan } from './types';
 
 const STATUS: Record<string, string> = {
@@ -96,5 +97,5 @@ export function generateJadwalPDF(list: Tarikan[]) {
   doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(156, 163, 175);
   doc.text(`Dicetak: ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
 
-  doc.save(`Jadwal-Tarikan-${now.getFullYear()}.pdf`);
+  return outputPdf(doc, `Jadwal-Tarikan-${now.getFullYear()}.pdf`);
 }

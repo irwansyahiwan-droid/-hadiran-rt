@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LOGO_DATA_URL } from './logoBase64';
+import { outputPdf } from './pdfOut';
 import { formatAktivitas, formatWaktu } from './aktivitas';
 import { formatRupiahPlain } from './utils';
 import type { AktivitasLog } from './types';
@@ -68,5 +69,5 @@ export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'
   doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(156, 163, 175);
   doc.text(`Dicetak: ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
 
-  doc.save(`Riwayat-Aktivitas-${docCode}.pdf`);
+  return outputPdf(doc, `Riwayat-Aktivitas-${docCode}.pdf`);
 }

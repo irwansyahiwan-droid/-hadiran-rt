@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LOGO_DATA_URL } from './logoBase64';
+import { outputPdf } from './pdfOut';
 import type { KasRT } from './types';
 
 interface KasRTStats {
@@ -203,5 +204,5 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(156, 163, 175);
   doc.text(`Dicetak: ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
 
-  doc.save(`Laporan-Kas-RT-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf`);
+  return outputPdf(doc, `Laporan-Kas-RT-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf`);
 }

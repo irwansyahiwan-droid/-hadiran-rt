@@ -184,7 +184,10 @@ export default function KasRTPage() {
     setLoading(false);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    import('../lib/generateKasRTPDF').catch(() => {}); // preload: jaga gesture share di HP
+  }, []);
 
   const saldoAwalEntry = list.find((k) => k.keterangan === 'Saldo Awal Kas RT');
   const saldoAwal   = saldoAwalEntry?.nominal ?? 0;

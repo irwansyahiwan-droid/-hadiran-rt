@@ -55,7 +55,11 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   }
 
   useEffect(() => {
-    if (open) { setLoading(true); load(); }
+    if (open) {
+      setLoading(true);
+      load();
+      import('../lib/generateLaporanTriwulanPDF').catch(() => {}); // preload (gesture share HP)
+    }
   }, [open]);
 
   // Tombol Back HP menutup overlay

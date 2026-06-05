@@ -143,7 +143,13 @@ export default function KasHadiranPage() {
     setLoading(false);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    // preload generator PDF agar gesture share tetap valid di HP (klik pertama)
+    import('../lib/generatePendapatanPDF').catch(() => {});
+    import('../lib/generateKasHadiranPDF').catch(() => {});
+    import('../lib/generateAbsensiPDF').catch(() => {});
+  }, []);
 
   const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);

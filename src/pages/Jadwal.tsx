@@ -583,7 +583,10 @@ export default function JadwalPage() {
     setLoading(false);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    import('../lib/generateJadwalPDF').catch(() => {}); // preload: jaga gesture share di HP
+  }, []);
 
   const selesaiCount    = tarikanList.filter(t => t.status === 'selesai').length;
   const dijadwalCount   = tarikanList.filter(t => t.status === 'dijadwalkan' || t.status === 'berlangsung').length;

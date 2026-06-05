@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LOGO_DATA_URL } from './logoBase64';
+import { outputPdf } from './pdfOut';
 import type { Tarikan } from './types';
 
 interface Hadir { nama: string }
@@ -110,5 +111,5 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
   doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(156, 163, 175);
   doc.text(`Dicetak: ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
 
-  doc.save(`Daftar-Hadir-Tarikan-${tarikan.nomor}.pdf`);
+  return outputPdf(doc, `Daftar-Hadir-Tarikan-${tarikan.nomor}.pdf`);
 }
