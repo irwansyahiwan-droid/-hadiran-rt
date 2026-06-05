@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.jpg';
 import { haptic } from '../../lib/utils';
 import type { Role } from '../../hooks/useAuth';
@@ -12,10 +12,11 @@ interface HeaderProps {
   onOpenRiwayat?: () => void;
   onOpenLaporan?: () => void;
   onOpenBackup?: () => void;
+  onOpenTentang?: () => void;
 }
 
 /** Header menyusut + shadow/blur menguat saat halaman di-scroll (ala app fintech). */
-export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan, onOpenBackup }: HeaderProps) {
+export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan, onOpenBackup, onOpenTentang }: HeaderProps) {
   const isBendahara = role === 'bendahara';
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -120,6 +121,9 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                     <MenuItem icon={DatabaseBackup} label="Backup & Restore" onClick={onOpenBackup} />
                   )}
                   {isBendahara && <div className="my-1.5 border-t border-gray-100 dark:border-gray-800" />}
+                  {onOpenTentang && (
+                    <MenuItem icon={Info} label="Tentang Aplikasi" onClick={onOpenTentang} />
+                  )}
                   <MenuItem
                     icon={isDark ? Sun : Moon}
                     label={isDark ? 'Mode Terang' : 'Mode Gelap'}
