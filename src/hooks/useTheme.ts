@@ -10,7 +10,10 @@ export function useTheme() {
     localStorage.setItem('hadiran-theme', isDark ? 'dark' : 'light');
 
     // Status bar HP ikut tema aktif (override meta theme-color statis).
-    const color = isDark ? '#030712' : '#DBE2EC';
+    // Light: near-putih agar SEAMLESS dgn Header (bg-white/95 ≈ #FDFDFE) —
+    // hilangkan seam abu di pucuk layar. Header selalu sticky di atas, jadi
+    // tak ada momen hero hijau menyentuh status bar.
+    const color = isDark ? '#030712' : '#FAFBFC';
     document
       .querySelectorAll('meta[name="theme-color"]')
       .forEach((m) => m.setAttribute('content', color));
