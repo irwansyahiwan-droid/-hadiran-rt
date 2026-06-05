@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { FileText, RefreshCw, Search, X, Check, Coins, Users, CalendarDays } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { formatTanggal, formatRupiahPlain } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
+import { showToast } from '../lib/toast';
 import type { Tarikan, Warga } from '../lib/types';
 
 type SubTab = 'anggota' | 'jadwal';
@@ -73,7 +74,18 @@ export default function JadwalWargaPage() {
       setLoading(false);
     }
     load();
+    import('../lib/generateJadwalPDF').catch(() => {}); // preload: jaga gesture share di HP
   }, []);
+
+  async function cetakJadwal() {
+    haptic();
+    try {
+      const { generateJadwalPDF } = await import('../lib/generateJadwalPDF');
+      generateJadwalPDF(allTarikan);
+    } catch {
+      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
+    }
+  }
 
   if (loading) {
     return (
@@ -270,7 +282,11 @@ export default function JadwalWargaPage() {
           {/* Header with PDF button */}
           <div className="flex items-center justify-between">
             <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Semua Tarikan</p>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <button
+              onClick={cetakJadwal}
+              disabled={allTarikan.length === 0}
+              className="press flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            >
               <FileText className="w-3.5 h-3.5" />
               PDF Jadwal
             </button>
