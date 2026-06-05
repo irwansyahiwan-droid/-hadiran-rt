@@ -9,7 +9,7 @@ import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic } from '../lib/utils';
 import type { Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -192,6 +192,18 @@ export default function KasHadiranPage() {
       showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
     } finally {
       setPdfLoading(null);
+    }
+  }
+
+  // Cetak daftar hadir (absensi) tarikan yang sedang dibuka → PDF.
+  async function handleAbsensiPDF() {
+    if (!detailTarikan) return;
+    haptic(12);
+    try {
+      const { generateAbsensiPDF } = await import('../lib/generateAbsensiPDF');
+      generateAbsensiPDF(detailTarikan, detailHadir, detailTidak);
+    } catch {
+      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
     }
   }
 
@@ -629,10 +641,19 @@ export default function KasHadiranPage() {
             <div className="px-5 pb-3 shrink-0 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-3">
                 <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
                   <p className="text-xs text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
                 </div>
+                {isBendahara && !detailLoading && (
+                  <button
+                    onClick={handleAbsensiPDF}
+                    aria-label="Cetak daftar hadir PDF"
+                    className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm"
+                  >
+                    <FileText className="w-4 h-4" /> Absensi
+                  </button>
+                )}
               </div>
               <div className="flex gap-2 mt-3">
                 <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">Hadir {detailHadir.length}</span>

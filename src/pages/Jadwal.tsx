@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
-  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle,
+  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import SuccessOverlay from '../components/SuccessOverlay';
@@ -11,6 +11,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { showToast } from '../lib/toast';
 import type { Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;
@@ -616,6 +617,22 @@ export default function JadwalPage() {
           <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
           </button>
+          {isBendahara && tarikanList.length > 0 && (
+            <button
+              onClick={async () => {
+                haptic();
+                try {
+                  const { generateJadwalPDF } = await import('../lib/generateJadwalPDF');
+                  generateJadwalPDF(tarikanList);
+                } catch {
+                  showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
+                }
+              }}
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
+            >
+              <FileText className="w-4 h-4" /> PDF
+            </button>
+          )}
         </div>
       </div>
 
