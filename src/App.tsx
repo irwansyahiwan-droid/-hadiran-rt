@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
 import { useBackDismiss } from './hooks/useBackDismiss';
+import { useSwipeNavigate } from './hooks/useSwipeNavigate';
 import { AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
 import Header from './components/layout/Header';
@@ -32,10 +33,25 @@ export default function App() {
   const [laporanOpen, setLaporanOpen] = useState(false);
 
   const TAB_ORDER: TabName[] = ['beranda', 'jadwal', 'talangan', 'kas', 'kas-rt'];
+  const scrollPos = useRef<Record<string, number>>({});
+
   const changeTab = (tab: TabName) => {
+    if (tab === activeTab) return;
+    scrollPos.current[activeTab] = window.scrollY; // ingat posisi scroll tab sekarang
     setDir(TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(activeTab) ? 1 : -1);
     setActiveTab(tab);
   };
+
+  // Swipe kiri = tab berikutnya, kanan = tab sebelumnya (pakai urutan tab yang terlihat)
+  const swipeTab = (delta: 1 | -1) => {
+    const warga = wargaMode && !auth.user;
+    const order = warga ? TAB_ORDER.filter((t) => t !== 'talangan') : TAB_ORDER;
+    const i = order.indexOf(activeTab);
+    if (i === -1) return;
+    const next = order[i + delta];
+    if (next) changeTab(next);
+  };
+  const swipe = useSwipeNavigate(() => swipeTab(1), () => swipeTab(-1));
 
   // Pull-to-refresh: remount halaman aktif → useEffect-nya memuat ulang data.
   const handleRefresh = () =>
@@ -46,6 +62,16 @@ export default function App() {
 
   // Tombol Back HP di tab non-Beranda → kembali ke Beranda (bukan keluar app).
   useBackDismiss(activeTab !== 'beranda', () => changeTab('beranda'));
+
+  // Restorasi posisi scroll saat pindah tab (best-effort untuk konten yang dimuat async).
+  useEffect(() => {
+    const target = scrollPos.current[activeTab] ?? 0;
+    if (target <= 0) { window.scrollTo(0, 0); return; }
+    const raf = requestAnimationFrame(() => window.scrollTo(0, target));
+    const t1 = setTimeout(() => window.scrollTo(0, target), 160);
+    const t2 = setTimeout(() => window.scrollTo(0, target), 360);
+    return () => { cancelAnimationFrame(raf); clearTimeout(t1); clearTimeout(t2); };
+  }, [activeTab]);
 
   if (auth.loading) {
     return (
@@ -86,12 +112,14 @@ export default function App() {
         />
         <main className="max-w-lg mx-auto px-5 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
-            <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>
-              {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} />}
-              {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
-              {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => changeTab('beranda') : undefined} />}
-              {activeTab === 'kas'      && <KasHadiranPage />}
-              {activeTab === 'kas-rt'   && <KasRTPage />}
+            <div {...swipe}>
+              <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>
+                {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} />}
+                {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
+                {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => changeTab('beranda') : undefined} />}
+                {activeTab === 'kas'      && <KasHadiranPage />}
+                {activeTab === 'kas-rt'   && <KasRTPage />}
+              </div>
             </div>
           </PullToRefresh>
         </main>
