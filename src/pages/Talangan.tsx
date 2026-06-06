@@ -7,6 +7,7 @@ import { formatTanggalShort, formatRupiahPlain, haptic } from '../lib/utils';
 import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
+import Tag from '../components/Tag';
 import CrossFade from '../components/CrossFade';
 import { showToast, showUndo } from '../lib/toast';
 import type { Talangan } from '../lib/types';
@@ -251,7 +252,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           <div className="border-t border-line divide-y divide-line dark:divide-gray-800">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-2 px-4 py-3">
-                <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
+                <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-control dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -263,9 +264,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatRupiahPlain(t.nominal)}</span>
                   {t.status_lunas && (
-                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-md whitespace-nowrap" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
-                      LUNAS
-                    </span>
+                    <Tag tone="success">LUNAS</Tag>
                   )}
                 </div>
                 {isBendahara && !t.status_lunas && (
@@ -363,7 +362,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama warga..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-green-600/10 focus:border-green-600 transition-all duration-200"
+          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-green-600/10 focus:border-green-600 transition-all duration-200"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -386,7 +385,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 statusFilter === f.id
                   ? 'bg-[#0F4C2E] text-white'
-                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
               }`}
             >
               {f.label}
@@ -395,7 +394,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         </div>
         <button
           onClick={() => setTalSort((s) => (s === 'tunggakan' ? 'nama' : 'tunggakan'))}
-          className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+          className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
           aria-label={`Urutkan: ${talSortLabel}`}
         >
           <ArrowDownUp className="w-3.5 h-3.5" />

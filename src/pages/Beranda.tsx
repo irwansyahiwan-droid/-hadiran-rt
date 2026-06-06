@@ -10,6 +10,7 @@ import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp
 import DonutChart from '../components/charts/DonutChart';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
+import Tag from '../components/Tag';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 
 
@@ -341,7 +342,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
-                    <span className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-md" style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}>Terjadwal</span>
+                    <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
                   </div>
                   <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
@@ -367,7 +368,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               value={trxSearch}
               onChange={(e) => setTrxSearch(e.target.value)}
               placeholder="Cari keterangan / nama..."
-              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
             {trxSearch && (
               <button onClick={() => setTrxSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
@@ -388,7 +389,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                     trxFilter === f.id
                       ? 'bg-[#0F4C2E] text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
                   }`}
                 >
                   {f.label}
@@ -397,7 +398,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </div>
             <button
               onClick={cycleTrxSort}
-              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
               aria-label={`Urutkan: ${trxSortLabel}`}
             >
               <ArrowDownUp className="w-3.5 h-3.5" />

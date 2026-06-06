@@ -21,7 +21,8 @@ export default {
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
         sunken: '#D9E0EB', // background app (cool gray)
-        line: '#ECEFF3',   // satu warna garis/divider untuk semua card
+        line: '#ECEFF3',    // garis/divider tipis untuk semua card
+        control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
         ink: {
           DEFAULT: '#111827', // judul / nominal utama

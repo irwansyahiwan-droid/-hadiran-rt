@@ -72,7 +72,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                     ? t === 'masuk'
                       ? 'bg-emerald-500 text-white border-emerald-500'
                       : 'bg-red-500 text-white border-red-500'
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-gray-200 dark:border-gray-700'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-control dark:border-gray-700'
                 }`}
               >
                 {t === 'masuk' ? '↓ Pemasukan' : '↑ Pengeluaran'}
@@ -88,7 +88,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               onChange={(e) => setKeterangan(e.target.value)}
               required
               placeholder="Contoh: Iuran warga bulan Juni"
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
             />
           </div>
 
@@ -103,7 +103,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                   onChange={(e) => setNominal(Number(e.target.value))}
                   required
                   min={1}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
                 />
               </div>
             </div>
@@ -114,7 +114,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 value={tanggal}
                 onChange={(e) => setTanggal(e.target.value)}
                 required
-                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
+                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex-1 py-3 rounded-xl border border-control dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               Batal
             </button>
@@ -310,7 +310,7 @@ export default function KasRTPage() {
                   showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
                 }
               }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
             >
               <FileText className="w-4 h-4" />
               PDF
@@ -321,7 +321,7 @@ export default function KasRTPage() {
                 const { generateKasRTExcel } = await import('../lib/generateKasRTExcel');
                 await generateKasRTExcel(displayList, { saldo, totalMasuk, totalKeluar, saldoAwal });
               }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
             >
               <Download className="w-4 h-4" />
               Excel
@@ -462,7 +462,7 @@ export default function KasRTPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari keterangan..."
-              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
@@ -483,7 +483,7 @@ export default function KasRTPage() {
                   className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                     filter === f.id
                       ? 'bg-[#0F4C2E] text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
                   }`}
                 >
                   {f.label}
@@ -492,7 +492,7 @@ export default function KasRTPage() {
             </div>
             <button
               onClick={cycleSort}
-              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
               aria-label={`Urutkan: ${sortLabel}`}
             >
               <ArrowDownUp className="w-3.5 h-3.5" />

@@ -4,6 +4,7 @@ import {
   RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
 import CrossFade from '../components/CrossFade';
 import { supabase } from '../lib/supabase';
@@ -274,7 +275,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         </button>
         <button
           onClick={() => setAll('tidak_hadir')}
-          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset
@@ -290,7 +291,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             className={`py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               filter === f
                 ? 'bg-emerald-500 text-white border-emerald-500'
-                : 'bg-white dark:bg-gray-900 text-gray-500 border-gray-200 dark:border-gray-700'
+                : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
             }`}
           >
             {f === 'semua' ? 'Semua' : f === 'hadir' ? 'Sudah Hadir' : 'Belum Hadir'}
@@ -305,7 +306,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama..."
-          className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -516,14 +517,14 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           type="date"
           value={tanggal}
           onChange={e => setTanggal(e.target.value)}
-          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-4"
+          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-4"
         />
 
         <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
         <select
           value={sohibulId}
           onChange={e => setSohibulId(e.target.value)}
-          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-5"
+          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-5"
         >
           <option value="">— Belum ditentukan —</option>
           {options.map(w => (
@@ -534,7 +535,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         <div className="flex gap-2.5">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-full border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="flex-1 py-3 rounded-full border border-control dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             Batal
           </button>
@@ -631,7 +632,7 @@ export default function JadwalPage() {
                   showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
                 }
               }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
             >
               <FileText className="w-4 h-4" /> PDF
             </button>
@@ -705,7 +706,7 @@ export default function JadwalPage() {
                             disabled={navigatingId === t.id}
                             title="Hitung Ulang"
                             aria-label="Hitung Ulang"
-                            className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-70"
+                            className="w-8 h-8 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-70"
                           >
                             <RefreshCw className={`w-3.5 h-3.5 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                           </button>
@@ -731,7 +732,7 @@ export default function JadwalPage() {
                             onClick={() => { haptic(); openWa(null, pesanTarikan(t.nomor, t.tanggal, t.sohibul_bait?.nama ?? '—', t.jumlah_per_orang)); }}
                             title="Bagikan pengingat ke WhatsApp"
                             aria-label="Bagikan pengingat ke WhatsApp"
-                            className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition-all cursor-pointer"
+                            className="w-8 h-8 rounded-xl border border-control dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition-all cursor-pointer"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
                           </button>
@@ -742,18 +743,15 @@ export default function JadwalPage() {
                           onClick={() => setEditingTarikan(t)}
                           title="Revisi jadwal"
                           aria-label="Revisi jadwal"
-                          className="w-8 h-8 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer"
+                          className="w-8 h-8 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ) : (
-                      <span
-                        className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-md"
-                        style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}
-                      >
+                      <Tag tone="neutral" className="shrink-0">
                         {isSelesai ? 'Selesai' : 'Terjadwal'}
-                      </span>
+                      </Tag>
                     )}
                   </div>
                   <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>

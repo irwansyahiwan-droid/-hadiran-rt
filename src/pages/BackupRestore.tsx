@@ -138,7 +138,7 @@ export default function BackupRestore({ open, onClose }: Props) {
           {!pending ? (
             <button
               onClick={() => { haptic(); fileRef.current?.click(); }}
-              className="press w-full min-h-[44px] py-3 rounded-2xl border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+              className="press w-full min-h-[44px] py-3 rounded-2xl border-2 border-control dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
             >
               <Upload className="w-4 h-4" /> Pilih File Backup
             </button>
@@ -164,7 +164,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                   onChange={(e) => setKonfirmasi(e.target.value)}
                   placeholder={KATA_KONFIRMASI}
                   autoCapitalize="characters"
-                  className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-rose-400 transition"
+                  className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-rose-400 transition"
                 />
               </div>
               <div className="flex items-center gap-2">
