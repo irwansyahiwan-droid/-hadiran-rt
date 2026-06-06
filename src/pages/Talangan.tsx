@@ -320,7 +320,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="space-y-4 pb-2 page-enter">
+    <div className="space-y-5 pb-2 page-enter">
       {/* Back header — hanya muncul saat dibuka dari Beranda (mode warga) */}
       {onBack && (
         <button

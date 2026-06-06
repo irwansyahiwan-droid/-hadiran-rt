@@ -219,7 +219,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-5 pb-20">
       {/* Back header */}
       <div className="flex items-center gap-3">
         <button onClick={onBack} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -605,7 +605,7 @@ export default function JadwalPage() {
   }
 
   return (
-    <div className="space-y-4 pb-2 page-enter">
+    <div className="space-y-5 pb-2 page-enter">
       <SuccessOverlay show={showSuccess} message="Iuran tersimpan & dihitung" onDone={() => setShowSuccess(false)} />
       {lastResult && (
         <ResultCard result={lastResult} onDismiss={() => setLastResult(null)} />

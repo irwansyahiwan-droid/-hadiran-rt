@@ -290,7 +290,7 @@ export default function KasRTPage() {
 
   return (
     <>
-      <div className="space-y-4 pb-2 page-enter">
+      <div className="space-y-5 pb-2 page-enter">
         {/* Header — di HP: judul di atas, tombol di bawah (anti-kepotong) */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">

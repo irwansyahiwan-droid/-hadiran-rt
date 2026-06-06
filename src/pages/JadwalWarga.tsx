@@ -118,7 +118,7 @@ export default function JadwalWargaPage() {
     : wargaList;
 
   return (
-    <div className="space-y-4 pb-2">
+    <div className="space-y-5 pb-2">
       {/* Hero Card — material/warna disamakan dengan hero Beranda (.hero-card) */}
       {lastTarikan ? (
         <div className="hero-card hero-noise">

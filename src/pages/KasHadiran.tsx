@@ -337,7 +337,7 @@ export default function KasHadiranPage() {
 
   return (
     <>
-      <div className="space-y-4 pb-2 overflow-x-hidden">
+      <div className="space-y-5 pb-2 overflow-x-hidden">
         {/* Header Card */}
         <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
 
