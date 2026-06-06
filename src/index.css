@@ -12,7 +12,7 @@ html {
 body {
   /* Premium light surface (ala BYOND): abu sejuk lembut agar kartu putih
      murni "mengambang" dgn bayangan — kontras halus = terasa mahal. */
-  background-color: #DBE2EC;
+  background-color: #D9E0EB;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -101,11 +101,11 @@ body {
 :root {
   --ease-spring:   cubic-bezier(0.34, 1.4, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  /* Layer pertama = hairline ring lebih GELAP dari background (#DBE2EC) → tepi
+  /* Layer pertama = hairline ring lebih GELAP dari background (#D9E0EB) → tepi
      kartu tetap kebaca saat siang/layar terang ketika bayangan lembut "kebakar"
      cahaya. Edge kontras tinggi bertahan, putih kartu tak tersentuh. */
-  --shadow-card:   0 0 0 1px rgba(16, 24, 40, 0.05), 0 1px 2px rgba(16, 24, 40, 0.05), 0 4px 9px -3px rgba(16, 24, 40, 0.08), 0 19px 40px -18px rgba(16, 24, 40, 0.23);
-  --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.28);
+  --shadow-card:   0 0 0 1px rgba(16, 24, 40, 0.055), 0 1px 2px rgba(16, 24, 40, 0.05), 0 4px 9px -3px rgba(16, 24, 40, 0.085), 0 19px 40px -18px rgba(16, 24, 40, 0.245);
+  --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.29);
 }
 
 /* Soft layered elevation for surfaces */
