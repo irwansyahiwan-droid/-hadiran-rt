@@ -30,7 +30,7 @@ const SUMBER = [
 
 function Section({ icon: Icon, title, children }: { icon: typeof BookOpen; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift p-5">
+    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
       <div className="flex items-center gap-2 mb-3">
         <span className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
           <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -49,7 +49,7 @@ export default function TentangApp({ open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 bg-[#D9E0EB] dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800"
+        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
@@ -62,7 +62,7 @@ export default function TentangApp({ open, onClose }: Props) {
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-extrabold text-gray-900 dark:text-gray-100 truncate">Tentang Aplikasi</h1>
+            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Tentang Aplikasi</h1>
           </div>
         </div>
       </header>

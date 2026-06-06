@@ -74,7 +74,7 @@ export default function BackupRestore({ open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 bg-[#D9E0EB] dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800"
+        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
@@ -87,14 +87,14 @@ export default function BackupRestore({ open, onClose }: Props) {
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <DatabaseBackup className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-extrabold text-gray-900 dark:text-gray-100 truncate">Backup &amp; Restore</h1>
+            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Backup &amp; Restore</h1>
           </div>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* Backup */}
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift p-5">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
           <div className="flex items-center gap-2 mb-1">
             <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">Backup Data</h2>

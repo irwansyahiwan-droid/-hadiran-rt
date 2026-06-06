@@ -21,17 +21,17 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-500" /> Masuk
           </span>
-          <span className="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
+          <span className="font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
         </div>
         <div className="flex items-center justify-between text-[13px]">
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <ArrowUpRight className="w-3.5 h-3.5 text-rose-500" /> Keluar
           </span>
-          <span className="font-semibold text-rose-500 tabular-nums">{formatRupiahPlain(keluar)}</span>
+          <span className="font-semibold text-neg tabular-nums">{formatRupiahPlain(keluar)}</span>
         </div>
         <div className="flex items-center justify-between text-[13px] pt-1.5 border-t border-gray-200 dark:border-gray-700">
           <span className="font-semibold text-gray-700 dark:text-gray-300">Saldo akhir</span>
-          <span className={`font-extrabold tabular-nums ${saldo < 0 ? 'text-rose-500' : 'text-gray-900 dark:text-gray-100'}`}>
+          <span className={`font-bold tabular-nums ${saldo < 0 ? 'text-neg' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}
           </span>
         </div>
@@ -82,7 +82,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 bg-[#D9E0EB] dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800"
+        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
@@ -95,7 +95,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-extrabold text-gray-900 dark:text-gray-100 truncate">Tutup Buku Triwulan</h1>
+            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Tutup Buku Triwulan</h1>
           </div>
           <button
             onClick={() => { haptic(); setLoading(true); load(); }}
@@ -115,7 +115,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
         {loading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 p-4">
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 p-4">
                 <div className="h-5 w-40 skeleton rounded-lg mb-3" />
                 <div className="grid grid-cols-2 gap-2">
                   <div className="h-28 skeleton rounded-2xl" />
@@ -125,7 +125,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
             ))}
           </div>
         ) : rows.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60">
             <EmptyState
               icon={FileText}
               title="Belum ada data"
@@ -137,11 +137,11 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
             <div
               key={r.key}
               style={{ animationDelay: `${Math.min(idx, 6) * 0.05}s` }}
-              className="rise bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift p-4 space-y-3"
+              className="rise bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-4 space-y-3"
             >
               <div className="flex items-end justify-between gap-2">
                 <div>
-                  <p className="text-[15px] font-extrabold text-gray-900 dark:text-gray-100">{r.label}</p>
+                  <p className="text-[15px] font-bold text-gray-900 dark:text-gray-100">{r.label}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{r.rentang}</p>
                 </div>
                 {idx === 0 && (

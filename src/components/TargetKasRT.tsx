@@ -58,7 +58,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 min-w-0">
             <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${tercapai ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>

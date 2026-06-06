@@ -26,7 +26,7 @@ export default function SmartInsight({ label, current, previous, className = '' 
   const Ic = tone.ic;
 
   return (
-    <div className={`flex items-center gap-3 rounded-2xl border border-gray-100 dark:border-gray-800/60 bg-white dark:bg-gray-900 lift px-4 py-3 ${className}`}>
+    <div className={`flex items-center gap-3 rounded-2xl border border-line dark:border-gray-800/60 bg-white dark:bg-gray-900 lift px-4 py-3 ${className}`}>
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${tone.bg}`}>
         <Sparkles className={`w-[18px] h-[18px] ${tone.c}`} strokeWidth={2} />
       </div>

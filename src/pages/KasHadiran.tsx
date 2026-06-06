@@ -396,7 +396,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span
@@ -441,7 +441,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <p className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
+            <p className="text-base font-extrabold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
 
             {/* Filter (status talangan) & sort */}
             {!loading && (
@@ -495,7 +495,7 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className="rise lift bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 overflow-hidden"
+                      className="rise lift bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 overflow-hidden"
                       style={{ animationDelay: `${Math.min(idx, 10) * 0.05}s`, ...(talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : {}) }}
                     >
 
@@ -539,7 +539,7 @@ export default function KasHadiranPage() {
                           </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-[17px] font-semibold text-emerald-600 dark:text-emerald-400">
+                          <p className="text-[17px] font-semibold text-pos dark:text-emerald-400">
                             +{formatRupiahPlain(sohibulTerima)}
                           </p>
                           <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
@@ -573,9 +573,9 @@ export default function KasHadiranPage() {
                       {/* ── Actions ──────────────────────────────────
                           PDF pendapatan tersedia untuk semua (termasuk warga);
                           Absensi, Batalkan & Hapus khusus bendahara. */}
-                      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap px-4 pb-3 pt-3 border-t border-gray-100 dark:border-gray-800">
+                      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap px-4 pb-3 pt-3 border-t border-line dark:border-gray-800">
                         {isBendahara && (
-                          <button className="flex items-center gap-1.5 text-xs text-[#555555] dark:text-gray-400 font-medium hover:text-blue-600 transition-colors">
+                          <button className="flex items-center gap-1.5 text-xs text-ink-sub dark:text-gray-400 font-medium hover:text-blue-600 transition-colors">
                             <Users className="w-3.5 h-3.5" />
                             Absensi
                           </button>
@@ -583,7 +583,7 @@ export default function KasHadiranPage() {
                         <button
                           onClick={() => handlePendapatanPDF(t)}
                           disabled={pdfLoading === t.id}
-                          className="flex items-center gap-1.5 text-xs text-[#555555] dark:text-gray-400 font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1.5 text-xs text-ink-sub dark:text-gray-400 font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
                         >
                           <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
                           {pdfLoading === t.id ? 'Memuat...' : 'PDF Pendapatan'}
@@ -593,7 +593,7 @@ export default function KasHadiranPage() {
                             onClick={() => handleBatalkanClick(t)}
                             disabled={processingId === t.id}
                             className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
-                              confirmBatalId === t.id ? 'text-amber-600' : 'text-[#555555] dark:text-gray-400 hover:text-amber-600'
+                              confirmBatalId === t.id ? 'text-amber-600' : 'text-ink-sub dark:text-gray-400 hover:text-amber-600'
                             }`}
                           >
                             <RotateCcw className={`w-3.5 h-3.5 ${processingId === t.id ? 'animate-spin' : ''}`} />
@@ -644,7 +644,7 @@ export default function KasHadiranPage() {
             </div>
 
             {/* Header */}
-            <div className="px-5 pb-3 shrink-0 border-b border-gray-100 dark:border-gray-800">
+            <div className="px-5 pb-3 shrink-0 border-b border-line dark:border-gray-800">
               <div className="flex items-center gap-3">
                 <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
                 <div className="min-w-0 flex-1">

@@ -123,7 +123,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/40'}`}>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
-                <span className={`font-bold ${saldoPreview < 0 ? 'text-red-600 dark:text-red-400' : tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                <span className={`font-bold ${saldoPreview < 0 ? 'text-neg dark:text-red-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
                   {formatRupiahPlain(Math.abs(saldoPreview))}
                 </span>
               </p>
@@ -397,14 +397,14 @@ export default function KasRTPage() {
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4">
-              <p className="text-sm font-bold text-[#111111] dark:text-gray-100 mb-2">Tren Saldo</p>
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4">
+              <p className="text-sm font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</p>
               <AreaTrend points={saldoSeries} />
             </div>
             {monthly.length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift p-4">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-bold text-[#111111] dark:text-gray-100">Masuk vs Keluar</p>
+                  <p className="text-sm font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
                   <div className="flex items-center gap-1">
                     {[3, 6, 12].map((p) => (
                       <button
@@ -430,12 +430,12 @@ export default function KasRTPage() {
         )}
 
         {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
-        <h2 className="text-base font-extrabold text-[#111111] dark:text-gray-100 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
+        <h2 className="text-base font-extrabold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
 
         <CrossFade loading={loading} skeleton={(
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}>
+              <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}>
                 <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/4" />
@@ -504,7 +504,7 @@ export default function KasRTPage() {
           {displayList.length === 0 ? (
             <EmptyState icon={Landmark} title="Tidak ada hasil" subtitle="Tidak ada transaksi pada filter ini." />
           ) : (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {displayList.map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === displayList.length - 1;
@@ -514,7 +514,7 @@ export default function KasRTPage() {
                   key={k.id}
                   onClick={editable ? () => { setSelectedRow(k); setConfirmDel(false); } : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise flex items-center gap-3 px-4 py-4 ${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-gray-100/70 dark:border-gray-800/50' : ''}`}
+                  className={`rise flex items-center gap-3 px-4 py-4 ${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100">
                     {isMasuk
@@ -523,17 +523,17 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-[#111111] dark:text-gray-100 leading-snug break-words">
+                    <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
-                    <p className="text-[12px] font-medium text-slate-400/90 dark:text-gray-500 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
+                    <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-[17px] font-extrabold ${isMasuk ? 'text-green-700' : 'text-red-600'}`}>
+                    <p className={`text-[17px] font-bold ${isMasuk ? 'text-pos' : 'text-neg'}`}>
                       {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
                     </p>
-                    <p className={`text-xs font-medium mt-0.5 ${k.saldo_setelah < 0 ? 'text-rose-500 dark:text-rose-400' : 'text-[#555555] dark:text-gray-400'}`}>
+                    <p className={`text-xs font-medium mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
                       Saldo: {k.saldo_setelah < 0 ? '-' : ''}Rp{Math.abs(k.saldo_setelah).toLocaleString('id-ID')}
                     </p>
                   </div>
@@ -573,13 +573,13 @@ export default function KasRTPage() {
             <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-2.5 mt-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Tipe</span>
-                <span className={`text-sm font-semibold ${selectedRow.tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <span className={`text-sm font-semibold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-red-400'}`}>
                   {selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Nominal</span>
-                <span className={`text-base font-bold ${selectedRow.tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <span className={`text-base font-bold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-red-400'}`}>
                   {selectedRow.tipe === 'masuk' ? '+' : '-'}{formatRupiahPlain(selectedRow.nominal)}
                 </span>
               </div>

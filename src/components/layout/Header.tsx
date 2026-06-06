@@ -120,7 +120,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                   {isBendahara && onOpenBackup && (
                     <MenuItem icon={DatabaseBackup} label="Backup & Restore" onClick={onOpenBackup} />
                   )}
-                  {isBendahara && <div className="my-1.5 border-t border-gray-100 dark:border-gray-800" />}
+                  {isBendahara && <div className="my-1.5 border-t border-line dark:border-gray-800" />}
                   {onOpenTentang && (
                     <MenuItem icon={Info} label="Tentang Aplikasi" onClick={onOpenTentang} />
                   )}

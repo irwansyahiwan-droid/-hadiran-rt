@@ -25,7 +25,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-gray-100/70 dark:bg-gray-900/80 dark:border-gray-800/70"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-line/70 dark:bg-gray-900/80 dark:border-gray-800/70"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)', boxShadow: '0 -10px 30px -20px rgba(16,24,40,0.35)' }}
     >
       <div className="relative max-w-lg mx-auto flex items-stretch justify-around h-16">
@@ -55,11 +55,11 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
               <span className={`flex items-center justify-center transition-transform duration-300 ${isActive ? '-translate-y-0.5' : ''}`}
                 style={{ transitionTimingFunction: 'var(--ease-spring)' }}>
                 <Icon
-                  className={`w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-[#0D6B5E] dark:text-[#1A9B86]' : 'text-gray-400 dark:text-gray-500'}`}
+                  className={`w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-brand-link dark:text-[#1A9B86]' : 'text-gray-400 dark:text-gray-500'}`}
                   strokeWidth={isActive ? 2.4 : 2}
                 />
               </span>
-              <span className={`text-[11px] leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-[#0D6B5E] dark:text-[#1A9B86]' : 'font-semibold text-gray-400 dark:text-gray-500'}`}>
+              <span className={`text-[11px] leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-brand-link dark:text-[#1A9B86]' : 'font-semibold text-gray-400 dark:text-gray-500'}`}>
                 {label}
               </span>
             </button>

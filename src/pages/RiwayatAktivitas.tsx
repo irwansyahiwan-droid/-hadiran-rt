@@ -122,7 +122,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
     <div className="fixed inset-0 z-50 bg-[#D9E0EB] dark:bg-gray-950 page-in-right overflow-y-auto">
       {/* Header */}
       <header
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800"
+        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
@@ -135,7 +135,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <History className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-extrabold text-gray-900 dark:text-gray-100 truncate">Riwayat Aktivitas</h1>
+            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Riwayat Aktivitas</h1>
           </div>
           <button
             onClick={exportPDF}
@@ -194,7 +194,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         {loading ? (
           <div className="space-y-2">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800/60 px-4 py-3.5 flex items-center gap-3">
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 px-4 py-3.5 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/5" />
@@ -204,7 +204,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
             ))}
           </div>
         ) : grouped.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60">
             <EmptyState
               icon={History}
               title={rows.length === 0 ? 'Belum ada aktivitas' : 'Tidak ada hasil'}
@@ -217,7 +217,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
           grouped.map((grp) => (
             <div key={grp.hari} className="space-y-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-1 pt-1">{grp.hari}</p>
-              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800/60 lift overflow-hidden">
+              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
                 {grp.items.map((row, idx) => {
                   const v = formatAktivitas(row);
                   const Icon = iconFor(row);
@@ -228,13 +228,13 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                       key={row.id}
                       onClick={() => { if (hasMore) { haptic(); setExpanded(isOpen ? null : row.id); } }}
                       style={{ animationDelay: `${Math.min(idx, 8) * 0.03}s` }}
-                      className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left ${hasMore ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'border-b border-[#F0F0F0] dark:border-gray-800' : ''}`}
+                      className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left ${hasMore ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
                     >
                       <div className={`w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${ACCENT_CLS[v.accent]}`}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-[#111111] dark:text-gray-100 leading-snug break-words">{v.title}</p>
+                        <p className="text-[14px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">{v.title}</p>
                         {v.detail && (
                           <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5 break-words">{v.detail}</p>
                         )}
@@ -258,8 +258,8 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                         )}
                       </div>
                       {v.amount != null && v.amount !== 0 && (
-                        <span className={`text-[15px] font-extrabold shrink-0 ${
-                          v.accent === 'rose' ? 'text-rose-500' : v.accent === 'emerald' ? 'text-emerald-600' : 'text-gray-700 dark:text-gray-300'
+                        <span className={`text-[15px] font-bold shrink-0 ${
+                          v.accent === 'rose' ? 'text-neg' : v.accent === 'emerald' ? 'text-pos' : 'text-gray-700 dark:text-gray-300'
                         }`}>
                           {formatRupiahPlain(v.amount)}
                         </span>
