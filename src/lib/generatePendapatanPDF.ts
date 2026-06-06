@@ -98,13 +98,21 @@ export function generatePendapatanPDF(
     tableRows.push([String(rowNum++), w.nama, 'Talangan', rp(SOHIBUL_PER), rp(KAS_PER), rp(TOTAL_PER)]);
   });
 
+  // Baris TOTAL (foot) — jumlah seluruh pembayar; selalu di bawah semua nama.
+  const totalSohibul = payingCount * SOHIBUL_PER;
+  const totalKas     = payingCount * KAS_PER;
+  const totalSemua   = payingCount * TOTAL_PER;
+
   autoTable(doc, {
     startY: cardY + cardH + 6,
     head: [['NO', 'NAMA ANGGOTA', 'STATUS', 'SOHIBUL BAIT', 'KAS', 'TOTAL']],
     body: tableRows,
+    foot: [['', `TOTAL · ${payingCount} pembayar`, '', rp(totalSohibul), rp(totalKas), rp(totalSemua)]],
+    showFoot: 'lastPage',
     margin: { left: M, right: M },
     headStyles: { fillColor: [6, 78, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.5 },
     bodyStyles: { fontSize: 7.5, textColor: [31, 41, 55] },
+    footStyles: { fillColor: [17, 24, 39], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
     alternateRowStyles: { fillColor: [249, 250, 251] },
     columnStyles: {
       0: { cellWidth: 8, halign: 'center' },
