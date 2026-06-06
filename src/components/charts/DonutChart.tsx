@@ -39,6 +39,8 @@ export default function DonutChart({
   const centerLabel = active !== null ? data[active].label : centerTop;
   const centerValue = active !== null ? data[active].value : total;
   const centerColor = active !== null ? data[active].color : undefined;
+  // Share % dari total — hanya saat segmen aktif (delight + nilai analitis, tak ramai saat diam)
+  const centerPct = active !== null ? Math.round((Math.max(0, data[active].value) / total) * 100) : null;
   // Font tengah adaptif: angka penuh (mis. Rp1.710.000) bisa panjang → kecilkan agar muat
   const centerStr = format(centerValue);
   const centerSize = centerStr.length >= 12 ? 'text-[10px]' : centerStr.length >= 9 ? 'text-[12px]' : 'text-sm';
@@ -74,7 +76,15 @@ export default function DonutChart({
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 pointer-events-none">
           <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 truncate max-w-full">{centerLabel}</span>
-          <span className={`${centerSize} font-extrabold tabular-nums leading-tight whitespace-nowrap`} style={{ color: centerColor }}>{centerStr}</span>
+          <span className={`${centerSize} font-bold tabular-nums leading-tight whitespace-nowrap`} style={{ color: centerColor }}>{centerStr}</span>
+          {centerPct !== null && (
+            <span
+              className="pop mt-1 px-1.5 py-px rounded-full text-[10px] font-bold tabular-nums leading-none"
+              style={{ color: centerColor, background: `${centerColor}1A` }}
+            >
+              {centerPct}% dari total
+            </span>
+          )}
         </div>
       </div>
 
