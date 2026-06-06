@@ -263,7 +263,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatRupiahPlain(t.nominal)}</span>
                   {t.status_lunas && (
-                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px] whitespace-nowrap" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
+                    <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-md whitespace-nowrap" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
                       LUNAS
                     </span>
                   )}
@@ -412,7 +412,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <div className="h-4 skeleton rounded-lg w-2/3" />
                 <div className="h-3 skeleton rounded-lg w-1/2" />
               </div>
-              <div className="h-5 w-20 skeleton rounded-[6px] shrink-0" />
+              <div className="h-5 w-20 skeleton rounded-md shrink-0" />
             </div>
           ))}
         </div>

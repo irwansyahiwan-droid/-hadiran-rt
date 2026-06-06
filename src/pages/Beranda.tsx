@@ -300,7 +300,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Alert Banner */}
       {talangan > 0 && (
-        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl px-5 py-4 shadow-[0_4px_12px_rgba(245,158,11,0.08)]">
+        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl px-5 py-4">
           <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
@@ -341,7 +341,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
-                    <span className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-[5px]" style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}>Terjadwal</span>
+                    <span className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-md" style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}>Terjadwal</span>
                   </div>
                   <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
@@ -419,9 +419,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
                 className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < displayTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
               >
-                <div className={`w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
+                <div className={`w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100' : 'bg-emerald-100'}`}>
                   {trx.tipe === 'setor'
-                    ? <ArrowUpRight className="w-[18px] h-[18px] text-orange-500" />
+                    ? <ArrowUpRight className="w-[18px] h-[18px] text-blue-600" />
                     : <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-500" />
                   }
                 </div>
@@ -454,9 +454,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           {...trxDrag.handlers}
         >
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-orange-100' : 'bg-emerald-100'}`}>
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-blue-100' : 'bg-emerald-100'}`}>
             {selectedTrx.tipe === 'setor'
-              ? <ArrowUpRight className="w-5 h-5 text-orange-500" />
+              ? <ArrowUpRight className="w-5 h-5 text-blue-600" />
               : <ArrowDownLeft className="w-5 h-5 text-emerald-500" />}
           </div>
           <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>

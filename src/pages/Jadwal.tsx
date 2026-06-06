@@ -665,7 +665,7 @@ export default function JadwalPage() {
                 <div className="h-4 skeleton rounded-lg w-3/5" />
                 <div className="h-3 skeleton rounded-lg w-2/5" />
               </div>
-              <div className="h-6 w-16 skeleton rounded-[6px] shrink-0" />
+              <div className="h-6 w-16 skeleton rounded-md shrink-0" />
             </div>
           ))}
         </div>
@@ -749,7 +749,7 @@ export default function JadwalPage() {
                       </div>
                     ) : (
                       <span
-                        className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-[5px]"
+                        className="shrink-0 text-[0.72rem] font-medium px-[7px] py-[1px] rounded-md"
                         style={{ background: 'rgba(142,142,147,0.12)', color: '#4B5563' }}
                       >
                         {isSelesai ? 'Selesai' : 'Terjadwal'}

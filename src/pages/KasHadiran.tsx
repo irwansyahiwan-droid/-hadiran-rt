@@ -513,11 +513,11 @@ export default function KasHadiranPage() {
                           <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
-                          <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(255,59,48,0.10)', color: '#9F1239' }}>
+                          <span className="px-[8px] py-[2px] text-[10px] font-medium rounded-md" style={{ background: 'rgba(255,59,48,0.10)', color: '#9F1239' }}>
                             {talanganInfo.count} belum bayar
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-[8px] py-[2px] text-[10px] font-medium rounded-[6px]" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
+                          <span className="inline-flex items-center gap-1 px-[8px] py-[2px] text-[10px] font-medium rounded-md" style={{ background: 'rgba(52,199,89,0.12)', color: '#166534' }}>
                             <Check className="w-3 h-3" strokeWidth={2.5} /> Lunas semua
                           </span>
                         )}
