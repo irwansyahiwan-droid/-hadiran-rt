@@ -12,8 +12,8 @@ html {
 body {
   /* Light surface segar: biru-putih cerah agar tampilan terasa terang &
      lapang, kartu putih tetap "mengambang" dgn bayangan berlapis.
-     Base sedikit lebih dalam (#DCE4EE -> #D3DDEB) agar kartu putih kontras. */
-  background-color: #D3DDEB;
+     Base lebih dalam (#DCE4EE -> #CCD7E8) agar kartu putih kontras. */
+  background-color: #CCD7E8;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -51,18 +51,18 @@ body {
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
    Dipakai di wrapper App (ganti bg-[#DCE4EE]). */
 .app-bg {
-  background-color: #D3DDEB;
+  background-color: #CCD7E8;
   background-image:
-    radial-gradient(125% 78% at 50% -8%,  rgba(21, 130, 76, 0.13) 0%, rgba(21, 130, 76, 0) 44%),
-    radial-gradient(95% 60% at 100% 2%,   rgba(45, 212, 150, 0.10) 0%, rgba(45, 212, 150, 0) 42%),
-    radial-gradient(85% 55% at 0% 100%,   rgba(13, 91, 54, 0.07) 0%,  transparent 50%);
+    radial-gradient(125% 80% at 50% -8%,  rgba(21, 130, 76, 0.20) 0%, rgba(21, 130, 76, 0) 46%),
+    radial-gradient(100% 62% at 100% 0%,  rgba(45, 212, 150, 0.17) 0%, rgba(45, 212, 150, 0) 44%),
+    radial-gradient(92% 58% at 0% 100%,   rgba(13, 91, 54, 0.12) 0%,  transparent 52%);
   background-attachment: fixed;
 }
 .dark .app-bg {
   background-color: #030712;
   background-image:
-    radial-gradient(125% 78% at 50% -8%, rgba(26, 155, 134, 0.12) 0%, transparent 46%),
-    radial-gradient(90% 55% at 0% 100%,  rgba(16, 130, 76, 0.08) 0%,  transparent 52%);
+    radial-gradient(125% 80% at 50% -8%, rgba(26, 155, 134, 0.18) 0%, transparent 48%),
+    radial-gradient(92% 58% at 0% 100%,  rgba(16, 130, 76, 0.12) 0%,  transparent 54%);
 }
 
 .card-clean {
