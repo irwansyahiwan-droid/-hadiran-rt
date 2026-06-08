@@ -542,7 +542,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 rounded-full text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan...' : 'Simpan Revisi'}
@@ -635,7 +635,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 rounded-full text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan...' : 'Simpan Tarikan'}
@@ -719,7 +719,7 @@ export default function JadwalPage() {
           {isBendahara && (
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
-              className="flex items-center gap-1.5 bg-[#0F6039] text-white text-sm font-semibold px-3 py-2 rounded-xl shadow-sm active:scale-95 transition-all"
+              className="btn-brand flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-xl active:scale-95 transition-all"
             >
               <Plus className="w-4 h-4" /> Tarikan
             </button>

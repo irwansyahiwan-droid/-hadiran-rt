@@ -249,7 +249,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
             disabled={saving || !nama.trim()}
             className={`flex-1 py-3 rounded-full text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
-              jadwalNonaktif ? 'bg-rose-600' : 'bg-[#0F6039]'
+              jadwalNonaktif ? 'bg-rose-600' : 'btn-brand'
             }`}
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
@@ -416,7 +416,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
       {/* FAB Tambah */}
       <button
         onClick={() => { haptic(); setForm({ mode: 'add', warga: null }); }}
-        className="fixed left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full bg-[#0F6039] text-white font-bold text-sm shadow-lg active:scale-[0.97] transition-all"
+        className="btn-brand fixed left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full font-bold text-sm active:scale-[0.97] transition-all"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}
       >
         <UserPlus className="w-4 h-4" /> Tambah Anggota

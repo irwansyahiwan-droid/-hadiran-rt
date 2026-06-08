@@ -272,7 +272,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
                     className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
-                      confirmId === t.id ? 'bg-rose-600' : 'bg-[#0F6039]'
+                      confirmId === t.id ? 'bg-rose-600' : 'btn-brand'
                     }`}
                   >
                     {processingId === t.id ? (

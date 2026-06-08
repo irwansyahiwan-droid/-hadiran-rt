@@ -329,7 +329,7 @@ export default function KasRTPage() {
             {isBendahara && (
               <button
                 onClick={() => { setEditing(null); setShowModal(true); }}
-                className="flex items-center gap-1.5 bg-[#0F6039] text-white text-sm font-semibold px-4 py-2 rounded-full active:scale-[0.97] active:opacity-90 transition-all duration-150 shadow-sm"
+                className="btn-brand flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full active:scale-[0.97] active:opacity-90 transition-all duration-150"
               >
                 <Plus className="w-4 h-4" />
                 Tambah
@@ -587,7 +587,7 @@ export default function KasRTPage() {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => { setEditing(selectedRow); setSelectedRow(null); setShowModal(true); }}
-                className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-[#0F6039] text-white text-sm font-bold"
+                className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold"
               >
                 <Pencil className="w-4 h-4" /> Edit
               </button>
