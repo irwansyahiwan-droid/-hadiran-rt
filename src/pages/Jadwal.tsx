@@ -357,7 +357,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || cancelling}
-            className="w-full py-3.5 rounded-full bg-[#0F6039] text-white font-bold text-sm shadow-sm active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2"
+            className="btn-brand w-full py-3.5 rounded-full font-bold text-sm disabled:opacity-70 flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             {saving ? 'Menghitung...' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
