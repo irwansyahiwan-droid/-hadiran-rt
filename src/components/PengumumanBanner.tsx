@@ -134,7 +134,10 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[92vh] overflow-y-auto">
+      <div
+        className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[92vh] overflow-y-auto"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 5rem)' }}
+      >
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Pengumuman</p>
