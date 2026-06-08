@@ -857,7 +857,12 @@ export default function JadwalPage() {
                       </Tag>
                     )}
                   </div>
-                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(t.tanggal)}</p>
+                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">
+                    {formatTanggal(t.tanggal)}
+                    {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
+                      <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>
+                    )}
+                  </p>
                 </div>
               </div>
             );

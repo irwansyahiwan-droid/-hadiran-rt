@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Users, Search, X, RefreshCw, UserPlus, Pencil,
-  CheckCircle2, Phone, Home, History,
+  CheckCircle2, Phone, Home, History, AlertTriangle,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
@@ -39,6 +39,8 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   const [susulan, setSusulan] = useState(false);
   const [pilih, setPilih] = useState<Set<string>>(() => new Set(selesaiTarikan.map((t) => t.id)));
   const [saving, setSaving] = useState(false);
+  // Pengaman: anggota yang dinonaktifkan tapi masih punya jadwal tarikan ke depan
+  const [jadwalNonaktif, setJadwalNonaktif] = useState<number[] | null>(null);
   useBackDismiss(true, onClose);
 
   const kasNaik = pilih.size * 5000;
@@ -52,8 +54,23 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
     });
   }
 
-  async function simpan() {
+  async function simpan(forceNonaktif = false) {
     if (!nama.trim()) { showToast('Nama anggota wajib diisi', 'error'); return; }
+    // Pengaman: menonaktifkan anggota yang masih jadi Sohibul di tarikan ke depan
+    if (mode === 'edit' && initial && initial.status_aktif && !aktif && !forceNonaktif) {
+      setSaving(true);
+      const { data } = await supabase
+        .from('tarikan')
+        .select('nomor')
+        .eq('sohibul_bait_id', initial.id)
+        .neq('status', 'selesai')
+        .order('nomor', { ascending: true });
+      setSaving(false);
+      if (data && data.length) {
+        setJadwalNonaktif(data.map((t) => t.nomor as number));
+        return; // tahan dulu, tampilkan peringatan
+      }
+    }
     setSaving(true);
     try {
       if (mode === 'edit' && initial) {
@@ -205,20 +222,39 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           </div>
         )}
 
+        {/* Peringatan: masih punya jadwal tarikan ke depan */}
+        {jadwalNonaktif && (
+          <div className="mb-4 rounded-2xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/70 dark:bg-rose-900/15 p-3.5">
+            <p className="flex items-center gap-2 text-sm font-bold text-rose-700 dark:text-rose-300">
+              <AlertTriangle className="w-4 h-4 shrink-0" /> Masih punya jadwal ke depan
+            </p>
+            <p className="text-xs text-rose-600 dark:text-rose-400/90 mt-1 leading-relaxed">
+              {initial?.nama} masih jadi Sohibul Bait di {jadwalNonaktif.length} tarikan:{' '}
+              <b>#{jadwalNonaktif.join(', #')}</b>. Setelah dinonaktifkan, jangan lupa ganti Sohibul Bait tarikan tersebut lewat <b>Revisi jadwal</b>.
+            </p>
+          </div>
+        )}
+
         <div className="flex gap-2.5">
           <button
-            onClick={onClose}
+            onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : onClose}
             className="flex-1 py-3 rounded-full border border-control dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
             Batal
           </button>
           <button
-            onClick={simpan}
+            onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
             disabled={saving || !nama.trim()}
-            className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            className={`flex-1 py-3 rounded-full text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
+              jadwalNonaktif ? 'bg-rose-600' : 'bg-[#0F6039]'
+            }`}
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
-            {saving ? 'Menyimpan...' : mode === 'add' ? 'Simpan Anggota' : 'Simpan Perubahan'}
+            {saving
+              ? 'Menyimpan...'
+              : jadwalNonaktif
+                ? 'Tetap Nonaktifkan'
+                : mode === 'add' ? 'Simpan Anggota' : 'Simpan Perubahan'}
           </button>
         </div>
       </div>

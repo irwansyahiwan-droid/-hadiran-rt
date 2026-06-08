@@ -335,7 +335,12 @@ export default function JadwalWargaPage() {
                       <p className={`text-sm font-semibold truncate ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
                         {t.sohibul_bait?.nama ?? '—'}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">{formatTanggal(t.tanggal)}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {formatTanggal(t.tanggal)}
+                        {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
+                          <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>
+                        )}
+                      </p>
                     </div>
 
                     {/* Status */}
