@@ -8,6 +8,7 @@ import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import DonutChart from '../components/charts/DonutChart';
+import PengumumanBanner from '../components/PengumumanBanner';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
@@ -286,6 +287,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </button>
         </div>
       </div>
+
+      {/* Pengumuman / Info Penting — dikelola bendahara, dilihat semua warga */}
+      <PengumumanBanner canManage={isBendahara && !isWargaMode} />
 
       {/* Stats Row */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">

@@ -217,6 +217,48 @@ body {
 }
 @keyframes heroSheen { to { transform: translateX(320%) skewX(-14deg); } }
 
+/* Pengumuman / Info Penting — banner cantik beranimasi */
+@keyframes annIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ann-in { animation: annIn 0.55s var(--ease-spring) both; }
+
+/* Sapuan kilau lembut yang berulang melintasi banner */
+.ann-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 42%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 50%, transparent 100%);
+  transform: translateX(-180%) skewX(-14deg);
+  animation: annSheen 5s var(--ease-out-expo) 1s infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes annSheen {
+  0%   { transform: translateX(-180%) skewX(-14deg); }
+  55%  { transform: translateX(320%)  skewX(-14deg); }
+  100% { transform: translateX(320%)  skewX(-14deg); }
+}
+
+/* Denyut bayangan halus berwarna sesuai jenis pengumuman */
+.ann-glow { animation: annGlow 3.2s ease-in-out infinite; }
+@keyframes annGlow {
+  0%, 100% { box-shadow: 0 8px 22px -12px rgba(0,0,0,0.25); }
+  50%      { box-shadow: 0 14px 34px -10px var(--ann-glow, rgba(16,185,129,0.5)); }
+}
+
+/* Ikon megafon bergoyang sesekali untuk menarik perhatian */
+.ann-wiggle { animation: annWiggle 4s ease-in-out infinite; transform-origin: 65% 65%; }
+@keyframes annWiggle {
+  0%, 90%, 100% { transform: rotate(0deg); }
+  93%           { transform: rotate(-13deg); }
+  95%           { transform: rotate(10deg); }
+  97%           { transform: rotate(-6deg); }
+  99%           { transform: rotate(3deg); }
+}
+
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
