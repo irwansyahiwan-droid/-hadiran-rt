@@ -1,0 +1,397 @@
+import { useEffect, useMemo, useState } from 'react';
+import {
+  ArrowLeft, Users, Search, X, RefreshCw, UserPlus, Pencil,
+  CheckCircle2, Phone, Home, History,
+} from 'lucide-react';
+import EmptyState from '../components/EmptyState';
+import Tag from '../components/Tag';
+import { supabase } from '../lib/supabase';
+import {
+  fetchAnggota, tambahAnggota, updateAnggota, backfillAnggotaSusulan,
+} from '../lib/anggota';
+import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
+import { showToast } from '../lib/toast';
+import { useBackDismiss } from '../hooks/useBackDismiss';
+import type { Warga, Tarikan } from '../lib/types';
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+}
+
+// ── Form Tambah / Edit Anggota ──────────────────────────────
+
+interface FormProps {
+  mode: 'add' | 'edit';
+  initial: Warga | null;
+  selesaiTarikan: Tarikan[]; // untuk opsi "anggota susulan" (mode add)
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: FormProps) {
+  const [nama, setNama] = useState(initial?.nama ?? '');
+  const [noRumah, setNoRumah] = useState(initial?.no_rumah ?? '');
+  const [noHp, setNoHp] = useState(initial?.no_hp ?? '');
+  const [role, setRole] = useState<'bendahara' | 'warga'>(initial?.role ?? 'warga');
+  const [aktif, setAktif] = useState(initial?.status_aktif ?? true);
+  // Anggota susulan (hanya mode add)
+  const [susulan, setSusulan] = useState(false);
+  const [pilih, setPilih] = useState<Set<string>>(() => new Set(selesaiTarikan.map((t) => t.id)));
+  const [saving, setSaving] = useState(false);
+  useBackDismiss(true, onClose);
+
+  const kasNaik = pilih.size * 5000;
+
+  function togglePilih(id: string) {
+    setPilih((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function simpan() {
+    if (!nama.trim()) { showToast('Nama anggota wajib diisi', 'error'); return; }
+    setSaving(true);
+    try {
+      if (mode === 'edit' && initial) {
+        await updateAnggota(initial.id, {
+          nama, no_rumah: noRumah, no_hp: noHp, role, status_aktif: aktif,
+        });
+        showToast('Data anggota diperbarui');
+      } else {
+        const baru = await tambahAnggota({ nama, no_rumah: noRumah, no_hp: noHp, role });
+        if (susulan && pilih.size > 0) {
+          const ids = selesaiTarikan.filter((t) => pilih.has(t.id)).map((t) => t.id);
+          const res = await backfillAnggotaSusulan(baru.id, ids);
+          showToast(
+            `${baru.nama} ditambahkan · lunas ${res.tarikanCount} tarikan · Kas +${formatRupiahPlain(res.kasNaik)}`
+          );
+        } else {
+          showToast(`${baru.nama} ditambahkan`);
+        }
+      }
+      haptic(12);
+      onSaved();
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Gagal menyimpan', 'error');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const input =
+    'w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400';
+  const label = 'block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5';
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
+      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-base font-bold text-gray-900 dark:text-gray-100">
+              {mode === 'add' ? 'Tambah Anggota' : 'Edit Anggota'}
+            </p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
+            </p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        <label className={label}>Nama Lengkap</label>
+        <input value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama warga" className={`${input} mb-4`} />
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label className={label}>No. Rumah</label>
+            <input value={noRumah} onChange={(e) => setNoRumah(e.target.value)} placeholder="mis. A-12" className={input} />
+          </div>
+          <div>
+            <label className={label}>No. HP</label>
+            <input value={noHp} onChange={(e) => setNoHp(e.target.value)} placeholder="08xxxx" inputMode="tel" className={input} />
+          </div>
+        </div>
+
+        <label className={label}>Peran</label>
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          {(['warga', 'bendahara'] as const).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRole(r)}
+              className={`py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                role === r
+                  ? 'bg-emerald-500 text-white border-emerald-500'
+                  : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
+              }`}
+            >
+              {r === 'warga' ? 'Warga' : 'Bendahara'}
+            </button>
+          ))}
+        </div>
+
+        {/* Status aktif — edit saja */}
+        {mode === 'edit' && (
+          <button
+            onClick={() => setAktif((a) => !a)}
+            className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 mb-4"
+          >
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+              aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+            }`}>
+              {aktif ? 'Aktif' : 'Nonaktif'}
+            </span>
+          </button>
+        )}
+
+        {/* Anggota susulan — tambah saja & hanya bila ada tarikan selesai */}
+        {mode === 'add' && selesaiTarikan.length > 0 && (
+          <div className="mb-4 rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/60 dark:bg-amber-900/15 overflow-hidden">
+            <button
+              onClick={() => setSusulan((s) => !s)}
+              className="w-full flex items-center justify-between gap-2 px-3.5 py-3 text-left"
+            >
+              <span className="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-300">
+                <History className="w-4 h-4 shrink-0" />
+                Anggota susulan — sudah lunas tarikan lama
+              </span>
+              <span className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${susulan ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${susulan ? 'translate-x-4' : 'translate-x-0.5'}`} />
+              </span>
+            </button>
+
+            {susulan && (
+              <div className="px-3.5 pb-3.5 space-y-2">
+                <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
+                  Ditandai <b>hadir</b> di tarikan terpilih lalu kas dihitung ulang. Talangan warga lain tidak terpengaruh.
+                </p>
+                <div className="rounded-xl bg-white dark:bg-gray-900 border border-amber-100 dark:border-amber-900/40 divide-y divide-line dark:divide-gray-800 max-h-52 overflow-y-auto">
+                  {selesaiTarikan.map((t) => {
+                    const on = pilih.has(t.id);
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => togglePilih(t.id)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left"
+                      >
+                        <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
+                          on ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 dark:border-gray-600'
+                        }`}>
+                          {on && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                        </span>
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-sm font-semibold text-gray-800 dark:text-gray-100">
+                            Tarikan #{t.nomor}
+                          </span>
+                          <span className="block text-[11px] text-gray-400">
+                            {t.sohibul_bait?.nama ?? '—'} · {formatTanggal(t.tanggal)}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                  {pilih.size} tarikan dipilih · Kas Hadiran +{formatRupiahPlain(kasNaik)}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex gap-2.5">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-full border border-control dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            Batal
+          </button>
+          <button
+            onClick={simpan}
+            disabled={saving || !nama.trim()}
+            className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
+            {saving ? 'Menyimpan...' : mode === 'add' ? 'Simpan Anggota' : 'Simpan Perubahan'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Halaman Kelola Anggota ──────────────────────────────────
+
+export default function KelolaAnggota({ open, onClose }: Props) {
+  const [list, setList] = useState<Warga[]>([]);
+  const [selesaiTarikan, setSelesaiTarikan] = useState<Tarikan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [form, setForm] = useState<{ mode: 'add' | 'edit'; warga: Warga | null } | null>(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const [anggota, tarRes] = await Promise.all([
+        fetchAnggota(),
+        supabase
+          .from('tarikan')
+          .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
+          .eq('status', 'selesai')
+          .order('nomor', { ascending: true }),
+      ]);
+      setList(anggota);
+      setSelesaiTarikan((tarRes.data as Tarikan[]) ?? []);
+    } catch {
+      setList([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (open) { setSearch(''); load(); }
+  }, [open]);
+
+  useBackDismiss(open && !form, onClose);
+
+  const aktifCount = list.filter((w) => w.status_aktif).length;
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return list;
+    return list.filter((w) => w.nama.toLowerCase().includes(q) || w.no_rumah.toLowerCase().includes(q));
+  }, [list, search]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-[#D9E0EB] dark:bg-gray-950 page-in-right overflow-y-auto">
+      <header
+        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
+          <button
+            onClick={() => { haptic(); onClose(); }}
+            className="press p-2 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label="Kembali"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          </button>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Kelola Anggota</h1>
+          </div>
+          <button
+            onClick={() => { haptic(); load(); }}
+            className="press p-2 -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            aria-label="Muat ulang"
+          >
+            <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-lg mx-auto px-4 py-4 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}>
+        <p className="text-xs text-gray-400 px-1">{aktifCount} aktif · {list.length} total</p>
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari nama / no. rumah..."
+            className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
+              <X className="w-4 h-4 text-gray-400" />
+            </button>
+          )}
+        </div>
+
+        {/* List */}
+        {loading ? (
+          <div className="space-y-2">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 px-4 py-3.5 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl skeleton shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 skeleton rounded-lg w-3/5" />
+                  <div className="h-3 skeleton rounded-lg w-2/5" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60">
+            <EmptyState
+              icon={Users}
+              title={list.length === 0 ? 'Belum ada anggota' : 'Tidak ada hasil'}
+              subtitle={list.length === 0 ? 'Tambahkan anggota RT lewat tombol di bawah.' : 'Coba kata kunci lain.'}
+            />
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+            {filtered.map((w, idx) => (
+              <button
+                key={w.id}
+                onClick={() => { haptic(); setForm({ mode: 'edit', warga: w }); }}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
+                  idx < filtered.length - 1 ? 'border-b border-line dark:border-gray-800' : ''
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${
+                  w.status_aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'
+                }`}>
+                  {w.nama.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-semibold truncate ${w.status_aktif ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400'}`}>
+                    {w.nama}
+                  </p>
+                  <p className="text-[11px] text-gray-400 flex items-center gap-2 mt-0.5">
+                    {w.no_rumah && <span className="inline-flex items-center gap-0.5"><Home className="w-3 h-3" />{w.no_rumah}</span>}
+                    {w.no_hp && <span className="inline-flex items-center gap-0.5"><Phone className="w-3 h-3" />{w.no_hp}</span>}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {w.role === 'bendahara' && <Tag tone="success">Bendahara</Tag>}
+                  {!w.status_aktif && <Tag tone="neutral">Nonaktif</Tag>}
+                  <Pencil className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* FAB Tambah */}
+      <button
+        onClick={() => { haptic(); setForm({ mode: 'add', warga: null }); }}
+        className="fixed left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full bg-[#0F6039] text-white font-bold text-sm shadow-lg active:scale-[0.97] transition-all"
+        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}
+      >
+        <UserPlus className="w-4 h-4" /> Tambah Anggota
+      </button>
+
+      {form && (
+        <AnggotaFormModal
+          mode={form.mode}
+          initial={form.warga}
+          selesaiTarikan={selesaiTarikan}
+          onClose={() => setForm(null)}
+          onSaved={() => { setForm(null); load(); }}
+        />
+      )}
+    </div>
+  );
+}

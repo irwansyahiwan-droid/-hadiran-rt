@@ -22,6 +22,7 @@ import KasRTPage from './pages/KasRT';
 import RiwayatAktivitas from './pages/RiwayatAktivitas';
 import LaporanTriwulan from './pages/LaporanTriwulan';
 import BackupRestore from './pages/BackupRestore';
+import KelolaAnggota from './pages/KelolaAnggota';
 import TentangApp from './pages/TentangApp';
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
   const [riwayatOpen, setRiwayatOpen] = useState(false);
   const [laporanOpen, setLaporanOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
+  const [anggotaOpen, setAnggotaOpen] = useState(false);
   const [tentangOpen, setTentangOpen] = useState(false);
 
   const TAB_ORDER: TabName[] = ['beranda', 'jadwal', 'talangan', 'kas', 'kas-rt'];
@@ -114,6 +116,7 @@ export default function App() {
           onOpenRiwayat={ctxValue.isBendahara ? () => setRiwayatOpen(true) : undefined}
           onOpenLaporan={ctxValue.isBendahara ? () => setLaporanOpen(true) : undefined}
           onOpenBackup={ctxValue.isBendahara ? () => setBackupOpen(true) : undefined}
+          onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
         />
         <main className="max-w-lg mx-auto px-3 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
@@ -146,6 +149,10 @@ export default function App() {
         {/* Backup & Restore — bendahara saja */}
         {ctxValue.isBendahara && (
           <BackupRestore open={backupOpen} onClose={() => setBackupOpen(false)} />
+        )}
+        {/* Kelola Anggota — bendahara saja */}
+        {ctxValue.isBendahara && (
+          <KelolaAnggota open={anggotaOpen} onClose={() => setAnggotaOpen(false)} />
         )}
         {/* Tentang Aplikasi — semua pengguna */}
         <TentangApp open={tentangOpen} onClose={() => setTentangOpen(false)} />

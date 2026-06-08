@@ -40,6 +40,7 @@ const TABLE_LABEL: Record<string, string> = {
   kas_rt: 'Kas RT',
   tarikan: 'Tarikan',
   talangan: 'Talangan',
+  warga: 'Anggota',
 };
 
 function num(v: unknown): number | null {
@@ -149,6 +150,24 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
         title: `${actionLabel} Tarikan #${nomor}`,
         detail: null,
         amount: num(data.total_terkumpul),
+        changes, actor, accent, actionLabel, tableLabel,
+      };
+    }
+    case 'warga': {
+      const nama = str(data.nama);
+      if (row.action === 'UPDATE') {
+        diffText('nama', 'Nama');
+        diffText('no_rumah', 'No. Rumah');
+        diffText('no_hp', 'No. HP');
+        diffText('role', 'Peran');
+        const aktifOld = old.status_aktif === true ? 'Aktif' : 'Nonaktif';
+        const aktifNew = baru.status_aktif === true ? 'Aktif' : 'Nonaktif';
+        if (aktifOld !== aktifNew) changes.push({ label: 'Status', from: aktifOld, to: aktifNew });
+      }
+      return {
+        title: `${actionLabel} Anggota${nama ? `: ${nama}` : ''}`,
+        detail: str(data.no_rumah) || null,
+        amount: null,
         changes, actor, accent, actionLabel, tableLabel,
       };
     }
