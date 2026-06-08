@@ -10,9 +10,9 @@ html {
 }
 
 body {
-  /* Premium light surface (ala BYOND): abu sejuk lembut agar kartu putih
-     murni "mengambang" dgn bayangan — kontras halus = terasa mahal. */
-  background-color: #D9E0EB;
+  /* Light surface segar: biru-putih cerah agar tampilan terasa terang &
+     lapang, kartu putih tetap "mengambang" dgn bayangan berlapis. */
+  background-color: #EEF3F8;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -60,9 +60,9 @@ body {
 /* ── Hero card design tokens ─────────────────────────────── */
 :root {
   --hero-radius: 24px;
-  /* Samakan warna dengan hero Kas RT: bg-gradient-to-br from-#0F4C2E via-#145D39 to-#1B7249 */
-  --hero-gradient: linear-gradient(135deg, #0F4C2E 0%, #145D39 50%, #1B7249 100%);
-  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(39, 149, 95, 0.30) 0%, rgba(39, 149, 95, 0) 55%);
+  /* Emerald lebih segar/hidup (tetap deep di kiri-atas agar teks putih lolos kontras) */
+  --hero-gradient: linear-gradient(135deg, #0D5B36 0%, #15824C 50%, #1C9A5C 100%);
+  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.34) 0%, rgba(45, 212, 150, 0) 55%);
   --hero-shadow: 0 20px 50px -20px rgba(7, 30, 22, 0.7);
   --hero-divider: rgba(255, 255, 255, 0.16);
 }
@@ -101,7 +101,7 @@ body {
 :root {
   --ease-spring:   cubic-bezier(0.34, 1.4, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  /* Layer pertama = hairline ring lebih GELAP dari background (#D9E0EB) → tepi
+  /* Layer pertama = hairline ring lebih GELAP dari background (#EEF3F8) → tepi
      kartu tetap kebaca saat siang/layar terang ketika bayangan lembut "kebakar"
      cahaya. Edge kontras tinggi bertahan, putih kartu tak tersentuh. */
   --shadow-card:   0 0 0 1px rgba(16, 24, 40, 0.055), 0 1px 2px rgba(16, 24, 40, 0.05), 0 4px 9px -3px rgba(16, 24, 40, 0.085), 0 19px 40px -18px rgba(16, 24, 40, 0.245);
