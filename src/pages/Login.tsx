@@ -81,7 +81,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       <div className="rise relative w-full max-w-sm bg-white/80 dark:bg-gray-900 backdrop-blur-xl rounded-3xl shadow-2xl shadow-emerald-200/50 border border-white/80 dark:border-gray-700 p-6"
         style={{ animationDelay: '0.22s' }}>
         <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Masuk</h2>
-        <p className="text-sm text-gray-400 mb-6">Silakan login untuk melanjutkan</p>
+        <p className="text-sm text-ink-faint dark:text-gray-400 mb-6">Silakan login untuk melanjutkan</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
@@ -111,12 +111,13 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full pl-10 pr-10 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((p) => !p)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -196,7 +197,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         </form>
       </div>
 
-      <p className="text-xs text-gray-400 mt-6 text-center">
+      <p className="text-xs text-ink-faint dark:text-gray-400 mt-6 text-center">
         Hubungi bendahara jika lupa password
       </p>
     </div>

@@ -55,11 +55,11 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
               <span className={`flex items-center justify-center transition-transform duration-300 ${isActive ? '-translate-y-0.5' : ''}`}
                 style={{ transitionTimingFunction: 'var(--ease-spring)' }}>
                 <Icon
-                  className={`w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-brand-link dark:text-[#1A9B86]' : 'text-gray-400 dark:text-gray-500'}`}
+                  className={`w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-brand-link dark:text-[#1A9B86]' : 'text-gray-500 dark:text-gray-500'}`}
                   strokeWidth={isActive ? 2.4 : 2}
                 />
               </span>
-              <span className={`text-[11px] leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-brand-link dark:text-[#1A9B86]' : 'font-semibold text-gray-400 dark:text-gray-500'}`}>
+              <span className={`text-[11px] leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-brand-link dark:text-[#1A9B86]' : 'font-semibold text-ink-faint dark:text-gray-500'}`}>
                 {label}
               </span>
             </button>

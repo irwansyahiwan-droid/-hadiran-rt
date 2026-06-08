@@ -96,7 +96,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           <div className="relative">
             <button
               onClick={() => { haptic(); setMenuOpen((o) => !o); }}
-              className="press p-1.5 -mr-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+              className="press w-11 h-11 -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
               aria-label="Menu"
               aria-haspopup="menu"
               aria-expanded={menuOpen}

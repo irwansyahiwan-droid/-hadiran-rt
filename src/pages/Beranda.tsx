@@ -221,10 +221,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               Pendapatan Kas Hadiran
             </p>
           </div>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center -mr-2">
             <button
               onClick={() => { haptic(); toggleHideAmount(); }}
-              className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+              className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
               aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
             >
               {hidden
@@ -234,7 +234,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <button
               onClick={() => load(true)}
               disabled={refreshing}
-              className="p-1.5 -mr-1 rounded-full hover:bg-white/10 transition-colors"
+              className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
               aria-label="Muat ulang"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-white/65 ${refreshing ? 'animate-spin' : ''}`} />
@@ -401,10 +401,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               value={trxSearch}
               onChange={(e) => setTrxSearch(e.target.value)}
               placeholder="Cari keterangan / nama..."
-              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              className="w-full pl-9 pr-11 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
             {trxSearch && (
-              <button onClick={() => setTrxSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
+              <button onClick={() => setTrxSearch('')} className="absolute right-0.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center" aria-label="Bersihkan">
                 <X className="w-4 h-4 text-gray-400" />
               </button>
             )}
@@ -419,7 +419,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <button
                   key={f.id}
                   onClick={() => setTrxFilter(f.id)}
-                  className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  aria-pressed={trxFilter === f.id}
+                  className={`press px-3 py-2 rounded-full text-xs font-semibold transition-colors ${
                     trxFilter === f.id
                       ? 'bg-[#0F4C2E] text-white'
                       : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
@@ -431,7 +432,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </div>
             <button
               onClick={cycleTrxSort}
-              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
+              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
               aria-label={`Urutkan: ${trxSortLabel}`}
             >
               <ArrowDownUp className="w-3.5 h-3.5" />

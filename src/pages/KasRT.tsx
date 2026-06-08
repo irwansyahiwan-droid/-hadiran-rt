@@ -98,11 +98,11 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                 <input
-                  type="number"
-                  value={nominal || ''}
-                  onChange={(e) => setNominal(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={nominal ? nominal.toLocaleString('id-ID') : ''}
+                  onChange={(e) => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)}
                   required
-                  min={1}
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
                 />
               </div>
