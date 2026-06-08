@@ -11,8 +11,9 @@ html {
 
 body {
   /* Light surface segar: biru-putih cerah agar tampilan terasa terang &
-     lapang, kartu putih tetap "mengambang" dgn bayangan berlapis. */
-  background-color: #DCE4EE;
+     lapang, kartu putih tetap "mengambang" dgn bayangan berlapis.
+     Base sedikit lebih dalam (#DCE4EE -> #D3DDEB) agar kartu putih kontras. */
+  background-color: #D3DDEB;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -43,6 +44,25 @@ body {
   /* backwards (bukan both): jangan retain transform saat diam → cegah
      containing block yg merusak posisi modal fixed di dalam halaman. */
   animation: fadeIn 0.2s ease-out backwards;
+}
+
+/* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
+   Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
+   attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
+   Dipakai di wrapper App (ganti bg-[#DCE4EE]). */
+.app-bg {
+  background-color: #D3DDEB;
+  background-image:
+    radial-gradient(125% 78% at 50% -8%,  rgba(21, 130, 76, 0.13) 0%, rgba(21, 130, 76, 0) 44%),
+    radial-gradient(95% 60% at 100% 2%,   rgba(45, 212, 150, 0.10) 0%, rgba(45, 212, 150, 0) 42%),
+    radial-gradient(85% 55% at 0% 100%,   rgba(13, 91, 54, 0.07) 0%,  transparent 50%);
+  background-attachment: fixed;
+}
+.dark .app-bg {
+  background-color: #030712;
+  background-image:
+    radial-gradient(125% 78% at 50% -8%, rgba(26, 155, 134, 0.12) 0%, transparent 46%),
+    radial-gradient(90% 55% at 0% 100%,  rgba(16, 130, 76, 0.08) 0%,  transparent 52%);
 }
 
 .card-clean {
@@ -104,7 +124,7 @@ body {
   /* Layer pertama = hairline ring lebih GELAP dari background (#DCE4EE) → tepi
      kartu tetap kebaca saat siang/layar terang ketika bayangan lembut "kebakar"
      cahaya. Edge kontras tinggi bertahan, putih kartu tak tersentuh. */
-  --shadow-card:   0 0 0 1px rgba(16, 24, 40, 0.07), 0 1px 2px rgba(16, 24, 40, 0.05), 0 4px 9px -3px rgba(16, 24, 40, 0.085), 0 19px 40px -18px rgba(16, 24, 40, 0.245);
+  --shadow-card:   0 0 0 1px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 18px -8px rgba(16, 24, 40, 0.12), 0 28px 56px -22px rgba(16, 24, 40, 0.30);
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.29);
 }
 
