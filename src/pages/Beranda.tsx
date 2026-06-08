@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp, Search, X, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp, Search, X, Eye, EyeOff, UserPlus } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -31,6 +31,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const { isBendahara, isWargaMode } = useAuthContext();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
+  const [anggotaBaru, setAnggotaBaru] = useState<{ nama: string; created_at: string } | null>(null);
   const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -45,7 +46,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     if (showRefreshing) setRefreshing(true);
     else setLoading(true);
 
-    const [summaryData, jadwalRes, setorRes, talanganLunasRes] = await Promise.all([
+    const [summaryData, jadwalRes, setorRes, talanganLunasRes, wargaBaruRes] = await Promise.all([
       fetchDashboardSummary(),
       supabase
         .from('tarikan')
@@ -62,6 +63,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         .select('id, nominal, tanggal_lunas, warga:warga_id(nama), tarikan:tarikan_id(nomor)')
         .eq('status_lunas', true)
         .not('tanggal_lunas', 'is', null),
+      supabase
+        .from('warga')
+        .select('nama, created_at')
+        .eq('status_aktif', true)
+        .order('created_at', { ascending: false })
+        .limit(1),
     ]);
 
     // Merge setor + talangan lunas → sort tanggal DESC → limit 20
@@ -97,6 +104,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       saldoCurrent = saldoCurrent - item.nominal;
       return { ...item, saldoSetelah };
     });
+
+    // Banner "anggota baru" — tampil bila ada anggota yang bergabung ≤ 14 hari terakhir
+    const wb = ((wargaBaruRes.data as { nama: string; created_at: string }[]) ?? [])[0];
+    const baru14Hari = wb?.created_at
+      ? Date.now() - new Date(wb.created_at).getTime() < 14 * 86_400_000
+      : false;
+    setAnggotaBaru(baru14Hari ? wb : null);
 
     setSummary(summaryData);
     setJadwalList((jadwalRes.data as Tarikan[]) ?? []);
@@ -317,6 +331,21 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             Lihat
           </button>
+        </div>
+      )}
+
+      {/* Banner Anggota Baru — otomatis tampil ≤ 14 hari sejak bergabung */}
+      {anggotaBaru && (
+        <div className="flex items-start gap-3 bg-emerald-50/90 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-3xl px-5 py-4">
+          <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center flex-shrink-0">
+            <UserPlus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Anggota Baru Bergabung</p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400/80 mt-0.5">
+              {anggotaBaru.nama} kini terdaftar sebagai anggota RT
+            </p>
+          </div>
         </div>
       )}
 

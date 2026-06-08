@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
-  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText,
+  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Plus,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
@@ -553,6 +553,99 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   );
 }
 
+// ── Tambah Tarikan Modal ────────────────────────────────────
+
+interface TambahTarikanModalProps {
+  nextNomor: number;
+  wargaList: Warga[];
+  onClose: () => void;
+  onSaved: () => void;
+}
+
+function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
+  const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
+  const [sohibulId, setSohibulId] = useState('');
+  const [saving, setSaving] = useState(false);
+  useBackDismiss(true, onClose);
+
+  async function simpan() {
+    setSaving(true);
+    try {
+      await supabase.from('tarikan').insert({
+        nomor: nextNomor,
+        tanggal,
+        sohibul_bait_id: sohibulId || null,
+        status: 'dijadwalkan',
+        jumlah_per_orang: 50000,
+        total_warga: wargaList.length,
+        total_hadir: 0,
+        total_terkumpul: 0,
+      });
+      showToast(`Tarikan #${nextNomor} ditambahkan`);
+      haptic(12);
+      onSaved();
+    } catch {
+      showToast('Gagal menambah tarikan', 'error');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <input
+          type="date"
+          value={tanggal}
+          onChange={e => setTanggal(e.target.value)}
+          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-4"
+        />
+
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <select
+          value={sohibulId}
+          onChange={e => setSohibulId(e.target.value)}
+          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-5"
+        >
+          <option value="">— Belum ditentukan —</option>
+          {wargaList.map(w => (
+            <option key={w.id} value={w.id}>{w.nama}</option>
+          ))}
+        </select>
+
+        <div className="flex gap-2.5">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-full border border-control dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          >
+            Batal
+          </button>
+          <button
+            onClick={() => { haptic(12); simpan(); }}
+            disabled={saving || !tanggal}
+            className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
+            {saving ? 'Menyimpan...' : 'Simpan Tarikan'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────
 
 export default function JadwalPage() {
@@ -565,6 +658,7 @@ export default function JadwalPage() {
   const [lastResult, setLastResult] = useState<AbsensiResult | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [editingTarikan, setEditingTarikan] = useState<Tarikan | null>(null);
+  const [creatingTarikan, setCreatingTarikan] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -592,6 +686,7 @@ export default function JadwalPage() {
   const selesaiCount    = tarikanList.filter(t => t.status === 'selesai').length;
   const dijadwalCount   = tarikanList.filter(t => t.status === 'dijadwalkan' || t.status === 'berlangsung').length;
   const nextDijadwal    = tarikanList.find(t => t.status === 'dijadwalkan');
+  const nextNomor       = tarikanList.reduce((max, t) => Math.max(max, t.nomor), 0) + 1;
 
   if (selectedTarikan) {
     return (
@@ -621,6 +716,14 @@ export default function JadwalPage() {
           <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
           </button>
+          {isBendahara && (
+            <button
+              onClick={() => { haptic(); setCreatingTarikan(true); }}
+              className="flex items-center gap-1.5 bg-[#0F6039] text-white text-sm font-semibold px-3 py-2 rounded-xl shadow-sm active:scale-95 transition-all"
+            >
+              <Plus className="w-4 h-4" /> Tarikan
+            </button>
+          )}
           {isBendahara && tarikanList.length > 0 && (
             <button
               onClick={async () => {
@@ -769,6 +872,15 @@ export default function JadwalPage() {
           wargaList={wargaList}
           onClose={() => setEditingTarikan(null)}
           onSaved={() => { setEditingTarikan(null); load(); }}
+        />
+      )}
+
+      {creatingTarikan && (
+        <TambahTarikanModal
+          nextNomor={nextNomor}
+          wargaList={wargaList}
+          onClose={() => setCreatingTarikan(false)}
+          onSaved={() => { setCreatingTarikan(false); load(); }}
         />
       )}
     </div>
