@@ -56,6 +56,15 @@ export default function PengumumanBanner({ canManage }: Props) {
               loading="lazy"
             />
           )}
+          {data!.media_url && data!.media_tipe === 'video' && (
+            <video
+              src={data!.media_url}
+              className="relative z-[2] w-full max-h-52 rounded-2xl mb-3 bg-black"
+              controls
+              playsInline
+              preload="metadata"
+            />
+          )}
           <div className="relative z-[2] flex items-start gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
               <Icon className="w-5 h-5 ann-wiggle" strokeWidth={2.2} />
@@ -120,40 +129,49 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
   const [tipe, setTipe] = useState<PengumumanTipe>(initial?.tipe ?? 'info');
   const [aktif, setAktif] = useState(initial?.aktif ?? true);
   const [mediaUrl, setMediaUrl] = useState<string | null>(initial?.media_url ?? null);
+  const [mediaTipe, setMediaTipe] = useState<'foto' | 'video' | null>(initial?.media_tipe ?? null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   useBackDismiss(true, onClose);
 
-  async function pilihFoto(e: React.ChangeEvent<HTMLInputElement>) {
+  async function pilihMedia(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = ''; // boleh pilih file sama lagi
     if (!file) return;
-    if (!file.type.startsWith('image/')) { showToast('Pilih berkas gambar', 'error'); return; }
-    if (file.size > 3 * 1024 * 1024) { showToast('Ukuran foto maksimal 3 MB', 'error'); return; }
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+    if (!isImage && !isVideo) { showToast('Pilih berkas gambar atau video', 'error'); return; }
+    const maxMB = isVideo ? 10 : 3;
+    if (file.size > maxMB * 1024 * 1024) {
+      showToast(`Ukuran ${isVideo ? 'video' : 'foto'} maksimal ${maxMB} MB`, 'error');
+      return;
+    }
     setUploading(true);
     try {
       setMediaUrl(await uploadMediaPengumuman(file));
+      setMediaTipe(isVideo ? 'video' : 'foto');
     } catch {
-      showToast('Gagal mengunggah foto', 'error');
+      showToast('Gagal mengunggah media', 'error');
     } finally {
       setUploading(false);
     }
   }
 
-  async function hapusFoto() {
+  async function hapusMedia() {
     haptic();
     if (mediaUrl) { try { await hapusMediaPengumuman(mediaUrl); } catch { /* abaikan */ } }
     setMediaUrl(null);
+    setMediaTipe(null);
   }
 
   async function simpan() {
-    if (!judul.trim() && !isi.trim() && !mediaUrl) { showToast('Isi pengumuman atau tambahkan foto dulu', 'error'); return; }
+    if (!judul.trim() && !isi.trim() && !mediaUrl) { showToast('Isi pengumuman atau tambahkan media dulu', 'error'); return; }
     setSaving(true);
     const ok = await setPengumuman({
       judul: judul.trim(), isi: isi.trim(), tipe, aktif,
-      media_url: mediaUrl, media_tipe: mediaUrl ? 'foto' : null,
+      media_url: mediaUrl, media_tipe: mediaUrl ? (mediaTipe ?? 'foto') : null,
     });
     setSaving(false);
     if (ok) { haptic(12); showToast(aktif ? 'Pengumuman tayang' : 'Pengumuman disimpan (nonaktif)'); onSaved(); }
@@ -193,9 +211,11 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           className="ann-glow ann-sheen relative overflow-hidden rounded-2xl px-4 py-3 text-white mb-4"
           style={{ background: style.grad, ['--ann-glow' as string]: style.glow }}
         >
-          {mediaUrl && (
+          {mediaUrl && mediaTipe === 'video' ? (
+            <video src={mediaUrl} className="relative z-[2] w-full max-h-40 rounded-xl mb-2.5 bg-black" controls playsInline preload="metadata" />
+          ) : mediaUrl ? (
             <img src={mediaUrl} alt="Pratinjau" className="relative z-[2] w-full max-h-40 object-cover rounded-xl mb-2.5" />
-          )}
+          ) : null}
           <div className="relative z-[2] flex items-start gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <Icon className="w-4 h-4" strokeWidth={2.2} />
@@ -225,15 +245,19 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-4 resize-none"
         />
 
-        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Foto (opsional)</label>
-        <input ref={fileRef} type="file" accept="image/*" onChange={pilihFoto} className="hidden" />
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Foto / Video (opsional)</label>
+        <input ref={fileRef} type="file" accept="image/*,video/*" onChange={pilihMedia} className="hidden" />
         {mediaUrl ? (
-          <div className="relative mb-4 rounded-xl overflow-hidden border border-control dark:border-gray-700">
-            <img src={mediaUrl} alt="Foto pengumuman" className="w-full max-h-44 object-cover" />
+          <div className="relative mb-1.5 rounded-xl overflow-hidden border border-control dark:border-gray-700">
+            {mediaTipe === 'video' ? (
+              <video src={mediaUrl} className="w-full max-h-44 bg-black" controls playsInline preload="metadata" />
+            ) : (
+              <img src={mediaUrl} alt="Foto pengumuman" className="w-full max-h-44 object-cover" />
+            )}
             <button
-              onClick={hapusFoto}
+              onClick={hapusMedia}
               className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/55 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/70 transition-colors"
-              aria-label="Hapus foto"
+              aria-label="Hapus media"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -242,12 +266,13 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           <button
             onClick={() => { haptic(); fileRef.current?.click(); }}
             disabled={uploading}
-            className="w-full mb-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors disabled:opacity-60"
+            className="w-full mb-1.5 flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors disabled:opacity-60"
           >
             {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
-            {uploading ? 'Mengunggah...' : 'Unggah Foto'}
+            {uploading ? 'Mengunggah...' : 'Unggah Foto / Video'}
           </button>
         )}
+        <p className="text-[11px] text-gray-400 mb-4">Foto maks 3 MB · Video maks 10 MB (MP4, ≤30 dtk)</p>
 
         <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Jenis</label>
         <div className="grid grid-cols-3 gap-2 mb-4">

@@ -80,7 +80,8 @@ export async function uploadMediaPengumuman(file: File): Promise<string> {
   const path = `media-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const { error } = await supabase.storage
     .from(BUCKET_PENGUMUMAN)
-    .upload(path, file, { contentType: file.type, upsert: true });
+    // cacheControl 7 hari → CDN nge-cache media (hemat egress utk tontonan berulang)
+    .upload(path, file, { contentType: file.type, upsert: true, cacheControl: '604800' });
   if (error) throw error;
   return supabase.storage.from(BUCKET_PENGUMUMAN).getPublicUrl(path).data.publicUrl;
 }
