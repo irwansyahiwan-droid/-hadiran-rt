@@ -46,8 +46,12 @@ export interface Pengumuman {
   isi: string;
   aktif: boolean;
   tipe: PengumumanTipe;
+  media_url?: string | null;             // foto/video di Supabase Storage
+  media_tipe?: 'foto' | 'video' | null;  // jenis media (video menyusul)
   updated_at?: string;
 }
+
+const BUCKET_PENGUMUMAN = 'pengumuman';
 
 const KEY_PENGUMUMAN = 'pengumuman';
 
@@ -64,8 +68,30 @@ export async function getPengumuman(): Promise<Pengumuman | null> {
     isi: v.isi ?? '',
     aktif: v.aktif ?? false,
     tipe: (v.tipe as PengumumanTipe) ?? 'info',
+    media_url: v.media_url ?? null,
+    media_tipe: v.media_tipe ?? null,
     updated_at: v.updated_at,
   };
+}
+
+/** Unggah foto/video pengumuman ke Storage, kembalikan URL publik. */
+export async function uploadMediaPengumuman(file: File): Promise<string> {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = `media-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage
+    .from(BUCKET_PENGUMUMAN)
+    .upload(path, file, { contentType: file.type, upsert: true });
+  if (error) throw error;
+  return supabase.storage.from(BUCKET_PENGUMUMAN).getPublicUrl(path).data.publicUrl;
+}
+
+/** Hapus media dari Storage (best-effort, dari URL publiknya). */
+export async function hapusMediaPengumuman(url: string): Promise<void> {
+  const marker = `/${BUCKET_PENGUMUMAN}/`;
+  const i = url.indexOf(marker);
+  if (i === -1) return;
+  const path = url.slice(i + marker.length);
+  await supabase.storage.from(BUCKET_PENGUMUMAN).remove([path]);
 }
 
 export async function setPengumuman(p: Pengumuman): Promise<boolean> {

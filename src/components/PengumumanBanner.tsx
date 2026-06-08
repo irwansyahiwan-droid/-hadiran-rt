@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Megaphone, Pencil, X, Trash2, RefreshCw, Plus, Info, AlertTriangle, PartyPopper, type LucideIcon } from 'lucide-react';
-import { getPengumuman, setPengumuman, clearPengumuman, type Pengumuman, type PengumumanTipe } from '../lib/pengaturan';
+import { useEffect, useRef, useState } from 'react';
+import { Megaphone, Pencil, X, Trash2, RefreshCw, Plus, Info, AlertTriangle, PartyPopper, ImagePlus, type LucideIcon } from 'lucide-react';
+import {
+  getPengumuman, setPengumuman, clearPengumuman,
+  uploadMediaPengumuman, hapusMediaPengumuman,
+  type Pengumuman, type PengumumanTipe,
+} from '../lib/pengaturan';
 import { haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -44,6 +48,14 @@ export default function PengumumanBanner({ canManage }: Props) {
           className="ann-in ann-glow ann-sheen relative overflow-hidden rounded-3xl px-5 py-4 text-white"
           style={{ background: style.grad, ['--ann-glow' as string]: style.glow }}
         >
+          {data!.media_url && data!.media_tipe === 'foto' && (
+            <img
+              src={data!.media_url}
+              alt={data!.judul || 'Foto pengumuman'}
+              className="relative z-[2] w-full max-h-52 object-cover rounded-2xl mb-3"
+              loading="lazy"
+            />
+          )}
           <div className="relative z-[2] flex items-start gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
               <Icon className="w-5 h-5 ann-wiggle" strokeWidth={2.2} />
@@ -107,14 +119,42 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
   const [isi, setIsi] = useState(initial?.isi ?? '');
   const [tipe, setTipe] = useState<PengumumanTipe>(initial?.tipe ?? 'info');
   const [aktif, setAktif] = useState(initial?.aktif ?? true);
+  const [mediaUrl, setMediaUrl] = useState<string | null>(initial?.media_url ?? null);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   useBackDismiss(true, onClose);
 
+  async function pilihFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // boleh pilih file sama lagi
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { showToast('Pilih berkas gambar', 'error'); return; }
+    if (file.size > 3 * 1024 * 1024) { showToast('Ukuran foto maksimal 3 MB', 'error'); return; }
+    setUploading(true);
+    try {
+      setMediaUrl(await uploadMediaPengumuman(file));
+    } catch {
+      showToast('Gagal mengunggah foto', 'error');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function hapusFoto() {
+    haptic();
+    if (mediaUrl) { try { await hapusMediaPengumuman(mediaUrl); } catch { /* abaikan */ } }
+    setMediaUrl(null);
+  }
+
   async function simpan() {
-    if (!judul.trim() && !isi.trim()) { showToast('Isi pengumuman dulu', 'error'); return; }
+    if (!judul.trim() && !isi.trim() && !mediaUrl) { showToast('Isi pengumuman atau tambahkan foto dulu', 'error'); return; }
     setSaving(true);
-    const ok = await setPengumuman({ judul: judul.trim(), isi: isi.trim(), tipe, aktif });
+    const ok = await setPengumuman({
+      judul: judul.trim(), isi: isi.trim(), tipe, aktif,
+      media_url: mediaUrl, media_tipe: mediaUrl ? 'foto' : null,
+    });
     setSaving(false);
     if (ok) { haptic(12); showToast(aktif ? 'Pengumuman tayang' : 'Pengumuman disimpan (nonaktif)'); onSaved(); }
     else showToast('Gagal menyimpan', 'error');
@@ -153,6 +193,9 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           className="ann-glow ann-sheen relative overflow-hidden rounded-2xl px-4 py-3 text-white mb-4"
           style={{ background: style.grad, ['--ann-glow' as string]: style.glow }}
         >
+          {mediaUrl && (
+            <img src={mediaUrl} alt="Pratinjau" className="relative z-[2] w-full max-h-40 object-cover rounded-xl mb-2.5" />
+          )}
           <div className="relative z-[2] flex items-start gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
               <Icon className="w-4 h-4" strokeWidth={2.2} />
@@ -181,6 +224,30 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           placeholder="Tulis detail pengumuman di sini..."
           className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-4 resize-none"
         />
+
+        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Foto (opsional)</label>
+        <input ref={fileRef} type="file" accept="image/*" onChange={pilihFoto} className="hidden" />
+        {mediaUrl ? (
+          <div className="relative mb-4 rounded-xl overflow-hidden border border-control dark:border-gray-700">
+            <img src={mediaUrl} alt="Foto pengumuman" className="w-full max-h-44 object-cover" />
+            <button
+              onClick={hapusFoto}
+              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/55 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/70 transition-colors"
+              aria-label="Hapus foto"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => { haptic(); fileRef.current?.click(); }}
+            disabled={uploading}
+            className="w-full mb-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors disabled:opacity-60"
+          >
+            {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
+            {uploading ? 'Mengunggah...' : 'Unggah Foto'}
+          </button>
+        )}
 
         <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Jenis</label>
         <div className="grid grid-cols-3 gap-2 mb-4">
@@ -224,7 +291,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           )}
           <button
             onClick={() => { haptic(12); simpan(); }}
-            disabled={saving || deleting}
+            disabled={saving || deleting || uploading}
             className="flex-1 py-3 rounded-full bg-[#0F6039] text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
