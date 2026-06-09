@@ -12,8 +12,8 @@ html {
 body {
   /* Light surface segar: biru-putih cerah agar tampilan terasa terang &
      lapang, kartu putih tetap "mengambang" dgn bayangan berlapis.
-     Kanvas terang-airy; kontras kartu dari bayangan crisp (lihat .app-bg). */
-  background-color: #E6EDF5;
+     Kanvas terang-airy; kontras kartu dari step warna + bayangan crisp (lihat .app-bg). */
+  background-color: #DCE4EE;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -51,16 +51,17 @@ body {
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
    Dipakai di wrapper App (ganti bg-[#DCE4EE]). */
 .app-bg {
-  /* Kanvas terang & lapang (premium minimal). Kontras kartu datang dari
-     bayangan crisp, BUKAN abu gelap → glow emerald jadi "nyala", tak muddy. */
-  background-color: #E6EDF5;
+  /* Kanvas terang & lapang (premium minimal), diperdalam 1 tingkat (#DCE4EE)
+     agar kartu putih punya step warna jelas (figure-ground) + bayangan crisp,
+     BUKAN abu gelap → glow emerald tetap "nyala", tak muddy. */
+  background-color: #DCE4EE;
   background-image:
     /* mesh aurora lebih keluar: emerald tengah, teal kanan, sky kiri */
     radial-gradient(105% 58% at 50% -10%, rgba(16, 185, 129, 0.42) 0%, rgba(16, 185, 129, 0) 50%),
     radial-gradient(84% 54% at 100% -4%,  rgba(20, 184, 166, 0.32) 0%, transparent 48%),
     radial-gradient(86% 54% at 0% 6%,     rgba(56, 189, 248, 0.22) 0%, transparent 46%),
     /* grounding lebih dalam di bawah agar tak "melayang kosong" */
-    linear-gradient(180deg, rgba(230, 237, 245, 0) 44%, rgba(166, 189, 216, 0.68) 100%);
+    linear-gradient(180deg, rgba(220, 228, 238, 0) 44%, rgba(166, 189, 216, 0.68) 100%);
   background-attachment: fixed;
 }
 .dark .app-bg {
@@ -132,9 +133,9 @@ body {
      cahaya. Edge kontras tinggi bertahan, putih kartu tak tersentuh. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.95),               /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(16, 24, 40, 0.06),                          /* hairline ring crisp */
-    0 2px 5px -1px rgba(16, 24, 40, 0.07),
-    0 16px 30px -10px rgba(16, 24, 40, 0.16),
+    0 0 0 1px rgba(16, 24, 40, 0.10),                          /* hairline ring crisp → kartu "tercetak" walau bayangan kebakar cahaya */
+    0 2px 6px -1px rgba(16, 24, 40, 0.09),
+    0 16px 30px -10px rgba(16, 24, 40, 0.17),
     0 40px 72px -26px rgba(13, 80, 50, 0.30);                  /* ambient dalam bertint emerald (brand) */
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.29);
 }
