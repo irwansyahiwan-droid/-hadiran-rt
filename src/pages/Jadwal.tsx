@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
-  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Plus,
+  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Plus, Share2,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
@@ -420,31 +420,43 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
 function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: () => void }) {
   const [visible, setVisible] = useState(false);
-  const [progress, setProgress] = useState(100);
-  const onDismissRef = useRef(onDismiss);
-  onDismissRef.current = onDismiss;
+  const [sharing, setSharing] = useState(false);
   const hasTalangan = result.talanganTotal > 0;
 
+  // Tampil tetap sampai bendahara menutup sendiri (untuk cocokkan uang real).
   useEffect(() => {
     const t1 = setTimeout(() => setVisible(true), 10);
-    const startTime = Date.now();
-    const DURATION = 5000;
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const pct = Math.max(0, 100 - (elapsed / DURATION) * 100);
-      setProgress(pct);
-      if (pct <= 0) {
-        clearInterval(interval);
-        setVisible(false);
-        setTimeout(() => onDismissRef.current(), 300);
-      }
-    }, 100);
-    return () => { clearTimeout(t1); clearInterval(interval); };
+    return () => clearTimeout(t1);
   }, []);
 
   function dismiss() {
     setVisible(false);
-    setTimeout(() => onDismissRef.current(), 300);
+    setTimeout(onDismiss, 300);
+  }
+
+  // Bagikan rincian tarikan sbg kartu PNG bermerek → grup WA warga.
+  async function share() {
+    haptic(12);
+    setSharing(true);
+    try {
+      const { shareReceipt } = await import('../lib/shareReceipt');
+      await shareReceipt({
+        title: `Hasil Tarikan #${result.tarikanNomor} — RT 004 / RW 006`,
+        amountLabel: 'Kas Terkumpul',
+        amount: formatRupiahPlain(result.kasTotal),
+        rows: [
+          { label: 'Hadir', value: `${result.hadirCount} warga` },
+          { label: 'Tidak Hadir', value: `${result.tidakCount} warga` },
+          ...(hasTalangan ? [{ label: 'Talangan Keluar', value: formatRupiahPlain(result.talanganTotal) }] : []),
+          { label: 'Sohibul Bait Terima', value: formatRupiahPlain(result.sohibulBaitTerima) },
+        ],
+        shareText: `Hasil Tarikan #${result.tarikanNomor} RT 004/006\nKas terkumpul: ${formatRupiahPlain(result.kasTotal)} · Sohibul terima: ${formatRupiahPlain(result.sohibulBaitTerima)}\n— Hadiran RT`,
+      });
+    } catch {
+      showToast('Gagal membuat gambar. Coba lagi.', 'error');
+    } finally {
+      setSharing(false);
+    }
   }
 
   return (
@@ -455,7 +467,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
             <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             Absensi Tarikan #{result.tarikanNomor} berhasil disimpan
           </p>
-          <button onClick={dismiss} className="p-0.5 text-gray-400 hover:text-gray-600 shrink-0 -mt-0.5">
+          <button onClick={dismiss} aria-label="Tutup" className="press p-0.5 text-gray-400 hover:text-gray-600 shrink-0 -mt-0.5">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -477,12 +489,13 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
             Sohibul Bait terima: <span className="font-semibold text-emerald-700 dark:text-emerald-400">{formatRupiahPlain(result.sohibulBaitTerima)}</span>
           </p>
         </div>
-        <div className="mt-3 h-0.5 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full ${hasTalangan ? 'bg-amber-400' : 'bg-emerald-400'}`}
-            style={{ width: `${progress}%`, transition: 'width 0.1s linear' }}
-          />
-        </div>
+        <button
+          onClick={share}
+          disabled={sharing}
+          className="press mt-3 w-full inline-flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold px-3 py-2.5 rounded-xl shadow-sm disabled:opacity-60"
+        >
+          <Share2 className="w-3.5 h-3.5" /> {sharing ? 'Menyiapkan…' : 'Bagikan PNG'}
+        </button>
       </div>
     </div>
   );
