@@ -202,19 +202,21 @@ export default function KasRTPage() {
   // Bagikan ringkasan Kas RT sbg kartu PNG bermerek → grup WA warga.
   async function handleShareReceipt() {
     haptic(12);
+    // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
+    const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
     try {
       const { shareReceipt } = await import('../lib/shareReceipt');
       await shareReceipt({
         title: 'Ringkasan Kas Besar RT 004 / RW 006',
         amountLabel: 'Saldo Bersih Kas RT',
-        amount: formatRupiahPlain(saldo),
+        amount: fmtSaldo,
         rows: [
           { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
           { label: 'Total Masuk', value: '+' + formatRupiahPlain(totalMasuk) },
           { label: 'Total Keluar', value: '-' + formatRupiahPlain(totalKeluar) },
-          { label: 'Saldo Bersih', value: formatRupiahPlain(saldo) },
+          { label: 'Saldo Bersih', value: fmtSaldo },
         ],
-        shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${formatRupiahPlain(saldo)}\n— Hadiran RT`,
+        shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${fmtSaldo}\n— Hadiran RT`,
       });
     } catch {
       showToast('Gagal membuat gambar. Coba lagi.', 'error');

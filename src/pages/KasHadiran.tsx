@@ -163,19 +163,21 @@ export default function KasHadiranPage() {
   // Bagikan ringkasan Kas Hadiran sbg kartu PNG bermerek → grup WA warga.
   async function handleShareReceipt() {
     haptic(12);
+    // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
+    const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
     try {
       const { shareReceipt } = await import('../lib/shareReceipt');
       await shareReceipt({
         title: 'Ringkasan Kas Hadiran RT 004 / RW 006',
         amountLabel: 'Saldo Kas Hadiran',
-        amount: formatRupiahPlain(saldo),
+        amount: fmtSaldo,
         rows: [
           { label: 'Kas Terkumpul', value: '+' + formatRupiahPlain(totalKasTerkumpul) },
           { label: 'Talangan Belum Lunas', value: '-' + formatRupiahPlain(totalTalanganBelum) },
           { label: 'Setor ke Kas RT', value: '-' + formatRupiahPlain(totalSetor) },
-          { label: 'Saldo Bersih', value: formatRupiahPlain(saldo) },
+          { label: 'Saldo Bersih', value: fmtSaldo },
         ],
-        shareText: `Ringkasan Kas Hadiran RT 004/006\nSaldo: ${formatRupiahPlain(saldo)} · ${tarikanSelesai.length} tarikan\n— Hadiran RT`,
+        shareText: `Ringkasan Kas Hadiran RT 004/006\nSaldo: ${fmtSaldo} · ${tarikanSelesai.length} tarikan\n— Hadiran RT`,
       });
     } catch {
       showToast('Gagal membuat gambar. Coba lagi.', 'error');
