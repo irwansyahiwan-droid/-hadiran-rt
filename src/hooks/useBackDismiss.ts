@@ -13,7 +13,7 @@ import { useEffect, useRef } from 'react';
 
 interface Layer { id: number; close: () => void }
 
-let stack: Layer[] = [];
+const stack: Layer[] = [];
 let seq = 0;
 let inited = false;
 let ignorePop = false;

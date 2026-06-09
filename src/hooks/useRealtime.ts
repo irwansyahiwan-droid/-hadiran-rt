@@ -23,7 +23,9 @@ export function useRealtime(tables: string[], onChange: () => void) {
     };
 
     const channel = supabase.channel(`rt:${key}`);
-    tables.forEach((table) => {
+    // Turunkan daftar tabel dari `key` (string stabil) → deps effect lengkap & benar.
+    const tbls = key ? key.split(',') : [];
+    tbls.forEach((table) => {
       channel.on('postgres_changes', { event: '*', schema: 'public', table }, fire);
     });
     channel.subscribe();

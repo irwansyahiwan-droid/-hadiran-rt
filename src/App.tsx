@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
@@ -13,17 +13,30 @@ import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import InstallPrompt from './components/InstallPrompt';
 import Toaster from './components/Toaster';
 import type { TabName } from './components/layout/BottomNav';
-import Beranda from './pages/Beranda';
-import JadwalPage from './pages/Jadwal';
-import JadwalWargaPage from './pages/JadwalWarga';
-import TalanganPage from './pages/Talangan';
-import KasHadiranPage from './pages/KasHadiran';
-import KasRTPage from './pages/KasRT';
-import RiwayatAktivitas from './pages/RiwayatAktivitas';
-import LaporanTriwulan from './pages/LaporanTriwulan';
-import BackupRestore from './pages/BackupRestore';
-import KelolaAnggota from './pages/KelolaAnggota';
-import TentangApp from './pages/TentangApp';
+
+// Code-splitting per halaman → first load ringan di HP warga; tiap tab/overlay
+// memuat chunk-nya sendiri saat dibutuhkan (vite:preloadError di main.tsx
+// menjaga dari "chunk basi" setelah redeploy).
+const Beranda = lazy(() => import('./pages/Beranda'));
+const JadwalPage = lazy(() => import('./pages/Jadwal'));
+const JadwalWargaPage = lazy(() => import('./pages/JadwalWarga'));
+const TalanganPage = lazy(() => import('./pages/Talangan'));
+const KasHadiranPage = lazy(() => import('./pages/KasHadiran'));
+const KasRTPage = lazy(() => import('./pages/KasRT'));
+const RiwayatAktivitas = lazy(() => import('./pages/RiwayatAktivitas'));
+const LaporanTriwulan = lazy(() => import('./pages/LaporanTriwulan'));
+const BackupRestore = lazy(() => import('./pages/BackupRestore'));
+const KelolaAnggota = lazy(() => import('./pages/KelolaAnggota'));
+const TentangApp = lazy(() => import('./pages/TentangApp'));
+
+// Fallback ringan saat chunk halaman dimuat (spinner brand, sinkron dgn loader auth).
+function PageFallback() {
+  return (
+    <div className="flex items-center justify-center py-24">
+      <RefreshCw className="w-7 h-7 text-emerald-500 animate-spin" />
+    </div>
+  );
+}
 
 export default function App() {
   const auth = useAuth();
@@ -123,11 +136,13 @@ export default function App() {
           <PullToRefresh onRefresh={handleRefresh}>
             <div {...swipe}>
               <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>
-                {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} />}
-                {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
-                {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => changeTab('beranda') : undefined} />}
-                {activeTab === 'kas'      && <KasHadiranPage />}
-                {activeTab === 'kas-rt'   && <KasRTPage />}
+                <Suspense fallback={<PageFallback />}>
+                  {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} />}
+                  {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
+                  {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => changeTab('beranda') : undefined} />}
+                  {activeTab === 'kas'      && <KasHadiranPage />}
+                  {activeTab === 'kas-rt'   && <KasRTPage />}
+                </Suspense>
               </div>
             </div>
           </PullToRefresh>
@@ -138,24 +153,25 @@ export default function App() {
         {/* Banner pasang app (Android prompt / panduan iOS) */}
         <InstallPrompt />
         <Toaster />
-        {/* Riwayat Aktivitas (audit log) — bendahara saja */}
-        {ctxValue.isBendahara && (
-          <RiwayatAktivitas open={riwayatOpen} onClose={() => setRiwayatOpen(false)} />
-        )}
-        {/* Tutup Buku Triwulan — bendahara saja */}
-        {ctxValue.isBendahara && (
-          <LaporanTriwulan open={laporanOpen} onClose={() => setLaporanOpen(false)} />
-        )}
-        {/* Backup & Restore — bendahara saja */}
-        {ctxValue.isBendahara && (
-          <BackupRestore open={backupOpen} onClose={() => setBackupOpen(false)} />
-        )}
-        {/* Kelola Anggota — bendahara saja */}
-        {ctxValue.isBendahara && (
-          <KelolaAnggota open={anggotaOpen} onClose={() => setAnggotaOpen(false)} />
-        )}
-        {/* Tentang Aplikasi — semua pengguna */}
-        <TentangApp open={tentangOpen} onClose={() => setTentangOpen(false)} />
+        {/* Overlay bendahara/umum — chunk dimuat saat pertama dibuka (gate by state).
+            Tiap overlay return null saat !open, jadi mount-on-open setara perilaku. */}
+        <Suspense fallback={null}>
+          {ctxValue.isBendahara && riwayatOpen && (
+            <RiwayatAktivitas open onClose={() => setRiwayatOpen(false)} />
+          )}
+          {ctxValue.isBendahara && laporanOpen && (
+            <LaporanTriwulan open onClose={() => setLaporanOpen(false)} />
+          )}
+          {ctxValue.isBendahara && backupOpen && (
+            <BackupRestore open onClose={() => setBackupOpen(false)} />
+          )}
+          {ctxValue.isBendahara && anggotaOpen && (
+            <KelolaAnggota open onClose={() => setAnggotaOpen(false)} />
+          )}
+          {tentangOpen && (
+            <TentangApp open onClose={() => setTentangOpen(false)} />
+          )}
+        </Suspense>
       </div>
     </AuthContext.Provider>
   );
