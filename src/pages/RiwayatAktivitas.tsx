@@ -119,7 +119,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#DCE4EE] dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#EEF0F4] dark:bg-gray-950 page-in-right overflow-y-auto">
       {/* Header */}
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"

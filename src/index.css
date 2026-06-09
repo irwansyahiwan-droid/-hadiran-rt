@@ -10,10 +10,10 @@ html {
 }
 
 body {
-  /* Light surface segar: biru-putih cerah agar tampilan terasa terang &
-     lapang, kartu putih tetap "mengambang" dgn bayangan berlapis.
-     Kanvas terang-airy; kontras kartu dari step warna + bayangan crisp (lihat .app-bg). */
-  background-color: #DCE4EE;
+  /* Kanvas abu netral sejuk (Apple/Linear clean): rata & tenang agar kartu
+     putih "pop" lewat step tonal netral + bayangan crisp — BUKAN dari glow/
+     aurora. Makin sedikit trik, makin mahal kelihatannya (lihat .app-bg). */
+  background-color: #EEF0F4;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -49,19 +49,15 @@ body {
 /* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
    Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
-   Dipakai di wrapper App (ganti bg-[#DCE4EE]). */
+   Dipakai di wrapper App (kanvas #EEF0F4). */
 .app-bg {
-  /* Kanvas terang & lapang (premium minimal), diperdalam 1 tingkat (#DCE4EE)
-     agar kartu putih punya step warna jelas (figure-ground) + bayangan crisp,
-     BUKAN abu gelap → glow emerald tetap "nyala", tak muddy. */
-  background-color: #DCE4EE;
+  /* Apple clean: kanvas abu netral sejuk RATA (#EEF0F4). Tanpa aurora tebal &
+     tanpa grounding gelap → tenang, lapang, profesional. Brand emerald hanya
+     "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
+     Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
+  background-color: #EEF0F4;
   background-image:
-    /* mesh aurora lebih keluar: emerald tengah, teal kanan, sky kiri */
-    radial-gradient(105% 58% at 50% -10%, rgba(16, 185, 129, 0.42) 0%, rgba(16, 185, 129, 0) 50%),
-    radial-gradient(84% 54% at 100% -4%,  rgba(20, 184, 166, 0.32) 0%, transparent 48%),
-    radial-gradient(86% 54% at 0% 6%,     rgba(56, 189, 248, 0.22) 0%, transparent 46%),
-    /* grounding lebih dalam di bawah agar tak "melayang kosong" */
-    linear-gradient(180deg, rgba(220, 228, 238, 0) 44%, rgba(166, 189, 216, 0.68) 100%);
+    radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
   background-attachment: fixed;
 }
 .dark .app-bg {
@@ -128,16 +124,16 @@ body {
 :root {
   --ease-spring:   cubic-bezier(0.34, 1.4, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  /* Layer pertama = hairline ring lebih GELAP dari background (#DCE4EE) → tepi
-     kartu tetap kebaca saat siang/layar terang ketika bayangan lembut "kebakar"
-     cahaya. Edge kontras tinggi bertahan, putih kartu tak tersentuh. */
+  /* Apple clean — pemisahan kartu dari "satu step tonal + bayangan crisp
+     terarah", BUKAN halo. Halo putih dihapus (biang "berkabut"), tint emerald
+     dihapus (biang muddy). Semua netral abu-ink → bayangan bersih & mahal.
+     Hairline ring tetap → tepi kartu "tercetak" walau bayangan kebakar cahaya. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(16, 24, 40, 0.09),                          /* hairline ring crisp → kartu "tercetak" walau bayangan kebakar cahaya */
-    0 0 16px 2px rgba(255, 255, 255, 0.85),                    /* HALO putih lembut → kartu seakan memancar/glow di kanvas tint */
-    0 3px 8px -2px rgba(16, 24, 40, 0.10),
-    0 18px 36px -12px rgba(16, 24, 40, 0.22),                  /* drop lebih dalam → kartu terangkat lebih tinggi */
-    0 46px 84px -28px rgba(13, 80, 50, 0.36);                  /* ambient dalam bertint emerald (brand) lebih kuat */
+    0 0 0 1px rgba(16, 24, 40, 0.07),                          /* hairline ring crisp → kartu "tercetak" */
+    0 1px 2px 0 rgba(16, 24, 40, 0.06),                       /* contact shadow rapat → kartu menapak */
+    0 8px 16px -6px rgba(16, 24, 40, 0.10),                   /* drop lembut terarah */
+    0 24px 48px -20px rgba(16, 24, 40, 0.14);                 /* ambient netral dalam → elevation tenang */
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.29);
 }
 
