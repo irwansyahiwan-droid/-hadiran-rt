@@ -258,7 +258,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                  <p className="text-xs text-ink-faint dark:text-gray-500 truncate">
                     {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>

@@ -38,7 +38,7 @@ export default function MonthlyBars({ data }: { data: MonthBar[] }) {
       </div>
       <div className="flex justify-between gap-2 mt-2">
         {data.map((d, i) => (
-          <span key={i} className="flex-1 text-center text-[10px] font-medium text-gray-400 dark:text-gray-500">{d.label}</span>
+          <span key={i} className="flex-1 text-center text-[10px] font-medium text-ink-faint dark:text-gray-500">{d.label}</span>
         ))}
       </div>
     </div>

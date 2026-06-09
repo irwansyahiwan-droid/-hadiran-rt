@@ -29,7 +29,7 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
 
       <p className="text-sm font-bold text-gray-700 dark:text-gray-200">{title}</p>
       {subtitle && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-[230px] leading-relaxed">{subtitle}</p>
+        <p className="text-xs text-ink-faint dark:text-gray-500 mt-1 max-w-[230px] leading-relaxed">{subtitle}</p>
       )}
     </div>
   );

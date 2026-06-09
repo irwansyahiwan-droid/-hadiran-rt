@@ -129,7 +129,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Footer */}
         <div className="text-center pt-2 pb-1 space-y-1.5">
-          <p className="text-[11px] text-gray-400 dark:text-gray-500">© 2026 RT 004/006 Tanah Baru, Beji, Kota Depok</p>
+          <p className="text-[11px] text-ink-faint dark:text-gray-500">© 2026 RT 004/006 Tanah Baru, Beji, Kota Depok</p>
           <p className="text-[12px] text-gray-500 dark:text-gray-400 inline-flex items-center justify-center gap-1">
             Dibuat oleh <b className="text-gray-700 dark:text-gray-200">Irwansyah (Bendahara)</b>, untuk warga
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />

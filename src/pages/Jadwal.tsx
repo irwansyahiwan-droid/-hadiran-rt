@@ -479,7 +479,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         </div>
         <div className="mt-3 h-0.5 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full ${hasTalangan ? 'bg-amber-400' : 'bg-green-400'}`}
+            className={`h-full rounded-full ${hasTalangan ? 'bg-amber-400' : 'bg-emerald-400'}`}
             style={{ width: `${progress}%`, transition: 'width 0.1s linear' }}
           />
         </div>

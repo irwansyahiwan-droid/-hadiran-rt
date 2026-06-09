@@ -15,7 +15,7 @@ interface Props {
 function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number; keluar: number; saldo: number }) {
   return (
     <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-3">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">{judul}</p>
+      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2">{judul}</p>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[13px]">
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
@@ -142,7 +142,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
               <div className="flex items-end justify-between gap-2">
                 <div>
                   <p className="text-[15px] font-bold text-gray-900 dark:text-gray-100">{r.label}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{r.rentang}</p>
+                  <p className="text-xs text-ink-faint dark:text-gray-500 mt-0.5">{r.rentang}</p>
                 </div>
                 {idx === 0 && (
                   <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">

@@ -354,7 +354,7 @@ export default function KasHadiranPage() {
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
-              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-green-400/20 border border-green-300/30 rounded-full text-green-200 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-emerald-400/20 border border-emerald-300/30 rounded-full text-emerald-100 text-xs font-semibold">
                 <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
               </span>
             )}
@@ -507,7 +507,7 @@ export default function KasHadiranPage() {
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
+                          <span className="text-[10px] text-ink-faint dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
                           <Tag tone="danger">{talanganInfo.count} belum bayar</Tag>
@@ -526,7 +526,7 @@ export default function KasHadiranPage() {
                           <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
-                          <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
+                          <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-medium text-ink-faint dark:text-gray-500">
                             Lihat detail
                             <ChevronRight className="w-3 h-3" />
                           </span>
@@ -659,7 +659,7 @@ export default function KasHadiranPage() {
                 <>
                   {detailTidak.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Tidak Hadir / Talangan</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2">Tidak Hadir / Talangan</p>
                       <div className="space-y-1.5">
                         {detailTidak.map((p) => (
                           <div key={p.id} className="flex items-center gap-2.5">
@@ -677,7 +677,7 @@ export default function KasHadiranPage() {
                   )}
                   {detailHadir.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">Hadir ({detailHadir.length})</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2">Hadir ({detailHadir.length})</p>
                       <div className="space-y-1.5">
                         {detailHadir.map((p) => (
                           <div key={p.id} className="flex items-center gap-2.5">
