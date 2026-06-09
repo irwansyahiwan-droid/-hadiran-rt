@@ -145,6 +145,18 @@ body {
 .lift  { box-shadow: var(--shadow-card); }
 .float { box-shadow: var(--shadow-float); }
 
+/* Dark elevation premium: di latar gelap bayangan drop tak terbaca & halo putih
+   jadi cincin norak → pisahkan kartu lewat (1) ring cahaya tipis di tepi +
+   (2) drop GELAP dalam utk kedalaman nyata. Bukan halo putih. */
+.dark {
+  --shadow-card:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),               /* tepi atas "tersinari" halus */
+    0 0 0 1px rgba(255, 255, 255, 0.07),                      /* ring cahaya tipis → kartu kebaca di gelap */
+    0 2px 6px -1px rgba(0, 0, 0, 0.5),
+    0 18px 40px -12px rgba(0, 0, 0, 0.62);                    /* drop gelap dalam → elevation nyata */
+  --shadow-float: 0 18px 48px -12px rgba(0, 0, 0, 0.72);
+}
+
 /* Tactile spring press for interactive surfaces */
 .press { transition: transform 0.18s var(--ease-spring), opacity 0.18s ease, box-shadow 0.18s ease; }
 .press:active { transform: scale(0.97); }

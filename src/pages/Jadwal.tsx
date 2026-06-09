@@ -252,7 +252,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Title + count */}
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir</p>
-        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
+        <span className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
           {wargaList.length}
         </span>
       </div>
@@ -325,10 +325,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               onClick={() => toggle(w.id)}
               className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
                 idx < filtered.length - 1 ? 'border-b border-line dark:border-gray-800' : ''
-              } ${isHadir ? 'hover:bg-emerald-50/50' : 'hover:bg-red-50/30'}`}
+              } ${isHadir ? 'hover:bg-emerald-50/50 dark:hover:bg-emerald-900/15' : 'hover:bg-red-50/30 dark:hover:bg-red-900/15'}`}
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                isHadir ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-400'
+                isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/25 text-red-400 dark:text-red-400'
               }`}>
                 {w.nama.charAt(0)}
               </div>

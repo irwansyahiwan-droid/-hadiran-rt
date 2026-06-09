@@ -516,10 +516,10 @@ export default function KasRTPage() {
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
                   className={`rise flex items-center gap-3 px-4 py-4 ${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}
                 >
-                  <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100">
+                  <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-800">
                     {isMasuk
-                      ? <ArrowDownLeft className="w-4 h-4 text-gray-500" />
-                      : <ArrowUpRight  className="w-4 h-4 text-gray-500" />}
+                      ? <ArrowDownLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      : <ArrowUpRight  className="w-4 h-4 text-gray-500 dark:text-gray-400" />}
                   </div>
 
                   <div className="flex-1 min-w-0">

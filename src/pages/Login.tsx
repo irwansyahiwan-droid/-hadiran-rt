@@ -73,8 +73,8 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           alt="Logo RT 004/006"
           className="pop w-20 h-20 rounded-3xl object-cover mx-auto mb-4 shadow-xl shadow-emerald-300/60 ring-1 ring-white/60"
         />
-        <h1 className="rise text-2xl font-black text-gray-900" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
-        <p className="rise text-[13px] text-gray-500 mt-1" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
+        <h1 className="rise text-2xl font-black text-gray-900 dark:text-gray-100" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
+        <p className="rise text-[13px] text-gray-500 dark:text-gray-400 mt-1" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
       </div>
 
       {/* Card */}
@@ -126,8 +126,8 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
-              <p className="text-sm text-red-600 font-medium">{error}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5">
+              <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
             </div>
           )}
 
@@ -143,7 +143,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <button
             type="button"
             onClick={() => { haptic(); setWargaOpen(true); }}
-            className="press w-full mt-2 min-h-[44px] py-3 rounded-xl border-2 border-blue-300 text-blue-700 font-semibold text-sm hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+            className="press w-full mt-2 min-h-[44px] py-3 rounded-xl border-2 border-blue-300 dark:border-blue-500/40 text-blue-700 dark:text-blue-300 font-semibold text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-2"
           >
             <Eye className="w-4 h-4" /> Mode Warga
           </button>
@@ -180,8 +180,8 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               </div>
 
               {wargaError && (
-                <div role="alert" className="bg-red-50 border border-red-200 rounded-xl px-4 py-2.5 mt-2">
-                  <p className="text-sm text-red-600 font-medium">{wargaError}</p>
+                <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5 mt-2">
+                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">{wargaError}</p>
                 </div>
               )}
 
