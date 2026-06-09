@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import FilterChips from '../components/FilterChips';
 import { supabase } from '../lib/supabase';
@@ -199,6 +199,28 @@ export default function KasRTPage() {
   const animatedSaldo = useCountUp(saldo);
   const hidden = useHideAmount();
 
+  // Bagikan ringkasan Kas RT sbg kartu PNG bermerek → grup WA warga.
+  async function handleShareReceipt() {
+    haptic(12);
+    try {
+      const { shareReceipt } = await import('../lib/shareReceipt');
+      await shareReceipt({
+        title: 'Ringkasan Kas Besar RT 004 / RW 006',
+        amountLabel: 'Saldo Bersih Kas RT',
+        amount: formatRupiahPlain(saldo),
+        rows: [
+          { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
+          { label: 'Total Masuk', value: '+' + formatRupiahPlain(totalMasuk) },
+          { label: 'Total Keluar', value: '-' + formatRupiahPlain(totalKeluar) },
+          { label: 'Saldo Bersih', value: formatRupiahPlain(saldo) },
+        ],
+        shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${formatRupiahPlain(saldo)}\n— Hadiran RT`,
+      });
+    } catch {
+      showToast('Gagal membuat gambar. Coba lagi.', 'error');
+    }
+  }
+
   // Daftar tampil = list difilter (tipe) & diurutkan (sort). saldo_setelah per
   // baris tetap akurat karena dihitung saat insert.
   const displayList = useMemo(() => {
@@ -349,15 +371,24 @@ export default function KasRTPage() {
                 <Landmark className="w-4 h-4 text-teal-200" />
                 <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
               </div>
-              <button
-                onClick={() => { haptic(); toggleHideAmount(); }}
-                className="press p-1.5 -mr-1.5 rounded-full hover:bg-white/10 transition-colors"
-                aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
-              >
-                {hidden
-                  ? <EyeOff className="w-4 h-4 text-teal-100/80" />
-                  : <Eye className="w-4 h-4 text-teal-100/80" />}
-              </button>
+              <div className="flex items-center gap-0.5 -mr-1.5">
+                <button
+                  onClick={handleShareReceipt}
+                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  aria-label="Bagikan ringkasan ke WhatsApp"
+                >
+                  <Share2 className="w-4 h-4 text-teal-100/80" />
+                </button>
+                <button
+                  onClick={() => { haptic(); toggleHideAmount(); }}
+                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+                >
+                  {hidden
+                    ? <EyeOff className="w-4 h-4 text-teal-100/80" />
+                    : <Eye className="w-4 h-4 text-teal-100/80" />}
+                </button>
+              </div>
             </div>
             <p className="text-5xl font-black tracking-tighter text-white mb-3 tabular-nums">
               {hidden

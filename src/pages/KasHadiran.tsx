@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet, Share2 } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import FilterChips from '../components/FilterChips';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -159,6 +159,28 @@ export default function KasHadiranPage() {
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const saldo = totalKasTerkumpul - totalTalanganBelum - totalSetor;
   const animatedSaldo = useCountUp(saldo);
+
+  // Bagikan ringkasan Kas Hadiran sbg kartu PNG bermerek → grup WA warga.
+  async function handleShareReceipt() {
+    haptic(12);
+    try {
+      const { shareReceipt } = await import('../lib/shareReceipt');
+      await shareReceipt({
+        title: 'Ringkasan Kas Hadiran RT 004 / RW 006',
+        amountLabel: 'Saldo Kas Hadiran',
+        amount: formatRupiahPlain(saldo),
+        rows: [
+          { label: 'Kas Terkumpul', value: '+' + formatRupiahPlain(totalKasTerkumpul) },
+          { label: 'Talangan Belum Lunas', value: '-' + formatRupiahPlain(totalTalanganBelum) },
+          { label: 'Setor ke Kas RT', value: '-' + formatRupiahPlain(totalSetor) },
+          { label: 'Saldo Bersih', value: formatRupiahPlain(saldo) },
+        ],
+        shareText: `Ringkasan Kas Hadiran RT 004/006\nSaldo: ${formatRupiahPlain(saldo)} · ${tarikanSelesai.length} tarikan\n— Hadiran RT`,
+      });
+    } catch {
+      showToast('Gagal membuat gambar. Coba lagi.', 'error');
+    }
+  }
 
   // Rekap per tarikan difilter (status talangan) & diurutkan.
   const displayTarikan = useMemo(() => {
@@ -346,9 +368,18 @@ export default function KasHadiranPage() {
         <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
 
           <div className="relative p-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Wallet className="w-4 h-4 text-blue-200" />
-              <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-2">
+                <Wallet className="w-4 h-4 text-blue-200" />
+                <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
+              </div>
+              <button
+                onClick={handleShareReceipt}
+                className="press p-1.5 -mr-1.5 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Bagikan ringkasan ke WhatsApp"
+              >
+                <Share2 className="w-4 h-4 text-white/70" />
+              </button>
             </div>
             <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               <Odometer value={animatedSaldo} />
