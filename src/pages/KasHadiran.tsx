@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Users, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp } from '../lib/hooks';
@@ -532,7 +532,7 @@ export default function KasHadiranPage() {
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">
-                            {t.total_hadir}/{t.total_warga} hadir · Lihat detail
+                            Lihat detail
                             <ChevronRight className="w-3 h-3" />
                           </span>
                         </div>
@@ -547,37 +547,26 @@ export default function KasHadiranPage() {
                       </button>
 
                       {/* ── Progress bar + kas info ───────────────────── */}
-                      <div className="px-4 pb-4 border-t border-gray-50 dark:border-gray-800 pt-3">
+                      <div className="px-4 pb-4">
                         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <span>
                             Kas Hadiran{' '}
                             <span className="font-semibold text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
                           </span>
-                          <span className="font-semibold">{pctHadir}% hadir</span>
+                          <span className="font-semibold">{t.total_hadir}/{t.total_warga} hadir</span>
                         </div>
-                        <div className="w-full h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                        <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-emerald-400 dark:bg-emerald-500 rounded-full transition-all"
                             style={{ width: `${pctHadir}%` }}
                           />
                         </div>
-                        {talanganInfo.count > 0 && (
-                          <p className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 mt-1.5 font-medium">
-                            <AlertTriangle className="w-3 h-3" /> {talanganInfo.count} warga belum bayar · {formatRupiahPlain(talanganInfo.total)}
-                          </p>
-                        )}
                       </div>
 
                       {/* ── Actions ──────────────────────────────────
                           PDF pendapatan tersedia untuk semua (termasuk warga);
                           Absensi, Batalkan & Hapus khusus bendahara. */}
-                      <div className="flex items-center gap-x-4 gap-y-2 flex-wrap px-4 pb-3 pt-3 border-t border-line dark:border-gray-800">
-                        {isBendahara && (
-                          <button className="flex items-center gap-1.5 text-xs text-ink-sub dark:text-gray-400 font-medium hover:text-blue-600 transition-colors">
-                            <Users className="w-3.5 h-3.5" />
-                            Absensi
-                          </button>
-                        )}
+                      <div className="flex items-center gap-x-4 px-4 pb-3 pt-3 border-t border-line dark:border-gray-800">
                         <button
                           onClick={() => handlePendapatanPDF(t)}
                           disabled={pdfLoading === t.id}
