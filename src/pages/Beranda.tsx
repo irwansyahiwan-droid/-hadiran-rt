@@ -234,7 +234,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <button
               onClick={() => load(true)}
               disabled={refreshing}
-              className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+              className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
               aria-label="Muat ulang"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-white/65 ${refreshing ? 'animate-spin' : ''}`} />
@@ -357,7 +357,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
-          <button onClick={() => onNavigate('jadwal')} className="text-sm text-brand-link dark:text-[#1A9B86] font-medium">Lihat semua →</button>
+          <button onClick={() => onNavigate('jadwal')} className="press -my-1 py-2 pl-2 text-sm text-brand-link dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {jadwalList.length === 0 ? (
@@ -389,7 +389,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-base font-bold text-ink dark:text-gray-100">Transaksi Terakhir</h2>
-          <button onClick={() => onNavigate('kas')} className="text-sm text-brand-link dark:text-[#1A9B86] font-medium">Lihat semua →</button>
+          <button onClick={() => onNavigate('kas')} className="press -my-1 py-2 pl-2 text-sm text-brand-link dark:text-[#1A9B86] font-medium">Lihat semua →</button>
         </div>
         {trxItems.length > 0 && (
           <div className="space-y-2 mb-3">
@@ -401,10 +401,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               value={trxSearch}
               onChange={(e) => setTrxSearch(e.target.value)}
               placeholder="Cari keterangan / nama..."
+              aria-label="Cari transaksi"
               className="w-full pl-9 pr-11 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
             {trxSearch && (
-              <button onClick={() => setTrxSearch('')} className="absolute right-0.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center" aria-label="Bersihkan">
+              <button onClick={() => setTrxSearch('')} className="absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center" aria-label="Bersihkan pencarian">
                 <X className="w-4 h-4 text-gray-400" />
               </button>
             )}
@@ -420,7 +421,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   key={f.id}
                   onClick={() => setTrxFilter(f.id)}
                   aria-pressed={trxFilter === f.id}
-                  className={`press px-3 py-2 rounded-full text-xs font-semibold transition-colors ${
+                  className={`press min-h-[44px] px-3.5 py-2 rounded-full text-xs font-semibold transition-colors ${
                     trxFilter === f.id
                       ? 'bg-[#0F4C2E] text-white'
                       : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
@@ -432,7 +433,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </div>
             <button
               onClick={cycleTrxSort}
-              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
+              className="press ml-auto inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
               aria-label={`Urutkan: ${trxSortLabel}`}
             >
               <ArrowDownUp className="w-3.5 h-3.5" />
