@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
+import { Lock, Mail, Eye, EyeOff, Users, Sparkles, ArrowRight, ChevronDown } from 'lucide-react';
 import logoRt from '../assets/logo-rt.jpg';
 import { haptic } from '../lib/utils';
 
@@ -19,17 +19,11 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Gerbang password Mode Warga (inline, bukan modal)
-  const [wargaOpen, setWargaOpen] = useState(false);
+  // Warga = pintu utama (selalu tampil). Bendahara = sekunder (collapse).
   const [wargaPassword, setWargaPassword] = useState('');
   const [showWargaPassword, setShowWargaPassword] = useState(false);
   const [wargaError, setWargaError] = useState('');
-  const wargaInputRef = useRef<HTMLInputElement>(null);
-
-  // Fokuskan field warga begitu muncul
-  useEffect(() => {
-    if (wargaOpen) wargaInputRef.current?.focus();
-  }, [wargaOpen]);
+  const [bendaharaOpen, setBendaharaOpen] = useState(false);
 
   function handleWargaSubmit() {
     haptic(12);
@@ -80,121 +74,147 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       {/* Card */}
       <div className="rise relative w-full max-w-sm bg-white/80 dark:bg-gray-900 backdrop-blur-xl rounded-3xl shadow-2xl shadow-emerald-200/50 border border-white/80 dark:border-gray-700 p-6"
         style={{ animationDelay: '0.22s' }}>
-        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Masuk</h2>
-        <p className="text-sm text-ink-faint dark:text-gray-400 mb-6">Silakan login untuk melanjutkan</p>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Selamat Datang</h2>
+        <p className="text-sm text-ink-faint dark:text-gray-400 mb-5">Warga RT 004/006 — silakan masuk</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="contoh@email.com"
-                required
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
-              />
+        {/* ── WARGA — pintu utama (istimewa) ───────────────────── */}
+        <div className="relative rounded-2xl p-4 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-gray-900 border border-emerald-200/80 dark:border-emerald-800/40 shadow-[0_8px_28px_-14px_rgba(16,185,129,0.55)]">
+          {/* badge sudut */}
+          <span className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-bold uppercase tracking-wide shadow-sm shadow-emerald-400/50">
+            <Sparkles className="w-2.5 h-2.5" /> Akses Cepat
+          </span>
+
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500 text-white shadow-md shadow-emerald-400/50 shrink-0">
+              <Users className="w-5 h-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Masuk sebagai Warga</p>
+              <p className="text-[11px] text-emerald-700/90 dark:text-emerald-300/80 font-medium">Lihat saldo, jadwal, absensi &amp; talangan</p>
             </div>
           </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((p) => !p)}
-                aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
+          <label htmlFor="warga-password" className="sr-only">Password Warga</label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/70" />
+            <input
+              id="warga-password"
+              type={showWargaPassword ? 'text' : 'password'}
+              value={wargaPassword}
+              onChange={(e) => setWargaPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleWargaSubmit();
+                }
+              }}
+              placeholder="Ketik: warga"
+              className="w-full pl-10 pr-12 py-3 rounded-xl bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-800/50 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+            />
+            <button
+              type="button"
+              onClick={() => setShowWargaPassword((p) => !p)}
+              aria-label={showWargaPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showWargaPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
 
-          {/* Error */}
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5">
-              <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+          {wargaError && (
+            <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5 mt-2">
+              <p className="text-sm text-red-600 dark:text-red-400 font-medium">{wargaError}</p>
             </div>
           )}
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="press w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-300/50 hover:from-emerald-600 hover:to-emerald-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-          >
-            {loading ? 'Memproses...' : 'Masuk'}
-          </button>
-
           <button
             type="button"
-            onClick={() => { haptic(); setWargaOpen(true); }}
-            className="press w-full mt-2 min-h-[44px] py-3 rounded-xl border-2 border-blue-300 dark:border-blue-500/40 text-blue-700 dark:text-blue-300 font-semibold text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex items-center justify-center gap-2"
+            onClick={handleWargaSubmit}
+            className="press w-full mt-3 min-h-[48px] py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-400/40 hover:from-emerald-600 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
           >
-            <Eye className="w-4 h-4" /> Mode Warga
+            Masuk Sekarang <ArrowRight className="w-4 h-4" />
           </button>
+        </div>
 
-          {/* Gerbang password Mode Warga — expand halus */}
-          <div className={`grid transition-all duration-300 ease-out ${wargaOpen ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0'}`}>
-            <div className="overflow-hidden">
-              <label htmlFor="warga-password" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password Warga</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  id="warga-password"
-                  ref={wargaInputRef}
-                  type={showWargaPassword ? 'text' : 'password'}
-                  value={wargaPassword}
-                  onChange={(e) => setWargaPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleWargaSubmit();
-                    }
-                  }}
-                  placeholder="Ketik: warga"
-                  className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowWargaPassword((p) => !p)}
-                  aria-label={showWargaPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  {showWargaPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+        {/* Pemisah */}
+        <div className="flex items-center gap-3 my-5">
+          <div className="h-px flex-1 bg-line dark:bg-gray-800" />
+          <span className="text-[11px] font-semibold text-ink-faint dark:text-gray-500 uppercase tracking-wide">atau</span>
+          <div className="h-px flex-1 bg-line dark:bg-gray-800" />
+        </div>
+
+        {/* ── BENDAHARA — sekunder (collapse) ──────────────────── */}
+        <button
+          type="button"
+          onClick={() => { haptic(); setBendaharaOpen((o) => !o); }}
+          aria-expanded={bendaharaOpen}
+          className="press w-full flex items-center justify-between px-1 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300"
+        >
+          <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-gray-400" /> Masuk sebagai Bendahara</span>
+          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${bendaharaOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        <div className={`grid transition-all duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}>
+          <div className="overflow-hidden">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="contoh@email.com"
+                    required={bendaharaOpen}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                  />
+                </div>
               </div>
 
-              {wargaError && (
-                <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5 mt-2">
-                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">{wargaError}</p>
+              {/* Password */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required={bendaharaOpen}
+                    className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((p) => !p)}
+                    aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5">
+                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
                 </div>
               )}
 
+              {/* Submit */}
               <button
-                type="button"
-                onClick={handleWargaSubmit}
-                className="press w-full mt-2 min-h-[44px] py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold text-sm shadow-lg shadow-blue-300/50 hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2"
+                type="submit"
+                disabled={loading}
+                className="press w-full py-3 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 dark:from-gray-700 dark:to-gray-800 text-white font-semibold text-sm shadow-lg shadow-gray-400/30 hover:from-gray-900 hover:to-black transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <Eye className="w-4 h-4" /> Masuk sebagai Warga
+                {loading ? 'Memproses...' : 'Masuk sebagai Bendahara'}
               </button>
-            </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
 
       <p className="text-xs text-ink-faint dark:text-gray-400 mt-6 text-center">
