@@ -164,7 +164,7 @@ export default function JadwalWargaPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-3xl border border-white dark:border-gray-700 shadow-sm p-6 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-6 text-center">
           <p className="text-sm text-gray-400">Belum ada tarikan selesai</p>
         </div>
       )}
@@ -204,7 +204,7 @@ export default function JadwalWargaPage() {
               { label: 'Tidak', value: tidakHadirCount, color: 'text-red-500' },
               { label: 'Total', value: wargaList.length, color: 'text-gray-700 dark:text-gray-300' },
             ].map(s => (
-              <div key={s.label} className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-2.5 text-center">
+              <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
                 <p className={`text-base font-black ${s.color}`}>{s.value}</p>
                 <p className="text-[9px] text-gray-400 mt-0.5">{s.label}</p>
               </div>
@@ -228,7 +228,7 @@ export default function JadwalWargaPage() {
           </div>
 
           {/* Warga list */}
-          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {filteredWarga.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-8">Tidak ditemukan</p>
             ) : (
@@ -294,15 +294,15 @@ export default function JadwalWargaPage() {
 
           {/* Stat cards */}
           <div className="grid grid-cols-3 gap-2">
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-3 text-center">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
               <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-3 text-center">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-black text-emerald-600">{terjadwalCount}</p>
               <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
             </div>
-            <div className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-3 text-center">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-black text-gray-900 dark:text-gray-100">{allTarikan.length}</p>
               <p className="text-[10px] text-gray-400 font-medium">Total</p>
             </div>
@@ -314,7 +314,7 @@ export default function JadwalWargaPage() {
               <p className="text-sm text-gray-400">Belum ada jadwal</p>
             </div>
           ) : (
-            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-3xl border border-white dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
               {allTarikan.map((t, idx) => {
                 const isSelesai = t.status === 'selesai';
                 const isLast = idx === allTarikan.length - 1;

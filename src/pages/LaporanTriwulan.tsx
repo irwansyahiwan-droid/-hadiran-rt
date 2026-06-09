@@ -115,7 +115,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
         {loading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 p-4">
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-4">
                 <div className="h-5 w-40 skeleton rounded-lg mb-3" />
                 <div className="grid grid-cols-2 gap-2">
                   <div className="h-28 skeleton rounded-2xl" />
@@ -125,7 +125,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
             ))}
           </div>
         ) : rows.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
             <EmptyState
               icon={FileText}
               title="Belum ada data"

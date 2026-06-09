@@ -371,7 +371,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
             <EmptyState
               icon={Users}
               title={list.length === 0 ? 'Belum ada anggota' : 'Tidak ada hasil'}

@@ -242,7 +242,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           { label: 'Kas', value: formatKompak(kasTotal), color: 'text-blue-600' },
           { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-amber-600' },
         ].map(s => (
-          <div key={s.label} className="bg-white/70 dark:bg-gray-800/70 rounded-2xl border border-white dark:border-gray-700 shadow-sm p-2.5 text-center">
+          <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
             <p className={`text-base font-black ${s.color}`}>{s.value}</p>
             <p className="text-[9px] text-gray-400 mt-0.5">{s.label}</p>
           </div>

@@ -204,7 +204,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
             ))}
           </div>
         ) : grouped.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
             <EmptyState
               icon={History}
               title={rows.length === 0 ? 'Belum ada aktivitas' : 'Tidak ada hasil'}

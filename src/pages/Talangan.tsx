@@ -348,7 +348,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           </div>
         </div>
       ) : (
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-3xl border border-white dark:border-gray-700 shadow-sm p-5 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 text-center">
           <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Semua Talangan Lunas</p>
           <p className="text-xs text-gray-400">{countLunas} talangan tercatat</p>
