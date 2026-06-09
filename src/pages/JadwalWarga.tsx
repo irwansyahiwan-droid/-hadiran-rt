@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, RefreshCw, Search, X, Check, Coins, Users, CalendarDays } from 'lucide-react';
+import { FileText, Search, X, Check, Coins, Users, CalendarDays } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -89,8 +89,25 @@ export default function JadwalWargaPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-7 h-7 text-emerald-500 animate-spin" />
+      <div className="space-y-6 pb-2">
+        {/* Hero */}
+        <div className="skeleton h-44 rounded-3xl" />
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-2">
+          {[0, 1, 2].map((i) => <div key={i} className="skeleton h-20 rounded-2xl" />)}
+        </div>
+        {/* List */}
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className={`flex items-center gap-3 p-3.5 ${i < 4 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+              <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
+              <div className="flex-1 space-y-1.5">
+                <div className="skeleton h-3.5 w-1/2 rounded-full" />
+                <div className="skeleton h-2.5 w-1/3 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

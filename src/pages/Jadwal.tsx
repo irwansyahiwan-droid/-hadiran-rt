@@ -213,8 +213,35 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
   if (loadingAbsensi) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" />
+      <div className="space-y-6 pb-20">
+        {/* Back header */}
+        <div className="flex items-center gap-3">
+          <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
+          <div className="flex-1 space-y-1.5">
+            <div className="skeleton h-4 w-44 rounded-full" />
+            <div className="skeleton h-2.5 w-28 rounded-full" />
+          </div>
+        </div>
+        {/* Stats bar */}
+        <div className="grid grid-cols-4 gap-2">
+          {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton h-16 rounded-2xl" />)}
+        </div>
+        {/* Filter tabs */}
+        <div className="grid grid-cols-3 gap-1.5">
+          {[0, 1, 2].map((i) => <div key={i} className="skeleton h-9 rounded-xl" />)}
+        </div>
+        {/* Warga list */}
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className={`flex items-center gap-3 p-3.5 ${i < 5 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+              <div className="skeleton w-8 h-8 rounded-xl shrink-0" />
+              <div className="flex-1 space-y-1.5">
+                <div className="skeleton h-3.5 w-2/5 rounded-full" />
+                <div className="skeleton h-2.5 w-1/4 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
