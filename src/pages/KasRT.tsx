@@ -7,6 +7,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
 import Odometer from '../components/Odometer';
+import SmartInsight from '../components/SmartInsight';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -195,6 +196,15 @@ export default function KasRTPage() {
   const saldoAwal   = saldoAwalEntry?.nominal ?? 0;
   const totalMasuk  = list.filter((k) => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT').reduce((s, k) => s + k.nominal, 0);
   const totalKeluar = list.filter((k) => k.tipe === 'keluar').reduce((s, k) => s + k.nominal, 0);
+  // Insight: kas masuk bulan ini vs bulan lalu (kecuali Saldo Awal).
+  const ymKey = (d: Date) => d.getFullYear() * 12 + d.getMonth();
+  const curYM = ymKey(new Date());
+  const masukBulan = (back: number) =>
+    list
+      .filter((k) => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT' && ymKey(new Date(k.tanggal)) === curYM - back)
+      .reduce((s, k) => s + k.nominal, 0);
+  const masukBulanIni = masukBulan(0);
+  const masukBulanLalu = masukBulan(1);
   const saldo       = saldoAwal + totalMasuk - totalKeluar;
   const animatedSaldo = useCountUp(saldo);
   const hidden = useHideAmount();
@@ -430,6 +440,11 @@ export default function KasRTPage() {
 
         {/* Target & progres Kas RT */}
         <TargetKasRT saldo={saldo} />
+
+        {/* Insight ringkas: kas masuk bulan ini vs bulan lalu */}
+        {(masukBulanIni > 0 || masukBulanLalu > 0) && (
+          <SmartInsight label="Kas masuk bulan ini" current={masukBulanIni} previous={masukBulanLalu} />
+        )}
 
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
