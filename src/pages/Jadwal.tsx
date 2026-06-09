@@ -290,8 +290,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             onClick={() => setFilter(f)}
             className={`py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               filter === f
-                ? 'bg-emerald-500 text-white border-emerald-500'
-                : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
+                ? 'bg-[#0F4C2E] text-white border-[#0F4C2E]'
+                : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
             }`}
           >
             {f === 'semua' ? 'Semua' : f === 'hadir' ? 'Sudah Hadir' : 'Belum Hadir'}
