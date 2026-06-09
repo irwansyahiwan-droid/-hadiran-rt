@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, UserPlus } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import FilterChips from '../components/FilterChips';
+import Odometer from '../components/Odometer';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -246,7 +247,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         {/* Big amount — ukuran konsisten dengan hero Kas RT */}
         <div className="relative mb-1">
           <span className="block text-white text-5xl font-black tracking-tighter leading-none tabular-nums">
-            {maskRp(`Rp${animatedKasHadiran.toLocaleString('id-ID')}`, hidden, 7)}
+            {hidden
+              ? maskRp(`Rp${animatedKasHadiran.toLocaleString('id-ID')}`, hidden, 7)
+              : <Odometer value={animatedKasHadiran} />}
           </span>
         </div>
 

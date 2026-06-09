@@ -6,6 +6,7 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
+import Odometer from '../components/Odometer';
 import Tag from '../components/Tag';
 import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
@@ -350,7 +351,7 @@ export default function KasHadiranPage() {
               <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
             </div>
             <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-              {animatedSaldo < 0 ? '-' : ''}Rp{Math.abs(animatedSaldo).toLocaleString('id-ID')}
+              <Odometer value={animatedSaldo} />
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (

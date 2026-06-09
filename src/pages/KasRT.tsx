@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
+import Odometer from '../components/Odometer';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -359,7 +360,9 @@ export default function KasRTPage() {
               </button>
             </div>
             <p className="text-5xl font-black tracking-tighter text-white mb-3 tabular-nums">
-              {maskRp(`Rp${animatedSaldo.toLocaleString('id-ID')}`, hidden, 7)}
+              {hidden
+                ? maskRp(`Rp${animatedSaldo.toLocaleString('id-ID')}`, hidden, 7)
+                : <Odometer value={animatedSaldo} />}
             </p>
 
             {/* Saldo Awal inline info */}
