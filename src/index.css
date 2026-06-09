@@ -55,7 +55,7 @@ body {
      tanpa grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #EEF0F4;
+  background-color: #E9ECF2;
   background-image:
     radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
   background-attachment: fixed;
@@ -67,6 +67,15 @@ body {
     radial-gradient(84% 54% at 100% -4%,  rgba(20, 184, 166, 0.22) 0%, transparent 50%),
     radial-gradient(86% 54% at 0% 6%,     rgba(56, 189, 248, 0.15) 0%, transparent 48%);
 }
+
+/* ── Kontras teks (LIGHT MODE saja) ──────────────────────────────────
+   Banyak halaman hardcode text-gray-400/500 (#9CA3AF gagal AA di putih →
+   teks "pudar"). Gelapkan satu tingkat dari SATU titik, scoped html:not(.dark)
+   agar dark mode (dark:text-gray-400, 83×) tak ikut tergelap & kontrasnya aman.
+   Placeholder TIDAK ikut (kelas berbeda) → tetap halus, bukan seperti terisi.
+   Specificity html:not(.dark) .text-* (0,2,1) menang tanpa !important. */
+html:not(.dark) .text-gray-400 { color: #6B7280; }  /* gray-400→500: AA lolos (≈4.8:1) */
+html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (≈7:1) */
 
 .card-clean {
   background: #FFFFFF;
@@ -130,10 +139,11 @@ body {
      Hairline ring tetap → tepi kartu "tercetak" walau bayangan kebakar cahaya. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(16, 24, 40, 0.07),                          /* hairline ring crisp → kartu "tercetak" */
-    0 1px 2px 0 rgba(16, 24, 40, 0.06),                       /* contact shadow rapat → kartu menapak */
-    0 8px 16px -6px rgba(16, 24, 40, 0.10),                   /* drop lembut terarah */
-    0 24px 48px -20px rgba(16, 24, 40, 0.14);                 /* ambient netral dalam → elevation tenang */
+    0 0 0 1px rgba(16, 24, 40, 0.08),                          /* hairline ring crisp → kartu "tercetak" */
+    0 1px 2px 0 rgba(16, 24, 40, 0.07),                       /* contact shadow rapat → kartu menapak */
+    0 6px 14px -4px rgba(16, 24, 40, 0.12),                   /* drop lembut dekat → definisi tepi */
+    0 16px 32px -10px rgba(16, 24, 40, 0.16),                 /* penumbra menengah → kartu "memancar" */
+    0 36px 70px -24px rgba(16, 24, 40, 0.22);                 /* ambient lebar & dalam → glow netral, melayang tinggi */
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.29);
 }
 

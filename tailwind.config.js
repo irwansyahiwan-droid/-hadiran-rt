@@ -25,9 +25,9 @@ export default {
         control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
         ink: {
-          DEFAULT: '#111827', // judul / nominal utama
-          sub: '#4B5563',     // teks sekunder
-          faint: '#64748B',   // tanggal / caption (naik dari slate-400 agar AA)
+          DEFAULT: '#0B1220', // judul / nominal utama (near-black, kontras maksimal)
+          sub: '#374151',     // teks sekunder (gray-700 — naik dari 600 agar lebih tegas)
+          faint: '#475569',   // tanggal / caption (slate-600 — naik dari 500, tetap kebaca jelas)
         },
       },
       borderRadius: {
