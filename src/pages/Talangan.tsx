@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X, ArrowDownUp, MessageCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X, MessageCircle } from 'lucide-react';
 import { useCountUp } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -8,6 +8,7 @@ import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
+import FilterChips from '../components/FilterChips';
 import CrossFade from '../components/CrossFade';
 import { showToast, showUndo } from '../lib/toast';
 import type { Talangan } from '../lib/types';
@@ -372,35 +373,16 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       </div>
 
       {/* Filter status (semua/belum/lunas) + sort */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5">
-          {([
-            { id: 'semua', label: 'Semua' },
-            { id: 'belum', label: 'Belum Lunas' },
-            { id: 'lunas', label: 'Lunas' },
-          ] as const).map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setStatusFilter(f.id)}
-              className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                statusFilter === f.id
-                  ? 'bg-[#0F4C2E] text-white'
-                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={() => setTalSort((s) => (s === 'tunggakan' ? 'nama' : 'tunggakan'))}
-          className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
-          aria-label={`Urutkan: ${talSortLabel}`}
-        >
-          <ArrowDownUp className="w-3.5 h-3.5" />
-          {talSortLabel}
-        </button>
-      </div>
+      <FilterChips
+        options={[
+          { id: 'semua', label: 'Semua' },
+          { id: 'belum', label: 'Belum Lunas' },
+          { id: 'lunas', label: 'Lunas' },
+        ] as const}
+        value={statusFilter}
+        onChange={setStatusFilter}
+        sort={{ label: talSortLabel, onCycle: () => setTalSort((s) => (s === 'tunggakan' ? 'nama' : 'tunggakan')) }}
+      />
 
       <CrossFade loading={loading} skeleton={(
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800">

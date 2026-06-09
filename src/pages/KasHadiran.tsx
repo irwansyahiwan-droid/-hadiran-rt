@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, ArrowDownUp, Download, ChevronRight, X, Wallet } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import FilterChips from '../components/FilterChips';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
@@ -447,41 +448,35 @@ export default function KasHadiranPage() {
 
             {/* Filter (status talangan) & sort */}
             {!loading && (
-              <div className="flex items-center gap-2 mb-3">
-                <div className="flex items-center gap-1.5">
-                  {([
-                    { id: 'semua',    label: 'Semua' },
-                    { id: 'talangan', label: 'Ada Talangan' },
-                    { id: 'lunas',    label: 'Lunas' },
-                  ] as const).map((f) => (
-                    <button
-                      key={f.id}
-                      onClick={() => setHadiranFilter(f.id)}
-                      className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                        hadiranFilter === f.id
-                          ? 'bg-[#0F4C2E] text-white'
-                          : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
-                      }`}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={cycleHadiranSort}
-                  className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
-                  aria-label={`Urutkan: ${hadiranSortLabel}`}
-                >
-                  <ArrowDownUp className="w-3.5 h-3.5" />
-                  {hadiranSortLabel}
-                </button>
-              </div>
+              <FilterChips
+                className="mb-3"
+                options={[
+                  { id: 'semua',    label: 'Semua' },
+                  { id: 'talangan', label: 'Ada Talangan' },
+                  { id: 'lunas',    label: 'Lunas' },
+                ] as const}
+                value={hadiranFilter}
+                onChange={setHadiranFilter}
+                sort={{ label: hadiranSortLabel, onCycle: cycleHadiranSort }}
+              />
             )}
 
             <div className="space-y-3">
               {loading ? (
-                <div className="flex justify-center py-8">
-                  <RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" />
+                <div className="space-y-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="skeleton w-12 h-12 rounded-2xl" />
+                        <div className="flex-1 space-y-2">
+                          <div className="skeleton h-3.5 w-2/5 rounded-full" />
+                          <div className="skeleton h-2.5 w-1/4 rounded-full" />
+                        </div>
+                        <div className="skeleton h-4 w-20 rounded-full" />
+                      </div>
+                      <div className="skeleton h-1.5 w-full rounded-full" />
+                    </div>
+                  ))}
                 </div>
               ) : displayTarikan.length === 0 ? (
                 /* Hasil filter kosong */

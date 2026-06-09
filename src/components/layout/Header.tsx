@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.jpg';
 import { haptic } from '../../lib/utils';
+import Tag from '../Tag';
 import type { Role } from '../../hooks/useAuth';
 
 interface HeaderProps {
@@ -83,14 +84,9 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           </h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span
-            className="text-[0.7rem] font-semibold px-[10px] py-[3px] rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
-            style={isBendahara
-              ? { background: 'rgba(52,199,89,0.12)', color: '#166534' }
-              : { background: 'rgba(0,122,255,0.10)', color: '#0071E3' }}
-          >
+          <Tag tone={isBendahara ? 'success' : 'info'} className="tracking-wide">
             {isBendahara ? 'BENDAHARA' : 'WARGA'}
-          </span>
+          </Tag>
 
           {/* Menu overflow — rapikan semua aksi ke sini agar judul tidak terdesak */}
           <div className="relative">

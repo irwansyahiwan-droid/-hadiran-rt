@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, ArrowDownUp, Search, X, Download, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
+import FilterChips from '../components/FilterChips';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
@@ -470,35 +471,16 @@ export default function KasRTPage() {
               </button>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5">
-              {([
-                { id: 'semua',  label: 'Semua' },
-                { id: 'masuk',  label: 'Masuk' },
-                { id: 'keluar', label: 'Keluar' },
-              ] as const).map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setFilter(f.id)}
-                  className={`press px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                    filter === f.id
-                      ? 'bg-[#0F4C2E] text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={cycleSort}
-              className="press ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
-              aria-label={`Urutkan: ${sortLabel}`}
-            >
-              <ArrowDownUp className="w-3.5 h-3.5" />
-              {sortLabel}
-            </button>
-          </div>
+          <FilterChips
+            options={[
+              { id: 'semua',  label: 'Semua' },
+              { id: 'masuk',  label: 'Masuk' },
+              { id: 'keluar', label: 'Keluar' },
+            ] as const}
+            value={filter}
+            onChange={setFilter}
+            sort={{ label: sortLabel, onCycle: cycleSort }}
+          />
           </div>
 
           {displayList.length === 0 ? (

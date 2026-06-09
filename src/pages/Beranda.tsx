@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, ArrowDownUp, Search, X, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, UserPlus } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import FilterChips from '../components/FilterChips';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -410,36 +411,17 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               </button>
             )}
           </div>
-          <div className="flex items-center gap-2 px-1">
-            <div className="flex items-center gap-1.5">
-              {([
-                { id: 'semua', label: 'Semua' },
-                { id: 'setor', label: 'Setor' },
-                { id: 'talangan_lunas', label: 'Talangan' },
-              ] as const).map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setTrxFilter(f.id)}
-                  aria-pressed={trxFilter === f.id}
-                  className={`press min-h-[44px] px-3.5 py-2 rounded-full text-xs font-semibold transition-colors ${
-                    trxFilter === f.id
-                      ? 'bg-[#0F4C2E] text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={cycleTrxSort}
-              className="press ml-auto inline-flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
-              aria-label={`Urutkan: ${trxSortLabel}`}
-            >
-              <ArrowDownUp className="w-3.5 h-3.5" />
-              {trxSortLabel}
-            </button>
-          </div>
+          <FilterChips
+            className="px-1"
+            options={[
+              { id: 'semua', label: 'Semua' },
+              { id: 'setor', label: 'Setor' },
+              { id: 'talangan_lunas', label: 'Talangan' },
+            ] as const}
+            value={trxFilter}
+            onChange={setTrxFilter}
+            sort={{ label: trxSortLabel, onCycle: cycleTrxSort }}
+          />
           </div>
         )}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">

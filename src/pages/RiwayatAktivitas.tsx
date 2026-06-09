@@ -4,6 +4,7 @@ import {
   CheckCircle2, RotateCcw, ArrowRight, RefreshCw, Download,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import FilterChips from '../components/FilterChips';
 import { useRealtime } from '../hooks/useRealtime';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { fetchAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
@@ -174,21 +175,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         </div>
 
         {/* Filter chips */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {FILTERS.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => { haptic(); setFilter(f.id); }}
-              className={`press shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                filter === f.id
-                  ? 'bg-[#0F4C2E] text-white'
-                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        <FilterChips options={FILTERS} value={filter} onChange={setFilter} wrap />
 
         {/* List */}
         {loading ? (
