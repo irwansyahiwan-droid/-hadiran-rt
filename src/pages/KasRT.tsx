@@ -415,7 +415,7 @@ export default function KasRTPage() {
                 {' · '}
                 {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                 {' · '}
-                {formatRupiahPlain(saldoAwal)}
+                {maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}
               </p>
             )}
 
@@ -425,14 +425,14 @@ export default function KasRTPage() {
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
                   <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Masuk</p>
                 </div>
-                <p className="text-sm font-bold text-white">+{formatRupiahPlain(totalMasuk)}</p>
+                <p className="text-sm font-bold text-white">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-red-300" />
                   <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Keluar</p>
                 </div>
-                <p className="text-sm font-bold text-white">-{formatRupiahPlain(totalKeluar)}</p>
+                <p className="text-sm font-bold text-white">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</p>
               </div>
             </div>
           </div>
@@ -564,10 +564,10 @@ export default function KasRTPage() {
 
                   <div className="text-right shrink-0">
                     <p className={`text-[17px] font-bold ${isMasuk ? 'text-pos' : 'text-neg'}`}>
-                      {isMasuk ? '+' : '-'}{formatRupiahPlain(k.nominal)}
+                      {maskRp(`${isMasuk ? '+' : '-'}${formatRupiahPlain(k.nominal)}`, hidden, 4)}
                     </p>
                     <p className={`text-xs font-medium mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
-                      Saldo: {k.saldo_setelah < 0 ? '-' : ''}Rp{Math.abs(k.saldo_setelah).toLocaleString('id-ID')}
+                      Saldo: {maskRp(`${k.saldo_setelah < 0 ? '-' : ''}Rp${Math.abs(k.saldo_setelah).toLocaleString('id-ID')}`, hidden, 4)}
                     </p>
                   </div>
                 </div>
@@ -613,7 +613,7 @@ export default function KasRTPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Nominal</span>
                 <span className={`text-base font-bold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-red-400'}`}>
-                  {selectedRow.tipe === 'masuk' ? '+' : '-'}{formatRupiahPlain(selectedRow.nominal)}
+                  {maskRp(`${selectedRow.tipe === 'masuk' ? '+' : '-'}${formatRupiahPlain(selectedRow.nominal)}`, hidden, 4)}
                 </span>
               </div>
             </div>

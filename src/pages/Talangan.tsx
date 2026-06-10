@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X, MessageCircle } from 'lucide-react';
-import { useCountUp } from '../lib/hooks';
+import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, X, MessageCircle, Eye, EyeOff } from 'lucide-react';
+import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggalShort, formatRupiahPlain, haptic } from '../lib/utils';
+import { formatTanggalShort, formatRupiahPlain, haptic, maskRp } from '../lib/utils';
 import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
@@ -195,6 +195,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const countBelum = list.filter(t => !t.status_lunas).length;
   const countLunas = list.filter(t => t.status_lunas).length;
   const animatedTotal = useCountUp(totalBelumLunas);
+  const hidden = useHideAmount();
 
   // Kirim pengingat talangan ke warga via WhatsApp (semua tunggakan belum lunas)
   function ingatkan(g: WargaGroup) {
@@ -337,11 +338,22 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
 
           <div className="relative p-5">
-            <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-widest mb-1">
-              Total Talangan Belum Lunas
-            </p>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-widest">
+                Total Talangan Belum Lunas
+              </p>
+              <button
+                onClick={() => { haptic(); toggleHideAmount(); }}
+                className="press p-1.5 -mr-1.5 -mt-1 rounded-full hover:bg-white/10 transition-colors"
+                aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+              >
+                {hidden
+                  ? <EyeOff className="w-4 h-4 text-white/70" />
+                  : <Eye className="w-4 h-4 text-white/70" />}
+              </button>
+            </div>
             <p className="text-white text-5xl font-black tracking-tighter mb-1">
-              Rp {animatedTotal.toLocaleString('id-ID')}
+              {maskRp(`Rp ${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
             </p>
             <p className="text-emerald-300 text-xs">
               {countBelum} belum lunas · {countLunas} sudah lunas

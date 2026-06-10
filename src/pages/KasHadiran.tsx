@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet, Share2 } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import FilterChips from '../components/FilterChips';
 import { useBackDismiss } from '../hooks/useBackDismiss';
-import { useCountUp } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import Odometer from '../components/Odometer';
@@ -12,7 +12,7 @@ import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import type { Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -356,6 +356,7 @@ export default function KasHadiranPage() {
     showToast('Setoran ke Kas RT tersimpan');
   }
 
+  const hidden = useHideAmount();
   const sudahSetor = totalSetor > 0;
   const heroGradient = sudahSetor
     ? 'from-[#1E40AF] via-[#2563EB] to-[#3B82F6]'
@@ -375,16 +376,29 @@ export default function KasHadiranPage() {
                 <Wallet className="w-4 h-4 text-blue-200" />
                 <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
               </div>
-              <button
-                onClick={handleShareReceipt}
-                className="press p-1.5 -mr-1.5 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Bagikan ringkasan ke WhatsApp"
-              >
-                <Share2 className="w-4 h-4 text-white/70" />
-              </button>
+              <div className="flex items-center -mr-1.5">
+                <button
+                  onClick={() => { haptic(); toggleHideAmount(); }}
+                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+                >
+                  {hidden
+                    ? <EyeOff className="w-4 h-4 text-white/70" />
+                    : <Eye className="w-4 h-4 text-white/70" />}
+                </button>
+                <button
+                  onClick={handleShareReceipt}
+                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  aria-label="Bagikan ringkasan ke WhatsApp"
+                >
+                  <Share2 className="w-4 h-4 text-white/70" />
+                </button>
+              </div>
             </div>
             <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-              <Odometer value={animatedSaldo} />
+              {hidden
+                ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+                : <Odometer value={animatedSaldo} />}
             </p>
             <p className="text-white/75 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
@@ -450,26 +464,26 @@ export default function KasHadiranPage() {
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="text-sm font-bold text-emerald-600">+{formatRupiahPlain(totalKasTerkumpul)}</span>
+              <span className="text-sm font-bold text-emerald-600">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
-              <span className="text-sm font-semibold text-amber-600">-{formatRupiahPlain(totalTalanganBelum)}</span>
+              <span className="text-sm font-semibold text-amber-600">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-1.5 min-w-0">
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
-              <span className="text-sm font-semibold text-blue-600">-{formatRupiahPlain(totalSetor)}</span>
+              <span className="text-sm font-semibold text-blue-600">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-slate-100 dark:bg-slate-800' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
               <span className={`text-base font-bold ${saldo < 0 ? 'text-slate-700 dark:text-slate-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
-                {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
+                {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
           </div>

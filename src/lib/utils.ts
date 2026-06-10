@@ -26,8 +26,9 @@ export function formatRupiahCompact(amount: number): string {
  *  `dots` mengatur lebar sensor agar proporsional dgn ukuran teks aslinya. */
 export function maskRp(rendered: string, hidden: boolean, dots = 6): string {
   if (!hidden) return rendered;
-  const neg = rendered.trimStart().startsWith('-') ? '-' : '';
-  return `${neg}Rp${'•'.repeat(dots)}`;
+  const t = rendered.trimStart();
+  const sign = t.startsWith('-') ? '-' : t.startsWith('+') ? '+' : '';
+  return `${sign}Rp${'•'.repeat(dots)}`;
 }
 
 /** Haptic feedback ringan untuk interaksi utama (no-op bila perangkat tak mendukung). */

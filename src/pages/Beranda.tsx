@@ -345,7 +345,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {donutTotal > 0 && (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
           <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Komposisi Kas Hadiran</p>
-          <DonutChart data={donutData} centerTop="Total" format={formatRupiahPlain} />
+          <DonutChart data={donutData} centerTop="Total" format={(v) => maskRp(formatRupiahPlain(v), hidden, 5)} />
         </div>
       )}
 
@@ -358,7 +358,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
             <p className="text-xs text-amber-600 dark:text-amber-400/80 mt-0.5">
-              Total {formatRupiahPlain(talangan)} belum diselesaikan
+              Total {maskRp(formatRupiahPlain(talangan), hidden, 4)} belum diselesaikan
             </p>
           </div>
           <button
@@ -478,11 +478,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">{trx.keterangan}</p>
                   <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(trx.tanggal)}</p>
                   <p className={`text-xs font-medium ${trx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
-                    Saldo: {trx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}
+                    Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
                   </p>
                 </div>
                 <span className={`text-[17px] font-bold shrink-0 ${trx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
-                  {trx.nominal < 0 ? '-' : '+'}Rp{Math.abs(trx.nominal).toLocaleString('id-ID')}
+                  {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
                 </span>
               </button>
             ))
@@ -514,13 +514,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">Jumlah</span>
               <span className={`text-[17px] font-semibold ${selectedTrx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
-                {selectedTrx.nominal < 0 ? '-' : '+'}Rp{Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}
+                {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">Saldo Setelah</span>
               <span className={`text-sm font-semibold ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-700 dark:text-gray-300'}`}>
-                {selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp{Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}
+                {maskRp(`${selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
             <div className="flex items-center justify-between">
