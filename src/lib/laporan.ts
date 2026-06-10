@@ -27,11 +27,11 @@ export interface RekapTriwulan {
   jumlahTransaksi: number;
 }
 
-// Pendapatan Kas Hadiran = IURAN (kas_masuk = total_terkumpul) saja.
-// Talangan (talangan_masuk/keluar) adalah penalti tak-hadir, mekanisme TERPISAH —
-// jangan dihitung sebagai pendapatan/pengeluaran kas hadiran (akan dobel & tak
-// sinkron dgn hero Beranda yang memakai total_terkumpul).
-const HADIRAN_MASUK = 'kas_masuk';
+// Pendapatan Kas Hadiran = SUM(tarikan.total_terkumpul) tarikan SELESAI — sumber
+// PERSIS sama dgn hero Beranda (fetchDashboardSummary), supaya tak pernah drift.
+// (Jangan pakai SUM transaksi_kas.kas_masuk: bisa ada baris basi/manual yg tak
+// nyangkut ke tarikan selesai → angka beda dgn Beranda.)
+// Talangan (talangan_masuk/keluar) = penalti tak-hadir, mekanisme TERPISAH, di-skip.
 const HADIRAN_KELUAR = new Set(['setor_kas_rt', 'kas_keluar']);
 const ROMAWI = ['I', 'II', 'III', 'IV'];
 const BULAN_SINGKAT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -65,7 +65,7 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
   const [trxRes, rtRes, tarikanRes, talanganRes] = await Promise.all([
     supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
     supabase.from('kas_rt').select('tipe, nominal, tanggal'),
-    supabase.from('tarikan').select('tanggal, status').eq('status', 'selesai'),
+    supabase.from('tarikan').select('tanggal, status, total_terkumpul').eq('status', 'selesai'),
     supabase.from('talangan').select('tanggal_lunas, status_lunas').eq('status_lunas', true),
   ]);
 
@@ -76,12 +76,13 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     return r;
   };
 
+  // KELUAR kas hadiran (setor ke RT / pengeluaran) dari ledger transaksi_kas.
+  // kas_masuk SENGAJA diabaikan di sini — pendapatan diambil dari total_terkumpul.
   for (const t of (trxRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
     const b = bagianOf(t.tanggal); if (!b) continue;
+    if (!HADIRAN_KELUAR.has(t.tipe)) continue;
     const r = get(b);
-    if (t.tipe === HADIRAN_MASUK) r.hadiranMasuk += t.nominal;
-    else if (HADIRAN_KELUAR.has(t.tipe)) r.hadiranKeluar += t.nominal;
-    else continue; // talangan_masuk/keluar → bukan ledger kas hadiran
+    r.hadiranKeluar += t.nominal;
     r.jumlahTransaksi += 1;
   }
 
@@ -93,9 +94,12 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     r.jumlahTransaksi += 1;
   }
 
-  for (const t of (tarikanRes.data as { tanggal: string }[] ?? [])) {
+  for (const t of (tarikanRes.data as { tanggal: string; total_terkumpul: number | null }[] ?? [])) {
     const b = bagianOf(t.tanggal); if (!b) continue;
-    get(b).tarikanSelesai += 1;
+    const r = get(b);
+    r.tarikanSelesai += 1;
+    r.hadiranMasuk += t.total_terkumpul ?? 0; // pendapatan = iuran tarikan
+    r.jumlahTransaksi += 1;
   }
 
   for (const t of (talanganRes.data as { tanggal_lunas: string | null }[] ?? [])) {
@@ -143,7 +147,7 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
   const [trxRes, rtRes, tarikanRes, talanganRes] = await Promise.all([
     supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
     supabase.from('kas_rt').select('tipe, nominal, tanggal'),
-    supabase.from('tarikan').select('tanggal, status').eq('status', 'selesai'),
+    supabase.from('tarikan').select('tanggal, status, total_terkumpul').eq('status', 'selesai'),
     supabase.from('talangan').select('tanggal_lunas, status_lunas').eq('status_lunas', true),
   ]);
 
@@ -155,11 +159,10 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
     tarikanSelesai: 0, talanganLunas: 0, jumlahTransaksi: 0,
   };
 
+  // KELUAR kas hadiran saja (kas_masuk diabaikan; pendapatan dari total_terkumpul).
   for (const t of (trxRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
-    if (!sampai(t.tanggal)) continue;
-    if (t.tipe === HADIRAN_MASUK) snap.hadiranMasuk += t.nominal;
-    else if (HADIRAN_KELUAR.has(t.tipe)) snap.hadiranKeluar += t.nominal;
-    else continue; // talangan_masuk/keluar → bukan ledger kas hadiran
+    if (!sampai(t.tanggal) || !HADIRAN_KELUAR.has(t.tipe)) continue;
+    snap.hadiranKeluar += t.nominal;
     snap.jumlahTransaksi += 1;
   }
   for (const t of (rtRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
@@ -168,8 +171,11 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
     else snap.rtMasuk += t.nominal;
     snap.jumlahTransaksi += 1;
   }
-  for (const t of (tarikanRes.data as { tanggal: string }[] ?? [])) {
-    if (sampai(t.tanggal)) snap.tarikanSelesai += 1;
+  for (const t of (tarikanRes.data as { tanggal: string; total_terkumpul: number | null }[] ?? [])) {
+    if (!sampai(t.tanggal)) continue;
+    snap.tarikanSelesai += 1;
+    snap.hadiranMasuk += t.total_terkumpul ?? 0; // pendapatan = iuran tarikan
+    snap.jumlahTransaksi += 1;
   }
   for (const t of (talanganRes.data as { tanggal_lunas: string | null }[] ?? [])) {
     if (sampai(t.tanggal_lunas)) snap.talanganLunas += 1;
