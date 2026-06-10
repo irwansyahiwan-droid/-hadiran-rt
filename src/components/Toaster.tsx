@@ -33,6 +33,8 @@ export default function Toaster() {
 
   return (
     <div
+      role="status"
+      aria-live="polite"
       className="fixed left-1/2 -translate-x-1/2 z-[70] flex flex-col items-center gap-2 w-[calc(100%-2rem)] max-w-sm pointer-events-none"
       style={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
     >

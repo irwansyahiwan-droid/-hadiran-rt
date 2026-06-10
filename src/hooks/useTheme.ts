@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 
 export function useTheme() {
-  const [isDark, setIsDark] = useState(() =>
-    typeof window !== 'undefined' && localStorage.getItem('hadiran-theme') === 'dark'
-  );
+  // Belum pernah toggle → ikut preferensi OS (logika sama dgn inline script
+  // di index.html yang memasang .dark sebelum paint pertama — jaga tetap sinkron).
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const stored = localStorage.getItem('hadiran-theme');
+    if (stored !== null) return stored === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);

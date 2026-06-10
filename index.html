@@ -7,6 +7,18 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Hadiran RT 004/006</title>
+    <meta name="description" content="Aplikasi manajemen arisan & kas RT 004/006, Tanah Baru Beji, Depok — jadwal tarikan, absensi, talangan, dan laporan kas transparan." />
+    <!-- Pasang tema SEBELUM paint pertama: tanpa ini pengguna dark mode melihat
+         kilatan putih tiap buka app (class .dark baru dipasang React setelah bundle).
+         Logika harus sama dgn useTheme: localStorage > preferensi OS. -->
+    <script>
+      try {
+        var t = localStorage.getItem('hadiran-theme');
+        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) { /* abaikan (mis. storage diblokir) */ }
+    </script>
     <!-- Status bar adaptif (di-override dinamis oleh useTheme saat toggle) -->
     <meta name="theme-color" content="#FAFBFC" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)" />
