@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Search, X, History, Plus, Pencil, Trash2,
   CheckCircle2, RotateCcw, ArrowRight, RefreshCw, Download,
+  ChevronDown, Route, Lightbulb,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import FilterChips from '../components/FilterChips';
@@ -177,6 +178,14 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         {/* Filter chips */}
         <FilterChips options={FILTERS} value={filter} onChange={setFilter} wrap />
 
+        {/* Hint: tiap baris bisa diketuk untuk penjelasan alur */}
+        {!loading && rows.length > 0 && (
+          <div className="flex items-center gap-2 text-[11.5px] text-ink-faint dark:text-gray-500 px-1">
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span>Ketuk satu aktivitas untuk lihat penjelasan alur &amp; pencatatannya.</span>
+          </div>
+        )}
+
         {/* List */}
         {loading ? (
           <div className="space-y-2">
@@ -210,12 +219,13 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                   const Icon = iconFor(row);
                   const isOpen = expanded === row.id;
                   const hasMore = v.changes.length > 0;
+                  const hasDetail = v.penjelasan != null || hasMore;
                   return (
                     <button
                       key={row.id}
-                      onClick={() => { if (hasMore) { haptic(); setExpanded(isOpen ? null : row.id); } }}
+                      onClick={() => { if (hasDetail) { haptic(); setExpanded(isOpen ? null : row.id); } }}
                       style={{ animationDelay: `${Math.min(idx, 8) * 0.03}s` }}
-                      className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left ${hasMore ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
+                      className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left ${hasDetail ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
                     >
                       <div className={`w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${ACCENT_CLS[v.accent]}`}>
                         <Icon className="w-4 h-4" />
@@ -229,28 +239,46 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                           {v.actor} · {formatWaktuRelatif(row.created_at)}
                         </p>
 
-                        {/* Diff (expand) */}
-                        {isOpen && hasMore && (
-                          <div className="mt-2 space-y-1.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl p-2.5">
-                            {v.changes.map((c, i) => (
-                              <div key={i} className="flex items-center gap-1.5 text-[11px] flex-wrap">
-                                <span className="text-ink-faint dark:text-gray-500 font-medium">{c.label}:</span>
-                                <span className="text-rose-500 dark:text-rose-400 line-through">{c.from}</span>
-                                <ArrowRight className="w-3 h-3 text-gray-400" />
-                                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{c.to}</span>
+                        {/* Expand: penjelasan alur + diff */}
+                        {isOpen && hasDetail && (
+                          <div className="mt-2 space-y-2">
+                            {v.penjelasan && (
+                              <div className="flex items-start gap-2 bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 rounded-xl p-2.5">
+                                <Route className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                                <div className="min-w-0">
+                                  <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-0.5">Alur &amp; pencatatan</p>
+                                  <p className="text-[12px] leading-relaxed text-gray-600 dark:text-gray-300">{v.penjelasan}</p>
+                                </div>
                               </div>
-                            ))}
-                            <p className="text-[10px] text-ink-faint dark:text-gray-500 pt-0.5">{formatWaktu(row.created_at)}</p>
+                            )}
+                            {hasMore && (
+                              <div className="space-y-1.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl p-2.5">
+                                {v.changes.map((c, i) => (
+                                  <div key={i} className="flex items-center gap-1.5 text-[11px] flex-wrap">
+                                    <span className="text-ink-faint dark:text-gray-500 font-medium">{c.label}:</span>
+                                    <span className="text-rose-500 dark:text-rose-400 line-through">{c.from}</span>
+                                    <ArrowRight className="w-3 h-3 text-gray-400" />
+                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{c.to}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <p className="text-[10px] text-ink-faint dark:text-gray-500 pl-0.5">{formatWaktu(row.created_at)}</p>
                           </div>
                         )}
                       </div>
-                      {v.amount != null && v.amount !== 0 && (
-                        <span className={`text-[15px] font-bold shrink-0 ${
-                          v.accent === 'rose' ? 'text-neg' : v.accent === 'emerald' ? 'text-pos' : 'text-gray-700 dark:text-gray-300'
-                        }`}>
-                          {formatRupiahPlain(v.amount)}
-                        </span>
-                      )}
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        {v.amount != null && v.amount !== 0 && (
+                          <span className={`text-[15px] font-bold ${
+                            v.accent === 'rose' ? 'text-neg' : v.accent === 'emerald' ? 'text-pos' : 'text-gray-700 dark:text-gray-300'
+                          }`}>
+                            {formatRupiahPlain(v.amount)}
+                          </span>
+                        )}
+                        {hasDetail && (
+                          <ChevronDown className={`w-4 h-4 text-gray-300 dark:text-gray-600 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                        )}
+                      </div>
                     </button>
                   );
                 })}

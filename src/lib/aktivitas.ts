@@ -19,6 +19,7 @@ export interface AktivitasView {
   accent: Accent;
   actionLabel: string;           // Tambah / Ubah / Hapus
   tableLabel: string;            // Kas Hadiran / Kas RT / Tarikan / Talangan
+  penjelasan: string | null;     // narasi alur/proses/pencatatan utk warga awam
 }
 
 const TIPE_KAS: Record<string, string> = {
@@ -112,25 +113,40 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
 
   switch (row.table_name) {
     case 'transaksi_kas': {
-      const tipe = TIPE_KAS[str(data.tipe)] ?? 'Transaksi Kas';
+      const tipeRaw = str(data.tipe);
+      const tipe = TIPE_KAS[tipeRaw] ?? 'Transaksi Kas';
       diffNominal();
       diffText('keterangan', 'Keterangan');
+      let penjelasan: string;
+      if (row.action === 'DELETE') penjelasan = `Transaksi ${tipe} dihapus — saldo Kas Hadiran dihitung ulang.`;
+      else if (row.action === 'UPDATE') penjelasan = 'Transaksi Kas Hadiran diubah — saldo berjalan disesuaikan otomatis.';
+      else if (tipeRaw === 'setor_kas_rt') penjelasan = 'Setoran dari Kas Hadiran ke Kas RT. Dicatat ganda: saldo Kas Hadiran berkurang, Kas RT bertambah dengan nilai sama.';
+      else if (tipeRaw === 'kas_masuk') penjelasan = 'Iuran satu tarikan tercatat sebagai pemasukan Kas Hadiran (Rp5.000 per pembayar). Otomatis dibuat saat tarikan ditutup.';
+      else if (tipeRaw === 'kas_keluar') penjelasan = 'Pengeluaran langsung dari Kas Hadiran — saldo berkurang.';
+      else if (tipeRaw === 'talangan_masuk') penjelasan = 'Pelunasan talangan tercatat. Ini mengganti dana yang sempat ditalangi panitia, bukan pendapatan kas baru.';
+      else penjelasan = 'Transaksi Kas Hadiran tercatat.';
       return {
         title: `${actionLabel} ${tipe}`,
         detail: str(data.keterangan) || null,
         amount: num(data.nominal),
-        changes, actor, accent, actionLabel, tableLabel,
+        changes, actor, accent, actionLabel, tableLabel, penjelasan,
       };
     }
     case 'kas_rt': {
-      const arah = str(data.tipe) === 'keluar' ? 'Keluar' : 'Masuk';
+      const isKeluar = str(data.tipe) === 'keluar';
+      const arah = isKeluar ? 'Keluar' : 'Masuk';
       diffNominal();
       diffText('keterangan', 'Keterangan');
+      let penjelasan: string;
+      if (row.action === 'DELETE') penjelasan = 'Transaksi Kas RT dihapus — saldo Kas RT dihitung ulang.';
+      else if (row.action === 'UPDATE') penjelasan = 'Transaksi Kas RT diubah — saldo berjalan disesuaikan otomatis.';
+      else if (isKeluar) penjelasan = 'Pengeluaran Kas RT (mis. kegiatan/operasional RT) — saldo Kas RT berkurang.';
+      else penjelasan = 'Pemasukan Kas RT — bisa setoran dari Kas Hadiran atau iuran manual dari anggota di luar hadiran. Saldo Kas RT bertambah.';
       return {
         title: `${actionLabel} Kas RT ${arah}`,
         detail: str(data.keterangan) || null,
         amount: num(data.nominal),
-        changes, actor, accent, actionLabel, tableLabel,
+        changes, actor, accent, actionLabel, tableLabel, penjelasan,
       };
     }
     case 'tarikan': {
@@ -138,10 +154,14 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
       if (row.action === 'UPDATE') {
         const sOld = str(old.status), sNew = str(baru.status);
         if (sOld !== sNew) {
+          const keSelesai = sNew === 'selesai';
           return {
             title: `Tarikan #${nomor}: ${STATUS_TARIKAN[sOld] ?? sOld} → ${STATUS_TARIKAN[sNew] ?? sNew}`,
             detail: null, amount: num(baru.total_terkumpul),
             changes, actor, accent, actionLabel, tableLabel,
+            penjelasan: keSelesai
+              ? 'Tarikan ditutup. Iuran Rp5.000/pembayar masuk Kas Hadiran; anggota yang tidak hadir otomatis ditalangi panitia Rp50.000; Sohibul Bait menerima jatah dari para pembayar.'
+              : 'Tarikan dikembalikan ke status terjadwal. Absensi, talangan, & kas masuk yang terkait tarikan ini ikut dihapus.',
           };
         }
         diffText('tanggal', 'Tanggal');
@@ -151,10 +171,17 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
         detail: null,
         amount: num(data.total_terkumpul),
         changes, actor, accent, actionLabel, tableLabel,
+        penjelasan:
+          row.action === 'INSERT' ? 'Jadwal tarikan baru dibuat (status terjadwal). Belum ada iuran sampai tarikan ditutup.'
+          : row.action === 'DELETE' ? 'Tarikan dihapus beserta absensi, talangan, & kas masuk turunannya.'
+          : 'Jadwal/tanggal tarikan diperbarui.',
       };
     }
     case 'warga': {
       const nama = str(data.nama);
+      let penjelasan = 'Data anggota diperbarui.';
+      if (row.action === 'INSERT') penjelasan = 'Anggota baru terdaftar. Mulai ikut perhitungan iuran pada tarikan berikutnya.';
+      else if (row.action === 'DELETE') penjelasan = 'Anggota dihapus dari master anggota.';
       if (row.action === 'UPDATE') {
         diffText('nama', 'Nama');
         diffText('no_rumah', 'No. Rumah');
@@ -162,13 +189,18 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
         diffText('role', 'Peran');
         const aktifOld = old.status_aktif === true ? 'Aktif' : 'Nonaktif';
         const aktifNew = baru.status_aktif === true ? 'Aktif' : 'Nonaktif';
-        if (aktifOld !== aktifNew) changes.push({ label: 'Status', from: aktifOld, to: aktifNew });
+        if (aktifOld !== aktifNew) {
+          changes.push({ label: 'Status', from: aktifOld, to: aktifNew });
+          penjelasan = aktifNew === 'Nonaktif'
+            ? 'Anggota dinonaktifkan (mis. mengundurkan diri). Tidak lagi dihitung di tarikan berikutnya — jumlah pembayar & iuran ikut menyesuaikan.'
+            : 'Anggota diaktifkan kembali. Kembali masuk perhitungan iuran tarikan berikutnya.';
+        }
       }
       return {
         title: `${actionLabel} Anggota${nama ? `: ${nama}` : ''}`,
         detail: str(data.no_rumah) || null,
         amount: null,
-        changes, actor, accent, actionLabel, tableLabel,
+        changes, actor, accent, actionLabel, tableLabel, penjelasan,
       };
     }
     case 'talangan': {
@@ -180,13 +212,16 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
         changes, actor,
         accent: lunas ? 'emerald' : 'amber',
         actionLabel, tableLabel,
+        penjelasan: lunas
+          ? 'Anggota melunasi talangan Rp50.000. Dana panitia yang sempat menalangi terganti — dicatat agar utang anggota nol.'
+          : 'Pelunasan talangan dibatalkan. Status anggota kembali "belum lunas".',
       };
     }
     default:
       return {
         title: `${actionLabel} ${tableLabel}`,
         detail: null, amount: num(data.nominal),
-        changes, actor, accent, actionLabel, tableLabel,
+        changes, actor, accent, actionLabel, tableLabel, penjelasan: null,
       };
   }
 }
