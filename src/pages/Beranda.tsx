@@ -227,6 +227,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Main Kas Card — clean & premium hero */}
       <div className="hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
+        {/* Ambient growth wave — latar "hidup" di belakang konten, tanpa menambah tinggi kartu */}
+        {kasSeries.length >= 2 && (
+          <div className="absolute inset-x-0 bottom-0 z-0 pointer-events-none" style={{ height: 104, opacity: 0.55 }}>
+            <HeroSparkline points={kasSeries} height={104} />
+          </div>
+        )}
+
         {/* Label row */}
         <div className="relative flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2">
@@ -269,28 +276,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
 
         {/* Sub-text */}
-        <p className="relative text-[13px] text-white/[0.78] mb-3">
+        <p className="relative text-[13px] text-white/[0.78] mb-3.5">
           Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
+          {lastDelta > 0 && (
+            <span className="inline-flex items-center gap-0.5 ml-1.5 font-semibold text-emerald-200/90 align-middle">
+              <TrendingUp className="w-3 h-3" strokeWidth={2.5} />
+              {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
+            </span>
+          )}
         </p>
-
-        {/* Tren pertumbuhan kas — sparkline "hidup" di dalam hero */}
-        {kasSeries.length >= 2 && (
-          <div className="relative mb-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-semibold uppercase text-white/55" style={{ letterSpacing: '0.14em' }}>
-                Pertumbuhan Kas
-              </span>
-              {lastDelta > 0 && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-200/95">
-                  <TrendingUp className="w-3 h-3" strokeWidth={2.5} />
-                  {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
-                  <span className="font-medium text-white/55">tarikan terakhir</span>
-                </span>
-              )}
-            </div>
-            <HeroSparkline points={kasSeries} />
-          </div>
-        )}
 
         {/* Divider */}
         <div className="relative hero-divider-x mb-1" />
