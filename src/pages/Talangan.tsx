@@ -231,7 +231,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 )}
               </div>
               {g.countBelum > 0 && (
-                <p className="text-xs text-amber-600 mt-0.5">
+                <p className="text-xs text-warn dark:text-amber-400 mt-0.5">
                   {g.countBelum} belum lunas · total {formatRupiahPlain(g.totalBelum)}
                 </p>
               )}

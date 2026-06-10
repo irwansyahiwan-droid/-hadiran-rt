@@ -264,10 +264,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Stats bar */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Hadir', value: hadirCount, color: 'text-emerald-600' },
-          { label: 'Tdk Hadir', value: tidakCount, color: 'text-red-500' },
-          { label: 'Kas', value: formatKompak(kasTotal), color: 'text-blue-600' },
-          { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-amber-600' },
+          { label: 'Hadir', value: hadirCount, color: 'text-emerald-700 dark:text-emerald-400' },
+          { label: 'Tdk Hadir', value: tidakCount, color: 'text-red-600 dark:text-red-400' },
+          { label: 'Kas', value: formatKompak(kasTotal), color: 'text-blue-600 dark:text-blue-400' },
+          { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-warn dark:text-amber-400' },
         ].map(s => (
           <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
             <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
@@ -361,7 +361,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
-                <p className={`text-xs ${isHadir ? 'text-emerald-600' : 'text-red-400'}`}>
+                <p className={`text-xs ${isHadir ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                   {isHadir ? 'Hadir' : 'Tidak hadir → Talangan'}
                 </p>
               </div>
@@ -812,7 +812,7 @@ export default function JadwalPage() {
           <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="text-xl font-bold text-emerald-600">{dijadwalCount}</p>
+          <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{dijadwalCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">

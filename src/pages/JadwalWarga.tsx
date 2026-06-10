@@ -216,9 +216,9 @@ export default function JadwalWargaPage() {
           {/* Stat bar */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { label: 'Selesai', value: selesaiAnggotaCount, color: 'text-emerald-600' },
-              { label: 'Hadir', value: hadirCount, color: 'text-blue-600' },
-              { label: 'Tidak', value: tidakHadirCount, color: 'text-red-500' },
+              { label: 'Selesai', value: selesaiAnggotaCount, color: 'text-emerald-700 dark:text-emerald-400' },
+              { label: 'Hadir', value: hadirCount, color: 'text-blue-600 dark:text-blue-400' },
+              { label: 'Tidak', value: tidakHadirCount, color: 'text-red-600 dark:text-red-400' },
               { label: 'Total', value: wargaList.length, color: 'text-gray-700 dark:text-gray-300' },
             ].map(s => (
               <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
@@ -316,7 +316,7 @@ export default function JadwalWargaPage() {
               <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-              <p className="text-xl font-bold text-emerald-600">{terjadwalCount}</p>
+              <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{terjadwalCount}</p>
               <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
