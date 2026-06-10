@@ -47,16 +47,15 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   }
 
   return (
-    <div className="relative min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden"
-      style={{ background: 'linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%)' }}>
+    <div className="login-bg relative min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden">
 
-      {/* Aurora background — blob mengambang lembut */}
+      {/* Aurora background — blob mengambang lembut (diredam di dark agar tidak menyilaukan) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="blob absolute -top-24 -left-20 w-72 h-72 rounded-full opacity-50 blur-3xl"
+        <div className="blob absolute -top-24 -left-20 w-72 h-72 rounded-full opacity-50 dark:opacity-25 blur-3xl"
           style={{ background: 'radial-gradient(circle, #34d399 0%, transparent 70%)' }} />
-        <div className="blob absolute top-1/3 -right-24 w-80 h-80 rounded-full opacity-40 blur-3xl"
+        <div className="blob absolute top-1/3 -right-24 w-80 h-80 rounded-full opacity-40 dark:opacity-20 blur-3xl"
           style={{ background: 'radial-gradient(circle, #10b981 0%, transparent 70%)', animationDelay: '-5s' }} />
-        <div className="blob absolute -bottom-28 left-1/4 w-72 h-72 rounded-full opacity-40 blur-3xl"
+        <div className="blob absolute -bottom-28 left-1/4 w-72 h-72 rounded-full opacity-40 dark:opacity-20 blur-3xl"
           style={{ background: 'radial-gradient(circle, #6ee7b7 0%, transparent 70%)', animationDelay: '-9s' }} />
       </div>
 

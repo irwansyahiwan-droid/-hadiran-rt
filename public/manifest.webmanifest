@@ -2,11 +2,12 @@
   "name": "Hadiran RT 004/006",
   "short_name": "Hadiran RT",
   "description": "Manajemen arisan & kas RT 004/006, Tanah Baru Beji, Depok",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#E8ECF2",
+  "background_color": "#E9ECF2",
   "theme_color": "#0F4C2E",
   "lang": "id",
   "icons": [

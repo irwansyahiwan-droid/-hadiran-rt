@@ -7,6 +7,9 @@ html {
      saat pertama dibuka lalu baru normal setelah reflow. */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Hilangkan kilat abu bawaan saat tap (iOS/Android) — feedback sentuh sudah
+     ditangani .press (spring scale) + haptic, highlight ganda terasa murahan. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -24,7 +27,21 @@ body {
      running text bank). Kelas tabular-nums per-span jadi redundan tapi aman. */
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
+  /* App punya PullToRefresh sendiri — matikan pull-to-refresh native Chrome
+     Android agar tidak dobel/rebutan gesture di posisi scroll 0. */
+  overscroll-behavior-y: contain;
 }
+
+/* ── Guard auto-zoom iOS ──────────────────────────────────────────────
+   Safari iOS men-zoom halaman saat fokus ke input ber-font <16px (dan zoom
+   tidak balik sendiri). Semua input app pakai text-sm (14px) → paksa 16px
+   dari SATU titik. Specificity (0,1,1) menang atas utility .text-sm (0,1,0). */
+input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
+
+/* ── Kanvas Login: light = gradient mint brand, dark = emerald pekat ──
+   Sebelumnya hardcoded inline (light saja) → dark mode kanvasnya bocor terang. */
+.login-bg { background: linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%); }
+.dark .login-bg { background: linear-gradient(160deg, #04231A 0%, #06402E 45%, #02150E 100%); }
 
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
 .dark body { background-color: #030712; }
