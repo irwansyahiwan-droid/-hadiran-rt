@@ -108,3 +108,67 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
   }
   return asc.reverse();
 }
+
+/** Snapshot "tutup buku sekarang" — kumulatif SELURUH kas s/d hari ini. */
+export interface SnapshotKas {
+  tanggal: string;        // 'Selasa, 10 Juni 2026'
+  rentang: string;        // 's/d 10 Jun 2026'
+  hadiranMasuk: number;
+  hadiranKeluar: number;
+  hadiranSaldoAkhir: number;
+  rtMasuk: number;
+  rtKeluar: number;
+  rtSaldoAkhir: number;
+  tarikanSelesai: number;
+  talanganLunas: number;
+  jumlahTransaksi: number;
+}
+
+export async function fetchSnapshotKas(): Promise<SnapshotKas> {
+  // Batas akhir hari ini (inklusif)
+  const cutoff = new Date();
+  cutoff.setHours(23, 59, 59, 999);
+  const sampai = (s: string | null | undefined): boolean => {
+    if (!s) return false;
+    const t = new Date(s).getTime();
+    return !Number.isNaN(t) && t <= cutoff.getTime();
+  };
+
+  const [trxRes, rtRes, tarikanRes, talanganRes] = await Promise.all([
+    supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
+    supabase.from('kas_rt').select('tipe, nominal, tanggal'),
+    supabase.from('tarikan').select('tanggal, status').eq('status', 'selesai'),
+    supabase.from('talangan').select('tanggal_lunas, status_lunas').eq('status_lunas', true),
+  ]);
+
+  const snap: SnapshotKas = {
+    tanggal: cutoff.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    rentang: `s/d ${cutoff.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`,
+    hadiranMasuk: 0, hadiranKeluar: 0, hadiranSaldoAkhir: 0,
+    rtMasuk: 0, rtKeluar: 0, rtSaldoAkhir: 0,
+    tarikanSelesai: 0, talanganLunas: 0, jumlahTransaksi: 0,
+  };
+
+  for (const t of (trxRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
+    if (!sampai(t.tanggal)) continue;
+    if (MASUK_HADIRAN.has(t.tipe)) snap.hadiranMasuk += t.nominal;
+    else snap.hadiranKeluar += t.nominal;
+    snap.jumlahTransaksi += 1;
+  }
+  for (const t of (rtRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
+    if (!sampai(t.tanggal)) continue;
+    if (t.tipe === 'keluar') snap.rtKeluar += t.nominal;
+    else snap.rtMasuk += t.nominal;
+    snap.jumlahTransaksi += 1;
+  }
+  for (const t of (tarikanRes.data as { tanggal: string }[] ?? [])) {
+    if (sampai(t.tanggal)) snap.tarikanSelesai += 1;
+  }
+  for (const t of (talanganRes.data as { tanggal_lunas: string | null }[] ?? [])) {
+    if (sampai(t.tanggal_lunas)) snap.talanganLunas += 1;
+  }
+
+  snap.hadiranSaldoAkhir = snap.hadiranMasuk - snap.hadiranKeluar;
+  snap.rtSaldoAkhir = snap.rtMasuk - snap.rtKeluar;
+  return snap;
+}

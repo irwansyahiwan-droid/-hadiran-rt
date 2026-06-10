@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, Share2, CalendarCheck } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import { useBackDismiss } from '../hooks/useBackDismiss';
-import { fetchRekapTriwulan } from '../lib/laporan';
+import { fetchRekapTriwulan, fetchSnapshotKas } from '../lib/laporan';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
-import type { RekapTriwulan } from '../lib/laporan';
+import { shareLaporanKas } from '../lib/shareLaporanKas';
+import type { LaporanKasCard } from '../lib/shareLaporanKas';
+import type { RekapTriwulan, SnapshotKas } from '../lib/laporan';
 
 interface Props {
   open: boolean;
@@ -42,13 +44,18 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
 
 export default function LaporanTriwulan({ open, onClose }: Props) {
   const [rows, setRows] = useState<RekapTriwulan[]>([]);
+  const [snap, setSnap] = useState<SnapshotKas | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sharingKey, setSharingKey] = useState<string | null>(null);
 
   async function load() {
     try {
-      setRows(await fetchRekapTriwulan());
+      const [rekap, snapshot] = await Promise.all([fetchRekapTriwulan(), fetchSnapshotKas()]);
+      setRows(rekap);
+      setSnap(snapshot);
     } catch {
       setRows([]);
+      setSnap(null);
     } finally {
       setLoading(false);
     }
@@ -75,6 +82,46 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
     } catch {
       showToast('Gagal membuat laporan', 'error');
     }
+  }
+
+  // Bagikan kartu PNG ke WhatsApp (anti-kepotong: kanvas auto-tinggi)
+  async function bagikan(key: string, card: LaporanKasCard) {
+    if (sharingKey) return;
+    haptic(12);
+    setSharingKey(key);
+    try {
+      await shareLaporanKas(card);
+    } catch {
+      showToast('Gagal membuat gambar', 'error');
+    } finally {
+      setSharingKey(null);
+    }
+  }
+
+  function triwulanToCard(r: RekapTriwulan): LaporanKasCard {
+    const total = r.hadiranSaldoAkhir + r.rtSaldoAkhir;
+    return {
+      title: 'Tutup Buku · Saldo',
+      periodeLabel: r.label,
+      rentang: r.rentang,
+      hadiranMasuk: r.hadiranMasuk, hadiranKeluar: r.hadiranKeluar, hadiranSaldoAkhir: r.hadiranSaldoAkhir,
+      rtMasuk: r.rtMasuk, rtKeluar: r.rtKeluar, rtSaldoAkhir: r.rtSaldoAkhir,
+      tarikanSelesai: r.tarikanSelesai, talanganLunas: r.talanganLunas, jumlahTransaksi: r.jumlahTransaksi,
+      shareText: `*Tutup Buku ${r.label}* (${r.rentang})\nKas Hadiran: ${formatRupiahPlain(r.hadiranSaldoAkhir)}\nKas RT: ${formatRupiahPlain(r.rtSaldoAkhir)}\nTotal saldo: ${formatRupiahPlain(total)}\n— Hadiran RT 004/006`,
+    };
+  }
+
+  function snapToCard(s: SnapshotKas): LaporanKasCard {
+    const total = s.hadiranSaldoAkhir + s.rtSaldoAkhir;
+    return {
+      title: 'Tutup Buku · Posisi Kas',
+      periodeLabel: `Per ${s.tanggal}`,
+      rentang: s.rentang,
+      hadiranMasuk: s.hadiranMasuk, hadiranKeluar: s.hadiranKeluar, hadiranSaldoAkhir: s.hadiranSaldoAkhir,
+      rtMasuk: s.rtMasuk, rtKeluar: s.rtKeluar, rtSaldoAkhir: s.rtSaldoAkhir,
+      tarikanSelesai: s.tarikanSelesai, talanganLunas: s.talanganLunas, jumlahTransaksi: s.jumlahTransaksi,
+      shareText: `*Tutup Buku — Posisi Kas RT 004/006*\n${s.tanggal}\nKas Hadiran: ${formatRupiahPlain(s.hadiranSaldoAkhir)}\nKas RT: ${formatRupiahPlain(s.rtSaldoAkhir)}\n*Total saldo: ${formatRupiahPlain(total)}*\n— Hadiran RT`,
+    };
   }
 
   if (!open) return null;
@@ -109,8 +156,50 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         <p className="text-xs text-gray-500 dark:text-gray-400 px-1">
-          Laporan keuangan otomatis dirangkum per 3 bulan (triwulan) dari seluruh transaksi. Tap <span className="font-semibold">Buat Laporan PDF</span> untuk mengunduh & cetak.
+          Tutup buku <span className="font-semibold">sekarang</span> untuk posisi kas terkini, atau pilih per triwulan. Bagikan sebagai gambar (PNG) langsung ke grup WhatsApp, atau unduh PDF.
         </p>
+
+        {/* Tutup Buku Sekarang — snapshot posisi kas s/d hari ini */}
+        {!loading && snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
+          <div className="rise hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
+            <div className="relative flex items-center gap-2 mb-2.5">
+              <CalendarCheck className="w-4 h-4 text-emerald-200" strokeWidth={2.2} />
+              <p className="text-[11px] font-bold uppercase text-white/85" style={{ letterSpacing: '0.14em' }}>
+                Tutup Buku Sekarang
+              </p>
+            </div>
+            <p className="relative text-[11px] text-white/65 mb-1">Total saldo · {snap.tanggal}</p>
+            <span className="relative block text-white text-[34px] font-black tracking-tighter leading-none tabular-nums mb-3">
+              {(() => {
+                const total = snap.hadiranSaldoAkhir + snap.rtSaldoAkhir;
+                return `${total < 0 ? '-' : ''}${formatRupiahPlain(total)}`;
+              })()}
+            </span>
+
+            <div className="relative grid grid-cols-2 gap-2 mb-3.5">
+              <div className="rounded-2xl bg-white/10 px-3 py-2">
+                <p className="text-[10px] text-white/60 uppercase tracking-wide">Kas Hadiran</p>
+                <p className="text-[14px] font-bold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
+              </div>
+              <div className="rounded-2xl bg-white/10 px-3 py-2">
+                <p className="text-[10px] text-white/60 uppercase tracking-wide">Kas RT</p>
+                <p className="text-[14px] font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => bagikan('snap', snapToCard(snap))}
+              disabled={sharingKey !== null}
+              className="press relative w-full min-h-[44px] py-3 rounded-2xl bg-white text-emerald-700 font-bold text-sm shadow-lg shadow-black/10 hover:bg-emerald-50 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {sharingKey === 'snap' ? (
+                <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan gambar…</>
+              ) : (
+                <><Share2 className="w-4 h-4" /> Bagikan ke WhatsApp (PNG)</>
+              )}
+            </button>
+          </div>
+        )}
 
         {loading ? (
           <div className="space-y-3">
@@ -162,12 +251,26 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 <span className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">{r.jumlahTransaksi} transaksi</span>
               </div>
 
-              <button
-                onClick={() => cetak(r)}
-                className="press w-full min-h-[44px] py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-300/40 hover:from-emerald-600 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" /> Buat Laporan PDF
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => bagikan(r.key, triwulanToCard(r))}
+                  disabled={sharingKey !== null}
+                  className="press btn-brand flex-1 min-h-[44px] py-3 rounded-2xl text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {sharingKey === r.key ? (
+                    <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan…</>
+                  ) : (
+                    <><Share2 className="w-4 h-4" /> Bagikan PNG</>
+                  )}
+                </button>
+                <button
+                  onClick={() => cetak(r)}
+                  className="press min-h-[44px] px-4 py-3 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-1.5"
+                  aria-label={`Unduh PDF ${r.label}`}
+                >
+                  <Download className="w-4 h-4" /> PDF
+                </button>
+              </div>
             </div>
           ))
         )}
