@@ -99,28 +99,26 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   }
 
   function triwulanToCard(r: RekapTriwulan): LaporanKasCard {
-    const total = r.hadiranSaldoAkhir + r.rtSaldoAkhir;
     return {
-      title: 'Tutup Buku · Saldo',
+      title: 'Total Kas RT',
       periodeLabel: r.label,
       rentang: r.rentang,
       hadiranMasuk: r.hadiranMasuk, hadiranKeluar: r.hadiranKeluar, hadiranSaldoAkhir: r.hadiranSaldoAkhir,
       rtMasuk: r.rtMasuk, rtKeluar: r.rtKeluar, rtSaldoAkhir: r.rtSaldoAkhir,
       tarikanSelesai: r.tarikanSelesai, talanganLunas: r.talanganLunas, jumlahTransaksi: r.jumlahTransaksi,
-      shareText: `*Tutup Buku ${r.label}* (${r.rentang})\nKas Hadiran: ${formatRupiahPlain(r.hadiranSaldoAkhir)}\nKas RT: ${formatRupiahPlain(r.rtSaldoAkhir)}\nTotal saldo: ${formatRupiahPlain(total)}\n— Hadiran RT 004/006`,
+      shareText: `*Tutup Buku ${r.label}* (${r.rentang})\n*Total Kas RT: ${formatRupiahPlain(r.rtSaldoAkhir)}*\nKas Hadiran (belum disetor): ${formatRupiahPlain(r.hadiranSaldoAkhir)}\n— Hadiran RT 004/006`,
     };
   }
 
   function snapToCard(s: SnapshotKas): LaporanKasCard {
-    const total = s.hadiranSaldoAkhir + s.rtSaldoAkhir;
     return {
-      title: 'Tutup Buku · Posisi Kas',
+      title: 'Total Kas RT',
       periodeLabel: `Per ${s.tanggal}`,
       rentang: s.rentang,
       hadiranMasuk: s.hadiranMasuk, hadiranKeluar: s.hadiranKeluar, hadiranSaldoAkhir: s.hadiranSaldoAkhir,
       rtMasuk: s.rtMasuk, rtKeluar: s.rtKeluar, rtSaldoAkhir: s.rtSaldoAkhir,
       tarikanSelesai: s.tarikanSelesai, talanganLunas: s.talanganLunas, jumlahTransaksi: s.jumlahTransaksi,
-      shareText: `*Tutup Buku — Posisi Kas RT 004/006*\n${s.tanggal}\nKas Hadiran: ${formatRupiahPlain(s.hadiranSaldoAkhir)}\nKas RT: ${formatRupiahPlain(s.rtSaldoAkhir)}\n*Total saldo: ${formatRupiahPlain(total)}*\n— Hadiran RT`,
+      shareText: `*Tutup Buku — Kas RT 004/006*\n${s.tanggal}\n*Total Kas RT: ${formatRupiahPlain(s.rtSaldoAkhir)}*\nKas Hadiran (belum disetor): ${formatRupiahPlain(s.hadiranSaldoAkhir)}\n— Hadiran RT`,
     };
   }
 
@@ -168,22 +166,19 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 Tutup Buku Sekarang
               </p>
             </div>
-            <p className="relative text-[11px] text-white/65 mb-1">Total saldo · {snap.tanggal}</p>
+            <p className="relative text-[11px] text-white/65 mb-1">Total Kas RT · {snap.tanggal}</p>
             <span className="relative block text-white text-[34px] font-black tracking-tighter leading-none tabular-nums mb-3">
-              {(() => {
-                const total = snap.hadiranSaldoAkhir + snap.rtSaldoAkhir;
-                return `${total < 0 ? '-' : ''}${formatRupiahPlain(total)}`;
-              })()}
+              {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
 
             <div className="relative grid grid-cols-2 gap-2 mb-3.5">
               <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-[10px] text-white/60 uppercase tracking-wide">Kas Hadiran</p>
-                <p className="text-[14px] font-bold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
+                <p className="text-[10px] text-white/60 uppercase tracking-wide">Kas RT (final)</p>
+                <p className="text-[14px] font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-[10px] text-white/60 uppercase tracking-wide">Kas RT</p>
-                <p className="text-[14px] font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
+                <p className="text-[10px] text-white/60 uppercase tracking-wide">Hadiran · belum disetor</p>
+                <p className="text-[14px] font-bold text-white/90 tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
               </div>
             </div>
 

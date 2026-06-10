@@ -65,7 +65,9 @@ const panelH = PANEL_PAD_T + PANEL_TITLE + 3 * ROW_H + PANEL_PAD_B;
 
 /** Render kartu laporan kas → PNG → bagikan (Web Share API + fallback WA). */
 export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
-  const grandSaldo = d.hadiranSaldoAkhir + d.rtSaldoAkhir;
+  // Kas RT = pool final/akumulasi → jadi angka utama. Saldo Kas Hadiran
+  // (belum disetor) ditampilkan terpisah di panel, TIDAK dijumlah ke total.
+  const heroAmount = d.rtSaldoAkhir;
 
   // Tinggi total dihitung dulu → kanvas pas, isi TIDAK akan terpotong.
   const H =
@@ -115,14 +117,14 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   ctx.font = `700 11px ${FONT}`;
   ctx.fillText(d.title.toUpperCase(), hx + 20, hy + 96);
 
-  const amountStr = rp(grandSaldo);
+  const amountStr = rp(heroAmount);
   let fs = 40;
   ctx.font = `800 ${fs}px ${FONT}`;
   while (ctx.measureText(amountStr).width > hw - 40 && fs > 22) {
     fs -= 1;
     ctx.font = `800 ${fs}px ${FONT}`;
   }
-  ctx.fillStyle = grandSaldo < 0 ? '#FCA5A5' : '#FFFFFF';
+  ctx.fillStyle = heroAmount < 0 ? '#FCA5A5' : '#FFFFFF';
   ctx.fillText(amountStr, hx + 20, hy + 134);
 
   ctx.fillStyle = 'rgba(255,255,255,0.62)';
@@ -130,7 +132,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   ctx.fillText(`${d.periodeLabel} · ${d.rentang}`, hx + 20, hy + 162);
 
   // ── Panel ledger ────────────────────────────────────────────
-  function drawPanel(y: number, judul: string, masuk: number, keluar: number, saldo: number) {
+  function drawPanel(y: number, judul: string, masuk: number, keluar: number, saldo: number, saldoLabel = 'Saldo akhir') {
     ctx.fillStyle = '#FFFFFF';
     roundRect(ctx, IX, y, IW, panelH, 18);
     ctx.fill();
@@ -144,7 +146,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
     const rows: { label: string; val: number; minus?: boolean; saldo?: boolean }[] = [
       { label: 'Masuk', val: masuk },
       { label: 'Keluar', val: keluar, minus: true },
-      { label: 'Saldo akhir', val: saldo, saldo: true },
+      { label: saldoLabel, val: saldo, saldo: true },
     ];
     let ry = y + PANEL_PAD_T + PANEL_TITLE;
     rows.forEach((r) => {
@@ -172,9 +174,9 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   }
 
   let y = PAD + HERO_H + GAP;
-  drawPanel(y, 'Kas Hadiran', d.hadiranMasuk, d.hadiranKeluar, d.hadiranSaldoAkhir);
+  drawPanel(y, 'Kas Hadiran', d.hadiranMasuk, d.hadiranKeluar, d.hadiranSaldoAkhir, 'Belum disetor');
   y += panelH + PANEL_GAP;
-  drawPanel(y, 'Kas RT', d.rtMasuk, d.rtKeluar, d.rtSaldoAkhir);
+  drawPanel(y, 'Kas RT', d.rtMasuk, d.rtKeluar, d.rtSaldoAkhir, 'Saldo akhir');
   y += panelH + GAP;
 
   // ── Baris aktivitas (satu baris, terpusat) ──────────────────
