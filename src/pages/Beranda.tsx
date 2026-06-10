@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, UserPlus, TrendingUp } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
@@ -10,6 +10,7 @@ import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import DonutChart from '../components/charts/DonutChart';
+import HeroSparkline from '../components/charts/HeroSparkline';
 import PengumumanBanner from '../components/PengumumanBanner';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
@@ -36,6 +37,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
   const [anggotaBaru, setAnggotaBaru] = useState<{ nama: string; created_at: string } | null>(null);
   const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
+  const [kasSeries, setKasSeries] = useState<number[]>([]);
+  const [lastDelta, setLastDelta] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
@@ -49,7 +52,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     if (showRefreshing) setRefreshing(true);
     else setLoading(true);
 
-    const [summaryData, jadwalRes, setorRes, talanganLunasRes, wargaBaruRes] = await Promise.all([
+    const [summaryData, jadwalRes, setorRes, talanganLunasRes, wargaBaruRes, selesaiRes] = await Promise.all([
       fetchDashboardSummary(),
       supabase
         .from('tarikan')
@@ -72,6 +75,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         .eq('status_aktif', true)
         .order('created_at', { ascending: false })
         .limit(1),
+      supabase
+        .from('tarikan')
+        .select('nomor, total_terkumpul')
+        .eq('status', 'selesai')
+        .order('nomor', { ascending: true }),
     ]);
 
     // Merge setor + talangan lunas → sort tanggal DESC → limit 20
@@ -114,6 +122,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       ? Date.now() - new Date(wb.created_at).getTime() < 14 * 86_400_000
       : false;
     setAnggotaBaru(baru14Hari ? wb : null);
+
+    // Tren pertumbuhan kas — deret kumulatif total_terkumpul per tarikan selesai
+    const selesaiRows = (selesaiRes.data as { nomor: number; total_terkumpul: number | null }[]) ?? [];
+    let run = 0;
+    const series = selesaiRows.map((t) => (run += t.total_terkumpul ?? 0));
+    setKasSeries(series);
+    setLastDelta(selesaiRows.length ? (selesaiRows[selesaiRows.length - 1].total_terkumpul ?? 0) : 0);
 
     setSummary(summaryData);
     setJadwalList((jadwalRes.data as Tarikan[]) ?? []);
@@ -254,9 +269,28 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
 
         {/* Sub-text */}
-        <p className="relative text-[13px] text-white/[0.78] mb-3.5">
+        <p className="relative text-[13px] text-white/[0.78] mb-3">
           Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
         </p>
+
+        {/* Tren pertumbuhan kas — sparkline "hidup" di dalam hero */}
+        {kasSeries.length >= 2 && (
+          <div className="relative mb-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-semibold uppercase text-white/55" style={{ letterSpacing: '0.14em' }}>
+                Pertumbuhan Kas
+              </span>
+              {lastDelta > 0 && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-200/95">
+                  <TrendingUp className="w-3 h-3" strokeWidth={2.5} />
+                  {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
+                  <span className="font-medium text-white/55">tarikan terakhir</span>
+                </span>
+              )}
+            </div>
+            <HeroSparkline points={kasSeries} />
+          </div>
+        )}
 
         {/* Divider */}
         <div className="relative hero-divider-x mb-1" />
