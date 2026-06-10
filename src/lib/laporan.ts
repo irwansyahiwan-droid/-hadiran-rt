@@ -16,8 +16,8 @@ export interface RekapTriwulan {
   romawi: string;          // 'II'
   label: string;           // 'Triwulan II 2026'
   rentang: string;         // 'Apr–Jun 2026'
-  hadiranMasuk: number;    // kas_masuk + talangan_masuk
-  hadiranKeluar: number;   // setor_kas_rt + kas_keluar + talangan_keluar
+  hadiranMasuk: number;    // kas_masuk (= total_terkumpul/iuran) — TANPA talangan
+  hadiranKeluar: number;   // setor_kas_rt + kas_keluar
   hadiranSaldoAkhir: number;
   rtMasuk: number;
   rtKeluar: number;
@@ -27,7 +27,12 @@ export interface RekapTriwulan {
   jumlahTransaksi: number;
 }
 
-const MASUK_HADIRAN = new Set(['kas_masuk', 'talangan_masuk']);
+// Pendapatan Kas Hadiran = IURAN (kas_masuk = total_terkumpul) saja.
+// Talangan (talangan_masuk/keluar) adalah penalti tak-hadir, mekanisme TERPISAH —
+// jangan dihitung sebagai pendapatan/pengeluaran kas hadiran (akan dobel & tak
+// sinkron dgn hero Beranda yang memakai total_terkumpul).
+const HADIRAN_MASUK = 'kas_masuk';
+const HADIRAN_KELUAR = new Set(['setor_kas_rt', 'kas_keluar']);
 const ROMAWI = ['I', 'II', 'III', 'IV'];
 const BULAN_SINGKAT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -74,8 +79,9 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
   for (const t of (trxRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
     const b = bagianOf(t.tanggal); if (!b) continue;
     const r = get(b);
-    if (MASUK_HADIRAN.has(t.tipe)) r.hadiranMasuk += t.nominal;
-    else r.hadiranKeluar += t.nominal;
+    if (t.tipe === HADIRAN_MASUK) r.hadiranMasuk += t.nominal;
+    else if (HADIRAN_KELUAR.has(t.tipe)) r.hadiranKeluar += t.nominal;
+    else continue; // talangan_masuk/keluar → bukan ledger kas hadiran
     r.jumlahTransaksi += 1;
   }
 
@@ -151,8 +157,9 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
 
   for (const t of (trxRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
     if (!sampai(t.tanggal)) continue;
-    if (MASUK_HADIRAN.has(t.tipe)) snap.hadiranMasuk += t.nominal;
-    else snap.hadiranKeluar += t.nominal;
+    if (t.tipe === HADIRAN_MASUK) snap.hadiranMasuk += t.nominal;
+    else if (HADIRAN_KELUAR.has(t.tipe)) snap.hadiranKeluar += t.nominal;
+    else continue; // talangan_masuk/keluar → bukan ledger kas hadiran
     snap.jumlahTransaksi += 1;
   }
   for (const t of (rtRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
