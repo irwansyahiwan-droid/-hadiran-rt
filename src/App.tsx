@@ -94,7 +94,7 @@ export default function App() {
 
   if (auth.loading) {
     return (
-      <div className="app-bg min-h-screen flex items-center justify-center">
+      <div className="app-bg min-h-dvh flex items-center justify-center">
         <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
       </div>
     );
@@ -120,7 +120,7 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={ctxValue}>
-      <div className="app-bg min-h-screen">
+      <div className="app-bg min-h-dvh">
         <Header
           role={isWargaMode ? 'warga' : auth.role}
           onLogout={isWargaMode ? ctxValue.exitWargaMode : auth.signOut}
@@ -132,7 +132,8 @@ export default function App() {
           onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
         />
-        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom) + 1rem)' }}>
+        {/* 4rem = tinggi nav (h-16) — sebelumnya 3.5rem bikin konten terpotong 8px di belakang nav */}
+        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom) + 1rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
             <div {...swipe}>
               <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>

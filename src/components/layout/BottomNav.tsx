@@ -20,24 +20,47 @@ const tabs: { id: TabName; label: string; icon: LucideIcon }[] = [
 export default function BottomNav({ active, onChange, isWargaMode }: BottomNavProps) {
   // Warga tidak punya tab Talangan — diakses lewat tombol "Lihat" di Beranda
   const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
+  const activeIndex = visibleTabs.findIndex(t => t.id === active);
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-line/70 dark:bg-gray-900/80 dark:border-gray-800/70"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)', boxShadow: '0 -10px 30px -20px rgba(16,24,40,0.35)' }}
+      // Material iOS tab bar: blur + saturate → warna konten di belakang "menyala"
+      // lewat kaca, bukan abu kusam (blur polos). Hairline atas tetap.
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/75 backdrop-blur-xl backdrop-saturate-150 border-t border-line/70 dark:bg-gray-900/80 dark:border-gray-800/70"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)',
+        boxShadow: '0 -10px 30px -20px rgba(16,24,40,0.35)',
+      }}
     >
-      <div className="relative max-w-lg mx-auto flex items-stretch justify-around h-16">
+      <div className="relative max-w-lg mx-auto flex items-stretch h-16">
+        {/* Indikator pill meluncur (spring) — slot selebar tombol, pill di area ikon.
+            Row TANPA padding horizontal agar slot = lebar tombol persis. */}
+        {activeIndex >= 0 && (
+          <div
+            aria-hidden
+            className="absolute inset-y-0 left-0 pointer-events-none transition-transform duration-300"
+            style={{
+              width: `${100 / visibleTabs.length}%`,
+              transform: `translateX(${activeIndex * 100}%)`,
+              transitionTimingFunction: 'var(--ease-spring)',
+            }}
+          >
+            <span className="absolute left-1/2 -translate-x-1/2 top-2 w-16 h-8 rounded-full bg-brand-link/10 dark:bg-emerald-400/10" />
+          </div>
+        )}
         {visibleTabs.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
             <button
               key={id}
               onClick={() => { if (!isActive) haptic(); onChange(id); }}
-              className="press relative flex flex-col items-center justify-center flex-1 w-full h-full py-2"
+              className="press relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
               aria-current={isActive ? 'page' : undefined}
             >
-              <span className={`flex items-center justify-center transition-transform duration-300 ${isActive ? '-translate-y-0.5' : ''}`}
-                style={{ transitionTimingFunction: 'var(--ease-spring)' }}>
+              {/* Tanpa lift translate: ala iOS, penekanan dari pill + tint, ikon tetap presisi di tengah pill */}
+              <span className="flex items-center justify-center">
                 <Icon
                   className={`w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-brand-link dark:text-[#1A9B86]' : 'text-gray-500 dark:text-gray-500'}`}
                   strokeWidth={isActive ? 2.4 : 2}

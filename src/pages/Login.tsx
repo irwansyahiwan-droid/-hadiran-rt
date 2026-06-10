@@ -47,7 +47,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
+    <div className="relative min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden"
       style={{ background: 'linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%)' }}>
 
       {/* Aurora background — blob mengambang lembut */}
