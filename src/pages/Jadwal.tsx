@@ -270,7 +270,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-amber-600' },
         ].map(s => (
           <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
-            <p className={`text-base font-black ${s.color}`}>{s.value}</p>
+            <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
             <p className="text-[9px] text-gray-400 mt-0.5">{s.label}</p>
           </div>
         ))}
@@ -480,11 +480,11 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         <div className="grid grid-cols-2 divide-x divide-line dark:divide-gray-800 border-t border-line dark:border-gray-800">
           <div className="px-4 py-3 min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-500">Kas Terkumpul</p>
-            <p className="text-xl font-black tracking-tight text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
+            <p className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
           </div>
           <div className="px-4 py-3 min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-500">Sohibul Terima</p>
-            <p className="text-xl font-black tracking-tight text-emerald-700 dark:text-emerald-400 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
+            <p className="text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
           </div>
         </div>
 
@@ -808,15 +808,15 @@ export default function JadwalPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
+          <p className="text-xl font-bold text-gray-500">{selesaiCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="text-xl font-black text-emerald-600">{dijadwalCount}</p>
+          <p className="text-xl font-bold text-emerald-600">{dijadwalCount}</p>
           <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="text-xl font-black text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
           <p className="text-[10px] text-gray-400 font-medium">Total</p>
         </div>
       </div>

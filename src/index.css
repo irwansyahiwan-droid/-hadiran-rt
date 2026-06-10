@@ -12,9 +12,11 @@ html {
 body {
   /* Kanvas abu netral sejuk (Apple/Linear clean): rata & tenang agar kartu
      putih "pop" lewat step tonal netral + bayangan crisp — BUKAN dari glow/
-     aurora. Makin sedikit trik, makin mahal kelihatannya (lihat .app-bg). */
-  background-color: #EEF0F4;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+     aurora. Makin sedikit trik, makin mahal kelihatannya (lihat .app-bg).
+     SATU nilai dengan .app-bg & token `sunken` — jangan biarkan drift lagi. */
+  background-color: #E9ECF2;
+  /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
+  font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* Tabular figures app-wide: tiap digit selebar sama → angka rupiah tidak
@@ -76,18 +78,6 @@ body {
    Specificity html:not(.dark) .text-* (0,2,1) menang tanpa !important. */
 html:not(.dark) .text-gray-400 { color: #6B7280; }  /* gray-400→500: AA lolos (≈4.8:1) */
 html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (≈7:1) */
-
-.card-clean {
-  background: #FFFFFF;
-  border: 1px solid #E8E8E8;
-  border-radius: 16px;
-}
-
-.card-elevated {
-  background: #FFFFFF;
-  border: 1px solid #E8E8E8;
-  box-shadow: none;
-}
 
 /* ── Hero card design tokens ─────────────────────────────── */
 :root {

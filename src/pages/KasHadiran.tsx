@@ -468,7 +468,7 @@ export default function KasHadiranPage() {
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-slate-100 dark:bg-slate-800' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-base font-black ${saldo < 0 ? 'text-slate-700 dark:text-slate-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
+              <span className={`text-base font-bold ${saldo < 0 ? 'text-slate-700 dark:text-slate-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
                 {saldo < 0 ? '-' : ''}Rp{Math.abs(saldo).toLocaleString('id-ID')}
               </span>
             </div>
@@ -478,7 +478,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <p className="text-base font-extrabold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
+            <p className="text-base font-bold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
 
             {/* Filter (status talangan) & sort */}
             {!loading && (
@@ -533,7 +533,7 @@ export default function KasHadiranPage() {
                       {/* ── Timeline mini-header ─────────────────────── */}
                       <div className="flex items-center justify-between px-4 pt-4 pb-2">
                         <div className="flex items-center gap-2">
-                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
                             talanganInfo.count === 0
                               ? 'bg-emerald-500 text-white'
                               : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'

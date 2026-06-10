@@ -74,7 +74,7 @@ export default function PengumumanBanner({ canManage }: Props) {
                 {style.label}
               </p>
               {data!.judul && (
-                <p className="text-[15px] font-black leading-snug mt-0.5 break-words">{data!.judul}</p>
+                <p className="text-[15px] font-bold leading-snug mt-0.5 break-words">{data!.judul}</p>
               )}
               {data!.isi && (
                 <p className="text-[13px] text-white/90 leading-relaxed mt-0.5 break-words whitespace-pre-line">{data!.isi}</p>
@@ -222,7 +222,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{style.label}</p>
-              <p className="text-sm font-black leading-snug break-words">{judul.trim() || 'Judul pengumuman'}</p>
+              <p className="text-sm font-bold leading-snug break-words">{judul.trim() || 'Judul pengumuman'}</p>
               {isi.trim() && <p className="text-xs text-white/90 mt-0.5 break-words whitespace-pre-line">{isi.trim()}</p>}
             </div>
           </div>

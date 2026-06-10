@@ -417,7 +417,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {/* Single belum lunas */}
           {showBelum && single.length > 0 && (
             <div>
-              <p className="text-base font-extrabold text-ink dark:text-gray-100 mt-6 mb-3">Daftar Talangan</p>
+              <p className="text-base font-bold text-ink dark:text-gray-100 mt-6 mb-3">Daftar Talangan</p>
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800">
                 {single.map(g => renderGroup(g))}
               </div>
@@ -427,7 +427,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {/* Lunas */}
           {showLunas && lunas.length > 0 && (
             <div>
-              <p className="text-base font-extrabold text-ink-sub dark:text-gray-400 mt-6 mb-3">Sudah Lunas</p>
+              <p className="text-base font-bold text-ink-sub dark:text-gray-400 mt-6 mb-3">Sudah Lunas</p>
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800 opacity-60">
                 {lunas.map(g => renderGroup(g, true))}
               </div>

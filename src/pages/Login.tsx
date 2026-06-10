@@ -67,7 +67,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           alt="Logo RT 004/006"
           className="pop w-20 h-20 rounded-3xl object-cover mx-auto mb-4 shadow-xl shadow-emerald-300/60 ring-1 ring-white/60"
         />
-        <h1 className="rise text-2xl font-black text-gray-900 dark:text-gray-100" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
+        <h1 className="rise text-2xl font-bold text-gray-900 dark:text-gray-100" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
         <p className="rise text-[13px] text-gray-500 dark:text-gray-400 mt-1" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
       </div>
 

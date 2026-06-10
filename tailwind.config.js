@@ -20,7 +20,7 @@ export default {
         warn: '#B45309',  // tunggakan / perhatian (amber-700)
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#EEF0F4', // background app (abu netral sejuk — kontras kartu dari shadow crisp, bukan glow)
+        sunken: '#E9ECF2', // background app — WAJIB sama dgn body & .app-bg di index.css (anti strip beda tone saat overscroll)
         line: '#ECEFF3',    // garis/divider tipis untuk semua card
         control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */

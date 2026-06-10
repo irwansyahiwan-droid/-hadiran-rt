@@ -144,7 +144,7 @@ export default function JadwalWargaPage() {
               Tarikan Terakhir
             </p>
             <div>
-              <p className="text-white text-lg font-black leading-tight">
+              <p className="text-white text-lg font-bold leading-tight">
                 Tarikan ke-{lastTarikan.nomor} · {formatTanggal(lastTarikan.tanggal)}
               </p>
               <p className="text-emerald-200 text-sm mt-0.5">
@@ -222,7 +222,7 @@ export default function JadwalWargaPage() {
               { label: 'Total', value: wargaList.length, color: 'text-gray-700 dark:text-gray-300' },
             ].map(s => (
               <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
-                <p className={`text-base font-black ${s.color}`}>{s.value}</p>
+                <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
                 <p className="text-[9px] text-gray-400 mt-0.5">{s.label}</p>
               </div>
             ))}
@@ -312,15 +312,15 @@ export default function JadwalWargaPage() {
           {/* Stat cards */}
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-              <p className="text-xl font-black text-gray-500">{selesaiCount}</p>
+              <p className="text-xl font-bold text-gray-500">{selesaiCount}</p>
               <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-              <p className="text-xl font-black text-emerald-600">{terjadwalCount}</p>
+              <p className="text-xl font-bold text-emerald-600">{terjadwalCount}</p>
               <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-              <p className="text-xl font-black text-gray-900 dark:text-gray-100">{allTarikan.length}</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{allTarikan.length}</p>
               <p className="text-[10px] text-gray-400 font-medium">Total</p>
             </div>
           </div>
@@ -341,7 +341,7 @@ export default function JadwalWargaPage() {
                     className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
                   >
                     {/* Badge nomor */}
-                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-black text-sm ${
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm ${
                       isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
                     }`}>
                       {t.nomor}

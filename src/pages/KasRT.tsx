@@ -482,7 +482,7 @@ export default function KasRTPage() {
         )}
 
         {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
-        <h2 className="text-base font-extrabold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
+        <h2 className="text-base font-bold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
 
         <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
