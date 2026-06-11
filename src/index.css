@@ -16,8 +16,9 @@ body {
   /* Kanvas abu netral sejuk (Apple/Linear clean): rata & tenang agar kartu
      putih "pop" lewat step tonal netral + bayangan crisp — BUKAN dari glow/
      aurora. Makin sedikit trik, makin mahal kelihatannya (lihat .app-bg).
-     SATU nilai dengan .app-bg & token `sunken` — jangan biarkan drift lagi. */
-  background-color: #E9ECF2;
+     SATU nilai dengan .app-bg, token `sunken`, & manifest background_color —
+     jangan biarkan drift lagi. */
+  background-color: #E4E8EF;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -70,11 +71,11 @@ input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
    Dipakai di wrapper App (kanvas #EEF0F4). */
 .app-bg {
-  /* Apple clean: kanvas abu netral sejuk RATA (#EEF0F4). Tanpa aurora tebal &
-     tanpa grounding gelap → tenang, lapang, profesional. Brand emerald hanya
+  /* Apple clean: kanvas abu netral sejuk RATA. Tanpa aurora tebal & tanpa
+     grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #E9ECF2;
+  background-color: #E4E8EF;
   background-image:
     radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
   background-attachment: fixed;
@@ -175,7 +176,7 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      Hairline ring tetap → tepi kartu "tercetak" walau bayangan kebakar cahaya. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(16, 24, 40, 0.08),                          /* hairline ring crisp → kartu "tercetak" */
+    0 0 0 1px rgba(16, 24, 40, 0.10),                          /* hairline ring crisp → kartu "tercetak" */
     0 1px 2px 0 rgba(16, 24, 40, 0.07),                       /* contact shadow rapat → kartu menapak */
     0 6px 14px -4px rgba(16, 24, 40, 0.12),                   /* drop lembut dekat → definisi tepi */
     0 16px 32px -10px rgba(16, 24, 40, 0.16),                 /* penumbra menengah → kartu "memancar" */
@@ -193,7 +194,7 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
 .dark {
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.05),               /* tepi atas "tersinari" halus */
-    0 0 0 1px rgba(255, 255, 255, 0.07),                      /* ring cahaya tipis → kartu kebaca di gelap */
+    0 0 0 1px rgba(255, 255, 255, 0.09),                      /* ring cahaya tipis → kartu kebaca di gelap */
     0 2px 6px -1px rgba(0, 0, 0, 0.5),
     0 18px 40px -12px rgba(0, 0, 0, 0.62);                    /* drop gelap dalam → elevation nyata */
   --shadow-float: 0 18px 48px -12px rgba(0, 0, 0, 0.72);
