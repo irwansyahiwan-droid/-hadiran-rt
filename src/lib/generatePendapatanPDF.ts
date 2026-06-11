@@ -89,7 +89,7 @@ export function generatePendapatanPDF(
     startY: Y + 7,
     head: [['NO', 'NAMA ANGGOTA', 'STATUS', 'SOHIBUL BAIT (Rp)', 'KAS (Rp)', 'TOTAL (Rp)']],
     body: tableRows,
-    foot: [['', `TOTAL · ${payingCount} pembayar`, '', rp(totalSohibul), rp(totalKas), rp(totalSemua)]],
+    foot: [['', `TOTAL · ${payingCount} pembayar`, '', fmtNum(totalSohibul), fmtNum(totalKas), fmtNum(totalSemua)]],
     showFoot: 'lastPage',
     margin: { left: M, right: M },
     columnStyles: {
