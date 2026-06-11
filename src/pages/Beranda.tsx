@@ -157,7 +157,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const donutTotal = donutData.reduce((s, d) => s + d.value, 0);
   const kasStatus =
     saldo < 0
-      ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
+      ? { label: 'Perlu Perhatian', dot: 'bg-red-500', text: 'text-red-600 dark:text-rose-400', bg: 'bg-red-50 dark:bg-rose-900/20' }
       : talangan > 0
         ? { label: 'Ada Tunggakan', dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' }
         : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' };
@@ -234,6 +234,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
         )}
 
+        {/* Scrim bawah — ujung kanan gradient (#1C9A5C) terlalu terang utk teks kecil
+            putih (≈2.7:1 < AA). Veil hitam halus hanya di area sub-text + baris stat
+            → teks kecil lolos 4.5:1 TANPA mengubah gradient brand. */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 z-0 pointer-events-none"
+          style={{ height: '70%', background: 'linear-gradient(to top, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.14) 50%, transparent 100%)' }}
+        />
+
         {/* Label row */}
         <div className="relative flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2">
@@ -276,7 +285,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
 
         {/* Sub-text */}
-        <p className="relative text-[13px] text-white/[0.78] mb-3.5">
+        <p className="relative text-[13px] text-white/90 mb-3.5">
           Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
           {lastDelta > 0 && (
             <span className="inline-flex items-center gap-0.5 ml-1.5 font-semibold text-emerald-200/90 align-middle">
@@ -295,8 +304,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             onClick={() => onNavigate('kas')}
             className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
-            <Wallet className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/75 mt-1.5">Saldo Aktif</span>
+            <Wallet className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/90 mt-1.5">Saldo Aktif</span>
             <span className={`text-[15px] font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 4)}
             </span>
@@ -305,16 +314,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             onClick={() => onNavigate('talangan')}
             className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
-            <ArrowLeftRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/75 mt-1.5">Talangan</span>
+            <ArrowLeftRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/90 mt-1.5">Talangan</span>
             <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
           <button
             onClick={() => onNavigate('kas-rt')}
             className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
-            <ArrowUpRight className="w-[18px] h-[18px] text-white/70" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/75 mt-1.5">Setor Kas RT</span>
+            <ArrowUpRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
+            <span className="text-[11px] text-white/90 mt-1.5">Setor Kas RT</span>
             <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
         </div>
@@ -363,7 +372,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <button
             onClick={() => onNavigate('talangan')}
-            className="text-xs text-amber-700 dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3 py-1.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
+            className="press inline-flex items-center min-h-[44px] text-xs text-amber-700 dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
           >
             Lihat
           </button>
@@ -389,7 +398,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
-          <button onClick={() => onNavigate('jadwal')} className="press -my-1 py-2 pl-2 text-sm text-brand-link dark:text-[#1A9B86] font-medium">Lihat semua →</button>
+          <button onClick={() => onNavigate('jadwal')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {jadwalList.length === 0 ? (
@@ -421,7 +430,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-base font-bold text-ink dark:text-gray-100">Transaksi Terakhir</h2>
-          <button onClick={() => onNavigate('kas')} className="press -my-1 py-2 pl-2 text-sm text-brand-link dark:text-[#1A9B86] font-medium">Lihat semua →</button>
+          <button onClick={() => onNavigate('kas')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
         </div>
         {trxItems.length > 0 && (
           <div className="space-y-2 mb-3">

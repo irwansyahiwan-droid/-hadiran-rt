@@ -48,7 +48,8 @@ export default function DonutChart({
   return (
     <div className="flex items-center gap-5">
       <div className="relative shrink-0" style={{ width: size, height: size }}>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+        {/* Grafik dekoratif — data disampaikan via legend tombol di bawah (terbaca SR) */}
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90" aria-hidden="true" focusable="false">
           <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-gray-100 dark:stroke-gray-800" />
           {data.map((d, i) => {
             const frac = Math.max(0, d.value) / total;
@@ -89,10 +90,14 @@ export default function DonutChart({
       </div>
 
       <div className="flex-1 space-y-2 min-w-0">
-        {data.map((d, i) => (
+        {data.map((d, i) => {
+          const pct = Math.round((Math.max(0, d.value) / total) * 100);
+          return (
           <button
             key={d.label}
             onClick={() => setActive((a) => (a === i ? null : i))}
+            aria-pressed={active === i}
+            aria-label={`${d.label}: ${format(d.value)}, ${pct}% dari total`}
             className={`press w-full flex items-center gap-2 rounded-lg px-1.5 py-1 -mx-1.5 transition-colors ${
               active === i ? 'bg-gray-100/80 dark:bg-gray-800' : ''
             }`}
@@ -101,7 +106,8 @@ export default function DonutChart({
             <span className={`text-xs truncate ${active === i ? 'font-bold text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>{d.label}</span>
             <span className="ml-auto shrink-0 text-xs font-bold text-gray-800 dark:text-gray-200 tabular-nums whitespace-nowrap">{format(d.value)}</span>
           </button>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

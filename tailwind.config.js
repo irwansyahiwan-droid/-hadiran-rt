@@ -12,6 +12,7 @@ export default {
           600: '#145D39',
           500: '#1B7249',
           link: '#0D6B5E',    // teal-green untuk tautan "Lihat semua"
+          linkDark: '#1A9B86', // pasangan link utk dark mode (tab aktif + tautan) — SATU sumber
         },
         /* ── Semantik nominal: SATU hijau, SATU merah, SATU amber ──────
            Hindari campur red/rose & green/emerald di satu layar. */
