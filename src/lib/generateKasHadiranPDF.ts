@@ -1,7 +1,9 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { LOGO_DATA_URL } from './logoBase64';
 import { outputPdf } from './pdfOut';
+import {
+  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C,
+} from './pdfTheme';
 import type { Tarikan } from './types';
 
 interface TalanganInfo { count: number; total: number; }
@@ -29,45 +31,21 @@ export function generateKasHadiranPDF(
   const docCode = `KAS-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  // ── Header ────────────────────────────────────────────────
-  doc.setFillColor(6, 78, 59);
-  doc.rect(0, 0, W, 36, 'F');
-  doc.addImage(LOGO_DATA_URL, 'JPEG', M, 6, 15, 15);
-  doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
-  doc.text('RT 004 / RW 006 — Tanah Baru', M + 18, 13);
-  doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(167, 243, 208);
-  doc.text('Beji, Kota Depok · Sistem Hadiran Digital', M + 18, 20);
-  doc.setFontSize(7.5);
-  doc.text(docCode, W - M, 13, { align: 'right' });
-  doc.text(tanggalCetak, W - M, 20, { align: 'right' });
-
-  // ── Title ─────────────────────────────────────────────────
-  doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(17, 24, 39);
-  doc.text('Laporan Alur Kas Hadiran', M, 47);
-  doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(107, 114, 128);
-  doc.text('Rekapitulasi kas masuk, talangan, dan saldo RT 004/006 Tanah Baru, Beji, Kota Depok', M, 53);
-
-  // ── 3 Stat cards ─────────────────────────────────────────
-  const cardY = 59; const cardH = 22; const gap = 4;
-  const cardW = (W - 2 * M - gap * 2) / 3;
-  const cards: [string, string, [number, number, number]][] = [
-    ['KAS HADIRAN TERKUMPUL', rp(stats.totalKasTerkumpul), [6, 95, 70]],
-    ['TALANGAN BELUM LUNAS',  `-${rp(stats.totalTalanganBelum)}`, [185, 28, 28]],
-    ['SALDO BERSIH KAS',      rp(stats.saldoAktif), stats.saldoAktif < 0 ? [127, 29, 29] : [6, 78, 59]],
-  ];
-  cards.forEach(([label, value, fill], i) => {
-    const x = M + i * (cardW + gap);
-    doc.setFillColor(...fill); doc.roundedRect(x, cardY, cardW, cardH, 3, 3, 'F');
-    doc.setFontSize(6.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(200, 240, 220);
-    doc.text(label, x + 4, cardY + 7);
-    doc.setFontSize(9.5); doc.setTextColor(255, 255, 255);
-    doc.text(value, x + 4, cardY + 16);
+  let Y = drawMasthead(doc, {
+    W, M, docCode, tanggalCetak,
+    title: 'Laporan Alur Kas Hadiran',
+    subtitle: 'Rekapitulasi kas masuk, talangan, dan saldo RT 004/006 Tanah Baru, Beji, Kota Depok',
   });
 
-  // ── Table ─────────────────────────────────────────────────
+  Y = drawStatStrip(doc, Y, [
+    { label: 'Kas Hadiran Terkumpul', value: rp(stats.totalKasTerkumpul) },
+    { label: 'Talangan Belum Lunas',  value: `-${rp(stats.totalTalanganBelum)}`, tone: 'neg' },
+    { label: 'Saldo Bersih Kas',      value: rp(stats.saldoAktif), tone: stats.saldoAktif < 0 ? 'neg' : 'ink' },
+  ], W, M);
+
+  // ── Tabel per tarikan ─────────────────────────────────────
   const sorted = [...tarikanList].sort((a, b) => a.nomor - b.nomor);
 
-  // Totals untuk baris TOTAL
   const totalKas  = sorted.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const totalTal  = Object.values(talanganMap).reduce((s, v) => s + v.total, 0);
   const totalSetor = Object.values(setorMap).reduce((s, v) => s + v, 0);
@@ -91,11 +69,12 @@ export function generateKasHadiranPDF(
   });
 
   autoTable(doc, {
-    startY: cardY + cardH + 6,
+    ...TABLE,
+    startY: Y + 7,
     head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'HADIR', 'KAS MASUK', 'TALANGAN', 'SETOR', 'NET KAS']],
     body: rows,
     foot: [[
-      'TOTAL', '', '', '',
+      '', 'TOTAL', '', '',
       rp(totalKas),
       totalTal > 0 ? `-${rp(totalTal)}` : 'Rp0',
       totalSetor > 0 ? `-${rp(totalSetor)}` : 'Rp0',
@@ -103,10 +82,6 @@ export function generateKasHadiranPDF(
     ]],
     showFoot: 'lastPage',
     margin: { left: M, right: M },
-    headStyles: { fillColor: [6, 78, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7 },
-    bodyStyles: { fontSize: 7.5, textColor: [31, 41, 55] },
-    alternateRowStyles: { fillColor: [249, 250, 251] },
-    footStyles: { fillColor: [17, 24, 39], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.5 },
     columnStyles: {
       0: { cellWidth: 8,  halign: 'center' },
       1: { cellWidth: 30 },
@@ -119,11 +94,10 @@ export function generateKasHadiranPDF(
     },
     didParseCell(data) {
       if (data.section === 'foot') {
-        // Warnai kolom numerik di baris TOTAL
-        if (data.column.index === 5 && totalTal > 0) data.cell.styles.textColor = [252, 165, 165];
-        if (data.column.index === 6 && totalSetor > 0) data.cell.styles.textColor = [253, 186, 116];
+        if (data.column.index === 5 && totalTal > 0) data.cell.styles.textColor = C.neg;
+        if (data.column.index === 6 && totalSetor > 0) data.cell.styles.textColor = C.warn;
         if (data.column.index === 7) {
-          data.cell.styles.textColor = totalNet < 0 ? [252, 165, 165] : [134, 239, 172];
+          data.cell.styles.textColor = totalNet < 0 ? C.neg : C.pos;
           data.cell.styles.fontSize = 8;
         }
         return;
@@ -134,65 +108,35 @@ export function generateKasHadiranPDF(
       const tal = talanganMap[row.id] ?? { count: 0, total: 0 };
       const setor = setorMap[row.id] ?? 0;
       if (data.column.index === 5 && tal.total > 0) {
-        data.cell.styles.textColor = [185, 28, 28];
+        data.cell.styles.textColor = C.neg;
         data.cell.styles.fontStyle = 'bold';
       }
       if (data.column.index === 6 && setor > 0) {
-        data.cell.styles.textColor = [120, 53, 15];
+        data.cell.styles.textColor = C.warn;
         data.cell.styles.fontStyle = 'bold';
       }
       if (data.column.index === 7) {
         const net = (row.total_terkumpul ?? 0) - tal.total - setor;
-        data.cell.styles.textColor = net < 0 ? [185, 28, 28] : [5, 150, 105];
+        data.cell.styles.textColor = net < 0 ? C.neg : C.pos;
         data.cell.styles.fontStyle = 'bold';
       }
     },
   });
 
-  // ── Ringkasan ─────────────────────────────────────────────
-  const afterY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
-  const sumX = W - M - 75; const sumW = 75;
-
-  doc.setDrawColor(229, 231, 235); doc.setLineWidth(0.3);
-  doc.roundedRect(sumX, afterY, sumW, 42, 2, 2, 'S');
-
-  const sumLines: [string, string, [number, number, number]?][] = [
-    ['Total Kas Terkumpul',   rp(stats.totalKasTerkumpul)],
-    ['Total Talangan Belum Lunas', `-${rp(stats.totalTalanganBelum)}`, [185, 28, 28]],
-    ['Total Setor ke Kas RT', `-${rp(stats.totalSetor)}`, [120, 53, 15]],
-  ];
-  sumLines.forEach(([label, value, color], i) => {
-    const y = afterY + 9 + i * 8;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(107, 114, 128);
-    doc.text(label, sumX + 4, y);
-    doc.setTextColor(...(color ?? [31, 41, 55] as [number, number, number]));
-    doc.text(value, sumX + sumW - 4, y, { align: 'right' });
-  });
-  doc.setFillColor(6, 78, 59);
-  doc.roundedRect(sumX, afterY + 31, sumW, 11, 1, 1, 'F');
-  doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
-  doc.text('Saldo Bersih Kas', sumX + 4, afterY + 38.5);
+  // ── Ringkasan tutup buku ──────────────────────────────────
+  const afterY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
   const saldoText = (stats.saldoAktif < 0 ? '-' : '') + rp(Math.abs(stats.saldoAktif));
-  doc.text(saldoText, sumX + sumW - 4, afterY + 38.5, { align: 'right' });
 
-  // ── TTD ───────────────────────────────────────────────────
-  const sigY = afterY + 57;
-  [{ role: 'Ketua RT 004/006', name: "Saman Ma'arif" },
-   { role: 'Sekretaris', name: 'M. Aryanto' },
-   { role: 'Bendahara', name: 'Irwansyah' }].forEach((p, i) => {
-    const cx = M + ((W - 2 * M) / 3) * i + (W - 2 * M) / 6;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(107, 114, 128);
-    doc.text(p.role, cx, sigY, { align: 'center' });
-    doc.setDrawColor(180, 180, 180); doc.setLineWidth(0.4);
-    doc.line(cx - 28, sigY + 16, cx + 28, sigY + 16);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(17, 24, 39);
-    doc.text(p.name, cx, sigY + 22, { align: 'center' });
-  });
+  const sumY = drawSummary(doc, afterY + 6, [
+    { label: 'Total Kas Terkumpul',        value: rp(stats.totalKasTerkumpul) },
+    { label: 'Total Talangan Belum Lunas', value: `-${rp(stats.totalTalanganBelum)}`, tone: 'neg' },
+    { label: 'Total Setor ke Kas RT',      value: `-${rp(stats.totalSetor)}`, tone: 'warn' },
+  ], { label: 'Saldo Bersih Kas', value: saldoText, tone: stats.saldoAktif < 0 ? 'neg' : 'ink' }, W, M);
 
-  // ── Footer ────────────────────────────────────────────────
+  drawSignatures(doc, sumY + 14, W, M);
+
   const H = doc.internal.pageSize.getHeight();
-  doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(156, 163, 175);
-  doc.text(`Dicetak: ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
+  drawFooter(doc, W, H, tanggalCetak);
 
   return outputPdf(doc, `Laporan-Kas-Hadiran-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf`);
 }
