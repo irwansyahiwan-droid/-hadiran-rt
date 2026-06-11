@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, C,
+  TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, C, fmtNum,
 } from './pdfTheme';
 import type { KasRT } from './types';
 
@@ -31,7 +31,7 @@ const COL = {
   3: { cellWidth: 30,   halign: 'right' as const },
   4: { cellWidth: 30,   halign: 'right' as const },
 };
-const HEAD = ['NO', 'TANGGAL', 'KETERANGAN', 'JUMLAH', 'SALDO'];
+const HEAD = ['NO', 'TANGGAL', 'KETERANGAN', 'JUMLAH (Rp)', 'SALDO (Rp)'];
 
 export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -67,7 +67,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     startY: Y,
     head: [HEAD],
     body: saldoAwalList.map((k, i) => [
-      String(i + 1), fmtDate(k.tanggal), k.keterangan, rp(k.nominal), rp(k.saldo_setelah),
+      String(i + 1), fmtDate(k.tanggal), k.keterangan, fmtNum(k.nominal), fmtNum(k.saldo_setelah),
     ]),
     margin: { left: M, right: M },
     columnStyles: COL,
@@ -80,7 +80,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     startY: Y,
     head: [HEAD],
     body: masukList.map((k, i) => [
-      String(i + 1), fmtDate(k.tanggal), k.keterangan, `+${rp(k.nominal)}`, rp(k.saldo_setelah),
+      String(i + 1), fmtDate(k.tanggal), k.keterangan, `+${fmtNum(k.nominal)}`, fmtNum(k.saldo_setelah),
     ]),
     margin: { left: M, right: M },
     columnStyles: COL,
@@ -99,7 +99,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     startY: Y,
     head: [HEAD],
     body: keluarList.map((k, i) => [
-      String(i + 1), fmtDate(k.tanggal), k.keterangan, `-${rp(k.nominal)}`, rp(k.saldo_setelah),
+      String(i + 1), fmtDate(k.tanggal), k.keterangan, `-${fmtNum(k.nominal)}`, fmtNum(k.saldo_setelah),
     ]),
     margin: { left: M, right: M },
     columnStyles: COL,

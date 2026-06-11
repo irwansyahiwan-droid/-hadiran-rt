@@ -23,6 +23,15 @@ export const C = {
   warn:  [180, 83, 9]    as RGB, // perhatian (token warn)
 } as const;
 
+/**
+ * Angka di SEL TABEL: polos tanpa "Rp" (satuan dicantumkan di header kolom,
+ * mis. "JUMLAH (Rp)") agar tabel lega & mudah dipindai. Prefiks "Rp" HANYA
+ * untuk Total/ringkasan/stat — aturan dari user 2026-06-11.
+ */
+export function fmtNum(n: number): string {
+  return n.toLocaleString('id-ID');
+}
+
 export const SIGNERS = [
   { role: 'Ketua RT 004/006', name: "Saman Ma'arif" },
   { role: 'Sekretaris', name: 'M. Aryanto' },
@@ -111,7 +120,7 @@ export const TABLE = {
   },
   bodyStyles: {
     fontSize: 7.5, textColor: C.sub,
-    cellPadding: { top: 2.1, bottom: 2.1, left: 1, right: 1 },
+    cellPadding: { top: 2.6, bottom: 2.6, left: 1, right: 1 },
     lineWidth: { bottom: 0.15 }, lineColor: C.line,
   },
   footStyles: {

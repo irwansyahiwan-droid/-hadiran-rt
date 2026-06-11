@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C,
+  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum,
 } from './pdfTheme';
 import type { Tarikan, Warga } from './types';
 
@@ -67,16 +67,16 @@ export function generatePendapatanPDF(
 
   // Hadir (membayar langsung)
   hadirList.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
-    tableRows.push([String(rowNum++), w.nama, '', rp(SOHIBUL_PER), rp(KAS_PER), rp(TOTAL_PER)]);
+    tableRows.push([String(rowNum++), w.nama, '', fmtNum(SOHIBUL_PER), fmtNum(KAS_PER), fmtNum(TOTAL_PER)]);
   });
   // Tidak hadir tapi talangan SUDAH lunas — di bawah, tetap dihitung
   // (teks polos tanpa "✓": glyph itu tidak ada di Helvetica jsPDF → kotak rusak)
   lunaslist.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
-    tableRows.push([String(rowNum++), w.nama, 'Lunas', rp(SOHIBUL_PER), rp(KAS_PER), rp(TOTAL_PER)]);
+    tableRows.push([String(rowNum++), w.nama, 'Lunas', fmtNum(SOHIBUL_PER), fmtNum(KAS_PER), fmtNum(TOTAL_PER)]);
   });
   // Tidak hadir, talangan BELUM lunas — paling bawah, tetap dihitung
   talanganList.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
-    tableRows.push([String(rowNum++), w.nama, 'Talangan', rp(SOHIBUL_PER), rp(KAS_PER), rp(TOTAL_PER)]);
+    tableRows.push([String(rowNum++), w.nama, 'Talangan', fmtNum(SOHIBUL_PER), fmtNum(KAS_PER), fmtNum(TOTAL_PER)]);
   });
 
   // Baris TOTAL (foot) — jumlah seluruh pembayar; selalu di bawah semua nama.
@@ -87,7 +87,7 @@ export function generatePendapatanPDF(
   autoTable(doc, {
     ...TABLE,
     startY: Y + 7,
-    head: [['NO', 'NAMA ANGGOTA', 'STATUS', 'SOHIBUL BAIT', 'KAS', 'TOTAL']],
+    head: [['NO', 'NAMA ANGGOTA', 'STATUS', 'SOHIBUL BAIT (Rp)', 'KAS (Rp)', 'TOTAL (Rp)']],
     body: tableRows,
     foot: [['', `TOTAL · ${payingCount} pembayar`, '', rp(totalSohibul), rp(totalKas), rp(totalSemua)]],
     showFoot: 'lastPage',

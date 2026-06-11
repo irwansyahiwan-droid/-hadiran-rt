@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C,
+  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -61,17 +61,17 @@ export function generateKasHadiranPDF(
       `#${t.nomor} · ${new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}`,
       t.sohibul_bait?.nama ?? '—',
       `${t.total_hadir}/${t.total_warga}`,
-      rp(kasIn),
-      tal.total > 0 ? `-${rp(tal.total)}` : 'Rp0',
-      setor > 0 ? `-${rp(setor)}` : 'Rp0',
-      net < 0 ? `-${rp(Math.abs(net))}` : rp(net),
+      fmtNum(kasIn),
+      tal.total > 0 ? `-${fmtNum(tal.total)}` : '0',
+      setor > 0 ? `-${fmtNum(setor)}` : '0',
+      net < 0 ? `-${fmtNum(Math.abs(net))}` : fmtNum(net),
     ];
   });
 
   autoTable(doc, {
     ...TABLE,
     startY: Y + 7,
-    head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'HADIR', 'KAS MASUK', 'TALANGAN', 'SETOR', 'NET KAS']],
+    head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'HADIR', 'KAS MASUK (Rp)', 'TALANGAN (Rp)', 'SETOR (Rp)', 'NET KAS (Rp)']],
     body: rows,
     foot: [[
       '', 'TOTAL', '', '',

@@ -1,9 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
-import { TABLE, drawMasthead, drawFooter } from './pdfTheme';
+import { TABLE, drawMasthead, drawFooter, fmtNum } from './pdfTheme';
 import { formatAktivitas, formatWaktu } from './aktivitas';
-import { formatRupiahPlain } from './utils';
 import type { AktivitasLog } from './types';
 
 /** Ekspor daftar riwayat aktivitas (audit log) ke PDF untuk arsip / lampiran LPJ. */
@@ -30,14 +29,14 @@ export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'
       formatWaktu(r.created_at),
       aktivitas,
       v.actor,
-      v.amount != null && v.amount !== 0 ? formatRupiahPlain(v.amount) : '—',
+      v.amount != null && v.amount !== 0 ? fmtNum(Math.abs(v.amount)) : '—',
     ];
   });
 
   autoTable(doc, {
     ...TABLE,
     startY: Y + 7,
-    head: [['NO', 'WAKTU', 'AKTIVITAS', 'OLEH', 'NILAI']],
+    head: [['NO', 'WAKTU', 'AKTIVITAS', 'OLEH', 'NILAI (Rp)']],
     body,
     margin: { left: M, right: M },
     bodyStyles: { ...TABLE.bodyStyles, valign: 'top' },
