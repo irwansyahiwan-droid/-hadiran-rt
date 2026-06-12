@@ -357,6 +357,18 @@ export default function KasHadiranPage() {
   }
 
   const hidden = useHideAmount();
+
+  // Rincian pendapatan tarikan yang sedang dibuka — rumus WAJIB sinkron dgn
+  // generatePendapatanPDF.ts (Rp45.000/pembayar → Sohibul, potongan admin Rp60.000;
+  // pembayar = semua anggota kecuali Sohibul Bait, termasuk talangan belum lunas).
+  const SOHIBUL_PER = 45000;
+  const POTONGAN_ADMIN = 60000;
+  const payingCount = detailTarikan
+    ? wargaList.filter((w) => w.id !== (detailTarikan.sohibul_bait_id ?? '')).length
+    : 0;
+  const pendapatanKotor = payingCount * SOHIBUL_PER;
+  const pendapatanBersih = pendapatanKotor - POTONGAN_ADMIN;
+
   const sudahSetor = totalSetor > 0;
   const heroGradient = sudahSetor
     ? 'from-[#1E40AF] via-[#2563EB] to-[#3B82F6]'
@@ -688,7 +700,7 @@ export default function KasHadiranPage() {
                     aria-label="Cetak daftar hadir PDF"
                     className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm"
                   >
-                    <FileText className="w-4 h-4" /> Absensi
+                    <FileText className="w-4 h-4" /> PDF Absensi
                   </button>
                 )}
               </div>
@@ -705,6 +717,30 @@ export default function KasHadiranPage() {
                 <div className="flex justify-center py-10"><RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" /></div>
               ) : (
                 <>
+                  {/* Rincian pendapatan real-time — angka sama dgn PDF Pendapatan */}
+                  {(detailHadir.length > 0 || detailTidak.length > 0) && (
+                    <div className="rounded-2xl border border-line dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 px-4 py-3.5">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2.5">Pendapatan Sohibul Bait</p>
+                      <div className="space-y-1.5 text-sm">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × {formatRupiahPlain(SOHIBUL_PER)}</span>
+                          <span className="font-semibold text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-ink-sub dark:text-gray-400">Potongan admin</span>
+                          <span className="font-semibold text-neg dark:text-red-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-line dark:border-gray-800">
+                          <span className="font-bold text-ink dark:text-gray-100">Bersih diterima SB</span>
+                          <span className="font-bold text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-ink-sub dark:text-gray-400">Kas Hadiran tarikan ini</span>
+                          <span className="font-semibold text-warn dark:text-amber-400 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {detailTidak.length > 0 && (
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2">Tidak Hadir / Talangan</p>
