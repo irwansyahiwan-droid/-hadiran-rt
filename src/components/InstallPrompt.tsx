@@ -80,7 +80,7 @@ export default function InstallPrompt() {
           </div>
           <button
             onClick={isIos ? () => setShowGuide(true) : install}
-            className="press shrink-0 inline-flex items-center gap-1.5 bg-[#0F4C2E] text-white text-xs font-bold px-3 py-2 rounded-xl"
+            className="press shrink-0 inline-flex items-center gap-1.5 bg-brand text-white text-xs font-bold px-3 py-2 rounded-xl"
           >
             <Download className="w-3.5 h-3.5" />
             Pasang
@@ -111,16 +111,16 @@ export default function InstallPrompt() {
                 const Icon = s.icon;
                 return (
                   <li key={i} className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-full bg-[#0F4C2E] text-white text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                    <span className="w-7 h-7 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
                     <span className="flex-1 text-sm text-gray-700 dark:text-gray-200">{s.text}</span>
-                    <Icon className="w-4 h-4 text-[#0F4C2E] dark:text-emerald-400 shrink-0" />
+                    <Icon className="w-4 h-4 text-brand dark:text-emerald-400 shrink-0" />
                   </li>
                 );
               })}
             </ol>
             <button
               onClick={() => setShowGuide(false)}
-              className="press w-full mt-5 py-3 rounded-xl bg-[#0F4C2E] text-white font-bold text-sm"
+              className="press w-full mt-5 py-3 rounded-xl bg-brand text-white font-bold text-sm"
             >
               Mengerti
             </button>

@@ -31,10 +31,6 @@ export default {
           faint: '#475569',   // tanggal / caption (slate-600 — naik dari 500, tetap kebaca jelas)
         },
       },
-      borderRadius: {
-        card: '24px', // permukaan besar (card/hero)
-        chip: '12px', // ikon / pill kecil
-      },
     },
   },
   plugins: [],

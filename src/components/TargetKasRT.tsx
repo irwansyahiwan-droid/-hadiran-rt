@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Target, Pencil, Trophy, CalendarClock, Plus, Trash2 } from 'lucide-react';
+import { Target, Pencil, Trophy, CalendarClock, Plus, Trash2, PartyPopper } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useAuthContext } from '../context/AuthContext';
@@ -91,8 +91,8 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
         </div>
 
         <div className="flex items-center justify-between mt-2.5">
-          <span className={`text-xs font-bold ${tercapai ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-            {tercapai ? '🎉 Target tercapai!' : `${Math.round(pct)}% terkumpul`}
+          <span className={`inline-flex items-center gap-1 text-xs font-bold ${tercapai ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+            {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
             {formatRupiahPlain(Math.max(0, saldo))} / {formatRupiahPlain(target.nominal)}

@@ -43,7 +43,7 @@ export default function PwaUpdatePrompt() {
       className="fixed left-1/2 -translate-x-1/2 z-[55] w-[calc(100%-2rem)] max-w-sm rise"
       style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
     >
-      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#0F4C2E] text-white float">
+      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-brand text-white float">
         <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
           <Sparkles className="w-4 h-4 text-emerald-200" />
         </div>
@@ -53,7 +53,7 @@ export default function PwaUpdatePrompt() {
         </div>
         <button
           onClick={() => waiting.postMessage('SKIP_WAITING')}
-          className="press shrink-0 inline-flex items-center gap-1.5 bg-white text-[#0F4C2E] text-xs font-bold px-3 py-2 rounded-xl"
+          className="press shrink-0 inline-flex items-center gap-1.5 bg-white text-brand text-xs font-bold px-3 py-2 rounded-xl"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Muat ulang

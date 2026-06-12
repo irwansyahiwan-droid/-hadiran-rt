@@ -375,7 +375,7 @@ export default function KasRTPage() {
         </div>
 
         {/* Saldo Card — always teal */}
-        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
+        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-brand via-brand-600 to-brand-500">
 
           <div className="relative p-6">
             <div className="flex items-center justify-between gap-2 mb-1">
@@ -463,7 +463,7 @@ export default function KasRTPage() {
                         key={p}
                         onClick={() => setChartPeriod(p)}
                         className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors ${
-                          chartPeriod === p ? 'bg-[#0F4C2E] text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                          chartPeriod === p ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}
                       >
                         {p}B

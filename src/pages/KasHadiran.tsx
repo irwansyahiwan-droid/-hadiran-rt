@@ -362,7 +362,7 @@ export default function KasHadiranPage() {
     ? 'from-[#1E40AF] via-[#2563EB] to-[#3B82F6]'
     : saldo < 0
       ? 'from-slate-800 via-slate-700 to-slate-500'
-      : 'from-[#0F4C2E] via-[#145D39] to-[#1B7249]';
+      : 'from-brand via-brand-600 to-brand-500';
 
   return (
     <>

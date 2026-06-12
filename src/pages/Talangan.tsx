@@ -335,7 +335,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
       {/* Header card */}
       {totalBelumLunas > 0 ? (
-        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-[#0F4C2E] via-[#145D39] to-[#1B7249]">
+        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-brand via-brand-600 to-brand-500">
 
           <div className="relative p-5">
             <div className="flex items-center justify-between gap-2 mb-1">
