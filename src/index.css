@@ -174,14 +174,17 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      terarah", BUKAN halo. Halo putih dihapus (biang "berkabut"), tint emerald
      dihapus (biang muddy). Semua netral abu-ink → bayangan bersih & mahal.
      Hairline ring tetap → tepi kartu "tercetak" walau bayangan kebakar cahaya. */
+  /* Dinaikkan satu step (2026-06-12) saat kanvas naik ke #E9ECF2 — selisih
+     tonal kartu–kanvas mengecil, "pop" dipindah ke bayangan, BUKAN
+     menggelapkan kanvas lagi. Tetap netral abu-ink agar bersih, tidak kotor. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(16, 24, 40, 0.10),                          /* hairline ring crisp → kartu "tercetak" */
-    0 1px 2px 0 rgba(16, 24, 40, 0.07),                       /* contact shadow rapat → kartu menapak */
-    0 6px 14px -4px rgba(16, 24, 40, 0.12),                   /* drop lembut dekat → definisi tepi */
-    0 16px 32px -10px rgba(16, 24, 40, 0.16),                 /* penumbra menengah → kartu "memancar" */
-    0 36px 70px -24px rgba(16, 24, 40, 0.22);                 /* ambient lebar & dalam → glow netral, melayang tinggi */
-  --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.29);
+    0 0 0 1px rgba(16, 24, 40, 0.12),                          /* hairline ring crisp → kartu "tercetak" */
+    0 1px 2px 0 rgba(16, 24, 40, 0.09),                       /* contact shadow rapat → kartu menapak */
+    0 6px 14px -4px rgba(16, 24, 40, 0.15),                   /* drop lembut dekat → definisi tepi */
+    0 16px 32px -10px rgba(16, 24, 40, 0.19),                 /* penumbra menengah → kartu "memancar" */
+    0 36px 70px -24px rgba(16, 24, 40, 0.26);                 /* ambient lebar & dalam → glow netral, melayang tinggi */
+  --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.33);
 }
 
 /* Soft layered elevation for surfaces */
