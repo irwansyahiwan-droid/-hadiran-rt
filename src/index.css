@@ -69,7 +69,7 @@ input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
 /* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
    Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
-   Dipakai di wrapper App (kanvas #EEF0F4). */
+   Dipakai di wrapper App (kanvas #E4E8EF — samakan dgn body/sunken/manifest). */
 .app-bg {
   /* Apple clean: kanvas abu netral sejuk RATA. Tanpa aurora tebal & tanpa
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
