@@ -18,7 +18,7 @@ body {
      aurora. Makin sedikit trik, makin mahal kelihatannya (lihat .app-bg).
      SATU nilai dengan .app-bg, token `sunken`, & manifest background_color —
      jangan biarkan drift lagi. */
-  background-color: #E4E8EF;
+  background-color: #E9ECF2;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -69,13 +69,13 @@ input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
 /* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
    Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
-   Dipakai di wrapper App (kanvas #E4E8EF — samakan dgn body/sunken/manifest). */
+   Dipakai di wrapper App (kanvas #E9ECF2 — samakan dgn body/sunken/manifest). */
 .app-bg {
   /* Apple clean: kanvas abu netral sejuk RATA. Tanpa aurora tebal & tanpa
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #E4E8EF;
+  background-color: #E9ECF2;
   background-image:
     radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
   background-attachment: fixed;
