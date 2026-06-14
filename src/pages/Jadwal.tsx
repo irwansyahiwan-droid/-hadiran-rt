@@ -882,8 +882,8 @@ export default function JadwalPage() {
                             disabled={navigatingId === t.id}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition-all duration-150 shadow-sm disabled:opacity-70 ${
                               isNext
-                                ? 'bg-[#0F6039] text-white'
-                                : 'bg-emerald-50 text-[#0F6039] border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800'
+                                ? 'btn-brand'
+                                : 'bg-emerald-50 text-brand border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800'
                             }`}
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />

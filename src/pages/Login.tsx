@@ -129,7 +129,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <button
             type="button"
             onClick={handleWargaSubmit}
-            className="press w-full mt-3 min-h-[48px] py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-400/40 hover:from-emerald-600 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
+            className="btn-brand w-full mt-3 min-h-[48px] py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
           >
             Masuk Sekarang <ArrowRight className="w-4 h-4" />
           </button>

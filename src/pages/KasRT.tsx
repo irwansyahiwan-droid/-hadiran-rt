@@ -145,7 +145,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               type="submit"
               disabled={saving || !nominal}
               className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition-all duration-150 flex items-center justify-center gap-2 ${
-                tipe === 'masuk' ? 'bg-[#0F6039]' : 'bg-red-500 hover:bg-red-600'
+                tipe === 'masuk' ? 'btn-brand' : 'bg-red-500 hover:bg-red-600'
               }`}
             >
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
@@ -376,6 +376,7 @@ export default function KasRTPage() {
 
         {/* Saldo Card — always teal */}
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-brand via-brand-600 to-brand-500">
+          <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-6">
             <div className="flex items-center justify-between gap-2 mb-1">

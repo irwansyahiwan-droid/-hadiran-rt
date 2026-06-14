@@ -371,7 +371,7 @@ export default function KasHadiranPage() {
 
   const sudahSetor = totalSetor > 0;
   const heroGradient = sudahSetor
-    ? 'from-[#1E40AF] via-[#2563EB] to-[#3B82F6]'
+    ? 'from-setor via-setor-600 to-setor-500'
     : saldo < 0
       ? 'from-slate-800 via-slate-700 to-slate-500'
       : 'from-brand via-brand-600 to-brand-500';
@@ -381,6 +381,7 @@ export default function KasHadiranPage() {
       <div className="space-y-6 pb-2 overflow-x-hidden">
         {/* Header Card */}
         <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
+          <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-6">
             <div className="flex items-center justify-between gap-2 mb-1">

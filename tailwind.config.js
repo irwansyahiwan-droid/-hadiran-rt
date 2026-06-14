@@ -19,6 +19,14 @@ export default {
         pos: '#047857',   // uang masuk / positif  (emerald-700, on-brand)
         neg: '#DC2626',   // uang keluar / negatif (red-600)
         warn: '#B45309',  // tunggakan / perhatian (amber-700)
+        /* ── Status SETOR (kartu hero Kas Hadiran saat sudah disetor) ──
+           Biru = sinyal status, BUKAN accent kedua. Hanya dipakai di hero
+           Kas Hadiran. Struktur DEFAULT/600/500 mirror brand utk pola gradient. */
+        setor: {
+          DEFAULT: '#1E40AF', // from — deep (blue-800)
+          600: '#2563EB',     // via  (blue-600)
+          500: '#3B82F6',     // to   (blue-500)
+        },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
         sunken: '#E9ECF2', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll)

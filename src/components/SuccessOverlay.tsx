@@ -64,7 +64,7 @@ export default function SuccessOverlay({ show, message = 'Berhasil!', onDone, du
           <div className="success-ring absolute inset-0 rounded-full bg-emerald-400/40" />
 
           {/* Lingkaran + centang */}
-          <div className="success-pop relative w-20 h-20 rounded-full bg-[#0F6039] flex items-center justify-center shadow-xl">
+          <div className="success-pop relative w-20 h-20 rounded-full bg-brand-600 flex items-center justify-center shadow-xl">
             <svg viewBox="0 0 32 32" className="w-10 h-10" fill="none" stroke="white" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
               <path className="check-draw" d="M8 16.5l5 5 11-11" />
             </svg>

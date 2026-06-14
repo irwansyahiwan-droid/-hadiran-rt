@@ -336,6 +336,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       {/* Header card */}
       {totalBelumLunas > 0 ? (
         <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-brand via-brand-600 to-brand-500">
+          <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-5">
             <div className="flex items-center justify-between gap-2 mb-1">
@@ -375,7 +376,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama warga..."
-          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-green-600/10 focus:border-green-600 transition-all duration-200"
+          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-200"
         />
         {search && (
           <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">

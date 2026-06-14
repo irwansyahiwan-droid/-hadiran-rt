@@ -209,7 +209,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
             <button
               type="submit"
               disabled={saving || !nominal}
-              className="press flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-300/40 hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-60 transition-all"
+              className="btn-brand flex-1 py-3 rounded-xl font-semibold text-sm disabled:opacity-60"
             >
               {saving ? 'Menyimpan...' : 'Simpan Target'}
             </button>

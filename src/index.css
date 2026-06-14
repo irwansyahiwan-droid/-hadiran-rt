@@ -220,6 +220,15 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
 }
 .btn-brand:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 6px 16px -8px rgba(16,150,80,0.5); }
 
+/* Sheen + kedalaman untuk kartu hero gradient (Saldo). Satu sumber cahaya
+   kiri-atas + bayang halus kanan-bawah → pecah gradient datar tanpa ubah
+   warna brand. Selalu pointer-events-none, di bawah konten (.relative). */
+.hero-sheen {
+  background:
+    radial-gradient(120% 80% at 14% -10%, rgba(255, 255, 255, 0.18), transparent 56%),
+    radial-gradient(90% 75% at 100% 115%, rgba(0, 0, 0, 0.18), transparent 60%);
+}
+
 /* Shimmer skeleton — replaces flat pulse for a premium loading feel */
 .skeleton {
   position: relative;
