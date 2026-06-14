@@ -16,8 +16,8 @@ export interface RekapTriwulan {
   romawi: string;          // 'II'
   label: string;           // 'Triwulan II 2026'
   rentang: string;         // 'Apr–Jun 2026'
-  hadiranMasuk: number;    // iuran (total_terkumpul) + pelunasan talangan (kas balik)
-  hadiranKeluar: number;   // setor_kas_rt + kas_keluar + talangan keluar (nalangin)
+  hadiranMasuk: number;    // iuran (total_terkumpul) saja
+  hadiranKeluar: number;   // setor_kas_rt + kas_keluar + talangan belum lunas (nalangin)
   hadiranSaldoAkhir: number;
   rtMasuk: number;
   rtKeluar: number;
@@ -34,12 +34,12 @@ export interface RekapTriwulan {
 //
 // Talangan = kas DIPAKAI untuk nalangin anggota yang absen (full nominal Rp50.000)
 // supaya Sohibul Bait tetap dapat penuh. Komitmen RT: itu KELUAR dari Kas Hadiran,
-// jadi saldo memang bisa minus (di dunia nyata ditutup Kas RT, tak dicatat). Karena
-// itu talangan WAJIB ikut perhitungan saldo, persis seperti Beranda & Kas Hadiran
-// (saldo = kas − talangan belum lunas − setor). Alokasi per triwulan:
-//   • talangan keluar → di triwulan tanggal tarikan        → hadiranKeluar
-//   • pelunasan (lunas) → di triwulan tanggal_lunas         → hadiranMasuk (kas balik)
-// Net kumulatif = −(talangan belum lunas) → saldo akhir sama dgn Beranda.
+// jadi saldo memang bisa minus (di dunia nyata ditutup Kas RT, tak dicatat). Saldo
+// dihitung PERSIS seperti Beranda & Kas Hadiran: kas − talangan BELUM lunas − setor.
+//   - talangan belum lunas -> KELUAR (hadiranKeluar) di triwulan tarikannya.
+//   - talangan lunas        -> uang sudah balik ke kas (net NOL); tidak masuk
+//     Masuk/Keluar, cukup dihitung untuk badge "lunas".
+// Jadi Masuk = iuran saja, Keluar = setor + talangan nyangkut (tak membengkak).
 const HADIRAN_KELUAR = new Set(['setor_kas_rt', 'kas_keluar']);
 
 interface TalanganRow {
@@ -118,13 +118,14 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
   }
 
   for (const t of (talanganRes.data as TalanganRow[] ?? [])) {
-    // Talangan keluar dari kas di triwulan tarikan (full nominal).
-    const bOut = bagianOf(t.tarikan?.tanggal);
-    if (bOut) get(bOut).hadiranKeluar += t.nominal ?? 0;
-    // Pelunasan = kas masuk balik di triwulan tanggal_lunas (hanya yg sudah lunas).
-    if (t.status_lunas) {
-      const bIn = bagianOf(t.tanggal_lunas);
-      if (bIn) { const r = get(bIn); r.hadiranMasuk += t.nominal ?? 0; r.talanganLunas += 1; }
+    if (!t.status_lunas) {
+      // Talangan masih nyangkut = kas keluar di triwulan tarikannya (full nominal).
+      const b = bagianOf(t.tarikan?.tanggal);
+      if (b) get(b).hadiranKeluar += t.nominal ?? 0;
+    } else {
+      // Sudah lunas = uang balik (net nol); hanya untuk badge hitungan.
+      const b = bagianOf(t.tanggal_lunas);
+      if (b) get(b).talanganLunas += 1;
     }
   }
 
@@ -199,10 +200,10 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
     snap.jumlahTransaksi += 1;
   }
   for (const t of (talanganRes.data as TalanganRow[] ?? [])) {
-    if (sampai(t.tarikan?.tanggal)) snap.hadiranKeluar += t.nominal ?? 0;   // nalangin = kas keluar
-    if (t.status_lunas && sampai(t.tanggal_lunas)) {
-      snap.hadiranMasuk += t.nominal ?? 0;                                  // pelunasan = kas masuk balik
-      snap.talanganLunas += 1;
+    if (!t.status_lunas) {
+      if (sampai(t.tarikan?.tanggal)) snap.hadiranKeluar += t.nominal ?? 0; // talangan nyangkut = kas keluar
+    } else if (sampai(t.tanggal_lunas)) {
+      snap.talanganLunas += 1;                                              // lunas = net nol, cukup dihitung
     }
   }
 
