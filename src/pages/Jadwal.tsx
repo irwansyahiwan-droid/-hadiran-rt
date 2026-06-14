@@ -175,6 +175,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         talanganTotal: talanganIds.length * 50000,
         sohibulBaitTerima: pembayarCount * 45000,
       });
+    } catch {
+      // Penyimpanan gagal (mis. koneksi putus) → JANGAN diam: beri tahu & tahan
+      // di layar absensi supaya bendahara bisa tekan "Simpan & Hitung" lagi.
+      // Kartu rincian hanya muncul kalau onSaved() benar-benar tercapai.
+      showToast('Gagal menyimpan & menghitung. Cek koneksi lalu tekan lagi.', 'error');
     } finally {
       setSaving(false);
     }
