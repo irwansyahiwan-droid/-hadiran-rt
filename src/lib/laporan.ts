@@ -16,8 +16,8 @@ export interface RekapTriwulan {
   romawi: string;          // 'II'
   label: string;           // 'Triwulan II 2026'
   rentang: string;         // 'Apr–Jun 2026'
-  hadiranMasuk: number;    // kas_masuk (= total_terkumpul/iuran) — TANPA talangan
-  hadiranKeluar: number;   // setor_kas_rt + kas_keluar
+  hadiranMasuk: number;    // iuran (total_terkumpul) + pelunasan talangan (kas balik)
+  hadiranKeluar: number;   // setor_kas_rt + kas_keluar + talangan keluar (nalangin)
   hadiranSaldoAkhir: number;
   rtMasuk: number;
   rtKeluar: number;
@@ -31,8 +31,23 @@ export interface RekapTriwulan {
 // PERSIS sama dgn hero Beranda (fetchDashboardSummary), supaya tak pernah drift.
 // (Jangan pakai SUM transaksi_kas.kas_masuk: bisa ada baris basi/manual yg tak
 // nyangkut ke tarikan selesai → angka beda dgn Beranda.)
-// Talangan (talangan_masuk/keluar) = penalti tak-hadir, mekanisme TERPISAH, di-skip.
+//
+// Talangan = kas DIPAKAI untuk nalangin anggota yang absen (full nominal Rp50.000)
+// supaya Sohibul Bait tetap dapat penuh. Komitmen RT: itu KELUAR dari Kas Hadiran,
+// jadi saldo memang bisa minus (di dunia nyata ditutup Kas RT, tak dicatat). Karena
+// itu talangan WAJIB ikut perhitungan saldo, persis seperti Beranda & Kas Hadiran
+// (saldo = kas − talangan belum lunas − setor). Alokasi per triwulan:
+//   • talangan keluar → di triwulan tanggal tarikan        → hadiranKeluar
+//   • pelunasan (lunas) → di triwulan tanggal_lunas         → hadiranMasuk (kas balik)
+// Net kumulatif = −(talangan belum lunas) → saldo akhir sama dgn Beranda.
 const HADIRAN_KELUAR = new Set(['setor_kas_rt', 'kas_keluar']);
+
+interface TalanganRow {
+  nominal: number | null;
+  status_lunas: boolean;
+  tanggal_lunas: string | null;
+  tarikan: { tanggal: string | null } | null;
+}
 const ROMAWI = ['I', 'II', 'III', 'IV'];
 const BULAN_SINGKAT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
@@ -66,7 +81,7 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
     supabase.from('kas_rt').select('tipe, nominal, tanggal'),
     supabase.from('tarikan').select('tanggal, status, total_terkumpul').eq('status', 'selesai'),
-    supabase.from('talangan').select('tanggal_lunas, status_lunas').eq('status_lunas', true),
+    supabase.from('talangan').select('nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
   ]);
 
   const map = new Map<string, RekapTriwulan>();
@@ -102,9 +117,15 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     r.jumlahTransaksi += 1;
   }
 
-  for (const t of (talanganRes.data as { tanggal_lunas: string | null }[] ?? [])) {
-    const b = bagianOf(t.tanggal_lunas); if (!b) continue;
-    get(b).talanganLunas += 1;
+  for (const t of (talanganRes.data as TalanganRow[] ?? [])) {
+    // Talangan keluar dari kas di triwulan tarikan (full nominal).
+    const bOut = bagianOf(t.tarikan?.tanggal);
+    if (bOut) get(bOut).hadiranKeluar += t.nominal ?? 0;
+    // Pelunasan = kas masuk balik di triwulan tanggal_lunas (hanya yg sudah lunas).
+    if (t.status_lunas) {
+      const bIn = bagianOf(t.tanggal_lunas);
+      if (bIn) { const r = get(bIn); r.hadiranMasuk += t.nominal ?? 0; r.talanganLunas += 1; }
+    }
   }
 
   // Urut menaik untuk saldo kumulatif, lalu kembalikan menurun (terbaru dulu).
@@ -148,7 +169,7 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
     supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
     supabase.from('kas_rt').select('tipe, nominal, tanggal'),
     supabase.from('tarikan').select('tanggal, status, total_terkumpul').eq('status', 'selesai'),
-    supabase.from('talangan').select('tanggal_lunas, status_lunas').eq('status_lunas', true),
+    supabase.from('talangan').select('nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
   ]);
 
   const snap: SnapshotKas = {
@@ -177,8 +198,12 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
     snap.hadiranMasuk += t.total_terkumpul ?? 0; // pendapatan = iuran tarikan
     snap.jumlahTransaksi += 1;
   }
-  for (const t of (talanganRes.data as { tanggal_lunas: string | null }[] ?? [])) {
-    if (sampai(t.tanggal_lunas)) snap.talanganLunas += 1;
+  for (const t of (talanganRes.data as TalanganRow[] ?? [])) {
+    if (sampai(t.tarikan?.tanggal)) snap.hadiranKeluar += t.nominal ?? 0;   // nalangin = kas keluar
+    if (t.status_lunas && sampai(t.tanggal_lunas)) {
+      snap.hadiranMasuk += t.nominal ?? 0;                                  // pelunasan = kas masuk balik
+      snap.talanganLunas += 1;
+    }
   }
 
   snap.hadiranSaldoAkhir = snap.hadiranMasuk - snap.hadiranKeluar;
