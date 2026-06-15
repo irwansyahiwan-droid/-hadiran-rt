@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff, Users, Sparkles, ArrowRight, ChevronDown } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Users, Sparkles, ArrowRight, ChevronDown, Info } from 'lucide-react';
 import logoRt from '../assets/logo-rt.jpg';
 import { haptic } from '../lib/utils';
 
@@ -34,6 +34,13 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       // Jangan reset field, biarkan warga memperbaiki ketikannya
       setWargaError('Password warga salah. Silakan ketik: warga');
     }
+  }
+
+  // Bantu warga yang bingung: satu ketukan mengisi kata kunci otomatis.
+  function isiOtomatis() {
+    haptic(8);
+    setWargaPassword(WARGA_PASSWORD);
+    setWargaError('');
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -91,6 +98,16 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Masuk sebagai Warga</p>
               <p className="text-[11px] text-emerald-700/90 dark:text-emerald-300/80 font-medium">Lihat saldo, jadwal, absensi &amp; talangan</p>
             </div>
+          </div>
+
+          {/* Petunjuk jelas — warga cukup ketik kata "warga"; ketuk kata di bawah utk isi otomatis */}
+          <div className="flex items-start gap-2 mb-3 rounded-xl bg-emerald-100/70 dark:bg-emerald-900/25 border border-emerald-200/70 dark:border-emerald-800/40 px-3 py-2.5">
+            <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+            <p className="text-[12px] text-emerald-800 dark:text-emerald-200 leading-snug">
+              Tanpa daftar. Cukup ketik kata{' '}
+              <button type="button" onClick={isiOtomatis} className="font-bold underline decoration-emerald-400 underline-offset-2 active:opacity-70">warga</button>
+              {' '}di kolom bawah, lalu tekan <span className="font-semibold">Masuk Sekarang</span>.
+            </p>
           </div>
 
           <label htmlFor="warga-password" className="sr-only">Password Warga</label>
@@ -217,7 +234,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       </div>
 
       <p className="text-xs text-ink-faint dark:text-gray-400 mt-6 text-center">
-        Hubungi bendahara jika lupa password
+        Bendahara lupa password? Hubungi pengurus RT
       </p>
     </div>
   );
