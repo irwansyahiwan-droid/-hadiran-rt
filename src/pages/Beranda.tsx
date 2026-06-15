@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, UserPlus, TrendingUp, ChevronRight, Users, Layers, CalendarClock } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, TrendingUp, ChevronRight, Users, Layers, CalendarClock } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
@@ -35,7 +35,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const { isBendahara, isWargaMode } = useAuthContext();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
-  const [anggotaBaru, setAnggotaBaru] = useState<{ nama: string; created_at: string } | null>(null);
   const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
   const [kasSeries, setKasSeries] = useState<number[]>([]);
   const [lastDelta, setLastDelta] = useState(0);
@@ -52,7 +51,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     if (showRefreshing) setRefreshing(true);
     else setLoading(true);
 
-    const [summaryData, jadwalRes, setorRes, talanganLunasRes, wargaBaruRes, selesaiRes] = await Promise.all([
+    const [summaryData, jadwalRes, setorRes, talanganLunasRes, selesaiRes] = await Promise.all([
       fetchDashboardSummary(),
       supabase
         .from('tarikan')
@@ -69,12 +68,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         .select('id, nominal, tanggal_lunas, warga:warga_id(nama), tarikan:tarikan_id(nomor)')
         .eq('status_lunas', true)
         .not('tanggal_lunas', 'is', null),
-      supabase
-        .from('warga')
-        .select('nama, created_at')
-        .eq('status_aktif', true)
-        .order('created_at', { ascending: false })
-        .limit(1),
       supabase
         .from('tarikan')
         .select('nomor, total_terkumpul')
@@ -115,13 +108,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       saldoCurrent = saldoCurrent - item.nominal;
       return { ...item, saldoSetelah };
     });
-
-    // Banner "anggota baru" — tampil bila ada anggota yang bergabung ≤ 14 hari terakhir
-    const wb = ((wargaBaruRes.data as { nama: string; created_at: string }[]) ?? [])[0];
-    const baru14Hari = wb?.created_at
-      ? Date.now() - new Date(wb.created_at).getTime() < 14 * 86_400_000
-      : false;
-    setAnggotaBaru(baru14Hari ? wb : null);
 
     // Tren pertumbuhan kas — deret kumulatif total_terkumpul per tarikan selesai
     const selesaiRows = (selesaiRes.data as { nomor: number; total_terkumpul: number | null }[]) ?? [];
@@ -224,13 +210,18 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <>
     <CrossFade loading={loading} skeleton={skeleton}>
     <div className="space-y-6 pb-2">
-      {/* Sapaan + badge status kas */}
-      <div className="flex items-end justify-between px-1">
-        <div>
-          <p className="text-[13px] text-ink-faint dark:text-gray-500">{greeting},</p>
-          <h1 className="text-xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
+      {/* Sapaan + avatar + badge status kas */}
+      <div className="flex items-center justify-between gap-3 px-1">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 shadow-[0_6px_16px_-5px_rgba(16,185,129,0.6)] ring-1 ring-white/40 dark:ring-white/10">
+            <span className="text-white text-lg font-black tracking-tight">{roleLabel.charAt(0)}</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[13px] text-ink-faint dark:text-gray-500 leading-tight">{greeting},</p>
+            <h1 className="text-lg font-bold text-ink dark:text-gray-100 leading-tight truncate">{roleLabel}</h1>
+          </div>
         </div>
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${kasStatus.bg} ${kasStatus.text}`}>
+        <span className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${kasStatus.bg} ${kasStatus.text}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${kasStatus.dot}`} />
           {kasStatus.label}
         </span>
@@ -337,7 +328,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             style={{ animationDelay: `${i * 0.04}s` }}
             className="rise press flex flex-col items-center gap-2 py-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift active:scale-[0.97] transition-transform"
           >
-            <span className={`w-11 h-11 rounded-2xl flex items-center justify-center ${chip}`}>
+            <span className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm ring-1 ring-black/[0.04] dark:ring-white/10 ${chip}`}>
               <Icon className={`w-[20px] h-[20px] ${ic}`} strokeWidth={1.9} />
             </span>
             <span className="text-[11px] font-semibold text-ink-sub dark:text-gray-300 leading-none">{label}</span>
@@ -392,25 +383,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       )}
 
-      {/* Banner Anggota Baru — otomatis tampil ≤ 14 hari sejak bergabung */}
-      {anggotaBaru && (
-        <div className="flex items-start gap-3 bg-emerald-50/90 dark:bg-emerald-900/20 border border-emerald-200/60 dark:border-emerald-800/40 rounded-3xl px-5 py-4">
-          <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center flex-shrink-0">
-            <UserPlus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Anggota Baru Bergabung</p>
-            <p className="text-xs text-emerald-600 dark:text-emerald-400/80 mt-0.5">
-              {anggotaBaru.nama} kini terdaftar sebagai anggota RT
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Jadwal Berikutnya */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
+          <h2 className="flex items-center gap-2 text-base font-bold text-ink dark:text-gray-100">
+            <span className="w-1 h-4 rounded-full bg-gradient-to-b from-emerald-400 to-teal-600" />
+            Jadwal Berikutnya
+          </h2>
           <button onClick={() => onNavigate('jadwal')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
         </div>
         {jadwalList.length === 0 ? (
@@ -472,7 +451,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Transaksi Terakhir */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-base font-bold text-ink dark:text-gray-100">Transaksi Terakhir</h2>
+          <h2 className="flex items-center gap-2 text-base font-bold text-ink dark:text-gray-100">
+            <span className="w-1 h-4 rounded-full bg-gradient-to-b from-emerald-400 to-teal-600" />
+            Transaksi Terakhir
+          </h2>
           <button onClick={() => onNavigate('kas')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
         </div>
         {trxItems.length > 0 && (
