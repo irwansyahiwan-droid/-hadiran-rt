@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, UserPlus, TrendingUp } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, UserPlus, TrendingUp, ChevronRight, Users, Layers, CalendarClock } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
@@ -163,9 +163,20 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' };
   const animatedKasHadiran = useCountUp(kasHadiran);
   const animatedSaldo = useCountUp(saldo);
-  const animatedTalangan = useCountUp(talangan);
-  const animatedSetor = useCountUp(setorKasRT);
   const hidden = useHideAmount();
+
+  // Pintasan navigasi — destinasi, bukan pengulangan nominal (nominal hidup di donut)
+  const quickActions = [
+    { label: 'Kas Hadiran', icon: Wallet, tab: 'kas', chip: 'bg-emerald-100 dark:bg-emerald-900/30', ic: 'text-emerald-600 dark:text-emerald-400' },
+    { label: 'Talangan', icon: ArrowLeftRight, tab: 'talangan', chip: 'bg-amber-100 dark:bg-amber-900/30', ic: 'text-amber-600 dark:text-amber-400' },
+    { label: 'Kas RT', icon: ArrowUpRight, tab: 'kas-rt', chip: 'bg-blue-100 dark:bg-blue-900/30', ic: 'text-blue-600 dark:text-blue-400' },
+    { label: 'Jadwal', icon: CalendarDays, tab: 'jadwal', chip: 'bg-slate-100 dark:bg-slate-800/60', ic: 'text-slate-600 dark:text-slate-300' },
+  ] as const;
+  const statTiles = [
+    { label: 'Anggota', value: summary?.jumlah_anggota ?? 0, icon: Users },
+    { label: 'Tarikan', value: summary?.jumlah_tarikan ?? 0, icon: Layers },
+    { label: 'Terjadwal', value: summary?.jumlah_dijadwalkan ?? 0, icon: CalendarClock },
+  ] as const;
 
   // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
   const displayTrx = useMemo(() => {
@@ -184,16 +195,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   const skeleton = (
       <div className="space-y-6 pb-2">
-        <div className="rounded-3xl h-48 skeleton" />
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
-          <div className="grid grid-cols-3 divide-x divide-line">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex flex-col items-center gap-2 px-3">
-                <div className="h-7 w-12 skeleton rounded-lg" />
-                <div className="h-3 w-10 skeleton rounded-lg" />
-              </div>
-            ))}
-          </div>
+        <div className="rounded-3xl h-44 skeleton" />
+        <div className="grid grid-cols-4 gap-2.5">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-[84px] rounded-2xl skeleton" />
+          ))}
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-[92px] rounded-2xl skeleton" />
+          ))}
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(4)].map((_, i) => (
@@ -296,67 +307,69 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </p>
 
         {/* Divider */}
-        <div className="relative hero-divider-x mb-1" />
+        <div className="relative hero-divider-x mb-2.5" />
 
-        {/* 3-column stat row */}
-        <div className="relative grid grid-cols-3">
-          <button
-            onClick={() => onNavigate('kas')}
-            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
-          >
+        {/* Saldo aktif — satu nominal penting (tampil minus bila kas talangan menipis),
+            sekaligus pintasan ke Kas Hadiran. Talangan & Setor pindah ke donut komposisi. */}
+        <button
+          onClick={() => onNavigate('kas')}
+          className="relative press flex items-center justify-between w-full -mb-1 py-1.5 active:opacity-80"
+        >
+          <span className="flex items-center gap-2">
             <Wallet className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/90 mt-1.5">Saldo Aktif</span>
-            <span className={`text-[15px] font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+            <span className="text-[13px] text-white/90">Saldo aktif</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className={`text-[18px] font-bold whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 4)}
             </span>
-          </button>
+            <ChevronRight className="w-4 h-4 text-white/50" />
+          </span>
+        </button>
+      </div>
+
+      {/* Pintasan cepat — 4 destinasi utama, navigasi tanpa mengulang nominal */}
+      <div className="grid grid-cols-4 gap-2.5">
+        {quickActions.map(({ label, icon: Icon, tab, chip, ic }, i) => (
           <button
-            onClick={() => onNavigate('talangan')}
-            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
+            key={label}
+            onClick={() => { haptic(); onNavigate(tab); }}
+            style={{ animationDelay: `${i * 0.04}s` }}
+            className="rise press flex flex-col items-center gap-2 py-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift active:scale-[0.97] transition-transform"
           >
-            <ArrowLeftRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/90 mt-1.5">Talangan</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
+            <span className={`w-11 h-11 rounded-2xl flex items-center justify-center ${chip}`}>
+              <Icon className={`w-[20px] h-[20px] ${ic}`} strokeWidth={1.9} />
+            </span>
+            <span className="text-[11px] font-semibold text-ink-sub dark:text-gray-300 leading-none">{label}</span>
           </button>
-          <button
-            onClick={() => onNavigate('kas-rt')}
-            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
-          >
-            <ArrowUpRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/90 mt-1.5">Setor Kas RT</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
-          </button>
-        </div>
+        ))}
       </div>
 
       {/* Pengumuman / Info Penting — dikelola bendahara, dilihat semua warga */}
       <PengumumanBanner canManage={isBendahara && !isWargaMode} />
 
-      {/* Stats Row */}
-      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
-        <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-bold text-ink dark:text-gray-100">{summary?.jumlah_anggota ?? 0}</span>
-            <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Anggota</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-bold text-ink dark:text-gray-100">{summary?.jumlah_tarikan ?? 0}</span>
-            <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Tarikan</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-bold text-ink dark:text-gray-100">{summary?.jumlah_dijadwalkan ?? 0}</span>
-            <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Terjadwal</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Donut komposisi kas (interaktif) */}
+      {/* Donut komposisi kas (interaktif) — satu-satunya rumah rincian Saldo/Talangan/Setor */}
       {donutTotal > 0 && (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
           <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Komposisi Kas Hadiran</p>
           <DonutChart data={donutData} centerTop="Total" format={(v) => maskRp(formatRupiahPlain(v), hidden, 5)} />
         </div>
       )}
+
+      {/* Statistik bento — Anggota / Tarikan / Terjadwal */}
+      <div className="grid grid-cols-3 gap-3">
+        {statTiles.map(({ label, value, icon: Icon }, i) => (
+          <div
+            key={label}
+            style={{ animationDelay: `${i * 0.05}s` }}
+            className="rise bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift px-3 py-3.5 flex flex-col items-center gap-1.5"
+          >
+            <Icon className="w-[18px] h-[18px] text-ink-faint dark:text-gray-500" strokeWidth={1.8} />
+            <span className="text-2xl font-bold text-ink dark:text-gray-100 leading-none tabular-nums">{value}</span>
+            <span className="text-[11px] font-medium text-ink-sub dark:text-gray-400">{label}</span>
+          </div>
+        ))}
+      </div>
 
       {/* Alert Banner */}
       {talangan > 0 && (
@@ -400,30 +413,60 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
           <button onClick={() => onNavigate('jadwal')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
-          {jadwalList.length === 0 ? (
+        {jadwalList.length === 0 ? (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             <EmptyState icon={CalendarDays} title="Belum ada jadwal" subtitle="Jadwal tarikan berikutnya akan tampil di sini." />
-          ) : (
-            jadwalList.map((j, idx) => (
-              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}>
-                {/* Avatar + badge nomor */}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* Spotlight — tarikan paling dekat, ditonjolkan */}
+            <button
+              onClick={() => onNavigate('jadwal')}
+              className="rise press w-full text-left bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-4 active:scale-[0.99] transition-transform"
+            >
+              <div className="flex items-center gap-4">
                 <div className="relative shrink-0">
-                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">
-                    {j.nomor}
+                  <AvatarPeci nama={jadwalList[0].sohibul_bait?.nama ?? '?'} className="w-14 h-14 rounded-3xl" />
+                  <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-emerald-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow ring-2 ring-white dark:ring-gray-900">
+                    {jadwalList[0].nomor}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
-                    <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
-                  </div>
-                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <Tag tone="success">Tarikan berikutnya</Tag>
+                  <p className="text-[17px] font-bold text-ink dark:text-gray-100 leading-tight truncate mt-1.5">{jadwalList[0].sohibul_bait?.nama ?? '-'}</p>
+                  <p className="text-[13px] font-medium text-ink-faint dark:text-gray-500 mt-0.5 flex items-center gap-1.5">
+                    <CalendarDays className="w-3.5 h-3.5 shrink-0" />
+                    {formatTanggal(jadwalList[0].tanggal)}
+                  </p>
                 </div>
+                <ChevronRight className="w-5 h-5 text-ink-faint/40 dark:text-gray-600 shrink-0" />
               </div>
-            ))
-          )}
-        </div>
+            </button>
+
+            {/* Sisa jadwal — daftar ringkas */}
+            {jadwalList.length > 1 && (
+              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+                {jadwalList.slice(1).map((j, idx, arr) => (
+                  <div key={j.id} style={{ animationDelay: `${(idx + 1) * 0.05}s` }} className={`rise flex items-center gap-3 px-4 py-[14px] ${idx < arr.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+                    <div className="relative shrink-0">
+                      <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                        {j.nomor}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
+                        <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
+                      </div>
+                      <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Transaksi Terakhir */}
