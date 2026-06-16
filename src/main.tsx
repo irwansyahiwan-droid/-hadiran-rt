@@ -7,6 +7,9 @@ import ErrorBoundary from './components/ErrorBoundary';
 // Inter self-hosted (variable, satu file woff2): di-bundle Vite → same-origin →
 // ke-cache service worker → font tetap ada saat offline, tanpa FOUT CDN.
 import '@fontsource-variable/inter';
+// Sora self-hosted (variable) — typeface display berkarakter untuk judul & nominal
+// hero. Body tetap Inter (readability). Same-origin → ke-cache SW, tanpa FOUT CDN.
+import '@fontsource-variable/sora';
 import './index.css';
 
 // Pulih otomatis dari "chunk basi": setelah versi baru di-deploy, index.html lama

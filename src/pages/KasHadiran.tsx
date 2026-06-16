@@ -409,7 +409,7 @@ export default function KasHadiranPage() {
                 </button>
               </div>
             </div>
-            <p className={`text-5xl font-black tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+            <p className={`font-display text-5xl font-extrabold tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {hidden
                 ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                 : <Odometer value={animatedSaldo} />}

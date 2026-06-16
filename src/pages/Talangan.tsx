@@ -354,7 +354,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   : <Eye className="w-4 h-4 text-white/70" />}
               </button>
             </div>
-            <p className="text-white text-5xl font-black tracking-tighter mb-1">
+            <p className="font-display text-white text-5xl font-extrabold tracking-tighter mb-1">
               {maskRp(`Rp ${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
             </p>
             <p className="text-emerald-300 text-xs">

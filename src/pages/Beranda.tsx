@@ -263,7 +263,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
         {/* Big amount — ukuran konsisten dengan hero Kas RT */}
         <div className="relative mb-1">
-          <span className="block text-white text-5xl font-black tracking-tighter leading-none tabular-nums">
+          <span className="font-display block text-white text-5xl font-extrabold tracking-tighter leading-none tabular-nums">
             {hidden
               ? maskRp(`Rp${animatedKasHadiran.toLocaleString('id-ID')}`, hidden, 7)
               : <Odometer value={animatedKasHadiran} />}

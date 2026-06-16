@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Typeface system ──────────────────────────────────────────────────
+   Body = Inter (readability maksimal). Display = Sora (grotesk geometrik
+   berkarakter) untuk judul & nominal hero → app punya "suara" visual sendiri,
+   bukan Inter polos di mana-mana. SATU sumber di sini; util `.font-display`
+   & base-layer (h1/h2) di bawah memetik token ini. */
+:root {
+  --font-display: 'Sora Variable', 'Sora', 'Inter Variable', system-ui, sans-serif;
+}
+/* Judul section/halaman naik kelas: Sora + tracking sedikit rapat (display besar
+   terasa lebih solid). Body & teks kecil TETAP Inter (di-set di `body`). */
+@layer base {
+  h1, h2 { font-family: var(--font-display); letter-spacing: -0.018em; }
+}
+/* Util eksplisit untuk elemen non-heading yang ingin Sora (mis. nominal hero). */
+.font-display { font-family: var(--font-display); }
+
 html {
   /* Cegah in-app browser (WhatsApp dll) menggelembungkan teks → tampil "oversize"
      saat pertama dibuka lalu baru normal setelah reflow. */

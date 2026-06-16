@@ -404,7 +404,7 @@ export default function KasRTPage() {
                 </button>
               </div>
             </div>
-            <p className="text-5xl font-black tracking-tighter text-white mb-3 tabular-nums">
+            <p className="font-display text-5xl font-extrabold tracking-tighter text-white mb-3 tabular-nums">
               {hidden
                 ? maskRp(`Rp${animatedSaldo.toLocaleString('id-ID')}`, hidden, 7)
                 : <Odometer value={animatedSaldo} />}

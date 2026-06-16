@@ -4,6 +4,10 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        // Display = Sora (judul & nominal hero). Body default tetap Inter (di body CSS).
+        display: ['Sora Variable', 'Sora', 'Inter Variable', 'system-ui', 'sans-serif'],
+      },
       colors: {
         /* ── Brand hijau (sumber: hero gradient di index.css) ──────────
            JANGAN ganti ke navy/gold. Lihat memory design-system. */
