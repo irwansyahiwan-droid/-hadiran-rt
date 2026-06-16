@@ -322,15 +322,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
         <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-bold text-ink dark:text-gray-100">{summary?.jumlah_anggota ?? 0}</span>
+            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{summary?.jumlah_anggota ?? 0}</span>
             <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Anggota</span>
           </div>
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-bold text-ink dark:text-gray-100">{summary?.jumlah_tarikan ?? 0}</span>
+            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{summary?.jumlah_tarikan ?? 0}</span>
             <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Tarikan</span>
           </div>
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="text-2xl font-bold text-ink dark:text-gray-100">{summary?.jumlah_dijadwalkan ?? 0}</span>
+            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{summary?.jumlah_dijadwalkan ?? 0}</span>
             <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Terjadwal</span>
           </div>
         </div>
