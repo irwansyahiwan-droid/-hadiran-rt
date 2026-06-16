@@ -381,19 +381,19 @@ export default function KasHadiranPage() {
     <>
       <div className="space-y-6 pb-2 overflow-x-hidden">
         {/* Header Card */}
-        <div className={`relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br ${heroGradient}`}>
+        <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-6">
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-blue-200" />
+                <Wallet className="w-4 h-4 text-white/70" />
                 <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
               </div>
-              <div className="flex items-center -mr-1.5">
+              <div className="flex items-center -mr-2">
                 <button
                   onClick={() => { haptic(); toggleHideAmount(); }}
-                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
                   aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 >
                   {hidden
@@ -402,7 +402,7 @@ export default function KasHadiranPage() {
                 </button>
                 <button
                   onClick={handleShareReceipt}
-                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
                   aria-label="Bagikan ringkasan ke WhatsApp"
                 >
                   <Share2 className="w-4 h-4 text-white/70" />
