@@ -117,7 +117,7 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     r.jumlahTransaksi += 1;
   }
 
-  for (const t of (talanganRes.data as TalanganRow[] ?? [])) {
+  for (const t of (talanganRes.data as unknown as TalanganRow[] ?? [])) {
     if (!t.status_lunas) {
       // Talangan masih nyangkut = kas keluar di triwulan tarikannya (full nominal).
       const b = bagianOf(t.tarikan?.tanggal);
@@ -199,7 +199,7 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
     snap.hadiranMasuk += t.total_terkumpul ?? 0; // pendapatan = iuran tarikan
     snap.jumlahTransaksi += 1;
   }
-  for (const t of (talanganRes.data as TalanganRow[] ?? [])) {
+  for (const t of (talanganRes.data as unknown as TalanganRow[] ?? [])) {
     if (!t.status_lunas) {
       if (sampai(t.tarikan?.tanggal)) snap.hadiranKeluar += t.nominal ?? 0; // talangan nyangkut = kas keluar
     } else if (sampai(t.tanggal_lunas)) {
