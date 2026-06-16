@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Eye, EyeOff, TrendingUp, ChevronRight, CalendarClock } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, CalendarDays, Receipt, Eye, EyeOff, TrendingUp, ChevronRight, CalendarClock } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import Odometer from '../components/Odometer';
 import CrossFade from '../components/CrossFade';
@@ -149,14 +149,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const animatedSaldo = useCountUp(saldo);
   const hidden = useHideAmount();
 
-  // Pintasan navigasi — destinasi, bukan pengulangan nominal (nominal hidup di donut)
-  const quickActions = [
-    { label: 'Kas Hadiran', icon: Wallet, tab: 'kas', chip: 'bg-emerald-100 dark:bg-emerald-900/30', ic: 'text-emerald-600 dark:text-emerald-400' },
-    { label: 'Talangan', icon: ArrowLeftRight, tab: 'talangan', chip: 'bg-amber-100 dark:bg-amber-900/30', ic: 'text-amber-600 dark:text-amber-400' },
-    { label: 'Kas RT', icon: ArrowUpRight, tab: 'kas-rt', chip: 'bg-blue-100 dark:bg-blue-900/30', ic: 'text-blue-600 dark:text-blue-400' },
-    { label: 'Jadwal', icon: CalendarDays, tab: 'jadwal', chip: 'bg-slate-100 dark:bg-slate-800/60', ic: 'text-slate-600 dark:text-slate-300' },
-  ] as const;
-
   // Beranda hanya menampilkan 5 transaksi terbaru sebagai preview.
   // Pencarian & filter penuh hidup di halaman Kas Hadiran.
   const recentTrx = trxItems.slice(0, 5);
@@ -164,11 +156,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const skeleton = (
       <div className="space-y-6 pb-2">
         <div className="rounded-3xl h-44 skeleton" />
-        <div className="grid grid-cols-4 gap-2.5">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-[84px] rounded-2xl skeleton" />
-          ))}
-        </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(4)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-line dark:border-gray-800' : ''}`}>
@@ -294,23 +281,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <ChevronRight className="w-4 h-4 text-white/50" />
           </span>
         </button>
-      </div>
-
-      {/* Pintasan cepat — 4 destinasi utama, navigasi tanpa mengulang nominal */}
-      <div className="grid grid-cols-4 gap-2.5">
-        {quickActions.map(({ label, icon: Icon, tab, chip, ic }, i) => (
-          <button
-            key={label}
-            onClick={() => { haptic(); onNavigate(tab); }}
-            style={{ animationDelay: `${i * 0.04}s` }}
-            className="rise press flex flex-col items-center gap-2 py-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift active:scale-[0.97] transition-transform"
-          >
-            <span className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm ring-1 ring-black/[0.04] dark:ring-white/10 ${chip}`}>
-              <Icon className={`w-[20px] h-[20px] ${ic}`} strokeWidth={1.9} />
-            </span>
-            <span className="text-[11px] font-semibold text-ink-sub dark:text-gray-300 leading-none">{label}</span>
-          </button>
-        ))}
       </div>
 
       {/* Perhatian — talangan urgent naik ke atas agar terlihat lebih cepat */}
