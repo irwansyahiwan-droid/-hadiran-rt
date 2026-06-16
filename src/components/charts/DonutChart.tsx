@@ -76,7 +76,7 @@ export default function DonutChart({
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 pointer-events-none">
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-500 truncate max-w-full">{centerLabel}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 truncate max-w-full">{centerLabel}</span>
           <span className={`${centerSize} font-bold tabular-nums leading-tight whitespace-nowrap text-gray-900 dark:text-gray-100`} style={centerColor ? { color: centerColor } : undefined}>{centerStr}</span>
           {centerPct !== null && (
             <span

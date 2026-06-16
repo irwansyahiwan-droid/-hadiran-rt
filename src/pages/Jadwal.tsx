@@ -262,7 +262,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <p className="text-base font-bold text-gray-900 dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
           </p>
-          <p className="text-xs text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
+          <p className="text-xs text-ink-faint dark:text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
         </div>
       </div>
 
@@ -276,7 +276,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         ].map(s => (
           <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
             <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-[9px] text-gray-400 mt-0.5">{s.label}</p>
+            <p className="text-[9px] text-ink-faint dark:text-gray-400 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -474,7 +474,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{result.tarikanNomor} selesai dihitung</p>
-            <p className="text-[11px] text-ink-faint dark:text-gray-500">Cocokkan uang dulu sebelum ditutup</p>
+            <p className="text-[11px] text-ink-faint dark:text-gray-400">Cocokkan uang dulu sebelum ditutup</p>
           </div>
           <button onClick={dismiss} aria-label="Tutup" className="press p-1.5 -mr-1 -mt-1 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0">
             <X className="w-4 h-4" />
@@ -484,11 +484,11 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         {/* Dua nominal utama bersisian */}
         <div className="grid grid-cols-2 divide-x divide-line dark:divide-gray-800 border-t border-line dark:border-gray-800">
           <div className="px-4 py-3 min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-500">Kas Terkumpul</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400">Kas Terkumpul</p>
             <p className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
           </div>
           <div className="px-4 py-3 min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-500">Sohibul Terima</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400">Sohibul Terima</p>
             <p className="text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
           </div>
         </div>
@@ -572,7 +572,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
-            <p className="text-xs text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
+            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
@@ -665,7 +665,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
-            <p className="text-xs text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
+            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
@@ -777,7 +777,7 @@ export default function JadwalPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Jadwal Tarikan</h1>
-          <p className="text-xs text-gray-400 mt-0.5">{selesaiCount} selesai · {dijadwalCount} terjadwal</p>
+          <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{selesaiCount} selesai · {dijadwalCount} terjadwal</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -814,15 +814,15 @@ export default function JadwalPage() {
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
           <p className="text-xl font-bold text-gray-500">{selesaiCount}</p>
-          <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
+          <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
           <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{dijadwalCount}</p>
-          <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
+          <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Terjadwal</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
           <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
-          <p className="text-[10px] text-gray-400 font-medium">Total</p>
+          <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Total</p>
         </div>
       </div>
 
@@ -857,7 +857,7 @@ export default function JadwalPage() {
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : isNext ? { borderLeft: '3px solid #34D399' } : undefined}
               >
                 {/* Nomor kecil */}
-                <span className="text-base font-bold text-gray-400 w-7 shrink-0 text-right tabular-nums">
+                <span className="text-base font-bold text-ink-faint dark:text-gray-400 w-7 shrink-0 text-right tabular-nums">
                   {String(t.nomor).padStart(2, '0')}.
                 </span>
 
@@ -924,7 +924,7 @@ export default function JadwalPage() {
                       </Tag>
                     )}
                   </div>
-                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">
+                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-400 mt-0.5">
                     {formatTanggal(t.tanggal)}
                     {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
                       <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>

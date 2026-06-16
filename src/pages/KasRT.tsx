@@ -332,7 +332,7 @@ export default function KasRTPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Kas RT</h1>
-            <p className="text-xs text-gray-400 mt-0.5">Per {today}</p>
+            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -561,7 +561,7 @@ export default function KasRTPage() {
                     <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
-                    <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
+                    <p className="text-[12px] font-medium text-ink-faint dark:text-gray-400 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
                   </div>
 
                   <div className="text-right shrink-0">
@@ -604,7 +604,7 @@ export default function KasRTPage() {
               <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-snug">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
+            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
             <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-2.5 mt-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Tipe</span>

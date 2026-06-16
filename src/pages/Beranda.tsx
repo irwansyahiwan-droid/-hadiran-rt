@@ -202,7 +202,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Sapaan + badge status kas */}
       <div className="flex items-end justify-between px-1">
         <div>
-          <p className="text-[13px] text-ink-faint dark:text-gray-500">{greeting},</p>
+          <p className="text-[13px] text-ink-faint dark:text-gray-400">{greeting},</p>
           <h1 className="text-xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
         </div>
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${kasStatus.bg} ${kasStatus.text}`}>
@@ -389,7 +389,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
                     <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
                   </div>
-                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
               </div>
             ))
@@ -456,7 +456,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">{trx.keterangan}</p>
-                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-500 mt-0.5">{formatTanggal(trx.tanggal)}</p>
+                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
                   <p className={`text-xs font-medium ${trx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
                     Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
                   </p>

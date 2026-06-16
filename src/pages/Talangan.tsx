@@ -260,7 +260,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
-                  <p className="text-xs text-ink-faint dark:text-gray-500 truncate">
+                  <p className="text-xs text-ink-faint dark:text-gray-400 truncate">
                     {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>
@@ -366,7 +366,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 text-center">
           <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Semua Talangan Lunas</p>
-          <p className="text-xs text-gray-400">{countLunas} talangan tercatat</p>
+          <p className="text-xs text-ink-faint dark:text-gray-400">{countLunas} talangan tercatat</p>
         </div>
       )}
 

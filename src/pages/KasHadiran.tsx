@@ -52,7 +52,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
         </div>
         <div>
           <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Setor ke Kas Besar RT</h3>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
             Saldo hadiran: <span className="font-semibold text-emerald-700 dark:text-emerald-400">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
         </div>
@@ -569,7 +569,7 @@ export default function KasHadiranPage() {
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
-                          <span className="text-[10px] text-ink-faint dark:text-gray-500">{formatTanggal(t.tanggal)}</span>
+                          <span className="text-[10px] text-ink-faint dark:text-gray-400">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
                           <Tag tone="danger">{talanganInfo.count} belum bayar</Tag>
@@ -588,7 +588,7 @@ export default function KasHadiranPage() {
                           <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
-                          <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-medium text-ink-faint dark:text-gray-500">
+                          <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-medium text-ink-faint dark:text-gray-400">
                             Lihat detail
                             <ChevronRight className="w-3 h-3" />
                           </span>
@@ -694,7 +694,7 @@ export default function KasHadiranPage() {
                 <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
                 <div className="min-w-0 flex-1">
                   <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
-                  <p className="text-xs text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
+                  <p className="text-xs text-ink-faint dark:text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
                 </div>
                 {isBendahara && !detailLoading && (
                   <button
@@ -722,7 +722,7 @@ export default function KasHadiranPage() {
                   {/* Rincian pendapatan real-time — angka sama dgn PDF Pendapatan */}
                   {(detailHadir.length > 0 || detailTidak.length > 0) && (
                     <div className="rounded-2xl border border-line dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 px-4 py-3.5">
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2.5">Pendapatan Sohibul Bait</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
                       <div className="space-y-1.5 text-sm">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × {formatRupiahPlain(SOHIBUL_PER)}</span>
@@ -745,7 +745,7 @@ export default function KasHadiranPage() {
                   )}
                   {detailTidak.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2">Tidak Hadir / Talangan</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Tidak Hadir / Talangan</p>
                       <div className="space-y-1.5">
                         {detailTidak.map((p) => (
                           <div key={p.id} className="flex items-center gap-2.5">
@@ -763,7 +763,7 @@ export default function KasHadiranPage() {
                   )}
                   {detailHadir.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-500 mb-2">Hadir ({detailHadir.length})</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Hadir ({detailHadir.length})</p>
                       <div className="space-y-1.5">
                         {detailHadir.map((p) => (
                           <div key={p.id} className="flex items-center gap-2.5">
@@ -776,7 +776,7 @@ export default function KasHadiranPage() {
                     </div>
                   )}
                   {detailHadir.length === 0 && detailTidak.length === 0 && (
-                    <p className="text-center text-sm text-gray-400 py-8">Belum ada data absensi untuk tarikan ini.</p>
+                    <p className="text-center text-sm text-ink-faint dark:text-gray-400 py-8">Belum ada data absensi untuk tarikan ini.</p>
                   )}
                 </>
               )}

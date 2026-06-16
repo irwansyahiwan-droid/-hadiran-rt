@@ -182,7 +182,7 @@ export default function JadwalWargaPage() {
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-6 text-center">
-          <p className="text-sm text-gray-400">Belum ada tarikan selesai</p>
+          <p className="text-sm text-ink-faint dark:text-gray-400">Belum ada tarikan selesai</p>
         </div>
       )}
 
@@ -223,7 +223,7 @@ export default function JadwalWargaPage() {
             ].map(s => (
               <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
                 <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
-                <p className="text-[9px] text-gray-400 mt-0.5">{s.label}</p>
+                <p className="text-[9px] text-ink-faint dark:text-gray-400 mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -247,7 +247,7 @@ export default function JadwalWargaPage() {
           {/* Warga list */}
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {filteredWarga.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">Tidak ditemukan</p>
+              <p className="text-sm text-ink-faint dark:text-gray-400 text-center py-8">Tidak ditemukan</p>
             ) : (
               filteredWarga.map((w, idx) => {
                 const isHadir = absensiMap[w.id] === 'hadir';
@@ -259,7 +259,7 @@ export default function JadwalWargaPage() {
                     }`}
                   >
                     {/* No */}
-                    <span className="text-[11px] text-gray-400 font-medium w-5 shrink-0 text-right">
+                    <span className="text-[11px] text-ink-faint dark:text-gray-400 font-medium w-5 shrink-0 text-right">
                       {idx + 1}
                     </span>
                     {/* Avatar */}
@@ -281,7 +281,7 @@ export default function JadwalWargaPage() {
                         {isHadir ? 'Hadir' : 'Tidak'}
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-gray-50 dark:bg-gray-800 text-gray-400 border-control dark:border-gray-700 shrink-0">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-gray-50 dark:bg-gray-800 text-ink-faint dark:text-gray-400 border-control dark:border-gray-700 shrink-0">
                         —
                       </span>
                     )}
@@ -313,22 +313,22 @@ export default function JadwalWargaPage() {
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-bold text-gray-500">{selesaiCount}</p>
-              <p className="text-[10px] text-gray-400 font-medium">Selesai</p>
+              <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{terjadwalCount}</p>
-              <p className="text-[10px] text-gray-400 font-medium">Terjadwal</p>
+              <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Terjadwal</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{allTarikan.length}</p>
-              <p className="text-[10px] text-gray-400 font-medium">Total</p>
+              <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Total</p>
             </div>
           </div>
 
           {/* List */}
           {allTarikan.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-32 gap-2">
-              <p className="text-sm text-gray-400">Belum ada jadwal</p>
+              <p className="text-sm text-ink-faint dark:text-gray-400">Belum ada jadwal</p>
             </div>
           ) : (
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
@@ -352,7 +352,7 @@ export default function JadwalWargaPage() {
                       <p className={`text-sm font-semibold truncate ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
                         {t.sohibul_bait?.nama ?? '—'}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
                         {formatTanggal(t.tanggal)}
                         {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
                           <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>

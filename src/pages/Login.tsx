@@ -155,7 +155,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         {/* Pemisah */}
         <div className="flex items-center gap-3 my-5">
           <div className="h-px flex-1 bg-line dark:bg-gray-800" />
-          <span className="text-[11px] font-semibold text-ink-faint dark:text-gray-500 uppercase tracking-wide">atau</span>
+          <span className="text-[11px] font-semibold text-ink-faint dark:text-gray-400 uppercase tracking-wide">atau</span>
           <div className="h-px flex-1 bg-line dark:bg-gray-800" />
         </div>
 

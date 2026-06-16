@@ -180,7 +180,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
         {/* Hint: tiap baris bisa diketuk untuk penjelasan alur */}
         {!loading && rows.length > 0 && (
-          <div className="flex items-center gap-2 text-[11.5px] text-ink-faint dark:text-gray-500 px-1">
+          <div className="flex items-center gap-2 text-[11.5px] text-ink-faint dark:text-gray-400 px-1">
             <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <span>Ketuk satu aktivitas untuk lihat penjelasan alur &amp; pencatatannya.</span>
           </div>
@@ -212,7 +212,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         ) : (
           grouped.map((grp) => (
             <div key={grp.hari} className="space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-500 px-1 pt-1">{grp.hari}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400 px-1 pt-1">{grp.hari}</p>
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
                 {grp.items.map((row, idx) => {
                   const v = formatAktivitas(row);
@@ -235,7 +235,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                         {v.detail && (
                           <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5 break-words">{v.detail}</p>
                         )}
-                        <p className="text-[11px] text-ink-faint dark:text-gray-500 mt-1">
+                        <p className="text-[11px] text-ink-faint dark:text-gray-400 mt-1">
                           {v.actor} · {formatWaktuRelatif(row.created_at)}
                         </p>
 
@@ -255,7 +255,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               <div className="space-y-1.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl p-2.5">
                                 {v.changes.map((c, i) => (
                                   <div key={i} className="flex items-center gap-1.5 text-[11px] flex-wrap">
-                                    <span className="text-ink-faint dark:text-gray-500 font-medium">{c.label}:</span>
+                                    <span className="text-ink-faint dark:text-gray-400 font-medium">{c.label}:</span>
                                     <span className="text-rose-500 dark:text-rose-400 line-through">{c.from}</span>
                                     <ArrowRight className="w-3 h-3 text-gray-400" />
                                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{c.to}</span>
@@ -263,7 +263,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                                 ))}
                               </div>
                             )}
-                            <p className="text-[10px] text-ink-faint dark:text-gray-500 pl-0.5">{formatWaktu(row.created_at)}</p>
+                            <p className="text-[10px] text-ink-faint dark:text-gray-400 pl-0.5">{formatWaktu(row.created_at)}</p>
                           </div>
                         )}
                       </div>
