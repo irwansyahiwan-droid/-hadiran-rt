@@ -47,10 +47,10 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
 
   return (
     <header
-      className={`sticky top-0 z-40 backdrop-blur-md transition-all duration-300 ${
+      className={`sticky top-0 z-40 backdrop-blur-xl backdrop-saturate-150 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/90 dark:bg-gray-900/90'
-          : 'bg-white/95 dark:bg-gray-900/95'
+          ? 'bg-white/80 dark:bg-gray-900/80 border-b border-line/70 dark:border-gray-800/70'
+          : 'bg-white/90 dark:bg-gray-900/85 border-b border-transparent'
       }`}
       style={{
         paddingTop: 'env(safe-area-inset-top)',
@@ -70,13 +70,13 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           <img
             src={logoRT}
             alt="Logo RT"
-            className={`object-contain rounded-full shadow-sm transition-all duration-300 ${
+            className={`object-contain rounded-full shadow-sm ring-1 ring-black/[0.06] dark:ring-white/10 transition-all duration-300 ${
               scrolled ? 'h-7 w-7' : 'h-8 w-8'
             }`}
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
           />
           <h1
-            className={`font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap transition-all duration-300 ${
+            className={`font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap transition-all duration-300 ${
               scrolled ? 'text-[15px]' : 'text-base'
             }`}
           >

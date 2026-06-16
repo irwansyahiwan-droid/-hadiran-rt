@@ -47,7 +47,9 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
               transitionTimingFunction: 'var(--ease-spring)',
             }}
           >
-            <span className="absolute left-1/2 -translate-x-1/2 top-2 w-16 h-8 rounded-full bg-brand-link/10 dark:bg-emerald-400/10" />
+            {/* Lozenge aktif 2026 — gradient brand + hairline ring + glow lembut
+                (ganti flat tint) → active state terasa "menyala" & punya kedalaman. */}
+            <span className="absolute left-1/2 -translate-x-1/2 top-1.5 w-16 h-9 rounded-2xl bg-gradient-to-b from-brand-link/[0.16] to-brand-link/[0.05] ring-1 ring-brand-link/20 shadow-[0_4px_14px_-4px_rgba(13,107,94,0.45)] dark:from-emerald-400/[0.20] dark:to-emerald-400/[0.05] dark:ring-emerald-400/20 dark:shadow-[0_4px_16px_-4px_rgba(52,211,153,0.4)]" />
           </div>
         )}
         {visibleTabs.map(({ id, label, icon: Icon }) => {
@@ -59,8 +61,11 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
               className="press relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Tanpa lift translate: ala iOS, penekanan dari pill + tint, ikon tetap presisi di tengah pill */}
-              <span className="flex items-center justify-center">
+              {/* Ikon aktif sedikit membesar (spring) → penekanan ekspresif tapi tetap presisi di pill */}
+              <span
+                className={`flex items-center justify-center transition-transform duration-300 ${isActive ? 'scale-110' : 'scale-100'}`}
+                style={{ transitionTimingFunction: 'var(--ease-spring)' }}
+              >
                 <Icon
                   className={`w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
                   strokeWidth={isActive ? 2.4 : 2}
