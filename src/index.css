@@ -180,12 +180,16 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   /* Bayangan BERSIH (2026-06-16) — canvas diperdalam ke #DCE1EA, jadi separasi
      datang dari kontras tonal + tepi crisp, BUKAN halo lebar. Lapisan ambient
      70px (biang "berkabut") dibuang → putih card keluar bersih & "nendang". */
+  /* CRISP 2-lapis (2026-06-16, pass 2) — dua lapis drop (mid 12px + lift 26px)
+     yang menumpuk jadi gradasi abu lebar ("fog ringan") diganti resep crisp ala
+     Linear/Apple: contact rapat + SATU lift halus tak lebar. Tepi 1px diturunkan
+     ke .06 (definisi edge tanpa cincin tebal). Separasi = kontras tonal + tepi
+     crisp, bukan blur menumpuk. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(16, 24, 40, 0.09),                         /* hairline ring crisp → kartu "tercetak" */
-    0 1px 2px 0 rgba(16, 24, 40, 0.07),                       /* contact shadow rapat → kartu menapak */
-    0 5px 12px -4px rgba(16, 24, 40, 0.11),                   /* drop lembut dekat → definisi tepi */
-    0 14px 26px -14px rgba(16, 24, 40, 0.13);                 /* lift halus → melayang, tanpa fog */
+    0 0 0 1px rgba(10, 14, 26, 0.06),                         /* tepi crisp 1px → definisi edge, kartu "tercetak" */
+    0 1px 2px 0 rgba(10, 14, 26, 0.06),                       /* contact shadow rapat → kartu menapak */
+    0 8px 24px rgba(10, 14, 26, 0.08);                        /* lift halus, TIDAK lebar → melayang tanpa fog */
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.33);
 }
 
@@ -197,11 +201,13 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
    jadi cincin norak → pisahkan kartu lewat (1) ring cahaya tipis di tepi +
    (2) drop GELAP dalam utk kedalaman nyata. Bukan halo putih. */
 .dark {
+  /* CRISP 2-lapis (2026-06-16, pass 2) — selaras light: drop lebar 40px diganti
+     contact rapat + SATU lift 24px tak lebar. Ring cahaya tetap carry the weight. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.05),               /* tepi atas "tersinari" halus */
     0 0 0 1px rgba(255, 255, 255, 0.09),                      /* ring cahaya tipis → kartu kebaca di gelap */
-    0 2px 6px -1px rgba(0, 0, 0, 0.5),
-    0 18px 40px -12px rgba(0, 0, 0, 0.62);                    /* drop gelap dalam → elevation nyata */
+    0 1px 2px rgba(0, 0, 0, 0.5),                             /* contact shadow rapat → kartu menapak */
+    0 8px 24px rgba(0, 0, 0, 0.55);                           /* lift halus, TIDAK lebar → elevation tanpa fog */
   --shadow-float: 0 18px 48px -12px rgba(0, 0, 0, 0.72);
 }
 
