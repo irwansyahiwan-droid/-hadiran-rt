@@ -19,10 +19,11 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
         {/* Elemen dekoratif mengambang */}
         <span className="blob absolute -top-1 right-3 w-2.5 h-2.5 rounded-full bg-amber-300/80" />
         <span className="blob absolute bottom-2 -left-1 w-3.5 h-3.5 rounded-md bg-emerald-300/70" style={{ animationDelay: '-4s' }} />
-        <span className="blob absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-blue-300/70" style={{ animationDelay: '-8s' }} />
+        {/* Teal brand, bukan biru — aturan config: biru = sinyal status, bukan accent dekoratif. */}
+        <span className="blob absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-teal-300/70" style={{ animationDelay: '-8s' }} />
 
-        {/* Tile ikon di tengah */}
-        <div className="pop absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 shadow-lg flex items-center justify-center ring-1 ring-black/5 dark:ring-white/10">
+        {/* Tile ikon di tengah — token `lift` (crisp card language), bukan shadow-lg generik. */}
+        <div className="pop lift absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">
           <Icon className="w-7 h-7 text-emerald-500 dark:text-emerald-400" strokeWidth={1.7} />
         </div>
       </div>
