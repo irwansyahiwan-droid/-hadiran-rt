@@ -13,6 +13,7 @@ import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import InstallPrompt from './components/InstallPrompt';
 import Toaster from './components/Toaster';
 import type { TabName } from './components/layout/BottomNav';
+import logoRT from './assets/logo-rt.jpg';
 
 // Code-splitting per halaman → first load ringan di HP warga; tiap tab/overlay
 // memuat chunk-nya sendiri saat dibutuhkan (vite:preloadError di main.tsx
@@ -31,9 +32,18 @@ const TentangApp = lazy(() => import('./pages/TentangApp'));
 
 // Fallback ringan saat chunk halaman dimuat (spinner brand, sinkron dgn loader auth).
 function PageFallback() {
+  // Skeleton berbentuk konten (hero + list) > spinner di void: tidak ada
+  // layout shift saat chunk halaman selesai dimuat, terasa lebih cepat.
+  // Shimmer & varian dark ikut sistem .skeleton; reduced-motion sudah
+  // dimatikan oleh catch-all global di index.css.
   return (
-    <div className="flex items-center justify-center py-24">
-      <RefreshCw className="w-7 h-7 text-emerald-500 animate-spin" />
+    <div role="status" aria-label="Memuat halaman" className="space-y-4">
+      <div className="skeleton rounded-3xl h-36" />
+      <div className="space-y-3">
+        <div className="skeleton rounded-2xl h-16" />
+        <div className="skeleton rounded-2xl h-16" />
+        <div className="skeleton rounded-2xl h-16" />
+      </div>
     </div>
   );
 }
@@ -93,9 +103,19 @@ export default function App() {
   }, [activeTab]);
 
   if (auth.loading) {
+    // Splash ber-brand (logo + nama) > spinner telanjang: first impression
+    // terasa "produk", bukan halaman loading generik.
     return (
-      <div className="app-bg min-h-dvh flex items-center justify-center">
-        <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
+      <div className="app-bg min-h-dvh flex flex-col items-center justify-center gap-5">
+        <img
+          src={logoRT}
+          alt=""
+          className="pop h-16 w-16 rounded-2xl object-contain ring-1 ring-black/[0.06] dark:ring-white/10 shadow-sm"
+        />
+        <div className="flex flex-col items-center gap-3">
+          <p className="text-base font-semibold tracking-tight text-ink dark:text-gray-100">Hadiran RT</p>
+          <RefreshCw className="w-5 h-5 text-emerald-500 animate-spin" />
+        </div>
       </div>
     );
   }
