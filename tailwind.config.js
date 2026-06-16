@@ -29,8 +29,8 @@ export default {
         },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#DCE1EA', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll)
-        line: '#E6EAF1',    // garis/divider tipis untuk semua card — sedikit lebih tegas agar tepi card "tercetak" di canvas baru
+        sunken: '#D4DAE4', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll)
+        line: '#CFD5DF',    // garis/divider tipis. Pass 3: #E6EAF1 dulu LEBIH TERANG dari canvas → border kartu jadi garis terang yg mewashout tepi crisp. Diturunkan ≈ tone canvas agar tak melawan hairline gelap (.lift); divider tetap bersih di atas putih.
         control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
         ink: {
