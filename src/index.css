@@ -10,7 +10,14 @@ html {
   /* Hilangkan kilat abu bawaan saat tap (iOS/Android) — feedback sentuh sudah
      ditangani .press (spring scale) + haptic, highlight ganda terasa murahan. */
   -webkit-tap-highlight-color: transparent;
+  /* Native control (date picker, scrollbar, autofill, form fields) ikut tema →
+     di dark mode tidak lagi muncul panel putih nyilau. Pasangan .dark di bawah. */
+  color-scheme: light;
+  /* Checkbox/radio/date/native control jadi on-brand (brand-500), bukan biru
+     iOS/Android generik. Satu baris, konsisten di seluruh app. */
+  accent-color: #1B7249;
 }
+html.dark { color-scheme: dark; accent-color: #1A9B86; } /* brand-linkDark */
 
 body {
   /* Kanvas abu netral sejuk (Apple/Linear clean): rata & tenang agar kartu
@@ -38,6 +45,26 @@ body {
    tidak balik sendiri). Semua input app pakai text-sm (14px) → paksa 16px
    dari SATU titik. Specificity (0,1,1) menang atas utility .text-sm (0,1,0). */
 input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
+
+/* ── Detail tuntas: seleksi, caret, fokus keyboard (semua on-brand) ───
+   Hal kecil yang bikin app terasa "satu produk", bukan kumpulan default. */
+::selection      { background: rgba(27, 114, 73, 0.18); }            /* brand-500 tint */
+.dark ::selection{ background: rgba(26, 155, 134, 0.30); }           /* brand-linkDark */
+input, textarea  { caret-color: #1B7249; }
+.dark input, .dark textarea { caret-color: #1A9B86; }
+/* Fokus keyboard terlihat (syarat a11y/store). Hanya elemen interaktif non-input
+   (input sudah punya focus:ring sendiri). :is(...) → specificity rendah, tak
+   menabrak utility Tailwind. Hanya muncul saat navigasi keyboard, bukan tap. */
+:is(button, a, summary, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid #1B7249;
+  outline-offset: 2px;
+}
+.dark :is(button, a, summary, [role="button"], [tabindex]):focus-visible {
+  outline-color: #1A9B86;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is(button, a, summary):focus-visible { transition: outline-offset 0.12s var(--ease-out-expo); }
+}
 
 /* ── Kanvas Login: light = gradient mint brand, dark = emerald pekat ──
    Sebelumnya hardcoded inline (light saja) → dark mode kanvasnya bocor terang. */
