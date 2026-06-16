@@ -18,7 +18,7 @@ body {
      aurora. Makin sedikit trik, makin mahal kelihatannya (lihat .app-bg).
      SATU nilai dengan .app-bg, token `sunken`, & manifest background_color —
      jangan biarkan drift lagi. */
-  background-color: #E4E7EE;
+  background-color: #DCE1EA;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -69,13 +69,13 @@ input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
 /* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
    Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
-   Dipakai di wrapper App (kanvas #E4E7EE — samakan dgn body/sunken/manifest). */
+   Dipakai di wrapper App (kanvas #DCE1EA — samakan dgn body/sunken/manifest). */
 .app-bg {
   /* Apple clean: kanvas abu netral sejuk RATA. Tanpa aurora tebal & tanpa
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #E4E7EE;
+  background-color: #DCE1EA;
   background-image:
     radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
   background-attachment: fixed;
@@ -177,13 +177,15 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   /* Dinaikkan satu step (2026-06-12) saat kanvas naik ke #E9ECF2 — selisih
      tonal kartu–kanvas mengecil, "pop" dipindah ke bayangan, BUKAN
      menggelapkan kanvas lagi. Tetap netral abu-ink agar bersih, tidak kotor. */
+  /* Bayangan BERSIH (2026-06-16) — canvas diperdalam ke #DCE1EA, jadi separasi
+     datang dari kontras tonal + tepi crisp, BUKAN halo lebar. Lapisan ambient
+     70px (biang "berkabut") dibuang → putih card keluar bersih & "nendang". */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(16, 24, 40, 0.12),                          /* hairline ring crisp → kartu "tercetak" */
-    0 1px 2px 0 rgba(16, 24, 40, 0.09),                       /* contact shadow rapat → kartu menapak */
-    0 6px 14px -4px rgba(16, 24, 40, 0.15),                   /* drop lembut dekat → definisi tepi */
-    0 16px 32px -10px rgba(16, 24, 40, 0.19),                 /* penumbra menengah → kartu "memancar" */
-    0 36px 70px -24px rgba(16, 24, 40, 0.26);                 /* ambient lebar & dalam → glow netral, melayang tinggi */
+    0 0 0 1px rgba(16, 24, 40, 0.09),                         /* hairline ring crisp → kartu "tercetak" */
+    0 1px 2px 0 rgba(16, 24, 40, 0.07),                       /* contact shadow rapat → kartu menapak */
+    0 5px 12px -4px rgba(16, 24, 40, 0.11),                   /* drop lembut dekat → definisi tepi */
+    0 14px 26px -14px rgba(16, 24, 40, 0.13);                 /* lift halus → melayang, tanpa fog */
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.33);
 }
 

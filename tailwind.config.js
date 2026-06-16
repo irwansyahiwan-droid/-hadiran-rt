@@ -29,7 +29,7 @@ export default {
         },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#E4E7EE', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll)
+        sunken: '#DCE1EA', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll)
         line: '#E6EAF1',    // garis/divider tipis untuk semua card — sedikit lebih tegas agar tepi card "tercetak" di canvas baru
         control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
