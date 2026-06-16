@@ -125,7 +125,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 }
               }}
               placeholder="Ketik: warga"
-              className="w-full pl-10 pr-12 py-3 rounded-xl bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-800/50 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+              className="w-full pl-10 pr-12 py-3 rounded-xl bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-800/50 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
             />
             <button
               type="button"
@@ -184,7 +184,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="contoh@email.com"
                     required={bendaharaOpen}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
                   />
                 </div>
               </div>
@@ -200,7 +200,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required={bendaharaOpen}
-                    className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                    className="w-full pl-10 pr-12 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
                   />
                   <button
                     type="button"

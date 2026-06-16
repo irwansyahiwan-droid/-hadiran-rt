@@ -61,7 +61,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
             <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
             <input type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
               placeholder="Setoran bulan Mei 2026"
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -70,13 +70,13 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                 <input type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
                   onChange={e => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)} required
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
               <input type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
-                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500" />
             </div>
           </div>
           <div className="flex gap-3 pt-1">
