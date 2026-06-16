@@ -29,5 +29,28 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/1-beranda.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard saldo & statistik kas"
+    },
+    {
+      "src": "/screenshots/2-jadwal.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Jadwal tarikan & daftar hadir"
+    },
+    {
+      "src": "/screenshots/3-kas.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Kas Hadiran & rekap per tarikan"
+    }
   ]
 }
