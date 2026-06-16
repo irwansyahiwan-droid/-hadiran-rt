@@ -13,6 +13,7 @@ import HeroSparkline from '../components/charts/HeroSparkline';
 import PengumumanBanner from '../components/PengumumanBanner';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
+import SectionTitle from '../components/SectionTitle';
 import Tag from '../components/Tag';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 
@@ -346,19 +347,17 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Jadwal Berikutnya */}
       <div>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="flex items-center gap-2 text-base font-bold text-ink dark:text-gray-100">
-            <span className="w-1 h-4 rounded-full bg-gradient-to-b from-emerald-400 to-teal-600" />
-            Jadwal Berikutnya
-            {jumlahDijadwalkan > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">
-                <CalendarClock className="w-3 h-3" strokeWidth={2.2} />
-                {jumlahDijadwalkan}
-              </span>
-            )}
-          </h2>
-          <button onClick={() => onNavigate('jadwal')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
-        </div>
+        <SectionTitle
+          action={<button onClick={() => onNavigate('jadwal')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>}
+        >
+          Jadwal Berikutnya
+          {jumlahDijadwalkan > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">
+              <CalendarClock className="w-3 h-3" strokeWidth={2.2} />
+              {jumlahDijadwalkan}
+            </span>
+          )}
+        </SectionTitle>
         {jadwalList.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             <EmptyState icon={CalendarDays} title="Belum ada jadwal" subtitle="Jadwal tarikan berikutnya akan tampil di sini." />
@@ -417,13 +416,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Transaksi Terakhir — preview 5 teratas; pencarian penuh ada di halaman Kas */}
       <div>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="flex items-center gap-2 text-base font-bold text-ink dark:text-gray-100">
-            <span className="w-1 h-4 rounded-full bg-gradient-to-b from-emerald-400 to-teal-600" />
-            Transaksi Terakhir
-          </h2>
-          <button onClick={() => onNavigate('kas')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
-        </div>
+        <SectionTitle
+          action={<button onClick={() => onNavigate('kas')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>}
+        >
+          Transaksi Terakhir
+        </SectionTitle>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {recentTrx.length === 0 ? (
             <EmptyState icon={Receipt} title="Belum ada transaksi" subtitle="Setoran & pelunasan talangan akan muncul di sini." />

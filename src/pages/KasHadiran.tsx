@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import FilterChips from '../components/FilterChips';
+import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
@@ -505,7 +506,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <p className="text-base font-bold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Rekap Per Tarikan</p>
+            <SectionTitle className="mt-6">Rekap Per Tarikan</SectionTitle>
 
             {/* Filter (status talangan) & sort */}
             {!loading && (

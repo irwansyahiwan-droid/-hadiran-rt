@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import FilterChips from '../components/FilterChips';
+import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
@@ -483,7 +484,7 @@ export default function KasRTPage() {
         )}
 
         {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
-        <h2 className="text-base font-bold text-ink dark:text-gray-100 mt-6 mb-3 px-1">Mutasi Kas Besar RT</h2>
+        <SectionTitle className="mt-6">Mutasi Kas Besar RT</SectionTitle>
 
         <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
