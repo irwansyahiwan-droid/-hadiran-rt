@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, TrendingUp, ChevronRight, Users, Layers, CalendarClock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Eye, EyeOff, TrendingUp, ChevronRight, CalendarClock } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
-import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -43,9 +42,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
   const trxDrag = useDragDismiss(() => setSelectedTrx(null));
   useBackDismiss(selectedTrx !== null, () => setSelectedTrx(null));
-  const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
-  const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
-  const [trxSearch, setTrxSearch] = useState('');
 
   async function load(showRefreshing = false) {
     if (showRefreshing) setRefreshing(true);
@@ -131,6 +127,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const saldo = summary?.saldo_aktif ?? 0;
   const talangan = summary?.total_talangan_belum_lunas ?? 0;
   const setorKasRT = summary?.total_setor_kas_rt ?? 0;
+  const jumlahDijadwalkan = summary?.jumlah_dijadwalkan ?? 0;
 
   const hour = new Date().getHours();
   const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
@@ -158,26 +155,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     { label: 'Kas RT', icon: ArrowUpRight, tab: 'kas-rt', chip: 'bg-blue-100 dark:bg-blue-900/30', ic: 'text-blue-600 dark:text-blue-400' },
     { label: 'Jadwal', icon: CalendarDays, tab: 'jadwal', chip: 'bg-slate-100 dark:bg-slate-800/60', ic: 'text-slate-600 dark:text-slate-300' },
   ] as const;
-  const statTiles = [
-    { label: 'Anggota', value: summary?.jumlah_anggota ?? 0, icon: Users },
-    { label: 'Tarikan', value: summary?.jumlah_tarikan ?? 0, icon: Layers },
-    { label: 'Terjadwal', value: summary?.jumlah_dijadwalkan ?? 0, icon: CalendarClock },
-  ] as const;
 
-  // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
-  const displayTrx = useMemo(() => {
-    const q = trxSearch.trim().toLowerCase();
-    let arr = [...trxItems];
-    if (trxSort === 'terlama') arr.reverse();
-    else if (trxSort === 'nominal') arr.sort((a, b) => Math.abs(b.nominal) - Math.abs(a.nominal));
-    if (trxFilter !== 'semua') arr = arr.filter((t) => t.tipe === trxFilter);
-    if (q) arr = arr.filter((t) => t.keterangan.toLowerCase().includes(q));
-    return arr;
-  }, [trxItems, trxFilter, trxSort, trxSearch]);
-
-  const trxSortLabel = trxSort === 'terbaru' ? 'Terbaru' : trxSort === 'terlama' ? 'Terlama' : 'Nominal';
-  const cycleTrxSort = () =>
-    setTrxSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'nominal' : 'terbaru'));
+  // Beranda hanya menampilkan 5 transaksi terbaru sebagai preview.
+  // Pencarian & filter penuh hidup di halaman Kas Hadiran.
+  const recentTrx = trxItems.slice(0, 5);
 
   const skeleton = (
       <div className="space-y-6 pb-2">
@@ -185,11 +166,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <div className="grid grid-cols-4 gap-2.5">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-[84px] rounded-2xl skeleton" />
-          ))}
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-[92px] rounded-2xl skeleton" />
           ))}
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
@@ -336,33 +312,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         ))}
       </div>
 
-      {/* Pengumuman / Info Penting — dikelola bendahara, dilihat semua warga */}
-      <PengumumanBanner canManage={isBendahara && !isWargaMode} />
-
-      {/* Donut komposisi kas (interaktif) — satu-satunya rumah rincian Saldo/Talangan/Setor */}
-      {donutTotal > 0 && (
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
-          <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Komposisi Kas Hadiran</p>
-          <DonutChart data={donutData} centerTop="Total" format={(v) => maskRp(formatRupiahPlain(v), hidden, 5)} />
-        </div>
-      )}
-
-      {/* Statistik bento — Anggota / Tarikan / Terjadwal */}
-      <div className="grid grid-cols-3 gap-3">
-        {statTiles.map(({ label, value, icon: Icon }, i) => (
-          <div
-            key={label}
-            style={{ animationDelay: `${i * 0.05}s` }}
-            className="rise bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift px-3 py-3.5 flex flex-col items-center gap-1.5"
-          >
-            <Icon className="w-[18px] h-[18px] text-ink-faint dark:text-gray-500" strokeWidth={1.8} />
-            <span className="text-2xl font-bold text-ink dark:text-gray-100 leading-none tabular-nums">{value}</span>
-            <span className="text-[11px] font-medium text-ink-sub dark:text-gray-400">{label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Alert Banner */}
+      {/* Perhatian — talangan urgent naik ke atas agar terlihat lebih cepat */}
       {talangan > 0 && (
         <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl px-5 py-4">
           <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
@@ -383,12 +333,29 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       )}
 
+      {/* Pengumuman / Info Penting — dikelola bendahara, dilihat semua warga */}
+      <PengumumanBanner canManage={isBendahara && !isWargaMode} />
+
+      {/* Donut komposisi kas (interaktif) — satu-satunya rumah rincian Saldo/Talangan/Setor */}
+      {donutTotal > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
+          <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Komposisi Kas Hadiran</p>
+          <DonutChart data={donutData} centerTop="Total" format={(v) => maskRp(formatRupiahPlain(v), hidden, 5)} />
+        </div>
+      )}
+
       {/* Jadwal Berikutnya */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="flex items-center gap-2 text-base font-bold text-ink dark:text-gray-100">
             <span className="w-1 h-4 rounded-full bg-gradient-to-b from-emerald-400 to-teal-600" />
             Jadwal Berikutnya
+            {jumlahDijadwalkan > 0 && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">
+                <CalendarClock className="w-3 h-3" strokeWidth={2.2} />
+                {jumlahDijadwalkan}
+              </span>
+            )}
           </h2>
           <button onClick={() => onNavigate('jadwal')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
         </div>
@@ -448,7 +415,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         )}
       </div>
 
-      {/* Transaksi Terakhir */}
+      {/* Transaksi Terakhir — preview 5 teratas; pencarian penuh ada di halaman Kas */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="flex items-center gap-2 text-base font-bold text-ink dark:text-gray-100">
@@ -457,50 +424,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </h2>
           <button onClick={() => onNavigate('kas')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
         </div>
-        {trxItems.length > 0 && (
-          <div className="space-y-2 mb-3">
-          {/* Search + filter + sort */}
-          <div className="relative px-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={trxSearch}
-              onChange={(e) => setTrxSearch(e.target.value)}
-              placeholder="Cari keterangan / nama..."
-              aria-label="Cari transaksi"
-              className="w-full pl-9 pr-11 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-            />
-            {trxSearch && (
-              <button onClick={() => setTrxSearch('')} className="absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center" aria-label="Bersihkan pencarian">
-                <X className="w-4 h-4 text-gray-400" />
-              </button>
-            )}
-          </div>
-          <FilterChips
-            className="px-1"
-            options={[
-              { id: 'semua', label: 'Semua' },
-              { id: 'setor', label: 'Setor' },
-              { id: 'talangan_lunas', label: 'Talangan' },
-            ] as const}
-            value={trxFilter}
-            onChange={setTrxFilter}
-            sort={{ label: trxSortLabel, onCycle: cycleTrxSort }}
-          />
-          </div>
-        )}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
-          {trxItems.length === 0 ? (
+          {recentTrx.length === 0 ? (
             <EmptyState icon={Receipt} title="Belum ada transaksi" subtitle="Setoran & pelunasan talangan akan muncul di sini." />
-          ) : displayTrx.length === 0 ? (
-            <EmptyState icon={Receipt} title="Tidak ada hasil" subtitle="Tidak ada transaksi pada filter ini." />
           ) : (
-            displayTrx.map((trx, idx) => (
+            recentTrx.map((trx, idx) => (
               <button
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < displayTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
+                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < recentTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
               >
                 <div className={`w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
                   {trx.tipe === 'setor'
