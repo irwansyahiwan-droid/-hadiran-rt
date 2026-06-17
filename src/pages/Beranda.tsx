@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, TrendingUp } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, TrendingUp, ChevronRight } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
@@ -368,8 +368,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Jadwal Berikutnya */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
-          <button onClick={() => onNavigate('jadwal')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
+            {jadwalList.length > 0 && (
+              <span className="text-[11px] font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{jadwalList.length}</span>
+            )}
+          </div>
+          <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
+            Lihat semua
+            <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
+          </button>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {jadwalList.length === 0 ? (
@@ -400,8 +408,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Transaksi Terakhir */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-base font-bold text-ink dark:text-gray-100">Transaksi Terakhir</h2>
-          <button onClick={() => onNavigate('kas')} className="press inline-flex items-center min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">Lihat semua →</button>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-bold text-ink dark:text-gray-100">Transaksi Terakhir</h2>
+            {trxItems.length > 0 && (
+              <span className="text-[11px] font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{trxItems.length}</span>
+            )}
+          </div>
+          <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
+            Lihat semua
+            <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
+          </button>
         </div>
         {trxItems.length > 0 && (
           <div className="space-y-2 mb-3">
@@ -461,7 +477,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
                   </p>
                 </div>
-                <span className={`text-[17px] font-bold shrink-0 ${trx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
+                <span className={`font-display text-[17px] font-bold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
                   {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
                 </span>
               </button>
@@ -493,7 +509,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">Jumlah</span>
-              <span className={`text-[17px] font-semibold ${selectedTrx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
+              <span className={`font-display text-[17px] font-bold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
                 {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
