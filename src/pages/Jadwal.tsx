@@ -813,15 +813,15 @@ export default function JadwalPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="text-xl font-bold text-gray-500">{selesaiCount}</p>
+          <p className="font-display text-xl font-bold text-gray-500 tabular-nums">{selesaiCount}</p>
           <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{dijadwalCount}</p>
+          <p className="font-display text-xl font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">{dijadwalCount}</p>
           <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Terjadwal</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{tarikanList.length}</p>
+          <p className="font-display text-xl font-bold text-gray-900 dark:text-gray-100 tabular-nums">{tarikanList.length}</p>
           <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Total</p>
         </div>
       </div>

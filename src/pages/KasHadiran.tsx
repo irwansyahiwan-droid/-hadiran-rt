@@ -506,7 +506,7 @@ export default function KasHadiranPage() {
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
           <div>
-            <SectionTitle className="mt-6">Rekap Per Tarikan</SectionTitle>
+            <SectionTitle className="mt-6" count={tarikanSelesai.length}>Rekap Per Tarikan</SectionTitle>
 
             {/* Filter (status talangan) & sort */}
             {!loading && (

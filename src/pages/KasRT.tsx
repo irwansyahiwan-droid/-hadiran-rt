@@ -484,7 +484,7 @@ export default function KasRTPage() {
         )}
 
         {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
-        <SectionTitle className="mt-6">Mutasi Kas Besar RT</SectionTitle>
+        <SectionTitle className="mt-6" count={list.length}>Mutasi Kas Besar RT</SectionTitle>
 
         <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
