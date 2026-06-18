@@ -167,7 +167,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
               </p>
             </div>
             <p className="relative text-micro text-white/65 mb-1">Total Kas RT · {snap.tanggal}</p>
-            <span className="relative block text-white text-[34px] font-black tracking-tighter leading-none tabular-nums mb-3">
+            <span className="relative block font-display text-white text-4xl font-extrabold tracking-tighter leading-none tabular-nums mb-3">
               {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
 

@@ -9,7 +9,6 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
-import DonutChart from '../components/charts/DonutChart';
 import HeroSparkline from '../components/charts/HeroSparkline';
 import PengumumanBanner from '../components/PengumumanBanner';
 import { useAuthContext } from '../context/AuthContext';
@@ -136,12 +135,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const hour = new Date().getHours();
   const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
   const roleLabel = isWargaMode ? 'Warga' : isBendahara ? 'Bendahara' : 'Pengguna';
-  const donutData = [
-    { label: 'Saldo Aktif', value: Math.max(0, saldo), color: '#10B981' },
-    { label: 'Talangan', value: talangan, color: '#F59E0B' },
-    { label: 'Setor ke Kas RT', value: setorKasRT, color: '#3B82F6' },
-  ];
-  const donutTotal = donutData.reduce((s, d) => s + d.value, 0);
   const kasStatus =
     saldo < 0
       ? { label: 'Perlu Perhatian', dot: 'bg-red-500', text: 'text-red-600 dark:text-rose-400', bg: 'bg-red-50 dark:bg-rose-900/20' }
@@ -333,14 +326,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
         </div>
       </div>
-
-      {/* Donut komposisi kas (interaktif) */}
-      {donutTotal > 0 && (
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
-          <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Komposisi Kas Hadiran</p>
-          <DonutChart data={donutData} centerTop="Total" format={(v) => maskRp(formatRupiahPlain(v), hidden, 5)} />
-        </div>
-      )}
 
       {/* Alert Banner */}
       {talangan > 0 && (
