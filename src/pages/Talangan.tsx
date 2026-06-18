@@ -224,9 +224,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[15px] font-semibold text-ink dark:text-gray-100 truncate flex-1">{g.nama}</p>
+                <p className="text-body font-semibold text-ink dark:text-gray-100 truncate flex-1">{g.nama}</p>
                 {g.countBelum > 0 && (
-                  <span className="text-[11px] text-amber-700 font-medium shrink-0">
+                  <span className="text-micro text-amber-700 font-medium shrink-0">
                     {g.countBelum}× @ Rp50.000
                   </span>
                 )}
@@ -259,7 +259,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-gray-900 dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
+                  <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
                   <p className="text-xs text-ink-faint dark:text-gray-400 truncate">
                     {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
@@ -304,7 +304,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     disabled={processingId === t.id}
                     title="Hapus data talangan"
                     aria-label="Hapus data talangan"
-                    className={`inline-flex items-center justify-center gap-1 h-7 px-2 rounded-lg text-[11px] font-bold transition-colors disabled:opacity-70 shrink-0 ${
+                    className={`inline-flex items-center justify-center gap-1 h-7 px-2 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 ${
                       deleteConfirmId === t.id
                         ? 'bg-red-600 text-white'
                         : 'text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
@@ -341,7 +341,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
           <div className="relative p-5">
             <div className="flex items-center justify-between gap-2 mb-1">
-              <p className="text-emerald-300 text-[10px] font-bold uppercase tracking-widest">
+              <p className="text-emerald-300 text-micro font-bold uppercase tracking-widest">
                 Total Talangan Belum Lunas
               </p>
               <button

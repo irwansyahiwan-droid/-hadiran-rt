@@ -70,14 +70,14 @@ export default function PengumumanBanner({ canManage }: Props) {
               <Icon className="w-5 h-5 ann-wiggle" strokeWidth={2.2} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/75">
+              <p className="text-micro font-bold uppercase tracking-[0.16em] text-white/75">
                 {style.label}
               </p>
               {data!.judul && (
-                <p className="text-[15px] font-bold leading-snug mt-0.5 break-words">{data!.judul}</p>
+                <p className="text-body font-bold leading-snug mt-0.5 break-words">{data!.judul}</p>
               )}
               {data!.isi && (
-                <p className="text-[13px] text-white/90 leading-relaxed mt-0.5 break-words whitespace-pre-line">{data!.isi}</p>
+                <p className="text-caption text-white/90 leading-relaxed mt-0.5 break-words whitespace-pre-line">{data!.isi}</p>
               )}
             </div>
             {canManage && (
@@ -221,7 +221,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
               <Icon className="w-4 h-4" strokeWidth={2.2} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{style.label}</p>
+              <p className="text-micro font-bold uppercase tracking-[0.16em] text-white/75">{style.label}</p>
               <p className="text-sm font-bold leading-snug break-words">{judul.trim() || 'Judul pengumuman'}</p>
               {isi.trim() && <p className="text-xs text-white/90 mt-0.5 break-words whitespace-pre-line">{isi.trim()}</p>}
             </div>
@@ -272,7 +272,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
             {uploading ? 'Mengunggah...' : 'Unggah Foto / Video'}
           </button>
         )}
-        <p className="text-[11px] text-gray-400 mb-4">Foto maks 3 MB · Video maks 10 MB (MP4, ≤30 dtk)</p>
+        <p className="text-micro text-gray-400 mb-4">Foto maks 3 MB · Video maks 10 MB (MP4, ≤30 dtk)</p>
 
         <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Jenis</label>
         <div className="grid grid-cols-3 gap-2 mb-4">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X, Download, Share, Plus } from 'lucide-react';
-import logoRt from '../assets/logo-rt.jpg';
+import logoRt from '../assets/logo-rt.svg';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -76,7 +76,7 @@ export default function InstallPrompt() {
           <img src={logoRt} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Pasang Hadiran RT</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400">Akses cepat dari layar utama HP</p>
+            <p className="text-micro text-gray-500 dark:text-gray-400">Akses cepat dari layar utama HP</p>
           </div>
           <button
             onClick={isIos ? () => setShowGuide(true) : install}

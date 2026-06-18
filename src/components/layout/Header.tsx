@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, type LucideIcon } from 'lucide-react';
-import logoRT from '../../assets/logo-rt.jpg';
+import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import Tag from '../Tag';
 import type { Role } from '../../hooks/useAuth';
@@ -77,7 +77,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           />
           <h1
             className={`font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap transition-all duration-300 ${
-              scrolled ? 'text-[15px]' : 'text-base'
+              scrolled ? 'text-body' : 'text-base'
             }`}
           >
             Hadiran RT

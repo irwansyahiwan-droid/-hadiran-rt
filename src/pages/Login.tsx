@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff, Users, Sparkles, ArrowRight, ChevronDown, Info } from 'lucide-react';
-import logoRt from '../assets/logo-rt.jpg';
+import logoRt from '../assets/logo-rt.svg';
 import { haptic } from '../lib/utils';
 
 // Pagar ringan untuk Mode Warga — BUKAN kredensial rahasia, hanya agar warga
@@ -74,7 +74,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           className="pop w-20 h-20 rounded-3xl object-cover mx-auto mb-4 shadow-xl shadow-emerald-300/60 ring-1 ring-white/60"
         />
         <h1 className="rise text-2xl font-bold text-gray-900 dark:text-gray-100" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
-        <p className="rise text-[13px] text-gray-500 dark:text-gray-400 mt-1" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
+        <p className="rise text-caption text-gray-500 dark:text-gray-400 mt-1" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
       </div>
 
       {/* Card */}
@@ -86,7 +86,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         {/* ── WARGA — pintu utama (istimewa) ───────────────────── */}
         <div className="relative rounded-2xl p-4 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-gray-900 border border-emerald-200/80 dark:border-emerald-800/40 shadow-[0_8px_28px_-14px_rgba(16,185,129,0.55)]">
           {/* badge sudut */}
-          <span className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[9px] font-bold uppercase tracking-wide shadow-sm shadow-emerald-400/50">
+          <span className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-micro font-bold uppercase tracking-wide shadow-sm shadow-emerald-400/50">
             <Sparkles className="w-2.5 h-2.5" /> Akses Cepat
           </span>
 
@@ -96,14 +96,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Masuk sebagai Warga</p>
-              <p className="text-[11px] text-emerald-700/90 dark:text-emerald-300/80 font-medium">Lihat saldo, jadwal, absensi &amp; talangan</p>
+              <p className="text-micro text-emerald-700/90 dark:text-emerald-300/80 font-medium">Lihat saldo, jadwal, absensi &amp; talangan</p>
             </div>
           </div>
 
           {/* Petunjuk jelas — warga cukup ketik kata "warga"; ketuk kata di bawah utk isi otomatis */}
           <div className="flex items-start gap-2 mb-3 rounded-xl bg-emerald-100/70 dark:bg-emerald-900/25 border border-emerald-200/70 dark:border-emerald-800/40 px-3 py-2.5">
             <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-            <p className="text-[12px] text-emerald-800 dark:text-emerald-200 leading-snug">
+            <p className="text-caption text-emerald-800 dark:text-emerald-200 leading-snug">
               Tanpa daftar. Cukup ketik kata{' '}
               <button type="button" onClick={isiOtomatis} className="font-bold underline decoration-emerald-400 underline-offset-2 active:opacity-70">warga</button>
               {' '}di kolom bawah, lalu tekan <span className="font-semibold">Masuk Sekarang</span>.
@@ -155,7 +155,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         {/* Pemisah */}
         <div className="flex items-center gap-3 my-5">
           <div className="h-px flex-1 bg-line dark:bg-gray-800" />
-          <span className="text-[11px] font-semibold text-ink-faint dark:text-gray-400 uppercase tracking-wide">atau</span>
+          <span className="text-micro font-semibold text-ink-faint dark:text-gray-400 uppercase tracking-wide">atau</span>
           <div className="h-px flex-1 bg-line dark:bg-gray-800" />
         </div>
 

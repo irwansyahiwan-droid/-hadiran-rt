@@ -188,7 +188,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
             {susulan && (
               <div className="px-3.5 pb-3.5 space-y-2">
-                <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
+                <p className="text-micro text-amber-700 dark:text-amber-400 leading-relaxed">
                   Ditandai <b>hadir</b> di tarikan terpilih lalu kas dihitung ulang. Talangan warga lain tidak terpengaruh.
                 </p>
                 <div className="rounded-xl bg-white dark:bg-gray-900 border border-amber-100 dark:border-amber-900/40 divide-y divide-line dark:divide-gray-800 max-h-52 overflow-y-auto">
@@ -209,7 +209,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                           <span className="block text-sm font-semibold text-gray-800 dark:text-gray-100">
                             Tarikan #{t.nomor}
                           </span>
-                          <span className="block text-[11px] text-ink-faint dark:text-gray-400">
+                          <span className="block text-micro text-ink-faint dark:text-gray-400">
                             {t.sohibul_bait?.nama ?? '—'} · {formatTanggal(t.tanggal)}
                           </span>
                         </span>
@@ -217,7 +217,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                     );
                   })}
                 </div>
-                <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                <p className="text-micro font-semibold text-emerald-700 dark:text-emerald-400">
                   {pilih.size} tarikan dipilih · Kas Hadiran +{formatRupiahPlain(kasNaik)}
                 </p>
               </div>
@@ -397,7 +397,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                   <p className={`text-sm font-semibold truncate ${w.status_aktif ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400'}`}>
                     {w.nama}
                   </p>
-                  <p className="text-[11px] text-ink-faint dark:text-gray-400 flex items-center gap-2 mt-0.5">
+                  <p className="text-micro text-ink-faint dark:text-gray-400 flex items-center gap-2 mt-0.5">
                     {w.no_rumah && <span className="inline-flex items-center gap-0.5"><Home className="w-3 h-3" />{w.no_rumah}</span>}
                     {w.no_hp && <span className="inline-flex items-center gap-0.5"><Phone className="w-3 h-3" />{w.no_hp}</span>}
                   </p>

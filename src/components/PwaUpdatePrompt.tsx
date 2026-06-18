@@ -49,7 +49,7 @@ export default function PwaUpdatePrompt() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold leading-tight">Versi baru tersedia</p>
-          <p className="text-[11px] text-white/70">Muat ulang untuk pakai versi terbaru.</p>
+          <p className="text-micro text-white/70">Muat ulang untuk pakai versi terbaru.</p>
         </div>
         <button
           onClick={() => waiting.postMessage('SKIP_WAITING')}

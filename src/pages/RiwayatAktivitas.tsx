@@ -212,7 +212,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         ) : (
           grouped.map((grp) => (
             <div key={grp.hari} className="space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400 px-1 pt-1">{grp.hari}</p>
+              <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400 px-1 pt-1">{grp.hari}</p>
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
                 {grp.items.map((row, idx) => {
                   const v = formatAktivitas(row);
@@ -231,11 +231,11 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">{v.title}</p>
+                        <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{v.title}</p>
                         {v.detail && (
-                          <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5 break-words">{v.detail}</p>
+                          <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5 break-words">{v.detail}</p>
                         )}
-                        <p className="text-[11px] text-ink-faint dark:text-gray-400 mt-1">
+                        <p className="text-micro text-ink-faint dark:text-gray-400 mt-1">
                           {v.actor} · {formatWaktuRelatif(row.created_at)}
                         </p>
 
@@ -246,15 +246,15 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               <div className="flex items-start gap-2 bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 rounded-xl p-2.5">
                                 <Route className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                 <div className="min-w-0">
-                                  <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-0.5">Alur &amp; pencatatan</p>
-                                  <p className="text-[12px] leading-relaxed text-gray-600 dark:text-gray-300">{v.penjelasan}</p>
+                                  <p className="text-micro font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-0.5">Alur &amp; pencatatan</p>
+                                  <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">{v.penjelasan}</p>
                                 </div>
                               </div>
                             )}
                             {hasMore && (
                               <div className="space-y-1.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl p-2.5">
                                 {v.changes.map((c, i) => (
-                                  <div key={i} className="flex items-center gap-1.5 text-[11px] flex-wrap">
+                                  <div key={i} className="flex items-center gap-1.5 text-micro flex-wrap">
                                     <span className="text-ink-faint dark:text-gray-400 font-medium">{c.label}:</span>
                                     <span className="text-neg dark:text-rose-400 line-through">{c.from}</span>
                                     <ArrowRight className="w-3 h-3 text-gray-400" />
@@ -263,14 +263,14 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                                 ))}
                               </div>
                             )}
-                            <p className="text-[10px] text-ink-faint dark:text-gray-400 pl-0.5">{formatWaktu(row.created_at)}</p>
+                            <p className="text-micro text-ink-faint dark:text-gray-400 pl-0.5">{formatWaktu(row.created_at)}</p>
                           </div>
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-1.5 shrink-0">
                         {v.amount != null && v.amount !== 0 && (
-                          <span className={`text-[15px] font-bold tabular-nums ${
-                            v.accent === 'rose' ? 'text-neg' : v.accent === 'emerald' ? 'text-pos' : 'text-gray-700 dark:text-gray-300'
+                          <span className={`text-body font-bold tabular-nums ${
+                            v.accent === 'rose' ? 'text-neg dark:text-rose-400' : v.accent === 'emerald' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'
                           }`}>
                             {formatRupiahPlain(v.amount)}
                           </span>

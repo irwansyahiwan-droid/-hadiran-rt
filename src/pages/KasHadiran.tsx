@@ -388,7 +388,7 @@ export default function KasHadiranPage() {
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2">
                 <Wallet className="w-4 h-4 text-white/70" />
-                <p className="text-white/75 text-[10px] font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
+                <p className="text-white/75 text-micro font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
               </div>
               <div className="flex items-center -mr-2">
                 <button
@@ -465,7 +465,7 @@ export default function KasHadiranPage() {
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
             <span
-              className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 rounded-full text-white text-[10px] font-bold"
+              className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 rounded-full text-white text-micro font-bold"
               aria-label={`${tarikanSelesai.length} tarikan selesai`}
             >
               {tarikanSelesai.length}
@@ -569,7 +569,7 @@ export default function KasHadiranPage() {
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
-                          <span className="text-[10px] text-ink-faint dark:text-gray-400">{formatTanggal(t.tanggal)}</span>
+                          <span className="text-micro text-ink-faint dark:text-gray-400">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
                           <Tag tone="danger">{talanganInfo.count} belum bayar</Tag>
@@ -588,16 +588,16 @@ export default function KasHadiranPage() {
                           <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
-                          <span className="inline-flex items-center gap-1 mt-1 text-[11px] font-medium text-ink-faint dark:text-gray-400">
+                          <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">
                             Lihat detail
                             <ChevronRight className="w-3 h-3" />
                           </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-[17px] font-semibold tabular-nums text-pos dark:text-emerald-400">
+                          <p className="text-amount font-semibold tabular-nums text-pos dark:text-emerald-400">
                             +{formatRupiahPlain(sohibulTerima)}
                           </p>
-                          <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
+                          <span className="inline-block mt-0.5 px-2 py-0.5 text-micro font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
                             Dapat Arisan
                           </span>
                         </div>
@@ -627,7 +627,7 @@ export default function KasHadiranPage() {
                         <button
                           onClick={() => handlePendapatanPDF(t)}
                           disabled={pdfLoading === t.id}
-                          className="flex items-center gap-1.5 text-xs text-ink-sub dark:text-gray-400 font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1.5 min-h-[44px] text-xs text-ink-sub dark:text-gray-400 font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
                         >
                           <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
                           {pdfLoading === t.id ? 'Memuat...' : 'PDF Pendapatan'}
@@ -636,7 +636,7 @@ export default function KasHadiranPage() {
                           <button
                             onClick={() => handleBatalkanClick(t)}
                             disabled={processingId === t.id}
-                            className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+                            className={`flex items-center gap-1.5 min-h-[44px] text-xs font-medium transition-colors disabled:opacity-50 ${
                               confirmBatalId === t.id ? 'text-amber-600' : 'text-ink-sub dark:text-gray-400 hover:text-amber-600'
                             }`}
                           >
@@ -649,8 +649,8 @@ export default function KasHadiranPage() {
                             onClick={() => handleHapusClick(t)}
                             disabled={processingId === t.id}
                             aria-label="Hapus tarikan"
-                            className={`flex items-center gap-1 text-xs font-medium ml-auto transition-colors disabled:opacity-50 ${
-                              confirmHapusId === t.id ? 'text-red-600' : 'text-gray-300 hover:text-red-500'
+                            className={`flex items-center gap-1 min-h-[44px] text-xs font-medium ml-auto transition-colors disabled:opacity-50 ${
+                              confirmHapusId === t.id ? 'text-red-600' : 'text-ink-faint dark:text-gray-500 hover:text-red-500'
                             }`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -707,9 +707,9 @@ export default function KasHadiranPage() {
                 )}
               </div>
               <div className="flex gap-2 mt-3">
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">Hadir {detailHadir.length}</span>
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400">Belum bayar {detailTidak.filter((x) => !x.lunas).length}</span>
-                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">Lunas {detailTidak.filter((x) => x.lunas).length}</span>
+                <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">Hadir {detailHadir.length}</span>
+                <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400">Belum bayar {detailTidak.filter((x) => !x.lunas).length}</span>
+                <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">Lunas {detailTidak.filter((x) => x.lunas).length}</span>
               </div>
             </div>
 
@@ -744,7 +744,7 @@ export default function KasHadiranPage() {
                   {/* Rincian pendapatan real-time — angka sama dgn PDF Pendapatan */}
                   {(detailHadir.length > 0 || detailTidak.length > 0) && (
                     <div className="rounded-2xl border border-line dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 px-4 py-3.5">
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
                       <div className="space-y-1.5 text-sm">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × {formatRupiahPlain(SOHIBUL_PER)}</span>
@@ -752,7 +752,7 @@ export default function KasHadiranPage() {
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Potongan admin</span>
-                          <span className="font-semibold tabular-nums text-neg dark:text-red-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
+                          <span className="font-semibold tabular-nums text-neg dark:text-rose-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-line dark:border-gray-800">
                           <span className="font-bold text-ink dark:text-gray-100">Bersih diterima SB</span>
@@ -767,16 +767,16 @@ export default function KasHadiranPage() {
                   )}
                   {detailTidak.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Tidak Hadir / Talangan</p>
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Tidak Hadir / Talangan</p>
                       <div className="space-y-1">
                         {detailTidak.map((p) => (
                           <div key={p.id} className="flex items-center gap-2.5 py-1">
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</span>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400"><AlertTriangle className="w-3 h-3" />Belum bayar</span>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400"><AlertTriangle className="w-3 h-3" />Belum bayar</span>
                             )}
                           </div>
                         ))}
@@ -785,7 +785,7 @@ export default function KasHadiranPage() {
                   )}
                   {detailHadir.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Hadir ({detailHadir.length})</p>
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Hadir ({detailHadir.length})</p>
                       <div className="space-y-1">
                         {detailHadir.map((p) => (
                           <div key={p.id} className="flex items-center gap-2.5 py-1">

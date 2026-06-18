@@ -43,7 +43,7 @@ export default function DonutChart({
   const centerPct = active !== null ? Math.round((Math.max(0, data[active].value) / total) * 100) : null;
   // Font tengah adaptif: angka penuh (mis. Rp1.710.000) bisa panjang → kecilkan agar muat
   const centerStr = format(centerValue);
-  const centerSize = centerStr.length >= 12 ? 'text-[10px]' : centerStr.length >= 9 ? 'text-[12px]' : 'text-sm';
+  const centerSize = centerStr.length >= 12 ? 'text-micro' : centerStr.length >= 9 ? 'text-caption' : 'text-sm';
 
   return (
     <div className="flex items-center gap-5">
@@ -76,11 +76,11 @@ export default function DonutChart({
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 pointer-events-none">
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 truncate max-w-full">{centerLabel}</span>
+          <span className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 truncate max-w-full">{centerLabel}</span>
           <span className={`${centerSize} font-bold tabular-nums leading-tight whitespace-nowrap text-gray-900 dark:text-gray-100`} style={centerColor ? { color: centerColor } : undefined}>{centerStr}</span>
           {centerPct !== null && (
             <span
-              className="pop mt-1 px-1.5 py-px rounded-full text-[10px] font-bold tabular-nums leading-none"
+              className="pop mt-1 px-1.5 py-px rounded-full text-micro font-bold tabular-nums leading-none"
               style={{ color: centerColor, background: `${centerColor}1A` }}
             >
               {centerPct}% dari total

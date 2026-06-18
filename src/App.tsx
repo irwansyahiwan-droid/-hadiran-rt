@@ -13,7 +13,7 @@ import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import InstallPrompt from './components/InstallPrompt';
 import Toaster from './components/Toaster';
 import type { TabName } from './components/layout/BottomNav';
-import logoRT from './assets/logo-rt.jpg';
+import logoRT from './assets/logo-rt.svg';
 
 // Code-splitting per halaman → first load ringan di HP warga; tiap tab/overlay
 // memuat chunk-nya sendiri saat dibutuhkan (vite:preloadError di main.tsx

@@ -17,23 +17,23 @@ interface Props {
 function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number; keluar: number; saldo: number }) {
   return (
     <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-3">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">{judul}</p>
+      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">{judul}</p>
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[13px]">
+        <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-500" /> Masuk
           </span>
           <span className="font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
         </div>
-        <div className="flex items-center justify-between text-[13px]">
+        <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <ArrowUpRight className="w-3.5 h-3.5 text-rose-500" /> Keluar
           </span>
-          <span className="font-semibold text-neg tabular-nums">{formatRupiahPlain(keluar)}</span>
+          <span className="font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
         </div>
-        <div className="flex items-center justify-between text-[13px] pt-1.5 border-t border-control dark:border-gray-700">
+        <div className="flex items-center justify-between text-caption pt-1.5 border-t border-control dark:border-gray-700">
           <span className="font-semibold text-gray-700 dark:text-gray-300">Saldo akhir</span>
-          <span className={`font-bold tabular-nums ${saldo < 0 ? 'text-neg' : 'text-gray-900 dark:text-gray-100'}`}>
+          <span className={`font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}
           </span>
         </div>
@@ -162,23 +162,23 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           <div className="rise hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
             <div className="relative flex items-center gap-2 mb-2.5">
               <CalendarCheck className="w-4 h-4 text-emerald-200" strokeWidth={2.2} />
-              <p className="text-[11px] font-bold uppercase text-white/85" style={{ letterSpacing: '0.14em' }}>
+              <p className="text-micro font-bold uppercase text-white/85" style={{ letterSpacing: '0.14em' }}>
                 Tutup Buku Sekarang
               </p>
             </div>
-            <p className="relative text-[11px] text-white/65 mb-1">Total Kas RT · {snap.tanggal}</p>
+            <p className="relative text-micro text-white/65 mb-1">Total Kas RT · {snap.tanggal}</p>
             <span className="relative block text-white text-[34px] font-black tracking-tighter leading-none tabular-nums mb-3">
               {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
 
             <div className="relative grid grid-cols-2 gap-2 mb-3.5">
               <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-[10px] text-white/60 uppercase tracking-wide">Kas RT (final)</p>
-                <p className="text-[14px] font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
+                <p className="text-micro text-white/60 uppercase tracking-wide">Kas RT (final)</p>
+                <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-[10px] text-white/60 uppercase tracking-wide">Hadiran · belum disetor</p>
-                <p className="text-[14px] font-bold text-white/90 tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
+                <p className="text-micro text-white/60 uppercase tracking-wide">Hadiran · belum disetor</p>
+                <p className="text-body font-bold text-white/90 tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
               </div>
             </div>
 
@@ -225,11 +225,11 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
             >
               <div className="flex items-end justify-between gap-2">
                 <div>
-                  <p className="text-[15px] font-bold text-gray-900 dark:text-gray-100">{r.label}</p>
+                  <p className="text-body font-bold text-gray-900 dark:text-gray-100">{r.label}</p>
                   <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{r.rentang}</p>
                 </div>
                 {idx === 0 && (
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <span className="text-micro font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                     Terbaru
                   </span>
                 )}
@@ -240,7 +240,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 <Ledger judul="Kas RT" masuk={r.rtMasuk} keluar={r.rtKeluar} saldo={r.rtSaldoAkhir} />
               </div>
 
-              <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-micro text-gray-500 dark:text-gray-400">
                 <span className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">{r.tarikanSelesai} tarikan</span>
                 <span className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">{r.talanganLunas} talangan lunas</span>
                 <span className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">{r.jumlahTransaksi} transaksi</span>

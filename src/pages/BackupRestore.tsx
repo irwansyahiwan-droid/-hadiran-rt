@@ -112,7 +112,7 @@ export default function BackupRestore({ open, onClose }: Props) {
           {lastBackup && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {lastBackup.map((r) => (
-                <span key={r.table} className="text-[11px] px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                <span key={r.table} className="text-micro px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                   {r.table}: {r.count}
                 </span>
               ))}
@@ -149,7 +149,7 @@ export default function BackupRestore({ open, onClose }: Props) {
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {ringkasBackup(pending).map((r) => (
-                  <span key={r.table} className="text-[11px] px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                  <span key={r.table} className="text-micro px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                     {r.table}: {r.count}
                   </span>
                 ))}

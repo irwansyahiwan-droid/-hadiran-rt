@@ -140,7 +140,7 @@ export default function JadwalWargaPage() {
       {lastTarikan ? (
         <div className="hero-card hero-noise">
           <div className="relative p-5 space-y-3">
-            <p className="text-emerald-200 text-[10px] font-bold uppercase tracking-widest">
+            <p className="text-emerald-200 text-micro font-bold uppercase tracking-widest">
               Tarikan Terakhir
             </p>
             <div>
@@ -168,13 +168,13 @@ export default function JadwalWargaPage() {
 
             {/* Badges */}
             <div className="flex gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
                 <Check className="w-3 h-3" strokeWidth={2.5} /> {hadirCount} Hadir
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
                 <X className="w-3 h-3" strokeWidth={2.5} /> {tidakHadirCount} Tidak Hadir
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
                 <Coins className="w-3 h-3" /> {formatRupiahPlain(iuranTerkumpul)}
               </span>
             </div>
@@ -223,7 +223,7 @@ export default function JadwalWargaPage() {
             ].map(s => (
               <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
                 <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
-                <p className="text-[9px] text-ink-faint dark:text-gray-400 mt-0.5">{s.label}</p>
+                <p className="text-micro text-ink-faint dark:text-gray-400 mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -259,12 +259,12 @@ export default function JadwalWargaPage() {
                     }`}
                   >
                     {/* No */}
-                    <span className="text-[11px] text-ink-faint dark:text-gray-400 font-medium w-5 shrink-0 text-right">
+                    <span className="text-micro text-ink-faint dark:text-gray-400 font-medium w-5 shrink-0 text-right">
                       {idx + 1}
                     </span>
                     {/* Avatar */}
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                      isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/25 text-red-400 dark:text-red-400'
+                      isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/25 text-red-600 dark:text-red-400'
                     }`}>
                       {w.nama.charAt(0)}
                     </div>
@@ -272,7 +272,7 @@ export default function JadwalWargaPage() {
                     <p className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
                     {/* Badge */}
                     {lastTarikan ? (
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 ${
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-micro font-semibold border shrink-0 ${
                         isHadir
                           ? 'bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50'
                           : 'bg-red-50 dark:bg-red-900/25 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50'
@@ -281,7 +281,7 @@ export default function JadwalWargaPage() {
                         {isHadir ? 'Hadir' : 'Tidak'}
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border bg-gray-50 dark:bg-gray-800 text-ink-faint dark:text-gray-400 border-control dark:border-gray-700 shrink-0">
+                      <span className="px-2.5 py-0.5 rounded-full text-micro font-semibold border bg-gray-50 dark:bg-gray-800 text-ink-faint dark:text-gray-400 border-control dark:border-gray-700 shrink-0">
                         —
                       </span>
                     )}
@@ -313,15 +313,15 @@ export default function JadwalWargaPage() {
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-bold text-gray-500">{selesaiCount}</p>
-              <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
+              <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{terjadwalCount}</p>
-              <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Terjadwal</p>
+              <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Terjadwal</p>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
               <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{allTarikan.length}</p>
-              <p className="text-[10px] text-ink-faint dark:text-gray-400 font-medium">Total</p>
+              <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Total</p>
             </div>
           </div>
 
@@ -361,7 +361,7 @@ export default function JadwalWargaPage() {
                     </div>
 
                     {/* Status */}
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold rounded-full border shrink-0 ${
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-micro font-semibold rounded-full border shrink-0 ${
                       isSelesai
                         ? 'text-gray-400 bg-gray-50 dark:bg-gray-800 border-control dark:border-gray-700'
                         : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/25 border-emerald-200 dark:border-emerald-800/50'

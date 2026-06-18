@@ -127,7 +127,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/40'}`}>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
-                <span className={`font-bold ${saldoPreview < 0 ? 'text-neg dark:text-red-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                <span className={`font-bold ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
                   {formatRupiahPlain(Math.abs(saldoPreview))}
                 </span>
               </p>
@@ -425,14 +425,14 @@ export default function KasRTPage() {
               <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
-                  <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Masuk</p>
+                  <p className="text-teal-100 text-micro font-semibold uppercase tracking-wide">Total Masuk</p>
                 </div>
                 <p className="text-sm font-bold text-white">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-red-300" />
-                  <p className="text-teal-100 text-[9px] font-semibold uppercase tracking-wide">Total Keluar</p>
+                  <p className="text-teal-100 text-micro font-semibold uppercase tracking-wide">Total Keluar</p>
                 </div>
                 <p className="text-sm font-bold text-white">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</p>
               </div>
@@ -464,7 +464,7 @@ export default function KasRTPage() {
                       <button
                         key={p}
                         onClick={() => setChartPeriod(p)}
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors ${
+                        className={`px-2 py-0.5 rounded-md text-micro font-bold transition-colors ${
                           chartPeriod === p ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}
                       >
@@ -473,7 +473,7 @@ export default function KasRTPage() {
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-[10px] font-medium mb-2">
+                <div className="flex items-center gap-2 text-micro font-medium mb-2">
                   <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-500" />Masuk</span>
                   <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-rose-400" />Keluar</span>
                 </div>
@@ -558,14 +558,14 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">
+                    <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
-                    <p className="text-[12px] font-medium text-ink-faint dark:text-gray-400 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
+                    <p className="text-caption font-medium text-ink-faint dark:text-gray-400 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-[17px] font-bold tabular-nums ${isMasuk ? 'text-pos' : 'text-neg'}`}>
+                    <p className={`text-amount font-bold tabular-nums ${isMasuk ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                       {maskRp(`${isMasuk ? '+' : '-'}${formatRupiahPlain(k.nominal)}`, hidden, 4)}
                     </p>
                     <p className={`text-xs font-medium tabular-nums mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
@@ -608,13 +608,13 @@ export default function KasRTPage() {
             <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-2.5 mt-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Tipe</span>
-                <span className={`text-sm font-semibold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-red-400'}`}>
+                <span className={`text-sm font-semibold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                   {selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Nominal</span>
-                <span className={`text-base font-bold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-red-400'}`}>
+                <span className={`text-base font-bold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                   {maskRp(`${selectedRow.tipe === 'masuk' ? '+' : '-'}${formatRupiahPlain(selectedRow.nominal)}`, hidden, 4)}
                 </span>
               </div>

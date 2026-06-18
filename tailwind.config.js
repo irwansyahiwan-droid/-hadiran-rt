@@ -8,6 +8,17 @@ export default {
         // Display = Sora (judul & nominal hero). Body default tetap Inter (di body CSS).
         display: ['Sora Variable', 'Sora', 'Inter Variable', 'system-ui', 'sans-serif'],
       },
+      /* ── Type ramp ringkas (mobile) ────────────────────────────────
+         Ganti 8 micro-step arbitrary (text-[9px]..text-[17px]) jadi 4 langkah
+         bermakna. Nilai = font-size SAJA (tanpa line-height) → utility leading-*
+         yang sudah ada tetap menang, tidak ada drift baris. Heading tetap pakai
+         skala Tailwind (lg/xl/2xl/5xl). Migrasi bertahap per layar. */
+      fontSize: {
+        micro:   '0.6875rem', // 11px — badge kecil, nomor, label uppercase mungil (serap 9/10/11)
+        caption: '0.8125rem', // 13px — tanggal, caption, teks sekunder (serap 12/13)
+        body:    '0.9375rem', // 15px — body utama list/baris (serap 14/15)
+        amount:  '1.0625rem', // 17px — nominal menonjol
+      },
       colors: {
         /* ── Brand hijau (sumber: hero gradient di index.css) ──────────
            JANGAN ganti ke navy/gold. Lihat memory design-system. */

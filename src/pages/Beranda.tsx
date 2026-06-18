@@ -202,10 +202,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Sapaan + badge status kas */}
       <div className="flex items-end justify-between px-1">
         <div>
-          <p className="text-[13px] text-ink-faint dark:text-gray-400">{greeting},</p>
+          <p className="text-caption text-ink-faint dark:text-gray-400">{greeting},</p>
           <h1 className="text-xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
         </div>
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${kasStatus.bg} ${kasStatus.text}`}>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-micro font-bold ${kasStatus.bg} ${kasStatus.text}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${kasStatus.dot}`} />
           {kasStatus.label}
         </span>
@@ -234,7 +234,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
             <p
-              className="text-[12px] font-semibold uppercase text-white/[0.85]"
+              className="text-caption font-semibold uppercase text-white/[0.85]"
               style={{ letterSpacing: '0.16em' }}
             >
               Pendapatan Kas Hadiran
@@ -271,7 +271,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
 
         {/* Sub-text */}
-        <p className="relative text-[13px] text-white/90 mb-3.5">
+        <p className="relative text-caption text-white/90 mb-3.5">
           Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
           {lastDelta > 0 && (
             <span className="inline-flex items-center gap-0.5 ml-1.5 font-semibold text-emerald-200/90 align-middle">
@@ -291,8 +291,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
             <Wallet className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/90 mt-1.5">Saldo Aktif</span>
-            <span className={`text-[15px] font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+            <span className="text-micro text-white/90 mt-1.5">Saldo Aktif</span>
+            <span className={`text-body font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 4)}
             </span>
           </button>
@@ -301,16 +301,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
             <ArrowLeftRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/90 mt-1.5">Talangan</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
+            <span className="text-micro text-white/90 mt-1.5">Talangan</span>
+            <span className="text-body font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
           <button
             onClick={() => onNavigate('kas-rt')}
             className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
             <ArrowUpRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-[11px] text-white/90 mt-1.5">Setor Kas RT</span>
-            <span className="text-[15px] font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
+            <span className="text-micro text-white/90 mt-1.5">Setor Kas RT</span>
+            <span className="text-body font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
         </div>
       </div>
@@ -371,7 +371,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
             {jadwalList.length > 0 && (
-              <span className="text-[11px] font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{jadwalList.length}</span>
+              <span className="text-micro font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{jadwalList.length}</span>
             )}
           </div>
           <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
@@ -388,16 +388,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
                   <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-micro font-bold rounded-full flex items-center justify-center shadow-sm">
                     {j.nomor}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
+                    <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
                     <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
                   </div>
-                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
               </div>
             ))
@@ -411,7 +411,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold text-ink dark:text-gray-100">Transaksi Terakhir</h2>
             {trxItems.length > 0 && (
-              <span className="text-[11px] font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{trxItems.length}</span>
+              <span className="text-micro font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{trxItems.length}</span>
             )}
           </div>
           <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
@@ -462,7 +462,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-                className={`rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 active:scale-[0.98] transition-all ${idx < displayTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
+                className={`press rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < displayTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
               >
                 <div className={`w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
                   {trx.tipe === 'setor'
@@ -471,13 +471,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-semibold text-ink dark:text-gray-100 leading-snug break-words">{trx.keterangan}</p>
-                  <p className="text-[12px] font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
+                  <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{trx.keterangan}</p>
+                  <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
                   <p className={`text-xs font-medium tabular-nums ${trx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
                     Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
                   </p>
                 </div>
-                <span className={`font-display text-[17px] font-bold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
+                <span className={`font-display text-amount font-bold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
                   {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
                 </span>
               </button>
@@ -504,12 +504,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               : <ArrowDownLeft className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />}
           </div>
-          <p className="text-[15px] font-medium text-gray-900 dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
+          <p className="text-body font-medium text-gray-900 dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
           <p className="text-xs text-ink-faint mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
           <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">Jumlah</span>
-              <span className={`font-display text-[17px] font-bold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg' : 'text-pos'}`}>
+              <span className={`font-display text-amount font-bold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
                 {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>

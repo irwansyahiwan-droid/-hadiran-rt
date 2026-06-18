@@ -71,7 +71,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
                   strokeWidth={isActive ? 2.4 : 2}
                 />
               </span>
-              <span className={`text-[11px] leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}>
+              <span className={`text-micro leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}>
                 {label}
               </span>
             </button>

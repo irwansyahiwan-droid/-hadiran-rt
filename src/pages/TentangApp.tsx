@@ -2,7 +2,7 @@ import { ArrowLeft, BookOpen, Coins, Users, Link2, Heart } from 'lucide-react';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { haptic } from '../lib/utils';
 import AvatarPeci from '../components/AvatarPeci';
-import logoRt from '../assets/logo-rt.jpg';
+import logoRt from '../assets/logo-rt.svg';
 
 interface Props {
   open: boolean;
@@ -72,12 +72,12 @@ export default function TentangApp({ open, onClose }: Props) {
         <div className="text-center pt-2 pb-1">
           <img src={logoRt} alt="Logo RT 004/006" className="w-20 h-20 rounded-3xl object-cover mx-auto mb-3 shadow-xl shadow-emerald-300/40 ring-1 ring-white/60" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Hadiran RT</h2>
-          <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">RT 004/006 · Tanah Baru Beji · Depok</p>
+          <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5">RT 004/006 · Tanah Baru Beji · Depok</p>
         </div>
 
         {/* Tentang */}
         <Section icon={BookOpen} title="TENTANG APLIKASI">
-          <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300">
+          <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
             Aplikasi Hadiran RT 004/006 adalah sistem digital untuk mengelola iuran tarikan bergilir antar warga
             (sistem <b>Sohibul Bait</b>), kas hadiran, talangan anggota, serta sinkronisasi setoran ke Kas Besar RT 004/006.
             Tujuannya: <b>transparansi penuh</b> bagi seluruh warga &amp; <b>kemudahan kerja Bendahara</b>.
@@ -90,7 +90,7 @@ export default function TentangApp({ open, onClose }: Props) {
             {IURAN.map((i) => (
               <li key={i.b} className="flex gap-2.5">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{i.b}:</b> {i.t}
                 </p>
               </li>
@@ -105,7 +105,7 @@ export default function TentangApp({ open, onClose }: Props) {
               <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-2.5">
                 <AvatarPeci nama={p.nama} className="w-10 h-10 rounded-xl" />
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>
+                  <p className="text-micro font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{p.nama}</p>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default function TentangApp({ open, onClose }: Props) {
             {SUMBER.map((s) => (
               <li key={s.b} className="flex gap-2.5">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                <p className="text-[13px] leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{s.b}:</b> {s.t}
                 </p>
               </li>
@@ -129,8 +129,8 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Footer */}
         <div className="text-center pt-2 pb-1 space-y-1.5">
-          <p className="text-[11px] text-ink-faint dark:text-gray-400">© 2026 RT 004/006 Tanah Baru, Beji, Kota Depok</p>
-          <p className="text-[12px] text-gray-500 dark:text-gray-400 inline-flex items-center justify-center gap-1">
+          <p className="text-micro text-ink-faint dark:text-gray-400">© 2026 RT 004/006 Tanah Baru, Beji, Kota Depok</p>
+          <p className="text-caption text-gray-500 dark:text-gray-400 inline-flex items-center justify-center gap-1">
             Dibuat oleh <b className="text-gray-700 dark:text-gray-200">Irwansyah (Bendahara)</b>, untuk warga
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
           </p>
