@@ -12,6 +12,7 @@ import PullToRefresh from './components/PullToRefresh';
 import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import InstallPrompt from './components/InstallPrompt';
 import Toaster from './components/Toaster';
+import WelcomeSheet from './components/WelcomeSheet';
 import type { TabName } from './components/layout/BottomNav';
 import logoRT from './assets/logo-rt.svg';
 
@@ -174,6 +175,8 @@ export default function App() {
         {/* Banner pasang app (Android prompt / panduan iOS) */}
         <InstallPrompt />
         <Toaster />
+        {/* Sambutan orientasi sekali-lihat (warga baru) — self-gate via localStorage */}
+        <WelcomeSheet />
         {/* Overlay bendahara/umum — chunk dimuat saat pertama dibuka (gate by state).
             Tiap overlay return null saat !open, jadi mount-on-open setara perilaku. */}
         <Suspense fallback={null}>

@@ -7,6 +7,7 @@ import { formatTanggalShort, formatRupiahPlain, haptic, maskRp } from '../lib/ut
 import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import SectionTitle from '../components/SectionTitle';
+import InfoTip from '../components/InfoTip';
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
 import FilterChips from '../components/FilterChips';
@@ -341,8 +342,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
           <div className="relative p-5">
             <div className="flex items-center justify-between gap-2 mb-1">
-              <p className="text-emerald-300 text-micro font-bold uppercase tracking-widest">
+              <p className="inline-flex items-center gap-1 text-emerald-300 text-micro font-bold uppercase tracking-widest">
                 Total Talangan Belum Lunas
+                <InfoTip label="Talangan" tone="onDark">
+                  Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
+                </InfoTip>
               </p>
               <button
                 onClick={() => { haptic(); toggleHideAmount(); }}

@@ -5,6 +5,7 @@ import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import type { Tarikan, Warga } from '../lib/types';
 import Tag from '../components/Tag';
+import InfoTip from '../components/InfoTip';
 
 type SubTab = 'anggota' | 'jadwal';
 
@@ -149,7 +150,11 @@ export default function JadwalWargaPage() {
                 Tarikan ke-{lastTarikan.nomor} · {formatTanggal(lastTarikan.tanggal)}
               </p>
               <p className="text-emerald-200 text-sm mt-0.5">
-                Sohibul Bait: {lastTarikan.sohibul_bait?.nama ?? '—'}
+                Sohibul Bait
+                <InfoTip label="Sohibul Bait" tone="onDark" className="mx-1">
+                  Anggota yang menerima seluruh hasil tarikan pada giliran ini (penerima arisan).
+                </InfoTip>
+                : {lastTarikan.sohibul_bait?.nama ?? '—'}
               </p>
             </div>
 
