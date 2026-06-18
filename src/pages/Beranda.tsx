@@ -247,8 +247,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
             >
               {hidden
-                ? <EyeOff className="w-3.5 h-3.5 text-white/65" />
-                : <Eye className="w-3.5 h-3.5 text-white/65" />}
+                ? <EyeOff className="w-[18px] h-[18px] text-white/65" />
+                : <Eye className="w-[18px] h-[18px] text-white/65" />}
             </button>
             <button
               onClick={() => load(true)}
@@ -256,7 +256,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
               aria-label="Muat ulang"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-white/65 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-[18px] h-[18px] text-white/65 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
