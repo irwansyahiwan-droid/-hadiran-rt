@@ -786,7 +786,7 @@ export default function JadwalPage() {
           {isBendahara && (
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
-              className="btn-brand flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-xl active:scale-95 transition-all"
+              className="btn-brand flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-xl active:scale-[0.97] transition-all"
             >
               <Plus className="w-4 h-4" /> Tarikan
             </button>
@@ -802,7 +802,7 @@ export default function JadwalPage() {
                   showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
                 }
               }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all"
             >
               <FileText className="w-4 h-4" /> PDF
             </button>
