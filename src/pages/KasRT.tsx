@@ -627,7 +627,7 @@ export default function KasRTPage() {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => { setEditing(selectedRow); setSelectedRow(null); setShowModal(true); }}
-                className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold"
+                className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 text-sm font-bold"
               >
                 <Pencil className="w-4 h-4" /> Edit
               </button>

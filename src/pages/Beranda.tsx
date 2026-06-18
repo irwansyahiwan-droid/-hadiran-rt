@@ -15,6 +15,7 @@ import PengumumanBanner from '../components/PengumumanBanner';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
+import SectionTitle from '../components/SectionTitle';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 
 
@@ -364,18 +365,17 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Jadwal Berikutnya */}
       <div>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-ink dark:text-gray-100">Jadwal Berikutnya</h2>
-            {jadwalList.length > 0 && (
-              <span className="text-micro font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{jadwalList.length}</span>
-            )}
-          </div>
-          <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
-            Lihat semua
-            <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
-          </button>
-        </div>
+        <SectionTitle
+          count={jadwalList.length}
+          action={
+            <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
+              Lihat semua
+              <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
+            </button>
+          }
+        >
+          Jadwal Berikutnya
+        </SectionTitle>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {jadwalList.length === 0 ? (
             <EmptyState icon={CalendarDays} title="Belum ada jadwal" subtitle="Jadwal tarikan berikutnya akan tampil di sini." />
@@ -404,18 +404,17 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Transaksi Terakhir */}
       <div>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-ink dark:text-gray-100">Transaksi Terakhir</h2>
-            {trxItems.length > 0 && (
-              <span className="text-micro font-bold text-ink-faint dark:text-gray-500 tabular-nums bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-0.5">{trxItems.length}</span>
-            )}
-          </div>
-          <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
-            Lihat semua
-            <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
-          </button>
-        </div>
+        <SectionTitle
+          count={trxItems.length}
+          action={
+            <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
+              Lihat semua
+              <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
+            </button>
+          }
+        >
+          Transaksi Terakhir
+        </SectionTitle>
         {trxItems.length > 0 && (
           <div className="space-y-2 mb-3">
           {/* Search + filter + sort */}

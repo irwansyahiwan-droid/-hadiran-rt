@@ -317,7 +317,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || deleting || uploading}
-            className="btn-brand flex-1 py-3 rounded-full text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan...' : 'Simpan'}

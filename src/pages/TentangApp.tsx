@@ -138,7 +138,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         <button
           onClick={() => { haptic(); onClose(); }}
-          className="btn-brand w-full min-h-[44px] py-3 rounded-2xl font-semibold text-sm"
+          className="btn-brand w-full min-h-[44px] py-3 font-semibold text-sm"
         >
           Tutup
         </button>

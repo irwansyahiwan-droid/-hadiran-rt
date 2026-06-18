@@ -250,7 +250,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 <button
                   onClick={() => bagikan(r.key, triwulanToCard(r))}
                   disabled={sharingKey !== null}
-                  className="press btn-brand flex-1 min-h-[44px] py-3 rounded-2xl text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+                  className="press btn-brand flex-1 min-h-[44px] py-3 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   {sharingKey === r.key ? (
                     <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan…</>

@@ -105,7 +105,7 @@ export default function BackupRestore({ open, onClose }: Props) {
           <button
             onClick={handleBackup}
             disabled={backingUp}
-            className="btn-brand w-full min-h-[44px] py-3 rounded-2xl font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2"
+            className="btn-brand w-full min-h-[44px] py-3 font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {backingUp ? <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan...</> : <><Download className="w-4 h-4" /> Unduh Backup Sekarang</>}
           </button>
