@@ -166,7 +166,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
               placeholder="Contoh: Dana HUT RI 17 Agustus"
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
+              className="field"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -180,7 +180,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
                   value={nominal ? nominal.toLocaleString('id-ID') : ''}
                   onChange={(e) => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)}
                   required
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
+                  className="field pl-9 pr-3"
                 />
               </div>
             </div>
@@ -190,7 +190,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
                 type="date"
                 value={tanggal}
                 onChange={(e) => setTanggal(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
+                className="field"
               />
             </div>
           </div>

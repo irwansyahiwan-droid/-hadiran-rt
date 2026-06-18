@@ -61,7 +61,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
             <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
             <input type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
               placeholder="Setoran bulan Mei 2026"
-              className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500" />
+              className="field" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -70,13 +70,13 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                 <input type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
                   onChange={e => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)} required
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500" />
+                  className="field pl-9 pr-3" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
               <input type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
-                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500" />
+                className="field" />
             </div>
           </div>
           <div className="flex gap-3 pt-1">
@@ -712,9 +712,9 @@ export default function KasHadiranPage() {
                 )}
               </div>
               <div className="flex gap-2 mt-3">
-                <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400">Hadir {detailHadir.length}</span>
-                <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400">Belum bayar {detailTidak.filter((x) => !x.lunas).length}</span>
-                <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">Lunas {detailTidak.filter((x) => x.lunas).length}</span>
+                <Tag tone="success">Hadir {detailHadir.length}</Tag>
+                <Tag tone="danger">Belum bayar {detailTidak.filter((x) => !x.lunas).length}</Tag>
+                <Tag tone="neutral">Lunas {detailTidak.filter((x) => x.lunas).length}</Tag>
               </div>
             </div>
 
@@ -779,9 +779,9 @@ export default function KasHadiranPage() {
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold bg-emerald-50 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-400"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</span>
+                              <Tag tone="success"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</Tag>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400"><AlertTriangle className="w-3 h-3" />Belum bayar</span>
+                              <Tag tone="danger"><AlertTriangle className="w-3 h-3" />Belum bayar</Tag>
                             )}
                           </div>
                         ))}

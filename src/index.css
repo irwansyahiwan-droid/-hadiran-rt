@@ -280,6 +280,31 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
     transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease;
   }
   .btn-brand:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 6px 16px -8px rgba(16,150,80,0.5); }
+
+  /* ── Field recipes ───────────────────────────────────────────────────
+     SATU sumber tinggi/warna/fokus field. `.field` = input form (bg-gray-50,
+     py-3); `.field-search` = bilah cari di halaman list (bg-white, py-2.5).
+     Padding horizontal default ada di sini; input ber-ikon meng-override
+     padding kiri/kanan di call-site (utilities layer menang). */
+  .field {
+    @apply w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800
+           border border-control dark:border-gray-700
+           text-sm text-gray-900 dark:text-gray-100
+           placeholder-gray-400 dark:placeholder-gray-500;
+  }
+  .field-search {
+    @apply w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900
+           border border-control dark:border-gray-700
+           text-sm dark:text-gray-100
+           placeholder-gray-400 dark:placeholder-gray-500;
+  }
+  /* Fokus: setara ring-2 emerald + border-emerald-500. Ditulis raw CSS
+     karena directive Tailwind tidak menerima opacity-modifier slash. */
+  .field:focus, .field-search:focus {
+    outline: none;
+    border-color: #10B981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.30);
+  }
 }
 
 /* Sheen + kedalaman untuk kartu hero gradient (Saldo). Satu sumber cahaya

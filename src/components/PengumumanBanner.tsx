@@ -233,7 +233,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           value={judul}
           onChange={e => setJudul(e.target.value)}
           placeholder="mis. Kerja Bakti Minggu Pagi"
-          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 mb-4"
+          className="field mb-4"
         />
 
         <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Isi</label>
@@ -242,7 +242,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
           onChange={e => setIsi(e.target.value)}
           rows={3}
           placeholder="Tulis detail pengumuman di sini..."
-          className="w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 mb-4 resize-none"
+          className="field mb-4 resize-none"
         />
 
         <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Foto / Video (opsional)</label>
