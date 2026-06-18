@@ -1,0 +1,4 @@
+# Aplikasi internal warga RT 004/006 — bukan situs publik.
+# Larang semua crawler agar nama warga & data kas tidak terindeks.
+User-agent: *
+Disallow: /
