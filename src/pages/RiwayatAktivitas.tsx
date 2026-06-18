@@ -256,9 +256,9 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                                 {v.changes.map((c, i) => (
                                   <div key={i} className="flex items-center gap-1.5 text-[11px] flex-wrap">
                                     <span className="text-ink-faint dark:text-gray-400 font-medium">{c.label}:</span>
-                                    <span className="text-rose-500 dark:text-rose-400 line-through">{c.from}</span>
+                                    <span className="text-neg dark:text-rose-400 line-through">{c.from}</span>
                                     <ArrowRight className="w-3 h-3 text-gray-400" />
-                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{c.to}</span>
+                                    <span className="text-pos dark:text-emerald-400 font-semibold">{c.to}</span>
                                   </div>
                                 ))}
                               </div>
