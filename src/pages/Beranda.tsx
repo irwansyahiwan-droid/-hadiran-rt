@@ -237,7 +237,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               className="text-caption font-semibold uppercase text-white/[0.85]"
               style={{ letterSpacing: '0.16em' }}
             >
-              Pendapatan Kas Hadiran
+              Saldo Kas Hadiran
             </p>
           </div>
           <div className="flex items-center -mr-2">
@@ -263,16 +263,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
         {/* Big amount — ukuran konsisten dengan hero Kas RT */}
         <div className="relative mb-1">
-          <span className="font-display block text-white text-5xl font-extrabold tracking-tighter leading-none tabular-nums">
+          <span className={`font-display block text-5xl font-extrabold tracking-tighter leading-none tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
             {hidden
-              ? maskRp(`Rp${animatedKasHadiran.toLocaleString('id-ID')}`, hidden, 7)
-              : <Odometer value={animatedKasHadiran} />}
+              ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+              : <Odometer value={animatedSaldo} />}
           </span>
         </div>
 
         {/* Sub-text */}
         <p className="relative text-caption text-white/90 mb-3.5">
-          Total iuran terkumpul · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
+          Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
           {lastDelta > 0 && (
             <span className="inline-flex items-center gap-0.5 ml-1.5 font-semibold text-emerald-200/90 align-middle">
               <TrendingUp className="w-3 h-3" strokeWidth={2.5} />
@@ -291,9 +291,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
           >
             <Wallet className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-micro text-white/90 mt-1.5">Saldo Aktif</span>
-            <span className={`text-body font-bold mt-0.5 whitespace-nowrap tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-              {maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 4)}
+            <span className="text-micro text-white/90 mt-1.5">Terkumpul</span>
+            <span className="text-body font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">
+              {maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}
             </span>
           </button>
           <button
