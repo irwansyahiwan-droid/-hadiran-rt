@@ -196,9 +196,6 @@ export default function KasHadiranPage() {
     return arr;
   }, [tarikanSelesai, talanganMap, hadiranFilter, hadiranSort]);
 
-  const hadiranSortLabel = hadiranSort === 'terbaru' ? 'Terbaru' : hadiranSort === 'terlama' ? 'Terlama' : 'Kas';
-  const cycleHadiranSort = () =>
-    setHadiranSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'kas' : 'terbaru'));
 
   // Setor per tarikan — untuk kolom SETOR di PDF
   const setorMap = transaksi
@@ -519,7 +516,15 @@ export default function KasHadiranPage() {
                 ] as const}
                 value={hadiranFilter}
                 onChange={setHadiranFilter}
-                sort={{ label: hadiranSortLabel, onCycle: cycleHadiranSort }}
+                sort={{
+                  value: hadiranSort,
+                  options: [
+                    { id: 'terbaru', label: 'Terbaru' },
+                    { id: 'terlama', label: 'Terlama' },
+                    { id: 'kas', label: 'Kas' },
+                  ] as const,
+                  onChange: setHadiranSort,
+                }}
               />
             )}
 

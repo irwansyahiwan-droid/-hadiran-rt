@@ -45,8 +45,8 @@ export default function PengumumanBanner({ canManage }: Props) {
       {/* Banner untuk semua warga (saat aktif) */}
       {tampil && (
         <div
-          className="ann-in ann-glow ann-sheen relative overflow-hidden rounded-3xl px-5 py-4 text-white"
-          style={{ background: style.grad, ['--ann-glow' as string]: style.glow }}
+          className="ann-in relative overflow-hidden rounded-3xl px-5 py-4 text-white"
+          style={{ background: style.grad }}
         >
           {data!.media_url && data!.media_tipe === 'foto' && (
             <img
@@ -67,7 +67,7 @@ export default function PengumumanBanner({ canManage }: Props) {
           )}
           <div className="relative z-[2] flex items-start gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-              <Icon className="w-5 h-5 ann-wiggle" strokeWidth={2.2} />
+              <Icon className="w-5 h-5" strokeWidth={2.2} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-micro font-bold uppercase tracking-[0.16em] text-white/75">
@@ -208,8 +208,8 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
 
         {/* Pratinjau langsung */}
         <div
-          className="ann-glow ann-sheen relative overflow-hidden rounded-2xl px-4 py-3 text-white mb-4"
-          style={{ background: style.grad, ['--ann-glow' as string]: style.glow }}
+          className="relative overflow-hidden rounded-2xl px-4 py-3 text-white mb-4"
+          style={{ background: style.grad }}
         >
           {mediaUrl && mediaTipe === 'video' ? (
             <video src={mediaUrl} className="relative z-[2] w-full max-h-40 rounded-xl mb-2.5 bg-black" controls playsInline preload="metadata" />

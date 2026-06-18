@@ -272,9 +272,6 @@ export default function KasRTPage() {
   // Seri saldo kronologis untuk area tren.
   const saldoSeries = useMemo(() => list.map((k) => k.saldo_setelah), [list]);
 
-  const sortLabel = sort === 'terbaru' ? 'Terbaru' : sort === 'terlama' ? 'Terlama' : 'Nominal';
-  const cycleSort = () =>
-    setSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'nominal' : 'terbaru'));
 
   const today = new Date().toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
@@ -532,7 +529,15 @@ export default function KasRTPage() {
             ] as const}
             value={filter}
             onChange={setFilter}
-            sort={{ label: sortLabel, onCycle: cycleSort }}
+            sort={{
+              value: sort,
+              options: [
+                { id: 'terbaru', label: 'Terbaru' },
+                { id: 'terlama', label: 'Terlama' },
+                { id: 'nominal', label: 'Nominal' },
+              ] as const,
+              onChange: setSort,
+            }}
           />
           </div>
 

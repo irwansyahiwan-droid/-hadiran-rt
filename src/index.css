@@ -194,20 +194,14 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   margin-top: -3.5px;
   border-radius: 9999px;
   background: #ECFDF5;
+  /* Glow statis — titik ujung terbaca tanpa denyut tak henti (idle = tenang). */
   box-shadow: 0 0 0 2px rgba(167, 243, 208, 0.35), 0 0 10px 2px rgba(110, 231, 183, 0.8);
-  transition: opacity 400ms ease 900ms;
-  animation: hsPulse 2.4s ease-in-out 1.2s infinite;
 }
 @keyframes hsAreaIn {
   to { opacity: 1; }
 }
-@keyframes hsPulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(167, 243, 208, 0.35), 0 0 8px 1px rgba(110, 231, 183, 0.7); }
-  50%      { box-shadow: 0 0 0 3px rgba(167, 243, 208, 0.18), 0 0 14px 4px rgba(110, 231, 183, 0.95); }
-}
 @media (prefers-reduced-motion: reduce) {
   .hs-area { animation: none; opacity: 1; }
-  .hs-dot { animation: none; }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -399,40 +393,9 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
 }
 .ann-in { animation: annIn 0.55s var(--ease-spring) both; }
 
-/* Sapuan kilau lembut yang berulang melintasi banner */
-.ann-sheen::after {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 42%;
-  background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.34) 50%, transparent 100%);
-  transform: translateX(-180%) skewX(-14deg);
-  animation: annSheen 5s var(--ease-out-expo) 1s infinite;
-  pointer-events: none;
-  z-index: 1;
-}
-@keyframes annSheen {
-  0%   { transform: translateX(-180%) skewX(-14deg); }
-  55%  { transform: translateX(320%)  skewX(-14deg); }
-  100% { transform: translateX(320%)  skewX(-14deg); }
-}
-
-/* Denyut bayangan halus berwarna sesuai jenis pengumuman */
-.ann-glow { animation: annGlow 3.2s ease-in-out infinite; }
-@keyframes annGlow {
-  0%, 100% { box-shadow: 0 8px 22px -12px rgba(0,0,0,0.25); }
-  50%      { box-shadow: 0 14px 34px -10px var(--ann-glow, rgba(16,185,129,0.5)); }
-}
-
-/* Ikon megafon bergoyang sesekali untuk menarik perhatian */
-.ann-wiggle { animation: annWiggle 4s ease-in-out infinite; transform-origin: 65% 65%; }
-@keyframes annWiggle {
-  0%, 90%, 100% { transform: rotate(0deg); }
-  93%           { transform: rotate(-13deg); }
-  95%           { transform: rotate(10deg); }
-  97%           { transform: rotate(-6deg); }
-  99%           { transform: rotate(3deg); }
-}
+/* Idle loops banner (sheen sweep, glow pulse, megaphone wiggle) dihapus —
+   kesan "premium" datang dari diam saat idle, bukan animasi tak henti.
+   Entrance `.ann-in` tetap; banner statis setelah muncul. */
 
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {

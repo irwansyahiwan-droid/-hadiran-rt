@@ -164,9 +164,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     return arr;
   }, [trxItems, trxFilter, trxSort, trxSearch]);
 
-  const trxSortLabel = trxSort === 'terbaru' ? 'Terbaru' : trxSort === 'terlama' ? 'Terlama' : 'Nominal';
-  const cycleTrxSort = () =>
-    setTrxSort((s) => (s === 'terbaru' ? 'terlama' : s === 'terlama' ? 'nominal' : 'terbaru'));
 
   const skeleton = (
       <div className="space-y-6 pb-2">
@@ -447,7 +444,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             ] as const}
             value={trxFilter}
             onChange={setTrxFilter}
-            sort={{ label: trxSortLabel, onCycle: cycleTrxSort }}
+            sort={{
+              value: trxSort,
+              options: [
+                { id: 'terbaru', label: 'Terbaru' },
+                { id: 'terlama', label: 'Terlama' },
+                { id: 'nominal', label: 'Nominal' },
+              ] as const,
+              onChange: setTrxSort,
+            }}
           />
           </div>
         )}
