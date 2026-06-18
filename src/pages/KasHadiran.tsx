@@ -716,7 +716,29 @@ export default function KasHadiranPage() {
             {/* Lists (scrollable) */}
             <div className="flex-1 overflow-y-auto px-5 py-4 pb-10 space-y-6">
               {detailLoading ? (
-                <div className="flex justify-center py-10"><RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" /></div>
+                <>
+                  {/* Skeleton kartu rincian pendapatan */}
+                  <div className="rounded-2xl border border-line dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 px-4 py-3.5 space-y-2.5">
+                    <div className="skeleton h-2.5 w-40 rounded-full" />
+                    {[0, 1, 2, 3].map((i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <div className="skeleton h-3 w-2/5 rounded-full" />
+                        <div className="skeleton h-3 w-20 rounded-full" />
+                      </div>
+                    ))}
+                  </div>
+                  {/* Skeleton baris nama */}
+                  <div className="space-y-1">
+                    <div className="skeleton h-2.5 w-32 rounded-full mb-2.5" />
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <div key={i} className="flex items-center gap-2.5 py-1">
+                        <div className="skeleton w-8 h-8 rounded-lg shrink-0" />
+                        <div className="skeleton h-3.5 flex-1 rounded-full" />
+                        <div className="skeleton h-5 w-16 rounded-full shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <>
                   {/* Rincian pendapatan real-time — angka sama dgn PDF Pendapatan */}
