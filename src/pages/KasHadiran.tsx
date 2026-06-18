@@ -409,7 +409,7 @@ export default function KasHadiranPage() {
                 </button>
               </div>
             </div>
-            <p className={`font-display text-5xl font-extrabold tracking-tighter mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+            <p className={`font-display text-5xl font-extrabold tracking-tighter tabular-nums mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {hidden
                 ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                 : <Odometer value={animatedSaldo} />}
@@ -478,25 +478,25 @@ export default function KasHadiranPage() {
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
+              <span className="text-sm font-bold tabular-nums text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
-              <span className="text-sm font-semibold text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
+              <span className="text-sm font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
               <div className="flex items-center gap-1.5 min-w-0">
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
-              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
+              <span className="text-sm font-semibold tabular-nums text-blue-600 dark:text-blue-400">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-slate-100 dark:bg-slate-800' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-base font-bold ${saldo < 0 ? 'text-slate-700 dark:text-slate-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
+              <span className={`text-base font-bold tabular-nums ${saldo < 0 ? 'text-slate-700 dark:text-slate-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
@@ -594,7 +594,7 @@ export default function KasHadiranPage() {
                           </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-[17px] font-semibold text-pos dark:text-emerald-400">
+                          <p className="text-[17px] font-semibold tabular-nums text-pos dark:text-emerald-400">
                             +{formatRupiahPlain(sohibulTerima)}
                           </p>
                           <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
@@ -608,7 +608,7 @@ export default function KasHadiranPage() {
                         <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <span>
                             Kas Hadiran{' '}
-                            <span className="font-semibold text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
+                            <span className="font-semibold tabular-nums text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
                           </span>
                           <span className="font-semibold">{t.total_hadir}/{t.total_warga} hadir</span>
                         </div>
@@ -726,19 +726,19 @@ export default function KasHadiranPage() {
                       <div className="space-y-1.5 text-sm">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × {formatRupiahPlain(SOHIBUL_PER)}</span>
-                          <span className="font-semibold text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
+                          <span className="font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Potongan admin</span>
-                          <span className="font-semibold text-neg dark:text-red-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
+                          <span className="font-semibold tabular-nums text-neg dark:text-red-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-line dark:border-gray-800">
                           <span className="font-bold text-ink dark:text-gray-100">Bersih diterima SB</span>
-                          <span className="font-bold text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
+                          <span className="font-bold tabular-nums text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kas Hadiran tarikan ini</span>
-                          <span className="font-semibold text-warn dark:text-amber-400 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
+                          <span className="font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
                         </div>
                       </div>
                     </div>

@@ -265,7 +265,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatRupiahPlain(t.nominal)}</span>
+                  <span className="text-xs font-bold tabular-nums text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatRupiahPlain(t.nominal)}</span>
                   {t.status_lunas && (
                     <Tag tone="success">LUNAS</Tag>
                   )}
@@ -354,7 +354,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   : <Eye className="w-4 h-4 text-white/70" />}
               </button>
             </div>
-            <p className="font-display text-white text-5xl font-extrabold tracking-tighter mb-1">
+            <p className="font-display text-white text-5xl font-extrabold tracking-tighter tabular-nums mb-1">
               {maskRp(`Rp ${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
             </p>
             <p className="text-emerald-300 text-xs">

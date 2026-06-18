@@ -565,10 +565,10 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-[17px] font-bold ${isMasuk ? 'text-pos' : 'text-neg'}`}>
+                    <p className={`text-[17px] font-bold tabular-nums ${isMasuk ? 'text-pos' : 'text-neg'}`}>
                       {maskRp(`${isMasuk ? '+' : '-'}${formatRupiahPlain(k.nominal)}`, hidden, 4)}
                     </p>
-                    <p className={`text-xs font-medium mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
+                    <p className={`text-xs font-medium tabular-nums mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
                       Saldo: {maskRp(`${k.saldo_setelah < 0 ? '-' : ''}Rp${Math.abs(k.saldo_setelah).toLocaleString('id-ID')}`, hidden, 4)}
                     </p>
                   </div>
