@@ -142,8 +142,11 @@ export default function JadwalWargaPage() {
       {lastTarikan ? (
         <div className="hero-card hero-noise">
           <div className="relative p-5 space-y-3">
-            <p className="text-emerald-200 text-micro font-bold uppercase tracking-widest">
+            <p className="inline-flex items-center gap-1 text-emerald-200 text-micro font-bold uppercase tracking-widest">
               Tarikan Terakhir
+              <InfoTip label="Tarikan" tone="onDark">
+                Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima total iuran anggota.
+              </InfoTip>
             </p>
             <div>
               <p className="text-white text-lg font-bold leading-tight">
@@ -224,7 +227,7 @@ export default function JadwalWargaPage() {
             {[
               { label: 'Selesai', value: selesaiAnggotaCount, color: 'text-emerald-700 dark:text-emerald-400' },
               { label: 'Hadir', value: hadirCount, color: 'text-blue-600 dark:text-blue-400' },
-              { label: 'Tidak', value: tidakHadirCount, color: 'text-red-600 dark:text-red-400' },
+              { label: 'Tidak', value: tidakHadirCount, color: 'text-rose-600 dark:text-rose-400' },
               { label: 'Total', value: wargaList.length, color: 'text-gray-700 dark:text-gray-300' },
             ].map(s => (
               <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
@@ -270,7 +273,7 @@ export default function JadwalWargaPage() {
                     </span>
                     {/* Avatar */}
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                      isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/25 text-red-600 dark:text-red-400'
+                      isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400'
                     }`}>
                       {w.nama.charAt(0)}
                     </div>

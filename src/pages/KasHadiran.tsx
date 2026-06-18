@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import FilterChips from '../components/FilterChips';
+import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
@@ -460,7 +461,12 @@ export default function KasHadiranPage() {
         {/* Alur Kas */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Alur Kas Hadiran</p>
+            <p className="inline-flex items-center gap-1 text-sm font-bold text-gray-900 dark:text-gray-100">
+              Alur Kas Hadiran
+              <InfoTip label="Iuran">
+                Tiap anggota bayar Rp50.000/tarikan: Rp45.000 untuk Sohibul Bait (penerima) + Rp5.000 masuk kas. Yang tidak hadir ditalangi dulu.
+              </InfoTip>
+            </p>
             <span
               className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 rounded-full text-white text-micro font-bold"
               aria-label={`${tarikanSelesai.length} tarikan selesai`}
@@ -655,7 +661,7 @@ export default function KasHadiranPage() {
                             disabled={processingId === t.id}
                             aria-label="Hapus tarikan"
                             className={`flex items-center gap-1 min-h-[44px] text-xs font-medium ml-auto transition-colors disabled:opacity-50 ${
-                              confirmHapusId === t.id ? 'text-red-600' : 'text-ink-faint dark:text-gray-500 hover:text-red-500'
+                              confirmHapusId === t.id ? 'text-rose-600' : 'text-ink-faint dark:text-gray-500 hover:text-rose-500'
                             }`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />

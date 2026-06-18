@@ -270,7 +270,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       <div className="grid grid-cols-4 gap-2">
         {[
           { label: 'Hadir', value: hadirCount, color: 'text-emerald-700 dark:text-emerald-400' },
-          { label: 'Tdk Hadir', value: tidakCount, color: 'text-red-600 dark:text-red-400' },
+          { label: 'Tdk Hadir', value: tidakCount, color: 'text-rose-600 dark:text-rose-400' },
           { label: 'Kas', value: formatKompak(kasTotal), color: 'text-blue-600 dark:text-blue-400' },
           { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-warn dark:text-amber-400' },
         ].map(s => (
@@ -357,16 +357,16 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               onClick={() => toggle(w.id)}
               className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
                 idx < filtered.length - 1 ? 'border-b border-line dark:border-gray-800' : ''
-              } ${isHadir ? 'hover:bg-emerald-50/50 dark:hover:bg-emerald-900/15' : 'hover:bg-red-50/30 dark:hover:bg-red-900/15'}`}
+              } ${isHadir ? 'hover:bg-emerald-50/50 dark:hover:bg-emerald-900/15' : 'hover:bg-rose-50/30 dark:hover:bg-rose-900/15'}`}
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-900/25 text-red-600 dark:text-red-400'
+                isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400'
               }`}>
                 {w.nama.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
-                <p className={`text-xs ${isHadir ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <p className={`text-xs ${isHadir ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   {isHadir ? 'Hadir' : 'Tidak hadir → Talangan'}
                 </p>
               </div>

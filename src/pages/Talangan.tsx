@@ -307,8 +307,8 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     aria-label="Hapus data talangan"
                     className={`inline-flex items-center justify-center gap-1 h-7 px-2 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 ${
                       deleteConfirmId === t.id
-                        ? 'bg-red-600 text-white'
-                        : 'text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                        ? 'bg-rose-600 text-white'
+                        : 'text-gray-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20'
                     }`}
                   >
                     {deleteConfirmId === t.id ? 'Hapus?' : <Trash2 className="w-3.5 h-3.5" />}

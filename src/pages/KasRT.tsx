@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import FilterChips from '../components/FilterChips';
+import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -75,7 +76,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                   tipe === t
                     ? t === 'masuk'
                       ? 'bg-emerald-500 text-white border-emerald-500'
-                      : 'bg-red-500 text-white border-red-500'
+                      : 'bg-rose-500 text-white border-rose-500'
                     : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-control dark:border-gray-700'
                 }`}
               >
@@ -124,7 +125,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           </div>
 
           {nominal > 0 && (
-            <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/40'}`}>
+            <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800/40'}`}>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
                 <span className={`font-bold ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}`}>
@@ -146,7 +147,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               type="submit"
               disabled={saving || !nominal}
               className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition-all duration-150 flex items-center justify-center gap-2 ${
-                tipe === 'masuk' ? 'btn-brand' : 'bg-red-500 hover:bg-red-600'
+                tipe === 'masuk' ? 'btn-brand' : 'bg-rose-500 hover:bg-rose-600'
               }`}
             >
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
@@ -328,7 +329,12 @@ export default function KasRTPage() {
         {/* Header — di HP: judul di atas, tombol di bawah (anti-kepotong) */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Kas RT</h1>
+            <h1 className="inline-flex items-center gap-1 text-lg font-bold text-gray-900 dark:text-gray-100">
+              Kas RT
+              <InfoTip label="Kas RT">
+                Kas besar RT 004/006. Sebagian iuran tiap tarikan (Rp5.000/anggota) disetor ke sini untuk kebutuhan RT — terpisah dari Kas Hadiran.
+              </InfoTip>
+            </h1>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -428,7 +434,7 @@ export default function KasRTPage() {
               </div>
               <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <TrendingDown className="w-3.5 h-3.5 text-red-300" />
+                  <TrendingDown className="w-3.5 h-3.5 text-rose-300" />
                   <p className="text-teal-100 text-micro font-semibold uppercase tracking-wide">Total Keluar</p>
                 </div>
                 <p className="text-sm font-bold text-white">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</p>
