@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Coins, Users, Link2, Heart } from 'lucide-react';
+import { ArrowLeft, BookOpen, Coins, Users, Link2, Heart, ShieldCheck } from 'lucide-react';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { haptic } from '../lib/utils';
 import AvatarPeci from '../components/AvatarPeci';
@@ -26,6 +26,13 @@ const SUMBER = [
   { b: 'Master Anggota', t: '70 KK aktif RT 004/006' },
   { b: 'Spreadsheet Hadiran', t: 'Jadwal, Absensi, Kas, Talangan' },
   { b: 'Spreadsheet Laporan Kas RT', t: 'sinkron real-time; sumber dana setoran = Iuran Anggota Hadiran' },
+];
+
+const KEAMANAN = [
+  { b: 'Hanya Bendahara yang bisa mengubah data', t: 'penambahan, perubahan & penghapusan dikunci di level database (Supabase RLS) untuk akun Bendahara terverifikasi — warga tidak bisa mengubah apa pun' },
+  { b: 'Warga hanya bisa melihat (read-only)', t: 'mode warga dibuat untuk transparansi: lihat saldo, jadwal & talangan, tanpa akses ubah' },
+  { b: 'Setiap perubahan tercatat', t: 'fitur Riwayat Aktivitas menyimpan jejak siapa mengubah apa & kapan, sehingga setiap tindakan dapat ditelusuri' },
+  { b: 'Transparan secara sengaja', t: 'kas RT memang terbuka untuk seluruh warga — keterbukaan ini tujuan, bukan kebocoran' },
 ];
 
 function Section({ icon: Icon, title, children }: { icon: typeof BookOpen; title: string; children: React.ReactNode }) {
@@ -121,6 +128,23 @@ export default function TentangApp({ open, onClose }: Props) {
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                 <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{s.b}:</b> {s.t}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        {/* Model Keamanan & Data */}
+        <Section icon={ShieldCheck} title="MODEL KEAMANAN & DATA">
+          <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300 mb-3">
+            Keamanan data dirancang sejak awal, bukan tambalan:
+          </p>
+          <ul className="space-y-2.5">
+            {KEAMANAN.map((k) => (
+              <li key={k.b} className="flex gap-2.5">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
+                  <b className="text-gray-900 dark:text-gray-100">{k.b}:</b> {k.t}
                 </p>
               </li>
             ))}
