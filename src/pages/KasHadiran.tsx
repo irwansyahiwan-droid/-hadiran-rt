@@ -714,7 +714,7 @@ export default function KasHadiranPage() {
             </div>
 
             {/* Lists (scrollable) */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 pb-10 space-y-5">
+            <div className="flex-1 overflow-y-auto px-5 py-4 pb-10 space-y-6">
               {detailLoading ? (
                 <div className="flex justify-center py-10"><RefreshCw className="w-6 h-6 text-emerald-500 animate-spin" /></div>
               ) : (
@@ -745,10 +745,10 @@ export default function KasHadiranPage() {
                   )}
                   {detailTidak.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Tidak Hadir / Talangan</p>
-                      <div className="space-y-1.5">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Tidak Hadir / Talangan</p>
+                      <div className="space-y-1">
                         {detailTidak.map((p) => (
-                          <div key={p.id} className="flex items-center gap-2.5">
+                          <div key={p.id} className="flex items-center gap-2.5 py-1">
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
@@ -763,10 +763,10 @@ export default function KasHadiranPage() {
                   )}
                   {detailHadir.length > 0 && (
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Hadir ({detailHadir.length})</p>
-                      <div className="space-y-1.5">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Hadir ({detailHadir.length})</p>
+                      <div className="space-y-1">
                         {detailHadir.map((p) => (
-                          <div key={p.id} className="flex items-center gap-2.5">
+                          <div key={p.id} className="flex items-center gap-2.5 py-1">
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             <Check className="w-4 h-4 text-emerald-500 shrink-0" strokeWidth={2.5} />

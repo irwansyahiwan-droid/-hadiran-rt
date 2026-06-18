@@ -74,7 +74,7 @@ export function generateKasHadiranPDF(
     head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'HADIR', 'KAS MASUK (Rp)', 'TALANGAN (Rp)', 'SETOR (Rp)', 'NET KAS (Rp)']],
     body: rows,
     foot: [[
-      '', 'TOTAL', '', '',
+      { content: 'TOTAL', colSpan: 4, styles: { halign: 'right' } },
       fmtNum(totalKas),
       totalTal > 0 ? `-${fmtNum(totalTal)}` : '0',
       totalSetor > 0 ? `-${fmtNum(totalSetor)}` : '0',
@@ -83,13 +83,13 @@ export function generateKasHadiranPDF(
     showFoot: 'lastPage',
     margin: { left: M, right: M },
     columnStyles: {
-      0: { cellWidth: 8,  halign: 'center' },
-      1: { cellWidth: 30 },
+      0: { cellWidth: 9,  halign: 'center' },
+      1: { cellWidth: 26 },
       2: { cellWidth: 'auto' },
-      3: { cellWidth: 14, halign: 'center' },
+      3: { cellWidth: 13, halign: 'center' },
       4: { cellWidth: 22, halign: 'right' },
       5: { cellWidth: 22, halign: 'right' },
-      6: { cellWidth: 16, halign: 'right' },
+      6: { cellWidth: 22, halign: 'right' },
       7: { cellWidth: 22, halign: 'right' },
     },
     didParseCell(data) {
@@ -98,7 +98,6 @@ export function generateKasHadiranPDF(
         if (data.column.index === 6 && totalSetor > 0) data.cell.styles.textColor = C.warn;
         if (data.column.index === 7) {
           data.cell.styles.textColor = totalNet < 0 ? C.neg : C.pos;
-          data.cell.styles.fontSize = 8;
         }
         return;
       }
