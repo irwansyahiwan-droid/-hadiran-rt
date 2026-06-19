@@ -67,7 +67,7 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
   });
 
   // ── Total + TTD ───────────────────────────────────────────
-  let afterY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+  const afterY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
   doc.setFontSize(8.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(C.ink[0], C.ink[1], C.ink[2]);
   doc.text(`Total Anggota Tercatat: ${total}`, M, afterY);
 

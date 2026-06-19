@@ -54,7 +54,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   }
 
   return (
-    <div className="login-bg relative min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden">
+    <main className="login-bg relative min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden">
 
       {/* Aurora background — blob mengambang lembut (diredam di dark agar tidak menyilaukan) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
@@ -86,7 +86,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         {/* ── WARGA — pintu utama (istimewa) ───────────────────── */}
         <div className="relative rounded-2xl p-4 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-gray-900 border border-emerald-200/80 dark:border-emerald-800/40 shadow-[0_8px_28px_-14px_rgba(16,185,129,0.55)]">
           {/* badge sudut */}
-          <span className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500 text-white text-micro font-bold uppercase tracking-wide shadow-sm shadow-emerald-400/50">
+          <span className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-700 text-white text-micro font-bold uppercase tracking-wide shadow-sm shadow-emerald-400/50">
             <Sparkles className="w-2.5 h-2.5" /> Akses Cepat
           </span>
 
@@ -236,6 +236,6 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       <p className="text-xs text-ink-faint dark:text-gray-400 mt-6 text-center">
         Bendahara lupa password? Hubungi pengurus RT
       </p>
-    </div>
+    </main>
   );
 }
