@@ -149,7 +149,15 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   /* Emerald lebih segar/hidup (tetap deep di kiri-atas agar teks putih lolos kontras) */
   --hero-gradient: linear-gradient(135deg, #0D5B36 0%, #15824C 50%, #1C9A5C 100%);
   --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.34) 0%, rgba(45, 212, 150, 0) 55%);
-  --hero-shadow: 0 20px 50px -20px rgba(7, 30, 22, 0.7);
+  /* Pass 4 cohesion (2026-06-20) — hero ikut bahasa "floating glass" .lift:
+     satu drop 20/50px diganti berlapis (contact + key + ambient ber-spread
+     negatif, terkontain) + inset highlight tepi-atas spt .lift → hero & kartu
+     putih jadi satu keluarga elevasi. Nada tetap green-ink (rgba 7,30,22). */
+  --hero-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),   /* tepi atas tersinari → glass */
+    0 2px 4px -1px rgba(7, 30, 22, 0.34),         /* contact rapat → menapak */
+    0 10px 22px -8px rgba(7, 30, 22, 0.44),       /* key mid — terkontain */
+    0 26px 48px -18px rgba(7, 30, 22, 0.55);      /* ambient float — melayang */
   --hero-divider: rgba(255, 255, 255, 0.16);
 }
 
