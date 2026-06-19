@@ -201,7 +201,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Pengumuman</p>
             <p className="text-xs text-gray-400 mt-0.5">Info penting untuk semua warga</p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>

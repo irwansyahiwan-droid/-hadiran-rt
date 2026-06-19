@@ -85,7 +85,7 @@ export default function InstallPrompt() {
             <Download className="w-3.5 h-3.5" />
             Pasang
           </button>
-          <button onClick={dismiss} aria-label="Tutup" className="p-1 -mr-1 text-gray-400 shrink-0">
+          <button onClick={dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center text-gray-400 shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>

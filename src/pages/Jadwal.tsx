@@ -476,7 +476,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{result.tarikanNomor} selesai dihitung</p>
             <p className="text-micro text-ink-faint dark:text-gray-400">Cocokkan uang dulu sebelum ditutup</p>
           </div>
-          <button onClick={dismiss} aria-label="Tutup" className="press p-1.5 -mr-1 -mt-1 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0">
+          <button onClick={dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 -mt-2 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -574,7 +574,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -667,7 +667,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={onClose} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
