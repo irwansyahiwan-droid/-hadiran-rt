@@ -1,5 +1,6 @@
 import { ArrowLeft, BookOpen, Coins, Users, Link2, Heart, ShieldCheck } from 'lucide-react';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { haptic } from '../lib/utils';
 import AvatarPeci from '../components/AvatarPeci';
 import logoRt from '../assets/logo-rt.svg';
@@ -51,10 +52,11 @@ function Section({ icon: Icon, title, children }: { icon: typeof BookOpen; title
 
 export default function TentangApp({ open, onClose }: Props) {
   useBackDismiss(open, onClose);
+  const dlg = useDialog(open, { onClose, label: 'Tentang aplikasi' });
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div ref={dlg.panelRef} {...dlg.panelProps} className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}

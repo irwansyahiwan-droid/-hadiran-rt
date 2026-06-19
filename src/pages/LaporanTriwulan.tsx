@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, Share2, CalendarCheck } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { fetchRekapTriwulan, fetchSnapshotKas } from '../lib/laporan';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -71,6 +72,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
 
   // Tombol Back HP menutup overlay
   useBackDismiss(open, onClose);
+  const dlg = useDialog(open, { onClose, label: 'Tutup buku triwulan' });
 
   async function cetak(r: RekapTriwulan) {
     haptic(12);
@@ -125,7 +127,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div ref={dlg.panelRef} {...dlg.panelProps} className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}

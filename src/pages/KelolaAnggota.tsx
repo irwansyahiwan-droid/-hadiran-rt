@@ -12,6 +12,7 @@ import {
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import type { Warga, Tarikan } from '../lib/types';
 
 interface Props {
@@ -42,6 +43,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   // Pengaman: anggota yang dinonaktifkan tapi masih punya jadwal tarikan ke depan
   const [jadwalNonaktif, setJadwalNonaktif] = useState<number[] | null>(null);
   useBackDismiss(true, onClose);
+  const dlg = useDialog(true, { onClose, label: mode === 'edit' ? 'Edit anggota' : 'Tambah anggota' });
 
   const kasNaik = pilih.size * 5000;
 
@@ -104,9 +106,11 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   const label = 'block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5';
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-modal flex items-end sm:items-center justify-center">
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div
+        ref={dlg.panelRef}
+        {...dlg.panelProps}
         className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 5rem)' }}
       >
@@ -299,6 +303,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
   }, [open]);
 
   useBackDismiss(open && !form, onClose);
+  const dlg = useDialog(open && !form, { onClose, label: 'Kelola anggota' });
 
   const aktifCount = list.filter((w) => w.status_aktif).length;
   const filtered = useMemo(() => {
@@ -310,7 +315,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div ref={dlg.panelRef} {...dlg.panelProps} className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}

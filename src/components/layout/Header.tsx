@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
@@ -22,6 +22,8 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   const isBendahara = role === 'bendahara';
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 6);
@@ -30,9 +32,34 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Saat menu buka: fokus item pertama → pola menu WAI-ARIA (keyboard mulai di dalam).
+  useEffect(() => {
+    if (!menuOpen) return;
+    menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+  }, [menuOpen]);
+
+  function closeMenu() {
+    setMenuOpen(false);
+    triggerRef.current?.focus(); // kembalikan fokus ke tombol pemicu
+  }
+
+  // Navigasi keyboard menu: panah naik/turun siklik, Home/End, Escape menutup.
+  function onMenuKeyDown(e: React.KeyboardEvent) {
+    const items = Array.from(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+    if (items.length === 0) return;
+    const idx = items.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(idx + 1) % items.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(idx - 1 + items.length) % items.length].focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+  }
+
   // Item menu overflow (kebab) — semua aksi dirapikan ke sini agar top bar lega.
   const MenuItem = ({ icon: Icon, label, onClick, danger }: { icon: LucideIcon; label: string; onClick: () => void; danger?: boolean }) => (
     <button
+      role="menuitem"
+      tabIndex={-1}
       onClick={() => { haptic(); setMenuOpen(false); onClick(); }}
       className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
         danger
@@ -91,6 +118,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           {/* Menu overflow — rapikan semua aksi ke sini agar judul tidak terdesak */}
           <div className="relative">
             <button
+              ref={triggerRef}
               onClick={() => { haptic(); setMenuOpen((o) => !o); }}
               className="press w-11 h-11 -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
               aria-label="Menu"
@@ -104,7 +132,10 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                 <div
+                  ref={menuRef}
                   role="menu"
+                  aria-label="Menu aplikasi"
+                  onKeyDown={onMenuKeyDown}
                   className="pop absolute right-0 top-[calc(100%+8px)] z-50 w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right"
                   style={{ boxShadow: 'var(--shadow-float)' }}
                 >

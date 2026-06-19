@@ -3,6 +3,7 @@ import {
   ArrowLeft, DatabaseBackup, Download, Upload, AlertTriangle, RefreshCw, CheckCircle2,
 } from 'lucide-react';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import {
@@ -18,6 +19,7 @@ const KATA_KONFIRMASI = 'PULIHKAN';
 
 export default function BackupRestore({ open, onClose }: Props) {
   useBackDismiss(open, onClose);
+  const dlg = useDialog(open, { onClose, label: 'Backup & restore data' });
   const fileRef = useRef<HTMLInputElement>(null);
   const [backingUp, setBackingUp] = useState(false);
   const [lastBackup, setLastBackup] = useState<{ table: string; count: number }[] | null>(null);
@@ -72,7 +74,7 @@ export default function BackupRestore({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div ref={dlg.panelRef} {...dlg.panelProps} className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}

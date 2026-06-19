@@ -8,6 +8,7 @@ import EmptyState from '../components/EmptyState';
 import FilterChips from '../components/FilterChips';
 import { useRealtime } from '../hooks/useRealtime';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { fetchAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -85,6 +86,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
   // Tombol Back HP menutup overlay (bukan keluar app)
   useBackDismiss(open, onClose);
+  const dlg = useDialog(open, { onClose, label: 'Riwayat aktivitas' });
 
   const grouped = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -121,7 +123,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div ref={dlg.panelRef} {...dlg.panelProps} className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
       {/* Header */}
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"

@@ -5,6 +5,7 @@ import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
@@ -32,6 +33,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
   useBackDismiss(true, onClose);
+  const dlg = useDialog(true, { onClose, label: 'Setor ke Kas Besar RT' });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,7 +49,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()} style={drag.style}>
+      <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()} style={drag.style}>
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
@@ -118,6 +120,7 @@ export default function KasHadiranPage() {
   const [detailTidak, setDetailTidak] = useState<{ id: string; nama: string; lunas: boolean }[]>([]);
   const detailDrag = useDragDismiss(() => setDetailTarikan(null));
   useBackDismiss(detailTarikan !== null, () => setDetailTarikan(null));
+  const detailDlg = useDialog(detailTarikan !== null, { onClose: () => setDetailTarikan(null), label: 'Detail tarikan' });
 
   async function load() {
     setLoading(true);
@@ -691,6 +694,8 @@ export default function KasHadiranPage() {
         <div className="fixed inset-0 z-50 flex items-end" onClick={() => setDetailTarikan(null)}>
           <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <div
+            ref={detailDlg.panelRef}
+            {...detailDlg.panelProps}
             className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl flex flex-col max-h-[82vh]"
             onClick={(e) => e.stopPropagation()}
             style={detailDrag.style}

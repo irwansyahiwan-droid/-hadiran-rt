@@ -6,6 +6,7 @@ import Odometer from '../components/Odometer';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
@@ -43,6 +44,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
   const trxDrag = useDragDismiss(() => setSelectedTrx(null));
   useBackDismiss(selectedTrx !== null, () => setSelectedTrx(null));
+  const trxDlg = useDialog(selectedTrx !== null, { onClose: () => setSelectedTrx(null), label: 'Detail transaksi' });
   const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
   const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
   const [trxSearch, setTrxSearch] = useState('');
@@ -482,6 +484,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div className="fixed inset-0 z-50 flex items-end" onClick={() => setSelectedTrx(null)}>
         <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
         <div
+          ref={trxDlg.panelRef}
+          {...trxDlg.panelProps}
           className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 float"
           onClick={e => e.stopPropagation()}
           style={trxDrag.style}

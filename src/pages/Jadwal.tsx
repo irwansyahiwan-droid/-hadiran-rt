@@ -12,6 +12,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { showToast } from '../lib/toast';
 import type { Tarikan, Warga } from '../lib/types';
 
@@ -542,6 +543,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
   const [saving, setSaving] = useState(false);
   useBackDismiss(true, onClose);
+  const dlg = useDialog(true, { onClose, label: `Revisi jadwal tarikan #${tarikan.nomor}` });
 
   // Pastikan sohibul saat ini tetap muncul di dropdown walau tidak aktif lagi
   const options = useMemo(() => {
@@ -568,7 +570,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float">
+      <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
@@ -630,6 +632,7 @@ interface TambahTarikanModalProps {
 }
 
 function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
+  const dlg = useDialog(true, { onClose, label: `Tambah jadwal tarikan #${nextNomor}` });
   const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
   const [sohibulId, setSohibulId] = useState('');
   const [saving, setSaving] = useState(false);
@@ -661,7 +664,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float">
+      <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>

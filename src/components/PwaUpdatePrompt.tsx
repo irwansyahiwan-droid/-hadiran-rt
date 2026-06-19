@@ -40,7 +40,7 @@ export default function PwaUpdatePrompt() {
 
   return (
     <div
-      className="fixed left-1/2 -translate-x-1/2 z-[55] w-[calc(100%-2rem)] max-w-sm rise"
+      className="fixed left-1/2 -translate-x-1/2 z-banner w-[calc(100%-2rem)] max-w-sm rise"
       style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
     >
       <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-brand text-white float">

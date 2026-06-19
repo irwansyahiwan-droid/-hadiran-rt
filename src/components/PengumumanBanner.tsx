@@ -8,6 +8,7 @@ import {
 import { haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 
 /** Gaya per jenis pengumuman: gradien latar + warna denyut glow + ikon. */
 const STYLE: Record<PengumumanTipe, { grad: string; glow: string; icon: LucideIcon; label: string }> = {
@@ -135,6 +136,7 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
   const [deleting, setDeleting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   useBackDismiss(true, onClose);
+  const dlg = useDialog(true, { onClose, label: 'Editor pengumuman' });
 
   async function pilihMedia(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -190,9 +192,11 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
   const Icon = style.icon;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-modal flex items-end sm:items-center justify-center">
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div
+        ref={dlg.panelRef}
+        {...dlg.panelProps}
         className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[92vh] overflow-y-auto"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 5rem)' }}
       >

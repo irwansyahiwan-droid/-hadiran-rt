@@ -38,7 +38,7 @@ export default function SuccessOverlay({ show, message = 'Berhasil!', onDone, du
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+    <div className="fixed inset-0 z-modal flex items-center justify-center pointer-events-none">
       <div className="sheet-backdrop absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
       <div className="relative flex flex-col items-center">
         <div className="relative w-20 h-20">

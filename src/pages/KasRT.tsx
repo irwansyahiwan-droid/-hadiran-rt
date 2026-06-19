@@ -13,6 +13,7 @@ import SmartInsight from '../components/SmartInsight';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useDialog } from '../hooks/useDialog';
 import { showToast, showUndo } from '../lib/toast';
 import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
@@ -37,6 +38,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const [tanggal, setTanggal] = useState((initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
+  const dlg = useDialog(true, { onClose, label: isEdit ? 'Edit transaksi Kas RT' : 'Tambah transaksi Kas RT' });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,6 +57,8 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
+        ref={dlg.panelRef}
+        {...dlg.panelProps}
         className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4"
         onClick={(e) => e.stopPropagation()}
         style={drag.style}
@@ -177,6 +181,7 @@ export default function KasRTPage() {
   const rowDrag = useDragDismiss(() => setSelectedRow(null));
   useBackDismiss(showModal, () => { setEditing(null); setShowModal(false); });
   useBackDismiss(selectedRow !== null, () => setSelectedRow(null));
+  const rowDlg = useDialog(selectedRow !== null, { onClose: () => setSelectedRow(null), label: 'Aksi transaksi' });
 
   async function load() {
     setLoading(true);
@@ -607,6 +612,8 @@ export default function KasRTPage() {
         <div className="fixed inset-0 z-50 flex items-end" onClick={() => setSelectedRow(null)}>
           <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <div
+            ref={rowDlg.panelRef}
+            {...rowDlg.panelProps}
             className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
             onClick={(e) => e.stopPropagation()}
             style={rowDrag.style}

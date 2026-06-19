@@ -4,6 +4,20 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      /* ── Tangga z-index app (SATU sumber, anti-tabrak) ─────────────
+         Tier overlay global dari bawah ke atas. Dua tier terbawah pakai
+         default Tailwind agar tak ada nilai kembar:
+           z-40  = nav     → Header + BottomNav + scrim dismiss-nya
+           z-50  = overlay → bottom-sheet, full-page overlay, dropdown menu
+         lalu token bernama untuk tier di atasnya:
+           z-banner = prompt app-level (Install / PWA update)
+           z-modal  = modal di ATAS overlay (form bertumpuk) + SuccessOverlay + WelcomeSheet
+           z-toast  = Toaster — SELALU paling atas & sendirian (jangan ada yg menyamai) */
+      zIndex: {
+        banner: '55',
+        modal: '60',
+        toast: '70',
+      },
       fontFamily: {
         // Display = Sora (judul & nominal hero). Body default tetap Inter (di body CSS).
         display: ['Sora Variable', 'Sora', 'Inter Variable', 'system-ui', 'sans-serif'],

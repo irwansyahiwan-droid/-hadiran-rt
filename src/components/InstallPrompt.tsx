@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, Download, Share, Plus } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
+import { useDialog } from '../hooks/useDialog';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -13,6 +14,7 @@ export default function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showGuide, setShowGuide] = useState(false);
   const [hidden, setHidden] = useState(true);
+  const guideDlg = useDialog(showGuide, { onClose: () => setShowGuide(false), label: 'Panduan pasang aplikasi di iPhone' });
 
   const isStandalone =
     typeof window !== 'undefined' &&
@@ -66,7 +68,7 @@ export default function InstallPrompt() {
   return (
     <>
       <div
-        className="fixed left-1/2 -translate-x-1/2 z-[55] w-[calc(100%-2rem)] max-w-sm rise"
+        className="fixed left-1/2 -translate-x-1/2 z-banner w-[calc(100%-2rem)] max-w-sm rise"
         style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
       >
         <div
@@ -92,9 +94,11 @@ export default function InstallPrompt() {
       </div>
 
       {showGuide && (
-        <div className="fixed inset-0 z-[60] flex items-end" onClick={() => setShowGuide(false)}>
+        <div className="fixed inset-0 z-modal flex items-end" onClick={() => setShowGuide(false)}>
           <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <div
+            ref={guideDlg.panelRef}
+            {...guideDlg.panelProps}
             className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
             onClick={(e) => e.stopPropagation()}
           >
