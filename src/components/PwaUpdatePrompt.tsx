@@ -12,6 +12,14 @@ export default function PwaUpdatePrompt() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
 
+    // Apakah halaman ini SUDAH dikontrol SW saat mount? Kalau BELUM (kunjungan
+    // perdana / cache terhapus / anggota baru), `controllerchange` pertama =
+    // klaim awal SW (self.clients.claim di sw.js) — BUKAN update. Dulu reload di
+    // sini menendang warga yg baru ketik 'warga' balik ke Login (mental ketik 2×
+    // beruntun). Gate warga per-sesi tetap utuh; ini cuma membuang reload kaget
+    // pada klaim pertama.
+    const hadController = !!navigator.serviceWorker.controller;
+
     navigator.serviceWorker
       .register('/sw.js')
       .then((reg) => {
@@ -30,7 +38,9 @@ export default function PwaUpdatePrompt() {
 
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return;
+      // Hanya reload utk update SUNGGUHAN (SW lama→baru via "Muat ulang"), yaitu
+      // saat halaman memang sudah dikontrol sebelumnya. Klaim pertama dilewati.
+      if (!hadController || refreshing) return;
       refreshing = true;
       window.location.reload();
     });
