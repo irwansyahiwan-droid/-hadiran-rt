@@ -229,17 +229,31 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      dinaikkan satu tingkat (tetap TIGHT, bukan fog): ring .06→.08 (hairline
      gelap lebih tegas), contact .06→.07, lift .08→.10 dgn y 8→10px. Bekerja
      bersama canvas yg diperdalam (#D4DAE4) + token `line` yg tak lagi mewashout. */
+  /* Pass 4 (2026-06-19) — "floating glass" (Revolut/Mercury): satu lift 10/24px
+     diganti DUA lapis key+ambient ber-spread NEGATIF (-4/-14) → kartu melayang
+     lebih tegas tapi blur tetap TERKONTAIN (tak melebar jadi fog, sesuai pass 3).
+     Tepi crisp dinaikkan tipis .08→.09 agar edge tetap menang di bawah lift baru. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(10, 14, 26, 0.08),                         /* tepi crisp 1px → definisi edge, kartu "tercetak" */
-    0 1px 2px 0 rgba(10, 14, 26, 0.07),                       /* contact shadow rapat → kartu menapak */
-    0 10px 24px rgba(10, 14, 26, 0.10);                       /* lift halus, TIDAK lebar → melayang tanpa fog */
+    0 0 0 1px rgba(10, 14, 26, 0.09),                         /* tepi crisp 1px → definisi edge, kartu "tercetak" */
+    0 1px 2px 0 rgba(10, 14, 26, 0.06),                       /* contact shadow rapat → kartu menapak */
+    0 6px 12px -4px rgba(10, 14, 26, 0.10),                   /* key mid — terkontain (spread neg), bukan fog */
+    0 18px 36px -14px rgba(10, 14, 26, 0.16);                 /* ambient float — melayang tegas, tetap rapat */
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.33);
 }
 
 /* Soft layered elevation for surfaces */
 .lift  { box-shadow: var(--shadow-card); }
 .float { box-shadow: var(--shadow-float); }
+
+/* Surface top-light (Pass 4, 2026-06-19) — permukaan card putih bukan flat:
+   cahaya dari atas (putih murni) meredup TIPIS ke bawah → kartu punya dimensi
+   "glass" ala Revolut/Mercury, bukan kertas datar. Hanya .lift (semua = card
+   putih, terverifikasi: tak ada .lift non-putih / ber-bg-gradient). Mengisi
+   background-image di atas background-color bg-white → tak menyentuh markup.
+   Dark: sheen putih sangat halus di tepi atas (top glass) di atas gray-900. */
+html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F4F7FC 100%); }
+.dark .lift { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 58%); }
 
 /* Dark elevation premium: di latar gelap bayangan drop tak terbaca & halo putih
    jadi cincin norak → pisahkan kartu lewat (1) ring cahaya tipis di tepi +
@@ -251,11 +265,15 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      dark sempat tertinggal. Di gelap separasi datang dari RING cahaya (drop nyaris
      tak terbaca), jadi yg dinaikkan ring .09→.12 + tepi-atas .05→.07; lift
      diselaraskan ke geometri light (0 10px 24px) & .55→.60 utk kedalaman. */
+  /* Pass 4 (2026-06-19) — paritas "floating glass" dgn light: satu lift 10/24
+     diganti dua lapis key+ambient ber-spread negatif. Di gelap separasi tetap
+     dari RING cahaya (.12→.13) + ambient gelap yg melayang tanpa melebar. */
   --shadow-card:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),               /* tepi atas "tersinari" — sedikit lebih crisp */
-    0 0 0 1px rgba(255, 255, 255, 0.12),                      /* ring cahaya → kartu "tercetak" tegas di gelap */
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),               /* tepi atas "tersinari" — glass edge */
+    0 0 0 1px rgba(255, 255, 255, 0.13),                      /* ring cahaya → kartu "tercetak" tegas di gelap */
     0 1px 2px rgba(0, 0, 0, 0.5),                             /* contact shadow rapat → kartu menapak */
-    0 10px 24px rgba(0, 0, 0, 0.60);                          /* lift halus, TIDAK lebar → elevation tanpa fog */
+    0 6px 12px -4px rgba(0, 0, 0, 0.45),                      /* key mid — terkontain (spread neg) */
+    0 18px 36px -14px rgba(0, 0, 0, 0.66);                    /* ambient float — kedalaman tanpa fog */
   --shadow-float: 0 18px 48px -12px rgba(0, 0, 0, 0.72);
 }
 
