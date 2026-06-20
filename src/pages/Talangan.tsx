@@ -234,7 +234,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               </div>
               {g.countBelum > 0 && (
                 <p className="text-xs text-warn dark:text-amber-400 mt-0.5">
-                  {g.countBelum} belum lunas · total {formatRupiahPlain(g.totalBelum)}
+                  {g.countBelum} belum lunas · total {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                 </p>
               )}
             </div>
@@ -266,7 +266,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-bold tabular-nums text-gray-700 dark:text-gray-300 whitespace-nowrap">{formatRupiahPlain(t.nominal)}</span>
+                  <span className="text-xs font-bold tabular-nums text-gray-700 dark:text-gray-300 whitespace-nowrap">{maskRp(formatRupiahPlain(t.nominal), hidden, 4)}</span>
                   {t.status_lunas && (
                     <Tag tone="success">LUNAS</Tag>
                   )}
