@@ -13,7 +13,7 @@ const tabs: { id: TabName; label: string; icon: LucideIcon }[] = [
   { id: 'beranda',  label: 'Beranda',  icon: Home },
   { id: 'jadwal',   label: 'Jadwal',   icon: CalendarDays },
   { id: 'talangan', label: 'Talangan', icon: ArrowLeftRight },
-  { id: 'kas',      label: 'Kas',      icon: Wallet },
+  { id: 'kas',      label: 'Hadiran',  icon: Wallet },
   { id: 'kas-rt',   label: 'Kas RT',   icon: Building2 },
 ];
 
@@ -58,17 +58,25 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
               className="press relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Ikon aktif sedikit membesar (spring) → penekanan ekspresif tapi tetap presisi di pill */}
+              {/* Ikon aktif sedikit membesar (spring) → penekanan ekspresif tapi tetap presisi di pill.
+                  Aktif juga DIISI (fill tint) → outline→solid ala iOS: active state terbaca
+                  "padat", bukan sekadar beda warna. Durasi 300ms + ease-spring disamakan dgn
+                  pill & label → seluruh handoff aktif mendarat bersamaan (nyambung dgn slide tab). */}
               <span
                 className={`flex items-center justify-center transition-transform duration-300 ${isActive ? 'scale-110' : 'scale-100'}`}
                 style={{ transitionTimingFunction: 'var(--ease-spring)' }}
               >
                 <Icon
-                  className={`w-[25px] h-[25px] transition-colors duration-200 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
-                  strokeWidth={isActive ? 2.4 : 2}
+                  className={`w-[25px] h-[25px] transition-colors duration-300 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
+                  strokeWidth={isActive ? 2.2 : 2}
+                  fill={isActive ? 'currentColor' : 'none'}
+                  style={{ fillOpacity: isActive ? 0.16 : 0, transition: 'fill-opacity 300ms var(--ease-spring)' }}
                 />
               </span>
-              <span className={`text-micro leading-none mt-1 transition-all duration-200 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}>
+              <span
+                className={`text-micro leading-none mt-1 transition-all duration-300 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}
+                style={{ transitionTimingFunction: 'var(--ease-spring)' }}
+              >
                 {label}
               </span>
             </button>
