@@ -69,7 +69,7 @@ export default function InstallPrompt() {
     <>
       <div
         className="fixed left-1/2 -translate-x-1/2 z-banner w-[calc(100%-2rem)] max-w-sm rise"
-        style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
       >
         <div
           className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800"

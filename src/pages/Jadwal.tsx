@@ -385,10 +385,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         })}
       </div>
 
-      {/* Sticky action buttons — offset di atas nav + safe-area agar tidak ketutup nav */}
+      {/* Sticky action buttons — melayang di atas nav kapsul (puncak nav ≈
+          safe+76px). +1.75rem menyamai jarak FAB/konten → bersih dari nav. */}
       <div
         className="fixed left-0 right-0 px-5 z-30"
-        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 1.75rem)' }}
       >
         <div className="max-w-lg mx-auto space-y-2">
           <button

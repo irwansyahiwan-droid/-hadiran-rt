@@ -51,7 +51,7 @@ export default function PwaUpdatePrompt() {
   return (
     <div
       className="fixed left-1/2 -translate-x-1/2 z-banner w-[calc(100%-2rem)] max-w-sm rise"
-      style={{ bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
+      style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
     >
       <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-brand text-white float">
         <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
