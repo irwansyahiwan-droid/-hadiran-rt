@@ -12,6 +12,8 @@ import EmptyState from '../components/EmptyState';
 import Odometer from '../components/Odometer';
 import Tag from '../components/Tag';
 import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
+import Fab from '../components/Fab';
+import ExportMenu from '../components/ExportMenu';
 import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
@@ -421,41 +423,34 @@ export default function KasHadiranPage() {
           </div>
         </div>
 
-        {/* Action buttons — PDF, Excel (.xlsx), Setor */}
+        {/* Ekspor (PDF/Excel) disatukan ke satu menu; aksi utama "Setor Kas RT"
+            kini hadir sebagai FAB di zona jempol. */}
         <div className="flex gap-2">
-          <button
-            onClick={async () => {
-              try {
-                const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
-                generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
-              } catch {
-                showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-              }
-            }}
-            className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 rounded-xl py-3 shadow-sm text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
-          >
-            <FileText className="w-4 h-4" />
-            Cetak PDF
-          </button>
-          <button
-            onClick={async () => {
-              const { generateKasHadiranExcel } = await import('../lib/generateKasHadiranExcel');
-              await generateKasHadiranExcel(displayTarikan, talanganMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldo });
-            }}
-            className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 rounded-xl py-3 shadow-sm text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
-          >
-            <Download className="w-4 h-4" />
-            Excel
-          </button>
-          {isBendahara && (
-            <button
-              onClick={() => setShowModal(true)}
-              className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 rounded-xl py-3 shadow-sm text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all cursor-pointer"
-            >
-              <ArrowUpRight className="w-4 h-4" />
-              Setor Kas RT
-            </button>
-          )}
+          <ExportMenu
+            items={[
+              {
+                label: 'Cetak PDF',
+                icon: FileText,
+                onClick: async () => {
+                  try {
+                    const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
+                    generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
+                  } catch {
+                    showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
+                  }
+                },
+              },
+              {
+                label: 'Ekspor Excel',
+                icon: Download,
+                tone: 'text-emerald-600 dark:text-emerald-400',
+                onClick: async () => {
+                  const { generateKasHadiranExcel } = await import('../lib/generateKasHadiranExcel');
+                  await generateKasHadiranExcel(displayTarikan, talanganMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldo });
+                },
+              },
+            ]}
+          />
         </div>
 
         {/* Alur Kas */}
@@ -832,6 +827,11 @@ export default function KasHadiranPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Aksi utama di zona jempol */}
+      {isBendahara && (
+        <Fab label="Setor" icon={ArrowUpRight} ariaLabel="Setor ke Kas RT" onClick={() => setShowModal(true)} />
       )}
     </>
   );

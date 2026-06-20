@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
-  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Plus, Share2,
+  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import Fab from '../components/Fab';
 import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
 import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
@@ -807,17 +808,9 @@ export default function JadwalPage() {
           <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{selesaiCount} selesai · {dijadwalCount} terjadwal</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <button onClick={load} aria-label="Muat ulang" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          {isBendahara && (
-            <button
-              onClick={() => { haptic(); setCreatingTarikan(true); }}
-              className="btn-brand flex items-center gap-1.5 text-sm font-semibold px-3 py-2 rounded-xl active:scale-[0.97] transition-all"
-            >
-              <Plus className="w-4 h-4" /> Tarikan
-            </button>
-          )}
           {isBendahara && tarikanList.length > 0 && (
             <button
               onClick={async () => {
@@ -981,6 +974,11 @@ export default function JadwalPage() {
           onClose={() => setCreatingTarikan(false)}
           onSaved={() => { setCreatingTarikan(false); load(); }}
         />
+      )}
+
+      {/* Aksi utama di zona jempol */}
+      {isBendahara && (
+        <Fab label="Tarikan" ariaLabel="Tambah jadwal tarikan" onClick={() => setCreatingTarikan(true)} />
       )}
     </div>
   );

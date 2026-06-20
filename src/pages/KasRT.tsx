@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Plus, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
+import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
@@ -11,6 +11,8 @@ import EmptyState from '../components/EmptyState';
 import Odometer from '../components/Odometer';
 import SmartInsight from '../components/SmartInsight';
 import CrossFade from '../components/CrossFade';
+import Fab from '../components/Fab';
+import ExportMenu from '../components/ExportMenu';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
@@ -343,43 +345,36 @@ export default function KasRTPage() {
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={load} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <button onClick={load} aria-label="Muat ulang" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
             </button>
-            <button
-              onClick={async () => {
-                try {
-                  const { generateKasRTPDF } = await import('../lib/generateKasRTPDF');
-                  generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal });
-                } catch {
-                  showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-                }
-              }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all"
-            >
-              <FileText className="w-4 h-4" />
-              PDF
-            </button>
-            {/* Ekspor Excel (.xlsx) — multi-sheet + styling */}
-            <button
-              onClick={async () => {
-                const { generateKasRTExcel } = await import('../lib/generateKasRTExcel');
-                await generateKasRTExcel(displayList, { saldo, totalMasuk, totalKeluar, saldoAwal });
-              }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-emerald-700 dark:text-emerald-400 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all"
-            >
-              <Download className="w-4 h-4" />
-              Excel
-            </button>
-            {isBendahara && (
-              <button
-                onClick={() => { setEditing(null); setShowModal(true); }}
-                className="btn-brand flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full active:scale-[0.97] active:opacity-90 transition-all duration-150"
-              >
-                <Plus className="w-4 h-4" />
-                Tambah
-              </button>
-            )}
+            {/* Ekspor (PDF/Excel) disatukan ke satu menu → aksi utama "Tambah"
+                tak tersaingi di toolbar; kini hadir sebagai FAB di zona jempol. */}
+            <ExportMenu
+              items={[
+                {
+                  label: 'Cetak PDF',
+                  icon: FileText,
+                  onClick: async () => {
+                    try {
+                      const { generateKasRTPDF } = await import('../lib/generateKasRTPDF');
+                      generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal });
+                    } catch {
+                      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
+                    }
+                  },
+                },
+                {
+                  label: 'Ekspor Excel',
+                  icon: Download,
+                  tone: 'text-emerald-600 dark:text-emerald-400',
+                  onClick: async () => {
+                    const { generateKasRTExcel } = await import('../lib/generateKasRTExcel');
+                    await generateKasRTExcel(displayList, { saldo, totalMasuk, totalKeluar, saldoAwal });
+                  },
+                },
+              ]}
+            />
           </div>
         </div>
 
@@ -653,6 +648,11 @@ export default function KasRTPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Aksi utama di zona jempol */}
+      {isBendahara && (
+        <Fab label="Tambah" ariaLabel="Tambah transaksi Kas RT" onClick={() => { setEditing(null); setShowModal(true); }} />
       )}
     </>
   );

@@ -160,6 +160,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     return arr;
   }, [trxItems, trxFilter, trxSort, trxSearch]);
 
+  // Beranda = ringkasan, bukan ledger penuh. Batasi render ke 20 teratas →
+  // dashboard tetap ringan saat data tumbuh (target 300 KK); sisanya lewat
+  // "Lihat semua" ke tab Kas. Pencarian/filter tetap atas seluruh data.
+  const TRX_LIMIT = 20;
+  const visibleTrx = displayTrx.slice(0, TRX_LIMIT);
+  const trxHidden = displayTrx.length - visibleTrx.length;
+
 
   const skeleton = (
       <div className="space-y-6 pb-2">
@@ -448,12 +455,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           ) : displayTrx.length === 0 ? (
             <EmptyState icon={Receipt} title="Tidak ada hasil" subtitle="Tidak ada transaksi pada filter ini." />
           ) : (
-            displayTrx.map((trx, idx) => (
+            visibleTrx.map((trx, idx) => (
               <button
                 key={trx.id}
                 onClick={() => setSelectedTrx(trx)}
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-                className={`press rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < displayTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
+                className={`press rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < visibleTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
               >
                 <div className={`w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
                   {trx.tipe === 'setor'
@@ -473,6 +480,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 </span>
               </button>
             ))
+          )}
+          {trxHidden > 0 && (
+            <button
+              onClick={() => onNavigate('kas')}
+              className="press w-full flex items-center justify-center gap-1 px-4 py-3.5 text-sm font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+            >
+              Lihat {trxHidden} transaksi lainnya
+              <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
+            </button>
           )}
         </div>
       </div>
