@@ -292,7 +292,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <Wallet className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
             <span className="text-micro text-white/90 mt-1.5">Terkumpul</span>
-            <span className="text-body font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">
+            <span className="font-bold text-white mt-0.5 whitespace-nowrap tabular-nums text-[clamp(0.6875rem,3.2vw,0.9375rem)]">
               {maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}
             </span>
           </button>
@@ -302,7 +302,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <ArrowLeftRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
             <span className="text-micro text-white/90 mt-1.5">Talangan</span>
-            <span className="text-body font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
+            <span className="font-bold text-white mt-0.5 whitespace-nowrap tabular-nums text-[clamp(0.6875rem,3.2vw,0.9375rem)]">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
           <button
             onClick={() => onNavigate('kas-rt')}
@@ -310,7 +310,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           >
             <ArrowUpRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
             <span className="text-micro text-white/90 mt-1.5">Setor Kas RT</span>
-            <span className="text-body font-bold text-white mt-0.5 whitespace-nowrap tabular-nums">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
+            <span className="font-bold text-white mt-0.5 whitespace-nowrap tabular-nums text-[clamp(0.6875rem,3.2vw,0.9375rem)]">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
         </div>
       </div>

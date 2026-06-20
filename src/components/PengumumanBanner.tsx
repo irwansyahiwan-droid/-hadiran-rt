@@ -84,10 +84,12 @@ export default function PengumumanBanner({ canManage }: Props) {
             {canManage && (
               <button
                 onClick={() => { haptic(); setEditing(true); }}
-                className="press shrink-0 w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors"
+                className="press shrink-0 -m-1.5 w-11 h-11 flex items-center justify-center"
                 aria-label="Edit pengumuman"
               >
-                <Pencil className="w-4 h-4" />
+                <span className="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors">
+                  <Pencil className="w-4 h-4" />
+                </span>
               </button>
             )}
           </div>
@@ -260,10 +262,12 @@ function PengumumanEditor({ initial, onClose, onSaved }: EditorProps) {
             )}
             <button
               onClick={hapusMedia}
-              className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/55 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/70 transition-colors"
+              className="press absolute top-0.5 right-0.5 w-11 h-11 flex items-center justify-center"
               aria-label="Hapus media"
             >
-              <Trash2 className="w-4 h-4" />
+              <span className="w-8 h-8 rounded-full bg-black/55 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/70 transition-colors">
+                <Trash2 className="w-4 h-4" />
+              </span>
             </button>
           </div>
         ) : (
