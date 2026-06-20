@@ -24,17 +24,14 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
 
   return (
     <nav
-      // Material iOS tab bar: blur + saturate → warna konten di belakang "menyala"
-      // lewat kaca, bukan abu kusam (blur polos). Hairline atas tetap.
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/75 backdrop-blur-xl backdrop-saturate-150 border-t border-line/70 dark:bg-gray-900/80 dark:border-gray-800/70"
-      style={{
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingLeft: 'env(safe-area-inset-left)',
-        paddingRight: 'env(safe-area-inset-right)',
-        boxShadow: '0 -10px 30px -20px rgba(16,24,40,0.35)',
-      }}
+      // Floating glass capsule (tren 2026, ala Arc/fintech modern): bar lepas
+      // dari tepi → kapsul membulat melayang. Kaca (blur+saturate) + ring tepi
+      // + bayangan berlapis → terasa "mengambang" di atas konten, bukan bilah
+      // datar menempel dasar. Jarak bawah hormati safe-area (home indicator).
+      className="fixed left-0 right-0 z-40 px-3 pointer-events-none"
+      style={{ bottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
     >
-      <div className="relative max-w-lg mx-auto flex items-stretch h-16">
+      <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-16 rounded-[26px] pointer-events-auto bg-white/70 dark:bg-gray-900/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-black/[0.06] dark:ring-white/10">
         {/* Indikator pill meluncur (spring) — slot selebar tombol, pill di area ikon.
             Row TANPA padding horizontal agar slot = lebar tombol persis. */}
         {activeIndex >= 0 && (

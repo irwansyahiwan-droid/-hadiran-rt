@@ -153,8 +153,9 @@ export default function App() {
           onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
         />
-        {/* 4rem = tinggi nav (h-16) — sebelumnya 3.5rem bikin konten terpotong 8px di belakang nav */}
-        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom) + 1rem)' }}>
+        {/* Nav kini kapsul MELAYANG (h-16 + jarak bawah 12px) → butuh ruang lebih
+            agar konten tak ngumpet di belakangnya. 4rem nav + 12px gap + napas. */}
+        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom) + 1.75rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
             <div {...swipe}>
               <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>

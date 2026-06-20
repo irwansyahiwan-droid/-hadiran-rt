@@ -20,7 +20,7 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel }: Fa
       onClick={() => { haptic(); onClick(); }}
       aria-label={ariaLabel ?? label}
       className="btn-brand press fixed right-4 z-30 inline-flex items-center gap-2 h-14 pl-5 pr-6 rounded-full text-sm font-bold"
-      style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 1rem)' }}
+      style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 1.75rem)' }}
     >
       <Icon className="w-5 h-5" strokeWidth={2.4} />
       {label}
