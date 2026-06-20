@@ -349,8 +349,11 @@ export default function KasRTPage() {
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
             </button>
             {/* Ekspor (PDF/Excel) disatukan ke satu menu → aksi utama "Tambah"
-                tak tersaingi di toolbar; kini hadir sebagai FAB di zona jempol. */}
+                tak tersaingi di toolbar; kini hadir sebagai FAB di zona jempol.
+                align kiri: tombol berada di kiri toolbar (HP) → dropdown buka ke
+                kanan agar tidak terpotong tepi layar. */}
             <ExportMenu
+              align="left"
               items={[
                 {
                   label: 'Cetak PDF',

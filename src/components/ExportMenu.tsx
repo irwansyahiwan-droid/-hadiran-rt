@@ -12,13 +12,17 @@ export interface ExportItem {
 
 interface ExportMenuProps {
   items: ExportItem[];
+  /** Arah buka dropdown relatif tombol. 'right' (default) = tepi kanan dropdown
+   *  sejajar tombol → cocok saat tombol di kanan layar (Kas RT). 'left' = buka
+   *  ke kanan → cocok saat tombol di kiri (Kas Hadiran), agar tak terpotong. */
+  align?: 'left' | 'right';
 }
 
 /** Tombol "Ekspor" + dropdown — menyatukan aksi ekspor yang JARANG dipakai
  *  (PDF / Excel) ke satu menu, agar aksi utama (FAB) tak tersaingi di toolbar.
  *  Satu aksi primer per layar. Popover ringan (bukan sheet) selaras menu Header:
  *  tutup via Escape / klik luar. */
-export default function ExportMenu({ items }: ExportMenuProps) {
+export default function ExportMenu({ items, align = 'right' }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,7 +52,7 @@ export default function ExportMenu({ items }: ExportMenuProps) {
           <div
             role="menu"
             aria-label="Ekspor"
-            className="pop absolute right-0 top-[calc(100%+8px)] z-50 w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right"
+            className={`pop absolute top-[calc(100%+8px)] z-50 w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             {items.map(({ label, icon: Icon, onClick, tone }) => (

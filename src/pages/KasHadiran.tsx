@@ -427,6 +427,7 @@ export default function KasHadiranPage() {
             kini hadir sebagai FAB di zona jempol. */}
         <div className="flex gap-2">
           <ExportMenu
+            align="left"
             items={[
               {
                 label: 'Cetak PDF',
