@@ -48,10 +48,12 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
       className="fixed left-0 right-0 z-40 px-3 pointer-events-none"
       style={{
         bottom: 'calc(env(safe-area-inset-bottom) + 6px)',
-        // Sertakan safe-area + margin di geseran → nav bersih total keluar layar
-        // walau di HP dgn home indicator (nav duduk lebih tinggi). 100% = tinggi nav.
-        transform: tucked ? 'translateY(calc(100% + env(safe-area-inset-bottom) + 1.75rem))' : 'translateY(0)',
-        transition: 'transform 0.32s var(--ease-out-expo)',
+        // Sertakan safe-area + margin lebar di geseran → nav bersih total keluar
+        // layar walau di HP dgn home indicator. Opacity fade = jaring pengaman:
+        // andai ada sisa posisi sepiksel pun, tetap tak terlihat. 100% = tinggi nav.
+        transform: tucked ? 'translateY(calc(100% + env(safe-area-inset-bottom) + 2.5rem))' : 'translateY(0)',
+        opacity: tucked ? 0 : 1,
+        transition: 'transform 0.32s var(--ease-out-expo), opacity 0.26s ease',
       }}
     >
       <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-16 rounded-[26px] pointer-events-auto bg-white/70 dark:bg-gray-900/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-black/[0.06] dark:ring-white/10">
