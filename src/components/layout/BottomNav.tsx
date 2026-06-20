@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Home, CalendarDays, ArrowLeftRight, Wallet, Building2, type LucideIcon } from 'lucide-react';
 import { haptic } from '../../lib/utils';
 
@@ -22,6 +23,22 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
   const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
   const activeIndex = visibleTabs.findIndex(t => t.id === active);
 
+  // Auto-hide: scroll turun (masuk ke konten) → nav menyelinap turun keluar layar;
+  // scroll naik → muncul lagi. Beri ruang baca list yg panjang. Dekat puncak (y<80)
+  // selalu tampil.
+  const [tucked, setTucked] = useState(false);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y > lastY + 4 && y > 80) setTucked(true);     // turun → sembunyi
+      else if (y < lastY - 4) setTucked(false);          // naik → muncul
+      lastY = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <nav
       // Floating glass capsule (tren 2026, ala Arc/fintech modern): bar lepas
@@ -29,7 +46,11 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
       // + bayangan berlapis → terasa "mengambang" di atas konten, bukan bilah
       // datar menempel dasar. Jarak bawah hormati safe-area (home indicator).
       className="fixed left-0 right-0 z-40 px-3 pointer-events-none"
-      style={{ bottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
+      style={{
+        bottom: 'calc(env(safe-area-inset-bottom) + 6px)',
+        transform: tucked ? 'translateY(calc(100% + 1.5rem))' : 'translateY(0)',
+        transition: 'transform 0.32s var(--ease-out-expo)',
+      }}
     >
       <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-16 rounded-[26px] pointer-events-auto bg-white/70 dark:bg-gray-900/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-black/[0.06] dark:ring-white/10">
         {/* Indikator pill meluncur (spring) — slot selebar tombol, pill di area ikon.
