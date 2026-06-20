@@ -5,11 +5,17 @@ export interface ReceiptRow {
   value: string;
 }
 
+export interface ReceiptList {
+  heading: string;      // mis. "Tidak Hadir (14)"
+  items: string[];      // daftar nama, dirender bernomor untuk kontrol cek-fisik
+}
+
 export interface ReceiptData {
   title: string;        // mis. "Ringkasan Kas RT"
   amountLabel: string;  // mis. "Saldo Bersih"
   amount: string;       // sudah diformat, mis. "Rp1.250.000"
   rows: ReceiptRow[];
+  list?: ReceiptList;   // opsional: daftar nama bernomor (mis. nama tidak hadir)
   shareText: string;    // teks pendamping saat share
 }
 
@@ -35,9 +41,32 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /** Render kartu receipt bermerek jadi PNG lalu bagikan (Web Share API + fallback WA). */
+/** Potong teks dgn elipsis agar muat dalam lebar maksimum (canvas). */
+function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
+  if (ctx.measureText(text).width <= maxW) return text;
+  let t = text;
+  while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t + '…';
+}
+
 export async function shareReceipt(data: ReceiptData): Promise<void> {
   const W = 380;
-  const H = 500;
+
+  // Tinggi dinamis: baris detail + (opsional) kartu daftar nama + footer.
+  const rowsCardTop = 250;
+  const rowsCardH = 36 * data.rows.length + 16;
+  let contentBottom = rowsCardTop + rowsCardH;
+
+  const items = data.list?.items ?? [];
+  const LIST_GAP = 14, LIST_TOP_PAD = 18, LIST_HEAD_H = 22, LIST_ITEM_H = 24, LIST_BOT_PAD = 14;
+  let listCardTop = 0, listCardH = 0;
+  if (items.length) {
+    listCardTop = contentBottom + LIST_GAP;
+    listCardH = LIST_TOP_PAD + LIST_HEAD_H + items.length * LIST_ITEM_H + LIST_BOT_PAD;
+    contentBottom = listCardTop + listCardH;
+  }
+  const H = contentBottom + 52; // ruang footer
+
   const scale = Math.min(3, window.devicePixelRatio || 2) * 1.5;
   const canvas = document.createElement('canvas');
   canvas.width = W * scale;
@@ -90,9 +119,9 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   ctx.fillText(data.title, 40, 195);
 
   // Baris detail (kartu putih)
-  let y = 250;
+  let y = rowsCardTop;
   ctx.fillStyle = '#FFFFFF';
-  roundRect(ctx, 20, y, W - 40, 36 * data.rows.length + 16, 20);
+  roundRect(ctx, 20, y, W - 40, rowsCardH, 20);
   ctx.fill();
   y += 26;
   data.rows.forEach((row) => {
@@ -107,6 +136,29 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     ctx.textAlign = 'left';
     y += 36;
   });
+
+  // Kartu daftar nama bernomor (mis. tidak hadir) — untuk kontrol cek-fisik
+  if (items.length) {
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, 20, listCardTop, W - 40, listCardH, 20);
+    ctx.fill();
+    // Heading
+    ctx.fillStyle = '#B45309'; // warn — selaras "tidak hadir / perhatian"
+    ctx.font = `700 11px ${rupiahFont}`;
+    ctx.textAlign = 'left';
+    ctx.fillText((data.list!.heading).toUpperCase(), 40, listCardTop + LIST_TOP_PAD + LIST_HEAD_H / 2);
+    // Item bernomor
+    let ly = listCardTop + LIST_TOP_PAD + LIST_HEAD_H + LIST_ITEM_H / 2;
+    items.forEach((nama, i) => {
+      ctx.fillStyle = '#9CA3AF';
+      ctx.font = `600 12px ${rupiahFont}`;
+      ctx.fillText(`${i + 1}.`, 40, ly);
+      ctx.fillStyle = '#111827';
+      ctx.font = `500 13px ${rupiahFont}`;
+      ctx.fillText(fitText(ctx, nama, W - 40 - 64), 64, ly);
+      ly += LIST_ITEM_H;
+    });
+  }
 
   // Footer
   const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });

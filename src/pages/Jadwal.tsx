@@ -37,6 +37,7 @@ interface AbsensiResult {
   kasTotal: number;
   talanganTotal: number;
   sohibulBaitTerima: number;
+  tidakHadirNama: string[]; // nama pembayar yg tidak hadir (= kena talangan) — utk kontrol cek-fisik
 }
 
 interface AbsensiViewProps {
@@ -168,6 +169,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         total_terkumpul: kasTerkumpul,
       }).eq('id', tarikanId);
 
+      // Nama pembayar tidak hadir (urut sesuai wargaList) — Sohibul dikecualikan.
+      const tidakHadirNama = wargaList
+        .filter(w => w.id !== sohibulId && map[w.id] !== 'hadir')
+        .map(w => w.nama);
+
       onSaved({
         tarikanNomor: tarikan.nomor,
         hadirCount: hadirIds.length,
@@ -175,6 +181,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         kasTotal: kasTerkumpul,
         talanganTotal: talanganIds.length * 50000,
         sohibulBaitTerima: pembayarCount * 45000,
+        tidakHadirNama,
       });
     } catch {
       // Penyimpanan gagal (mis. koneksi putus) → JANGAN diam: beri tahu & tahan
@@ -456,6 +463,9 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           ...(hasTalangan ? [{ label: 'Talangan Keluar', value: formatRupiahPlain(result.talanganTotal) }] : []),
           { label: 'Sohibul Bait Terima', value: formatRupiahPlain(result.sohibulBaitTerima) },
         ],
+        list: result.tidakHadirNama.length
+          ? { heading: `Tidak Hadir (${result.tidakHadirNama.length})`, items: result.tidakHadirNama }
+          : undefined,
         shareText: `Hasil Tarikan #${result.tarikanNomor} RT 004/006\nKas terkumpul: ${formatRupiahPlain(result.kasTotal)} · Sohibul terima: ${formatRupiahPlain(result.sohibulBaitTerima)}\n— Hadiran RT`,
       });
     } catch {
@@ -503,6 +513,23 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {result.tidakCount} Tidak hadir
           </span>
         </div>
+
+        {/* Daftar tidak hadir — kontrol cocokkan uang fisik vs data */}
+        {result.tidakHadirNama.length > 0 && (
+          <div className="px-4 py-3 border-t border-line dark:border-gray-800">
+            <p className="text-micro font-bold uppercase tracking-wider text-warn dark:text-amber-400 mb-2">
+              Tidak hadir ({result.tidakHadirNama.length}) — cek vs uang fisik
+            </p>
+            <ol className="space-y-1">
+              {result.tidakHadirNama.map((nama, i) => (
+                <li key={`${i}-${nama}`} className="flex items-center gap-2 text-caption text-ink-sub dark:text-gray-300">
+                  <span className="w-5 shrink-0 text-right tabular-nums text-ink-faint dark:text-gray-500">{i + 1}.</span>
+                  <span className="truncate">{nama}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
 
         {/* Talangan keluar */}
         {hasTalangan && (
