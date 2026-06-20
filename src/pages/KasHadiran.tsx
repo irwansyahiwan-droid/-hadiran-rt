@@ -84,7 +84,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
           </div>
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-control dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300">Batal</button>
+              className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
             <button type="submit" disabled={saving || !nominal}
               className="btn-brand flex-1 py-3 text-sm font-semibold disabled:opacity-70 active:scale-[0.97] transition-all flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}

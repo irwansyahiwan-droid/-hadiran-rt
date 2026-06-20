@@ -245,7 +245,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         <div className="flex gap-2.5">
           <button
             onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : onClose}
-            className="flex-1 py-3 rounded-full border border-control dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="btn-secondary flex-1 py-3 rounded-full"
           >
             Batal
           </button>

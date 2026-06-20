@@ -307,6 +307,21 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
   }
   .btn-brand:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 6px 16px -8px rgba(16,150,80,0.5); }
 
+  /* ── Secondary button (aksi netral: Batal/Tutup di footer modal) ───────
+     SATU sumber untuk tombol sekunder berbingkai yang sebelumnya disalin
+     manual di tiap sheet (warna/hover kadang luput — mis. tombol Batal tanpa
+     hover). Sengaja NETRAL radius & lebar: call-site tetap pegang `flex-1`/
+     `w-full` + `rounded-xl`/`rounded-full` → adopsi = refactor murni tanpa
+     ubah bentuk, hanya menambah hover + spring-press (paritas tactile dgn
+     .btn-brand). Pasangan visual btn-brand di footer dua-tombol. */
+  .btn-secondary {
+    @apply border border-control dark:border-gray-700
+           text-sm font-semibold text-gray-600 dark:text-gray-300
+           hover:bg-gray-50 dark:hover:bg-gray-800;
+    transition: background-color 0.18s ease, transform 0.15s var(--ease-spring);
+  }
+  .btn-secondary:active { transform: scale(0.97); }
+
   /* ── Field recipes ───────────────────────────────────────────────────
      SATU sumber tinggi/warna/fokus field. `.field` = input form (bg-gray-50,
      py-3); `.field-search` = bilah cari di halaman list (bg-white, py-2.5).
