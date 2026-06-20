@@ -6,6 +6,7 @@ import {
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
+import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
 import CrossFade from '../components/CrossFade';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -197,7 +198,6 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   // dan hapus SEMUA data turunannya (absensi, talangan, transaksi kas tarikan ini).
   async function batalkan() {
     setCancelling(true);
-    setConfirmCancel(false);
     try {
       const tarikanId = tarikan.id;
       await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
@@ -216,12 +216,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }
 
   function handleBatalkanClick() {
-    if (confirmCancel) {
-      batalkan();
-    } else {
-      setConfirmCancel(true);
-      setTimeout(() => setConfirmCancel(false), 3500);
-    }
+    haptic(8);
+    setConfirmCancel(true); // buka dialog pengaman (wajib ketik nomor tarikan)
   }
 
   if (loadingAbsensi) {
@@ -403,28 +399,29 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             {saving ? 'Menghitung...' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
           </button>
 
-          {/* Batalkan — hanya untuk tarikan yang sudah selesai (undo simpan & hitung) */}
+          {/* Batalkan — hanya untuk tarikan yang sudah selesai (undo simpan & hitung).
+              Pengaman: buka dialog yang mewajibkan ketik nomor tarikan. */}
           {tarikan.status === 'selesai' && (
             <button
               onClick={handleBatalkanClick}
               disabled={saving || cancelling}
-              className={`w-full py-3 rounded-full font-bold text-sm shadow-sm active:scale-[0.97] transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2 ${
-                confirmCancel
-                  ? 'bg-rose-600 text-white'
-                  : 'bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400'
-              }`}
+              className="w-full py-3 rounded-full font-bold text-sm shadow-sm active:scale-[0.97] transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
             >
-              {cancelling ? (
-                <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan...</>
-              ) : confirmCancel ? (
-                'Yakin? Data tarikan ini akan dihapus'
-              ) : (
-                <><RotateCcw className="w-4 h-4" />Batalkan Hasil Tarikan</>
-              )}
+              {cancelling
+                ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan...</>
+                : <><RotateCcw className="w-4 h-4" />Batalkan Hasil Tarikan</>}
             </button>
           )}
         </div>
       </div>
+
+      <ConfirmBatalTarikan
+        open={confirmCancel}
+        nomor={tarikan.nomor}
+        loading={cancelling}
+        onClose={() => setConfirmCancel(false)}
+        onConfirm={batalkan}
+      />
     </div>
   );
 }

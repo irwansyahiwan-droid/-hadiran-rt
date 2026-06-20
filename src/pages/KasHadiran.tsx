@@ -11,6 +11,7 @@ import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import Odometer from '../components/Odometer';
 import Tag from '../components/Tag';
+import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
 import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
@@ -108,7 +109,7 @@ export default function KasHadiranPage() {
   const [talanganMap, setTalanganMap] = useState<Record<string, { count: number; total: number }>>({});
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
-  const [confirmBatalId, setConfirmBatalId] = useState<string | null>(null);
+  const [batalTarikan, setBatalTarikan] = useState<Tarikan | null>(null);
   const [confirmHapusId, setConfirmHapusId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -275,7 +276,6 @@ export default function KasHadiranPage() {
   // dan hapus data turunannya (absensi, talangan, transaksi kas tarikan ini).
   async function batalkanTarikan(t: Tarikan) {
     setProcessingId(t.id);
-    setConfirmBatalId(null);
     try {
       await supabase.from('absensi').delete().eq('tarikan_id', t.id);
       await supabase.from('talangan').delete().eq('tarikan_id', t.id);
@@ -284,20 +284,17 @@ export default function KasHadiranPage() {
         status: 'dijadwalkan', total_hadir: 0, total_terkumpul: 0,
       }).eq('id', t.id);
       await load();
+      setBatalTarikan(null); // tutup dialog pengaman
       showToast(`Tarikan #${t.nomor} dibatalkan`, 'info');
     } finally {
       setProcessingId(null);
     }
   }
 
+  // Buka dialog pengaman (wajib ketik nomor tarikan) — cegah salah-pencet.
   function handleBatalkanClick(t: Tarikan) {
     setConfirmHapusId(null);
-    if (confirmBatalId === t.id) {
-      batalkanTarikan(t);
-    } else {
-      setConfirmBatalId(t.id);
-      setTimeout(() => setConfirmBatalId(prev => (prev === t.id ? null : prev)), 3500);
-    }
+    setBatalTarikan(t);
   }
 
   // Hapus tarikan sepenuhnya (semua data turunan). Pola undo: hapus permanen
@@ -650,12 +647,10 @@ export default function KasHadiranPage() {
                           <button
                             onClick={() => handleBatalkanClick(t)}
                             disabled={processingId === t.id}
-                            className={`flex items-center gap-1.5 min-h-[44px] text-xs font-medium transition-colors disabled:opacity-50 ${
-                              confirmBatalId === t.id ? 'text-amber-600' : 'text-ink-sub dark:text-gray-400 hover:text-amber-600'
-                            }`}
+                            className="flex items-center gap-1.5 min-h-[44px] text-xs font-medium transition-colors disabled:opacity-50 text-ink-sub dark:text-gray-400 hover:text-amber-600"
                           >
                             <RotateCcw className={`w-3.5 h-3.5 ${processingId === t.id ? 'animate-spin' : ''}`} />
-                            {confirmBatalId === t.id ? 'Yakin batalkan?' : 'Batalkan'}
+                            Batalkan
                           </button>
                         )}
                         {isBendahara && (
@@ -688,6 +683,14 @@ export default function KasHadiranPage() {
           onClose={() => setShowModal(false)}
         />
       )}
+
+      <ConfirmBatalTarikan
+        open={!!batalTarikan}
+        nomor={batalTarikan?.nomor ?? 0}
+        loading={!!batalTarikan && processingId === batalTarikan.id}
+        onClose={() => setBatalTarikan(null)}
+        onConfirm={() => { if (batalTarikan) batalkanTarikan(batalTarikan); }}
+      />
 
       {/* Sheet detail tarikan: hadir & tidak hadir + status bayar talangan */}
       {detailTarikan && (
