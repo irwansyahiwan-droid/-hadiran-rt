@@ -48,7 +48,9 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
       className="fixed left-0 right-0 z-40 px-3 pointer-events-none"
       style={{
         bottom: 'calc(env(safe-area-inset-bottom) + 6px)',
-        transform: tucked ? 'translateY(calc(100% + 1.5rem))' : 'translateY(0)',
+        // Sertakan safe-area + margin di geseran → nav bersih total keluar layar
+        // walau di HP dgn home indicator (nav duduk lebih tinggi). 100% = tinggi nav.
+        transform: tucked ? 'translateY(calc(100% + env(safe-area-inset-bottom) + 1.75rem))' : 'translateY(0)',
         transition: 'transform 0.32s var(--ease-out-expo)',
       }}
     >
