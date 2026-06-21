@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Home, CalendarDays, ArrowLeftRight, Wallet, Building2, type LucideIcon } from 'lucide-react';
 import { haptic } from '../../lib/utils';
+import { useScrollHide } from '../../hooks/useScrollDirection';
 
 export type TabName = 'beranda' | 'jadwal' | 'talangan' | 'kas' | 'kas-rt';
 
@@ -25,19 +25,8 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
 
   // Auto-hide: scroll turun (masuk ke konten) → nav menyelinap turun keluar layar;
   // scroll naik → muncul lagi. Beri ruang baca list yg panjang. Dekat puncak (y<80)
-  // selalu tampil.
-  const [tucked, setTucked] = useState(false);
-  useEffect(() => {
-    let lastY = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (y > lastY + 4 && y > 80) setTucked(true);     // turun → sembunyi
-      else if (y < lastY - 4) setTucked(false);          // naik → muncul
-      lastY = y;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  // selalu tampil. Listener scroll dibagi pakai (lihat hook).
+  const tucked = useScrollHide({ threshold: 80 });
 
   return (
     <nav

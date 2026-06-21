@@ -3,6 +3,7 @@ import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
+import { useScrolledPast } from '../../hooks/useScrollDirection';
 import Tag from '../Tag';
 import type { Role } from '../../hooks/useAuth';
 
@@ -21,18 +22,13 @@ interface HeaderProps {
 /** Header menyusut + shadow/blur menguat saat halaman di-scroll (ala app fintech). */
 export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan, onOpenBackup, onOpenAnggota, onOpenTentang }: HeaderProps) {
   const isBendahara = role === 'bendahara';
-  const [scrolled, setScrolled] = useState(false);
+  // Header menyusut + shadow/blur menguat saat halaman tergeser >6px dari puncak.
+  // Listener scroll dibagi pakai (lihat hook).
+  const scrolled = useScrolledPast(6);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuMounted = useExitAnim(menuOpen);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 6);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   // Saat menu buka: fokus item pertama → pola menu WAI-ARIA (keyboard mulai di dalam).
   useEffect(() => {

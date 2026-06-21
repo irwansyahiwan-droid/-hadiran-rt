@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Plus, type LucideIcon } from 'lucide-react';
 import { haptic } from '../lib/utils';
+import { useScrollHide } from '../hooks/useScrollDirection';
 
 interface FabProps {
   onClick: () => void;
@@ -19,22 +19,9 @@ interface FabProps {
  *  PINTAR (Material 3 2026): mengkerut jadi bulat ikon-saja saat scroll turun
  *  (beri ruang baca list), memanjang lagi dengan label saat scroll naik/berhenti. */
 export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel }: FabProps) {
-  const [compact, setCompact] = useState(false);
-
-  useEffect(() => {
-    let lastY = window.scrollY;
-    let idle: ReturnType<typeof setTimeout>;
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (y > lastY + 4 && y > 80) setCompact(true);       // scroll turun → mengkerut
-      else if (y < lastY - 4) setCompact(false);           // scroll naik → memanjang
-      lastY = y;
-      clearTimeout(idle);
-      idle = setTimeout(() => setCompact(false), 900);     // diam sejenak → memanjang lagi
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => { window.removeEventListener('scroll', onScroll); clearTimeout(idle); };
-  }, []);
+  // Mengkerut jadi bulat ikon-saja saat scroll turun; memanjang lagi saat
+  // scroll naik / diam (900ms). Listener scroll dibagi pakai (lihat hook).
+  const compact = useScrollHide({ threshold: 80, idleExpandMs: 900 });
 
   return (
     <button
