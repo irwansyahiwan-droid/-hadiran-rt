@@ -51,9 +51,18 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
         // Sertakan safe-area + margin lebar di geseran → nav bersih total keluar
         // layar walau di HP dgn home indicator. Opacity fade = jaring pengaman:
         // andai ada sisa posisi sepiksel pun, tetap tak terlihat. 100% = tinggi nav.
-        transform: tucked ? 'translateY(calc(100% + env(safe-area-inset-bottom) + 2.5rem))' : 'translateY(0)',
+        // translate3d (bukan translateY) + backface-hidden + will-change →
+        // PAKSA layer GPU stabil. Tanpa ini, iOS Safari kadang tak mempromosikan
+        // fixed+backdrop-filter ke compositor, lalu nav "melompat ke atas-tengah"
+        // saat scroll (address-bar muncul/sembunyi me-relayout containing block).
+        transform: tucked
+          ? 'translate3d(0, calc(100% + env(safe-area-inset-bottom) + 2.5rem), 0)'
+          : 'translate3d(0, 0, 0)',
         opacity: tucked ? 0 : 1,
         transition: 'transform 0.32s var(--ease-out-expo), opacity 0.26s ease',
+        willChange: 'transform',
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
       }}
     >
       <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-16 rounded-[26px] pointer-events-auto bg-white/70 dark:bg-gray-900/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-black/[0.06] dark:ring-white/10">
