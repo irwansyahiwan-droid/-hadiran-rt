@@ -318,7 +318,7 @@ export default function KasHadiranPage() {
   }
 
   function handleHapusClick(t: Tarikan) {
-    setConfirmBatalId(null);
+    setBatalTarikan(null);
     if (confirmHapusId === t.id) {
       hapusTarikan(t);
     } else {
