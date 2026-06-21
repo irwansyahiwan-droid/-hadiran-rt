@@ -52,7 +52,7 @@ export default function ExportMenu({ items, align = 'right' }: ExportMenuProps) 
           <div
             role="menu"
             aria-label="Ekspor"
-            className={`pop absolute top-[calc(100%+8px)] z-50 w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
+            className={`pop-menu absolute top-[calc(100%+8px)] z-50 w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             {items.map(({ label, icon: Icon, onClick, tone }) => (

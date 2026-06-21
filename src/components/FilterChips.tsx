@@ -92,7 +92,7 @@ export default function FilterChips<T extends string, S extends string = string>
               <div
                 role="listbox"
                 aria-label="Pilihan urutan"
-                className="absolute right-0 top-full mt-2 z-50 min-w-[10rem] py-1.5 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float origin-top-right"
+                className="pop-menu absolute right-0 top-full mt-2 z-50 min-w-[10rem] py-1.5 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float origin-top-right"
               >
                 {sort.options.map((o) => {
                   const selected = o.id === sort.value;

@@ -136,7 +136,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                   role="menu"
                   aria-label="Menu aplikasi"
                   onKeyDown={onMenuKeyDown}
-                  className="pop absolute right-0 top-[calc(100%+8px)] z-50 w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right"
+                  className="pop-menu absolute right-0 top-[calc(100%+8px)] z-50 w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right"
                   style={{ boxShadow: 'var(--shadow-float)' }}
                 >
                   {isBendahara && onOpenLaporan && (
