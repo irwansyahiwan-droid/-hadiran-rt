@@ -4,6 +4,9 @@ interface HeroSparklineProps {
   /** Deret kumulatif (mis. total kas terkumpul per tarikan selesai). */
   points: number[];
   height?: number;
+  /** Mainkan draw-on garis + fade area. `false` → tampil utuh seketika
+   *  (mis. saat remount Beranda agar entrance tak mengulang tiap kunjungan). */
+  animate?: boolean;
 }
 
 /**
@@ -15,21 +18,22 @@ interface HeroSparklineProps {
  * Garis menggambar sendiri (draw-on) sekali saat mount; dihormati oleh guard
  * `prefers-reduced-motion` global di index.css.
  */
-export default function HeroSparkline({ points, height = 40 }: HeroSparklineProps) {
+export default function HeroSparkline({ points, height = 40, animate = true }: HeroSparklineProps) {
   const gid = useId().replace(/:/g, '');
   const pathRef = useRef<SVGPathElement>(null);
   const [len, setLen] = useState(0);
-  const [drawn, setDrawn] = useState(false);
+  const [drawn, setDrawn] = useState(!animate);
 
   // Ukur panjang garis untuk animasi stroke-dasharray (draw-on).
   useEffect(() => {
     if (pathRef.current) {
       setLen(pathRef.current.getTotalLength());
+      if (!animate) { setDrawn(true); return; }
       // tick berikutnya: lepas dashoffset → garis "tertarik" keluar
       const t = requestAnimationFrame(() => setDrawn(true));
       return () => cancelAnimationFrame(t);
     }
-  }, [points.length]);
+  }, [points.length, animate]);
 
   if (points.length < 2) return null;
 
@@ -71,7 +75,7 @@ export default function HeroSparkline({ points, height = 40 }: HeroSparklineProp
             <stop offset="100%" stopColor="#6EE7B7" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <path d={area} fill={`url(#hsArea${gid})`} className="hs-area" />
+        <path d={area} fill={`url(#hsArea${gid})`} className={animate ? 'hs-area' : ''} />
         <path
           ref={pathRef}
           d={line}

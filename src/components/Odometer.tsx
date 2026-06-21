@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 
 interface OdometerProps {
   /** Nilai yang ditampilkan. Biasanya sudah di-animate via useCountUp agar digit berputar. */
@@ -26,6 +26,23 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
 
   const negative = value < 0;
   const grouped = Math.abs(Math.round(value)).toLocaleString('id-ID');
+  const len = grouped.length;
+
+  // Kolom di-key dari KANAN (satuan stabil) → saat angka bertambah panjang
+  // (mis. 999→1.000), kolom lama tak remount (roll mulus) & hanya kolom baru
+  // di depan yg "masuk dari kiri". `animatedKeys` permanen → kelas tak dicabut
+  // di tengah animasi oleh re-render count-up tiap frame; CSS main sekali saat
+  // mount. Mount awal TIDAK dianimasikan (seenMax disetel = panjang awal).
+  const seenMax = useRef<number | null>(null);
+  const animatedKeys = useRef<Set<number>>(new Set());
+  if (!prefersReduced) {
+    if (seenMax.current === null) {
+      seenMax.current = len;
+    } else if (len > seenMax.current) {
+      for (let r = seenMax.current; r < len; r++) animatedKeys.current.add(r);
+      seenMax.current = len;
+    }
+  }
 
   return (
     <span
@@ -35,9 +52,11 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
       {negative && <span style={cell}>-</span>}
       {prefix && <span style={cell}>{prefix}</span>}
       {grouped.split('').map((c, i) => {
+        const rightIndex = len - 1 - i;
+        const colIn = animatedKeys.current.has(rightIndex) ? 'odo-col-in' : '';
         if (c < '0' || c > '9') {
           return (
-            <span key={`s${i}`} style={cell}>
+            <span key={`c${rightIndex}`} className={colIn} style={cell}>
               {c}
             </span>
           );
@@ -45,8 +64,8 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
         const d = Number(c);
         return (
           <span
-            key={`d${i}`}
-            className="overflow-hidden"
+            key={`c${rightIndex}`}
+            className={`overflow-hidden ${colIn}`}
             style={{ ...cell, height: '1em' }}
           >
             <span

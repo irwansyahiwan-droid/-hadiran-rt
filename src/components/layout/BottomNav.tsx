@@ -99,7 +99,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
                 />
               </span>
               <span
-                className={`text-micro leading-none mt-1 transition-all duration-300 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}
+                className={`text-micro leading-none mt-1 transition-colors duration-300 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}
                 style={{ transitionTimingFunction: 'var(--ease-spring)' }}
               >
                 {label}

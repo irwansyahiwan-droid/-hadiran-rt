@@ -9,24 +9,35 @@ const STYLES = {
   info: { icon: Info, ring: 'ring-slate-200 dark:ring-slate-700', dot: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-300' },
 } as const;
 
+const EXIT_MS = 200; // selaras durasi .toast-out
+
 export default function Toaster() {
   const [items, setItems] = useState<ToastItem[]>([]);
+  // id toast yg sedang memainkan exit (slide naik + fade) sebelum dilepas.
+  const [leaving, setLeaving] = useState<Set<string>>(new Set());
+
+  // Tandai keluar → mainkan .toast-out → lepas dari DOM setelah animasi selesai.
+  const dismiss = (id: string, after?: () => void) => {
+    setLeaving((prev) => new Set(prev).add(id));
+    setTimeout(() => {
+      setItems((prev) => prev.filter((x) => x.id !== id));
+      setLeaving((prev) => { const n = new Set(prev); n.delete(id); return n; });
+      after?.();
+    }, EXIT_MS);
+  };
 
   useEffect(() => {
     return subscribeToast((t) => {
       haptic(8);
       setItems((prev) => [...prev, t]);
-      setTimeout(() => {
-        setItems((prev) => prev.filter((x) => x.id !== t.id));
-        t.onExpire?.(); // commit ditunda (guard mencegah jalan bila sudah di-undo)
-      }, t.duration ?? 2600);
+      // commit ditunda (guard mencegah jalan bila sudah di-undo)
+      setTimeout(() => dismiss(t.id, () => t.onExpire?.()), t.duration ?? 2600);
     });
   }, []);
 
   const handleAction = (t: ToastItem) => {
     haptic(12);
-    setItems((prev) => prev.filter((x) => x.id !== t.id));
-    t.onAction?.();
+    dismiss(t.id, () => t.onAction?.());
   };
 
   if (items.length === 0) return null;
@@ -44,7 +55,7 @@ export default function Toaster() {
         return (
           <div
             key={t.id}
-            className={`toast-in pointer-events-auto flex items-center gap-2.5 w-full px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ${s.ring}`}
+            className={`${leaving.has(t.id) ? 'toast-out' : 'toast-in'} pointer-events-auto flex items-center gap-2.5 w-full px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ${s.ring}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${s.dot}`}>

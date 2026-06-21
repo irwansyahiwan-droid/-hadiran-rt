@@ -24,22 +24,48 @@ export function useHideAmount(): boolean {
   return hideAmount;
 }
 
+/* ── Gerbang "mainkan sekali per sesi" ───────────────────────────────
+ * Entrance yang menyenangkan (count-up, sheen, draw-on) jadi pajak waktu
+ * bila replay tiap remount. Beranda dibuka puluhan kali/hari (tab/back) →
+ * komponennya remount → animasi mengulang. Helper ini menandai sebuah key
+ * di sessionStorage: TRUE sekali (kunjungan pertama sesi), FALSE setelahnya.
+ * Dipakai lewat useState-initializer agar konsumsi terjadi sekali per mount. */
+function consumeFirstPlay(key: string): boolean {
+  if (typeof window === 'undefined') return false;
+  const k = 'fp:' + key;
+  try {
+    if (sessionStorage.getItem(k)) return false;
+    sessionStorage.setItem(k, '1');
+    return true;
+  } catch {
+    return true;
+  }
+}
+
+/** Mengembalikan `true` hanya pada mount pertama key ini dalam satu sesi. */
+export function useFirstPlay(key: string): boolean {
+  return useState(() => consumeFirstPlay(key))[0];
+}
+
 /**
  * Menganimasikan angka menuju `target`.
  * - Mount pertama: menghitung naik dari 0.
  * - Perubahan berikutnya (mis. setelah refresh): menganimasikan dari nilai
  *   sebelumnya, bukan reset ke 0 — terasa halus, bukan menyentak.
  * - Menghormati `prefers-reduced-motion` (langsung ke nilai akhir).
+ * - `animate=false` → langsung ke nilai akhir tanpa hitung-naik (mis. saat
+ *   remount Beranda agar count-up tak mengulang tiap kunjungan).
  */
-export function useCountUp(target: number, duration = 1000): number {
-  const [current, setCurrent] = useState(0);
-  const fromRef = useRef(0);
+export function useCountUp(target: number, duration = 1000, animate = true): number {
+  const [current, setCurrent] = useState(animate ? 0 : target);
+  const fromRef = useRef(animate ? 0 : target);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const prefersReduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      !animate ||
+      (typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
     if (prefersReduced) {
       fromRef.current = target;
@@ -67,7 +93,7 @@ export function useCountUp(target: number, duration = 1000): number {
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [target, duration]);
+  }, [target, duration, animate]);
 
   return current;
 }

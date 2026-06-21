@@ -7,7 +7,7 @@ import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
-import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import HeroSparkline from '../components/charts/HeroSparkline';
@@ -143,10 +143,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       : talangan > 0
         ? { label: 'Ada Tunggakan', dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' }
         : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' };
-  const animatedKasHadiran = useCountUp(kasHadiran);
-  const animatedSaldo = useCountUp(saldo);
-  const animatedTalangan = useCountUp(talangan);
-  const animatedSetor = useCountUp(setorKasRT);
+  // Entrance hero (count-up, sheen sweep, draw-on sparkline) hanya pada
+  // kunjungan pertama sesi — balik ke Beranda via tab/back tak mengulanginya.
+  const firstHero = useFirstPlay('beranda-hero');
+  const animatedKasHadiran = useCountUp(kasHadiran, 1000, firstHero);
+  const animatedSaldo = useCountUp(saldo, 1000, firstHero);
+  const animatedTalangan = useCountUp(talangan, 1000, firstHero);
+  const animatedSetor = useCountUp(setorKasRT, 1000, firstHero);
   const hidden = useHideAmount();
 
   // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
@@ -212,11 +215,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Main Kas Card — clean & premium hero */}
-      <div className="hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
+      <div className={`hero-card hero-noise${firstHero ? ' hero-sheen-sweep' : ''}`} style={{ padding: '18px 20px 16px' }}>
         {/* Ambient growth wave — latar "hidup" di belakang konten, tanpa menambah tinggi kartu */}
         {kasSeries.length >= 2 && (
           <div className="absolute inset-x-0 bottom-0 z-0 pointer-events-none" style={{ height: 104, opacity: 0.55 }}>
-            <HeroSparkline points={kasSeries} height={104} />
+            <HeroSparkline points={kasSeries} height={104} animate={firstHero} />
           </div>
         )}
 
