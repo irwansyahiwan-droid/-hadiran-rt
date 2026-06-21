@@ -48,6 +48,22 @@ export function useFirstPlay(key: string): boolean {
 }
 
 /**
+ * Menunda unmount agar elemen sempat memainkan animasi keluar.
+ * `open` = niat tampil; kembalian `mounted` = apakah masih perlu dirender.
+ * Saat `open` jadi false, `mounted` tetap true selama `ms` (mainkan exit),
+ * lalu false. Pemanggil: render saat `mounted`, pakai kelas exit saat `!open`.
+ */
+export function useExitAnim(open: boolean, ms = 120): boolean {
+  const [mounted, setMounted] = useState(open);
+  useEffect(() => {
+    if (open) { setMounted(true); return; }
+    const t = setTimeout(() => setMounted(false), ms);
+    return () => clearTimeout(t);
+  }, [open, ms]);
+  return mounted;
+}
+
+/**
  * Menganimasikan angka menuju `target`.
  * - Mount pertama: menghitung naik dari 0.
  * - Perubahan berikutnya (mis. setelah refresh): menganimasikan dari nilai

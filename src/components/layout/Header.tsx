@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
+import { useExitAnim } from '../../lib/hooks';
 import Tag from '../Tag';
 import type { Role } from '../../hooks/useAuth';
 
@@ -22,6 +23,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   const isBendahara = role === 'bendahara';
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuMounted = useExitAnim(menuOpen);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -128,15 +130,15 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
               <MoreVertical className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
 
-            {menuOpen && (
+            {menuOpen && <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />}
+            {menuMounted && (
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                 <div
                   ref={menuRef}
                   role="menu"
                   aria-label="Menu aplikasi"
                   onKeyDown={onMenuKeyDown}
-                  className="pop-menu absolute right-0 top-[calc(100%+8px)] z-50 w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right"
+                  className={`${menuOpen ? 'pop-menu' : 'pop-menu-out'} absolute right-0 top-[calc(100%+8px)] z-50 w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right`}
                   style={{ boxShadow: 'var(--shadow-float)' }}
                 >
                   {isBendahara && onOpenLaporan && (

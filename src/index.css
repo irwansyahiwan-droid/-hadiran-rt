@@ -481,7 +481,13 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
   from { opacity: 0; transform: scale(0.96); }
   to   { opacity: 1; transform: scale(1); }
 }
-.pop-menu { animation: popMenuIn 0.17s var(--ease-out-expo) both; }
+@keyframes popMenuOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.96); }
+}
+.pop-menu     { animation: popMenuIn 0.17s var(--ease-out-expo) both; }
+/* Exit lebih cepat dari enter (sistem merespons, bukan menunda). */
+.pop-menu-out { animation: popMenuOut 0.12s var(--ease-out-expo) forwards; pointer-events: none; }
 
 /* Slow-floating aurora blobs (login background) */
 @keyframes floatBlob {

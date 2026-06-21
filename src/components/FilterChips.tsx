@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowDownUp, Check } from 'lucide-react';
 import { haptic } from '../lib/utils';
+import { useExitAnim } from '../lib/hooks';
 
 interface ChipOption<T extends string> {
   id: T;
@@ -42,6 +43,7 @@ export default function FilterChips<T extends string, S extends string = string>
   className = '',
 }: FilterChipsProps<T, S>) {
   const [sortOpen, setSortOpen] = useState(false);
+  const sortMounted = useExitAnim(sortOpen);
   const sortLabel = sort
     ? 'options' in sort
       ? (sort.options.find((o) => o.id === sort.value)?.label ?? sort.options[0]?.label ?? '')
@@ -86,13 +88,15 @@ export default function FilterChips<T extends string, S extends string = string>
           </button>
 
           {sortOpen && (
+            /* Penangkap klik di luar → tutup */
+            <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
+          )}
+          {sortMounted && (
             <>
-              {/* Penangkap klik di luar → tutup */}
-              <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
               <div
                 role="listbox"
                 aria-label="Pilihan urutan"
-                className="pop-menu absolute right-0 top-full mt-2 z-50 min-w-[10rem] py-1.5 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float origin-top-right"
+                className={`${sortOpen ? 'pop-menu' : 'pop-menu-out'} absolute right-0 top-full mt-2 z-50 min-w-[10rem] py-1.5 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float origin-top-right`}
               >
                 {sort.options.map((o) => {
                   const selected = o.id === sort.value;

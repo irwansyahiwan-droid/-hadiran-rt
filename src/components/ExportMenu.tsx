@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, ChevronDown, type LucideIcon } from 'lucide-react';
 import { haptic } from '../lib/utils';
+import { useExitAnim } from '../lib/hooks';
 
 export interface ExportItem {
   label: string;
@@ -24,6 +25,7 @@ interface ExportMenuProps {
  *  tutup via Escape / klik luar. */
 export default function ExportMenu({ items, align = 'right' }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
+  const mounted = useExitAnim(open);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,13 +48,13 @@ export default function ExportMenu({ items, align = 'right' }: ExportMenuProps) 
         <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
       </button>
 
-      {open && (
+      {open && <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />}
+      {mounted && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div
             role="menu"
             aria-label="Ekspor"
-            className={`pop-menu absolute top-[calc(100%+8px)] z-50 w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
+            className={`${open ? 'pop-menu' : 'pop-menu-out'} absolute top-[calc(100%+8px)] z-50 w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             {items.map(({ label, icon: Icon, onClick, tone }) => (
