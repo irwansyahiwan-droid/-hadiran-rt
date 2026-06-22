@@ -16,7 +16,7 @@ interface BannerSlide {
   judul: string;
   isi: string;
   icon: LucideIcon;
-  grad: string;        // gradien latar (selaras PengumumanBanner)
+  grad: string;        // gradien latar
   glow: string;        // warna glow di balik ikon
   cta?: { label: string; tab: string };
   /** Bila ada → render progress bar (Target Kas RT) menggantikan teks isi. */
@@ -169,7 +169,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
 
   return (
     <section aria-roledescription="carousel" aria-label="Info, target & panduan" className="select-none">
-      <div className="relative overflow-hidden rounded-3xl">
+      <div className="relative overflow-hidden rounded-3xl lift">
         <div
           ref={trackRef}
           className="flex items-stretch"
@@ -190,15 +190,29 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
             return (
               <div
                 key={s.id}
-                className="w-full shrink-0 px-0.5"
+                className="w-full shrink-0"
                 aria-roledescription="slide"
                 aria-label={`${i + 1} dari ${count}`}
                 aria-hidden={i !== index}
               >
                 <div
-                  className="relative h-full overflow-hidden rounded-2xl px-3.5 py-3 text-white"
+                  className="relative h-full min-h-[104px] overflow-hidden px-5 py-[18px] text-white flex flex-col justify-center"
                   style={{ background: s.grad }}
                 >
+                  {/* Blob ambient sudut kanan-atas — beri kedalaman ala banner promo bank */}
+                  <div
+                    aria-hidden
+                    className="absolute -top-10 -right-8 w-36 h-36 rounded-full pointer-events-none"
+                    style={{ background: `radial-gradient(circle, ${s.glow} 0%, transparent 70%)`, opacity: 0.5 }}
+                  />
+                  {/* Blob terang sudut kiri-bawah */}
+                  <div
+                    aria-hidden
+                    className="absolute -bottom-12 -left-10 w-32 h-32 rounded-full pointer-events-none"
+                    style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)' }}
+                  />
+                  {/* Sheen tepi atas — kilau kaca tipis */}
+                  <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-white/30 pointer-events-none" />
                   {/* Veil bawah — jaga kontras teks kecil di ujung gradient terang */}
                   <div
                     aria-hidden
@@ -206,12 +220,12 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                     style={{ height: '70%', background: 'linear-gradient(to top, rgba(0,0,0,0.28), transparent)' }}
                   />
 
-                  <div className="relative flex items-center gap-2.5">
+                  <div className="relative flex items-center gap-3">
                     <div
-                      className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0"
-                      style={{ boxShadow: `0 0 12px 1px ${s.glow}` }}
+                      className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 ring-1 ring-inset ring-white/25"
+                      style={{ boxShadow: `0 0 16px 1px ${s.glow}` }}
                     >
-                      <Icon className="w-4 h-4" strokeWidth={2.2} />
+                      <Icon className="w-5 h-5" strokeWidth={2.2} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
@@ -222,15 +236,15 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                           </span>
                         )}
                       </div>
-                      <p className="text-caption font-bold leading-snug break-words">{s.judul}</p>
+                      <p className="text-body font-bold leading-snug break-words">{s.judul}</p>
                     </div>
                     {s.cta && onNavigate && (
                       <button
                         onClick={() => { haptic(); onNavigate(s.cta!.tab); }}
                         aria-label={s.cta.label}
-                        className="press shrink-0 -mr-1 w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors"
+                        className="press shrink-0 -mr-1 w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors ring-1 ring-inset ring-white/15"
                       >
-                        <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
+                        <ChevronRight className="w-[18px] h-[18px]" strokeWidth={2.5} />
                       </button>
                     )}
                   </div>

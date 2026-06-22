@@ -12,7 +12,6 @@ import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import HeroSparkline from '../components/charts/HeroSparkline';
 import BannerCarousel from '../components/BannerCarousel';
-import PengumumanBanner from '../components/PengumumanBanner';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
@@ -323,9 +322,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
 
-      {/* Pengumuman / Info Penting — dikelola bendahara, dilihat semua warga */}
-      <PengumumanBanner canManage={isBendahara && !isWargaMode} />
-
       {/* Stats Row */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
         <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
@@ -343,6 +339,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
         </div>
       </div>
+
+      {/* Carousel promo — target Kas RT + panduan singkat (gaya banner app bank) */}
+      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
 
       {/* Alert Banner */}
       {talangan > 0 && (
@@ -364,9 +363,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </button>
         </div>
       )}
-
-      {/* Carousel target + panduan — edukasi singkat untuk warga */}
-      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
 
       {/* Jadwal Berikutnya */}
       <div>
