@@ -95,8 +95,8 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           <img
             src={logoRT}
             alt="Logo RT"
-            className={`object-contain rounded-full shadow-sm ring-1 ring-black/[0.06] dark:ring-white/10 transition-all duration-300 ${
-              scrolled ? 'h-7 w-7' : 'h-8 w-8'
+            className={`object-contain rounded-full shadow-sm ring-1 ring-black/[0.08] dark:ring-white/10 transition-all duration-300 ${
+              scrolled ? 'h-8 w-8' : 'h-9 w-9'
             }`}
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
           />
