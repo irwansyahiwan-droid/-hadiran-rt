@@ -137,11 +137,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const hour = new Date().getHours();
   const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
   const roleLabel = isWargaMode ? 'Warga' : isBendahara ? 'Bendahara' : 'Pengguna';
+  // Chip status = SATU suara ringkas. Saat ada tunggakan, banner "Talangan
+  // Belum Lunas" di bawah sudah membawa pesannya → chip TIDAK mengulang
+  // "Ada Tunggakan" (dedup), cukup netral "Kas Aktif". Saldo minus tetap
+  // kritis & pesannya BEDA dari banner → "Perlu Perhatian" (bukan duplikat).
   const kasStatus =
     saldo < 0
       ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
       : talangan > 0
-        ? { label: 'Ada Tunggakan', dot: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' }
+        ? { label: 'Kas Aktif', dot: 'bg-gray-400 dark:bg-gray-500', text: 'text-gray-600 dark:text-gray-300', bg: 'bg-gray-100 dark:bg-gray-800' }
         : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' };
   // Entrance hero (count-up, sheen sweep, draw-on sparkline) hanya pada
   // kunjungan pertama sesi — balik ke Beranda via tab/back tak mengulanginya.
