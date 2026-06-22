@@ -196,7 +196,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                 aria-hidden={i !== index}
               >
                 <div
-                  className="relative h-full overflow-hidden rounded-3xl px-5 py-4 text-white min-h-[124px]"
+                  className="relative h-full overflow-hidden rounded-2xl px-3.5 py-3 text-white"
                   style={{ background: s.grad }}
                 >
                   {/* Veil bawah — jaga kontras teks kecil di ujung gradient terang */}
@@ -206,61 +206,55 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                     style={{ height: '70%', background: 'linear-gradient(to top, rgba(0,0,0,0.28), transparent)' }}
                   />
 
-                  {s.ribbon && (
-                    <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 text-micro font-bold uppercase tracking-wide">
-                      <PartyPopper className="w-3 h-3" /> {s.ribbon}
-                    </span>
-                  )}
-
-                  <div className="relative flex items-start gap-3">
+                  <div className="relative flex items-center gap-2.5">
                     <div
-                      className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0"
-                      style={{ boxShadow: `0 0 16px 1px ${s.glow}` }}
+                      className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0"
+                      style={{ boxShadow: `0 0 12px 1px ${s.glow}` }}
                     >
-                      <Icon className="w-5 h-5" strokeWidth={2.2} />
+                      <Icon className="w-4 h-4" strokeWidth={2.2} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-micro font-bold uppercase tracking-[0.16em] text-white/75">{s.label}</p>
-                      <p className="text-body font-bold leading-snug mt-0.5 break-words">{s.judul}</p>
-
-                      {prog ? (
-                        <div className="mt-2">
-                          <div className="h-2 rounded-full bg-white/25 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-white transition-[width] duration-700 ease-out"
-                              style={{ width: `${ratio}%` }}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between mt-1.5 text-micro">
-                            <span className="font-bold tabular-nums">
-                              {done ? 'Target tercapai!' : `${Math.round(ratio)}% terkumpul`}
-                            </span>
-                            <span className="text-white/85 tabular-nums">
-                              {formatRupiahPlain(Math.max(0, prog.value))} / {formatRupiahPlain(prog.max)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between mt-1 text-micro text-white/75">
-                            <span className="tabular-nums">{done ? 'Selesai 🎉' : `Kurang ${formatRupiahPlain(sisa)}`}</span>
-                            <span className="inline-flex items-center gap-1">
-                              <CalendarClock className="w-3 h-3" /> {fmtDeadline(prog.deadline)}
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        s.isi && <p className="text-caption text-white/90 leading-relaxed mt-0.5 break-words">{s.isi}</p>
-                      )}
-
-                      {s.cta && onNavigate && (
-                        <button
-                          onClick={() => { haptic(); onNavigate(s.cta!.tab); }}
-                          className="press mt-2.5 inline-flex items-center gap-1 rounded-full bg-white/15 hover:bg-white/25 px-3 py-1.5 text-xs font-semibold backdrop-blur-sm transition-colors"
-                        >
-                          {s.cta.label}
-                          <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-micro font-bold uppercase tracking-[0.14em] text-white/75 truncate">{s.label}</p>
+                        {s.ribbon && (
+                          <span className="inline-flex items-center gap-0.5 rounded-full bg-white/20 px-1.5 py-0.5 text-[0.625rem] font-bold uppercase shrink-0">
+                            <PartyPopper className="w-2.5 h-2.5" /> {s.ribbon}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-caption font-bold leading-snug break-words">{s.judul}</p>
                     </div>
+                    {s.cta && onNavigate && (
+                      <button
+                        onClick={() => { haptic(); onNavigate(s.cta!.tab); }}
+                        aria-label={s.cta.label}
+                        className="press shrink-0 -mr-1 w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors"
+                      >
+                        <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
+                      </button>
+                    )}
                   </div>
+
+                  {prog ? (
+                    <div className="relative mt-2">
+                      <div className="h-1.5 rounded-full bg-white/25 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-white transition-[width] duration-700 ease-out"
+                          style={{ width: `${ratio}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between mt-1 text-micro">
+                        <span className="font-bold tabular-nums">
+                          {done ? 'Target tercapai 🎉' : `${Math.round(ratio)}% · kurang ${formatRupiahPlain(sisa)}`}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-white/75">
+                          <CalendarClock className="w-3 h-3" /> {fmtDeadline(prog.deadline)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    s.isi && <p className="relative text-caption text-white/90 leading-snug mt-1.5 break-words line-clamp-2">{s.isi}</p>
+                  )}
                 </div>
               </div>
             );

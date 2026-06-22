@@ -323,9 +323,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
 
-      {/* Carousel target + panduan — edukasi singkat untuk warga */}
-      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
-
       {/* Pengumuman / Info Penting — dikelola bendahara, dilihat semua warga */}
       <PengumumanBanner canManage={isBendahara && !isWargaMode} />
 
@@ -367,6 +364,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </button>
         </div>
       )}
+
+      {/* Carousel target + panduan — edukasi singkat untuk warga */}
+      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
 
       {/* Jadwal Berikutnya */}
       <div>
