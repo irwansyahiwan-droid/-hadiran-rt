@@ -11,6 +11,7 @@ import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../li
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import HeroSparkline from '../components/charts/HeroSparkline';
+import BannerCarousel from '../components/BannerCarousel';
 import PengumumanBanner from '../components/PengumumanBanner';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
@@ -321,6 +322,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </button>
         </div>
       </div>
+
+      {/* Carousel target + panduan — edukasi singkat untuk warga */}
+      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
 
       {/* Pengumuman / Info Penting — dikelola bendahara, dilihat semua warga */}
       <PengumumanBanner canManage={isBendahara && !isWargaMode} />
