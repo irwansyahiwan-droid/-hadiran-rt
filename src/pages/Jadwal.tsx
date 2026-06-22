@@ -346,7 +346,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           className="field-search"
         />
         {search && (
-          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
+          <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan pencarian">
             <X className="w-4 h-4 text-gray-400" />
           </button>
         )}
@@ -809,7 +809,7 @@ export default function JadwalPage() {
           <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{selesaiCount} selesai · {dijadwalCount} terjadwal</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={load} aria-label="Muat ulang" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <button onClick={load} aria-label="Muat ulang" className="press p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
           </button>
           {isBendahara && tarikanList.length > 0 && (

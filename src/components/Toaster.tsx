@@ -14,10 +14,11 @@ const EXIT_MS = 200; // selaras durasi .toast-out
 export default function Toaster() {
   const [items, setItems] = useState<ToastItem[]>([]);
   // id toast yg sedang memainkan exit (slide naik + fade) sebelum dilepas.
-  const [leaving, setLeaving] = useState<Set<string>>(new Set());
+  // id = number (counter di lib/toast) — Set<number> selaras dgn ToastItem.id.
+  const [leaving, setLeaving] = useState<Set<number>>(new Set());
 
   // Tandai keluar → mainkan .toast-out → lepas dari DOM setelah animasi selesai.
-  const dismiss = (id: string, after?: () => void) => {
+  const dismiss = (id: number, after?: () => void) => {
     setLeaving((prev) => new Set(prev).add(id));
     setTimeout(() => {
       setItems((prev) => prev.filter((x) => x.id !== id));

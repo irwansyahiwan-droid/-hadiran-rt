@@ -247,7 +247,7 @@ export default function JadwalWargaPage() {
               className="field-search"
             />
             {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan pencarian">
+              <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan pencarian">
                 <X className="w-4 h-4 text-gray-400" />
               </button>
             )}

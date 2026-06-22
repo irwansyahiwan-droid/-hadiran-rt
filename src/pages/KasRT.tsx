@@ -345,7 +345,7 @@ export default function KasRTPage() {
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={load} aria-label="Muat ulang" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <button onClick={load} aria-label="Muat ulang" className="press p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
             </button>
             {/* Ekspor (PDF/Excel) disatukan ke satu menu → aksi utama "Tambah"
@@ -470,7 +470,7 @@ export default function KasRTPage() {
                       <button
                         key={p}
                         onClick={() => setChartPeriod(p)}
-                        className={`px-2 py-0.5 rounded-md text-micro font-bold transition-colors ${
+                        className={`press px-2 py-0.5 rounded-md text-micro font-bold transition-colors ${
                           chartPeriod === p ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}
                       >
@@ -525,7 +525,7 @@ export default function KasRTPage() {
               className="field-search"
             />
             {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
+              <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
                 <X className="w-4 h-4 text-gray-400" />
               </button>
             )}

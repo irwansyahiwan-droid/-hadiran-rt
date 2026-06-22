@@ -309,6 +309,15 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
 .press { transition: transform 0.16s var(--ease-out-expo), opacity 0.16s ease, box-shadow 0.16s ease; }
 .press:active { transform: scale(0.97); }
 
+/* Press feedback TRANSFORM-SAFE untuk tombol ikon/utility yang centering-nya
+   sudah pakai transform (mis. "×" bersihkan: absolute + -translate-y-1/2).
+   .press (scale) akan MENIMPA translate itu → ikon loncat dari tengah saat
+   ditekan. Di sini feedback lewat opacity, BUKAN transform → komposisi aman
+   dengan translate apa pun di call-site. Tetap "mendengar" sentuhan di app
+   touch-first (hover tak pernah aktif di HP), melengkapi .press yang opt-in. */
+.press-icon { transition: opacity 0.14s var(--ease-out-expo); }
+.press-icon:active { opacity: 0.45; }
+
 /* Primary CTA brand: emerald gradient HIDUP + glow → menonjol di kanvas terang
    (ganti flat bg-[#0F6039]). Fill dasar tetap dalam agar teks putih lolos AA. */
 /* @layer components → utility rounded-* di call-site tetap bisa override

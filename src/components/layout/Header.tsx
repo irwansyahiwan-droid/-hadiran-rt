@@ -61,8 +61,8 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       onClick={() => { haptic(); setMenuOpen(false); onClick(); }}
       className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
         danger
-          ? 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20'
-          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800'
+          ? 'text-rose-600 dark:text-rose-400 hover:bg-rose-50 active:bg-rose-100 dark:hover:bg-rose-900/20 dark:active:bg-rose-900/35'
+          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-700'
       }`}
     >
       <Icon className={`w-[18px] h-[18px] ${danger ? 'text-rose-500' : 'text-gray-400'}`} />

@@ -356,7 +356,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
             className="field-search"
           />
           {search && (
-            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
+            <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
               <X className="w-4 h-4 text-gray-400" />
             </button>
           )}
