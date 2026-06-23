@@ -471,14 +471,14 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
 
       {/* Dots */}
       {count > 1 && (
-        <div className="flex items-center justify-center gap-1.5 mt-2.5">
+        <div className="flex items-center justify-center mt-1.5">
           {slides.map((s, i) => (
             <button
               key={s.id}
               onClick={() => goTo(i)}
               aria-label={`Ke slide ${i + 1}: ${s.judul}`}
               aria-current={i === index}
-              className="press py-1.5"
+              className="press grid place-items-center min-h-[40px] px-2"
             >
               <span
                 className={`block h-1.5 rounded-full transition-all duration-300 ${
