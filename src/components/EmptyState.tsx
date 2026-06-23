@@ -22,8 +22,9 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
         {/* Teal brand, bukan biru — aturan config: biru = sinyal status, bukan accent dekoratif. */}
         <span className="blob absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-teal-300/70" style={{ animationDelay: '-8s' }} />
 
-        {/* Tile ikon di tengah — token `lift` (crisp card language), bukan shadow-lg generik. */}
-        <div className="pop lift absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">
+        {/* Tile ikon di tengah — token `lift` (crisp card language), bukan shadow-lg
+            generik. `empty-bob` = pop masuk lalu mengambang halus (scene bernapas). */}
+        <div className="empty-bob lift absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">
           <Icon className="w-7 h-7 text-emerald-500 dark:text-emerald-400" strokeWidth={1.7} />
         </div>
       </div>

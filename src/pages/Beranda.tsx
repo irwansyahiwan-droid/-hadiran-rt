@@ -154,6 +154,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const animatedSaldo = useCountUp(saldo, 1000, firstHero);
   const animatedTalangan = useCountUp(talangan, 1000, firstHero);
   const animatedSetor = useCountUp(setorKasRT, 1000, firstHero);
+  // Baris statistik (Anggota/Tarikan/Terjadwal) ikut count-up spt nominal hero →
+  // angka "berputar naik" konsisten, bukan diam saat hero beranimasi.
+  const animAnggota = useCountUp(summary?.jumlah_anggota ?? 0, 900, firstHero);
+  const animTarikan = useCountUp(summary?.jumlah_tarikan ?? 0, 900, firstHero);
+  const animTerjadwal = useCountUp(summary?.jumlah_dijadwalkan ?? 0, 900, firstHero);
   const hidden = useHideAmount();
 
   // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
@@ -326,15 +331,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
         <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{summary?.jumlah_anggota ?? 0}</span>
+            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{animAnggota}</span>
             <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Anggota</span>
           </div>
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{summary?.jumlah_tarikan ?? 0}</span>
+            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{animTarikan}</span>
             <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Tarikan</span>
           </div>
           <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{summary?.jumlah_dijadwalkan ?? 0}</span>
+            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{animTerjadwal}</span>
             <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Terjadwal</span>
           </div>
         </div>
