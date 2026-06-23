@@ -513,6 +513,13 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
 }
 .blob { animation: floatBlob 15s ease-in-out infinite; }
 
+/* Motif dekoratif banner Beranda — mengambang halus ("hidup"), bukan gerak besar.
+   translateY di wrapper-dalam; peek/rotate ditahan elemen luar agar tak bentrok.
+   animation-delay di-stagger per slide (lihat ART di BannerCarousel) supaya tiap
+   motif tak naik-turun seragam. Catch-all reduced-motion di bawah menonaktifkannya. */
+@keyframes bannerArtFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.banner-art-float { animation: bannerArtFloat 5.5s ease-in-out infinite; }
+
 /* One-time specular sheen sweep on hero card when dashboard loads.
    Hanya saat `.hero-sheen-sweep` (kunjungan pertama sesi) — balik ke Beranda
    via tab/back tak menyapu ulang. Lihat useFirstPlay di lib/hooks. */
