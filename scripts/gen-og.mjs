@@ -50,7 +50,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"/>
     <div class="txt">
       <span class="badge"><span class="dot"></span>Aplikasi Resmi Warga RT 004/006</span>
       <h1>Hadiran <span class="g">RT</span></h1>
-      <p>Arisan, kas &amp; talangan warga — transparan dalam genggaman.</p>
+      <p>Hadiran, kas &amp; talangan warga — transparan dalam genggaman.</p>
       <div class="pills">
         <span class="pill">Jadwal</span><span class="pill">Absensi</span><span class="pill">Talangan</span><span class="pill">Kas RT</span><span class="pill">Laporan PDF</span>
       </div>
