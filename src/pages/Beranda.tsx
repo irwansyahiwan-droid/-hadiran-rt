@@ -327,6 +327,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
 
+      {/* Carousel promo — target Kas RT + panduan singkat (gaya banner app bank).
+          Posisi tepat di bawah hero (pola app bank: saldo → promo → statistik),
+          sekaligus memisah dua grid 3-kolom (hero stat-row & Stats Row). */}
+      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
+
       {/* Stats Row */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
         <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
@@ -344,9 +349,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
         </div>
       </div>
-
-      {/* Carousel promo — target Kas RT + panduan singkat (gaya banner app bank) */}
-      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
 
       {/* Alert Banner */}
       {talangan > 0 && (

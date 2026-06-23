@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Target, Palmtree, ClipboardCheck, HandCoins, Coins, Building2,
-  ChevronRight, CalendarClock, PartyPopper, type LucideIcon,
+  ChevronRight, CalendarClock, PartyPopper, Smartphone, type LucideIcon,
 } from 'lucide-react';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 
@@ -23,6 +23,50 @@ interface BannerSlide {
   progress?: { value: number; max: number; deadline: string };
   /** Pita kecil di pojok (mis. "Tercapai!"). */
   ribbon?: string;
+  /** Bila true → render mockup iPhone mengintip di kanan (slide promo aplikasi). */
+  phone?: boolean;
+}
+
+/** Mockup iPhone kecil yang mengintip dari kanan banner — cuplikan dashboard
+ *  yang distylisasi (mini hero + baris stat + transaksi), bukan screenshot. */
+function PhoneMock() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute -right-2 top-3 z-[1] w-[78px] rotate-[-8deg]"
+      style={{ filter: 'drop-shadow(0 14px 22px rgba(0,0,0,0.45))' }}
+    >
+      {/* Glow di balik HP — beri kedalaman & kesan "menyala" */}
+      <div
+        className="absolute -inset-4 rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(45,212,150,0.45) 0%, transparent 70%)' }}
+      />
+      {/* Bezel */}
+      <div className="relative rounded-[17px] bg-gray-900 p-[2.5px] ring-1 ring-white/15">
+        {/* Layar */}
+        <div className="relative h-[120px] overflow-hidden rounded-[14px] bg-gray-50">
+          {/* Dynamic island */}
+          <div className="absolute left-1/2 top-[5px] z-10 h-[3.5px] w-[22px] -translate-x-1/2 rounded-full bg-gray-900/90" />
+          <div className="px-[5px] pt-3">
+            {/* Mini hero (emerald, identik tema saldo) */}
+            <div className="h-[30px] rounded-[7px]" style={{ background: 'linear-gradient(135deg,#0D5B36,#1C9A5C)' }} />
+            {/* Mini stat row 3-kolom */}
+            <div className="mt-[5px] flex gap-[3px]">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-[13px] flex-1 rounded-[3px] bg-white ring-1 ring-gray-200/80" />
+              ))}
+            </div>
+            {/* Mini baris transaksi */}
+            <div className="mt-[5px] space-y-[3px]">
+              <div className="h-[6px] rounded-full bg-gray-200" />
+              <div className="h-[6px] w-2/3 rounded-full bg-gray-200" />
+              <div className="h-[6px] w-5/6 rounded-full bg-gray-200" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const ROTATE_MS = 5500;
@@ -60,8 +104,10 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
       judul: 'Bersama menuju Rp25 juta',
       isi: '',
       icon: Target,
-      grad: 'linear-gradient(135deg, #0F4C2E 0%, #1B7249 100%)',
-      glow: 'rgba(110,231,183,0.6)',
+      // Teal-cyan, sengaja BEDA keluarga dari hero emerald — slide ini kini tepat
+      // di bawah hero, hijau-di-atas-hijau bikin dua kartu menyatu jadi satu blok.
+      grad: 'linear-gradient(135deg, #0D4F5C 0%, #119AAB 100%)',
+      glow: 'rgba(45,212,191,0.58)',
       progress: { value: kasRT, max: TARGET_NOMINAL, deadline: TARGET_DEADLINE },
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
@@ -78,6 +124,16 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
           cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
         } as BannerSlide]
       : []),
+    {
+      id: 'app-hp',
+      label: 'Aplikasi',
+      judul: 'Pantau kas RT dari HP',
+      isi: 'Saldo, jadwal & talangan dalam satu genggaman.',
+      icon: Smartphone,
+      grad: 'linear-gradient(135deg, #0F172A 0%, #1F2937 100%)',
+      glow: 'rgba(45,212,150,0.5)',
+      phone: true,
+    },
     {
       id: 'panduan-absensi',
       label: 'Panduan · Absensi',
@@ -196,7 +252,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                 aria-hidden={i !== index}
               >
                 <div
-                  className="hero-noise relative h-full min-h-[104px] overflow-hidden px-5 py-[18px] text-white flex flex-col justify-center"
+                  className={`hero-noise relative h-full min-h-[104px] overflow-hidden px-5 py-[18px] text-white flex flex-col justify-center${s.phone ? ' pr-[92px]' : ''}`}
                   style={{
                     background: s.grad,
                     // Glass edge (SATU box-shadow, hindari bentrok dgn ring Tailwind):
@@ -228,6 +284,9 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                     className="absolute inset-x-0 bottom-0 pointer-events-none"
                     style={{ height: '70%', background: 'linear-gradient(to top, rgba(0,0,0,0.28), transparent)' }}
                   />
+
+                  {/* Mockup iPhone mengintip — hanya slide promo aplikasi */}
+                  {s.phone && <PhoneMock />}
 
                   <div className="relative flex items-center gap-3">
                     <div
