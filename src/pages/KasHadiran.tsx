@@ -621,7 +621,7 @@ export default function KasHadiranPage() {
                         </div>
                         <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-emerald-400 dark:bg-emerald-500 rounded-full transition-all"
+                            className="h-full bg-emerald-400 dark:bg-emerald-500 rounded-full transition-[width] duration-700 ease-out"
                             style={{ width: `${pctHadir}%` }}
                           />
                         </div>

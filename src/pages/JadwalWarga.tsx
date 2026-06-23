@@ -169,7 +169,7 @@ export default function JadwalWargaPage() {
               </div>
               <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-white rounded-full transition-all"
+                  className="h-full bg-white rounded-full transition-[width] duration-700 ease-out"
                   style={{ width: `${pctHadir}%` }}
                 />
               </div>

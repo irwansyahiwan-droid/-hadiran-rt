@@ -42,7 +42,7 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
           <span
             role="tooltip"
             onClick={(e) => e.stopPropagation()}
-            className={`absolute top-full mt-1.5 z-50 w-60 max-w-[78vw] p-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float text-left normal-case tracking-normal ${align === 'right' ? 'right-0' : 'left-0'}`}
+            className={`pop-menu absolute top-full mt-1.5 z-50 w-60 max-w-[78vw] p-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float text-left normal-case tracking-normal ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
           >
             <span className="block text-caption font-bold text-ink dark:text-gray-100 mb-0.5">{label}</span>
             <span className="block text-caption font-normal text-ink-sub dark:text-gray-300 leading-relaxed">{children}</span>
