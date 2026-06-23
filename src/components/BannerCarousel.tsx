@@ -196,8 +196,15 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                 aria-hidden={i !== index}
               >
                 <div
-                  className="relative h-full min-h-[104px] overflow-hidden px-5 py-[18px] text-white flex flex-col justify-center"
-                  style={{ background: s.grad }}
+                  className="hero-noise relative h-full min-h-[104px] overflow-hidden px-5 py-[18px] text-white flex flex-col justify-center"
+                  style={{
+                    background: s.grad,
+                    // Glass edge (SATU box-shadow, hindari bentrok dgn ring Tailwind):
+                    // (1) highlight tepi-atas "kaca disinari" + (2) inset hairline ring
+                    // tipis keliling → tepi kartu "tercetak", bahasa elevasi sama dgn
+                    // --hero-shadow & .lift.
+                    boxShadow: 'inset 0 1px 0 0 rgba(255,255,255,0.18), inset 0 0 0 1px rgba(255,255,255,0.08)',
+                  }}
                 >
                   {/* Blob ambient sudut kanan-atas — beri kedalaman ala banner promo bank */}
                   <div
@@ -211,8 +218,10 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                     className="absolute -bottom-12 -left-10 w-32 h-32 rounded-full pointer-events-none"
                     style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)' }}
                   />
-                  {/* Sheen tepi atas — kilau kaca tipis */}
-                  <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-white/30 pointer-events-none" />
+                  {/* Specular sheen kaca — cahaya kiri-atas + bayang kanan-bawah (SATU
+                      sumber dgn hero card, .hero-sheen) → permukaan melengkung "kaca",
+                      bukan gradient datar. Di bawah konten (z-0). */}
+                  <div aria-hidden className="hero-sheen absolute inset-0 z-0 pointer-events-none" />
                   {/* Veil bawah — jaga kontras teks kecil di ujung gradient terang */}
                   <div
                     aria-hidden
