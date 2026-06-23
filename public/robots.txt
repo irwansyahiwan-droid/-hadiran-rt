@@ -2,3 +2,11 @@
 # Larang semua crawler agar nama warga & data kas tidak terindeks.
 User-agent: *
 Disallow: /
+
+# Kecuali halaman promosi /info (tanpa data warga) + aset preview-nya,
+# supaya pratinjau link saat di-share ke WhatsApp/Telegram tetap muncul.
+Allow: /info
+Allow: /landing.html
+Allow: /og-hadiran.jpg
+Allow: /favicon.png
+Allow: /icon-192.png

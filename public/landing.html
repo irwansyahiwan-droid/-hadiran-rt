@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Hadiran RT 004/006 — Arisan & Kas Warga, Transparan dalam Genggaman</title>
+<meta name="description" content="Aplikasi resmi warga RT 004/006 Tanah Baru, Beji, Depok. Pantau jadwal tarikan, absensi, talangan, dan kas RT yang transparan — langsung dari HP, tanpa install." />
+
+<!-- Halaman promosi warga — tidak perlu diindeks mesin pencari (data app tetap privat). -->
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0D5B36" />
+
+<link rel="icon" href="/favicon.png" type="image/png" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+
+<!-- Preview saat link di-share (WhatsApp / Telegram / FB) -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Hadiran RT 004/006" />
+<meta property="og:title" content="Hadiran RT 004/006 — Arisan & Kas Warga" />
+<meta property="og:description" content="Pantau jadwal tarikan, absensi, talangan & kas RT yang transparan. Langsung dari HP, tanpa install." />
+<meta property="og:image" content="https://hadiran-rt.vercel.app/og-hadiran.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://hadiran-rt.vercel.app/info" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Hadiran RT 004/006 — Arisan & Kas Warga" />
+<meta name="twitter:description" content="Pantau jadwal tarikan, absensi, talangan & kas RT yang transparan. Langsung dari HP, tanpa install." />
+<meta name="twitter:image" content="https://hadiran-rt.vercel.app/og-hadiran.jpg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --emerald-deep: #0A4E2E;
+    --emerald: #15824C;
+    --emerald-bright: #1FA862;
+    --gold: #F4C20D;
+    --ink: #0B1220;
+    --ink-sub: #374151;
+    --ink-faint: #5A6678;
+    --canvas: #EEF1F6;
+    --surface: #FFFFFF;
+    --line: #E4E9F1;
+    --radius: 22px;
+    --shadow-card: 0 1px 2px rgba(11,18,32,.04), 0 8px 24px -12px rgba(11,18,32,.12);
+    --shadow-float: 0 10px 40px -12px rgba(10,78,46,.45);
+    --maxw: 560px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--canvas);
+    color: var(--ink);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .display { font-family: 'Sora', 'Inter', sans-serif; letter-spacing: -0.02em; }
+  .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+  /* ─────────── HERO ─────────── */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.30) 0%, rgba(45,212,150,0) 55%),
+      linear-gradient(150deg, var(--emerald-deep) 0%, var(--emerald) 55%, var(--emerald-bright) 100%);
+    color: #fff;
+    padding: calc(env(safe-area-inset-top) + 40px) 0 56px;
+    text-align: center;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: .05; pointer-events: none;
+  }
+  .hero > * { position: relative; z-index: 1; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.22);
+    color: #EAFBF1;
+    font-size: 12.5px; font-weight: 600;
+    padding: 7px 14px; border-radius: 999px;
+    backdrop-filter: blur(8px);
+    margin-bottom: 26px;
+  }
+  .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #6EF0A8; box-shadow: 0 0 8px #6EF0A8; }
+
+  .coin {
+    width: 104px; height: 104px; margin: 0 auto 24px;
+    border-radius: 26px; overflow: hidden;
+    box-shadow: 0 14px 34px -10px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.12);
+  }
+  .coin svg { display: block; width: 100%; height: 100%; }
+
+  .hero h1 {
+    font-size: clamp(28px, 8.5vw, 40px);
+    font-weight: 800; line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .hero h1 .g { color: #FFE08A; }
+  .hero p.sub {
+    font-size: clamp(15px, 4.2vw, 17px);
+    color: #DCF3E6; max-width: 420px; margin: 0 auto 30px;
+  }
+
+  .cta-row { display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 0 auto; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    min-height: 52px; padding: 0 24px;
+    border-radius: 16px; font-weight: 700; font-size: 16px;
+    text-decoration: none; cursor: pointer; border: 0;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F1F6F2 100%);
+    color: var(--emerald-deep);
+    box-shadow: 0 8px 22px -8px rgba(0,0,0,.4);
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.28);
+    color: #fff;
+  }
+  .btn svg { width: 19px; height: 19px; }
+
+  .trust {
+    display: flex; justify-content: center; gap: 0;
+    margin: 34px auto 0; max-width: 380px;
+  }
+  .trust div { flex: 1; text-align: center; padding: 0 6px; }
+  .trust .n { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 19px; display: block; }
+  .trust .l { font-size: 11.5px; color: #CDEAD8; line-height: 1.3; margin-top: 2px; }
+  .trust .sep { flex: 0 0 1px; background: rgba(255,255,255,.18); margin: 4px 0; }
+
+  /* ─────────── SECTIONS ─────────── */
+  section { padding: 52px 0; }
+  .eyebrow {
+    text-align: center; font-size: 12.5px; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--emerald); margin-bottom: 10px;
+  }
+  .sec-title {
+    text-align: center; font-size: clamp(23px, 6.5vw, 29px);
+    font-weight: 800; line-height: 1.18; margin-bottom: 10px;
+  }
+  .sec-lead {
+    text-align: center; color: var(--ink-faint);
+    font-size: 15px; max-width: 440px; margin: 0 auto 36px;
+  }
+
+  /* Feature cards */
+  .features { display: grid; gap: 14px; }
+  .fcard {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow-card);
+    display: flex; gap: 15px; align-items: flex-start;
+  }
+  .ficon {
+    flex: 0 0 46px; width: 46px; height: 46px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    background: linear-gradient(150deg, #EAF7F0 0%, #DCF1E6 100%);
+    color: var(--emerald);
+  }
+  .ficon svg { width: 23px; height: 23px; }
+  .fcard h3 { font-family: 'Sora', sans-serif; font-size: 16.5px; font-weight: 700; margin-bottom: 4px; letter-spacing: -.01em; }
+  .fcard p { font-size: 14px; color: var(--ink-faint); line-height: 1.5; }
+  .fnum {
+    margin-left: auto; flex: 0 0 auto;
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13px;
+    color: #C3CCD9;
+  }
+
+  /* Highlight chips section */
+  .alt { background: linear-gradient(180deg, #FFFFFF 0%, #F4F7FB 100%); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .chip {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 16px; padding: 16px;
+  }
+  .chip .ci { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: #F0F3F8; color: var(--emerald); margin-bottom: 11px; }
+  .chip .ci svg { width: 20px; height: 20px; }
+  .chip h4 { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; font-family: 'Sora', sans-serif; }
+  .chip p { font-size: 12.8px; color: var(--ink-faint); line-height: 1.45; }
+
+  /* Roles */
+  .roles { display: grid; gap: 14px; }
+  .role {
+    border-radius: var(--radius); padding: 22px;
+    border: 1px solid var(--line);
+  }
+  .role.bendahara { background: linear-gradient(150deg, var(--emerald-deep), var(--emerald)); color: #fff; border: 0; }
+  .role.warga { background: var(--surface); box-shadow: var(--shadow-card); }
+  .role .rt { display: flex; align-items: center; gap: 10px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 12px; }
+  .role .rt svg { width: 22px; height: 22px; }
+  .role ul { list-style: none; display: grid; gap: 9px; }
+  .role li { display: flex; gap: 9px; align-items: flex-start; font-size: 14px; }
+  .role li svg { width: 17px; height: 17px; flex: 0 0 17px; margin-top: 2px; }
+  .role.bendahara li { color: #E7F7EE; }
+  .role.bendahara .check { color: #8FF0BB; }
+  .role.warga li { color: var(--ink-sub); }
+  .role.warga .check { color: var(--emerald); }
+
+  /* Steps */
+  .steps { display: grid; gap: 16px; }
+  .step { display: flex; gap: 16px; align-items: flex-start; }
+  .step .sn {
+    flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(150deg, var(--emerald), var(--emerald-bright));
+    color: #fff; font-family: 'Sora', sans-serif; font-weight: 700;
+    display: grid; place-items: center; font-size: 17px;
+    box-shadow: var(--shadow-float);
+  }
+  .step h4 { font-size: 16px; font-weight: 700; font-family: 'Sora', sans-serif; margin-bottom: 3px; }
+  .step p { font-size: 14px; color: var(--ink-faint); }
+
+  /* Security note */
+  .secnote {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px;
+    display: flex; gap: 15px; align-items: flex-start;
+    box-shadow: var(--shadow-card);
+  }
+  .secnote .si { flex: 0 0 46px; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(150deg, #EAF7F0, #DCF1E6); color: var(--emerald); display: grid; place-items: center; }
+  .secnote .si svg { width: 24px; height: 24px; }
+  .secnote h3 { font-family: 'Sora', sans-serif; font-size: 16.5px; font-weight: 700; margin-bottom: 5px; }
+  .secnote p { font-size: 13.8px; color: var(--ink-faint); line-height: 1.5; }
+
+  /* Final CTA */
+  .final {
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.28) 0%, rgba(45,212,150,0) 55%),
+      linear-gradient(150deg, var(--emerald-deep) 0%, var(--emerald) 100%);
+    color: #fff; text-align: center;
+    border-radius: 28px; padding: 44px 26px; position: relative; overflow: hidden;
+  }
+  .final h2 { font-family: 'Sora', sans-serif; font-size: clamp(22px, 6vw, 27px); font-weight: 800; margin-bottom: 10px; }
+  .final p { color: #DCF3E6; font-size: 15px; margin-bottom: 26px; max-width: 360px; margin-left: auto; margin-right: auto; }
+
+  footer { text-align: center; padding: 36px 20px calc(env(safe-area-inset-bottom) + 40px); color: var(--ink-faint); }
+  footer .fcoin { width: 40px; height: 40px; border-radius: 12px; overflow: hidden; margin: 0 auto 12px; box-shadow: 0 4px 12px -4px rgba(0,0,0,.3); }
+  footer .fcoin svg { width: 100%; height: 100%; display: block; }
+  footer strong { color: var(--ink); font-family: 'Sora', sans-serif; }
+  footer .fm { font-size: 13px; margin-top: 4px; }
+  footer .fm2 { font-size: 12px; margin-top: 14px; color: #97A2B2; }
+
+  @media (min-width: 480px) {
+    .cta-row { flex-direction: row; max-width: none; justify-content: center; }
+    .cta-row .btn { flex: 0 1 220px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- inline coin SVG reused (sumber: src/assets/logo-rt.svg) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="rtGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F9D451"/><stop offset="0.55" stop-color="#F4C20D"/><stop offset="1" stop-color="#E3A500"/>
+    </linearGradient>
+    <radialGradient id="rtSheen" cx="0.5" cy="0.28" r="0.72">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="0.6" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="coin" viewBox="0 0 640 640">
+      <rect width="640" height="640" fill="url(#rtGold)"/>
+      <rect width="640" height="640" fill="url(#rtSheen)"/>
+      <circle cx="320" cy="320" r="252" fill="none" stroke="#0F6B2E" stroke-width="16"/>
+      <circle cx="320" cy="320" r="230" fill="#FFFFFF"/>
+      <text x="321" y="430" fill="#0F6B2E" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="300" letter-spacing="-6" text-anchor="middle">46</text>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="badge"><span class="dot"></span>Aplikasi Resmi Warga RT 004/006</span>
+    <div class="coin"><svg viewBox="0 0 640 640"><use href="#coin"/></svg></div>
+    <h1 class="display">Hadiran <span class="g">RT</span><br/>Arisan &amp; Kas Warga</h1>
+    <p class="sub">Jadwal tarikan, absensi, talangan, dan kas RT yang <strong>transparan</strong> — semua dalam satu genggaman.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        Buka Aplikasi
+      </a>
+      <a class="btn btn-ghost" href="#fitur">Lihat Fitur</a>
+    </div>
+    <div class="trust">
+      <div><span class="n display">7</span><span class="l">Fitur utama</span></div>
+      <div class="sep"></div>
+      <div><span class="n display">100%</span><span class="l">Gratis &amp; tanpa install</span></div>
+      <div class="sep"></div>
+      <div><span class="n display">Real-time</span><span class="l">Data selalu terbaru</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ FITUR ══════════ -->
+<section id="fitur">
+  <div class="wrap">
+    <p class="eyebrow">Fitur Lengkap</p>
+    <h2 class="sec-title display">Semua urusan arisan &amp;<br/>kas RT, di satu tempat</h2>
+    <p class="sec-lead">Dirancang khusus untuk kebutuhan pengurus dan warga RT 004/006 — sederhana dipakai, transparan datanya.</p>
+
+    <div class="features">
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
+        <div><h3>Beranda &amp; Dashboard</h3><p>Total saldo kas, ringkasan uang masuk &amp; keluar, dan jadwal tarikan berikutnya — langsung terlihat begitu dibuka.</p></div>
+        <span class="fnum">01</span>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div><h3>Jadwal Tarikan</h3><p>Jadwal arisan per Sohibul Bait. Tahu siapa giliran menerima dan kapan tanggal tarikannya, jauh-jauh hari.</p></div>
+        <span class="fnum">02</span>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></div>
+        <div><h3>Absensi Hadiran</h3><p>Daftar hadir tiap tarikan tercatat rapi — siapa yang hadir dan siapa yang berhalangan, tanpa repot catat manual.</p></div>
+        <span class="fnum">03</span>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div><h3>Talangan</h3><p>Warga yang tidak hadir otomatis tercatat talangan. Status lunas/belum jelas, ditandai oleh bendahara — tidak ada yang terlewat.</p></div>
+        <span class="fnum">04</span>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1.2"/></svg></div>
+        <div><h3>Kas Hadiran</h3><p>Rekap kas per arisan: iuran yang terkumpul dan jumlah yang diterima Sohibul Bait di setiap tarikan, transparan untuk semua.</p></div>
+        <span class="fnum">05</span>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
+        <div><h3>Kas RT</h3><p>Kas besar lingkungan, terpisah dari kas arisan. Pantau setiap pemasukan &amp; pengeluaran kas RT secara terbuka.</p></div>
+        <span class="fnum">06</span>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></div>
+        <div><h3>Laporan &amp; Cetak PDF</h3><p>Laporan triwulan rapi, siap diunduh sebagai PDF atau Excel untuk diarsipkan dan dibagikan saat rapat warga.</p></div>
+        <span class="fnum">07</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ KEUNGGULAN ══════════ -->
+<section class="alt">
+  <div class="wrap">
+    <p class="eyebrow">Nyaman Dipakai</p>
+    <h2 class="sec-title display">Terasa seperti aplikasi,<br/>tanpa ribet</h2>
+    <p class="sec-lead">Bukan sekadar halaman web — dibuat senyaman aplikasi di HP Anda.</p>
+    <div class="chips">
+      <div class="chip">
+        <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h4>Mode Warga</h4><p>Lihat semua data kas &amp; jadwal tanpa login. Aman — hanya bisa melihat, tidak bisa mengubah.</p>
+      </div>
+      <div class="chip">
+        <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M12 18h.01"/></svg></div>
+        <h4>Pasang Seperti App</h4><p>Bisa ditambahkan ke layar utama HP (Android &amp; iPhone) dan dibuka tanpa browser.</p>
+      </div>
+      <div class="chip">
+        <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
+        <h4>Mode Gelap</h4><p>Tampilan otomatis menyesuaikan terang/gelap — nyaman di mata, siang maupun malam.</p>
+      </div>
+      <div class="chip">
+        <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 4v5h-5"/></svg></div>
+        <h4>Selalu Terbaru</h4><p>Data tersimpan aman di cloud dan langsung diperbarui untuk semua warga, real-time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ UNTUK SIAPA ══════════ -->
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Untuk Semua Warga</p>
+    <h2 class="sec-title display">Satu app, dua peran</h2>
+    <p class="sec-lead">Pengurus mengelola, warga memantau — semua dengan akses yang sesuai.</p>
+    <div class="roles">
+      <div class="role bendahara">
+        <div class="rt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>Bendahara</div>
+        <ul>
+          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Catat tarikan, absensi &amp; talangan</li>
+          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Kelola kas hadiran &amp; kas RT</li>
+          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Tandai lunas &amp; cetak laporan PDF</li>
+        </ul>
+      </div>
+      <div class="role warga">
+        <div class="rt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg>Warga</div>
+        <ul>
+          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Pantau saldo &amp; transparansi kas</li>
+          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cek jadwal tarikan &amp; giliran</li>
+          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Lihat status talangan sendiri, kapan saja</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CARA PAKAI ══════════ -->
+<section class="alt">
+  <div class="wrap">
+    <p class="eyebrow">Mudah Dimulai</p>
+    <h2 class="sec-title display">Cukup 3 langkah</h2>
+    <p class="sec-lead" style="margin-bottom:32px">Tidak perlu install dari Play Store. Buka link, langsung pakai.</p>
+    <div class="steps">
+      <div class="step"><div class="sn">1</div><div><h4>Buka tautan aplikasi</h4><p>Klik link yang dibagikan di grup — terbuka langsung di browser HP, tanpa mengunduh apa pun.</p></div></div>
+      <div class="step"><div class="sn">2</div><div><h4>Masuk sebagai Warga</h4><p>Pilih mode Warga untuk melihat-lihat. Pengurus login sebagai bendahara untuk mengelola data.</p></div></div>
+      <div class="step"><div class="sn">3</div><div><h4>Pantau kapan saja</h4><p>Cek kas, jadwal, dan talangan dari mana saja. Tambahkan ke layar utama agar mudah dibuka lagi.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ KEAMANAN ══════════ -->
+<section>
+  <div class="wrap">
+    <div class="secnote">
+      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 0 1 4 0v2"/></svg></div>
+      <div>
+        <h3>Data warga aman &amp; privat</h3>
+        <p>Aplikasi ini khusus internal RT 004/006 — tidak terindeks Google dan tidak terbuka untuk umum. Hanya pengurus yang dapat mengubah data; setiap perubahan tercatat otomatis.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FINAL CTA ══════════ -->
+<section style="padding-top:8px">
+  <div class="wrap">
+    <div class="final">
+      <div class="coin" style="width:72px;height:72px;border-radius:18px;margin-bottom:18px"><svg viewBox="0 0 640 640"><use href="#coin"/></svg></div>
+      <h2>Yuk, pantau kas RT<br/>bareng-bareng</h2>
+      <p>Transparansi bikin warga makin guyub. Buka sekarang — gratis dan langsung bisa dipakai.</p>
+      <a class="btn btn-primary" href="/" style="display:inline-flex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        Buka Hadiran RT
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fcoin"><svg viewBox="0 0 640 640"><use href="#coin"/></svg></div>
+  <strong>Hadiran RT 004/006</strong>
+  <div class="fm">Tanah Baru, Beji, Depok</div>
+  <div class="fm2">Aplikasi manajemen arisan &amp; kas warga · Dibuat untuk warga, oleh warga.</div>
+</footer>
+
+</body>
+</html>
