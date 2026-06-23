@@ -67,9 +67,10 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
               transitionTimingFunction: 'var(--ease-spring)',
             }}
           >
-            {/* Lozenge aktif 2026 — gradient brand + hairline ring + glow lembut
-                (ganti flat tint) → active state terasa "menyala" & punya kedalaman. */}
-            <span className="absolute left-1/2 -translate-x-1/2 top-1.5 w-16 h-9 rounded-2xl bg-gradient-to-b from-brand-link/[0.16] to-brand-link/[0.05] ring-1 ring-brand-link/20 shadow-[0_4px_14px_-4px_rgba(13,107,94,0.45)] dark:from-emerald-400/[0.20] dark:to-emerald-400/[0.05] dark:ring-emerald-400/20 dark:shadow-[0_4px_16px_-4px_rgba(52,211,153,0.4)]" />
+            {/* Lozenge aktif 2026 — gradient brand 3-stop + hairline ring + tepi
+                atas tersinari (inset highlight) + glow brand lebih hidup → pill
+                aktif "menyala" dengan kedalaman kaca, bukan tint datar. */}
+            <span className="absolute left-1/2 -translate-x-1/2 top-1.5 w-16 h-9 rounded-2xl bg-gradient-to-b from-brand-link/[0.22] via-brand-link/[0.12] to-brand-link/[0.06] ring-1 ring-brand-link/25 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_6px_18px_-5px_rgba(13,107,94,0.55)] dark:from-emerald-400/[0.26] dark:via-emerald-400/[0.14] dark:to-emerald-400/[0.06] dark:ring-emerald-400/25 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_6px_20px_-5px_rgba(52,211,153,0.5)]" />
           </div>
         )}
         {visibleTabs.map(({ id, label, icon: Icon }) => {
@@ -81,19 +82,21 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
               className="press relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Ikon aktif sedikit membesar (spring) → penekanan ekspresif tapi tetap presisi di pill.
-                  Aktif juga DIISI (fill tint) → outline→solid ala iOS: active state terbaca
-                  "padat", bukan sekadar beda warna. Durasi 300ms + ease-spring disamakan dgn
-                  pill & label → seluruh handoff aktif mendarat bersamaan (nyambung dgn slide tab). */}
+              {/* Ikon aktif membesar (spring) + NAIK ~3px → duduk lebih tinggi
+                  "terangkat ke dalam" lozenge (dock lift ala iOS), label tinggal
+                  di bawah. Aktif juga DIISI (fill tint) → outline→solid ala iOS:
+                  active state terbaca "padat", bukan sekadar beda warna. Durasi
+                  300ms + ease-spring disamakan dgn pill & label → seluruh handoff
+                  aktif mendarat bersamaan (nyambung dgn slide tab). */}
               <span
-                className={`flex items-center justify-center transition-transform duration-300 ${isActive ? 'scale-110' : 'scale-100'}`}
+                className={`flex items-center justify-center transition-transform duration-300 ${isActive ? 'scale-110 -translate-y-[3px]' : 'scale-100'}`}
                 style={{ transitionTimingFunction: 'var(--ease-spring)' }}
               >
                 <Icon
                   className={`w-[25px] h-[25px] transition-colors duration-300 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
                   strokeWidth={isActive ? 2.2 : 2}
                   fill={isActive ? 'currentColor' : 'none'}
-                  style={{ fillOpacity: isActive ? 0.16 : 0, transition: 'fill-opacity 300ms var(--ease-spring)' }}
+                  style={{ fillOpacity: isActive ? 0.2 : 0, transition: 'fill-opacity 300ms var(--ease-spring)' }}
                 />
               </span>
               <span

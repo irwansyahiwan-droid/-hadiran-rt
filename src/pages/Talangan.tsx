@@ -275,7 +275,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
                       confirmId === t.id ? 'bg-rose-600' : 'btn-brand'
                     }`}
                   >
@@ -288,7 +288,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBatalClick(t)}
                     disabled={processingId === t.id}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition-all duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
                       cancelConfirmId === t.id
                         ? 'bg-rose-600 text-white'
                         : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
@@ -305,10 +305,10 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     disabled={processingId === t.id}
                     title="Hapus data talangan"
                     aria-label="Hapus data talangan"
-                    className={`inline-flex items-center justify-center gap-1 h-7 px-2 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 ${
                       deleteConfirmId === t.id
                         ? 'bg-rose-600 text-white'
-                        : 'text-gray-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20'
+                        : 'text-gray-400 dark:text-gray-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20'
                     }`}
                   >
                     {deleteConfirmId === t.id ? 'Hapus?' : <Trash2 className="w-3.5 h-3.5" />}

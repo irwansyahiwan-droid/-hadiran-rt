@@ -410,7 +410,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                 <div className="flex items-center gap-1.5 shrink-0">
                   {w.role === 'bendahara' && <Tag tone="success">Bendahara</Tag>}
                   {!w.status_aktif && <Tag tone="neutral">Nonaktif</Tag>}
-                  <Pencil className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600" />
+                  <Pencil className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                 </div>
               </button>
             ))}
