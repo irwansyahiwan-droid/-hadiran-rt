@@ -13,6 +13,33 @@ export function formatRupiahPlain(amount: number): string {
   return `Rp${Math.abs(amount).toLocaleString('id-ID')}`;
 }
 
+/**
+ * Ubah error Supabase/Postgres jadi pesan yang manusiawi (Bahasa Indonesia),
+ * dan catat detail mentahnya ke console untuk debug. JANGAN tampilkan
+ * error.message mentah ke warga — kode SQL seperti "duplicate key value..."
+ * bikin bingung & tidak premium.
+ *
+ * Pakai: showToast(pesanError(error, 'Gagal menyimpan'), 'error')
+ */
+export function pesanError(error: unknown, fallback = 'Terjadi kesalahan. Coba lagi.'): string {
+  // Selalu simpan detail mentah untuk diagnosa.
+  if (error) console.error('[pesanError]', error);
+
+  const e = error as { code?: string; message?: string } | null | undefined;
+  const code = e?.code;
+  const msg = (e?.message ?? '').toLowerCase();
+
+  // Petakan kode/pola umum Postgres & PostgREST ke kalimat ramah.
+  if (code === '23505' || msg.includes('duplicate')) return 'Data ini sudah ada — tidak bisa ditambah dua kali.';
+  if (code === '23503') return 'Data masih terkait catatan lain, jadi tidak bisa diubah/dihapus.';
+  if (code === '23514' || msg.includes('check constraint')) return 'Nilai yang dimasukkan tidak valid.';
+  if (code === '23502') return 'Ada kolom wajib yang masih kosong.';
+  if (code === '42501' || msg.includes('row-level security') || msg.includes('permission')) return 'Akses ditolak. Pastikan kamu masuk sebagai Bendahara.';
+  if (msg.includes('failed to fetch') || msg.includes('network')) return 'Koneksi bermasalah. Periksa internet lalu coba lagi.';
+
+  return fallback;
+}
+
 /** Rupiah ringkas untuk tempat sempit: Rp1,7jt / Rp850rb / Rp500. */
 export function formatRupiahCompact(amount: number): string {
   const neg = amount < 0 ? '-' : '';

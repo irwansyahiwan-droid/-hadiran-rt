@@ -897,9 +897,9 @@ export default function JadwalPage() {
                             disabled={navigatingId === t.id}
                             title="Hitung Ulang"
                             aria-label="Hitung Ulang"
-                            className="w-8 h-8 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-70"
+                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-70"
                           >
-                            <RefreshCw className={`w-3.5 h-3.5 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`w-[18px] h-[18px] ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                           </button>
                         ) : (
                           // Semua tarikan terjadwal punya tombol Proses — tinggal klik saat pertemuan
@@ -923,9 +923,9 @@ export default function JadwalPage() {
                             onClick={() => { haptic(); openWa(null, pesanTarikan(t.nomor, t.tanggal, t.sohibul_bait?.nama ?? '—', t.jumlah_per_orang)); }}
                             title="Bagikan pengingat ke WhatsApp"
                             aria-label="Bagikan pengingat ke WhatsApp"
-                            className="w-8 h-8 rounded-xl border border-control dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition-all cursor-pointer"
+                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition-all cursor-pointer"
                           >
-                            <MessageCircle className="w-3.5 h-3.5" />
+                            <MessageCircle className="w-[18px] h-[18px]" />
                           </button>
                         )}
 
@@ -934,9 +934,9 @@ export default function JadwalPage() {
                           onClick={() => setEditingTarikan(t)}
                           title="Revisi jadwal"
                           aria-label="Revisi jadwal"
-                          className="w-8 h-8 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer"
+                          className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer"
                         >
-                          <Pencil className="w-3.5 h-3.5" />
+                          <Pencil className="w-[18px] h-[18px]" />
                         </button>
                       </div>
                     ) : (

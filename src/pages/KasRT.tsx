@@ -6,7 +6,7 @@ import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
 import Odometer from '../components/Odometer';
 import SmartInsight from '../components/SmartInsight';
@@ -292,7 +292,7 @@ export default function KasRTPage() {
         .update({ tipe: data.tipe, nominal: data.nominal, keterangan: data.keterangan, tanggal: data.tanggal })
         .eq('id', editing.id)
         .select();
-      if (error) { showToast('Gagal mengubah: ' + error.message, 'error'); return; }
+      if (error) { showToast(pesanError(error, 'Gagal mengubah transaksi.'), 'error'); return; }
       if (!upd || upd.length === 0) { showToast('Gagal mengubah — policy UPDATE kas_rt belum aktif di database', 'error'); return; }
     } else {
       const { error } = await supabase.from('kas_rt').insert({
@@ -302,7 +302,7 @@ export default function KasRTPage() {
         tanggal: data.tanggal,
         saldo_setelah: 0, // sementara; dihitung ulang di bawah
       });
-      if (error) { showToast('Gagal menyimpan: ' + error.message, 'error'); return; }
+      if (error) { showToast(pesanError(error, 'Gagal menyimpan transaksi.'), 'error'); return; }
     }
     await recomputeKasRTSaldo();
     setShowModal(false);
@@ -321,7 +321,7 @@ export default function KasRTPage() {
       'Transaksi dihapus',
       async () => {
         const { data: del, error } = await supabase.from('kas_rt').delete().eq('id', row.id).select();
-        if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); await load(); return; }
+        if (error) { showToast(pesanError(error, 'Gagal menghapus transaksi.'), 'error'); await load(); return; }
         if (!del || del.length === 0) { showToast('Gagal menghapus — policy DELETE kas_rt belum aktif di database', 'error'); await load(); return; }
         await recomputeKasRTSaldo();
         await load();
