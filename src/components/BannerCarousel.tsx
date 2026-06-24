@@ -203,25 +203,25 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     {
       id: 'panduan-absensi', kind: 'absensi', eyebrow: 'PANDUAN · ABSENSI',
       judul: 'Hadir dicatat setiap tarikan', desc: 'Bendahara menandai daftar hadir per tarikan. Yang tidak hadir otomatis kena talangan.',
-      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#3568e0 0%,#1e44b6 100%)', glow: 'rgba(96,165,250,0.55)',
+      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#2d5fda 0%,#16399f 100%)', glow: 'rgba(96,165,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
       id: 'panduan-tarikan', kind: 'tarikan', eyebrow: 'PANDUAN · TARIKAN',
       judul: 'Satu Sohibul Bait per tarikan', desc: 'Setiap tarikan ada satu penerima. Iuran semua anggota yang hadir terkumpul untuknya.',
-      icon: Coins, grad: 'linear-gradient(150deg,#7a47dc 0%,#4e28a8 100%)', glow: 'rgba(167,139,250,0.55)',
+      icon: Coins, grad: 'linear-gradient(150deg,#7140d4 0%,#421f96 100%)', glow: 'rgba(167,139,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
       id: 'panduan-talangan', kind: 'talangan', eyebrow: 'PANDUAN · TALANGAN',
       judul: 'Tidak hadir kena talangan', desc: 'Talangan wajib dilunasi sebelum tarikan berikutnya agar kas tetap sehat.',
-      icon: HandCoins, grad: 'linear-gradient(150deg,#cf7d18 0%,#a4530a 100%)', glow: 'rgba(251,191,36,0.5)',
+      icon: HandCoins, grad: 'linear-gradient(150deg,#c67414 0%,#954908 100%)', glow: 'rgba(251,191,36,0.5)',
       cta: { label: 'Lihat Talangan', tab: 'talangan' },
     },
     {
       id: 'panduan-kas-rt', kind: 'kasrt', eyebrow: 'PANDUAN · KAS RT',
       judul: 'Kas besar RT yang terpisah', desc: 'Sebagian setoran masuk ke Kas RT — terpisah dari Kas Hadiran, untuk kebutuhan warga.',
-      icon: Building2, grad: 'linear-gradient(150deg,#1b8447 0%,#0c6b46 100%)', glow: 'rgba(16,185,129,0.55)',
+      icon: Building2, grad: 'linear-gradient(150deg,#177f40 0%,#095d3c 100%)', glow: 'rgba(16,185,129,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
   ];
@@ -399,7 +399,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
           const z = Math.round(50 - ad * 10);
           const grad = isSaldo
-            ? 'linear-gradient(150deg,#1c8a4a 0%,#0c6233 55%,#073f22 100%)'
+            ? 'linear-gradient(150deg,#1a8848 0%,#0a5c2f 55%,#06351d 100%)'
             : promo!.grad;
           const Icon = promo?.icon;
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
@@ -485,9 +485,9 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
-                  <div className={`mt-[16px] text-[1.4rem] font-extrabold leading-[1.18] tracking-[-.01em] ${tw}`}>{promo!.judul}</div>
+                  <div className={`mt-[16px] text-[1.5rem] font-extrabold leading-[1.16] tracking-[-.02em] ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
-                    <div className={`mt-[10px] text-[0.84rem] font-medium leading-relaxed text-white/95 ${tw}`}>{promo!.desc}</div>
+                    <div className={`mt-[10px] text-[0.85rem] font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
 
                   {/* Progress target → kartu target Kas RT. */}

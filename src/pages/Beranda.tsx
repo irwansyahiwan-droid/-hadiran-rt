@@ -280,7 +280,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
               >
                 <Wallet className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] font-medium text-white/90">Terkumpul</span>
+                <span className="mt-0.5 text-[10px] font-medium text-white/95">Terkumpul</span>
                 <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
@@ -288,7 +288,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
               >
                 <ArrowLeftRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] font-medium text-white/90">Talangan</span>
+                <span className="mt-0.5 text-[10px] font-medium text-white/95">Talangan</span>
                 <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
@@ -296,7 +296,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 className="press flex w-full min-w-0 flex-col items-center gap-1 px-0.5 active:opacity-80"
               >
                 <ArrowUpRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] font-medium text-white/90">Setor Kas RT</span>
+                <span className="mt-0.5 text-[10px] font-medium text-white/95">Setor Kas RT</span>
                 <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
             </div>
