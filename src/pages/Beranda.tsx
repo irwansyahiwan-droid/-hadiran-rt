@@ -252,7 +252,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             {/* Eyebrow */}
             <div className="flex items-center gap-[9px]">
               <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/80">Saldo Kas Hadiran</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/90">Saldo Kas Hadiran</span>
             </div>
 
             {/* Nominal besar + sub-teks */}
@@ -262,7 +262,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                   : <Odometer value={animatedSaldo} />}
               </span>
-              <p className="mt-2.5 text-[0.78rem] leading-relaxed text-white/85">
+              <p className="mt-2.5 text-[0.78rem] leading-relaxed text-white/90">
                 Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
                 {lastDelta > 0 && (
                   <span className="ml-1.5 inline-flex items-center gap-0.5 align-middle font-semibold text-emerald-200/90">
@@ -280,7 +280,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
               >
                 <Wallet className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] text-white/72">Terkumpul</span>
+                <span className="mt-0.5 text-[10px] text-white/85">Terkumpul</span>
                 <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
@@ -288,7 +288,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
               >
                 <ArrowLeftRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] text-white/72">Talangan</span>
+                <span className="mt-0.5 text-[10px] text-white/85">Talangan</span>
                 <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
@@ -296,7 +296,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 className="press flex w-full min-w-0 flex-col items-center gap-1 px-0.5 active:opacity-80"
               >
                 <ArrowUpRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] text-white/72">Setor Kas RT</span>
+                <span className="mt-0.5 text-[10px] text-white/85">Setor Kas RT</span>
                 <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
             </div>

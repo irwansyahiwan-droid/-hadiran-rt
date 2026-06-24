@@ -52,9 +52,10 @@ function TargetPhoto() {
       <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(31,138,126,.24), rgba(14,95,87,.46))', mixBlendMode: 'multiply' }} />
       <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(190,240,214,.12), transparent 42%)', mixBlendMode: 'soft-light' }} />
       {/* Fade kiri → lebur ke gradient kartu (judul tetap terbaca). */}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #1c8576 0%, rgba(28,133,118,.72) 30%, rgba(28,133,118,0) 62%)' }} />
-      {/* Scrim bawah → progress & tanggal tetap legibel di atas foto. */}
-      <div className="absolute inset-x-0 bottom-0 h-[44%]" style={{ background: 'linear-gradient(to top, rgba(7,40,33,.58), transparent)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #1c8576 0%, rgba(28,133,118,.80) 32%, rgba(28,133,118,0) 64%)' }} />
+      {/* Scrim bawah → progress & tanggal tetap legibel di atas foto.
+          Lebih tinggi & pekat: dua perhentian agar transisi halus tapi teks tegas. */}
+      <div className="absolute inset-x-0 bottom-0 h-[58%]" style={{ background: 'linear-gradient(to top, rgba(6,34,28,.82), rgba(6,34,28,.34) 46%, transparent)' }} />
     </div>
   );
 }
@@ -214,7 +215,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     {
       id: 'panduan-talangan', kind: 'talangan', eyebrow: 'PANDUAN · TALANGAN',
       judul: 'Tidak hadir kena talangan', desc: 'Talangan wajib dilunasi sebelum tarikan berikutnya agar kas tetap sehat.',
-      icon: HandCoins, grad: 'linear-gradient(150deg,#ec9a33 0%,#cf6f15 100%)', glow: 'rgba(251,191,36,0.55)',
+      icon: HandCoins, grad: 'linear-gradient(150deg,#cf7d18 0%,#a4530a 100%)', glow: 'rgba(251,191,36,0.5)',
       cta: { label: 'Lihat Talangan', tab: 'talangan' },
     },
     {
@@ -483,13 +484,13 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                     >
                       {Icon && <Icon className="h-[22px] w-[22px]" strokeWidth={1.8} />}
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/80">{promo!.eyebrow}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/90">{promo!.eyebrow}</span>
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
                   <div className={`mt-[16px] text-[1.4rem] font-extrabold leading-[1.18] tracking-[-.01em] ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
-                    <div className={`mt-[10px] text-[0.84rem] leading-relaxed text-white/85 ${tw}`}>{promo!.desc}</div>
+                    <div className={`mt-[10px] text-[0.84rem] leading-relaxed text-white/90 ${tw}`}>{promo!.desc}</div>
                   )}
 
                   {/* Progress target → kartu target Kas RT. */}
@@ -506,11 +507,14 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                           }}
                         />
                       </div>
-                      <div className="mt-[12px] flex items-center justify-between text-[0.78rem] text-white/90">
+                      <div
+                        className="mt-[12px] flex items-center justify-between text-[0.78rem] text-white"
+                        style={{ textShadow: '0 1px 4px rgba(4,28,22,.55)' }}
+                      >
                         <span className="font-extrabold tabular-nums">
-                          {done ? 'Target tercapai 🎉' : <>{Math.round(ratio)}% · <span className="font-medium">kurang {formatRupiahPlain(sisa)}</span></>}
+                          {done ? 'Target tercapai 🎉' : <>{Math.round(ratio)}% · <span className="font-semibold text-white/90">kurang {formatRupiahPlain(sisa)}</span></>}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 text-white/80">
+                        <span className="inline-flex items-center gap-1.5 text-white/90">
                           <CalendarClock className="h-3 w-3" /> {fmtDeadline(TARGET_DEADLINE)}
                         </span>
                       </div>
