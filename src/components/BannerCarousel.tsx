@@ -338,15 +338,20 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide }: Pro
     setIndex(((i % count) + count) % count);
   }
 
+  // stopPropagation: swipe di carousel = ganti SLIDE, jangan bubbling ke
+  // useSwipeNavigate (App) yang akan salah memicu pindah TAB/halaman.
   function onTouchStart(e: React.TouchEvent) {
+    e.stopPropagation();
     startX.current = e.touches[0].clientX;
     widthRef.current = trackRef.current?.clientWidth || 1;
   }
   function onTouchMove(e: React.TouchEvent) {
     if (startX.current === null) return;
+    e.stopPropagation();
     setDrag(e.touches[0].clientX - startX.current);
   }
-  function onTouchEnd() {
+  function onTouchEnd(e: React.TouchEvent) {
+    e.stopPropagation();
     if (startX.current === null) return;
     const d = drag;
     startX.current = null;
