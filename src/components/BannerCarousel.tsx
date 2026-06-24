@@ -15,7 +15,7 @@ const TARGET_DEADLINE = '2026-12-31';
    tinggi tetap agar tumpukan kartu konsisten antar-slide. */
 const CARD_H = 344;     // tinggi kartu (px)
 const TOP = 8;          // offset atas kartu di dalam viewport
-const VIEWPORT_H = 384; // tinggi area carousel — sisakan ruang bayangan kartu aktif
+const VIEWPORT_H = 362; // tinggi area carousel — rapat di bawah kartu (8px sisa), bayangan toh ter-clip
 
 /** Slide promo/panduan (kartu non-saldo). Kartu saldo masuk lewat prop `heroSlide`. */
 interface PromoSlide {
@@ -536,7 +536,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
       {/* Indikator "story" tersegmen — aktif melebar + bar progress mengisi;
           yang sudah lewat terisi penuh. */}
       {count > 1 && (
-        <div className="flex items-center justify-center gap-1.5 pt-3.5">
+        <div className="flex items-center justify-center gap-1.5 pt-2">
           {Array.from({ length: count }).map((_, i) => {
             const isActive = i === index;
             const past = i < index;
