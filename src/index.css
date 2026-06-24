@@ -520,6 +520,30 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
 @keyframes bannerArtFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .banner-art-float { animation: bannerArtFloat 5.5s ease-in-out infinite; }
 
+/* Grafik motif "tertarik" (draw-on) saat slide grafik jadi aktif + fade area/dot.
+   Catch-all reduced-motion di bawah membuat forwards-anim langsung ke state akhir. */
+@keyframes bannerDraw { to { stroke-dashoffset: 0; } }
+@keyframes bannerFade { to { opacity: 1; } }
+.banner-draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: bannerDraw 1.1s var(--ease-out-expo) 0.12s forwards; }
+.banner-draw-area { opacity: 0; animation: bannerFade 0.9s ease-out 0.5s forwards; }
+.banner-draw-dot  { opacity: 0; animation: bannerFade 0.4s ease-out 1s forwards; }
+
+/* Kilau kaca menyapu pelan di slide aktif → kartu terasa hidup (sekali tiap ~5.5s). */
+.banner-shimmer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 20; }
+.banner-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 42%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.16) 50%, transparent 100%);
+  transform: translateX(-160%) skewX(-12deg);
+  animation: bannerShimmer 5.5s ease-in-out 1.2s infinite;
+}
+@keyframes bannerShimmer {
+  0%       { transform: translateX(-160%) skewX(-12deg); }
+  55%, 100%{ transform: translateX(320%)  skewX(-12deg); }
+}
+
 /* One-time specular sheen sweep on hero card when dashboard loads.
    Hanya saat `.hero-sheen-sweep` (kunjungan pertama sesi) — balik ke Beranda
    via tab/back tak menyapu ulang. Lihat useFirstPlay di lib/hooks. */

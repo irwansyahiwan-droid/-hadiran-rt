@@ -36,8 +36,8 @@ function PhoneMock() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute -right-2 top-3 z-[1] w-[78px] rotate-[-8deg]"
-      style={{ filter: 'drop-shadow(0 14px 22px rgba(0,0,0,0.45))' }}
+      className="pointer-events-none absolute -right-2 top-2 z-[1] w-[78px]"
+      style={{ transform: 'rotate(-8deg) scale(1.3)', transformOrigin: 'right center', filter: 'drop-shadow(0 14px 22px rgba(0,0,0,0.45))' }}
     >
       {/* Glow di balik HP — beri kedalaman & kesan "menyala" */}
       <div
@@ -76,13 +76,13 @@ function PhoneMock() {
  *  Elemen luar menahan peek/rotate; wrapper-dalam yang mengambang (banner-art-float)
  *  agar rotate tak bentrok dengan animasi naik-turun. */
 function ArtFrame({
-  children, glow, rotate = -6, delay = '0s', width = 76,
-}: { children: React.ReactNode; glow: string; rotate?: number; delay?: string; width?: number }) {
+  children, glow, rotate = -6, delay = '0s', width = 76, scale = 1,
+}: { children: React.ReactNode; glow: string; rotate?: number; delay?: string; width?: number; scale?: number }) {
   return (
     <div
       aria-hidden
       className="pointer-events-none absolute -right-2 top-1/2 z-[1]"
-      style={{ transform: `translateY(-50%) rotate(${rotate}deg)`, width }}
+      style={{ transform: `translateY(-50%) rotate(${rotate}deg) scale(${scale})`, transformOrigin: 'right center', width }}
     >
       {/* Glow di balik motif — kedalaman & kesan "menyala" senada hero card */}
       <div
@@ -177,15 +177,15 @@ function KasRtArt() {
 
 /** Pilih motif sesuai jenis slide panduan. */
 const ART = {
-  absensi:  { Motif: AbsensiArt,  rotate: -7, delay: '0s',   width: 76 },
-  tarikan:  { Motif: TarikanArt,  rotate: 0,  delay: '1.1s', width: 60 },
-  talangan: { Motif: TalanganArt, rotate: -9, delay: '0.5s', width: 80 },
-  'kas-rt': { Motif: KasRtArt,    rotate: 0,  delay: '1.6s', width: 78 },
+  absensi:  { Motif: AbsensiArt,  rotate: -7, delay: '0s',   width: 76, scale: 1.32 },
+  tarikan:  { Motif: TarikanArt,  rotate: 0,  delay: '1.1s', width: 60, scale: 1.42 },
+  talangan: { Motif: TalanganArt, rotate: -9, delay: '0.5s', width: 80, scale: 1.26 },
+  'kas-rt': { Motif: KasRtArt,    rotate: 0,  delay: '1.6s', width: 78, scale: 1.3 },
 } as const;
 
 function SlideArt({ art, glow }: { art: NonNullable<BannerSlide['art']>; glow: string }) {
-  const { Motif, rotate, delay, width } = ART[art];
-  return <ArtFrame glow={glow} rotate={rotate} delay={delay} width={width}><Motif /></ArtFrame>;
+  const { Motif, rotate, delay, width, scale } = ART[art];
+  return <ArtFrame glow={glow} rotate={rotate} delay={delay} width={width} scale={scale}><Motif /></ArtFrame>;
 }
 
 /** Motif latar PENUH kartu (di atas gradient, di bawah konten) → banner terasa
@@ -203,12 +203,14 @@ const MOTIF: Record<string, MotifKind> = {
   'panduan-kas-rt': 'growth',  // grafik naik
 };
 
-function SlideMotif({ kind }: { kind: MotifKind }) {
+function SlideMotif({ kind, animate }: { kind: MotifKind; animate?: boolean }) {
   const uid = useId().replace(/:/g, '');
   const base = 'pointer-events-none absolute inset-0 z-0 h-full w-full';
 
   if (kind === 'growth') {
     const gid = `mg-${uid}`;
+    const areaD = 'M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36 L320,140 L0,140 Z';
+    const lineD = 'M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36';
     return (
       <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="none" className={base}>
         <defs>
@@ -222,9 +224,21 @@ function SlideMotif({ kind }: { kind: MotifKind }) {
           <line x1="0" y1="82" x2="320" y2="82" />
           <line x1="0" y1="116" x2="320" y2="116" />
         </g>
-        <path d="M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36 L320,140 L0,140 Z" fill={`url(#${gid})`} />
-        <path d="M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36" fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="2" />
-        <circle cx="300" cy="42" r="3" fill="#fff" fillOpacity="0.55" />
+        {/* Slide aktif → garis "tertarik" (draw-on) + area & dot fade in.
+            Render terkondisi: tiap kali jadi aktif, grup ini mount ulang → animasi main lagi. */}
+        {animate ? (
+          <g>
+            <path d={areaD} fill={`url(#${gid})`} className="banner-draw-area" />
+            <path d={lineD} pathLength={1} fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="2" className="banner-draw-line" />
+            <circle cx="300" cy="42" r="3" fill="#fff" fillOpacity="0.55" className="banner-draw-dot" />
+          </g>
+        ) : (
+          <g>
+            <path d={areaD} fill={`url(#${gid})`} />
+            <path d={lineD} fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="2" />
+            <circle cx="300" cy="42" r="3" fill="#fff" fillOpacity="0.55" />
+          </g>
+        )}
       </svg>
     );
   }
@@ -527,7 +541,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide }: Pro
                         transition: dragging ? 'none' : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)',
                       }}
                     >
-                      <SlideMotif kind={motif} />
+                      <SlideMotif kind={motif} animate={slideIndex === index && !reduced} />
                     </div>
                   )}
                   {/* Specular sheen kaca — cahaya kiri-atas + bayang kanan-bawah (SATU
@@ -595,6 +609,8 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide }: Pro
                   ) : (
                     s.isi && <p className="relative text-caption text-white/90 leading-snug mt-1.5 break-words line-clamp-2">{s.isi}</p>
                   )}
+                  {/* Kilau kaca menyapu — hanya slide aktif (hemat & tak silau di latar) */}
+                  {slideIndex === index && !reduced && <div aria-hidden className="banner-shimmer" />}
                 </div>
               </div>
             );
