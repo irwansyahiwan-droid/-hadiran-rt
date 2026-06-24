@@ -223,8 +223,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </span>
       </div>
 
-      {/* Main Kas Card — clean & premium hero */}
-      <div className={`hero-card hero-noise${firstHero ? ' hero-sheen-sweep' : ''}`} style={{ padding: '18px 20px 16px' }}>
+      {/* Hero saldo + promo digabung jadi SATU carousel mewah: saldo = slide
+          "rumah" (ditahan lebih lama lalu balik), promo numpang lewat di
+          permukaan yang sama. Container bawa --hero-shadow → semua slide naik kelas. */}
+      <BannerCarousel
+        kasRT={setorKasRT}
+        onNavigate={onNavigate}
+        heroSlide={
+          <div className={`hero-card hero-noise${firstHero ? ' hero-sheen-sweep' : ''}`} style={{ padding: '18px 20px 16px' }}>
         {/* Ambient growth wave — latar "hidup" di belakang konten, tanpa menambah tinggi kartu */}
         {kasSeries.length >= 2 && (
           <div className="absolute inset-x-0 bottom-0 z-0 pointer-events-none" style={{ height: 104, opacity: 0.55 }}>
@@ -325,12 +331,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <span className="font-bold text-white mt-0.5 whitespace-nowrap tabular-nums text-[clamp(0.6875rem,3.2vw,0.9375rem)]">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
           </button>
         </div>
-      </div>
-
-      {/* Carousel promo — target Kas RT + panduan singkat (gaya banner app bank).
-          Posisi tepat di bawah hero (pola app bank: saldo → promo → statistik),
-          sekaligus memisah dua grid 3-kolom (hero stat-row & Stats Row). */}
-      <BannerCarousel kasRT={setorKasRT} onNavigate={onNavigate} />
+          </div>
+        }
+      />
 
       {/* Stats Row */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">

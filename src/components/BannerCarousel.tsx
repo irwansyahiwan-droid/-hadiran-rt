@@ -188,7 +188,8 @@ function SlideArt({ art, glow }: { art: NonNullable<BannerSlide['art']>; glow: s
   return <ArtFrame glow={glow} rotate={rotate} delay={delay} width={width}><Motif /></ArtFrame>;
 }
 
-const ROTATE_MS = 5500;
+const ROTATE_MS = 5000;       // dwell slide promo
+const HERO_MS = 6800;         // dwell slide saldo (rumah) — ditahan lebih lama
 const SWIPE_THRESHOLD = 48; // px geser minimal untuk pindah slide
 
 /** Hitung "31 Des 2026 · N hari lagi". */
@@ -204,9 +205,12 @@ interface Props {
   kasRT?: number;
   /** Pindah tab saat tombol CTA slide ditekan. */
   onNavigate?: (tab: string) => void;
+  /** Bila ada → jadi slide PERTAMA (kartu saldo hero). Carousel jadi satu
+   *  permukaan "saldo + promo": saldo = rumah (dwell lebih lama lalu balik). */
+  heroSlide?: React.ReactNode;
 }
 
-export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
+export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide }: Props) {
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0); // offset geser sementara (px) saat menyentuh
   const startX = useRef<number | null>(null);
@@ -299,7 +303,8 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
     },
   ];
 
-  const count = slides.length;
+  const hasHero = heroSlide != null;
+  const count = slides.length + (hasHero ? 1 : 0);
   const reduced =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -309,15 +314,22 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
     if (index >= count) setIndex(0);
   }, [count, index]);
 
-  // Auto-rotate — berhenti saat ≤1 slide, reduced-motion, sedang disentuh, atau tab tak terlihat.
+  // Auto-rotate dgn dwell per-slide: saldo (hero, index 0) ditahan lebih lama lalu
+  // kembali jadi "rumah"; promo lebih singkat. Berhenti saat ≤1 slide, reduced-motion,
+  // atau sedang disentuh. Saat tab tersembunyi → tunda, jangan lompat.
   useEffect(() => {
     if (count <= 1 || reduced || startX.current !== null) return;
-    const id = window.setInterval(() => {
-      if (document.hidden) return;
-      setIndex((i) => (i + 1) % count);
-    }, ROTATE_MS);
-    return () => window.clearInterval(id);
-  }, [count, reduced, index]);
+    const dwell = hasHero && index === 0 ? HERO_MS : ROTATE_MS;
+    let id: number;
+    const schedule = () => {
+      id = window.setTimeout(() => {
+        if (document.hidden) { schedule(); return; }
+        setIndex((i) => (i + 1) % count);
+      }, dwell);
+    };
+    schedule();
+    return () => window.clearTimeout(id);
+  }, [count, reduced, index, hasHero]);
 
   if (count === 0) return null;
 
@@ -348,7 +360,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
 
   return (
     <section aria-roledescription="carousel" aria-label="Info, target & panduan" className="select-none">
-      <div className="relative overflow-hidden rounded-3xl lift">
+      <div className="relative overflow-hidden rounded-3xl lift" style={hasHero ? { boxShadow: 'var(--hero-shadow)' } : undefined}>
         <div
           ref={trackRef}
           className="flex items-stretch"
@@ -360,7 +372,18 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
+          {hasHero && (
+            <div
+              className="w-full shrink-0"
+              aria-roledescription="slide"
+              aria-label={`1 dari ${count}`}
+              aria-hidden={index !== 0}
+            >
+              {heroSlide}
+            </div>
+          )}
           {slides.map((s, i) => {
+            const slideIndex = hasHero ? i + 1 : i;
             const Icon = s.icon;
             const prog = s.progress;
             const ratio = prog && prog.max > 0 ? Math.min(100, Math.max(0, (prog.value / prog.max) * 100)) : 0;
@@ -371,8 +394,8 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
                 key={s.id}
                 className="w-full shrink-0"
                 aria-roledescription="slide"
-                aria-label={`${i + 1} dari ${count}`}
-                aria-hidden={i !== index}
+                aria-label={`${slideIndex + 1} dari ${count}`}
+                aria-hidden={slideIndex !== index}
               >
                 <div
                   className={`hero-noise relative h-full min-h-[104px] overflow-hidden px-5 py-[18px] text-white flex flex-col justify-center${s.phone ? ' pr-[92px]' : s.art ? ' pr-[88px]' : ''}`}
@@ -469,26 +492,31 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
         </div>
       </div>
 
-      {/* Dots */}
+      {/* Dots — termasuk slide saldo (rumah) di posisi pertama */}
       {count > 1 && (
         <div className="flex items-center justify-center mt-1.5">
-          {slides.map((s, i) => (
-            <button
-              key={s.id}
-              onClick={() => goTo(i)}
-              aria-label={`Ke slide ${i + 1}: ${s.judul}`}
-              aria-current={i === index}
-              className="press grid place-items-center min-h-[40px] px-2"
-            >
-              <span
-                className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ${
-                  i === index
-                    ? 'w-5 bg-brand dark:bg-brand-linkDark'
-                    : 'w-1.5 bg-gray-300 dark:bg-gray-600'
-                }`}
-              />
-            </button>
-          ))}
+          {Array.from({ length: count }).map((_, i) => {
+            const judul = hasHero
+              ? (i === 0 ? 'Saldo' : slides[i - 1]?.judul ?? '')
+              : (slides[i]?.judul ?? '');
+            return (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                aria-label={`Ke slide ${i + 1}: ${judul}`}
+                aria-current={i === index}
+                className="press grid place-items-center min-h-[40px] px-2"
+              >
+                <span
+                  className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ${
+                    i === index
+                      ? 'w-5 bg-brand dark:bg-brand-linkDark'
+                      : 'w-1.5 bg-gray-300 dark:bg-gray-600'
+                  }`}
+                />
+              </button>
+            );
+          })}
         </div>
       )}
     </section>
