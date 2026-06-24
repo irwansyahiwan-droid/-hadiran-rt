@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, TrendingUp, ChevronRight } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
+import { showToast } from '../lib/toast';
 import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
 import CrossFade from '../components/CrossFade';
@@ -39,6 +41,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [lastDelta, setLastDelta] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
   const trxDrag = useDragDismiss(() => setSelectedTrx(null));
   useBackDismiss(selectedTrx !== null, () => setSelectedTrx(null));
@@ -50,7 +53,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   async function load(showRefreshing = false) {
     if (showRefreshing) setRefreshing(true);
     else setLoading(true);
+    setError(false);
 
+    try {
     const [summaryData, jadwalRes, setorRes, talanganLunasRes, selesaiRes] = await Promise.all([
       fetchDashboardSummary(),
       supabase
@@ -116,8 +121,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     setSummary(summaryData);
     setJadwalList((jadwalRes.data as Tarikan[]) ?? []);
     setTrxItems(withSaldo);
-    setLoading(false);
-    setRefreshing(false);
+    } catch {
+      // Pull-to-refresh gagal (data sudah tampil) → jangan hapus dashboard, cukup
+      // beri tahu. Cold load / retry gagal (showRefreshing=false) → error screen.
+      if (showRefreshing) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      else setError(true);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }
 
   useEffect(() => {
@@ -205,6 +217,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   return (
     <>
     <CrossFade loading={loading} skeleton={skeleton}>
+    {error ? (
+    <ErrorState className="pt-10" onRetry={() => load()} retrying={loading} />
+    ) : (
     <div className="space-y-6 pb-2">
       {/* Sapaan + badge status kas */}
       <div className="flex items-end justify-between px-1">
@@ -479,6 +494,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
     </div>
+    )}
     </CrossFade>
 
     {/* Transaksi detail bottom sheet */}

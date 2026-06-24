@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, Share2, CalendarCheck } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { fetchRekapTriwulan, fetchSnapshotKas } from '../lib/laporan';
@@ -47,16 +48,17 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   const [rows, setRows] = useState<RekapTriwulan[]>([]);
   const [snap, setSnap] = useState<SnapshotKas | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [sharingKey, setSharingKey] = useState<string | null>(null);
 
   async function load() {
+    setError(false);
     try {
       const [rekap, snapshot] = await Promise.all([fetchRekapTriwulan(), fetchSnapshotKas()]);
       setRows(rekap);
       setSnap(snapshot);
     } catch {
-      setRows([]);
-      setSnap(null);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -209,6 +211,10 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 </div>
               </div>
             ))}
+          </div>
+        ) : error ? (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
+            <ErrorState onRetry={() => { setLoading(true); load(); }} retrying={loading} />
           </div>
         ) : rows.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">

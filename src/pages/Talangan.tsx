@@ -9,6 +9,7 @@ import AvatarPeci from '../components/AvatarPeci';
 import SectionTitle from '../components/SectionTitle';
 import InfoTip from '../components/InfoTip';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
 import Tag from '../components/Tag';
 import FilterChips from '../components/FilterChips';
 import CrossFade from '../components/CrossFade';
@@ -27,6 +28,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const { isBendahara } = useAuthContext();
   const [list, setList] = useState<Talangan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
@@ -38,12 +40,18 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase
-      .from('talangan')
-      .select('*, warga(*), tarikan(*)')
-      .order('created_at', { ascending: true });
-    setList((data as Talangan[]) ?? []);
-    setLoading(false);
+    setError(false);
+    try {
+      const { data } = await supabase
+        .from('talangan')
+        .select('*, warga(*), tarikan(*)')
+        .order('created_at', { ascending: true });
+      setList((data as Talangan[]) ?? []);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { load(); }, []);
@@ -416,6 +424,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           ))}
         </div>
       )}>
+        {error ? (
+        <ErrorState onRetry={() => load()} retrying={loading} />
+        ) : (
         <>
           {/* Berganda warning */}
           {showBelum && berganda.length > 0 && (
@@ -466,6 +477,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             />
           )}
         </>
+        )}
       </CrossFade>
     </div>
   );

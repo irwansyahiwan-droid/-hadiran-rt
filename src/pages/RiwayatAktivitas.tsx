@@ -5,6 +5,7 @@ import {
   ChevronDown, Route, Lightbulb,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
 import FilterChips from '../components/FilterChips';
 import { useRealtime } from '../hooks/useRealtime';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -58,16 +59,18 @@ function labelHari(dateStr: string): string {
 export default function RiwayatAktivitas({ open, onClose }: Props) {
   const [rows, setRows] = useState<AktivitasLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]['id']>('semua');
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
   async function load() {
+    setError(false);
     try {
       const data = await fetchAktivitas();
       setRows(data);
     } catch {
-      setRows([]);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -200,6 +203,10 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                 </div>
               </div>
             ))}
+          </div>
+        ) : error ? (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
+            <ErrorState onRetry={() => { setLoading(true); load(); }} retrying={loading} />
           </div>
         ) : grouped.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">

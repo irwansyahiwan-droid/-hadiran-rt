@@ -9,6 +9,7 @@ import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
 import Odometer from '../components/Odometer';
 import Tag from '../components/Tag';
 import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
@@ -114,6 +115,7 @@ export default function KasHadiranPage() {
   const [batalTarikan, setBatalTarikan] = useState<Tarikan | null>(null);
   const [confirmHapusId, setConfirmHapusId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [hadiranFilter, setHadiranFilter] = useState<'semua' | 'talangan' | 'lunas'>('semua');
   const [hadiranSort, setHadiranSort] = useState<'terbaru' | 'terlama' | 'kas'>('terbaru');
@@ -128,6 +130,8 @@ export default function KasHadiranPage() {
 
   async function load() {
     setLoading(true);
+    setError(false);
+    try {
     const [txRes, tarRes, talRes, wargaRes] = await Promise.all([
       supabase.from('transaksi_kas').select('*').order('tanggal', { ascending: true }),
       supabase
@@ -153,7 +157,11 @@ export default function KasHadiranPage() {
       return acc;
     }, {});
     setTalanganMap(map);
-    setLoading(false);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -553,6 +561,8 @@ export default function KasHadiranPage() {
                     </div>
                   ))}
                 </div>
+              ) : error ? (
+                <ErrorState onRetry={() => load()} retrying={loading} />
               ) : displayTarikan.length === 0 ? (
                 /* Hasil filter kosong */
                 <EmptyState icon={TrendingUp} title="Tidak ada hasil" subtitle="Tidak ada tarikan pada filter ini." />

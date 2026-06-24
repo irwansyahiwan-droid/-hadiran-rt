@@ -6,11 +6,13 @@ import { showToast } from '../lib/toast';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 import Tag from '../components/Tag';
 import InfoTip from '../components/InfoTip';
+import ErrorState from '../components/ErrorState';
 
 type SubTab = 'anggota' | 'jadwal';
 
 export default function JadwalWargaPage() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>('anggota');
   const [lastTarikan, setLastTarikan] = useState<Tarikan | null>(null);
   const [wargaList, setWargaList] = useState<Warga[]>([]);
@@ -20,9 +22,10 @@ export default function JadwalWargaPage() {
   const [search, setSearch] = useState('');
   const [wargaFilter, setWargaFilter] = useState<'semua' | 'hadir' | 'titip' | 'tidak'>('semua');
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
+  async function load() {
+    setLoading(true);
+    setError(false);
+    try {
 
       const [tarRes, wargaRes] = await Promise.all([
         supabase
@@ -74,8 +77,14 @@ export default function JadwalWargaPage() {
         setTalanganLunasSet(lunasSet);
       }
 
+    } catch {
+      setError(true);
+    } finally {
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
     load();
     import('../lib/generateJadwalPDF').catch(() => {}); // preload: jaga gesture share di HP
   }, []);
@@ -111,6 +120,14 @@ export default function JadwalWargaPage() {
             </div>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pt-10">
+        <ErrorState onRetry={() => load()} retrying={loading} />
       </div>
     );
   }

@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
 import Odometer from '../components/Odometer';
 import SmartInsight from '../components/SmartInsight';
 import CrossFade from '../components/CrossFade';
@@ -172,6 +173,7 @@ export default function KasRTPage() {
   const { isBendahara } = useAuthContext();
   const [list, setList] = useState<KasRT[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState<'semua' | 'masuk' | 'keluar'>('semua');
   const [sort, setSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
@@ -187,13 +189,19 @@ export default function KasRTPage() {
 
   async function load() {
     setLoading(true);
-    const { data } = await supabase
-      .from('kas_rt')
-      .select('*')
-      .order('tanggal', { ascending: true })
-      .order('created_at', { ascending: true });
-    setList((data as KasRT[]) ?? []);
-    setLoading(false);
+    setError(false);
+    try {
+      const { data } = await supabase
+        .from('kas_rt')
+        .select('*')
+        .order('tanggal', { ascending: true })
+        .order('created_at', { ascending: true });
+      setList((data as KasRT[]) ?? []);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -509,7 +517,9 @@ export default function KasRTPage() {
             ))}
           </div>
         )}>
-          {list.length === 0 ? (
+          {error ? (
+          <ErrorState onRetry={() => load()} retrying={loading} />
+        ) : list.length === 0 ? (
           <EmptyState icon={Landmark} title="Belum ada transaksi" subtitle="Transaksi akan muncul setelah data pertama ditambahkan." />
         ) : (
           <>

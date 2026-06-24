@@ -4,6 +4,7 @@ import {
   CheckCircle2, Phone, Home, History, AlertTriangle,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
 import Tag from '../components/Tag';
 import { supabase } from '../lib/supabase';
 import {
@@ -275,11 +276,13 @@ export default function KelolaAnggota({ open, onClose }: Props) {
   const [list, setList] = useState<Warga[]>([]);
   const [selesaiTarikan, setSelesaiTarikan] = useState<Tarikan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState<{ mode: 'add' | 'edit'; warga: Warga | null } | null>(null);
 
   async function load() {
     setLoading(true);
+    setError(false);
     try {
       const [anggota, tarRes] = await Promise.all([
         fetchAnggota(),
@@ -292,7 +295,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
       setList(anggota);
       setSelesaiTarikan((tarRes.data as Tarikan[]) ?? []);
     } catch {
-      setList([]);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -374,6 +377,10 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                 </div>
               </div>
             ))}
+          </div>
+        ) : error ? (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
+            <ErrorState onRetry={() => load()} retrying={loading} />
           </div>
         ) : filtered.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">

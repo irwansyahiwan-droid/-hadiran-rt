@@ -4,6 +4,7 @@ import {
   RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import ErrorState from '../components/ErrorState';
 import Fab from '../components/Fab';
 import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
@@ -784,6 +785,7 @@ export default function JadwalPage() {
   const [tarikanList, setTarikanList] = useState<Tarikan[]>([]);
   const [wargaList, setWargaList] = useState<Warga[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [selectedTarikan, setSelectedTarikan] = useState<Tarikan | null>(null);
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<AbsensiResult | null>(null);
@@ -793,20 +795,26 @@ export default function JadwalPage() {
 
   async function load() {
     setLoading(true);
-    const [tarRes, wargaRes] = await Promise.all([
-      supabase
-        .from('tarikan')
-        .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
-        .order('nomor', { ascending: true }),
-      supabase
-        .from('warga')
-        .select('*')
-        .eq('status_aktif', true)
-        .order('nama', { ascending: true }),
-    ]);
-    setTarikanList((tarRes.data as Tarikan[]) ?? []);
-    setWargaList((wargaRes.data as Warga[]) ?? []);
-    setLoading(false);
+    setError(false);
+    try {
+      const [tarRes, wargaRes] = await Promise.all([
+        supabase
+          .from('tarikan')
+          .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
+          .order('nomor', { ascending: true }),
+        supabase
+          .from('warga')
+          .select('*')
+          .eq('status_aktif', true)
+          .order('nama', { ascending: true }),
+      ]);
+      setTarikanList((tarRes.data as Tarikan[]) ?? []);
+      setWargaList((wargaRes.data as Warga[]) ?? []);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -897,7 +905,9 @@ export default function JadwalPage() {
           ))}
         </div>
       )}>
-        {tarikanList.length === 0 ? (
+        {error ? (
+        <ErrorState onRetry={() => load()} retrying={loading} />
+      ) : tarikanList.length === 0 ? (
         <EmptyState icon={Calendar} title="Belum ada jadwal" subtitle="Jadwal tarikan akan muncul setelah dibuat oleh bendahara." />
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
