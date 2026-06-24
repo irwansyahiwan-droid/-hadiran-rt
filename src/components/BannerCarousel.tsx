@@ -401,6 +401,8 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const grad = isSaldo
             ? 'linear-gradient(150deg,#1f8a4c 0%,#0f6b39 55%,#0a5530 100%)'
             : promo!.grad;
+          // Warna aura kartu → glow box-shadow saat aktif (mengambang dari latar).
+          const glowColor = isSaldo ? 'rgba(36,176,94,0.5)' : promo!.glow;
           const Icon = promo?.icon;
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
           const tw = isSaldo ? '' : ({
@@ -427,7 +429,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 opacity, zIndex: z, willChange: 'transform, opacity',
                 transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(.22,.61,.36,1), opacity 0.45s ease, box-shadow 0.45s ease',
                 boxShadow: active
-                  ? '0 28px 64px -22px rgba(2,28,14,.6), 0 12px 28px -14px rgba(0,0,0,.4)'
+                  ? `0 34px 80px -26px ${glowColor}, 0 26px 58px -28px rgba(2,28,14,.6), 0 10px 24px -14px rgba(0,0,0,.42)`
                   : '0 16px 36px -20px rgba(0,0,0,.45)',
                 cursor: dragging ? 'grabbing' : 'grab', WebkitFontSmoothing: 'antialiased',
               }}
@@ -455,9 +457,14 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
               {/* Foto Pak RT & Bendahara — kartu target. Di bawah glass overlay & teks. */}
               {promo?.kind === 'target' && <TargetPhoto />}
 
-              {/* Sheen tepi-atas + hairline kaca + vignette bawah + noise (bahasa .lift). */}
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 30%)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.22)' }} />
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'radial-gradient(135% 82% at 50% 128%, rgba(0,0,0,.34), rgba(0,0,0,0) 56%)' }} />
+              {/* Lapisan kaca (di bawah konten z-3, di atas dekorasi/foto):
+                  1) gloss diagonal sudut kanan-atas — "liquid glass" light catch,
+                     sengaja jauh dari eyebrow/judul di kiri agar kontras teks aman;
+                  2) highlight tepi-atas + rim light terang + garis dasar gelap → kaca tebal;
+                  3) vignette bawah; 4) noise (bahasa .lift). */}
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(238deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.10) 17%, rgba(255,255,255,0) 40%)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0) 28%)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.24), inset 0 1.5px 0 rgba(255,255,255,.36), inset 0 -1px 0 rgba(0,0,0,.20)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'radial-gradient(135% 82% at 50% 128%, rgba(0,0,0,.36), rgba(0,0,0,0) 56%)' }} />
               <div className="hero-noise pointer-events-none absolute inset-0" style={{ borderRadius: 30 }} />
 
               {/* ---------- KONTEN ---------- */}
