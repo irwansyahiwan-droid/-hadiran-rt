@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import rtBendahara from '../assets/rt-bendahara.jpg';
+import dashboardPhone from '../assets/dashboard-phone.jpg';
 
 /** Target Kas RT yang dipromosikan di carousel (info, terpisah dari widget editable). */
 const TARGET_NOMINAL = 25_000_000;
@@ -16,6 +17,11 @@ const TARGET_DEADLINE = '2026-12-31';
 const CARD_H = 344;     // tinggi kartu (px)
 const TOP = 8;          // offset atas kartu di dalam viewport
 const VIEWPORT_H = 362; // tinggi area carousel — rapat di bawah kartu (8px sisa), bayangan toh ter-clip
+
+/** Satu easing untuk semua transisi kartu/sheen/indikator → tak drift antar-tempat. */
+const EASE = 'cubic-bezier(.22,.61,.36,1)';
+/** Drop-shadow gelap halus untuk teks putih di atas gradient/foto — jaga kontras AA tanpa glow berwarna. */
+const TEXT_SHADOW = '0 1px 3px rgba(2,12,8,.34)';
 
 /** Slide promo/panduan (kartu non-saldo). Kartu saldo masuk lewat prop `heroSlide`. */
 interface PromoSlide {
@@ -52,7 +58,7 @@ function TargetPhoto() {
       <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(31,138,126,.24), rgba(14,95,87,.46))', mixBlendMode: 'multiply' }} />
       <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(190,240,214,.12), transparent 42%)', mixBlendMode: 'soft-light' }} />
       {/* Fade kiri → lebur ke gradient kartu (judul tetap terbaca). */}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #1c8576 0%, rgba(28,133,118,.80) 32%, rgba(28,133,118,0) 64%)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #27a99a 0%, rgba(39,169,154,.80) 32%, rgba(39,169,154,0) 64%)' }} />
       {/* Scrim bawah → progress & tanggal tetap legibel di atas foto.
           Lebih tinggi & pekat: dua perhentian agar transisi halus tapi teks tegas. */}
       <div className="absolute inset-x-0 bottom-0 h-[58%]" style={{ background: 'linear-gradient(to top, rgba(6,34,28,.82), rgba(6,34,28,.34) 46%, transparent)' }} />
@@ -60,29 +66,30 @@ function TargetPhoto() {
   );
 }
 
-/** Mockup HP mengambang — cuplikan dashboard distylisasi (mini hero + stat + transaksi). */
+/** iPhone mengambang berisi screenshot dashboard asli (Beranda) → "pantau dari HP" yang konkret.
+ *  Bingkai titanium gelap + dynamic island + sheen kaca tipis; sedikit miring & membleed
+ *  ke kanan-bawah agar terasa melayang. */
 function AppPhone() {
   return (
     <div
       aria-hidden
-      className="banner-art-float absolute right-[-2px] top-[6px] h-[128px] w-[98px] overflow-hidden rounded-[20px] bg-[#080c09] p-[5px]"
-      style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.18), 0 22px 36px -16px rgba(0,0,0,.75)' }}
+      className="banner-art-float absolute right-[-6px] top-[20px] h-[196px] w-[96px] rotate-[6deg] rounded-[26px] bg-[#0a0e0c] p-[3px]"
+      style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.24), 0 26px 44px -16px rgba(0,0,0,.72)' }}
     >
-      <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-gray-50">
-        <div className="absolute left-1/2 top-[5px] z-10 h-[3.5px] w-[22px] -translate-x-1/2 rounded-full bg-gray-900/90" />
-        <div className="px-[6px] pt-3">
-          <div className="h-[34px] rounded-[8px]" style={{ background: 'linear-gradient(135deg,#0D5B36,#1C9A5C)' }} />
-          <div className="mt-[6px] flex gap-[3px]">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-[15px] flex-1 rounded-[3px] bg-white ring-1 ring-gray-200/80" />
-            ))}
-          </div>
-          <div className="mt-[6px] space-y-[4px]">
-            <div className="h-[6px] rounded-full bg-gray-200" />
-            <div className="h-[6px] w-2/3 rounded-full bg-gray-200" />
-            <div className="h-[6px] w-5/6 rounded-full bg-gray-200" />
-          </div>
-        </div>
+      <div className="relative h-full w-full overflow-hidden rounded-[23px] bg-black">
+        <img
+          src={dashboardPhone}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-top"
+          draggable={false}
+        />
+        {/* Dynamic island */}
+        <div className="absolute left-1/2 top-[7px] z-10 h-[13px] w-[38px] -translate-x-1/2 rounded-full bg-black/95" />
+        {/* Sheen kaca diagonal tipis di layar. */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(132deg, rgba(255,255,255,.18), rgba(255,255,255,0) 36%)' }}
+        />
       </div>
     </div>
   );
@@ -192,36 +199,36 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     {
       id: 'target-kas-rt', kind: 'target', eyebrow: 'TARGET KAS RT',
       judul: 'Bersama menuju Rp25 juta', icon: Target,
-      grad: 'linear-gradient(150deg,#1f8a7e 0%,#0e5f57 100%)', glow: 'rgba(45,212,191,0.55)',
+      grad: 'linear-gradient(150deg,#27a99a 0%,#147a6f 100%)', glow: 'rgba(45,212,191,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
     {
       id: 'app-hp', kind: 'app', eyebrow: 'APLIKASI',
       judul: 'Pantau kas RT dari HP', desc: 'Saldo, jadwal & talangan dalam satu genggaman.',
-      icon: Smartphone, grad: 'linear-gradient(160deg,#1b2620 0%,#0e1512 100%)', glow: 'rgba(45,212,150,0.5)',
+      icon: Smartphone, grad: 'linear-gradient(160deg,#2e463a 0%,#16261d 100%)', glow: 'rgba(45,212,150,0.5)',
     },
     {
       id: 'panduan-absensi', kind: 'absensi', eyebrow: 'PANDUAN · ABSENSI',
       judul: 'Hadir dicatat setiap tarikan', desc: 'Bendahara menandai daftar hadir per tarikan. Yang tidak hadir otomatis kena talangan.',
-      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#2d5fda 0%,#16399f 100%)', glow: 'rgba(96,165,250,0.55)',
+      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#4274f0 0%,#1f4cc8 100%)', glow: 'rgba(96,165,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
       id: 'panduan-tarikan', kind: 'tarikan', eyebrow: 'PANDUAN · TARIKAN',
       judul: 'Satu Sohibul Bait per tarikan', desc: 'Setiap tarikan ada satu penerima. Iuran semua anggota yang hadir terkumpul untuknya.',
-      icon: Coins, grad: 'linear-gradient(150deg,#7140d4 0%,#421f96 100%)', glow: 'rgba(167,139,250,0.55)',
+      icon: Coins, grad: 'linear-gradient(150deg,#8a55ec 0%,#5430bd 100%)', glow: 'rgba(167,139,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
       id: 'panduan-talangan', kind: 'talangan', eyebrow: 'PANDUAN · TALANGAN',
       judul: 'Tidak hadir kena talangan', desc: 'Talangan wajib dilunasi sebelum tarikan berikutnya agar kas tetap sehat.',
-      icon: HandCoins, grad: 'linear-gradient(150deg,#c67414 0%,#954908 100%)', glow: 'rgba(251,191,36,0.5)',
+      icon: HandCoins, grad: 'linear-gradient(150deg,#e28a1c 0%,#b25c0c 100%)', glow: 'rgba(251,191,36,0.5)',
       cta: { label: 'Lihat Talangan', tab: 'talangan' },
     },
     {
       id: 'panduan-kas-rt', kind: 'kasrt', eyebrow: 'PANDUAN · KAS RT',
       judul: 'Kas besar RT yang terpisah', desc: 'Sebagian setoran masuk ke Kas RT — terpisah dari Kas Hadiran, untuk kebutuhan warga.',
-      icon: Building2, grad: 'linear-gradient(150deg,#177f40 0%,#095d3c 100%)', glow: 'rgba(16,185,129,0.55)',
+      icon: Building2, grad: 'linear-gradient(150deg,#1f9c50 0%,#0c7049 100%)', glow: 'rgba(16,185,129,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
   ];
@@ -412,12 +419,12 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
           const z = Math.round(50 - ad * 10);
           const grad = isSaldo
-            ? 'linear-gradient(150deg,#1a8848 0%,#0a5c2f 55%,#06351d 100%)'
+            ? 'linear-gradient(150deg,#23a85a 0%,#0f7440 55%,#0a5730 100%)'
             : promo!.grad;
           const Icon = promo?.icon;
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
           const tw = isSaldo ? '' : ({
-            target: 'max-w-[56%]', app: 'max-w-[60%]', absensi: 'max-w-[74%]',
+            target: 'max-w-[56%]', app: 'max-w-[54%]', absensi: 'max-w-[74%]',
             tarikan: 'max-w-[66%]', talangan: 'max-w-[64%]', kasrt: 'max-w-[76%]',
           } as const)[promo!.kind];
 
@@ -438,7 +445,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 borderRadius: 30, padding: 24, boxSizing: 'border-box', background: grad, color: '#fff',
                 transform: `translateX(${x}px) translateY(${ty}px) scale(${scale.toFixed(3)}) rotateY(${ry}deg)`,
                 opacity, zIndex: z, willChange: 'transform, opacity',
-                transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(.22,.61,.36,1), opacity 0.45s ease, box-shadow 0.45s ease',
+                transition: dragging ? 'none' : `transform 0.62s ${EASE}, opacity 0.45s ease, box-shadow 0.45s ease`,
                 boxShadow: active
                   ? '0 18px 40px -22px rgba(15,40,30,.40), 0 6px 16px -12px rgba(0,0,0,.28)'
                   : '0 10px 24px -18px rgba(0,0,0,.32)',
@@ -453,7 +460,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 style={{
                   inset: '-12%',
                   transform: `translateX(${(-d * 16 * pf).toFixed(2)}px) translateY(${(-d * 4 * pf).toFixed(2)}px)`,
-                  transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(.22,.61,.36,1)',
+                  transition: dragging ? 'none' : `transform 0.62s ${EASE}`,
                 }}
               >
                 <div className="absolute" style={{ top: '-26%', right: '-16%', width: '76%', height: '76%', background: 'radial-gradient(circle at 62% 38%, rgba(255,255,255,.18), rgba(255,255,255,0) 62%)' }} />
@@ -474,7 +481,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
               {isSaldo ? (
                 <div className="relative z-[3] flex h-full flex-col">{heroSlide}</div>
               ) : (
-                <div className="relative z-[3] flex h-full flex-col">
+                <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW }}>
                   {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
                   {promo!.cta && onNavigate && (
                     <button
@@ -514,7 +521,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                             width: `${targetFill}%`,
                             background: 'linear-gradient(90deg,#bff0d6,#ffffff)',
                             boxShadow: '0 0 12px rgba(255,255,255,.5)',
-                            transition: reduced ? 'none' : 'width 0.95s cubic-bezier(.22,.61,.36,1)',
+                            transition: reduced ? 'none' : `width 0.95s ${EASE}`,
                           }}
                         />
                       </div>
@@ -566,7 +573,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
               >
                 <span
                   className="block h-1 overflow-hidden rounded-full bg-brand/20 dark:bg-brand-linkDark/25"
-                  style={{ width: isActive ? 26 : 7, transition: 'width 0.42s cubic-bezier(.22,.61,.36,1)' }}
+                  style={{ width: isActive ? 26 : 7, transition: reduced ? 'none' : `width 0.42s ${EASE}` }}
                 >
                   {isActive && !reduced && (
                     <span ref={progressBarRef} className="block h-full rounded-full bg-brand dark:bg-brand-linkDark" style={{ width: '0%' }} />
