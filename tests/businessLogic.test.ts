@@ -84,6 +84,8 @@ vi.mock('../src/lib/supabase', () => ({ supabase: h.supabase }));
 
 // Impor KODE ASLI (utils memakai supabase yang sudah di-mock di atas)
 import { fetchDashboardSummary, formatRupiah, formatRupiahPlain } from '../src/lib/utils';
+import { ringkasAbsensi } from '../src/lib/absensiHitung';
+import type { AbsensiStatus, Warga } from '../src/lib/types';
 
 const s = h.supabase;
 type Row = Record<string, unknown>;
@@ -91,13 +93,18 @@ type Row = Record<string, unknown>;
 // ── Transkrip operasi DB (mirror Jadwal.tsx / Talangan.tsx) ──────────────────
 // Pembayar = SEMUA anggota aktif kecuali Sohibul Bait. Kas & Sohibul berbasis
 // jumlah pembayar (konstan), bukan jumlah hadir. hadirIds/tidakIds = absensi semua warga.
-async function prosesTarikan(tarikan: Row, hadirIds: string[], tidakIds: string[]) {
+async function prosesTarikan(tarikan: Row, hadirIds: string[], tidakIds: string[], titipIds: string[] = []) {
   const tarikanId = tarikan.id;
   const sohibulId = tarikan.sohibul_bait_id as string;
-  const pembayarIds = h.store.warga.filter(w => w.id !== sohibulId).map(w => w.id as string);
-  const hadirSet = new Set(hadirIds);
-  const talanganIds = pembayarIds.filter(id => !hadirSet.has(id)); // pembayar tidak hadir
-  const kasTerkumpul = pembayarIds.length * 5000;
+
+  // Rumus talangan & kas dari SATU sumber teruji (sama dgn layar absensi).
+  const map: Record<string, AbsensiStatus> = {};
+  hadirIds.forEach(id => { map[id] = 'hadir'; });
+  titipIds.forEach(id => { map[id] = 'titip'; });
+  tidakIds.forEach(id => { map[id] = 'tidak_hadir'; });
+  const r = ringkasAbsensi(h.store.warga as unknown as Warga[], map, sohibulId);
+  const talanganIds = r.talanganIds;
+  const kasTerkumpul = r.kasTotal;
 
   const { data: existingLunas } = (await s.from('talangan')
     .select('warga_id, tanggal_lunas').eq('tarikan_id', tarikanId).eq('status_lunas', true)) as { data: Row[] };
@@ -105,6 +112,7 @@ async function prosesTarikan(tarikan: Row, hadirIds: string[], tidakIds: string[
 
   await s.from('absensi').delete().eq('tarikan_id', tarikanId);
   if (hadirIds.length) await s.from('absensi').insert(hadirIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'hadir' })));
+  if (titipIds.length) await s.from('absensi').insert(titipIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'titip' })));
   if (tidakIds.length) await s.from('absensi').insert(tidakIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'tidak_hadir' })));
 
   await s.from('talangan').delete().eq('tarikan_id', tarikanId);
@@ -114,7 +122,7 @@ async function prosesTarikan(tarikan: Row, hadirIds: string[], tidakIds: string[
   })));
 
   await s.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk');
-  if (pembayarIds.length) await s.from('transaksi_kas').insert({
+  if (r.pembayarCount) await s.from('transaksi_kas').insert({
     tipe: 'kas_masuk', nominal: kasTerkumpul,
     keterangan: `Kas hadiran tarikan #${tarikan.nomor}`, tanggal: tarikan.tanggal,
     tarikan_id: tarikanId, saldo_setelah: 0,
@@ -207,6 +215,16 @@ describe('Proses tarikan — Kas & Sohibul berbasis pembayar (N−1), bukan hadi
     await prosesTarikan(h.store.tarikan[0], ['w2', 'w3', 'w4', 'w5'], ['w1']);
     expect(h.store.talangan).toHaveLength(0);
     expect(h.store.tarikan[0].total_terkumpul).toBe(20000);
+  });
+
+  it('Titip (tidak hadir, iuran masuk) bebas talangan; kas tetap penuh', async () => {
+    // Sohibul=w1. w2,w3 hadir; w4 titip; w5 tidak hadir → HANYA w5 kena talangan.
+    await prosesTarikan(h.store.tarikan[0], ['w2', 'w3'], ['w5'], ['w4']);
+    const talangan = h.store.talangan.filter(t => !t.status_lunas);
+    expect(talangan.map(t => t.warga_id)).toEqual(['w5']); // w4 (titip) TIDAK kena talangan
+    expect(h.store.tarikan[0].total_terkumpul).toBe(20000); // 4 pembayar × 5.000 (konstan)
+    // Status 'titip' tersimpan apa adanya di absensi
+    expect(h.store.absensi.find(a => a.warga_id === 'w4')?.status).toBe('titip');
   });
 });
 

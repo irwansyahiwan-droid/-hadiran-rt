@@ -280,7 +280,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     }`}
                   >
                     {processingId === t.id ? (
-                      <><RefreshCw className="w-3 h-3 animate-spin" />Memproses...</>
+                      <><RefreshCw className="w-3 h-3 animate-spin" />Memproses…</>
                     ) : confirmId === t.id ? 'Yakin?' : 'Bayar'}
                   </button>
                 )}
@@ -295,7 +295,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     }`}
                   >
                     {processingId === t.id ? (
-                      <><RefreshCw className="w-3 h-3 animate-spin" />Memproses...</>
+                      <><RefreshCw className="w-3 h-3 animate-spin" />Memproses…</>
                     ) : cancelConfirmId === t.id ? 'Yakin batal?' : 'Batalkan'}
                   </button>
                 )}
@@ -380,7 +380,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Cari nama warga..."
+          placeholder="Cari nama warga…"
           className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all duration-200"
         />
         {search && (

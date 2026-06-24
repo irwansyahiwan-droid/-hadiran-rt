@@ -167,7 +167,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari aktivitas / nama bendahara..."
+            placeholder="Cari aktivitas / nama bendahara…"
             className="field-search"
           />
           {search && (

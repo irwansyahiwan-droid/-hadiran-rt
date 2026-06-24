@@ -562,8 +562,14 @@ export default function KasRTPage() {
                 <div
                   key={k.id}
                   onClick={editable ? () => { setSelectedRow(k); setConfirmDel(false); } : undefined}
+                  role={editable ? 'button' : undefined}
+                  tabIndex={editable ? 0 : undefined}
+                  aria-label={editable ? `Aksi: ${k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}` : undefined}
+                  onKeyDown={editable ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedRow(k); setConfirmDel(false); }
+                  } : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise flex items-center gap-3 px-4 py-4 ${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}
+                  className={`rise flex items-center gap-3 px-4 py-4 ${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-800">
                     {isMasuk

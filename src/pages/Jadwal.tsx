@@ -20,7 +20,7 @@ import { showToast } from '../lib/toast';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, AbsensiStatus>;
-type AbsensiFilter = 'semua' | 'hadir' | 'belum';
+type AbsensiFilter = 'semua' | 'hadir' | 'titip' | 'belum';
 
 // Tap memutar status: tidak hadir → hadir → titip → tidak hadir.
 // (Awal semua 'tidak_hadir', jadi tap pertama = Hadir.)
@@ -134,6 +134,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
     let list = wargaList;
     if (search) list = list.filter(w => w.nama.toLowerCase().includes(search.toLowerCase()));
     if (filter === 'hadir')  list = list.filter(w => map[w.id] === 'hadir');
+    if (filter === 'titip')  list = list.filter(w => map[w.id] === 'titip');
     if (filter === 'belum')  list = list.filter(w => map[w.id] === 'tidak_hadir');
     return list;
   }, [wargaList, search, filter, map]);
@@ -342,18 +343,19 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       </div>
 
       {/* Filter tabs */}
-      <div className="grid grid-cols-3 gap-1.5">
-        {(['semua', 'hadir', 'belum'] as AbsensiFilter[]).map(f => (
+      <div className="grid grid-cols-4 gap-1.5">
+        {(['semua', 'hadir', 'titip', 'belum'] as AbsensiFilter[]).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
+            aria-pressed={filter === f}
             className={`py-1.5 rounded-xl text-xs font-semibold border transition ${
               filter === f
                 ? 'bg-brand text-white border-brand'
                 : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
             }`}
           >
-            {f === 'semua' ? 'Semua' : f === 'hadir' ? 'Sudah Hadir' : 'Belum Hadir'}
+            {f === 'semua' ? 'Semua' : f === 'hadir' ? 'Hadir' : f === 'titip' ? 'Titip' : 'Tidak'}
           </button>
         ))}
       </div>
@@ -907,7 +909,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-4 cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 transition-colors duration-200 ${!isLast ? 'border-b border-line dark:border-gray-800' : ''}`}
+                className={`flex items-center gap-3 px-4 py-4 transition-colors duration-200 ${!isLast ? 'border-b border-line dark:border-gray-800' : ''}`}
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : isNext ? { borderLeft: '3px solid #34D399' } : undefined}
               >
                 {/* Nomor kecil */}

@@ -258,7 +258,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving
-              ? 'Menyimpan...'
+              ? 'Menyimpan…'
               : jadwalNonaktif
                 ? 'Tetap Nonaktifkan'
                 : mode === 'add' ? 'Simpan Anggota' : 'Simpan Perubahan'}
@@ -352,7 +352,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari nama / no. rumah..."
+            placeholder="Cari nama / no. rumah…"
             className="field-search"
           />
           {search && (

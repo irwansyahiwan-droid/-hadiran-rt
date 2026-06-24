@@ -18,6 +18,7 @@ export default function JadwalWargaPage() {
   const [absensiMap, setAbsensiMap] = useState<Record<string, AbsensiStatus>>({});
   const [talanganLunasSet, setTalanganLunasSet] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
+  const [wargaFilter, setWargaFilter] = useState<'semua' | 'hadir' | 'titip' | 'tidak'>('semua');
 
   useEffect(() => {
     async function load() {
@@ -137,9 +138,14 @@ export default function JadwalWargaPage() {
     return statusAbsensi === 'hadir' || statusAbsensi === 'titip' || talanganLunasSet.has(w.id);
   }).length;
 
-  const filteredWarga = search
-    ? wargaList.filter(w => w.nama.toLowerCase().includes(search.toLowerCase()))
-    : wargaList;
+  const filteredWarga = wargaList.filter(w => {
+    if (search && !w.nama.toLowerCase().includes(search.toLowerCase())) return false;
+    if (wargaFilter === 'semua') return true;
+    const st = absensiMap[w.id];
+    if (wargaFilter === 'hadir') return st === 'hadir';
+    if (wargaFilter === 'titip') return st === 'titip';
+    return st === 'tidak_hadir'; // 'tidak'
+  });
 
   return (
     <div className="space-y-6 pb-2">
@@ -257,6 +263,28 @@ export default function JadwalWargaPage() {
               </button>
             )}
           </div>
+
+          {/* Filter status — hanya relevan bila sudah ada tarikan terakhir */}
+          {lastTarikan && (
+            <div className="grid grid-cols-4 gap-1.5">
+              {([
+                ['semua', 'Semua'], ['hadir', 'Hadir'], ['titip', 'Titip'], ['tidak', 'Tidak'],
+              ] as const).map(([id, label]) => (
+                <button
+                  key={id}
+                  onClick={() => setWargaFilter(id)}
+                  aria-pressed={wargaFilter === id}
+                  className={`py-1.5 rounded-xl text-xs font-semibold border transition ${
+                    wargaFilter === id
+                      ? 'bg-brand text-white border-brand'
+                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Warga list */}
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
