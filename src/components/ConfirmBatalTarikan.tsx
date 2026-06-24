@@ -78,7 +78,7 @@ export default function ConfirmBatalTarikan({ open, nomor, loading = false, onCl
           <button
             onClick={() => { haptic(20); onConfirm(); }}
             disabled={!cocok || loading}
-            className="press flex-1 py-3 rounded-xl bg-rose-600 text-white font-semibold text-sm shadow-lg shadow-rose-300/40 dark:shadow-none hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="press flex-1 py-3 rounded-xl bg-rose-600 text-white font-semibold text-sm shadow-lg shadow-rose-300/40 dark:shadow-none hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
           >
             {loading
               ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan…</>

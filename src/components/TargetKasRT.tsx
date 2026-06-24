@@ -215,7 +215,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
               disabled={saving || !nominal}
               className="btn-brand flex-1 py-3 font-semibold text-sm disabled:opacity-60"
             >
-              {saving ? 'Menyimpan...' : 'Simpan Target'}
+              {saving ? 'Menyimpan…' : 'Simpan Target'}
             </button>
           </div>
         </form>

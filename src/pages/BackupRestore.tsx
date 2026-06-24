@@ -140,7 +140,7 @@ export default function BackupRestore({ open, onClose }: Props) {
           {!pending ? (
             <button
               onClick={() => { haptic(); fileRef.current?.click(); }}
-              className="press w-full min-h-[44px] py-3 rounded-2xl border-2 border-control dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+              className="press w-full min-h-[44px] py-3 rounded-2xl border-2 border-control dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-center gap-2"
             >
               <Upload className="w-4 h-4" /> Pilih File Backup
             </button>
@@ -180,7 +180,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                 <button
                   onClick={handleRestore}
                   disabled={restoring || konfirmasi.trim().toUpperCase() !== KATA_KONFIRMASI}
-                  className="press flex-1 min-h-[44px] py-3 rounded-xl bg-rose-600 text-white font-semibold text-sm shadow-lg shadow-rose-300/40 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                  className="press flex-1 min-h-[44px] py-3 rounded-xl bg-rose-600 text-white font-semibold text-sm shadow-lg shadow-rose-300/40 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
                 >
                   {restoring ? <><RefreshCw className="w-4 h-4 animate-spin" /> Memulihkan...</> : 'Pulihkan Sekarang'}
                 </button>

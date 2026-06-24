@@ -170,7 +170,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${bendaharaOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        <div className={`grid transition-all duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}>
           <div className="overflow-hidden">
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
@@ -224,9 +224,9 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="press w-full py-3 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 dark:from-gray-700 dark:to-gray-800 text-white font-semibold text-sm shadow-lg shadow-gray-400/30 hover:from-gray-900 hover:to-black transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                className="press w-full py-3 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 dark:from-gray-700 dark:to-gray-800 text-white font-semibold text-sm shadow-lg shadow-gray-400/30 hover:from-gray-900 hover:to-black transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? 'Memproses...' : 'Masuk sebagai Bendahara'}
+                {loading ? 'Memproses…' : 'Masuk sebagai Bendahara'}
               </button>
             </form>
           </div>

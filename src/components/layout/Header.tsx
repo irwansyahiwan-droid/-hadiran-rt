@@ -72,7 +72,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
 
   return (
     <header
-      className={`sticky top-0 z-40 backdrop-blur-xl backdrop-saturate-150 transition-all duration-300 ${
+      className={`sticky top-0 z-40 backdrop-blur-xl backdrop-saturate-150 transition duration-300 ${
         scrolled
           ? 'bg-white/80 dark:bg-gray-900/80 border-b border-line/70 dark:border-gray-800/70'
           : 'bg-white/90 dark:bg-gray-900/85 border-b border-transparent'
@@ -86,7 +86,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       }}
     >
       <div
-        className={`flex items-center justify-between max-w-lg mx-auto px-4 transition-all duration-300 ${
+        className={`flex items-center justify-between max-w-lg mx-auto px-4 transition duration-300 ${
           scrolled ? 'py-2' : 'py-3'
         }`}
         style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
@@ -95,13 +95,13 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           <img
             src={logoRT}
             alt="Logo RT"
-            className={`object-contain rounded-full shadow-sm ring-1 ring-black/[0.08] dark:ring-white/10 transition-all duration-300 ${
+            className={`object-contain rounded-full shadow-sm ring-1 ring-black/[0.08] dark:ring-white/10 transition duration-300 ${
               scrolled ? 'h-8 w-8' : 'h-9 w-9'
             }`}
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
           />
           <h1
-            className={`font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap transition-all duration-300 ${
+            className={`font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap transition duration-300 ${
               scrolled ? 'text-body' : 'text-base'
             }`}
           >
@@ -167,7 +167,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       </div>
       {!isBendahara && (
         <div
-          className="border-t border-blue-100 bg-blue-50 overflow-hidden px-5 dark:bg-blue-950 dark:border-blue-900 transition-all duration-300"
+          className="border-t border-blue-100 bg-blue-50 overflow-hidden px-5 dark:bg-blue-950 dark:border-blue-900 transition-[max-height,opacity] duration-300"
           style={{
             maxHeight: scrolled ? '0px' : '40px',
             opacity: scrolled ? 0 : 1,

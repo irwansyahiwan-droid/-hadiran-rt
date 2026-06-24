@@ -148,7 +148,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             <button
               key={r}
               onClick={() => setRole(r)}
-              className={`py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+              className={`py-2.5 rounded-xl text-sm font-semibold border transition ${
                 role === r
                   ? 'bg-emerald-500 text-white border-emerald-500'
                   : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
@@ -252,7 +252,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           <button
             onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
             disabled={saving || !nama.trim()}
-            className={`flex-1 py-3 rounded-full text-white text-sm font-bold active:scale-[0.97] transition-all disabled:opacity-60 flex items-center justify-center gap-2 ${
+            className={`flex-1 py-3 rounded-full text-white text-sm font-bold active:scale-[0.97] transition disabled:opacity-60 flex items-center justify-center gap-2 ${
               jadwalNonaktif ? 'bg-rose-600' : 'btn-brand'
             }`}
           >
@@ -421,7 +421,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
       {/* FAB Tambah */}
       <button
         onClick={() => { haptic(); setForm({ mode: 'add', warga: null }); }}
-        className="btn-brand fixed left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full font-bold text-sm active:scale-[0.97] transition-all"
+        className="btn-brand fixed left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full font-bold text-sm active:scale-[0.97] transition"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}
       >
         <UserPlus className="w-4 h-4" /> Tambah Anggota
