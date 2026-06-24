@@ -401,8 +401,6 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const grad = isSaldo
             ? 'linear-gradient(150deg,#1f8a4c 0%,#0f6b39 55%,#0a5530 100%)'
             : promo!.grad;
-          // Warna aura kartu → glow box-shadow saat aktif (mengambang dari latar).
-          const glowColor = isSaldo ? 'rgba(36,176,94,0.5)' : promo!.glow;
           const Icon = promo?.icon;
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
           const tw = isSaldo ? '' : ({
@@ -429,43 +427,35 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 opacity, zIndex: z, willChange: 'transform, opacity',
                 transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(.22,.61,.36,1), opacity 0.45s ease, box-shadow 0.45s ease',
                 boxShadow: active
-                  ? `0 34px 80px -26px ${glowColor}, 0 26px 58px -28px rgba(2,28,14,.6), 0 10px 24px -14px rgba(0,0,0,.42)`
-                  : '0 16px 36px -20px rgba(0,0,0,.45)',
+                  ? '0 18px 40px -22px rgba(15,40,30,.40), 0 6px 16px -12px rgba(0,0,0,.28)'
+                  : '0 10px 24px -18px rgba(0,0,0,.32)',
                 cursor: dragging ? 'grabbing' : 'grab', WebkitFontSmoothing: 'antialiased',
               }}
             >
-              {/* Lapisan dekoratif parallax — radial highlight/bayang + kilau, bergeser
-                  berlawanan arah swipe → kesan kedalaman. */}
+              {/* Sorot lembut tunggal di kanan-atas, ikut parallax tipis saat swipe →
+                  dimensi halus tanpa kesan "berbayang". (Gaya flat/tegas ala BYOND.) */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute"
                 style={{
                   inset: '-12%',
-                  transform: `translateX(${(-d * 22 * pf).toFixed(2)}px) translateY(${(-d * 6 * pf).toFixed(2)}px)`,
+                  transform: `translateX(${(-d * 16 * pf).toFixed(2)}px) translateY(${(-d * 4 * pf).toFixed(2)}px)`,
                   transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(.22,.61,.36,1)',
                 }}
               >
-                <div className="absolute" style={{ top: '-22%', right: '-12%', width: '80%', height: '80%', background: 'radial-gradient(circle at 65% 35%, rgba(255,255,255,.36), rgba(255,255,255,0) 60%)' }} />
-                <div className="absolute" style={{ bottom: '-32%', left: '-24%', width: '92%', height: '92%', background: 'radial-gradient(circle, rgba(255,255,255,.15), rgba(255,255,255,0) 62%)' }} />
-                <div className="absolute" style={{ top: '-12%', left: '18%', width: '62%', height: '58%', background: 'radial-gradient(circle, rgba(0,0,0,.18), rgba(0,0,0,0) 62%)' }} />
-                <div className="absolute" style={{ top: '6%', left: '-30%', width: '120%', height: '42%', transform: 'rotate(-18deg)', background: 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.18) 45%, rgba(255,255,255,0))', filter: 'blur(3px)' }} />
+                <div className="absolute" style={{ top: '-26%', right: '-16%', width: '76%', height: '76%', background: 'radial-gradient(circle at 62% 38%, rgba(255,255,255,.18), rgba(255,255,255,0) 62%)' }} />
                 {promo?.kind === 'app' && (
-                  <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.12) 1.2px, transparent 1.2px)', backgroundSize: '17px 17px', opacity: 0.7 }} />
+                  <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.10) 1.2px, transparent 1.2px)', backgroundSize: '17px 17px', opacity: 0.6 }} />
                 )}
               </div>
 
-              {/* Foto Pak RT & Bendahara — kartu target. Di bawah glass overlay & teks. */}
+              {/* Foto Pak RT & Bendahara — kartu target. Di bawah overlay & teks. */}
               {promo?.kind === 'target' && <TargetPhoto />}
 
-              {/* Lapisan kaca (di bawah konten z-3, di atas dekorasi/foto):
-                  1) gloss diagonal sudut kanan-atas — "liquid glass" light catch,
-                     sengaja jauh dari eyebrow/judul di kiri agar kontras teks aman;
-                  2) highlight tepi-atas + rim light terang + garis dasar gelap → kaca tebal;
-                  3) vignette bawah; 4) noise (bahasa .lift). */}
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(238deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.10) 17%, rgba(255,255,255,0) 40%)' }} />
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0) 28%)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.24), inset 0 1.5px 0 rgba(255,255,255,.36), inset 0 -1px 0 rgba(0,0,0,.20)' }} />
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'radial-gradient(135% 82% at 50% 128%, rgba(0,0,0,.36), rgba(0,0,0,0) 56%)' }} />
-              <div className="hero-noise pointer-events-none absolute inset-0" style={{ borderRadius: 30 }} />
+              {/* Permukaan bersih & tegas: hanya hairline tepi tipis + scrim bawah ringan
+                  agar teks legibel. Tanpa gloss/noise/vignette berat. */}
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.18)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.16), rgba(0,0,0,0) 38%)' }} />
 
               {/* ---------- KONTEN ---------- */}
               {isSaldo ? (
@@ -487,7 +477,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   <div className="flex items-center gap-[9px]">
                     <div
                       className="grid h-[44px] w-[44px] place-items-center rounded-[14px] bg-white/15"
-                      style={{ boxShadow: `inset 0 0 0 1px rgba(255,255,255,.24), 0 0 16px 1px ${promo!.glow}, 0 6px 14px -8px rgba(0,0,0,.5)` }}
+                      style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.22)' }}
                     >
                       {Icon && <Icon className="h-[22px] w-[22px]" strokeWidth={1.8} />}
                     </div>
