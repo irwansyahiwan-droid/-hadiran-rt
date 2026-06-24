@@ -55,10 +55,10 @@ function TargetPhoto() {
         style={{ objectPosition: '72% center', filter: 'saturate(.9) contrast(1.03)' }}
       />
       {/* Duotone teal — selaraskan cast biru foto dgn gradient slide. */}
-      <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(31,138,126,.24), rgba(14,95,87,.46))', mixBlendMode: 'multiply' }} />
+      <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(20,118,107,.34), rgba(8,72,64,.60))', mixBlendMode: 'multiply' }} />
       <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(190,240,214,.12), transparent 42%)', mixBlendMode: 'soft-light' }} />
       {/* Fade kiri → lebur ke gradient kartu (judul tetap terbaca). */}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #27a99a 0%, rgba(39,169,154,.80) 32%, rgba(39,169,154,0) 64%)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #0f786c 0%, rgba(15,120,108,.84) 34%, rgba(15,120,108,0) 64%)' }} />
       {/* Scrim bawah → progress & tanggal tetap legibel di atas foto.
           Lebih tinggi & pekat: dua perhentian agar transisi halus tapi teks tegas. */}
       <div className="absolute inset-x-0 bottom-0 h-[58%]" style={{ background: 'linear-gradient(to top, rgba(6,34,28,.82), rgba(6,34,28,.34) 46%, transparent)' }} />
@@ -199,36 +199,36 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     {
       id: 'target-kas-rt', kind: 'target', eyebrow: 'TARGET KAS RT',
       judul: 'Bersama menuju Rp25 juta', icon: Target,
-      grad: 'linear-gradient(150deg,#27a99a 0%,#147a6f 100%)', glow: 'rgba(45,212,191,0.55)',
+      grad: 'linear-gradient(150deg,#2cb8a5 0%,#0a564e 100%)', glow: 'rgba(45,212,191,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
     {
       id: 'app-hp', kind: 'app', eyebrow: 'APLIKASI',
       judul: 'Pantau kas RT dari HP', desc: 'Saldo, jadwal & talangan dalam satu genggaman.',
-      icon: Smartphone, grad: 'linear-gradient(160deg,#2e463a 0%,#16261d 100%)', glow: 'rgba(45,212,150,0.5)',
+      icon: Smartphone, grad: 'linear-gradient(160deg,#33503f 0%,#0e1c15 100%)', glow: 'rgba(45,212,150,0.5)',
     },
     {
       id: 'panduan-absensi', kind: 'absensi', eyebrow: 'PANDUAN · ABSENSI',
       judul: 'Hadir dicatat setiap tarikan', desc: 'Bendahara menandai daftar hadir per tarikan. Yang tidak hadir otomatis kena talangan.',
-      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#4274f0 0%,#1f4cc8 100%)', glow: 'rgba(96,165,250,0.55)',
+      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#4a7cf6 0%,#173dac 100%)', glow: 'rgba(96,165,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
       id: 'panduan-tarikan', kind: 'tarikan', eyebrow: 'PANDUAN · TARIKAN',
       judul: 'Satu Sohibul Bait per tarikan', desc: 'Setiap tarikan ada satu penerima. Iuran semua anggota yang hadir terkumpul untuknya.',
-      icon: Coins, grad: 'linear-gradient(150deg,#8a55ec 0%,#5430bd 100%)', glow: 'rgba(167,139,250,0.55)',
+      icon: Coins, grad: 'linear-gradient(150deg,#9059f2 0%,#4825a8 100%)', glow: 'rgba(167,139,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
       id: 'panduan-talangan', kind: 'talangan', eyebrow: 'PANDUAN · TALANGAN',
       judul: 'Tidak hadir kena talangan', desc: 'Talangan wajib dilunasi sebelum tarikan berikutnya agar kas tetap sehat.',
-      icon: HandCoins, grad: 'linear-gradient(150deg,#e28a1c 0%,#b25c0c 100%)', glow: 'rgba(251,191,36,0.5)',
+      icon: HandCoins, grad: 'linear-gradient(150deg,#ef9120 0%,#9a4c07 100%)', glow: 'rgba(251,191,36,0.5)',
       cta: { label: 'Lihat Talangan', tab: 'talangan' },
     },
     {
       id: 'panduan-kas-rt', kind: 'kasrt', eyebrow: 'PANDUAN · KAS RT',
       judul: 'Kas besar RT yang terpisah', desc: 'Sebagian setoran masuk ke Kas RT — terpisah dari Kas Hadiran, untuk kebutuhan warga.',
-      icon: Building2, grad: 'linear-gradient(150deg,#1f9c50 0%,#0c7049 100%)', glow: 'rgba(16,185,129,0.55)',
+      icon: Building2, grad: 'linear-gradient(150deg,#22a957 0%,#0a5e3d 100%)', glow: 'rgba(16,185,129,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
   ];
@@ -419,7 +419,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
           const z = Math.round(50 - ad * 10);
           const grad = isSaldo
-            ? 'linear-gradient(150deg,#23a85a 0%,#0f7440 55%,#0a5730 100%)'
+            ? 'linear-gradient(150deg,#24ad5c 0%,#0c6c3a 52%,#064a28 100%)'
             : promo!.grad;
           const Icon = promo?.icon;
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
@@ -474,8 +474,8 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
 
               {/* Permukaan bersih & tegas: hanya hairline tepi tipis + scrim bawah ringan
                   agar teks legibel. Tanpa gloss/noise/vignette berat. */}
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.20), inset 0 1px 0 rgba(255,255,255,.26)' }} />
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.20), rgba(0,0,0,0) 40%)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.26), inset 0 1px 0 rgba(255,255,255,.36), inset 0 -1px 0 rgba(0,0,0,.18)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.28), rgba(0,0,0,0) 46%)' }} />
 
               {/* ---------- KONTEN ---------- */}
               {isSaldo ? (
