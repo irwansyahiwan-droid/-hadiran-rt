@@ -203,13 +203,13 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     {
       id: 'panduan-absensi', kind: 'absensi', eyebrow: 'PANDUAN · ABSENSI',
       judul: 'Hadir dicatat setiap tarikan', desc: 'Bendahara menandai daftar hadir per tarikan. Yang tidak hadir otomatis kena talangan.',
-      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#3f72e6 0%,#274fc4 100%)', glow: 'rgba(96,165,250,0.55)',
+      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#3568e0 0%,#1e44b6 100%)', glow: 'rgba(96,165,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
       id: 'panduan-tarikan', kind: 'tarikan', eyebrow: 'PANDUAN · TARIKAN',
       judul: 'Satu Sohibul Bait per tarikan', desc: 'Setiap tarikan ada satu penerima. Iuran semua anggota yang hadir terkumpul untuknya.',
-      icon: Coins, grad: 'linear-gradient(150deg,#8454e0 0%,#5a30b8 100%)', glow: 'rgba(167,139,250,0.55)',
+      icon: Coins, grad: 'linear-gradient(150deg,#7a47dc 0%,#4e28a8 100%)', glow: 'rgba(167,139,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
     },
     {
@@ -221,7 +221,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     {
       id: 'panduan-kas-rt', kind: 'kasrt', eyebrow: 'PANDUAN · KAS RT',
       judul: 'Kas besar RT yang terpisah', desc: 'Sebagian setoran masuk ke Kas RT — terpisah dari Kas Hadiran, untuk kebutuhan warga.',
-      icon: Building2, grad: 'linear-gradient(150deg,#1f8a4c 0%,#127a52 100%)', glow: 'rgba(16,185,129,0.55)',
+      icon: Building2, grad: 'linear-gradient(150deg,#1b8447 0%,#0c6b46 100%)', glow: 'rgba(16,185,129,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
   ];
@@ -399,7 +399,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
           const z = Math.round(50 - ad * 10);
           const grad = isSaldo
-            ? 'linear-gradient(150deg,#1f8a4c 0%,#0f6b39 55%,#0a5530 100%)'
+            ? 'linear-gradient(150deg,#1c8a4a 0%,#0c6233 55%,#073f22 100%)'
             : promo!.grad;
           const Icon = promo?.icon;
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
@@ -454,8 +454,8 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
 
               {/* Permukaan bersih & tegas: hanya hairline tepi tipis + scrim bawah ringan
                   agar teks legibel. Tanpa gloss/noise/vignette berat. */}
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.18)' }} />
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.16), rgba(0,0,0,0) 38%)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.20), inset 0 1px 0 rgba(255,255,255,.26)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.20), rgba(0,0,0,0) 40%)' }} />
 
               {/* ---------- KONTEN ---------- */}
               {isSaldo ? (
@@ -481,13 +481,13 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                     >
                       {Icon && <Icon className="h-[22px] w-[22px]" strokeWidth={1.8} />}
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/90">{promo!.eyebrow}</span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white">{promo!.eyebrow}</span>
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
                   <div className={`mt-[16px] text-[1.4rem] font-extrabold leading-[1.18] tracking-[-.01em] ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
-                    <div className={`mt-[10px] text-[0.84rem] leading-relaxed text-white/90 ${tw}`}>{promo!.desc}</div>
+                    <div className={`mt-[10px] text-[0.84rem] font-medium leading-relaxed text-white/95 ${tw}`}>{promo!.desc}</div>
                   )}
 
                   {/* Progress target → kartu target Kas RT. */}
