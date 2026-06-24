@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Coins, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
@@ -19,7 +19,7 @@ import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
-import type { Tarikan, TransaksiKas, Warga } from '../lib/types';
+import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
 
@@ -89,9 +89,9 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
             <button type="button" onClick={onClose}
               className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
             <button type="submit" disabled={saving || !nominal}
-              className="btn-brand flex-1 py-3 text-sm font-semibold disabled:opacity-70 active:scale-[0.97] transition-all flex items-center justify-center gap-2">
+              className="btn-brand flex-1 py-3 text-sm font-semibold disabled:opacity-70 active:scale-[0.97] transition flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
-              {saving ? 'Menyimpan...' : 'Setor'}
+              {saving ? 'Menyimpan…' : 'Setor'}
             </button>
           </div>
         </form>
@@ -120,6 +120,7 @@ export default function KasHadiranPage() {
   const [detailTarikan, setDetailTarikan] = useState<Tarikan | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailHadir, setDetailHadir] = useState<{ id: string; nama: string }[]>([]);
+  const [detailTitip, setDetailTitip] = useState<{ id: string; nama: string }[]>([]);
   const [detailTidak, setDetailTidak] = useState<{ id: string; nama: string; lunas: boolean }[]>([]);
   const detailDrag = useDragDismiss(() => setDetailTarikan(null));
   useBackDismiss(detailTarikan !== null, () => setDetailTarikan(null));
@@ -219,8 +220,8 @@ export default function KasHadiranPage() {
         supabase.from('absensi').select('warga_id, status').eq('tarikan_id', tarikan.id),
         supabase.from('talangan').select('warga_id').eq('tarikan_id', tarikan.id).eq('status_lunas', true),
       ]);
-      const absensiMap: Record<string, 'hadir' | 'tidak_hadir'> = {};
-      (absensiRes.data as { warga_id: string; status: 'hadir' | 'tidak_hadir' }[] ?? [])
+      const absensiMap: Record<string, AbsensiStatus> = {};
+      (absensiRes.data as { warga_id: string; status: AbsensiStatus }[] ?? [])
         .forEach(a => { absensiMap[a.warga_id] = a.status; });
       const lunasSet = new Set(
         (talanganRes.data as { warga_id: string }[] ?? []).map(t => t.warga_id),
@@ -240,7 +241,7 @@ export default function KasHadiranPage() {
     haptic(12);
     try {
       const { generateAbsensiPDF } = await import('../lib/generateAbsensiPDF');
-      generateAbsensiPDF(detailTarikan, detailHadir, detailTidak);
+      generateAbsensiPDF(detailTarikan, detailHadir, detailTidak, detailTitip);
     } catch {
       showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
     }
@@ -251,6 +252,7 @@ export default function KasHadiranPage() {
     setDetailTarikan(t);
     setDetailLoading(true);
     setDetailHadir([]);
+    setDetailTitip([]);
     setDetailTidak([]);
     const [absRes, talRes] = await Promise.all([
       supabase.from('absensi').select('warga_id, status').eq('tarikan_id', t.id),
@@ -261,15 +263,19 @@ export default function KasHadiranPage() {
       (talRes.data as { warga_id: string; status_lunas: boolean }[] ?? []).map((x) => [x.warga_id, x.status_lunas]),
     );
     const hadir: { id: string; nama: string }[] = [];
+    const titip: { id: string; nama: string }[] = [];
     const tidak: { id: string; nama: string; lunas: boolean }[] = [];
-    (absRes.data as { warga_id: string; status: 'hadir' | 'tidak_hadir' }[] ?? []).forEach((a) => {
+    (absRes.data as { warga_id: string; status: AbsensiStatus }[] ?? []).forEach((a) => {
       const nama = namaMap.get(a.warga_id) ?? '—';
       if (a.status === 'hadir') hadir.push({ id: a.warga_id, nama });
+      else if (a.status === 'titip') titip.push({ id: a.warga_id, nama });
       else tidak.push({ id: a.warga_id, nama, lunas: lunasMap.get(a.warga_id) ?? false });
     });
     hadir.sort((a, b) => a.nama.localeCompare(b.nama));
+    titip.sort((a, b) => a.nama.localeCompare(b.nama));
     tidak.sort((a, b) => Number(a.lunas) - Number(b.lunas) || a.nama.localeCompare(b.nama)); // belum bayar di atas
     setDetailHadir(hadir);
+    setDetailTitip(titip);
     setDetailTidak(tidak);
     setDetailLoading(false);
   }
@@ -637,7 +643,7 @@ export default function KasHadiranPage() {
                           className="flex items-center gap-1.5 min-h-[44px] text-xs text-ink-sub dark:text-gray-400 font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
                         >
                           <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
-                          {pdfLoading === t.id ? 'Memuat...' : 'PDF Pendapatan'}
+                          {pdfLoading === t.id ? 'Memuat…' : 'PDF Pendapatan'}
                         </button>
                         {isBendahara && (
                           <button
@@ -721,8 +727,9 @@ export default function KasHadiranPage() {
                   </button>
                 )}
               </div>
-              <div className="flex gap-2 mt-3">
+              <div className="flex flex-wrap gap-2 mt-3">
                 <Tag tone="success">Hadir {detailHadir.length}</Tag>
+                {detailTitip.length > 0 && <Tag tone="info">Titip {detailTitip.length}</Tag>}
                 <Tag tone="danger">Belum bayar {detailTidak.filter((x) => !x.lunas).length}</Tag>
                 <Tag tone="neutral">Lunas {detailTidak.filter((x) => x.lunas).length}</Tag>
               </div>
@@ -757,7 +764,7 @@ export default function KasHadiranPage() {
               ) : (
                 <>
                   {/* Rincian pendapatan real-time — angka sama dgn PDF Pendapatan */}
-                  {(detailHadir.length > 0 || detailTidak.length > 0) && (
+                  {(detailHadir.length > 0 || detailTitip.length > 0 || detailTidak.length > 0) && (
                     <div className="rounded-2xl border border-line dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 px-4 py-3.5">
                       <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
                       <div className="space-y-1.5 text-sm">
@@ -777,6 +784,20 @@ export default function KasHadiranPage() {
                           <span className="text-ink-sub dark:text-gray-400">Kas Hadiran tarikan ini</span>
                           <span className="font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
                         </div>
+                      </div>
+                    </div>
+                  )}
+                  {detailTitip.length > 0 && (
+                    <div>
+                      <p className="text-micro font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2.5">Titip · iuran masuk ({detailTitip.length})</p>
+                      <div className="space-y-1">
+                        {detailTitip.map((p) => (
+                          <div key={p.id} className="flex items-center gap-2.5 py-1">
+                            <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
+                            <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -812,7 +833,7 @@ export default function KasHadiranPage() {
                       </div>
                     </div>
                   )}
-                  {detailHadir.length === 0 && detailTidak.length === 0 && (
+                  {detailHadir.length === 0 && detailTitip.length === 0 && detailTidak.length === 0 && (
                     <p className="text-center text-sm text-ink-faint dark:text-gray-400 py-8">Belum ada data absensi untuk tarikan ini.</p>
                   )}
                 </>

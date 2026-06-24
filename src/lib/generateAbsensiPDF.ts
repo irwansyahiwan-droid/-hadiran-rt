@@ -10,7 +10,7 @@ interface Hadir { nama: string }
 interface Tidak { nama: string; lunas: boolean }
 
 /** Daftar hadir (absensi) satu tarikan → unduh PDF. */
-export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]) {
+export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[], titip: Hadir[] = []) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
@@ -19,9 +19,10 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
   const docCode = `ABS-${String(tarikan.nomor).padStart(3, '0')}-${now.getFullYear()}`;
 
   const hadirS = [...hadir].sort((a, b) => a.nama.localeCompare(b.nama));
+  const titipS = [...titip].sort((a, b) => a.nama.localeCompare(b.nama));
   const tidakS = [...tidak].sort((a, b) => a.nama.localeCompare(b.nama));
   const lunasCount = tidakS.filter((t) => t.lunas).length;
-  const total = hadirS.length + tidakS.length;
+  const total = hadirS.length + titipS.length + tidakS.length;
 
   const tglTarikan = tarikan.tanggal
     ? new Date(tarikan.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -44,6 +45,7 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
   const rows: Row[] = [];
   let n = 1;
   hadirS.forEach((h) => rows.push([String(n++), h.nama, 'Hadir']));
+  titipS.forEach((t) => rows.push([String(n++), t.nama, 'Titip']));
   tidakS.forEach((t) => rows.push([String(n++), t.nama, t.lunas ? 'Talangan Lunas' : 'Talangan']));
 
   autoTable(doc, {
@@ -61,6 +63,7 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
       if (data.section !== 'body' || data.column.index !== 2) return;
       const s = rows[data.row.index]?.[2] ?? '';
       if (s === 'Hadir') { data.cell.styles.textColor = C.pos; data.cell.styles.fontStyle = 'bold'; }
+      else if (s === 'Titip') { data.cell.styles.fontStyle = 'bold'; }
       else if (s === 'Talangan Lunas') { data.cell.styles.textColor = C.pos; }
       else if (s === 'Talangan') { data.cell.styles.textColor = C.neg; data.cell.styles.fontStyle = 'bold'; }
     },

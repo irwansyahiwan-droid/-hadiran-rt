@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Calendar, CheckCircle2, Pencil, RefreshCw,
+  ArrowLeft, Calendar, CheckCircle2, Coins, Pencil, RefreshCw,
   RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
@@ -12,14 +12,45 @@ import CrossFade from '../components/CrossFade';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
+import { ringkasAbsensi } from '../lib/absensiHitung';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { showToast } from '../lib/toast';
-import type { Tarikan, Warga } from '../lib/types';
+import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 
-type AbsensiMap = Record<string, 'hadir' | 'tidak_hadir'>;
+type AbsensiMap = Record<string, AbsensiStatus>;
 type AbsensiFilter = 'semua' | 'hadir' | 'belum';
+
+// Tap memutar status: tidak hadir → hadir → titip → tidak hadir.
+// (Awal semua 'tidak_hadir', jadi tap pertama = Hadir.)
+const NEXT_STATUS: Record<AbsensiStatus, AbsensiStatus> = {
+  tidak_hadir: 'hadir',
+  hadir: 'titip',
+  titip: 'tidak_hadir',
+};
+
+// Bahasa visual per status di daftar hadir.
+const STATUS_UI: Record<AbsensiStatus, { label: string; text: string; ava: string; hover: string }> = {
+  hadir: {
+    label: 'Hadir',
+    text: 'text-emerald-700 dark:text-emerald-400',
+    ava: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+    hover: 'hover:bg-emerald-50/50 dark:hover:bg-emerald-900/15',
+  },
+  titip: {
+    label: 'Titip · iuran masuk',
+    text: 'text-blue-700 dark:text-blue-400',
+    ava: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    hover: 'hover:bg-blue-50/50 dark:hover:bg-blue-900/15',
+  },
+  tidak_hadir: {
+    label: 'Tidak hadir → Talangan',
+    text: 'text-rose-600 dark:text-rose-400',
+    ava: 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400',
+    hover: 'hover:bg-rose-50/30 dark:hover:bg-rose-900/15',
+  },
+};
 
 function formatKompak(n: number): string {
   if (n === 0) return 'Rp0';
@@ -35,11 +66,12 @@ function formatKompak(n: number): string {
 interface AbsensiResult {
   tarikanNomor: number;
   hadirCount: number;
-  tidakCount: number;
+  titipCount: number; // tidak hadir tapi iuran masuk (tidak kena talangan)
+  tidakCount: number; // = jumlah yang kena talangan
   kasTotal: number;
   talanganTotal: number;
   sohibulBaitTerima: number;
-  tidakHadirNama: string[]; // nama pembayar yg tidak hadir (= kena talangan) — utk kontrol cek-fisik
+  tidakHadirNama: string[]; // nama pembayar yg tidak hadir & TIDAK titip (= kena talangan) — utk kontrol cek-fisik
 }
 
 interface AbsensiViewProps {
@@ -70,7 +102,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         const init: AbsensiMap = {};
         wargaList.forEach(w => { init[w.id] = 'tidak_hadir'; });
         (data ?? []).forEach((a: { warga_id: string; status: string }) => {
-          init[a.warga_id] = a.status as 'hadir' | 'tidak_hadir';
+          init[a.warga_id] = a.status as AbsensiStatus;
         });
         setMap(init);
       } else {
@@ -83,25 +115,19 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
     loadExisting();
   }, [tarikan, wargaList]);
 
-  // Pembayar = semua anggota KECUALI Sohibul Bait (Sohibul tidak bayar)
+  // Pembayar = semua anggota KECUALI Sohibul Bait (Sohibul tidak bayar).
   const sohibulId = tarikan.sohibul_bait_id ?? '';
-  const pembayarCount = wargaList.filter(w => w.id !== sohibulId).length;
-  const hadirCount = Object.values(map).filter(v => v === 'hadir').length;
-  const tidakCount = wargaList.length - hadirCount;
-  // Pembayar yang tidak hadir → kena talangan (Sohibul dikecualikan)
-  const talanganCount = wargaList.filter(w => w.id !== sohibulId && map[w.id] !== 'hadir').length;
-  // Kas & Sohibul KONSTAN: berbasis jumlah pembayar (bukan jumlah hadir)
-  const kasTotal = pembayarCount * 5000;       // mis. 68 × 5.000 = 340.000
-  const talanganTotal = talanganCount * 50000; // 50.000 per pembayar absen
+  // Ringkasan kehadiran & talangan dari satu sumber teruji (absensiHitung.test.ts).
+  const { hadirCount, titipCount, tidakCount, talanganTotal } = ringkasAbsensi(wargaList, map, sohibulId);
 
-  function setAll(status: 'hadir' | 'tidak_hadir') {
+  function setAll(status: AbsensiStatus) {
     const next: AbsensiMap = {};
     wargaList.forEach(w => { next[w.id] = status; });
     setMap(next);
   }
 
   function toggle(id: string) {
-    setMap(prev => ({ ...prev, [id]: prev[id] === 'hadir' ? 'tidak_hadir' : 'hadir' }));
+    setMap(prev => ({ ...prev, [id]: NEXT_STATUS[prev[id] ?? 'tidak_hadir'] }));
   }
 
   const filtered = useMemo(() => {
@@ -116,16 +142,12 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
     setSaving(true);
     try {
       const tarikanId = tarikan.id;
-      const hadirIds  = wargaList.filter(w => map[w.id] === 'hadir').map(w => w.id);
-      const tidakIds  = wargaList.filter(w => map[w.id] === 'tidak_hadir').map(w => w.id);
+      const hadirIds  = wargaList.filter(w => map[w.id] === 'hadir').map(w => w.id); // utk total_hadir (kehadiran fisik)
 
-      // Pembayar = semua anggota KECUALI Sohibul Bait. Sohibul tidak bayar.
-      // Kas & Sohibul dihitung dari jumlah pembayar (konstan), BUKAN jumlah hadir.
-      const pembayarIds   = wargaList.filter(w => w.id !== sohibulId).map(w => w.id);
-      const pembayarCount = pembayarIds.length;                              // mis. 68
-      const kasTerkumpul  = pembayarCount * 5000;                            // 340.000
-      // Pembayar yang tidak hadir → kena talangan (Sohibul dikecualikan)
-      const talanganIds   = pembayarIds.filter(id => map[id] !== 'hadir');
+      // Semua hitungan uang & talangan dari satu sumber teruji → layar, PDF,
+      // dan data tersimpan tak pernah beda rumus.
+      const r = ringkasAbsensi(wargaList, map, sohibulId);
+      const { pembayarCount, kasTotal: kasTerkumpul, talanganIds } = r;
 
       // Simpan status lunas yang sudah ada sebelum menghapus (agar tidak ter-reset saat Hitung Ulang)
       const { data: existingLunas } = await supabase
@@ -139,10 +161,14 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
       await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
 
-      if (hadirIds.length)
-        await supabase.from('absensi').insert(hadirIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'hadir' })));
-      if (tidakIds.length)
-        await supabase.from('absensi').insert(tidakIds.map(warga_id => ({ tarikan_id: tarikanId, warga_id, status: 'tidak_hadir' })));
+      // Simpan status apa adanya (hadir / titip / tidak_hadir) untuk SEMUA anggota.
+      const absensiRows = wargaList.map(w => ({
+        tarikan_id: tarikanId,
+        warga_id: w.id,
+        status: map[w.id] ?? 'tidak_hadir',
+      }));
+      if (absensiRows.length)
+        await supabase.from('absensi').insert(absensiRows);
 
       await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
       if (talanganIds.length)
@@ -171,19 +197,15 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         total_terkumpul: kasTerkumpul,
       }).eq('id', tarikanId);
 
-      // Nama pembayar tidak hadir (urut sesuai wargaList) — Sohibul dikecualikan.
-      const tidakHadirNama = wargaList
-        .filter(w => w.id !== sohibulId && map[w.id] !== 'hadir')
-        .map(w => w.nama);
-
       onSaved({
         tarikanNomor: tarikan.nomor,
-        hadirCount: hadirIds.length,
-        tidakCount: talanganIds.length,
-        kasTotal: kasTerkumpul,
-        talanganTotal: talanganIds.length * 50000,
-        sohibulBaitTerima: pembayarCount * 45000,
-        tidakHadirNama,
+        hadirCount: r.hadirCount,
+        titipCount: r.titipCount,
+        tidakCount: r.talanganCount, // yang kena talangan
+        kasTotal: r.kasTotal,
+        talanganTotal: r.talanganTotal,
+        sohibulBaitTerima: r.sohibulBaitTerima,
+        tidakHadirNama: r.tidakHadirNama, // nama pembayar 'tidak_hadir' (hadir & titip bebas)
       });
     } catch {
       // Penyimpanan gagal (mis. koneksi putus) → JANGAN diam: beri tahu & tahan
@@ -260,7 +282,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
     <div className="space-y-6 pb-20">
       {/* Back header */}
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <button onClick={onBack} aria-label="Kembali" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
           <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
         <div>
@@ -275,8 +297,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       <div className="grid grid-cols-4 gap-2">
         {[
           { label: 'Hadir', value: hadirCount, color: 'text-emerald-700 dark:text-emerald-400' },
+          { label: 'Titip', value: titipCount, color: 'text-blue-600 dark:text-blue-400' },
           { label: 'Tdk Hadir', value: tidakCount, color: 'text-rose-600 dark:text-rose-400' },
-          { label: 'Kas', value: formatKompak(kasTotal), color: 'text-blue-600 dark:text-blue-400' },
           { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-warn dark:text-amber-400' },
         ].map(s => (
           <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
@@ -304,10 +326,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           Semua Hadir
         </button>
         <button
-          onClick={() => setAll('hadir')}
+          onClick={() => setAll('titip')}
           className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
         >
-          <UserCheck className="w-3.5 h-3.5" />
+          <Coins className="w-3.5 h-3.5" />
           Semua Titip
         </button>
         <button
@@ -325,7 +347,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+            className={`py-1.5 rounded-xl text-xs font-semibold border transition ${
               filter === f
                 ? 'bg-brand text-white border-brand'
                 : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
@@ -342,7 +364,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Cari nama..."
+          placeholder="Cari nama…"
           className="field-search"
         />
         {search && (
@@ -355,31 +377,36 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Warga list */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
         {filtered.map((w, idx) => {
-          const isHadir = map[w.id] === 'hadir';
+          const st = map[w.id] ?? 'tidak_hadir';
+          const ui = STATUS_UI[st];
           return (
             <button
               key={w.id}
               onClick={() => toggle(w.id)}
+              aria-label={`${w.nama} — ${ui.label}. Ketuk untuk ganti status`}
               className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
                 idx < filtered.length - 1 ? 'border-b border-line dark:border-gray-800' : ''
-              } ${isHadir ? 'hover:bg-emerald-50/50 dark:hover:bg-emerald-900/15' : 'hover:bg-rose-50/30 dark:hover:bg-rose-900/15'}`}
+              } ${ui.hover}`}
             >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400'
-              }`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ui.ava}`}>
                 {w.nama.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
-                <p className={`text-xs ${isHadir ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                  {isHadir ? 'Hadir' : 'Tidak hadir → Talangan'}
-                </p>
+                <p className={`text-xs ${ui.text}`}>{ui.label}</p>
               </div>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                isHadir ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 dark:border-gray-600'
-              }`}>
-                {isHadir && <CheckCircle2 className="w-4 h-4 text-white" />}
-              </div>
+              {/* Indikator status: hadir ✓ emerald · titip koin biru · tidak hadir lingkaran kosong */}
+              {st === 'hadir' ? (
+                <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500">
+                  <CheckCircle2 className="w-4 h-4 text-white" />
+                </div>
+              ) : st === 'titip' ? (
+                <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-blue-500 border-blue-500">
+                  <Coins className="w-3.5 h-3.5 text-white" />
+                </div>
+              ) : (
+                <div className="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 shrink-0" />
+              )}
             </button>
           );
         })}
@@ -398,7 +425,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             className="btn-brand w-full py-3.5 font-bold text-sm disabled:opacity-70 flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
-            {saving ? 'Menghitung...' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
+            {saving ? 'Menghitung…' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
           </button>
 
           {/* Batalkan — hanya untuk tarikan yang sudah selesai (undo simpan & hitung).
@@ -407,10 +434,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             <button
               onClick={handleBatalkanClick}
               disabled={saving || cancelling}
-              className="w-full py-3 rounded-full font-bold text-sm shadow-sm active:scale-[0.97] transition-all duration-150 disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
+              className="w-full py-3 rounded-full font-bold text-sm shadow-sm active:scale-[0.97] transition duration-150 disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
             >
               {cancelling
-                ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan...</>
+                ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan…</>
                 : <><RotateCcw className="w-4 h-4" />Batalkan Hasil Tarikan</>}
             </button>
           )}
@@ -458,6 +485,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         amount: formatRupiahPlain(result.kasTotal),
         rows: [
           { label: 'Hadir', value: `${result.hadirCount} warga` },
+          ...(result.titipCount > 0 ? [{ label: 'Titip (iuran masuk)', value: `${result.titipCount} warga` }] : []),
           { label: 'Tidak Hadir', value: `${result.tidakCount} warga` },
           ...(hasTalangan ? [{ label: 'Talangan Keluar', value: formatRupiahPlain(result.talanganTotal) }] : []),
           { label: 'Sohibul Bait Terima', value: formatRupiahPlain(result.sohibulBaitTerima) },
@@ -475,7 +503,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
   }
 
   return (
-    <div className={`transition-all duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
+    <div className={`transition duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
       <div className="rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift overflow-hidden">
         {/* Header — badge sukses + judul + tutup */}
         <div className="flex items-center gap-2.5 px-4 pt-4 pb-3">
@@ -508,6 +536,11 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {result.hadirCount} Hadir
           </span>
+          {result.titipCount > 0 && (
+            <span className="inline-flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> {result.titipCount} Titip
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5 font-semibold text-rose-600 dark:text-rose-400">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {result.tidakCount} Tidak hadir
           </span>
@@ -640,7 +673,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
             className="btn-brand flex-1 py-3 text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
-            {saving ? 'Menyimpan...' : 'Simpan Revisi'}
+            {saving ? 'Menyimpan…' : 'Simpan Revisi'}
           </button>
         </div>
       </div>
@@ -734,7 +767,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
             className="btn-brand flex-1 py-3 text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
-            {saving ? 'Menyimpan...' : 'Simpan Tarikan'}
+            {saving ? 'Menyimpan…' : 'Simpan Tarikan'}
           </button>
         </div>
       </div>
@@ -823,7 +856,7 @@ export default function JadwalPage() {
                   showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
                 }
               }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all"
+              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition"
             >
               <FileText className="w-4 h-4" /> PDF
             </button>
@@ -897,7 +930,7 @@ export default function JadwalPage() {
                             disabled={navigatingId === t.id}
                             title="Hitung Ulang"
                             aria-label="Hitung Ulang"
-                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer disabled:opacity-70"
+                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
                           >
                             <RefreshCw className={`w-[18px] h-[18px] ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                           </button>
@@ -906,14 +939,14 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition-all duration-150 shadow-sm disabled:opacity-70 ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm disabled:opacity-70 ${
                               isNext
                                 ? 'btn-brand'
                                 : 'bg-emerald-50 text-brand border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800'
                             }`}
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
-                            {navigatingId === t.id ? 'Memproses...' : 'Proses'}
+                            {navigatingId === t.id ? 'Memproses…' : 'Proses'}
                           </button>
                         )}
 
@@ -923,7 +956,7 @@ export default function JadwalPage() {
                             onClick={() => { haptic(); openWa(null, pesanTarikan(t.nomor, t.tanggal, t.sohibul_bait?.nama ?? '—', t.jumlah_per_orang)); }}
                             title="Bagikan pengingat ke WhatsApp"
                             aria-label="Bagikan pengingat ke WhatsApp"
-                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition-all cursor-pointer"
+                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition cursor-pointer"
                           >
                             <MessageCircle className="w-[18px] h-[18px]" />
                           </button>
@@ -934,7 +967,7 @@ export default function JadwalPage() {
                           onClick={() => setEditingTarikan(t)}
                           title="Revisi jadwal"
                           aria-label="Revisi jadwal"
-                          className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all cursor-pointer"
+                          className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
                         >
                           <Pencil className="w-[18px] h-[18px]" />
                         </button>

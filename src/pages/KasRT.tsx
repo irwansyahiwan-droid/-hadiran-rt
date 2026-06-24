@@ -78,7 +78,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 key={t}
                 type="button"
                 onClick={() => setTipe(t)}
-                className={`py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+                className={`py-2.5 rounded-xl text-sm font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
                       ? 'bg-emerald-500 text-white border-emerald-500'
@@ -152,12 +152,12 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <button
               type="submit"
               disabled={saving || !nominal}
-              className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition-all duration-150 flex items-center justify-center gap-2 ${
+              className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition duration-150 flex items-center justify-center gap-2 ${
                 tipe === 'masuk' ? 'btn-brand' : 'bg-rose-500 hover:bg-rose-600'
               }`}
             >
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
-              {saving ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Simpan'}
+              {saving ? 'Menyimpan…' : isEdit ? 'Simpan Perubahan' : 'Simpan'}
             </button>
           </div>
         </form>
@@ -521,7 +521,7 @@ export default function KasRTPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari keterangan..."
+              placeholder="Cari keterangan…"
               className="field-search"
             />
             {search && (

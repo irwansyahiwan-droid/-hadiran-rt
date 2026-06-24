@@ -481,7 +481,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate }: Props) {
               className="press grid place-items-center min-h-[40px] px-2"
             >
               <span
-                className={`block h-1.5 rounded-full transition-all duration-300 ${
+                className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ${
                   i === index
                     ? 'w-5 bg-brand dark:bg-brand-linkDark'
                     : 'w-1.5 bg-gray-300 dark:bg-gray-600'

@@ -432,7 +432,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               type="text"
               value={trxSearch}
               onChange={(e) => setTrxSearch(e.target.value)}
-              placeholder="Cari keterangan / nama..."
+              placeholder="Cari keterangan / nama…"
               aria-label="Cari transaksi"
               className="field-search pr-11"
             />

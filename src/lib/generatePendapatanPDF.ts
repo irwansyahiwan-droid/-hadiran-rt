@@ -4,7 +4,7 @@ import { outputPdf } from './pdfOut';
 import {
   TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum,
 } from './pdfTheme';
-import type { Tarikan, Warga } from './types';
+import type { AbsensiStatus, Tarikan, Warga } from './types';
 
 function rp(n: number) { return `Rp${n.toLocaleString('id-ID')}`; }
 const DASH = '—';
@@ -12,7 +12,7 @@ const DASH = '—';
 export function generatePendapatanPDF(
   tarikan: Tarikan,
   wargaList: Warga[],
-  absensiMap: Record<string, 'hadir' | 'tidak_hadir'>,
+  absensiMap: Record<string, AbsensiStatus>,
   talanganLunasSet: Set<string>,
 ) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -27,6 +27,7 @@ export function generatePendapatanPDF(
   // ── Derived stats ─────────────────────────────────────────
   const sohibulId = tarikan.sohibul_bait_id ?? '';
   const hadirList  = wargaList.filter(w => w.id !== sohibulId && absensiMap[w.id] === 'hadir');
+  const titipList  = wargaList.filter(w => w.id !== sohibulId && absensiMap[w.id] === 'titip');
   const lunaslist  = wargaList.filter(w => w.id !== sohibulId && absensiMap[w.id] === 'tidak_hadir' && talanganLunasSet.has(w.id));
   const talanganList = wargaList.filter(w => w.id !== sohibulId && absensiMap[w.id] === 'tidak_hadir' && !talanganLunasSet.has(w.id));
   const sohibul    = wargaList.find(w => w.id === sohibulId);
@@ -68,6 +69,10 @@ export function generatePendapatanPDF(
   // Hadir (membayar langsung)
   hadirList.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
     tableRows.push([String(rowNum++), w.nama, '', fmtNum(SOHIBUL_PER), fmtNum(KAS_PER), fmtNum(TOTAL_PER)]);
+  });
+  // Titip — tidak hadir tapi iuran masuk (bukan talangan). Tetap dihitung penuh.
+  titipList.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(w => {
+    tableRows.push([String(rowNum++), w.nama, 'Titip', fmtNum(SOHIBUL_PER), fmtNum(KAS_PER), fmtNum(TOTAL_PER)]);
   });
   // Tidak hadir tapi talangan SUDAH lunas — di bawah, tetap dihitung
   // (teks polos tanpa "✓": glyph itu tidak ada di Helvetica jsPDF → kotak rusak)
@@ -116,6 +121,9 @@ export function generatePendapatanPDF(
           data.cell.styles.fontStyle = 'bold';
         } else if (status === 'Talangan') {
           data.cell.styles.textColor = C.neg;
+          data.cell.styles.fontStyle = 'bold';
+        } else if (status === 'Titip') {
+          // Iuran masuk (bukan talangan) — tandai bold, warna default.
           data.cell.styles.fontStyle = 'bold';
         }
       }

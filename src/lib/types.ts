@@ -1,3 +1,11 @@
+/**
+ * Status kehadiran anggota pada satu tarikan.
+ * - hadir       : hadir fisik, bayar          → tidak talangan
+ * - titip       : tidak hadir, iuran masuk     → tidak talangan
+ * - tidak_hadir : tidak hadir, iuran tidak ada → kena talangan Rp50.000
+ */
+export type AbsensiStatus = 'hadir' | 'titip' | 'tidak_hadir';
+
 export interface Warga {
   id: string;
   nama: string;

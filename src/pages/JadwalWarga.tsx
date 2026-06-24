@@ -3,7 +3,7 @@ import { FileText, Search, X, Check, Coins, Users, CalendarDays } from 'lucide-r
 import { supabase } from '../lib/supabase';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
-import type { Tarikan, Warga } from '../lib/types';
+import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 import Tag from '../components/Tag';
 import InfoTip from '../components/InfoTip';
 
@@ -15,7 +15,7 @@ export default function JadwalWargaPage() {
   const [lastTarikan, setLastTarikan] = useState<Tarikan | null>(null);
   const [wargaList, setWargaList] = useState<Warga[]>([]);
   const [allTarikan, setAllTarikan] = useState<Tarikan[]>([]);
-  const [absensiMap, setAbsensiMap] = useState<Record<string, 'hadir' | 'tidak_hadir'>>({});
+  const [absensiMap, setAbsensiMap] = useState<Record<string, AbsensiStatus>>({});
   const [talanganLunasSet, setTalanganLunasSet] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
 
@@ -59,11 +59,11 @@ export default function JadwalWargaPage() {
             .eq('status_lunas', true),
         ]);
 
-        const aMap: Record<string, 'hadir' | 'tidak_hadir'> = {};
+        const aMap: Record<string, AbsensiStatus> = {};
         // Default semua tidak hadir
         warga.forEach(w => { aMap[w.id] = 'tidak_hadir'; });
         (absensiRes.data ?? []).forEach((a: { warga_id: string; status: string }) => {
-          aMap[a.warga_id] = a.status as 'hadir' | 'tidak_hadir';
+          aMap[a.warga_id] = a.status as AbsensiStatus;
         });
         setAbsensiMap(aMap);
 
@@ -117,7 +117,12 @@ export default function JadwalWargaPage() {
   const hadirCount = lastTarikan
     ? Object.values(absensiMap).filter(v => v === 'hadir').length
     : 0;
-  const tidakHadirCount = lastTarikan ? (lastTarikan.total_warga - hadirCount) : 0;
+  const titipCount = lastTarikan
+    ? Object.values(absensiMap).filter(v => v === 'titip').length
+    : 0;
+  const tidakHadirCount = lastTarikan
+    ? Object.values(absensiMap).filter(v => v === 'tidak_hadir').length
+    : 0;
   const pctHadir = lastTarikan && lastTarikan.total_warga > 0
     ? Math.round((hadirCount / lastTarikan.total_warga) * 100)
     : 0;
@@ -126,10 +131,10 @@ export default function JadwalWargaPage() {
   const selesaiCount = allTarikan.filter(t => t.status === 'selesai').length;
   const terjadwalCount = allTarikan.filter(t => t.status === 'dijadwalkan' || t.status === 'berlangsung').length;
 
-  // Stat "Selesai" di sub-tab anggota = hadir + talanganLunas (sudah menyelesaikan kewajiban)
+  // Stat "Selesai" di sub-tab anggota = hadir + titip + talanganLunas (sudah menyelesaikan kewajiban)
   const selesaiAnggotaCount = wargaList.filter(w => {
     const statusAbsensi = absensiMap[w.id];
-    return statusAbsensi === 'hadir' || talanganLunasSet.has(w.id);
+    return statusAbsensi === 'hadir' || statusAbsensi === 'titip' || talanganLunasSet.has(w.id);
   }).length;
 
   const filteredWarga = search
@@ -199,7 +204,7 @@ export default function JadwalWargaPage() {
       <div className="flex gap-2">
         <button
           onClick={() => setSubTab('anggota')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition ${
             subTab === 'anggota'
               ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
               : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
@@ -209,7 +214,7 @@ export default function JadwalWargaPage() {
         </button>
         <button
           onClick={() => setSubTab('jadwal')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
+          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition ${
             subTab === 'jadwal'
               ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
               : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
@@ -227,8 +232,8 @@ export default function JadwalWargaPage() {
             {[
               { label: 'Selesai', value: selesaiAnggotaCount, color: 'text-emerald-700 dark:text-emerald-400' },
               { label: 'Hadir', value: hadirCount, color: 'text-blue-600 dark:text-blue-400' },
+              { label: 'Titip', value: titipCount, color: 'text-indigo-600 dark:text-indigo-400' },
               { label: 'Tidak', value: tidakHadirCount, color: 'text-rose-600 dark:text-rose-400' },
-              { label: 'Total', value: wargaList.length, color: 'text-gray-700 dark:text-gray-300' },
             ].map(s => (
               <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
                 <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
@@ -243,7 +248,7 @@ export default function JadwalWargaPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Cari nama warga..."
+              placeholder="Cari nama warga…"
               className="field-search"
             />
             {search && (
@@ -259,7 +264,11 @@ export default function JadwalWargaPage() {
               <p className="text-sm text-ink-faint dark:text-gray-400 text-center py-8">Tidak ditemukan</p>
             ) : (
               filteredWarga.map((w, idx) => {
-                const isHadir = absensiMap[w.id] === 'hadir';
+                const st = absensiMap[w.id];
+                const ava =
+                  st === 'hadir' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                  : st === 'titip' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                  : 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400';
                 return (
                   <div
                     key={w.id}
@@ -272,21 +281,20 @@ export default function JadwalWargaPage() {
                       {idx + 1}
                     </span>
                     {/* Avatar */}
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                      isHadir ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400'
-                    }`}>
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ava}`}>
                       {w.nama.charAt(0)}
                     </div>
                     {/* Nama */}
                     <p className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
-                    {/* Badge */}
-                    {lastTarikan ? (
-                      <Tag tone={isHadir ? 'success' : 'danger'} className="shrink-0">
-                        {isHadir ? <Check className="w-3 h-3" strokeWidth={2.5} /> : <X className="w-3 h-3" strokeWidth={2.5} />}
-                        {isHadir ? 'Hadir' : 'Tidak'}
-                      </Tag>
-                    ) : (
+                    {/* Badge — hadir / titip (iuran masuk) / tidak hadir */}
+                    {!lastTarikan ? (
                       <Tag tone="neutral" className="shrink-0">—</Tag>
+                    ) : st === 'hadir' ? (
+                      <Tag tone="success" className="shrink-0"><Check className="w-3 h-3" strokeWidth={2.5} />Hadir</Tag>
+                    ) : st === 'titip' ? (
+                      <Tag tone="info" className="shrink-0"><Coins className="w-3 h-3" />Titip</Tag>
+                    ) : (
+                      <Tag tone="danger" className="shrink-0"><X className="w-3 h-3" strokeWidth={2.5} />Tidak</Tag>
                     )}
                   </div>
                 );
