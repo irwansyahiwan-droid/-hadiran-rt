@@ -1,70 +1,85 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  Target, Palmtree, ClipboardCheck, HandCoins, Coins, Building2,
-  ChevronRight, CalendarClock, PartyPopper, Smartphone, Check, X, Star,
+  Target, ClipboardCheck, HandCoins, Coins, Building2, Smartphone,
+  ChevronRight, Crown, Check, X, CalendarClock,
   type LucideIcon,
 } from 'lucide-react';
 import { formatRupiahPlain, haptic } from '../lib/utils';
+import rtBendahara from '../assets/rt-bendahara.jpg';
 
 /** Target Kas RT yang dipromosikan di carousel (info, terpisah dari widget editable). */
 const TARGET_NOMINAL = 25_000_000;
 const TARGET_DEADLINE = '2026-12-31';
 
-/** Satu kartu di carousel. */
-interface BannerSlide {
+/* Geometri kartu 3D. Lebar/spacing dihitung dari lebar viewport carousel (responsif);
+   tinggi tetap agar tumpukan kartu konsisten antar-slide. */
+const CARD_H = 344;     // tinggi kartu (px)
+const TOP = 8;          // offset atas kartu di dalam viewport
+const VIEWPORT_H = 384; // tinggi area carousel — sisakan ruang bayangan kartu aktif
+
+/** Slide promo/panduan (kartu non-saldo). Kartu saldo masuk lewat prop `heroSlide`. */
+interface PromoSlide {
   id: string;
-  label: string;       // kapsul kecil uppercase
+  kind: 'target' | 'app' | 'absensi' | 'tarikan' | 'talangan' | 'kasrt';
+  eyebrow: string;
   judul: string;
-  isi: string;
+  desc?: string;
   icon: LucideIcon;
-  grad: string;        // gradien latar
-  glow: string;        // warna glow di balik ikon
+  grad: string;
+  glow: string;
   cta?: { label: string; tab: string };
-  /** Bila ada → render progress bar (Target Kas RT) menggantikan teks isi. */
-  progress?: { value: number; max: number; deadline: string };
-  /** Pita kecil di pojok (mis. "Tercapai!"). */
-  ribbon?: string;
-  /** Bila true → render mockup iPhone mengintip di kanan (slide promo aplikasi). */
-  phone?: boolean;
-  /** Motif dekoratif mengintip di kanan (slide panduan) — memperkuat makna slide. */
-  art?: 'absensi' | 'tarikan' | 'talangan' | 'kas-rt';
 }
 
-/** Mockup iPhone kecil yang mengintip dari kanan banner — cuplikan dashboard
- *  yang distylisasi (mini hero + baris stat + transaksi), bukan screenshot. */
-function PhoneMock() {
+/* ------------------------------------------------------------------ */
+/* Dekorasi per-jenis kartu — motif tematik yang mengintip di kanan/   */
+/* bawah, memperkuat makna slide (port dari mockup desain).            */
+/* ------------------------------------------------------------------ */
+
+/** Foto Pak RT & Bendahara menatap ke horizon → wajah "Bersama menuju target".
+ *  Membleed dari sisi kanan, di-tint teal & di-fade ke gradient kartu agar judul
+ *  + progress di kiri tetap tajam. Lapisan ini di bawah konten (teks) & di bawah
+ *  glass overlay (sheen/vignette/noise) → grain ikut menyatukan foto dgn kartu. */
+function TargetPhoto() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0">
+      <img
+        src={rtBendahara}
+        alt=""
+        className="absolute right-0 top-0 h-full w-[68%] object-cover"
+        style={{ objectPosition: '72% center', filter: 'saturate(.9) contrast(1.03)' }}
+      />
+      {/* Duotone teal — selaraskan cast biru foto dgn gradient slide. */}
+      <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(31,138,126,.24), rgba(14,95,87,.46))', mixBlendMode: 'multiply' }} />
+      <div className="absolute right-0 top-0 h-full w-[68%]" style={{ background: 'linear-gradient(180deg, rgba(190,240,214,.12), transparent 42%)', mixBlendMode: 'soft-light' }} />
+      {/* Fade kiri → lebur ke gradient kartu (judul tetap terbaca). */}
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #1c8576 0%, rgba(28,133,118,.72) 30%, rgba(28,133,118,0) 62%)' }} />
+      {/* Scrim bawah → progress & tanggal tetap legibel di atas foto. */}
+      <div className="absolute inset-x-0 bottom-0 h-[44%]" style={{ background: 'linear-gradient(to top, rgba(7,40,33,.58), transparent)' }} />
+    </div>
+  );
+}
+
+/** Mockup HP mengambang — cuplikan dashboard distylisasi (mini hero + stat + transaksi). */
+function AppPhone() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute -right-2 top-2 z-[1] w-[78px]"
-      style={{ transform: 'rotate(-8deg) scale(1.3)', transformOrigin: 'right center', filter: 'drop-shadow(0 14px 22px rgba(0,0,0,0.45))' }}
+      className="banner-art-float absolute right-[-2px] top-[6px] h-[128px] w-[98px] overflow-hidden rounded-[20px] bg-[#080c09] p-[5px]"
+      style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.18), 0 22px 36px -16px rgba(0,0,0,.75)' }}
     >
-      {/* Glow di balik HP — beri kedalaman & kesan "menyala" */}
-      <div
-        className="absolute -inset-4 rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(45,212,150,0.45) 0%, transparent 70%)' }}
-      />
-      {/* Bezel */}
-      <div className="banner-art-float relative rounded-[17px] bg-gray-900 p-[2.5px] ring-1 ring-white/15" style={{ animationDelay: '0.8s' }}>
-        {/* Layar */}
-        <div className="relative h-[120px] overflow-hidden rounded-[14px] bg-gray-50">
-          {/* Dynamic island */}
-          <div className="absolute left-1/2 top-[5px] z-10 h-[3.5px] w-[22px] -translate-x-1/2 rounded-full bg-gray-900/90" />
-          <div className="px-[5px] pt-3">
-            {/* Mini hero (emerald, identik tema saldo) */}
-            <div className="h-[30px] rounded-[7px]" style={{ background: 'linear-gradient(135deg,#0D5B36,#1C9A5C)' }} />
-            {/* Mini stat row 3-kolom */}
-            <div className="mt-[5px] flex gap-[3px]">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="h-[13px] flex-1 rounded-[3px] bg-white ring-1 ring-gray-200/80" />
-              ))}
-            </div>
-            {/* Mini baris transaksi */}
-            <div className="mt-[5px] space-y-[3px]">
-              <div className="h-[6px] rounded-full bg-gray-200" />
-              <div className="h-[6px] w-2/3 rounded-full bg-gray-200" />
-              <div className="h-[6px] w-5/6 rounded-full bg-gray-200" />
-            </div>
+      <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-gray-50">
+        <div className="absolute left-1/2 top-[5px] z-10 h-[3.5px] w-[22px] -translate-x-1/2 rounded-full bg-gray-900/90" />
+        <div className="px-[6px] pt-3">
+          <div className="h-[34px] rounded-[8px]" style={{ background: 'linear-gradient(135deg,#0D5B36,#1C9A5C)' }} />
+          <div className="mt-[6px] flex gap-[3px]">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-[15px] flex-1 rounded-[3px] bg-white ring-1 ring-gray-200/80" />
+            ))}
+          </div>
+          <div className="mt-[6px] space-y-[4px]">
+            <div className="h-[6px] rounded-full bg-gray-200" />
+            <div className="h-[6px] w-2/3 rounded-full bg-gray-200" />
+            <div className="h-[6px] w-5/6 rounded-full bg-gray-200" />
           </div>
         </div>
       </div>
@@ -72,229 +87,83 @@ function PhoneMock() {
   );
 }
 
-/** Bingkai bersama motif dekoratif kanan — peek + glow + drop-shadow + float halus.
- *  Elemen luar menahan peek/rotate; wrapper-dalam yang mengambang (banner-art-float)
- *  agar rotate tak bentrok dengan animasi naik-turun. */
-function ArtFrame({
-  children, glow, rotate = -6, delay = '0s', width = 76, scale = 1,
-}: { children: React.ReactNode; glow: string; rotate?: number; delay?: string; width?: number; scale?: number }) {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute -right-2 top-1/2 z-[1]"
-      style={{ transform: `translateY(-50%) rotate(${rotate}deg) scale(${scale})`, transformOrigin: 'right center', width }}
-    >
-      {/* Glow di balik motif — kedalaman & kesan "menyala" senada hero card */}
-      <div
-        className="absolute -inset-5 rounded-full"
-        style={{ background: `radial-gradient(circle, ${glow} 0%, transparent 70%)`, opacity: 0.65 }}
-      />
-      <div
-        className="banner-art-float relative"
-        style={{ animationDelay: delay, filter: 'drop-shadow(0 12px 18px rgba(0,0,0,0.4))' }}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/** Mini daftar hadir — dua hadir (✓) satu absen (✗) → "hadir dicatat, absen kena talangan". */
+/** Mini daftar hadir — dua hadir (✓) satu absen (✗) → hadir dicatat, absen kena talangan. */
 function AbsensiArt() {
   const rows = [true, true, false];
   return (
-    <div className="rounded-[13px] bg-white/14 p-[7px] ring-1 ring-inset ring-white/25">
-      <div className="space-y-[5px]">
-        {rows.map((ok, i) => (
-          <div key={i} className="flex items-center gap-[5px]">
-            <span className="h-[13px] w-[13px] shrink-0 rounded-full bg-white/40" />
-            <span className="h-[5px] flex-1 rounded-full bg-white/30" />
-            <span className={`grid h-[14px] w-[14px] shrink-0 place-items-center rounded-full ${ok ? 'bg-emerald-400' : 'bg-white/20'}`}>
-              {ok
-                ? <Check className="h-[9px] w-[9px] text-emerald-950" strokeWidth={3.5} />
-                : <X className="h-[9px] w-[9px] text-white/80" strokeWidth={3} />}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/** Tumpukan koin + bintang → iuran terkumpul untuk satu Sohibul Bait (penerima). */
-function TarikanArt() {
-  return (
-    <div className="relative mx-auto h-[62px] w-[52px]">
-      <Star
-        className="absolute left-1/2 top-0 h-[18px] w-[18px] -translate-x-1/2 text-amber-200"
-        fill="currentColor" strokeWidth={0}
-        style={{ filter: 'drop-shadow(0 0 6px rgba(251,191,36,0.7))' }}
-      />
-      {[0, 1, 2].map((i) => (
-        <div
-          key={i}
-          className="absolute left-1/2 h-[12px] w-[50px] -translate-x-1/2 rounded-full ring-1 ring-inset ring-white/40"
-          style={{ bottom: `${i * 11}px`, background: 'linear-gradient(180deg,#FDE68A,#F59E0B)' }}
-        />
+    <div className="pointer-events-none absolute bottom-[24px] right-[-6px] flex w-[142px] flex-col gap-[9px]">
+      {rows.map((ok, i) => (
+        <div key={i} className={`flex items-center gap-[9px] rounded-[11px] px-[10px] py-[8px] ${ok ? 'bg-white/14' : 'bg-white/10'}`}>
+          <span className={`grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full ${ok ? 'bg-white' : 'bg-white/40'}`}>
+            {ok
+              ? <Check className="h-[11px] w-[11px] text-emerald-600" strokeWidth={3.5} />
+              : <X className="h-[9px] w-[9px] text-white/90" strokeWidth={3} />}
+          </span>
+          <span className={`h-[6px] flex-1 rounded-full ${ok ? 'bg-white/50' : 'bg-white/30'}`} />
+        </div>
       ))}
     </div>
   );
 }
 
-/** Nota "Rp50.000" → nominal talangan untuk yang tidak hadir. */
+/** Penerima bermahkota + tumpukan koin → iuran terkumpul untuk satu Sohibul Bait. */
+function TarikanArt() {
+  return (
+    <>
+      <div
+        className="absolute right-[14px] top-[18px] h-[60px] w-[60px] rounded-full p-[3px]"
+        style={{ background: 'linear-gradient(135deg,#ffe27a,#e9a900)', boxShadow: '0 12px 22px -8px rgba(0,0,0,.55)' }}
+      >
+        <div className="grid h-[54px] w-[54px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/40">
+          <Coins className="h-6 w-6 text-white" strokeWidth={1.8} />
+        </div>
+        <Crown
+          className="absolute left-1/2 top-[-9px] h-[18px] w-[18px] -translate-x-1/2 -rotate-[8deg] text-amber-200"
+          fill="currentColor" strokeWidth={0}
+          style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.4))' }}
+        />
+      </div>
+      <div className="pointer-events-none absolute bottom-[28px] right-[10px] flex flex-col gap-[5px]">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="h-[16px] w-[78px] rounded-full"
+            style={{ background: i === 2 ? 'linear-gradient(180deg,#ffe27a,#f0b520)' : 'linear-gradient(180deg,#ffd84d,#e9a900)', boxShadow: '0 4px 10px -3px rgba(0,0,0,.4)' }}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+/** Nota miring "Rp50.000" → nominal talangan bagi yang tidak hadir. */
 function TalanganArt() {
   return (
-    <div className="rounded-[12px] bg-white/15 px-[9px] py-[8px] ring-1 ring-inset ring-white/25">
-      <div className="flex items-center gap-1">
-        <span className="h-[6px] w-[6px] rounded-full bg-amber-300" style={{ boxShadow: '0 0 6px rgba(251,191,36,0.85)' }} />
-        <span className="text-[0.5rem] font-bold uppercase tracking-wider text-white/70">Talangan</span>
-      </div>
-      <p className="mt-[3px] font-display text-[0.95rem] font-extrabold leading-tight text-white">
-        Rp50<span className="text-white/70">.000</span>
-      </p>
-    </div>
-  );
-}
-
-/** Dua tumpukan koin dipisah garis → Kas RT (besar) terpisah dari Kas Hadiran. */
-function KasRtArt() {
-  return (
-    <div className="flex items-end justify-center gap-[7px]">
-      <div className="flex flex-col-reverse gap-[3px]">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className="h-[7px] w-[30px] rounded-full bg-white/35 ring-1 ring-inset ring-white/25" />
-        ))}
-      </div>
-      <span className="h-[34px] w-px bg-white/25" />
-      <div className="flex flex-col-reverse gap-[3px]">
-        {[0, 1].map((i) => (
-          <span key={i} className="h-[7px] w-[26px] rounded-full bg-white/[0.22] ring-1 ring-inset ring-white/20" />
-        ))}
+    <div className="pointer-events-none absolute bottom-[22px] right-[-18px] rotate-[8deg]">
+      <div
+        className="rounded-[14px] px-[16px] py-[11px] text-[#b25e00]"
+        style={{ background: 'linear-gradient(135deg,#fff5e0,#ffe2a8)', boxShadow: '0 12px 24px -10px rgba(0,0,0,.5)' }}
+      >
+        <div className="flex items-center gap-[5px] text-[9px] font-extrabold uppercase tracking-[0.12em]">
+          <span className="h-[6px] w-[6px] rounded-full bg-[#e9a900]" />Talangan
+        </div>
+        <div className="font-display text-[23px] font-extrabold tracking-[-.02em]">Rp50.000</div>
       </div>
     </div>
   );
 }
 
-/** Pilih motif sesuai jenis slide panduan. */
-const ART = {
-  absensi:  { Motif: AbsensiArt,  rotate: -7, delay: '0s',   width: 76, scale: 1.32 },
-  tarikan:  { Motif: TarikanArt,  rotate: 0,  delay: '1.1s', width: 60, scale: 1.42 },
-  talangan: { Motif: TalanganArt, rotate: -9, delay: '0.5s', width: 80, scale: 1.26 },
-  'kas-rt': { Motif: KasRtArt,    rotate: 0,  delay: '1.6s', width: 78, scale: 1.3 },
-} as const;
-
-function SlideArt({ art, glow }: { art: NonNullable<BannerSlide['art']>; glow: string }) {
-  const { Motif, rotate, delay, width, scale } = ART[art];
-  return <ArtFrame glow={glow} rotate={rotate} delay={delay} width={width} scale={scale}><Motif /></ArtFrame>;
-}
-
-/** Motif latar PENUH kartu (di atas gradient, di bawah konten) → banner terasa
- *  "didesain": grafik/pola tematik putih tipis yang mengisi ruang, bukan teks saja. */
-type MotifKind = 'growth' | 'rays' | 'dots' | 'rings' | 'waves';
-
-/** Pilih motif per slide (by id) — tak menyentuh data slide, mudah disetel. */
-const MOTIF: Record<string, MotifKind> = {
-  'target-kas-rt':  'growth',  // grafik naik = pertumbuhan kas
-  'wisata-bareng':  'rays',    // pancaran = perayaan
-  'app-hp':         'dots',    // dot-grid = nuansa teknologi
-  'panduan-absensi':'rings',   // cincin konsentris
-  'panduan-tarikan':'rays',    // pancaran/kilau koin
-  'panduan-talangan':'waves',  // gelombang = arus dana
-  'panduan-kas-rt': 'growth',  // grafik naik
-};
-
-function SlideMotif({ kind, animate }: { kind: MotifKind; animate?: boolean }) {
-  const uid = useId().replace(/:/g, '');
-  const base = 'pointer-events-none absolute inset-0 z-0 h-full w-full';
-
-  if (kind === 'growth') {
-    const gid = `mg-${uid}`;
-    const areaD = 'M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36 L320,140 L0,140 Z';
-    const lineD = 'M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36';
-    return (
-      <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="none" className={base}>
-        <defs>
-          <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#fff" stopOpacity="0.16" />
-            <stop offset="1" stopColor="#fff" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <g stroke="#fff" strokeOpacity="0.07">
-          <line x1="0" y1="46" x2="320" y2="46" />
-          <line x1="0" y1="82" x2="320" y2="82" />
-          <line x1="0" y1="116" x2="320" y2="116" />
-        </g>
-        {/* Slide aktif → garis "tertarik" (draw-on) + area & dot fade in.
-            Render terkondisi: tiap kali jadi aktif, grup ini mount ulang → animasi main lagi. */}
-        {animate ? (
-          <g>
-            <path d={areaD} fill={`url(#${gid})`} className="banner-draw-area" />
-            <path d={lineD} pathLength={1} fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="2" className="banner-draw-line" />
-            <circle cx="300" cy="42" r="3" fill="#fff" fillOpacity="0.55" className="banner-draw-dot" />
-          </g>
-        ) : (
-          <g>
-            <path d={areaD} fill={`url(#${gid})`} />
-            <path d={lineD} fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="2" />
-            <circle cx="300" cy="42" r="3" fill="#fff" fillOpacity="0.55" />
-          </g>
-        )}
-      </svg>
-    );
-  }
-  if (kind === 'dots') {
-    const pid = `md-${uid}`;
-    return (
-      <svg aria-hidden className={base}>
-        <defs>
-          <pattern id={pid} width="18" height="18" patternUnits="userSpaceOnUse">
-            <circle cx="2" cy="2" r="1.4" fill="#fff" fillOpacity="0.16" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill={`url(#${pid})`} />
-      </svg>
-    );
-  }
-  if (kind === 'waves') {
-    return (
-      <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="none" className={base}>
-        <g fill="none" stroke="#fff" strokeOpacity="0.1" strokeWidth="2">
-          <path d="M0,42 C54,22 110,62 168,42 C226,22 290,62 320,46" />
-          <path d="M0,82 C54,62 110,102 168,82 C226,62 290,102 320,86" />
-          <path d="M0,120 C54,100 110,140 168,120 C226,100 290,140 320,124" />
-        </g>
-      </svg>
-    );
-  }
-  if (kind === 'rings') {
-    return (
-      <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="xMaxYMin slice" className={base}>
-        <g fill="none" stroke="#fff" strokeOpacity="0.1" strokeWidth="2">
-          <circle cx="296" cy="18" r="26" />
-          <circle cx="296" cy="18" r="52" />
-          <circle cx="296" cy="18" r="80" />
-          <circle cx="296" cy="18" r="110" />
-        </g>
-      </svg>
-    );
-  }
-  // rays
+/** Batang grafik → Kas RT besar yang terpisah dari Kas Hadiran. */
+function KasrtArt() {
+  const bars = [30, 48, 38, 62];
   return (
-    <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="none" className={base}>
-      <g stroke="#fff" strokeOpacity="0.08" strokeWidth="2">
-        <line x1="300" y1="14" x2="120" y2="140" />
-        <line x1="300" y1="14" x2="180" y2="140" />
-        <line x1="300" y1="14" x2="240" y2="140" />
-        <line x1="300" y1="14" x2="60" y2="120" />
-        <line x1="300" y1="14" x2="20" y2="80" />
-      </g>
-    </svg>
+    <div className="pointer-events-none absolute bottom-[30px] right-0 flex items-end gap-[7px] opacity-85">
+      {bars.map((h, i) => (
+        <div key={i} className="w-[11px] rounded-[5px]" style={{ height: h, background: i === bars.length - 1 ? '#fff' : `rgba(255,255,255,${0.35 + i * 0.05})` }} />
+      ))}
+    </div>
   );
 }
-
-const ROTATE_MS = 5000;       // dwell slide promo
-const HERO_MS = 6800;         // dwell slide saldo (rumah) — ditahan lebih lama
-const SWIPE_THRESHOLD = 48; // px geser minimal untuk pindah slide
 
 /** Hitung "31 Des 2026 · N hari lagi". */
 function fmtDeadline(iso: string): string {
@@ -305,341 +174,392 @@ function fmtDeadline(iso: string): string {
 }
 
 interface Props {
-  /** Saldo Kas RT terkini → progress Target Kas RT & syarat slide Wisata. */
+  /** Saldo Kas RT terkini → progress Target Kas RT. */
   kasRT?: number;
-  /** Pindah tab saat tombol CTA slide ditekan. */
+  /** Pindah tab saat CTA / kartu panduan ditekan. */
   onNavigate?: (tab: string) => void;
-  /** Bila ada → jadi slide PERTAMA (kartu saldo hero). Carousel jadi satu
-   *  permukaan "saldo + promo": saldo = rumah (dwell lebih lama lalu balik). */
+  /** Konten kartu SALDO (rumah) — dibangun di Beranda agar tetap memegang data
+   *  live, Odometer, hide-amount & refresh. Carousel hanya membungkusnya dengan
+   *  bingkai kartu 3D + dekorasi kaca. */
   heroSlide?: React.ReactNode;
+  /** Sapuan sheen sekali-muat pada kartu saldo (kunjungan pertama sesi). */
+  heroSweep?: boolean;
 }
 
-export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide }: Props) {
-  const [index, setIndex] = useState(0);
-  const [drag, setDrag] = useState(0); // offset geser sementara (px) saat menyentuh
-  const startX = useRef<number | null>(null);
-  const widthRef = useRef(1);
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  const tercapai = kasRT >= TARGET_NOMINAL;
-
-  // Susun slide. Slide "Wisata Bareng" hanya tampil bila target tercapai.
-  const slides: BannerSlide[] = [
+export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroSweep }: Props) {
+  const promos: PromoSlide[] = [
     {
-      id: 'target-kas-rt',
-      label: 'Target Kas RT',
-      judul: 'Bersama menuju Rp25 juta',
-      isi: '',
-      icon: Target,
-      // Teal-cyan, sengaja BEDA keluarga dari hero emerald — slide ini kini tepat
-      // di bawah hero, hijau-di-atas-hijau bikin dua kartu menyatu jadi satu blok.
-      grad: 'linear-gradient(135deg, #0D4F5C 0%, #119AAB 100%)',
-      glow: 'rgba(45,212,191,0.58)',
-      progress: { value: kasRT, max: TARGET_NOMINAL, deadline: TARGET_DEADLINE },
+      id: 'target-kas-rt', kind: 'target', eyebrow: 'TARGET KAS RT',
+      judul: 'Bersama menuju Rp25 juta', icon: Target,
+      grad: 'linear-gradient(150deg,#1f8a7e 0%,#0e5f57 100%)', glow: 'rgba(45,212,191,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
-    ...(tercapai
-      ? [{
-          id: 'wisata-bareng',
-          label: 'Tercapai!',
-          judul: 'Saatnya wisata bareng warga 🎉',
-          isi: 'Target Kas RT tercapai — yuk rencanakan jalan-jalan seru bersama satu RT!',
-          icon: Palmtree,
-          grad: 'linear-gradient(135deg, #C2410C 0%, #F59E0B 100%)',
-          glow: 'rgba(245,158,11,0.55)',
-          ribbon: 'Tercapai',
-          cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
-        } as BannerSlide]
-      : []),
     {
-      id: 'app-hp',
-      label: 'Aplikasi',
-      judul: 'Pantau kas RT dari HP',
-      isi: 'Saldo, jadwal & talangan dalam satu genggaman.',
-      icon: Smartphone,
-      grad: 'linear-gradient(135deg, #0F172A 0%, #1F2937 100%)',
-      glow: 'rgba(45,212,150,0.5)',
-      phone: true,
+      id: 'app-hp', kind: 'app', eyebrow: 'APLIKASI',
+      judul: 'Pantau kas RT dari HP', desc: 'Saldo, jadwal & talangan dalam satu genggaman.',
+      icon: Smartphone, grad: 'linear-gradient(160deg,#1b2620 0%,#0e1512 100%)', glow: 'rgba(45,212,150,0.5)',
     },
     {
-      id: 'panduan-absensi',
-      label: 'Panduan · Absensi',
-      judul: 'Hadir dicatat setiap tarikan',
-      isi: 'Bendahara menandai daftar hadir per tarikan. Yang tidak hadir otomatis kena talangan.',
-      icon: ClipboardCheck,
-      grad: 'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
-      glow: 'rgba(96,165,250,0.55)',
+      id: 'panduan-absensi', kind: 'absensi', eyebrow: 'PANDUAN · ABSENSI',
+      judul: 'Hadir dicatat setiap tarikan', desc: 'Bendahara menandai daftar hadir per tarikan. Yang tidak hadir otomatis kena talangan.',
+      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#3f72e6 0%,#274fc4 100%)', glow: 'rgba(96,165,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
-      art: 'absensi',
     },
     {
-      id: 'panduan-tarikan',
-      label: 'Panduan · Tarikan',
-      judul: 'Satu Sohibul Bait per tarikan',
-      isi: 'Setiap tarikan ada satu penerima. Iuran semua anggota yang hadir terkumpul untuknya.',
-      icon: Coins,
-      grad: 'linear-gradient(135deg, #6D28D9 0%, #8B5CF6 100%)',
-      glow: 'rgba(167,139,250,0.55)',
+      id: 'panduan-tarikan', kind: 'tarikan', eyebrow: 'PANDUAN · TARIKAN',
+      judul: 'Satu Sohibul Bait per tarikan', desc: 'Setiap tarikan ada satu penerima. Iuran semua anggota yang hadir terkumpul untuknya.',
+      icon: Coins, grad: 'linear-gradient(150deg,#8454e0 0%,#5a30b8 100%)', glow: 'rgba(167,139,250,0.55)',
       cta: { label: 'Buka Jadwal', tab: 'jadwal' },
-      art: 'tarikan',
     },
     {
-      id: 'panduan-talangan',
-      label: 'Panduan · Talangan',
-      judul: 'Tidak hadir = talangan Rp50.000',
-      isi: 'Talangan wajib dilunasi sebelum tarikan berikutnya agar kas tetap sehat.',
-      icon: HandCoins,
-      grad: 'linear-gradient(135deg, #B45309 0%, #F59E0B 100%)',
-      glow: 'rgba(251,191,36,0.55)',
+      id: 'panduan-talangan', kind: 'talangan', eyebrow: 'PANDUAN · TALANGAN',
+      judul: 'Tidak hadir kena talangan', desc: 'Talangan wajib dilunasi sebelum tarikan berikutnya agar kas tetap sehat.',
+      icon: HandCoins, grad: 'linear-gradient(150deg,#ec9a33 0%,#cf6f15 100%)', glow: 'rgba(251,191,36,0.55)',
       cta: { label: 'Lihat Talangan', tab: 'talangan' },
-      art: 'talangan',
     },
     {
-      id: 'panduan-kas-rt',
-      label: 'Panduan · Kas RT',
-      judul: 'Kas besar RT yang terpisah',
-      isi: 'Sebagian setoran masuk ke Kas RT — terpisah dari Kas Hadiran, untuk kebutuhan warga.',
-      icon: Building2,
-      grad: 'linear-gradient(135deg, #0F766E 0%, #10B981 100%)',
-      glow: 'rgba(16,185,129,0.55)',
+      id: 'panduan-kas-rt', kind: 'kasrt', eyebrow: 'PANDUAN · KAS RT',
+      judul: 'Kas besar RT yang terpisah', desc: 'Sebagian setoran masuk ke Kas RT — terpisah dari Kas Hadiran, untuk kebutuhan warga.',
+      icon: Building2, grad: 'linear-gradient(150deg,#1f8a4c 0%,#127a52 100%)', glow: 'rgba(16,185,129,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
-      art: 'kas-rt',
     },
   ];
 
   const hasHero = heroSlide != null;
-  const count = slides.length + (hasHero ? 1 : 0);
+  const count = promos.length + (hasHero ? 1 : 0);
+  const heroOffset = hasHero ? 1 : 0;
+  const targetIdx = promos.findIndex((p) => p.kind === 'target') + heroOffset;
   const reduced =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-  // Jaga index tetap valid bila jumlah slide berubah (Wisata muncul/hilang).
-  useEffect(() => {
-    if (index >= count) setIndex(0);
-  }, [count, index]);
+  const ratio = TARGET_NOMINAL > 0 ? Math.min(100, Math.max(0, (kasRT / TARGET_NOMINAL) * 100)) : 0;
+  const sisa = Math.max(0, TARGET_NOMINAL - kasRT);
+  const done = kasRT >= TARGET_NOMINAL;
 
-  // Auto-rotate dgn dwell per-slide: saldo (hero, index 0) ditahan lebih lama lalu
-  // kembali jadi "rumah"; promo lebih singkat. Berhenti saat ≤1 slide, reduced-motion,
-  // atau sedang disentuh. Saat tab tersembunyi → tunda, jangan lompat.
+  const [index, setIndex] = useState(0);
+  const [drag, setDrag] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  // Bar progress target "ditarik" 0→ratio tiap kali kartu target jadi aktif.
+  const [targetFill, setTargetFill] = useState(0);
+
+  // Lebar viewport → lebar & spacing kartu (responsif, mobile-first).
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [vw, setVw] = useState(340);
+  useLayoutEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+    const update = () => setVw(el.clientWidth || 340);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const cardW = Math.min(vw - 44, 326);
+  const spacing = Math.round(cardW * 0.82);
+
+  // Refs untuk loop autoplay tanpa stale closure.
+  const idxRef = useRef(0);
+  const dirRef = useRef(1);
+  const progRef = useRef(0);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
+  const pressedRef = useRef(false);
+
+  // Drag pointer.
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const activeRef = useRef(false);
+  const movedRef = useRef(false);
+
+  // Jaga index valid bila jumlah kartu berubah; reset progress saat slide ganti.
   useEffect(() => {
-    if (count <= 1 || reduced || startX.current !== null) return;
-    const dwell = hasHero && index === 0 ? HERO_MS : ROTATE_MS;
-    let id: number;
-    const schedule = () => {
-      id = window.setTimeout(() => {
-        if (document.hidden) { schedule(); return; }
-        setIndex((i) => (i + 1) % count);
-      }, dwell);
+    if (index >= count) { setIndex(0); return; }
+    idxRef.current = index;
+    progRef.current = 0;
+    if (progressBarRef.current) progressBarRef.current.style.width = '0%';
+    // Kartu target → tarik ulang bar dari 0.
+    if (index === targetIdx) {
+      setTargetFill(0);
+      const id = window.setTimeout(() => setTargetFill(ratio), 60);
+      return () => window.clearTimeout(id);
+    }
+    setTargetFill(0);
+  }, [index, count, targetIdx, ratio]);
+
+  // Autoplay ping-pong + isi bar progress indikator aktif. Berhenti saat
+  // reduced-motion, disentuh, atau tab tersembunyi.
+  useEffect(() => {
+    if (reduced || count <= 1) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (t: number) => {
+      const dt = Math.min(0.05, (t - last) / 1000);
+      last = t;
+      if (!draggingRef.current && !pressedRef.current && !document.hidden) {
+        const interval = idxRef.current === 0 && hasHero ? 6.5 : 4.8;
+        progRef.current += dt / interval;
+        if (progRef.current >= 1) {
+          progRef.current = 0;
+          // advance ping-pong
+          const lastI = count - 1;
+          let d = dirRef.current;
+          let ni = idxRef.current + d;
+          if (ni > lastI) { d = -1; ni = idxRef.current - 1; }
+          else if (ni < 0) { d = 1; ni = idxRef.current + 1; }
+          dirRef.current = d;
+          setIndex(Math.max(0, Math.min(lastI, ni)));
+        }
+      }
+      if (progressBarRef.current) progressBarRef.current.style.width = `${progRef.current * 100}%`;
+      raf = requestAnimationFrame(tick);
     };
-    schedule();
-    return () => window.clearTimeout(id);
-  }, [count, reduced, index, hasHero]);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [count, reduced, hasHero]);
 
   if (count === 0) return null;
 
   function goTo(i: number) {
-    haptic();
-    setIndex(((i % count) + count) % count);
+    const ni = Math.max(0, Math.min(count - 1, i));
+    if (ni !== index) haptic();
+    setIndex(ni);
   }
 
-  // stopPropagation: swipe di carousel = ganti SLIDE, jangan bubbling ke
-  // useSwipeNavigate (App) yang akan salah memicu pindah TAB/halaman.
-  function onTouchStart(e: React.TouchEvent) {
-    e.stopPropagation();
-    startX.current = e.touches[0].clientX;
-    widthRef.current = trackRef.current?.clientWidth || 1;
+  /* --- pointer drag (mouse + touch) --- */
+  function onDown(e: React.PointerEvent) {
+    activeRef.current = true;
+    movedRef.current = false;
+    startX.current = e.clientX;
+    startY.current = e.clientY;
+    setPressed(true); pressedRef.current = true;
+    // Sengaja TIDAK setPointerCapture di sini — capture sejak sentuh bisa menelan
+    // klik tombol di dalam kartu (Terkumpul/Talangan/Setor Kas RT, chevron CTA).
+    // Capture baru dipasang saat drag benar-benar mulai (di onMove).
   }
-  function onTouchMove(e: React.TouchEvent) {
-    if (startX.current === null) return;
-    e.stopPropagation();
-    setDrag(e.touches[0].clientX - startX.current);
+  function onMove(e: React.PointerEvent) {
+    if (!activeRef.current) return;
+    const dx = e.clientX - startX.current;
+    const dy = e.clientY - startY.current;
+    if (!draggingRef.current) {
+      if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) {
+        setDragging(true); draggingRef.current = true; movedRef.current = true;
+        // Tangkap pointer hanya untuk gerak drag → tetap mulus walau jari keluar kartu.
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* noop */ }
+      } else return;
+    }
+    let ndx = dx;
+    // Damping di tepi — geser melewati kartu pertama/terakhir terasa "kenyal".
+    if ((index === 0 && ndx > 0) || (index === count - 1 && ndx < 0)) ndx *= 0.35;
+    setDrag(ndx);
   }
-  function onTouchEnd(e: React.TouchEvent) {
-    e.stopPropagation();
-    if (startX.current === null) return;
+  function onUp() {
+    if (!activeRef.current) return;
+    activeRef.current = false;
     const d = drag;
-    startX.current = null;
+    let ni = index;
+    if (draggingRef.current) ni = Math.max(0, Math.min(count - 1, index + Math.round(-d / spacing)));
     setDrag(0);
-    if (d <= -SWIPE_THRESHOLD) goTo(index + 1);
-    else if (d >= SWIPE_THRESHOLD) goTo(index - 1);
+    setDragging(false); draggingRef.current = false;
+    setPressed(false); pressedRef.current = false;
+    if (ni !== index) { haptic(); setIndex(ni); }
   }
 
-  const dragging = startX.current !== null;
-  const pct = (drag / widthRef.current) * 100;
+  const currentFloat = index - drag / spacing;
+  const pf = reduced ? 0 : 1;
 
   return (
-    <section aria-roledescription="carousel" aria-label="Info, target & panduan" className="select-none">
-      <div className="relative overflow-hidden rounded-3xl lift" style={hasHero ? { boxShadow: 'var(--hero-shadow)' } : undefined}>
-        <div
-          ref={trackRef}
-          className="flex items-stretch"
-          style={{
-            transform: `translateX(calc(${-index * 100}% + ${pct}%))`,
-            transition: dragging ? 'none' : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)',
-          }}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
-          {hasHero && (
+    <section aria-roledescription="carousel" aria-label="Saldo, target & panduan" className="select-none">
+      <div
+        ref={viewportRef}
+        className="relative w-full overflow-hidden"
+        style={{ height: VIEWPORT_H, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y' }}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
+        /* Cegah swipe carousel bubbling ke useSwipeNavigate (App) → tak pindah tab. */
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+      >
+        {Array.from({ length: count }).map((_, i) => {
+          const promo = hasHero ? (i === 0 ? null : promos[i - 1]) : promos[i];
+          const isSaldo = promo === null;
+          const d = i - currentFloat;
+          const ad = Math.abs(d);
+          const c1 = Math.min(ad, 1);
+          const active = i === index;
+          const scale = (1 - c1 * 0.12) * (pressed && active && !dragging ? 0.985 : 1);
+          const opacity = Number((1 - c1 * 0.5).toFixed(3));
+          const ty = (c1 * 10).toFixed(2);
+          const x = (d * spacing).toFixed(2);
+          const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
+          const z = Math.round(50 - ad * 10);
+          const grad = isSaldo
+            ? 'linear-gradient(150deg,#1f8a4c 0%,#0f6b39 55%,#0a5530 100%)'
+            : promo!.grad;
+          const Icon = promo?.icon;
+          // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
+          const tw = isSaldo ? '' : ({
+            target: 'max-w-[56%]', app: 'max-w-[60%]', absensi: 'max-w-[74%]',
+            tarikan: 'max-w-[66%]', talangan: 'max-w-[64%]', kasrt: 'max-w-[76%]',
+          } as const)[promo!.kind];
+
+          return (
             <div
-              className="w-full shrink-0"
+              key={isSaldo ? 'saldo' : promo!.id}
+              role="group"
               aria-roledescription="slide"
-              aria-label={`1 dari ${count}`}
-              aria-hidden={index !== 0}
+              aria-label={`${i + 1} dari ${count}`}
+              aria-hidden={!active}
+              onClick={() => {
+                if (movedRef.current) { movedRef.current = false; return; }
+                if (!active) goTo(i);
+              }}
+              className={`absolute left-1/2 overflow-hidden text-white${isSaldo && heroSweep ? ' sheen-sweep' : ''}`}
+              style={{
+                top: TOP, width: cardW, height: CARD_H, marginLeft: -cardW / 2,
+                borderRadius: 30, padding: 24, boxSizing: 'border-box', background: grad, color: '#fff',
+                transform: `translateX(${x}px) translateY(${ty}px) scale(${scale.toFixed(3)}) rotateY(${ry}deg)`,
+                opacity, zIndex: z, willChange: 'transform, opacity',
+                transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(.22,.61,.36,1), opacity 0.45s ease, box-shadow 0.45s ease',
+                boxShadow: active
+                  ? '0 28px 64px -22px rgba(2,28,14,.6), 0 12px 28px -14px rgba(0,0,0,.4)'
+                  : '0 16px 36px -20px rgba(0,0,0,.45)',
+                cursor: dragging ? 'grabbing' : 'grab', WebkitFontSmoothing: 'antialiased',
+              }}
             >
-              {heroSlide}
-            </div>
-          )}
-          {slides.map((s, i) => {
-            const slideIndex = hasHero ? i + 1 : i;
-            const Icon = s.icon;
-            const motif = MOTIF[s.id];
-            const prog = s.progress;
-            const ratio = prog && prog.max > 0 ? Math.min(100, Math.max(0, (prog.value / prog.max) * 100)) : 0;
-            const sisa = prog ? Math.max(0, prog.max - prog.value) : 0;
-            const done = prog ? prog.value >= prog.max : false;
-            return (
+              {/* Lapisan dekoratif parallax — radial highlight/bayang + kilau, bergeser
+                  berlawanan arah swipe → kesan kedalaman. */}
               <div
-                key={s.id}
-                className="w-full shrink-0"
-                aria-roledescription="slide"
-                aria-label={`${slideIndex + 1} dari ${count}`}
-                aria-hidden={slideIndex !== index}
+                aria-hidden
+                className="pointer-events-none absolute"
+                style={{
+                  inset: '-12%',
+                  transform: `translateX(${(-d * 22 * pf).toFixed(2)}px) translateY(${(-d * 6 * pf).toFixed(2)}px)`,
+                  transition: dragging ? 'none' : 'transform 0.62s cubic-bezier(.22,.61,.36,1)',
+                }}
               >
-                <div
-                  className={`hero-noise relative h-full min-h-[104px] overflow-hidden px-5 py-[18px] text-white flex flex-col justify-center${s.phone ? ' pr-[92px]' : s.art ? ' pr-[88px]' : ''}`}
-                  style={{
-                    background: s.grad,
-                    // Glass edge (SATU box-shadow, hindari bentrok dgn ring Tailwind):
-                    // (1) highlight tepi-atas "kaca disinari" + (2) inset hairline ring
-                    // tipis keliling → tepi kartu "tercetak", bahasa elevasi sama dgn
-                    // --hero-shadow & .lift.
-                    boxShadow: 'inset 0 1px 0 0 rgba(255,255,255,0.18), inset 0 0 0 1px rgba(255,255,255,0.08)',
-                  }}
-                >
-                  {/* Blob ambient sudut kanan-atas — beri kedalaman ala banner promo bank */}
-                  <div
-                    aria-hidden
-                    className="absolute -top-10 -right-8 w-36 h-36 rounded-full pointer-events-none"
-                    style={{ background: `radial-gradient(circle, ${s.glow} 0%, transparent 70%)`, opacity: 0.5 }}
-                  />
-                  {/* Blob terang sudut kiri-bawah */}
-                  <div
-                    aria-hidden
-                    className="absolute -bottom-12 -left-10 w-32 h-32 rounded-full pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)' }}
-                  />
-                  {/* Motif latar penuh kartu — grafik/pola tematik → banner artistik.
-                      Parallax halus saat di-swipe (geser 6% dari drag) → kesan kedalaman. */}
-                  {motif && (
-                    <div
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 z-0"
-                      style={{
-                        transform: `translateX(${drag * 0.06}px)`,
-                        transition: dragging ? 'none' : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)',
-                      }}
+                <div className="absolute" style={{ top: '-22%', right: '-12%', width: '80%', height: '80%', background: 'radial-gradient(circle at 65% 35%, rgba(255,255,255,.36), rgba(255,255,255,0) 60%)' }} />
+                <div className="absolute" style={{ bottom: '-32%', left: '-24%', width: '92%', height: '92%', background: 'radial-gradient(circle, rgba(255,255,255,.15), rgba(255,255,255,0) 62%)' }} />
+                <div className="absolute" style={{ top: '-12%', left: '18%', width: '62%', height: '58%', background: 'radial-gradient(circle, rgba(0,0,0,.18), rgba(0,0,0,0) 62%)' }} />
+                <div className="absolute" style={{ top: '6%', left: '-30%', width: '120%', height: '42%', transform: 'rotate(-18deg)', background: 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.18) 45%, rgba(255,255,255,0))', filter: 'blur(3px)' }} />
+                {promo?.kind === 'app' && (
+                  <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.12) 1.2px, transparent 1.2px)', backgroundSize: '17px 17px', opacity: 0.7 }} />
+                )}
+              </div>
+
+              {/* Foto Pak RT & Bendahara — kartu target. Di bawah glass overlay & teks. */}
+              {promo?.kind === 'target' && <TargetPhoto />}
+
+              {/* Sheen tepi-atas + hairline kaca + vignette bawah + noise (bahasa .lift). */}
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 30%)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.22)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'radial-gradient(135% 82% at 50% 128%, rgba(0,0,0,.34), rgba(0,0,0,0) 56%)' }} />
+              <div className="hero-noise pointer-events-none absolute inset-0" style={{ borderRadius: 30 }} />
+
+              {/* ---------- KONTEN ---------- */}
+              {isSaldo ? (
+                <div className="relative z-[3] flex h-full flex-col">{heroSlide}</div>
+              ) : (
+                <div className="relative z-[3] flex h-full flex-col">
+                  {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
+                  {promo!.cta && onNavigate && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); haptic(); onNavigate(promo!.cta!.tab); }}
+                      aria-label={promo!.cta.label}
+                      className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15"
                     >
-                      <SlideMotif kind={motif} animate={slideIndex === index && !reduced} />
-                    </div>
+                      <ChevronRight className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                    </button>
                   )}
-                  {/* Specular sheen kaca — cahaya kiri-atas + bayang kanan-bawah (SATU
-                      sumber dgn hero card, .hero-sheen) → permukaan melengkung "kaca",
-                      bukan gradient datar. Di bawah konten (z-0). */}
-                  <div aria-hidden className="hero-sheen absolute inset-0 z-0 pointer-events-none" />
-                  {/* Veil bawah — jaga kontras teks kecil di ujung gradient terang */}
-                  <div
-                    aria-hidden
-                    className="absolute inset-x-0 bottom-0 pointer-events-none"
-                    style={{ height: '70%', background: 'linear-gradient(to top, rgba(0,0,0,0.28), transparent)' }}
-                  />
 
-                  {/* Mockup iPhone mengintip — hanya slide promo aplikasi */}
-                  {s.phone && <PhoneMock />}
-                  {/* Motif dekoratif mengintip — slide panduan */}
-                  {s.art && <SlideArt art={s.art} glow={s.glow} />}
-
-                  <div className="relative z-10 flex items-center gap-3">
+                  {/* Eyebrow: tile ikon + label. */}
+                  <div className="flex items-center gap-[9px]">
                     <div
-                      className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 ring-1 ring-inset ring-white/25"
-                      style={{ boxShadow: `0 0 16px 1px ${s.glow}` }}
+                      className="grid h-[44px] w-[44px] place-items-center rounded-[14px] bg-white/15"
+                      style={{ boxShadow: `inset 0 0 0 1px rgba(255,255,255,.24), 0 0 16px 1px ${promo!.glow}, 0 6px 14px -8px rgba(0,0,0,.5)` }}
                     >
-                      <Icon className="w-5 h-5" strokeWidth={2.2} />
+                      {Icon && <Icon className="h-[22px] w-[22px]" strokeWidth={1.8} />}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-micro font-bold uppercase tracking-[0.14em] text-white/75 truncate">{s.label}</p>
-                        {s.ribbon && (
-                          <span className="inline-flex items-center gap-0.5 rounded-full bg-white/20 px-1.5 py-0.5 text-[0.625rem] font-bold uppercase shrink-0">
-                            <PartyPopper className="w-2.5 h-2.5" /> {s.ribbon}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-body font-bold leading-snug break-words">{s.judul}</p>
-                    </div>
-                    {s.cta && onNavigate && (
-                      <button
-                        onClick={() => { haptic(); onNavigate(s.cta!.tab); }}
-                        aria-label={s.cta.label}
-                        className="press shrink-0 -mr-1 w-9 h-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors ring-1 ring-inset ring-white/15"
-                      >
-                        <ChevronRight className="w-[18px] h-[18px]" strokeWidth={2.5} />
-                      </button>
-                    )}
+                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/80">{promo!.eyebrow}</span>
                   </div>
 
-                  {prog ? (
-                    <div className="relative mt-2">
-                      <div className="h-1.5 rounded-full bg-white/25 overflow-hidden">
+                  {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
+                  <div className={`mt-[16px] text-[1.4rem] font-extrabold leading-[1.18] tracking-[-.01em] ${tw}`}>{promo!.judul}</div>
+                  {promo!.desc && (
+                    <div className={`mt-[10px] text-[0.84rem] leading-relaxed text-white/85 ${tw}`}>{promo!.desc}</div>
+                  )}
+
+                  {/* Progress target → kartu target Kas RT. */}
+                  {promo!.kind === 'target' && (
+                    <div className="mt-auto">
+                      <div className="relative h-[9px] overflow-hidden rounded-full bg-white/20">
                         <div
-                          className="h-full rounded-full bg-white transition-[width] duration-700 ease-out"
-                          style={{ width: `${ratio}%` }}
+                          className="absolute left-0 top-0 h-full rounded-full"
+                          style={{
+                            width: `${targetFill}%`,
+                            background: 'linear-gradient(90deg,#bff0d6,#ffffff)',
+                            boxShadow: '0 0 12px rgba(255,255,255,.5)',
+                            transition: reduced ? 'none' : 'width 0.95s cubic-bezier(.22,.61,.36,1)',
+                          }}
                         />
                       </div>
-                      <div className="flex items-center justify-between mt-1 text-micro">
-                        <span className="font-bold tabular-nums">
-                          {done ? 'Target tercapai 🎉' : `${Math.round(ratio)}% · kurang ${formatRupiahPlain(sisa)}`}
+                      <div className="mt-[12px] flex items-center justify-between text-[0.78rem] text-white/90">
+                        <span className="font-extrabold tabular-nums">
+                          {done ? 'Target tercapai 🎉' : <>{Math.round(ratio)}% · <span className="font-medium">kurang {formatRupiahPlain(sisa)}</span></>}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-white/75">
-                          <CalendarClock className="w-3 h-3" /> {fmtDeadline(prog.deadline)}
+                        <span className="inline-flex items-center gap-1.5 text-white/80">
+                          <CalendarClock className="h-3 w-3" /> {fmtDeadline(TARGET_DEADLINE)}
                         </span>
                       </div>
                     </div>
-                  ) : (
-                    s.isi && <p className="relative text-caption text-white/90 leading-snug mt-1.5 break-words line-clamp-2">{s.isi}</p>
                   )}
-                  {/* Kilau kaca menyapu — hanya slide aktif (hemat & tak silau di latar) */}
-                  {slideIndex === index && !reduced && <div aria-hidden className="banner-shimmer" />}
+
+                  {/* Dekorasi tematik per jenis. */}
+                  {promo!.kind === 'app' && <AppPhone />}
+                  {promo!.kind === 'absensi' && <AbsensiArt />}
+                  {promo!.kind === 'tarikan' && <TarikanArt />}
+                  {promo!.kind === 'talangan' && <TalanganArt />}
+                  {promo!.kind === 'kasrt' && <KasrtArt />}
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              )}
+
+              {/* Kilau kaca menyapu — hanya kartu aktif. */}
+              {active && !reduced && <div aria-hidden className="banner-shimmer" />}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Dots — termasuk slide saldo (rumah) di posisi pertama */}
+      {/* Indikator "story" tersegmen — aktif melebar + bar progress mengisi;
+          yang sudah lewat terisi penuh. */}
       {count > 1 && (
-        <div className="flex items-center justify-center mt-1.5">
+        <div className="flex items-center justify-center gap-1.5 pt-3.5">
           {Array.from({ length: count }).map((_, i) => {
-            const judul = hasHero
-              ? (i === 0 ? 'Saldo' : slides[i - 1]?.judul ?? '')
-              : (slides[i]?.judul ?? '');
+            const isActive = i === index;
+            const past = i < index;
             return (
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                aria-label={`Ke slide ${i + 1}: ${judul}`}
-                aria-current={i === index}
-                className="press grid place-items-center min-h-[40px] px-2"
+                aria-label={`Ke slide ${i + 1}`}
+                aria-current={isActive}
+                className="press grid place-items-center"
+                style={{ minHeight: 28, paddingTop: 8, paddingBottom: 8 }}
               >
                 <span
-                  className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ${
-                    i === index
-                      ? 'w-5 bg-brand dark:bg-brand-linkDark'
-                      : 'w-1.5 bg-gray-300 dark:bg-gray-600'
-                  }`}
-                />
+                  className="block h-1 overflow-hidden rounded-full bg-brand/20 dark:bg-brand-linkDark/25"
+                  style={{ width: isActive ? 26 : 7, transition: 'width 0.42s cubic-bezier(.22,.61,.36,1)' }}
+                >
+                  {isActive && !reduced && (
+                    <span ref={progressBarRef} className="block h-full rounded-full bg-brand dark:bg-brand-linkDark" style={{ width: '0%' }} />
+                  )}
+                  {(past || (isActive && reduced)) && (
+                    <span className="block h-full w-full rounded-full bg-brand dark:bg-brand-linkDark" />
+                  )}
+                </span>
               </button>
             );
           })}

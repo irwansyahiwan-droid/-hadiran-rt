@@ -546,8 +546,11 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
 
 /* One-time specular sheen sweep on hero card when dashboard loads.
    Hanya saat `.hero-sheen-sweep` (kunjungan pertama sesi) — balik ke Beranda
-   via tab/back tak menyapu ulang. Lihat useFirstPlay di lib/hooks. */
-.hero-card.hero-sheen-sweep::before {
+   via tab/back tak menyapu ulang. Lihat useFirstPlay di lib/hooks.
+   `.sheen-sweep` = varian generik (mis. kartu saldo di dalam carousel 3D yang
+   tak lagi memakai `.hero-card` namun tetap ingin sapuan sekali-muat). */
+.hero-card.hero-sheen-sweep::before,
+.sheen-sweep::before {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;

@@ -10,7 +10,6 @@ import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
-import HeroSparkline from '../components/charts/HeroSparkline';
 import BannerCarousel from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
@@ -37,7 +36,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
   const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
-  const [kasSeries, setKasSeries] = useState<number[]>([]);
   const [lastDelta, setLastDelta] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -111,11 +109,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       return { ...item, saldoSetelah };
     });
 
-    // Tren pertumbuhan kas — deret kumulatif total_terkumpul per tarikan selesai
+    // Delta tarikan terakhir → dipakai di sub-teks saldo ("↗ +RpX").
     const selesaiRows = (selesaiRes.data as { nomor: number; total_terkumpul: number | null }[]) ?? [];
-    let run = 0;
-    const series = selesaiRows.map((t) => (run += t.total_terkumpul ?? 0));
-    setKasSeries(series);
     setLastDelta(selesaiRows.length ? (selesaiRows[selesaiRows.length - 1].total_terkumpul ?? 0) : 0);
 
     setSummary(summaryData);
@@ -229,109 +224,83 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <BannerCarousel
         kasRT={setorKasRT}
         onNavigate={onNavigate}
+        heroSweep={firstHero}
         heroSlide={
-          <div className={`hero-card hero-noise${firstHero ? ' hero-sheen-sweep' : ''}`} style={{ padding: '18px 20px 16px' }}>
-        {/* Ambient growth wave — latar "hidup" di belakang konten, tanpa menambah tinggi kartu */}
-        {kasSeries.length >= 2 && (
-          <div className="absolute inset-x-0 bottom-0 z-0 pointer-events-none" style={{ height: 104, opacity: 0.55 }}>
-            <HeroSparkline points={kasSeries} height={104} animate={firstHero} />
-          </div>
-        )}
+          <>
+            {/* Aksi pojok kanan-atas — sembunyikan nominal & muat ulang. Absolut
+                relatif area konten (di dalam padding kartu) → sejajar eyebrow. */}
+            <div className="absolute right-0 top-0 flex items-center gap-2">
+              <button
+                onClick={() => { haptic(); toggleHideAmount(); }}
+                className="press grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15"
+                aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+              >
+                {hidden
+                  ? <EyeOff className="h-[18px] w-[18px] text-white/85" />
+                  : <Eye className="h-[18px] w-[18px] text-white/85" />}
+              </button>
+              <button
+                onClick={() => load(true)}
+                disabled={refreshing}
+                className="press grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15"
+                aria-label="Muat ulang"
+              >
+                <RefreshCw className={`h-[18px] w-[18px] text-white/85 ${refreshing ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
 
-        {/* Scrim bawah — ujung kanan gradient (#1C9A5C) terlalu terang utk teks kecil
-            putih (≈2.7:1 < AA). Veil hitam halus hanya di area sub-text + baris stat
-            → teks kecil lolos 4.5:1 TANPA mengubah gradient brand. */}
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 z-0 pointer-events-none"
-          style={{ height: '70%', background: 'linear-gradient(to top, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.14) 50%, transparent 100%)' }}
-        />
+            {/* Eyebrow */}
+            <div className="flex items-center gap-[9px]">
+              <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/80">Saldo Kas Hadiran</span>
+            </div>
 
-        {/* Label row */}
-        <div className="relative flex items-center justify-between mb-2.5">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
-            <p
-              className="text-caption font-semibold uppercase text-white/[0.85]"
-              style={{ letterSpacing: '0.16em' }}
-            >
-              Saldo Kas Hadiran
-            </p>
-          </div>
-          <div className="flex items-center -mr-2">
-            <button
-              onClick={() => { haptic(); toggleHideAmount(); }}
-              className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-              aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
-            >
-              {hidden
-                ? <EyeOff className="w-[18px] h-[18px] text-white/80" />
-                : <Eye className="w-[18px] h-[18px] text-white/80" />}
-            </button>
-            <button
-              onClick={() => load(true)}
-              disabled={refreshing}
-              className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-              aria-label="Muat ulang"
-            >
-              <RefreshCw className={`w-[18px] h-[18px] text-white/80 ${refreshing ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
-        </div>
+            {/* Nominal besar + sub-teks */}
+            <div className="mt-3.5">
+              <span className={`font-display block text-[clamp(1.9rem,9vw,2.6rem)] font-extrabold leading-none tracking-tighter tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+                {hidden
+                  ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+                  : <Odometer value={animatedSaldo} />}
+              </span>
+              <p className="mt-2.5 text-[0.78rem] leading-relaxed text-white/85">
+                Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
+                {lastDelta > 0 && (
+                  <span className="ml-1.5 inline-flex items-center gap-0.5 align-middle font-semibold text-emerald-200/90">
+                    <TrendingUp className="h-3 w-3" strokeWidth={2.5} />
+                    {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
+                  </span>
+                )}
+              </p>
+            </div>
 
-        {/* Big amount — ukuran konsisten dengan hero Kas RT */}
-        <div className="relative mb-1">
-          <span className={`font-display block text-5xl font-extrabold tracking-tighter leading-none tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-            {hidden
-              ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
-              : <Odometer value={animatedSaldo} />}
-          </span>
-        </div>
-
-        {/* Sub-text */}
-        <p className="relative text-caption text-white/90 mb-3.5">
-          Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
-          {lastDelta > 0 && (
-            <span className="inline-flex items-center gap-0.5 ml-1.5 font-semibold text-emerald-200/90 align-middle">
-              <TrendingUp className="w-3 h-3" strokeWidth={2.5} />
-              {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
-            </span>
-          )}
-        </p>
-
-        {/* Divider */}
-        <div className="relative hero-divider-x mb-1" />
-
-        {/* 3-column stat row */}
-        <div className="relative grid grid-cols-3">
-          <button
-            onClick={() => onNavigate('kas')}
-            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
-          >
-            <Wallet className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-micro text-white/90 mt-1.5">Terkumpul</span>
-            <span className="font-bold text-white mt-0.5 whitespace-nowrap tabular-nums text-[clamp(0.6875rem,3.2vw,0.9375rem)]">
-              {maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}
-            </span>
-          </button>
-          <button
-            onClick={() => onNavigate('talangan')}
-            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
-          >
-            <ArrowLeftRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-micro text-white/90 mt-1.5">Talangan</span>
-            <span className="font-bold text-white mt-0.5 whitespace-nowrap tabular-nums text-[clamp(0.6875rem,3.2vw,0.9375rem)]">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
-          </button>
-          <button
-            onClick={() => onNavigate('kas-rt')}
-            className="hero-col press flex flex-col items-center w-full min-w-0 px-2 py-2.5 active:opacity-80"
-          >
-            <ArrowUpRight className="w-[18px] h-[18px] text-white/80" strokeWidth={1.7} />
-            <span className="text-micro text-white/90 mt-1.5">Setor Kas RT</span>
-            <span className="font-bold text-white mt-0.5 whitespace-nowrap tabular-nums text-[clamp(0.6875rem,3.2vw,0.9375rem)]">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
-          </button>
-        </div>
-          </div>
+            {/* Baris stat 3-kolom — ditahan ke dasar kartu (mt-auto). */}
+            <div className="mt-auto grid grid-cols-3 border-t border-white/15 pt-[18px]">
+              <button
+                onClick={(e) => { e.stopPropagation(); onNavigate('kas'); }}
+                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
+              >
+                <Wallet className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
+                <span className="mt-0.5 text-[10px] text-white/72">Terkumpul</span>
+                <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onNavigate('talangan'); }}
+                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
+              >
+                <ArrowLeftRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
+                <span className="mt-0.5 text-[10px] text-white/72">Talangan</span>
+                <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onNavigate('kas-rt'); }}
+                className="press flex w-full min-w-0 flex-col items-center gap-1 px-0.5 active:opacity-80"
+              >
+                <ArrowUpRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
+                <span className="mt-0.5 text-[10px] text-white/72">Setor Kas RT</span>
+                <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
+              </button>
+            </div>
+          </>
         }
       />
 
