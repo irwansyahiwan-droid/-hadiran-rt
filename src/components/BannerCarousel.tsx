@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import {
   Target, Palmtree, ClipboardCheck, HandCoins, Coins, Building2,
   ChevronRight, CalendarClock, PartyPopper, Smartphone, Check, X, Star,
@@ -186,6 +186,96 @@ const ART = {
 function SlideArt({ art, glow }: { art: NonNullable<BannerSlide['art']>; glow: string }) {
   const { Motif, rotate, delay, width } = ART[art];
   return <ArtFrame glow={glow} rotate={rotate} delay={delay} width={width}><Motif /></ArtFrame>;
+}
+
+/** Motif latar PENUH kartu (di atas gradient, di bawah konten) → banner terasa
+ *  "didesain": grafik/pola tematik putih tipis yang mengisi ruang, bukan teks saja. */
+type MotifKind = 'growth' | 'rays' | 'dots' | 'rings' | 'waves';
+
+/** Pilih motif per slide (by id) — tak menyentuh data slide, mudah disetel. */
+const MOTIF: Record<string, MotifKind> = {
+  'target-kas-rt':  'growth',  // grafik naik = pertumbuhan kas
+  'wisata-bareng':  'rays',    // pancaran = perayaan
+  'app-hp':         'dots',    // dot-grid = nuansa teknologi
+  'panduan-absensi':'rings',   // cincin konsentris
+  'panduan-tarikan':'rays',    // pancaran/kilau koin
+  'panduan-talangan':'waves',  // gelombang = arus dana
+  'panduan-kas-rt': 'growth',  // grafik naik
+};
+
+function SlideMotif({ kind }: { kind: MotifKind }) {
+  const uid = useId().replace(/:/g, '');
+  const base = 'pointer-events-none absolute inset-0 z-0 h-full w-full';
+
+  if (kind === 'growth') {
+    const gid = `mg-${uid}`;
+    return (
+      <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="none" className={base}>
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#fff" stopOpacity="0.16" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <g stroke="#fff" strokeOpacity="0.07">
+          <line x1="0" y1="46" x2="320" y2="46" />
+          <line x1="0" y1="82" x2="320" y2="82" />
+          <line x1="0" y1="116" x2="320" y2="116" />
+        </g>
+        <path d="M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36 L320,140 L0,140 Z" fill={`url(#${gid})`} />
+        <path d="M0,116 L46,104 L96,110 L146,82 L196,90 L246,56 L300,42 L320,36" fill="none" stroke="#fff" strokeOpacity="0.28" strokeWidth="2" />
+        <circle cx="300" cy="42" r="3" fill="#fff" fillOpacity="0.55" />
+      </svg>
+    );
+  }
+  if (kind === 'dots') {
+    const pid = `md-${uid}`;
+    return (
+      <svg aria-hidden className={base}>
+        <defs>
+          <pattern id={pid} width="18" height="18" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.4" fill="#fff" fillOpacity="0.16" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill={`url(#${pid})`} />
+      </svg>
+    );
+  }
+  if (kind === 'waves') {
+    return (
+      <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="none" className={base}>
+        <g fill="none" stroke="#fff" strokeOpacity="0.1" strokeWidth="2">
+          <path d="M0,42 C54,22 110,62 168,42 C226,22 290,62 320,46" />
+          <path d="M0,82 C54,62 110,102 168,82 C226,62 290,102 320,86" />
+          <path d="M0,120 C54,100 110,140 168,120 C226,100 290,140 320,124" />
+        </g>
+      </svg>
+    );
+  }
+  if (kind === 'rings') {
+    return (
+      <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="xMaxYMin slice" className={base}>
+        <g fill="none" stroke="#fff" strokeOpacity="0.1" strokeWidth="2">
+          <circle cx="296" cy="18" r="26" />
+          <circle cx="296" cy="18" r="52" />
+          <circle cx="296" cy="18" r="80" />
+          <circle cx="296" cy="18" r="110" />
+        </g>
+      </svg>
+    );
+  }
+  // rays
+  return (
+    <svg aria-hidden viewBox="0 0 320 140" preserveAspectRatio="none" className={base}>
+      <g stroke="#fff" strokeOpacity="0.08" strokeWidth="2">
+        <line x1="300" y1="14" x2="120" y2="140" />
+        <line x1="300" y1="14" x2="180" y2="140" />
+        <line x1="300" y1="14" x2="240" y2="140" />
+        <line x1="300" y1="14" x2="60" y2="120" />
+        <line x1="300" y1="14" x2="20" y2="80" />
+      </g>
+    </svg>
+  );
 }
 
 const ROTATE_MS = 5000;       // dwell slide promo
@@ -390,6 +480,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide }: Pro
           {slides.map((s, i) => {
             const slideIndex = hasHero ? i + 1 : i;
             const Icon = s.icon;
+            const motif = MOTIF[s.id];
             const prog = s.progress;
             const ratio = prog && prog.max > 0 ? Math.min(100, Math.max(0, (prog.value / prog.max) * 100)) : 0;
             const sisa = prog ? Math.max(0, prog.max - prog.value) : 0;
@@ -425,6 +516,20 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide }: Pro
                     className="absolute -bottom-12 -left-10 w-32 h-32 rounded-full pointer-events-none"
                     style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)' }}
                   />
+                  {/* Motif latar penuh kartu — grafik/pola tematik → banner artistik.
+                      Parallax halus saat di-swipe (geser 6% dari drag) → kesan kedalaman. */}
+                  {motif && (
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 z-0"
+                      style={{
+                        transform: `translateX(${drag * 0.06}px)`,
+                        transition: dragging ? 'none' : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)',
+                      }}
+                    >
+                      <SlideMotif kind={motif} />
+                    </div>
+                  )}
                   {/* Specular sheen kaca — cahaya kiri-atas + bayang kanan-bawah (SATU
                       sumber dgn hero card, .hero-sheen) → permukaan melengkung "kaca",
                       bukan gradient datar. Di bawah konten (z-0). */}
