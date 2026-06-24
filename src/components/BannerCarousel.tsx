@@ -267,6 +267,9 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   const progressBarRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const pressedRef = useRef(false);
+  // Jeda autoplay saat pointer hover (mouse) atau fokus keyboard masuk (WCAG 2.2.2).
+  const hoverRef = useRef(false);
+  const focusRef = useRef(false);
 
   // Drag pointer.
   const startX = useRef(0);
@@ -298,7 +301,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     const tick = (t: number) => {
       const dt = Math.min(0.05, (t - last) / 1000);
       last = t;
-      if (!draggingRef.current && !pressedRef.current && !document.hidden) {
+      if (!draggingRef.current && !pressedRef.current && !hoverRef.current && !focusRef.current && !document.hidden) {
         const interval = idxRef.current === 0 && hasHero ? 6.5 : 4.8;
         progRef.current += dt / interval;
         if (progRef.current >= 1) {
@@ -371,11 +374,21 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   const pf = reduced ? 0 : 1;
 
   return (
-    <section aria-roledescription="carousel" aria-label="Saldo, target & panduan" className="select-none">
+    <section
+      aria-roledescription="carousel"
+      aria-label="Saldo, target & panduan"
+      className="select-none"
+      onFocusCapture={() => { focusRef.current = true; }}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) focusRef.current = false;
+      }}
+    >
       <div
         ref={viewportRef}
         className="relative w-full overflow-hidden"
         style={{ height: VIEWPORT_H, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y' }}
+        onMouseEnter={() => { hoverRef.current = true; }}
+        onMouseLeave={() => { hoverRef.current = false; }}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
@@ -393,7 +406,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const c1 = Math.min(ad, 1);
           const active = i === index;
           const scale = (1 - c1 * 0.12) * (pressed && active && !dragging ? 0.985 : 1);
-          const opacity = Number((1 - c1 * 0.5).toFixed(3));
+          const opacity = Number((1 - c1 * 0.62).toFixed(3));
           const ty = (c1 * 10).toFixed(2);
           const x = (d * spacing).toFixed(2);
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
@@ -467,6 +480,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                     <button
                       onClick={(e) => { e.stopPropagation(); haptic(); onNavigate(promo!.cta!.tab); }}
                       aria-label={promo!.cta.label}
+                      tabIndex={active ? 0 : -1}
                       className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15"
                     >
                       <ChevronRight className="h-[18px] w-[18px]" strokeWidth={2.2} />
@@ -487,7 +501,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
                   <div className={`mt-[16px] text-[1.5rem] font-extrabold leading-[1.16] tracking-[-.02em] ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
-                    <div className={`mt-[10px] text-[0.85rem] font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
+                    <div className={`mt-[10px] text-[0.9rem] font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
 
                   {/* Progress target → kartu target Kas RT. */}
@@ -537,7 +551,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
       {/* Indikator "story" tersegmen — aktif melebar + bar progress mengisi;
           yang sudah lewat terisi penuh. */}
       {count > 1 && (
-        <div className="flex items-center justify-center gap-1.5 pt-2">
+        <div className="flex items-center justify-center gap-1.5 pt-0.5">
           {Array.from({ length: count }).map((_, i) => {
             const isActive = i === index;
             const past = i < index;
@@ -548,7 +562,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 aria-label={`Ke slide ${i + 1}`}
                 aria-current={isActive}
                 className="press grid place-items-center"
-                style={{ minHeight: 28, paddingTop: 8, paddingBottom: 8 }}
+                style={{ minHeight: 44, paddingTop: 16, paddingBottom: 16 }}
               >
                 <span
                   className="block h-1 overflow-hidden rounded-full bg-brand/20 dark:bg-brand-linkDark/25"
