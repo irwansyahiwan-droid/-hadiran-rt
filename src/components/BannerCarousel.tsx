@@ -484,7 +484,16 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
 
               {/* ---------- KONTEN ---------- */}
               {isSaldo ? (
-                <div className="relative z-[3] flex h-full flex-col">{heroSlide}</div>
+                /* Kartu saldo non-aktif: tombol Eye/Refresh/stat di dalam heroSlide
+                   dibangun di Beranda → tak ikut tabIndex per-slide. Tandai `inert`
+                   saat kartu tak aktif agar fokus & a11y-tree-nya benar-benar mati,
+                   selaras dgn aria-hidden kartu (tak ada focusable di dalam aria-hidden). */
+                <div
+                  className="relative z-[3] flex h-full flex-col"
+                  {...(!active ? ({ inert: '' } as Record<string, string>) : {})}
+                >
+                  {heroSlide}
+                </div>
               ) : (
                 <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW }}>
                   {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
