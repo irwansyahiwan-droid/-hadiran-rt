@@ -360,13 +360,13 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
     @apply w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800
            border border-control dark:border-gray-700
            text-sm text-gray-900 dark:text-gray-100
-           placeholder-gray-400 dark:placeholder-gray-500;
+           placeholder-gray-500 dark:placeholder-gray-400;
   }
   .field-search {
     @apply w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-gray-900
            border border-control dark:border-gray-700
            text-sm dark:text-gray-100
-           placeholder-gray-400 dark:placeholder-gray-500;
+           placeholder-gray-500 dark:placeholder-gray-400;
   }
   /* Fokus: setara ring-2 emerald + border-emerald-500. Ditulis raw CSS
      karena directive Tailwind tidak menerima opacity-modifier slash. */

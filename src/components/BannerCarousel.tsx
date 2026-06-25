@@ -149,7 +149,7 @@ function TalanganArt() {
   return (
     <div className="pointer-events-none absolute bottom-[22px] right-[-18px] rotate-[8deg]">
       <div
-        className="rounded-[14px] px-[16px] py-[11px] text-[#b25e00]"
+        className="rounded-[14px] px-[16px] py-[11px] text-[#6e3700]"
         style={{ background: 'linear-gradient(135deg,#fff5e0,#ffe2a8)', boxShadow: '0 12px 24px -10px rgba(0,0,0,.5)' }}
       >
         <div className="flex items-center gap-[5px] text-[9px] font-extrabold uppercase tracking-[0.12em]">
@@ -476,6 +476,11 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   agar teks legibel. Tanpa gloss/noise/vignette berat. */}
               <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.26), inset 0 1px 0 rgba(255,255,255,.36), inset 0 -1px 0 rgba(0,0,0,.18)' }} />
               <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.28), rgba(0,0,0,0) 46%)' }} />
+              {/* Scrim ATAS — simetris dgn scrim bawah. Gradient stop teratas (mis.
+                  saldo #24ad5c, target #2cb8a5) terlalu terang utk teks putih
+                  (eyebrow 11px & desc 14px < 4.5:1). Scrim ini menarik kontras
+                  eyebrow/judul/desc ke ≥4.5:1 tanpa mengubah warna brand gradient. */}
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,0) 56%)' }} />
 
               {/* ---------- KONTEN ---------- */}
               {isSaldo ? (

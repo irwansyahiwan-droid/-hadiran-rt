@@ -36,7 +36,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           </span>
           <span className="flex-1 min-w-0">
             <span className="block text-sm font-bold text-gray-800 dark:text-gray-100">Tetapkan Target Kas RT</span>
-            <span className="block text-xs text-gray-400">Mis. dana 17 Agustus — pacu semangat warga</span>
+            <span className="block text-xs text-gray-500 dark:text-gray-400">Mis. dana 17 Agustus — pacu semangat warga</span>
           </span>
           <Plus className="w-4 h-4 text-gray-400 shrink-0" />
         </button>
@@ -69,7 +69,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{target.keterangan || 'Target Kas RT'}</p>
-              <p className="text-micro text-gray-400">Target {formatRupiahPlain(target.nominal)}</p>
+              <p className="text-micro text-gray-500 dark:text-gray-400">Target {formatRupiahPlain(target.nominal)}</p>
             </div>
           </div>
           {isBendahara && (
@@ -107,7 +107,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           </span>
         </div>
 
-        <div className="flex items-center justify-between mt-1.5 text-micro text-gray-400">
+        <div className="flex items-center justify-between mt-1.5 text-micro text-gray-500 dark:text-gray-400">
           <span>{tercapai ? `Lebih ${formatRupiahPlain(saldo - target.nominal)}` : `Kurang ${formatRupiahPlain(sisa)}`}</span>
           {deadline && (
             <span className="inline-flex items-center gap-1"><CalendarClock className="w-3 h-3" />{deadline}</span>
