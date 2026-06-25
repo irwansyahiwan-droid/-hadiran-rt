@@ -43,8 +43,12 @@ body {
      jangan biarkan drift lagi. */
   /* Pass 3 (2026-06-16): #DCE1EA → #D4DAE4. Pass 2 menaruh seluruh "pop" di
      bayangan & menolak menggelapkan canvas; user konfirmasi masih kurang
-     "nendang" → perbesar gap tonal card↔canvas (lever utama ala Linear/Apple). */
-  background-color: #D4DAE4;
+     "nendang" → perbesar gap tonal card↔canvas (lever utama ala Linear/Apple).
+     Pass 5 (2026-06-25): #D4DAE4 → #EEF1F6. Canvas L~85% terbaca terlalu abu/
+     utilitarian vs standar fintech 2026 (Revolut/Jago/Apple canvas L~94-96%).
+     Naik ke L~94% (airy-premium) — separasi kartu disandar ke shadow crisp
+     (pass 4 floating glass) + hairline, BUKAN lagi gap tonal besar. */
+  background-color: #EEF1F6;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -121,7 +125,7 @@ input, textarea  { caret-color: #1B7249; }
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #D4DAE4;
+  background-color: #EEF1F6;
   background-image:
     radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
   background-attachment: fixed;
