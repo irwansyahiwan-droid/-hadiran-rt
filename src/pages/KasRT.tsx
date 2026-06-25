@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
+import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Trash2, Eye, EyeOff, Share2, RotateCcw } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
@@ -579,7 +579,12 @@ export default function KasRTPage() {
           </div>
 
           {displayList.length === 0 ? (
-            <EmptyState icon={Landmark} title="Tidak ada hasil" subtitle="Tidak ada transaksi pada filter ini." />
+            <EmptyState
+              icon={Landmark}
+              title="Tidak ada hasil"
+              subtitle="Tidak ada transaksi pada filter ini."
+              action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setFilter('semua'); setSearch(''); } }}
+            />
           ) : (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {displayList.map((k, idx) => {

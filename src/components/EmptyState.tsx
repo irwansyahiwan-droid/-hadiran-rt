@@ -5,11 +5,13 @@ interface EmptyStateProps {
   title: string;
   subtitle?: string;
   className?: string;
+  /** Aksi lanjut yang jelas — wajib untuk empty-state hasil filter (mis. "Reset filter"). */
+  action?: { label: string; onClick: () => void; icon?: LucideIcon };
 }
 
 /** Empty state ilustratif — scene berlapis: backdrop lembut + elemen
  *  dekoratif mengambang + tile ikon mengambang di tengah. */
-export default function EmptyState({ icon: Icon, title, subtitle, className = '' }: EmptyStateProps) {
+export default function EmptyState({ icon: Icon, title, subtitle, className = '', action }: EmptyStateProps) {
   return (
     <div className={`flex flex-col items-center justify-center text-center px-6 py-12 ${className}`}>
       <div className="relative w-28 h-24 mb-4">
@@ -32,6 +34,15 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
       <p className="text-sm font-bold text-gray-700 dark:text-gray-200">{title}</p>
       {subtitle && (
         <p className="text-xs text-ink-faint dark:text-gray-400 mt-1 max-w-[230px] leading-relaxed">{subtitle}</p>
+      )}
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="press mt-4 inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-xl text-sm font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200/60 dark:ring-emerald-800/40 active:bg-emerald-100 dark:active:bg-emerald-900/30 transition-colors"
+        >
+          {action.icon && <action.icon className="w-4 h-4" strokeWidth={2} />}
+          {action.label}
+        </button>
       )}
     </div>
   );

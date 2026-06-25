@@ -93,8 +93,8 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           aria-label={`Progress target ${target.keterangan || 'Kas RT'}`}
         >
           <div
-            className={`h-full rounded-full transition-[width] duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-600'}`}
-            style={{ width: `${pct}%` }}
+            className={`h-full w-full origin-left rounded-full transition-transform duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-600'}`}
+            style={{ transform: `scaleX(${Math.min(pct, 100) / 100})` }}
           />
         </div>
 

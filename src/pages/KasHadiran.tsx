@@ -566,7 +566,12 @@ export default function KasHadiranPage() {
                 <ErrorState onRetry={() => load()} retrying={loading} />
               ) : displayTarikan.length === 0 ? (
                 /* Hasil filter kosong */
-                <EmptyState icon={TrendingUp} title="Tidak ada hasil" subtitle="Tidak ada tarikan pada filter ini." />
+                <EmptyState
+                  icon={TrendingUp}
+                  title="Tidak ada hasil"
+                  subtitle="Tidak ada tarikan pada filter ini."
+                  action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => setHadiranFilter('semua') }}
+                />
               ) : (
                 displayTarikan.map((t, idx) => {
                   const kasHadiran = t.total_terkumpul ?? 0;
@@ -638,8 +643,8 @@ export default function KasHadiranPage() {
                         </div>
                         <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-emerald-400 dark:bg-emerald-500 rounded-full transition-[width] duration-700 ease-out"
-                            style={{ width: `${pctHadir}%` }}
+                            className="h-full w-full origin-left bg-emerald-400 dark:bg-emerald-500 rounded-full transition-transform duration-700 ease-out"
+                            style={{ transform: `scaleX(${Math.min(pctHadir, 100) / 100})` }}
                           />
                         </div>
                       </div>

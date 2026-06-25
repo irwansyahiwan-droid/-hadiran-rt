@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight, RotateCcw } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -453,7 +453,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           {trxItems.length === 0 ? (
             <EmptyState icon={Receipt} title="Belum ada transaksi" subtitle="Setoran & pelunasan talangan akan muncul di sini." />
           ) : displayTrx.length === 0 ? (
-            <EmptyState icon={Receipt} title="Tidak ada hasil" subtitle="Tidak ada transaksi pada filter ini." />
+            <EmptyState
+              icon={Receipt}
+              title="Tidak ada hasil"
+              subtitle="Tidak ada transaksi pada filter ini."
+              action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setTrxFilter('semua'); setTrxSearch(''); } }}
+            />
           ) : (
             visibleTrx.map((trx, idx) => (
               <button
