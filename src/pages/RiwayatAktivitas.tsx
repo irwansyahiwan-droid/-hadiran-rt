@@ -172,6 +172,8 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari aktivitas / nama bendahara…"
+            inputMode="search"
+            enterKeyHint="search"
             className="field-search pr-11"
           />
           {search && <ClearButton onClick={() => setSearch('')} />}

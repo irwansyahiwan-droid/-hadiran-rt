@@ -357,6 +357,8 @@ export default function KelolaAnggota({ open, onClose }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama / no. rumah…"
+            inputMode="search"
+            enterKeyHint="search"
             className="field-search pr-11"
           />
           {search && <ClearButton onClick={() => setSearch('')} />}

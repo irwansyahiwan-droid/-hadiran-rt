@@ -552,6 +552,8 @@ export default function KasRTPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari keterangan…"
+              inputMode="search"
+              enterKeyHint="search"
               className="field-search pr-11"
             />
             {search && <ClearButton onClick={() => setSearch('')} />}
@@ -587,7 +589,7 @@ export default function KasRTPage() {
               return (
                 <div
                   key={k.id}
-                  onClick={editable ? () => { setSelectedRow(k); setConfirmDel(false); } : undefined}
+                  onClick={editable ? () => { haptic(); setSelectedRow(k); setConfirmDel(false); } : undefined}
                   role={editable ? 'button' : undefined}
                   tabIndex={editable ? 0 : undefined}
                   aria-label={editable ? `Aksi: ${k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}` : undefined}

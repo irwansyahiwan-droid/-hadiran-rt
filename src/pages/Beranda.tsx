@@ -422,6 +422,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               onChange={(e) => setTrxSearch(e.target.value)}
               placeholder="Cari keterangan / nama…"
               aria-label="Cari transaksi"
+              inputMode="search"
+              enterKeyHint="search"
               className="field-search pr-11"
             />
             {trxSearch && <ClearButton onClick={() => setTrxSearch('')} />}
@@ -456,7 +458,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             visibleTrx.map((trx, idx) => (
               <button
                 key={trx.id}
-                onClick={() => setSelectedTrx(trx)}
+                onClick={() => { haptic(); setSelectedTrx(trx); }}
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
                 className={`press rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < visibleTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
               >

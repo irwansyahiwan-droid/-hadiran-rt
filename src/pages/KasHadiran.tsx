@@ -257,6 +257,7 @@ export default function KasHadiranPage() {
 
   // Buka sheet detail tarikan: daftar hadir & tidak hadir (+ status bayar talangan).
   async function openDetail(t: Tarikan) {
+    haptic();
     setDetailTarikan(t);
     setDetailLoading(true);
     setDetailHadir([]);

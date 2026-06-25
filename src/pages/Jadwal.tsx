@@ -369,6 +369,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama…"
+          inputMode="search"
+          enterKeyHint="search"
           className="field-search pr-11"
         />
         {search && <ClearButton onClick={() => setSearch('')} />}
@@ -943,7 +945,7 @@ export default function JadwalPage() {
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isSelesai ? (
                           <button
-                            onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
+                            onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
                             title="Hitung Ulang"
                             aria-label="Hitung Ulang"
@@ -954,7 +956,7 @@ export default function JadwalPage() {
                         ) : (
                           // Semua tarikan terjadwal punya tombol Proses — tinggal klik saat pertemuan
                           <button
-                            onClick={() => { setNavigatingId(t.id); setSelectedTarikan(t); }}
+                            onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm disabled:opacity-70 ${
                               isNext

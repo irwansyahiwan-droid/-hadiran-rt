@@ -273,6 +273,8 @@ export default function JadwalWargaPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Cari nama warga…"
+              inputMode="search"
+              enterKeyHint="search"
               className="field-search pr-11"
             />
             {search && <ClearButton onClick={() => setSearch('')} />}
