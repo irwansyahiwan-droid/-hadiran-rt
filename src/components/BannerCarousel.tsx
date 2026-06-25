@@ -12,11 +12,19 @@ import dashboardPhone from '../assets/dashboard-phone.jpg';
 const TARGET_NOMINAL = 25_000_000;
 const TARGET_DEADLINE = '2026-12-31';
 
-/* Geometri kartu 3D. Lebar/spacing dihitung dari lebar viewport carousel (responsif);
-   tinggi tetap agar tumpukan kartu konsisten antar-slide. */
-const CARD_H = 344;     // tinggi kartu (px)
+/* Geometri kartu 3D. Lebar/spacing dihitung dari lebar viewport carousel (responsif).
+   Tinggi: maksimum tetap (344) agar tumpukan kartu konsisten di HP normal, TAPI
+   menyusut di layar pendek (mis. iPhone SE 667px) supaya hero tak menelan >½ layar
+   pertama & seksi di bawahnya tetap mengintip (lihat cardHeight()). */
+const CARD_H = 344;     // tinggi kartu maksimum (px)
 const TOP = 8;          // offset atas kartu di dalam viewport
-const VIEWPORT_H = 362; // tinggi area carousel — rapat di bawah kartu (8px sisa), bayangan toh ter-clip
+const CARD_GAP = 18;    // sisa tinggi viewport di luar kartu (TOP + napas bawah)
+
+/** Tinggi kartu efektif menurut tinggi viewport. ≥740px → 344 persis (HP modern,
+ *  desain tak berubah). Di bawah itu skala ~46.5% tinggi layar, lantai 300px. */
+function cardHeight(vh: number): number {
+  return vh >= 740 ? CARD_H : Math.max(300, Math.round(vh * 0.465));
+}
 
 /** Satu easing untuk semua transisi kartu/sheen/indikator → tak drift antar-tempat. */
 const EASE = 'cubic-bezier(.22,.61,.36,1)';
@@ -267,6 +275,16 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   const cardW = Math.min(vw - 44, 326);
   const spacing = Math.round(cardW * 0.82);
 
+  // Tinggi layar → tinggi kartu (shrink di HP pendek). Lacak resize/rotasi.
+  const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800);
+  useEffect(() => {
+    const onResize = () => setVh(window.innerHeight);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const cardH = cardHeight(vh);
+  const viewportH = cardH + CARD_GAP;
+
   // Refs untuk loop autoplay tanpa stale closure.
   const idxRef = useRef(0);
   const dirRef = useRef(1);
@@ -393,7 +411,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
       <div
         ref={viewportRef}
         className="relative w-full overflow-hidden"
-        style={{ height: VIEWPORT_H, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y' }}
+        style={{ height: viewportH, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y' }}
         onMouseEnter={() => { hoverRef.current = true; }}
         onMouseLeave={() => { hoverRef.current = false; }}
         onPointerDown={onDown}
@@ -441,7 +459,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
               }}
               className={`absolute left-1/2 overflow-hidden text-white${isSaldo && heroSweep ? ' sheen-sweep' : ''}`}
               style={{
-                top: TOP, width: cardW, height: CARD_H, marginLeft: -cardW / 2,
+                top: TOP, width: cardW, height: cardH, marginLeft: -cardW / 2,
                 borderRadius: 30, padding: 24, boxSizing: 'border-box', background: grad, color: '#fff',
                 transform: `translateX(${x}px) translateY(${ty}px) scale(${scale.toFixed(3)}) rotateY(${ry}deg)`,
                 opacity, zIndex: z, willChange: 'transform, opacity',
