@@ -41,9 +41,9 @@ export default function ErrorState({
         </div>
       </div>
 
-      <p className="text-sm font-bold text-gray-700 dark:text-gray-200">{title}</p>
+      <p className="text-balance text-sm font-bold text-gray-700 dark:text-gray-200">{title}</p>
       {subtitle && (
-        <p className="text-xs text-ink-faint dark:text-gray-400 mt-1 max-w-[240px] leading-relaxed">{subtitle}</p>
+        <p className="text-pretty text-xs text-ink-faint dark:text-gray-400 mt-1 max-w-[240px] leading-relaxed">{subtitle}</p>
       )}
 
       {onRetry && (
