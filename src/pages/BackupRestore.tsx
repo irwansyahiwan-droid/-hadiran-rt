@@ -109,7 +109,7 @@ export default function BackupRestore({ open, onClose }: Props) {
             disabled={backingUp}
             className="btn-brand w-full min-h-[44px] py-3 font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            {backingUp ? <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan...</> : <><Download className="w-4 h-4" /> Unduh Backup Sekarang</>}
+            {backingUp ? <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan…</> : <><Download className="w-4 h-4" /> Unduh Backup Sekarang</>}
           </button>
           {lastBackup && (
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -186,7 +186,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                   disabled={restoring || konfirmasi.trim().toUpperCase() !== KATA_KONFIRMASI}
                   className="press flex-1 min-h-[44px] py-3 rounded-xl bg-rose-600 text-white font-semibold text-sm shadow-lg shadow-rose-300/40 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
                 >
-                  {restoring ? <><RefreshCw className="w-4 h-4 animate-spin" /> Memulihkan...</> : 'Pulihkan Sekarang'}
+                  {restoring ? <><RefreshCw className="w-4 h-4 animate-spin" /> Memulihkan…</> : 'Pulihkan Sekarang'}
                 </button>
               </div>
             </div>
