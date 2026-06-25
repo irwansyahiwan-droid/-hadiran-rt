@@ -12,6 +12,35 @@ interface Options {
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/* ── Kunci scroll latar saat dialog terbuka ───────────────────────────────
+   Tanpa ini, halaman di belakang ikut tergeser saat jari menyapu backdrop /
+   sheet (makin terasa setelah sheet form sendiri bisa di-scroll: mencapai
+   batas scroll-nya "merembet" menggeser halaman). Counter modul → beberapa
+   dialog bertumpuk (mis. sheet membuka konfirmasi) tak saling buka-kunci.
+   Sengaja overflow:hidden (BUKAN position:fixed) → tak melompatkan scroll &
+   tak bentrok dgn restorasi scroll antar-tab (App) maupun .app-bg fixed.
+   Full-screen overlay (yg punya overflow-y-auto sendiri) tetap bisa scroll
+   internal — mengunci body tak memengaruhinya. */
+let lockCount = 0;
+let prevBodyOverflow = '';
+let prevHtmlOverflow = '';
+function lockScroll() {
+  if (lockCount === 0) {
+    prevBodyOverflow = document.body.style.overflow;
+    prevHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }
+  lockCount += 1;
+}
+function unlockScroll() {
+  lockCount = Math.max(0, lockCount - 1);
+  if (lockCount === 0) {
+    document.body.style.overflow = prevBodyOverflow;
+    document.documentElement.style.overflow = prevHtmlOverflow;
+  }
+}
+
 /**
  * A11y untuk bottom-sheet / modal. Lengkapi semantik dialog + kelola fokus —
  * hal yang membedakan "kelihatan premium" dengan "betul-betul siap assistive tech":
@@ -40,6 +69,9 @@ export function useDialog<T extends HTMLElement = HTMLDivElement>(
     if (!active) return;
     const panel = panelRef.current;
     const prevFocus = document.activeElement as HTMLElement | null;
+
+    // Kunci scroll latar selama dialog hidup (lihat catatan di atas).
+    lockScroll();
 
     // Fokus awal ke panel (tabindex -1) → dialog diumumkan sebelum isinya.
     panel?.focus();
@@ -74,6 +106,7 @@ export function useDialog<T extends HTMLElement = HTMLDivElement>(
     document.addEventListener('keydown', onKeyDown, true);
     return () => {
       document.removeEventListener('keydown', onKeyDown, true);
+      unlockScroll();
       // Kembalikan fokus ke pemicu (best-effort — elemen mungkin sudah unmount).
       prevFocus?.focus?.();
     };
