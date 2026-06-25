@@ -76,7 +76,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
             <button
               onClick={() => { haptic(); setEditing(true); }}
               aria-label="Ubah target"
-              className="press w-9 h-9 -mr-1 inline-flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="press relative w-9 h-9 -mr-1 inline-flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors before:absolute before:-inset-1 before:content-['']"
             >
               <Pencil className="w-4 h-4" />
             </button>

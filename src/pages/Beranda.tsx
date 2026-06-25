@@ -245,10 +245,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <>
             {/* Aksi pojok kanan-atas — sembunyikan nominal & muat ulang. Absolut
                 relatif area konten (di dalam padding kartu) → sejajar eyebrow. */}
-            <div className="absolute right-0 top-0 flex items-center gap-2">
+            <div className="absolute right-0 top-0 flex items-center gap-2.5">
               <button
                 onClick={() => { haptic(); toggleHideAmount(); }}
-                className="press grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15"
+                className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
                 aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
               >
                 {hidden
@@ -258,7 +258,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <button
                 onClick={() => load(true)}
                 disabled={refreshing}
-                className="press grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15"
+                className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
                 aria-label="Muat ulang"
               >
                 <RefreshCw className={`h-[18px] w-[18px] text-white/85 ${refreshing ? 'animate-spin' : ''}`} />
