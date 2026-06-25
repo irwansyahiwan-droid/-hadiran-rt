@@ -507,9 +507,9 @@ export default function KasHadiranPage() {
               </div>
               <span className="text-sm font-semibold tabular-nums text-blue-600 dark:text-blue-400">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
-            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-slate-100 dark:bg-slate-800' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
+            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-base font-bold tabular-nums ${saldo < 0 ? 'text-slate-700 dark:text-slate-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
+              <span className={`text-base font-bold tabular-nums ${saldo < 0 ? 'text-gray-700 dark:text-gray-300' : 'text-emerald-700 dark:text-emerald-400'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
