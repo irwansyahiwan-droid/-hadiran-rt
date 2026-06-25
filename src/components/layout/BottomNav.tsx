@@ -54,7 +54,11 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
         backfaceVisibility: 'hidden',
       }}
     >
-      <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-16 rounded-[26px] pointer-events-auto bg-white/70 dark:bg-gray-900/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-black/[0.06] dark:ring-white/10">
+      {/* bg /82 (naik dari /70): di /70 konten berwarna di belakang (mis. kartu
+          peringatan kuning) menembus & menode kaca jadi tidak netral. /82 tetap
+          translucent (blur+saturate jalan, masih terbaca "kaca") tapi cukup
+          opak agar nav selalu netral di atas konten apa pun. Dark /80. */}
+      <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-16 rounded-[26px] pointer-events-auto bg-white/82 dark:bg-gray-900/80 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-black/[0.06] dark:ring-white/10">
         {/* Indikator pill meluncur (spring) — slot selebar tombol, pill di area ikon.
             Row TANPA padding horizontal agar slot = lebar tombol persis. */}
         {activeIndex >= 0 && (
