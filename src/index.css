@@ -47,8 +47,11 @@ body {
      Pass 5 (2026-06-25): #D4DAE4 → #EEF1F6. Canvas L~85% terbaca terlalu abu/
      utilitarian vs standar fintech 2026 (Revolut/Jago/Apple canvas L~94-96%).
      Naik ke L~94% (airy-premium) — separasi kartu disandar ke shadow crisp
-     (pass 4 floating glass) + hairline, BUKAN lagi gap tonal besar. */
-  background-color: #EEF1F6;
+     (pass 4 floating glass) + hairline, BUKAN lagi gap tonal besar.
+     Pass 6 (2026-06-25): #EEF1F6 → #E6EAF1 (turun ~3% L). User minta "kartu
+     lebih nendang dikit" → kembalikan SEDIKIT gap tonal kartu↔kanvas (lever
+     Linear/Apple) tanpa kehilangan airy — shadow & hairline tetap carry. */
+  background-color: #E6EAF1;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -119,13 +122,13 @@ input, textarea  { caret-color: #1B7249; }
 /* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
    Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
-   Dipakai di wrapper App (kanvas #D4DAE4 — samakan dgn body/sunken/manifest). */
+   Dipakai di wrapper App (kanvas #E6EAF1 — samakan dgn body/sunken/manifest). */
 .app-bg {
   /* Apple clean: kanvas abu netral sejuk RATA. Tanpa aurora tebal & tanpa
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #EEF1F6;
+  background-color: #E6EAF1;
   background-image:
     radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
   background-attachment: fixed;
@@ -240,7 +243,7 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   /* Pass 3 (2026-06-16) — user konfirmasi masih kurang "nendang". Edge & lift
      dinaikkan satu tingkat (tetap TIGHT, bukan fog): ring .06→.08 (hairline
      gelap lebih tegas), contact .06→.07, lift .08→.10 dgn y 8→10px. Bekerja
-     bersama canvas yg diperdalam (#D4DAE4) + token `line` yg tak lagi mewashout. */
+     bersama canvas (kini #EEF1F6 airy, pass 5) + token `line` yg tak lagi mewashout. */
   /* Pass 4 (2026-06-19) — "floating glass" (Revolut/Mercury): satu lift 10/24px
      diganti DUA lapis key+ambient ber-spread NEGATIF (-4/-14) → kartu melayang
      lebih tegas tapi blur tetap TERKONTAIN (tak melebar jadi fog, sesuai pass 3).
@@ -249,7 +252,10 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      mengecil, jadi separasi DIPINDAH ke TEPI (cara fintech 2026: pisah dari edge,
      bukan dari warna latar). Edge ring .09→.12 (tepi "tercetak" lebih tegas),
      contact .06→.08 (menapak lebih jelas), key .10→.12 & ambient .16→.19 (lift
-     sedikit naik). Spread tetap NEGATIF → crisp, tak melebar jadi fog. */
+     sedikit naik). Spread tetap NEGATIF → crisp, tak melebar jadi fog.
+     Pass 6 (2026-06-25): canvas turun tipis #EEF1F6→#E6EAF1 (gap tonal naik ~3% L,
+     "kartu lebih nendang") — resep edge/lift di bawah TETAP, kini bekerja bareng
+     gap tonal kecil itu. Tetap airy, bukan balik ke punch #D4DAE4. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
     0 0 0 1px rgba(10, 14, 26, 0.12),                         /* tepi crisp 1px → definisi edge, kartu "tercetak" */

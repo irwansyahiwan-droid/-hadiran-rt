@@ -884,7 +884,7 @@ export default function JadwalPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="font-display text-xl font-bold text-gray-500 tabular-nums">{selesaiCount}</p>
+          <p className="font-display text-xl font-bold text-gray-500 dark:text-gray-400 tabular-nums">{selesaiCount}</p>
           <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
