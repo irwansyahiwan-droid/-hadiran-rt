@@ -53,7 +53,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
       <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4" onClick={e => e.stopPropagation()} style={drag.style}>
+      <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} style={drag.style}>
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>

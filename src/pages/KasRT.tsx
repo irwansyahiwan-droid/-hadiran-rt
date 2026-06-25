@@ -63,7 +63,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
-        className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4"
+        className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         style={drag.style}
       >
