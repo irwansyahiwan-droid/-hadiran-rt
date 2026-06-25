@@ -5,6 +5,7 @@ import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 import Tag from '../components/Tag';
+import ClearButton from '../components/ClearButton';
 import InfoTip from '../components/InfoTip';
 import ErrorState from '../components/ErrorState';
 
@@ -272,13 +273,9 @@ export default function JadwalWargaPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Cari nama warga…"
-              className="field-search"
+              className="field-search pr-11"
             />
-            {search && (
-              <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan pencarian">
-                <X className="w-4 h-4 text-gray-400" />
-              </button>
-            )}
+            {search && <ClearButton onClick={() => setSearch('')} />}
           </div>
 
           {/* Filter status — hanya relevan bila sudah ada tarikan terakhir */}

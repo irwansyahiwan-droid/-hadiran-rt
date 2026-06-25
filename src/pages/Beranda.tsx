@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, X, Eye, EyeOff, TrendingUp, ChevronRight } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight } from 'lucide-react';
+import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import { showToast } from '../lib/toast';
@@ -423,11 +424,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               aria-label="Cari transaksi"
               className="field-search pr-11"
             />
-            {trxSearch && (
-              <button onClick={() => setTrxSearch('')} className="absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center" aria-label="Bersihkan pencarian">
-                <X className="w-4 h-4 text-gray-400" />
-              </button>
-            )}
+            {trxSearch && <ClearButton onClick={() => setTrxSearch('')} />}
           </div>
           <FilterChips
             className="px-1"

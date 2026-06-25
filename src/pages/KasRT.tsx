@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, X, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
+import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Trash2, Eye, EyeOff, Share2 } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
+import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
@@ -551,13 +552,9 @@ export default function KasRTPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari keterangan…"
-              className="field-search"
+              className="field-search pr-11"
             />
-            {search && (
-              <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
-                <X className="w-4 h-4 text-gray-400" />
-              </button>
-            )}
+            {search && <ClearButton onClick={() => setSearch('')} />}
           </div>
           <FilterChips
             options={[

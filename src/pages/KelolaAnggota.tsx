@@ -3,6 +3,7 @@ import {
   ArrowLeft, Users, Search, X, RefreshCw, UserPlus, Pencil,
   CheckCircle2, Phone, Home, History, AlertTriangle,
 } from 'lucide-react';
+import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import Tag from '../components/Tag';
@@ -356,13 +357,9 @@ export default function KelolaAnggota({ open, onClose }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama / no. rumah…"
-            className="field-search"
+            className="field-search pr-11"
           />
-          {search && (
-            <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
-              <X className="w-4 h-4 text-gray-400" />
-            </button>
-          )}
+          {search && <ClearButton onClick={() => setSearch('')} />}
         </div>
 
         {/* List */}

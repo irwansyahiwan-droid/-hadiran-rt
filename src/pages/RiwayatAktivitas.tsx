@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Search, X, History, Plus, Pencil, Trash2,
+  ArrowLeft, Search, History, Plus, Pencil, Trash2,
   CheckCircle2, RotateCcw, ArrowRight, RefreshCw, Download,
   ChevronDown, Route, Lightbulb,
 } from 'lucide-react';
+import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import FilterChips from '../components/FilterChips';
@@ -171,13 +172,9 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari aktivitas / nama bendahara…"
-            className="field-search"
+            className="field-search pr-11"
           />
-          {search && (
-            <button onClick={() => setSearch('')} className="press-icon absolute right-3 top-1/2 -translate-y-1/2" aria-label="Bersihkan">
-              <X className="w-4 h-4 text-gray-400" />
-            </button>
-          )}
+          {search && <ClearButton onClick={() => setSearch('')} />}
         </div>
 
         {/* Filter chips */}
