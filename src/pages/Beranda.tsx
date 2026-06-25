@@ -515,7 +515,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               : <ArrowDownLeft className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />}
           </div>
           <p className="text-body font-medium text-gray-900 dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
-          <p className="text-xs text-ink-faint mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
+          <p className="text-xs text-ink-faint dark:text-gray-400 mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
           <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">Jumlah</span>
