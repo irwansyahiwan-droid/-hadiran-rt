@@ -257,6 +257,10 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   const [drag, setDrag] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [pressed, setPressed] = useState(false);
+  // Autoplay berhenti permanen setelah user navigasi manual (swipe / tap indikator):
+  // di HP tak ada hover/fokus utk menjeda, jadi "ambil kendali" = mekanisme stop
+  // yang disyaratkan WCAG 2.2.2 (Pause, Stop, Hide). Sekali berhenti, tetap berhenti.
+  const [stopped, setStopped] = useState(false);
   // Bar progress target "ditarik" 0→ratio tiap kali kartu target jadi aktif.
   const [targetFill, setTargetFill] = useState(0);
 
@@ -320,7 +324,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   // Autoplay ping-pong + isi bar progress indikator aktif. Berhenti saat
   // reduced-motion, disentuh, atau tab tersembunyi.
   useEffect(() => {
-    if (reduced || count <= 1) return;
+    if (reduced || count <= 1 || stopped) return;
     let raf = 0;
     let last = performance.now();
     const tick = (t: number) => {
@@ -346,11 +350,12 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [count, reduced, hasHero]);
+  }, [count, reduced, hasHero, stopped]);
 
   if (count === 0) return null;
 
   function goTo(i: number) {
+    setStopped(true); // navigasi manual → hentikan autoplay (WCAG 2.2.2)
     const ni = Math.max(0, Math.min(count - 1, i));
     if (ni !== index) haptic();
     setIndex(ni);
@@ -387,11 +392,13 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     if (!activeRef.current) return;
     activeRef.current = false;
     const d = drag;
+    const didDrag = draggingRef.current;
     let ni = index;
-    if (draggingRef.current) ni = Math.max(0, Math.min(count - 1, index + Math.round(-d / spacing)));
+    if (didDrag) ni = Math.max(0, Math.min(count - 1, index + Math.round(-d / spacing)));
     setDrag(0);
     setDragging(false); draggingRef.current = false;
     setPressed(false); pressedRef.current = false;
+    if (didDrag) setStopped(true); // swipe = ambil kendali → hentikan autoplay (WCAG 2.2.2)
     if (ni !== index) { haptic(); setIndex(ni); }
   }
 
@@ -607,10 +614,10 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   className="block h-1 overflow-hidden rounded-full bg-brand/20 dark:bg-brand-linkDark/25"
                   style={{ width: isActive ? 26 : 7, transition: reduced ? 'none' : `width 0.42s ${EASE}` }}
                 >
-                  {isActive && !reduced && (
+                  {isActive && !reduced && !stopped && (
                     <span ref={progressBarRef} className="block h-full rounded-full bg-brand dark:bg-brand-linkDark" style={{ width: '0%' }} />
                   )}
-                  {(past || (isActive && reduced)) && (
+                  {(past || (isActive && (reduced || stopped))) && (
                     <span className="block h-full w-full rounded-full bg-brand dark:bg-brand-linkDark" />
                   )}
                 </span>
