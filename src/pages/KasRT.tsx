@@ -38,7 +38,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const [tipe, setTipe] = useState<Tipe>(initial?.tipe ?? 'masuk');
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
-  const [tanggal, setTanggal] = useState((initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
+  const [tanggal, setTanggal] = useState(() => (initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
   const dlg = useDialog(true, { onClose, label: isEdit ? 'Edit transaksi Kas RT' : 'Tambah transaksi Kas RT' });
@@ -217,20 +217,31 @@ export default function KasRTPage() {
     import('../lib/generateKasRTPDF').catch(() => {}); // preload: jaga gesture share di HP
   }, []);
 
-  const saldoAwalEntry = list.find((k) => k.keterangan === 'Saldo Awal Kas RT');
-  const saldoAwal   = saldoAwalEntry?.nominal ?? 0;
-  const totalMasuk  = list.filter((k) => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT').reduce((s, k) => s + k.nominal, 0);
-  const totalKeluar = list.filter((k) => k.tipe === 'keluar').reduce((s, k) => s + k.nominal, 0);
-  // Insight: kas masuk bulan ini vs bulan lalu (kecuali Saldo Awal).
-  const ymKey = (d: Date) => d.getFullYear() * 12 + d.getMonth();
-  const curYM = ymKey(new Date());
-  const masukBulan = (back: number) =>
-    list
-      .filter((k) => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT' && ymKey(new Date(k.tanggal)) === curYM - back)
-      .reduce((s, k) => s + k.nominal, 0);
-  const masukBulanIni = masukBulan(0);
-  const masukBulanLalu = masukBulan(1);
-  const saldo       = saldoAwal + totalMasuk - totalKeluar;
+  // Agregat ringkasan (saldo, total masuk/keluar, insight bulanan) — satu pass
+  // atas list, hanya dihitung ulang saat list berubah (bukan tiap keystroke cari/filter).
+  const { saldoAwalEntry, saldoAwal, totalMasuk, totalKeluar, masukBulanIni, masukBulanLalu, saldo } = useMemo(() => {
+    const ymKey = (d: Date) => d.getFullYear() * 12 + d.getMonth();
+    const curYM = ymKey(new Date());
+    const awalEntry = list.find((k) => k.keterangan === 'Saldo Awal Kas RT');
+    const awal = awalEntry?.nominal ?? 0;
+    let masuk = 0, keluar = 0, mIni = 0, mLalu = 0;
+    for (const k of list) {
+      const isSaldoAwal = k.keterangan === 'Saldo Awal Kas RT';
+      if (k.tipe === 'keluar') { keluar += k.nominal; continue; }
+      if (k.tipe === 'masuk' && !isSaldoAwal) {
+        masuk += k.nominal;
+        const back = curYM - ymKey(new Date(k.tanggal));
+        if (back === 0) mIni += k.nominal;
+        else if (back === 1) mLalu += k.nominal;
+      }
+    }
+    return {
+      saldoAwalEntry: awalEntry, saldoAwal: awal,
+      totalMasuk: masuk, totalKeluar: keluar,
+      masukBulanIni: mIni, masukBulanLalu: mLalu,
+      saldo: awal + masuk - keluar,
+    };
+  }, [list]);
   const animatedSaldo = useCountUp(saldo);
   const hidden = useHideAmount();
 

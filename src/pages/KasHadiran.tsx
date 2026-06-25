@@ -33,7 +33,7 @@ interface SetorModalProps {
 function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
   const [nominal, setNominal] = useState(0);
   const [keterangan, setKeterangan] = useState('');
-  const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
+  const [tanggal, setTanggal] = useState(() => new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
   useBackDismiss(true, onClose);
@@ -213,13 +213,13 @@ export default function KasHadiranPage() {
   }, [tarikanSelesai, talanganMap, hadiranFilter, hadiranSort]);
 
 
-  // Setor per tarikan — untuk kolom SETOR di PDF
-  const setorMap = transaksi
+  // Setor per tarikan — untuk kolom SETOR di PDF (hanya berubah saat transaksi berubah)
+  const setorMap = useMemo(() => transaksi
     .filter(t => t.tipe === 'setor_kas_rt' && t.tarikan_id)
     .reduce<Record<string, number>>((acc, t) => {
       if (t.tarikan_id) acc[t.tarikan_id] = (acc[t.tarikan_id] ?? 0) + t.nominal;
       return acc;
-    }, {});
+    }, {}), [transaksi]);
 
   async function handlePendapatanPDF(tarikan: Tarikan) {
     setPdfLoading(tarikan.id);

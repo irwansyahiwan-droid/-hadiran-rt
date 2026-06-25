@@ -699,7 +699,7 @@ interface TambahTarikanModalProps {
 
 function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
   const dlg = useDialog(true, { onClose, label: `Tambah jadwal tarikan #${nextNomor}` });
-  const [tanggal, setTanggal] = useState(new Date().toISOString().slice(0, 10));
+  const [tanggal, setTanggal] = useState(() => new Date().toISOString().slice(0, 10));
   const [sohibulId, setSohibulId] = useState('');
   const [saving, setSaving] = useState(false);
   useBackDismiss(true, onClose);
