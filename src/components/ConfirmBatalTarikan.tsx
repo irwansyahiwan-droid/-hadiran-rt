@@ -57,13 +57,16 @@ export default function ConfirmBatalTarikan({ open, nomor, loading = false, onCl
           </div>
         </div>
 
-        <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mt-4 mb-1.5">
+        <label htmlFor="batal-tarikan-konfirmasi" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mt-4 mb-1.5">
           Ketik angka <span className="font-bold text-rose-600 dark:text-rose-400">{nomor}</span> untuk konfirmasi
         </label>
         <input
+          id="batal-tarikan-konfirmasi"
           ref={inputRef}
           type="text"
           inputMode="numeric"
+          name="konfirmasi-batal"
+          autoComplete="off"
           value={ketik}
           onChange={(e) => setKetik(e.target.value)}
           placeholder={String(nomor)}

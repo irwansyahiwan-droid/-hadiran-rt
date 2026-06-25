@@ -61,8 +61,8 @@ export default function InstallPrompt() {
 
   const steps = [
     { icon: Share, text: 'Ketuk ikon Bagikan di bar Safari' },
-    { icon: Plus, text: 'Pilih "Tambahkan ke Layar Utama"' },
-    { icon: Download, text: 'Ketuk "Tambah" di kanan atas' },
+    { icon: Plus, text: 'Pilih “Tambahkan ke Layar Utama”' },
+    { icon: Download, text: 'Ketuk “Tambah” di kanan atas' },
   ];
 
   return (

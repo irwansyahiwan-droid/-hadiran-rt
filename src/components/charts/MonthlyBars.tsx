@@ -18,9 +18,14 @@ export default function MonthlyBars({ data }: { data: MonthBar[] }) {
   const max = Math.max(1, ...data.flatMap((d) => [d.masuk, d.keluar]));
   const H = 96; // tinggi area bar
 
+  // Ringkasan untuk pembaca layar — chart visual (title tooltip) hanya terbaca mouse.
+  const summary = data
+    .map((d) => `${d.label}: masuk ${d.masuk.toLocaleString('id-ID')}, keluar ${d.keluar.toLocaleString('id-ID')}`)
+    .join('. ');
+
   return (
-    <div>
-      <div className="flex items-end justify-between gap-2" style={{ height: H }}>
+    <div role="img" aria-label={`Grafik pemasukan & pengeluaran bulanan. ${summary}`}>
+      <div className="flex items-end justify-between gap-2" style={{ height: H }} aria-hidden="true">
         {data.map((d, i) => (
           <div key={i} className="flex-1 flex items-end justify-center gap-1 h-full">
             <div

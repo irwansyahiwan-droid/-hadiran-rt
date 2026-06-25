@@ -44,11 +44,18 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
     }
   }
 
+  // Teks lengkap untuk pembaca layar — kolom digit 0-9 yg bertumpuk dibaca sbg
+  // "0123456789" tanpa ini. Kolom visual di-aria-hidden, nilai asli diumumkan.
+  const spoken = `${negative ? '-' : ''}${prefix}${grouped}`;
+
   return (
     <span
       className={`inline-block tabular-nums ${className}`}
       style={{ whiteSpace: 'nowrap' }}
+      role="text"
+      aria-label={spoken}
     >
+      <span aria-hidden="true">
       {negative && <span style={cell}>-</span>}
       {prefix && <span style={cell}>{prefix}</span>}
       {grouped.split('').map((c, i) => {
@@ -87,6 +94,7 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
           </span>
         );
       })}
+      </span>
     </span>
   );
 }

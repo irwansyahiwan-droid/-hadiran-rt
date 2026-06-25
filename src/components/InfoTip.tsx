@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Info } from 'lucide-react';
 import { haptic } from '../lib/utils';
 
@@ -20,6 +20,15 @@ interface InfoTipProps {
  */
 export default function InfoTip({ label, children, tone = 'default', align = 'left', className = '' }: InfoTipProps) {
   const [open, setOpen] = useState(false);
+
+  // Escape menutup popover (keyboard) — selaras pola menu lain.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
   const trigger =
     tone === 'onDark'
       ? 'text-white/70 hover:text-white'

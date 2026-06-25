@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowDownUp, Check } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
@@ -44,6 +44,14 @@ export default function FilterChips<T extends string, S extends string = string>
 }: FilterChipsProps<T, S>) {
   const [sortOpen, setSortOpen] = useState(false);
   const sortMounted = useExitAnim(sortOpen);
+
+  // Escape menutup popover urutan (keyboard).
+  useEffect(() => {
+    if (!sortOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSortOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [sortOpen]);
   const sortLabel = sort
     ? 'options' in sort
       ? (sort.options.find((o) => o.id === sort.value)?.label ?? sort.options[0]?.label ?? '')

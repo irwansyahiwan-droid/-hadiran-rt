@@ -84,7 +84,14 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
         </div>
 
         {/* Progress bar */}
-        <div className="h-3 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+        <div
+          className="h-3 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden"
+          role="progressbar"
+          aria-valuenow={Math.round(pct)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Progress target ${target.keterangan || 'Kas RT'}`}
+        >
           <div
             className={`h-full rounded-full transition-[width] duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-600'}`}
             style={{ width: `${pct}%` }}
@@ -164,21 +171,27 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
 
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nama Target</label>
+            <label htmlFor="target-nama" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nama Target</label>
             <input
+              id="target-nama"
+              name="nama-target"
+              autoComplete="off"
               type="text"
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
-              placeholder="Contoh: Dana HUT RI 17 Agustus"
+              placeholder="Contoh: Dana HUT RI 17 Agustus…"
               className="field"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal Target</label>
+              <label htmlFor="target-nominal" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal Target</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                 <input
+                  id="target-nominal"
+                  name="nominal-target"
+                  autoComplete="off"
                   type="text"
                   inputMode="numeric"
                   value={nominal ? nominal.toLocaleString('id-ID') : ''}
@@ -189,8 +202,10 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Batas Waktu</label>
+              <label htmlFor="target-tanggal" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Batas Waktu</label>
               <input
+                id="target-tanggal"
+                name="batas-waktu-target"
                 type="date"
                 value={tanggal}
                 onChange={(e) => setTanggal(e.target.value)}

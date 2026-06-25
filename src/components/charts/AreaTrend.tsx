@@ -23,7 +23,7 @@ export default function AreaTrend({ points, height = 84 }: AreaTrendProps) {
   const area = `${line} L${W},${height} L0,${height} Z`;
 
   return (
-    <svg viewBox={`0 0 ${W} ${height}`} preserveAspectRatio="none" className="w-full" style={{ height }}>
+    <svg viewBox={`0 0 ${W} ${height}`} preserveAspectRatio="none" className="w-full" style={{ height }} aria-hidden="true">
       <defs>
         <linearGradient id="areaTrendG" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#10B981" stopOpacity="0.28" />
