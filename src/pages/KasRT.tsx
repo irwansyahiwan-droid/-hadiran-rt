@@ -93,8 +93,11 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
+            <label htmlFor="kasrt-keterangan" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
             <input
+              id="kasrt-keterangan"
+              name="keterangan"
+              autoComplete="off"
               type="text"
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
@@ -106,10 +109,13 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal</label>
+              <label htmlFor="kasrt-nominal" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                 <input
+                  id="kasrt-nominal"
+                  name="nominal"
+                  autoComplete="off"
                   type="text"
                   inputMode="numeric"
                   value={nominal ? nominal.toLocaleString('id-ID') : ''}
@@ -120,8 +126,10 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
+              <label htmlFor="kasrt-tanggal" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
               <input
+                id="kasrt-tanggal"
+                name="tanggal"
                 type="date"
                 value={tanggal}
                 onChange={(e) => setTanggal(e.target.value)}

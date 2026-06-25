@@ -643,16 +643,20 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           </button>
         </div>
 
-        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-add-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
         <input
+          id="jadwal-add-tanggal"
+          name="tanggal-tarikan"
           type="date"
           value={tanggal}
           onChange={e => setTanggal(e.target.value)}
           className="field mb-4"
         />
 
-        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-add-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
         <select
+          id="jadwal-add-sohibul"
+          name="sohibul-bait"
           value={sohibulId}
           onChange={e => setSohibulId(e.target.value)}
           className="field mb-5"
@@ -737,16 +741,20 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           </button>
         </div>
 
-        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-edit-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
         <input
+          id="jadwal-edit-tanggal"
+          name="tanggal-tarikan"
           type="date"
           value={tanggal}
           onChange={e => setTanggal(e.target.value)}
           className="field mb-4"
         />
 
-        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-edit-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
         <select
+          id="jadwal-edit-sohibul"
+          name="sohibul-bait"
           value={sohibulId}
           onChange={e => setSohibulId(e.target.value)}
           className="field mb-5"

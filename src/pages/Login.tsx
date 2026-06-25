@@ -175,11 +175,17 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
+                <label htmlFor="login-email" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
+                    id="login-email"
+                    name="email"
                     type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    autoCapitalize="off"
+                    spellCheck={false}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="contoh@email.com"
@@ -191,11 +197,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
               {/* Password */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
+                <label htmlFor="login-password" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
+                    id="login-password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
@@ -215,7 +224,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
               {/* Error */}
               {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5">
+                <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5">
                   <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
                 </div>
               )}

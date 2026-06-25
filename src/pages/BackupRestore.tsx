@@ -157,10 +157,14 @@ export default function BackupRestore({ open, onClose }: Props) {
                 ))}
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                <label htmlFor="restore-konfirmasi" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
                   Ketik <span className="font-bold text-rose-600">{KATA_KONFIRMASI}</span> untuk konfirmasi
                 </label>
                 <input
+                  id="restore-konfirmasi"
+                  name="konfirmasi-restore"
+                  autoComplete="off"
+                  spellCheck={false}
                   type="text"
                   value={konfirmasi}
                   onChange={(e) => setKonfirmasi(e.target.value)}

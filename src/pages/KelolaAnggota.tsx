@@ -129,21 +129,21 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           </button>
         </div>
 
-        <label className={label}>Nama Lengkap</label>
-        <input value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama warga" className={`${input} mb-4`} />
+        <label htmlFor="anggota-nama" className={label}>Nama Lengkap</label>
+        <input id="anggota-nama" name="nama" autoComplete="name" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama warga" className={`${input} mb-4`} />
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
-            <label className={label}>No. Rumah</label>
-            <input value={noRumah} onChange={(e) => setNoRumah(e.target.value)} placeholder="mis. A-12" className={input} />
+            <label htmlFor="anggota-rumah" className={label}>No. Rumah</label>
+            <input id="anggota-rumah" name="no-rumah" autoComplete="off" value={noRumah} onChange={(e) => setNoRumah(e.target.value)} placeholder="mis. A-12" className={input} />
           </div>
           <div>
-            <label className={label}>No. HP</label>
-            <input value={noHp} onChange={(e) => setNoHp(e.target.value)} placeholder="08xxxx" inputMode="tel" className={input} />
+            <label htmlFor="anggota-hp" className={label}>No. HP</label>
+            <input id="anggota-hp" name="no-hp" type="tel" autoComplete="tel" value={noHp} onChange={(e) => setNoHp(e.target.value)} placeholder="08xxxx" inputMode="tel" className={input} />
           </div>
         </div>
 
-        <label className={label}>Peran</label>
+        <span className={label}>Peran</span>
         <div className="grid grid-cols-2 gap-2 mb-4">
           {(['warga', 'bendahara'] as const).map((r) => (
             <button

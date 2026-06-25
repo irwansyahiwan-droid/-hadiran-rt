@@ -65,24 +65,24 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
         </div>
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
-            <input type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
+            <label htmlFor="kashadiran-keterangan" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
+            <input id="kashadiran-keterangan" name="keterangan" autoComplete="off" type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
               placeholder="Setoran bulan Mei 2026"
               className="field" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal</label>
+              <label htmlFor="kashadiran-nominal" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
-                <input type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
+                <input id="kashadiran-nominal" name="nominal" autoComplete="off" type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
                   onChange={e => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)} required
                   className="field pl-9 pr-3" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
-              <input type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
+              <label htmlFor="kashadiran-tanggal" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Tanggal</label>
+              <input id="kashadiran-tanggal" name="tanggal" type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
                 className="field" />
             </div>
           </div>
