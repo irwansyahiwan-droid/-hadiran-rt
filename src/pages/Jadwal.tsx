@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Calendar, CheckCircle2, Coins, Pencil, RefreshCw,
+  ArrowLeft, Calendar, CheckCircle2, Coins, Pencil, Plus, RefreshCw,
   RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
 } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
@@ -885,6 +885,15 @@ export default function JadwalPage() {
               <FileText className="w-4 h-4" /> PDF
             </button>
           )}
+          {isBendahara && (
+            <button
+              onClick={() => { haptic(); setCreatingTarikan(true); }}
+              aria-label="Tambah jadwal tarikan"
+              className="flex items-center gap-1.5 btn-brand text-sm font-semibold px-3 py-2 rounded-xl active:scale-[0.97] transition"
+            >
+              <Plus className="w-4 h-4" /> Jadwal
+            </button>
+          )}
         </div>
       </div>
 
@@ -1036,9 +1045,15 @@ export default function JadwalPage() {
         />
       )}
 
-      {/* Aksi utama di zona jempol */}
-      {isBendahara && (
-        <Fab label="Tarikan" ariaLabel="Tambah jadwal tarikan" onClick={() => setCreatingTarikan(true)} />
+      {/* Aksi utama di zona jempol: PROSES tarikan giliran berikutnya →
+          langsung ke layar hitung & simpan absensi. Tambah jadwal ada di header. */}
+      {isBendahara && nextDijadwal && (
+        <Fab
+          icon={RefreshCw}
+          label="Proses"
+          ariaLabel={`Proses tarikan #${nextDijadwal.nomor} — hitung & simpan absensi`}
+          onClick={() => { setNavigatingId(nextDijadwal.id); setSelectedTarikan(nextDijadwal); }}
+        />
       )}
     </div>
   );
