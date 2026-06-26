@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Calendar, CheckCircle2, Coins, Pencil, Plus, RefreshCw,
+  ArrowLeft, Calendar, CheckCircle2, Coins, Lock, Pencil, Plus, RefreshCw,
   RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
 } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
@@ -322,23 +322,6 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         ))}
       </div>
 
-      {/* Sohibul Bait — penerima, di luar daftar absen & talangan. Dipajang
-          terpisah supaya jelas dia TIDAK kena hitungan iuran/talangan. */}
-      {sohibulWarga && (
-        <div className="flex items-center gap-3 rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50/70 dark:bg-amber-900/15 px-3.5 py-3 lift">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
-            {sohibulWarga.nama.charAt(0)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{sohibulWarga.nama}</p>
-            <p className="text-xs font-medium text-amber-700 dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
-          </div>
-          <span className="px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 shrink-0">
-            Penerima
-          </span>
-        </div>
-      )}
-
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
@@ -406,6 +389,22 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
       {/* Warga list */}
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+        {/* Sohibul Bait — baris TERKUNCI di paling atas: penerima, tidak bayar,
+            tidak bisa di-tap (hadir/titip/tidak hadir) & di luar hitungan talangan. */}
+        {sohibulWarga && (
+          <div className="w-full flex items-center gap-3 p-3.5 border-b border-line dark:border-gray-800 bg-amber-50/60 dark:bg-amber-900/15">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+              {sohibulWarga.nama.charAt(0)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{sohibulWarga.nama}</p>
+              <p className="text-xs font-medium text-amber-700 dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
+            </div>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 shrink-0">
+              <Lock className="w-3 h-3" /> Penerima
+            </span>
+          </div>
+        )}
         {filtered.map((w, idx) => {
           const st = map[w.id] ?? 'tidak_hadir';
           const ui = STATUS_UI[st];
