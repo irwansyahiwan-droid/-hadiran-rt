@@ -64,23 +64,30 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           style={{ background: 'radial-gradient(circle, #10b981 0%, transparent 70%)', animationDelay: '-5s' }} />
         <div className="blob absolute -bottom-28 left-1/4 w-72 h-72 rounded-full opacity-40 dark:opacity-20 blur-3xl"
           style={{ background: 'radial-gradient(circle, #6ee7b7 0%, transparent 70%)', animationDelay: '-9s' }} />
+        {/* Grain halus — permukaan terasa "kertas premium", bukan flat digital */}
+        <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06] mix-blend-overlay"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
       </div>
 
       {/* Logo area */}
       <div className="relative mb-8 text-center">
-        <img
-          src={logoRt}
-          alt="Logo RT 004/006"
-          className="pop w-20 h-20 rounded-3xl object-cover mx-auto mb-4 shadow-xl shadow-emerald-300/60 ring-1 ring-white/60"
-        />
-        <h1 className="rise text-2xl font-bold text-gray-900 dark:text-gray-100" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
-        <p className="rise text-caption text-gray-500 dark:text-gray-400 mt-1" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
+        <div className="pop relative mx-auto mb-4 w-20 h-20">
+          {/* Halo lembut di belakang logo — kedalaman, bukan glow norak */}
+          <div className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-emerald-400/25 dark:bg-emerald-500/20 blur-2xl" aria-hidden="true" />
+          <img
+            src={logoRt}
+            alt="Logo RT 004/006"
+            className="relative w-20 h-20 rounded-3xl object-cover ring-1 ring-white/70 dark:ring-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.6)_inset,0_10px_22px_-10px_rgba(5,80,50,0.45),0_24px_48px_-22px_rgba(5,80,50,0.5)]"
+          />
+        </div>
+        <h1 className="rise font-display text-[1.7rem] font-bold tracking-tight text-gray-900 dark:text-gray-100" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
+        <p className="rise text-caption text-emerald-700/80 dark:text-emerald-300/70 font-medium mt-1.5" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
       </div>
 
-      {/* Card */}
-      <div className="rise relative w-full max-w-sm bg-white/80 dark:bg-gray-900 backdrop-blur-xl rounded-3xl shadow-2xl shadow-emerald-200/50 border border-white/80 dark:border-gray-700 p-6"
+      {/* Card — floating glass: hairline + bayangan berlapis (depth, bukan glow) */}
+      <div className="rise relative w-full max-w-sm bg-white/85 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl border border-white/70 dark:border-gray-700/80 p-6 shadow-[0_1px_0_0_rgba(255,255,255,0.7)_inset,0_2px_6px_-2px_rgba(5,80,50,0.18),0_18px_40px_-16px_rgba(5,80,50,0.28),0_36px_64px_-32px_rgba(5,80,50,0.3)]"
         style={{ animationDelay: '0.22s' }}>
-        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Selamat Datang</h2>
+        <h2 className="font-display text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-1">Selamat Datang</h2>
         <p className="text-sm text-ink-faint dark:text-gray-400 mb-5">Warga RT 004/006 — silakan masuk</p>
 
         {/* ── WARGA — pintu utama (istimewa) ───────────────────── */}
