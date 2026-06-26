@@ -19,7 +19,7 @@ describe('ringkasAbsensi', () => {
       map({ '1': 'hadir', '2': 'hadir', '3': 'titip', '4': 'tidak_hadir', '5': 'tidak_hadir' }),
       SOHIBUL,
     );
-    expect(r.hadirCount).toBe(2);          // w1 + w2
+    expect(r.hadirCount).toBe(1);          // hanya w2 (w1 Sohibul dikecualikan)
     expect(r.titipCount).toBe(1);          // w3
     expect(r.tidakCount).toBe(2);          // w4 + w5
     expect(r.talanganCount).toBe(2);       // w4, w5
@@ -78,6 +78,9 @@ describe('ringkasAbsensi', () => {
     );
     expect(r.talanganIds).not.toContain('1');
     expect(r.talanganCount).toBe(0);
+    // Sohibul 'tidak_hadir' TIDAK menambah tidakCount (di luar akuntansi pembayar)
+    expect(r.tidakCount).toBe(0); // w2..w5 semua hadir → tak ada pembayar absen
+    expect(r.hadirCount).toBe(4); // w2..w5
   });
 
   it('status hilang dianggap tidak_hadir → pembayar tanpa data kena talangan', () => {

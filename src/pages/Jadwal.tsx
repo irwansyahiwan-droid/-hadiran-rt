@@ -96,6 +96,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
   useEffect(() => {
     async function loadExisting() {
+      const sohibulId = tarikan.sohibul_bait_id ?? '';
       if (tarikan.status === 'selesai') {
         const { data } = await supabase
           .from('absensi')
@@ -106,10 +107,13 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         (data ?? []).forEach((a: { warga_id: string; status: string }) => {
           init[a.warga_id] = a.status as AbsensiStatus;
         });
+        // Sohibul Bait penerima → selalu 'hadir' (di luar akuntansi talangan).
+        if (sohibulId) init[sohibulId] = 'hadir';
         setMap(init);
       } else {
         const init: AbsensiMap = {};
         wargaList.forEach(w => { init[w.id] = 'tidak_hadir'; });
+        if (sohibulId) init[sohibulId] = 'hadir';
         setMap(init);
       }
       setLoadingAbsensi(false);
@@ -119,13 +123,20 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
   // Pembayar = semua anggota KECUALI Sohibul Bait (Sohibul tidak bayar).
   const sohibulId = tarikan.sohibul_bait_id ?? '';
+  const sohibulWarga = useMemo(() => wargaList.find(w => w.id === sohibulId), [wargaList, sohibulId]);
+  // Daftar yang bisa di-absen = pembayar saja; Sohibul Bait dipajang terpisah.
+  const pembayarList = useMemo(() => wargaList.filter(w => w.id !== sohibulId), [wargaList, sohibulId]);
   // Ringkasan kehadiran & talangan dari satu sumber teruji (absensiHitung.test.ts).
   const { hadirCount, titipCount, tidakCount, talanganTotal } = ringkasAbsensi(wargaList, map, sohibulId);
 
+  // Bulk action hanya menyentuh pembayar; status Sohibul Bait dikunci 'hadir'.
   function setAll(status: AbsensiStatus) {
-    const next: AbsensiMap = {};
-    wargaList.forEach(w => { next[w.id] = status; });
-    setMap(next);
+    setMap(prev => {
+      const next: AbsensiMap = { ...prev };
+      pembayarList.forEach(w => { next[w.id] = status; });
+      if (sohibulId) next[sohibulId] = 'hadir';
+      return next;
+    });
   }
 
   function toggle(id: string) {
@@ -133,19 +144,19 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }
 
   const filtered = useMemo(() => {
-    let list = wargaList;
+    let list = pembayarList;
     if (search) list = list.filter(w => w.nama.toLowerCase().includes(search.toLowerCase()));
     if (filter === 'hadir')  list = list.filter(w => map[w.id] === 'hadir');
     if (filter === 'titip')  list = list.filter(w => map[w.id] === 'titip');
     if (filter === 'belum')  list = list.filter(w => map[w.id] === 'tidak_hadir');
     return list;
-  }, [wargaList, search, filter, map]);
+  }, [pembayarList, search, filter, map]);
 
   async function simpan() {
     setSaving(true);
     try {
       const tarikanId = tarikan.id;
-      const hadirIds  = wargaList.filter(w => map[w.id] === 'hadir').map(w => w.id); // utk total_hadir (kehadiran fisik)
+      const hadirIds  = pembayarList.filter(w => map[w.id] === 'hadir').map(w => w.id); // total_hadir = pembayar hadir (Sohibul di luar akuntansi)
 
       // Semua hitungan uang & talangan dari satu sumber teruji → layar, PDF,
       // dan data tersimpan tak pernah beda rumus.
@@ -311,11 +322,28 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         ))}
       </div>
 
-      {/* Title + count */}
+      {/* Sohibul Bait — penerima, di luar daftar absen & talangan. Dipajang
+          terpisah supaya jelas dia TIDAK kena hitungan iuran/talangan. */}
+      {sohibulWarga && (
+        <div className="flex items-center gap-3 rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-amber-50/70 dark:bg-amber-900/15 px-3.5 py-3 lift">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+            {sohibulWarga.nama.charAt(0)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{sohibulWarga.nama}</p>
+            <p className="text-xs font-medium text-amber-700 dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
+          </div>
+          <span className="px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 shrink-0">
+            Penerima
+          </span>
+        </div>
+      )}
+
+      {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir</p>
+        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
         <span className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
-          {wargaList.length}
+          {pembayarList.length}
         </span>
       </div>
 

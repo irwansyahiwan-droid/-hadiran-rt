@@ -6,9 +6,9 @@ export const SOHIBUL_PER_PEMBAYAR = 45000;   // Rp45.000 → Sohibul Bait
 export const TALANGAN_PER_ORANG = 50000;     // talangan per pembayar absen
 
 export interface RingkasanAbsensi {
-  hadirCount: number;       // status 'hadir' (seluruh anggota)
-  titipCount: number;       // status 'titip' — tidak hadir tapi iuran masuk
-  tidakCount: number;       // status 'tidak_hadir' (seluruh anggota)
+  hadirCount: number;       // pembayar 'hadir' (Sohibul Bait dikecualikan)
+  titipCount: number;       // pembayar 'titip' — tidak hadir tapi iuran masuk
+  tidakCount: number;       // pembayar 'tidak_hadir' (= talanganCount)
   pembayarCount: number;    // semua anggota kecuali Sohibul Bait
   talanganCount: number;    // pembayar 'tidak_hadir' (HANYA ini kena talangan)
   kasTotal: number;         // konstan: pembayarCount × KAS_PER_PEMBAYAR
@@ -26,6 +26,8 @@ export interface RingkasanAbsensi {
  * - HANYA pembayar 'tidak_hadir' kena talangan. 'hadir' & 'titip' bebas
  *   (titip = tidak hadir fisik tapi iurannya tetap masuk).
  * - Sohibul Bait tidak pernah kena talangan (dia penerima, bukan pembayar).
+ * - Semua hitungan kehadiran (hadir/titip/tidak) HANYA atas pembayar; Sohibul
+ *   Bait di luar akuntansi (bukan pembayar, jadi tak ikut diangka-kan).
  */
 export function ringkasAbsensi(
   wargaList: Warga[],
@@ -34,12 +36,14 @@ export function ringkasAbsensi(
 ): RingkasanAbsensi {
   const statusOf = (id: string): AbsensiStatus => map[id] ?? 'tidak_hadir';
 
-  const hadirCount = wargaList.filter(w => statusOf(w.id) === 'hadir').length;
-  const titipCount = wargaList.filter(w => statusOf(w.id) === 'titip').length;
-  const tidakCount = wargaList.filter(w => statusOf(w.id) === 'tidak_hadir').length;
-
+  // Sohibul Bait dikecualikan dari SEMUA hitungan (uang & kehadiran).
   const pembayar = wargaList.filter(w => w.id !== sohibulId);
   const pembayarCount = pembayar.length;
+
+  const hadirCount = pembayar.filter(w => statusOf(w.id) === 'hadir').length;
+  const titipCount = pembayar.filter(w => statusOf(w.id) === 'titip').length;
+  const tidakCount = pembayar.filter(w => statusOf(w.id) === 'tidak_hadir').length;
+
   const talanganPembayar = pembayar.filter(w => statusOf(w.id) === 'tidak_hadir');
 
   return {
