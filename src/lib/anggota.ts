@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { ringkasAbsensi } from './absensiHitung';
+import { ringkasAbsensi, KAS_PER_PEMBAYAR, TALANGAN_PER_ORANG } from './absensiHitung';
 import type { AbsensiStatus, Warga } from './types';
 
 /**
@@ -27,8 +27,9 @@ export interface AnggotaInput {
   role: 'bendahara' | 'warga';
 }
 
-const IURAN_KAS = 5000;        // bagian iuran yang masuk Kas Hadiran per pembayar
-const TALANGAN_NOMINAL = 50000; // talangan per pembayar yang tidak hadir
+// Nominal uang = SATU SUMBER dari absensiHitung.ts (jangan duplikat angka).
+const IURAN_KAS = KAS_PER_PEMBAYAR;       // Rp5.000 → Kas Hadiran per pembayar
+const TALANGAN_NOMINAL = TALANGAN_PER_ORANG; // Rp50.000 talangan per pembayar absen
 
 /** Tambah anggota baru. Mengembalikan baris warga yang baru dibuat. */
 export async function tambahAnggota(input: AnggotaInput): Promise<Warga> {
