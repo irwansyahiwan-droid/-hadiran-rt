@@ -19,7 +19,7 @@ import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
 import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -174,7 +174,7 @@ export default function KasHadiranPage() {
 
   const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
-  const saldo = totalKasTerkumpul - totalTalanganBelum - totalSetor;
+  const saldo = hitungSaldoHadiran(totalKasTerkumpul, totalTalanganBelum, totalSetor);
   const animatedSaldo = useCountUp(saldo);
 
   // Bagikan ringkasan Kas Hadiran sbg kartu PNG bermerek → grup WA warga.

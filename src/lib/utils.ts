@@ -83,6 +83,25 @@ export function formatTanggalShort(dateStr: string): string {
   });
 }
 
+/**
+ * SATU SUMBER rumus Saldo Kas Hadiran. Dipakai dashboard (Beranda) & halaman
+ * Kas Hadiran supaya angkanya tak pernah drift bila salah satu diubah.
+ *
+ *   saldo = kas terkumpul − talangan belum lunas − setoran ke Kas RT
+ *
+ * Saldo SENGAJA bisa NEGATIF: talangan ditutup penuh (Rp50.000) dari kas, jadi
+ * saat banyak talangan belum lunas saldo bisa minus. Kalau minus, dananya
+ * ditalangi Kas RT (kebijakan pengurus — TIDAK dicatat sbg transaksi terpisah).
+ * Jadi saldo negatif itu normal, bukan bug.
+ */
+export function hitungSaldoHadiran(
+  totalKasTerkumpul: number,
+  totalTalanganBelumLunas: number,
+  totalSetor: number,
+): number {
+  return totalKasTerkumpul - totalTalanganBelumLunas - totalSetor;
+}
+
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
   const [wargaRes, tarikanRes, talanganRes, transaksiRes] = await Promise.all([
     supabase.from('warga').select('id', { count: 'exact' }).eq('status_aktif', true),
@@ -110,8 +129,8 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
     .filter((t: { status: string }) => t.status === 'selesai')
     .reduce((sum: number, t: { total_terkumpul: number }) => sum + (t.total_terkumpul ?? 0), 0);
 
-  // Saldo = kas terkumpul − talangan belum lunas − setoran ke kas RT
-  const saldoAktif = totalKasTerkumpul - totalTalanganBelumLunas - totalSetor;
+  // Saldo = kas terkumpul − talangan belum lunas − setoran ke kas RT (satu sumber)
+  const saldoAktif = hitungSaldoHadiran(totalKasTerkumpul, totalTalanganBelumLunas, totalSetor);
 
   return {
     saldo_aktif: saldoAktif,
