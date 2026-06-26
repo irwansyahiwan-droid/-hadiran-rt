@@ -507,6 +507,10 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   eyebrow/judul/desc ke ≥4.5:1 tanpa mengubah warna brand gradient. */}
               <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,0) 56%)' }} />
 
+              {/* Motif anyaman ketupat (songket) — identitas RT, HANYA kartu saldo.
+                  Di bawah konten z-[3]; di-mask ke sudut kanan-atas → nominal kiri bersih. */}
+              {isSaldo && <div aria-hidden className="songket-weave pointer-events-none absolute inset-0" style={{ borderRadius: 30 }} />}
+
               {/* ---------- KONTEN ---------- */}
               {isSaldo ? (
                 /* Kartu saldo non-aktif: tombol Eye/Refresh/stat di dalam heroSlide

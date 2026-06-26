@@ -153,6 +153,13 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
 /* ── Hero card design tokens ─────────────────────────────── */
 :root {
   --hero-radius: 24px;
+  /* ── Emas songket — warna HONOR/dekoratif kultural (identitas RT) ──────
+     BUKAN warna semantik & BUKAN accent kedua. Hidup HANYA di dua tempat:
+     (1) motif anyaman `.songket-weave` pada kartu saldo, (2) sorot "Giliran
+     berikutnya" (mahkota + cincin avatar) Sohibul Bait di Beranda. TIDAK
+     pernah menyentuh uang/status/nav — `warn` (#B45309) tetap satu-satunya
+     amber SEMANTIK. Dipisah persis seperti `setor` biru yang juga scoped. */
+  --gold-songket: #E8B651;
   /* Emerald lebih segar/hidup (tetap deep di kiri-atas agar teks putih lolos kontras) */
   --hero-gradient: linear-gradient(135deg, #0D5B36 0%, #15824C 50%, #1C9A5C 100%);
   --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.34) 0%, rgba(45, 212, 150, 0) 55%);
@@ -185,6 +192,22 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   opacity: 0.06;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Motif anyaman ketupat (songket) — identitas RT pada kartu saldo ──────
+   Kisi belah-ketupat benang emas tipis di atas gradient emerald → kesan kain
+   songket/anyaman bambu: app ini "kampung kita", bukan dompet bank generik.
+   Dekoratif murni (pointer-events-none, di bawah konten z-[3]); soft-light
+   melebur benang ke permukaan (bukan stiker tempel); di-mask ke sudut
+   kanan-ATAS supaya nominal saldo besar di kiri tetap bersih & legibel.
+   Statis → idle tetap tenang (tak ada loop), tak melawan reduced-motion. */
+.songket-weave {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M0 16 L16 0 L32 16 L16 32 Z' fill='none' stroke='%23E8B651' stroke-width='1.25'/%3E%3C/svg%3E");
+  background-size: 32px 32px;
+  opacity: 0.8;
+  mix-blend-mode: soft-light;
+  -webkit-mask-image: radial-gradient(150% 100% at 100% 4%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 66%);
+  mask-image: radial-gradient(150% 100% at 100% 4%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 66%);
 }
 
 .hero-divider-x {

@@ -848,7 +848,14 @@ export default function JadwalPage() {
 
   return (
     <div className="space-y-6 pb-2 page-enter">
-      <SuccessOverlay show={showSuccess} message="Iuran tersimpan & dihitung" onDone={() => setShowSuccess(false)} />
+      <SuccessOverlay
+        show={showSuccess}
+        variant="honor"
+        duration={2100}
+        message={lastResult ? `Tarikan #${lastResult.tarikanNomor} selesai` : 'Iuran tersimpan & dihitung'}
+        submessage={lastResult ? `Sohibul Bait terima ${formatRupiahPlain(lastResult.sohibulBaitTerima)}` : undefined}
+        onDone={() => setShowSuccess(false)}
+      />
       {lastResult && (
         <ResultCard result={lastResult} onDismiss={() => setLastResult(null)} />
       )}

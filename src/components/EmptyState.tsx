@@ -24,6 +24,12 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
         {/* Teal brand, bukan biru — aturan config: biru = sinyal status, bukan accent dekoratif. */}
         <span className="blob absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-teal-300/70" style={{ animationDelay: '-8s' }} />
 
+        {/* Emblem ketupat (anyaman) — identitas RT yang samar membingkai ikon →
+            empty-state terasa "milik app ini", bukan SaaS generik. Emerald (bukan
+            emas: jaga scope `--gold-songket` honor). Statik di belakang tile yang
+            mengambang → parallax halus. */}
+        <span aria-hidden className="absolute inset-0 m-auto w-[68px] h-[68px] rotate-45 rounded-[15px] border border-emerald-400/35 dark:border-emerald-300/15" />
+
         {/* Tile ikon di tengah — token `lift` (crisp card language), bukan shadow-lg
             generik. `empty-bob` = pop masuk lalu mengambang halus (scene bernapas). */}
         <div className="empty-bob lift absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">

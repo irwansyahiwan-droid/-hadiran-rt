@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight, RotateCcw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight, RotateCcw, Crown } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -374,13 +374,25 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </SectionTitle>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {jadwalList.length === 0 ? (
-            <EmptyState icon={CalendarDays} title="Belum ada jadwal" subtitle="Jadwal tarikan berikutnya akan tampil di sini." />
+            <EmptyState icon={CalendarDays} title="Belum ada jadwal tarikan" subtitle="Giliran Sohibul Bait berikutnya akan muncul di sini." />
           ) : (
-            jadwalList.map((j, idx) => (
-              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-4 py-[14px] ${idx < jadwalList.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+            jadwalList.map((j, idx) => {
+              // Item pertama = giliran TERDEKAT → sorot "honor": inti sosial arisan
+              // adalah giliran siapa. Sohibul Bait berikutnya dapat mahkota + cincin
+              // emas songket (selaras motif hero), sisanya tetap baris netral.
+              const next = idx === 0;
+              return (
+              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-4 py-[14px] ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
-                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
+                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className={`w-11 h-11 rounded-2xl ${next ? 'ring-2 ring-[var(--gold-songket)] ring-offset-2 ring-offset-white dark:ring-offset-gray-900' : ''}`} />
+                  {next && (
+                    <Crown
+                      className="absolute -top-2.5 left-1/2 h-4 w-4 -translate-x-1/2 -rotate-[8deg]"
+                      style={{ color: 'var(--gold-songket)', filter: 'drop-shadow(0 1px 1.5px rgba(0,0,0,.35))' }}
+                      fill="currentColor" strokeWidth={0}
+                    />
+                  )}
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-500 text-white text-micro font-bold rounded-full flex items-center justify-center shadow-sm">
                     {j.nomor}
                   </span>
@@ -388,12 +400,20 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
-                    <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
+                    {next ? (
+                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/25 px-2 py-0.5 text-micro font-bold text-emerald-700 dark:text-emerald-300">
+                        <Crown className="h-3 w-3" style={{ color: 'var(--gold-songket)' }} fill="currentColor" strokeWidth={0} />
+                        Giliran berikutnya
+                      </span>
+                    ) : (
+                      <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
+                    )}
                   </div>
                   <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
                 </div>
               </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
