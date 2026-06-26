@@ -859,7 +859,7 @@ export default function JadwalPage() {
           <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{selesaiCount} selesai · {dijadwalCount} terjadwal</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={load} aria-label="Muat ulang" className="press p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
           </button>
           {isBendahara && tarikanList.length > 0 && (

@@ -373,7 +373,7 @@ export default function KasRTPage() {
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={load} aria-label="Muat ulang" className="press p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
             </button>
             {/* Ekspor (PDF/Excel) disatukan ke satu menu → aksi utama "Tambah"
@@ -422,14 +422,14 @@ export default function KasRTPage() {
               <div className="flex items-center gap-0.5 -mr-1.5">
                 <button
                   onClick={handleShareReceipt}
-                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
                   aria-label="Bagikan ringkasan ke WhatsApp"
                 >
                   <Share2 className="w-4 h-4 text-teal-100/80" />
                 </button>
                 <button
                   onClick={() => { haptic(); toggleHideAmount(); }}
-                  className="press p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
                   aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 >
                   {hidden

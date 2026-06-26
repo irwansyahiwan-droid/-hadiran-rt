@@ -858,7 +858,7 @@ export default function KasHadiranPage() {
 
             <button
               onClick={() => setDetailTarikan(null)}
-              className="press absolute top-3 right-4 p-1.5 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="press absolute top-2 right-2 w-11 h-11 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
               aria-label="Tutup"
             >
               <X className="w-4 h-4" />

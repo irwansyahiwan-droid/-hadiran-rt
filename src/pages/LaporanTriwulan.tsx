@@ -137,7 +137,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
         <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
           <button
             onClick={() => { haptic(); onClose(); }}
-            className="press p-2 -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="press w-11 h-11 flex items-center justify-center -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Kembali"
           >
             <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
@@ -148,7 +148,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           </div>
           <button
             onClick={() => { haptic(); setLoading(true); load(); }}
-            className="press p-2 -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="press w-11 h-11 flex items-center justify-center -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Muat ulang"
           >
             <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />

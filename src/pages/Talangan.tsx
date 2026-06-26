@@ -359,7 +359,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               </p>
               <button
                 onClick={() => { haptic(); toggleHideAmount(); }}
-                className="press p-1.5 -mr-1.5 -mt-1 rounded-full hover:bg-white/10 transition-colors"
+                className="press w-11 h-11 flex items-center justify-center -mr-2 -mt-1 rounded-full hover:bg-white/10 transition-colors"
                 aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
               >
                 {hidden
