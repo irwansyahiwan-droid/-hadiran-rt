@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
-import type { Warga } from './types';
+import { ringkasAbsensi } from './absensiHitung';
+import type { AbsensiStatus, Warga } from './types';
 
 /**
  * Logika kelola anggota (warga) + pencatatan "anggota susulan".
@@ -8,8 +9,9 @@ import type { Warga } from './types';
  * tarikan-tarikan lama. Mereka ditandai HADIR di tarikan terdahulu lalu
  * keuangan tarikan itu dihitung ulang.
  *
- * Penting — recomputeTarikan() di sini SENGAJA berbeda dengan tombol
- * "Hitung Ulang" manual di halaman Jadwal:
+ * Penting — recomputeTarikan() memakai RUMUS yang sama dengan tombol "Hitung
+ * Ulang" manual di Jadwal (satu sumber `ringkasAbsensi`: titip bebas talangan,
+ * Sohibul Bait di luar akuntansi). Yang berbeda hanya CARA kerjanya:
  *   - Sumber kehadiran = baris `absensi` yang SUDAH tersimpan di DB
  *     (bukan dari layar yang bisa ter-toggle tak sengaja).
  *   - Tidak menulis ulang absensi anggota lain.
@@ -90,22 +92,25 @@ export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResu
     .eq('status_aktif', true);
   const activeIds = (wargaRows ?? []).map((w) => w.id as string);
 
-  // 3) Kehadiran (sumber kebenaran = absensi di DB)
+  // 3) Kehadiran (sumber kebenaran = absensi tersimpan di DB)
   const { data: absRows } = await supabase
     .from('absensi')
     .select('warga_id, status')
     .eq('tarikan_id', tarikanId);
-  const hadirSet = new Set(
-    (absRows ?? []).filter((a) => a.status === 'hadir').map((a) => a.warga_id as string)
-  );
+  const statusMap: Record<string, AbsensiStatus> = {};
+  (absRows ?? []).forEach((a) => {
+    statusMap[a.warga_id as string] = a.status as AbsensiStatus;
+  });
 
-  // Pembayar = semua anggota aktif KECUALI Sohibul Bait
-  const pembayarIds = activeIds.filter((id) => id !== sohibulId);
-  const pembayarCount = pembayarIds.length;
-  const kasTerkumpul = pembayarCount * IURAN_KAS;
-  const hadirCount = activeIds.filter((id) => hadirSet.has(id)).length;
-  // Pembayar yang TIDAK hadir → kena talangan
-  const talanganIds = pembayarIds.filter((id) => !hadirSet.has(id));
+  // Hitung lewat SATU SUMBER (ringkasAbsensi) — sama persis dgn alur "Proses"
+  // di Jadwal: HANYA 'tidak_hadir' kena talangan (titip BEBAS talangan), Sohibul
+  // Bait di luar akuntansi (uang & kehadiran). ringkasAbsensi hanya butuh id.
+  const wargaLite = activeIds.map((id) => ({ id }) as Warga);
+  const r = ringkasAbsensi(wargaLite, statusMap, sohibulId);
+  const pembayarCount = r.pembayarCount;
+  const kasTerkumpul = r.kasTotal;
+  const hadirCount = r.hadirCount;
+  const talanganIds = r.talanganIds;
   const talanganSet = new Set(talanganIds);
 
   // 4) Talangan — MINIMAL DIFF (jaga history & status lunas yang asli)
