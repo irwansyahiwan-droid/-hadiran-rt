@@ -54,11 +54,13 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
         backfaceVisibility: 'hidden',
       }}
     >
-      {/* bg /82 (naik dari /70): di /70 konten berwarna di belakang (mis. kartu
-          peringatan kuning) menembus & menode kaca jadi tidak netral. /82 tetap
-          translucent (blur+saturate jalan, masih terbaca "kaca") tapi cukup
-          opak agar nav selalu netral di atas konten apa pun. Dark /80. */}
-      <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-16 rounded-[26px] pointer-events-auto bg-white/82 dark:bg-gray-900/80 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-black/[0.06] dark:ring-white/10">
+      {/* Permukaan SOLID (bukan kaca): putih murni → kapsul "pop" tegas di atas
+          konten apa pun, tak ada warna latar yg menembus & menode bar. (Sebelumnya
+          bg-white/82 + backdrop-blur; user minta non-transparan agar putih lebih
+          nendang.) Tanpa backdrop-filter juga lebih hemat GPU & tak lagi perlu
+          guard prefers-reduced-transparency utk bar ini. Ring tepi dinaikkan
+          .06→.08 agar batas kapsul tetap "tercetak" di atas putih solid. Dark = gray-900 solid. */}
+      <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-[70px] rounded-[28px] pointer-events-auto bg-white dark:bg-gray-900 ring-1 ring-black/[0.08] dark:ring-white/10">
         {/* Indikator pill meluncur (spring) — slot selebar tombol, pill di area ikon.
             Row TANPA padding horizontal agar slot = lebar tombol persis. */}
         {activeIndex >= 0 && (
@@ -74,7 +76,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
             {/* Lozenge aktif 2026 — gradient brand 3-stop + hairline ring + tepi
                 atas tersinari (inset highlight) + glow brand lebih hidup → pill
                 aktif "menyala" dengan kedalaman kaca, bukan tint datar. */}
-            <span className="absolute left-1/2 -translate-x-1/2 top-1.5 w-16 h-9 rounded-2xl bg-gradient-to-b from-brand-link/[0.22] via-brand-link/[0.12] to-brand-link/[0.06] ring-1 ring-brand-link/25 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_6px_18px_-5px_rgba(13,107,94,0.55)] dark:from-emerald-400/[0.26] dark:via-emerald-400/[0.14] dark:to-emerald-400/[0.06] dark:ring-emerald-400/25 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_6px_20px_-5px_rgba(52,211,153,0.5)]" />
+            <span className="absolute left-1/2 -translate-x-1/2 top-2 w-[68px] h-10 rounded-2xl bg-gradient-to-b from-brand-link/[0.22] via-brand-link/[0.12] to-brand-link/[0.06] ring-1 ring-brand-link/25 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5),0_6px_18px_-5px_rgba(13,107,94,0.55)] dark:from-emerald-400/[0.26] dark:via-emerald-400/[0.14] dark:to-emerald-400/[0.06] dark:ring-emerald-400/25 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_6px_20px_-5px_rgba(52,211,153,0.5)]" />
           </div>
         )}
         {visibleTabs.map(({ id, label, icon: Icon }) => {
@@ -97,7 +99,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
                 style={{ transitionTimingFunction: 'var(--ease-spring)' }}
               >
                 <Icon
-                  className={`w-[25px] h-[25px] transition-colors duration-300 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
+                  className={`w-[26px] h-[26px] transition-colors duration-300 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
                   strokeWidth={isActive ? 2.2 : 2}
                   fill={isActive ? 'currentColor' : 'none'}
                   style={{ fillOpacity: isActive ? 0.2 : 0, transition: 'fill-opacity 300ms var(--ease-spring)' }}

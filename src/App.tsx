@@ -153,9 +153,9 @@ export default function App() {
           onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
         />
-        {/* Nav kini kapsul MELAYANG (h-16 + jarak bawah 12px) → butuh ruang lebih
-            agar konten tak ngumpet di belakangnya. 4rem nav + 12px gap + napas. */}
-        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom) + 1.75rem)' }}>
+        {/* Nav kini kapsul MELAYANG (h-[70px] + jarak bawah 6px) → butuh ruang lebih
+            agar konten tak ngumpet di belakangnya. 4.5rem nav + gap + napas. */}
+        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
             <div {...swipe}>
               <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>

@@ -290,7 +290,7 @@ export default function JadwalWargaPage() {
                   key={id}
                   onClick={() => setWargaFilter(id)}
                   aria-pressed={wargaFilter === id}
-                  className={`py-1.5 rounded-xl text-xs font-semibold border transition ${
+                  className={`inline-flex items-center justify-center min-h-[44px] rounded-xl text-xs font-semibold border transition ${
                     wargaFilter === id
                       ? 'bg-brand text-white border-brand'
                       : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
