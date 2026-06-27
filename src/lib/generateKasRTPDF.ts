@@ -5,6 +5,7 @@ import {
   TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, C, fmtNum,
 } from './pdfTheme';
 import type { KasRT } from './types';
+import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
 
 interface KasRTStats {
   saldo: number;
@@ -74,43 +75,40 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   });
   Y = getY(doc);
 
-  Y = sectionLabel(doc, Y + 6, 'Pemasukan', W, M, { text: `+${rp(stats.totalMasuk)}`, tone: 'pos' });
-  autoTable(doc, {
-    ...TABLE,
-    startY: Y,
-    head: [HEAD],
-    body: masukList.map((k, i) => [
-      String(i + 1), fmtDate(k.tanggal), k.keterangan, `+${fmtNum(k.nominal)}`, fmtNum(k.saldo_setelah),
-    ]),
-    margin: { left: M, right: M },
-    columnStyles: COL,
-    didParseCell(data) {
-      if (data.section === 'body' && data.column.index === 3) {
-        data.cell.styles.textColor = C.pos;
-        data.cell.styles.fontStyle = 'bold';
-      }
-    },
-  });
-  Y = getY(doc);
+  // Satu sub-bagian per kategori (label "PENERIMAAN/PENGELUARAN — <kategori>" +
+  // subtotal + tabel) → laporan berkelompok untuk pertanggungjawaban.
+  const renderKategori = (
+    startY: number, prefix: string, label: string, rows: KasRT[],
+    tone: 'pos' | 'neg', sign: '+' | '-',
+  ): number => {
+    if (rows.length === 0) return startY;
+    const sub = rows.reduce((s, k) => s + k.nominal, 0);
+    const y = sectionLabel(doc, startY + 6, `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone });
+    autoTable(doc, {
+      ...TABLE,
+      startY: y,
+      head: [HEAD],
+      body: rows.map((k, i) => [
+        String(i + 1), fmtDate(k.tanggal), k.keterangan, `${sign}${fmtNum(k.nominal)}`, fmtNum(k.saldo_setelah),
+      ]),
+      margin: { left: M, right: M },
+      columnStyles: COL,
+      didParseCell(data) {
+        if (data.section === 'body' && data.column.index === 3) {
+          data.cell.styles.textColor = tone === 'pos' ? C.pos : C.neg;
+          data.cell.styles.fontStyle = 'bold';
+        }
+      },
+    });
+    return getY(doc);
+  };
 
-  Y = sectionLabel(doc, Y + 6, 'Pengeluaran', W, M, { text: `-${rp(stats.totalKeluar)}`, tone: 'neg' });
-  autoTable(doc, {
-    ...TABLE,
-    startY: Y,
-    head: [HEAD],
-    body: keluarList.map((k, i) => [
-      String(i + 1), fmtDate(k.tanggal), k.keterangan, `-${fmtNum(k.nominal)}`, fmtNum(k.saldo_setelah),
-    ]),
-    margin: { left: M, right: M },
-    columnStyles: COL,
-    didParseCell(data) {
-      if (data.section === 'body' && data.column.index === 3) {
-        data.cell.styles.textColor = C.neg;
-        data.cell.styles.fontStyle = 'bold';
-      }
-    },
-  });
-  Y = getY(doc);
+  for (const kat of KATEGORI_MASUK) {
+    Y = renderKategori(Y, 'PENERIMAAN', kat.label, masukList.filter((k) => (k.kategori ?? 'lainnya') === kat.key), 'pos', '+');
+  }
+  for (const kat of KATEGORI_KELUAR) {
+    Y = renderKategori(Y, 'PENGELUARAN', kat.label, keluarList.filter((k) => (k.kategori ?? 'lainnya') === kat.key), 'neg', '-');
+  }
 
   // ── Ringkasan tutup buku ──────────────────────────────────────
   Y = drawSummary(doc, Y + 6, [

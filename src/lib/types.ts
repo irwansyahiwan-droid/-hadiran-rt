@@ -63,6 +63,7 @@ export interface KasRT {
   keterangan: string;
   tanggal: string;
   tarikan_id: string | null;
+  kategori: string | null;   // lihat lib/kategoriKasRt.ts; NULL = Saldo Awal / belum dikategorikan
   saldo_setelah: number;
   created_at: string;
 }

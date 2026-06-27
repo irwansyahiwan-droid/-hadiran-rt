@@ -23,6 +23,7 @@ import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
 import TargetKasRT from '../components/TargetKasRT';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
+import { kategoriOpsi, kategoriDefault, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -30,7 +31,7 @@ type Tipe = 'masuk' | 'keluar';
 interface ModalProps {
   saldoSekarang: number;
   initial?: KasRT | null;
-  onSave: (data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string }) => Promise<void>;
+  onSave: (data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string; kategori: string }) => Promise<void>;
   onClose: () => void;
 }
 
@@ -40,16 +41,23 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(() => (initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
+  const [kategori, setKategori] = useState<string>(initial?.kategori ?? kategoriDefault(initial?.tipe ?? 'masuk'));
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
   const dlg = useDialog(true, { onClose, label: isEdit ? 'Edit transaksi Kas RT' : 'Tambah transaksi Kas RT' });
+
+  // Ganti tipe → pastikan kategori tetap valid utk tipe baru (set default bila tidak).
+  function pilihTipe(t: Tipe) {
+    setTipe(t);
+    setKategori((cur) => (kategoriOpsi(t).some((o) => o.key === cur) ? cur : kategoriDefault(t)));
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!nominal) return;
     setSaving(true);
     try {
-      await onSave({ tipe, nominal, keterangan, tanggal });
+      await onSave({ tipe, nominal, keterangan, tanggal, kategori });
     } finally {
       setSaving(false);
     }
@@ -79,7 +87,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               <button
                 key={t}
                 type="button"
-                onClick={() => setTipe(t)}
+                onClick={() => pilihTipe(t)}
                 className={`py-2.5 rounded-xl text-sm font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
@@ -91,6 +99,17 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 {t === 'masuk' ? '↓ Pemasukan' : '↑ Pengeluaran'}
               </button>
             ))}
+          </div>
+
+          {/* Kategori — untuk laporan pertanggungjawaban (opsi ikut tipe) */}
+          <div>
+            <label htmlFor="kasrt-kategori" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Kategori</label>
+            <select id="kasrt-kategori" name="kategori" value={kategori} onChange={(e) => setKategori(e.target.value)} required
+              className="field">
+              {kategoriOpsi(tipe).map((o) => (
+                <option key={o.key} value={o.key}>{o.label}</option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -308,16 +327,29 @@ export default function KasRTPage() {
   // Seri saldo kronologis untuk area tren.
   const saldoSeries = useMemo(() => list.map((k) => k.saldo_setelah), [list]);
 
+  // Rekap per kategori (pertanggungjawaban) — Saldo Awal dikecualikan.
+  const rekapKategori = useMemo(() => {
+    const masuk: Record<string, number> = {};
+    const keluar: Record<string, number> = {};
+    for (const k of list) {
+      if (k.keterangan === 'Saldo Awal Kas RT') continue;
+      const bucket = k.tipe === 'masuk' ? masuk : keluar;
+      const key = k.kategori ?? 'lainnya';
+      bucket[key] = (bucket[key] ?? 0) + k.nominal;
+    }
+    return { masuk, keluar };
+  }, [list]);
+
 
   const today = new Date().toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
   });
 
-  async function handleSave(data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string }) {
+  async function handleSave(data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string; kategori: string }) {
     if (editing) {
       const { data: upd, error } = await supabase
         .from('kas_rt')
-        .update({ tipe: data.tipe, nominal: data.nominal, keterangan: data.keterangan, tanggal: data.tanggal })
+        .update({ tipe: data.tipe, nominal: data.nominal, keterangan: data.keterangan, tanggal: data.tanggal, kategori: data.kategori })
         .eq('id', editing.id)
         .select();
       if (error) { showToast(pesanError(error, 'Gagal mengubah transaksi.'), 'error'); return; }
@@ -328,6 +360,7 @@ export default function KasRTPage() {
         nominal: data.nominal,
         keterangan: data.keterangan,
         tanggal: data.tanggal,
+        kategori: data.kategori,
         saldo_setelah: 0, // sementara; dihitung ulang di bawah
       });
       if (error) { showToast(pesanError(error, 'Gagal menyimpan transaksi.'), 'error'); return; }
@@ -517,6 +550,47 @@ export default function KasRTPage() {
           </div>
         )}
 
+        {/* Rekap per kategori — untuk pertanggungjawaban */}
+        {!loading && list.length > 0 && (
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4 mt-4">
+            <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Rekap per Kategori</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Penerimaan */}
+              <div className="inset-soft rounded-xl p-3">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Penerimaan</span>
+                  <span className="text-caption font-bold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
+                </div>
+                <div className="space-y-1.5">
+                  {KATEGORI_MASUK.filter((o) => (rekapKategori.masuk[o.key] ?? 0) > 0).map((o) => (
+                    <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
+                      <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                      <span className="font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
+                    </div>
+                  ))}
+                  {totalMasuk === 0 && <p className="text-caption text-ink-faint dark:text-gray-500">Belum ada penerimaan.</p>}
+                </div>
+              </div>
+              {/* Pengeluaran */}
+              <div className="inset-soft rounded-xl p-3">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Pengeluaran</span>
+                  <span className="text-caption font-bold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
+                </div>
+                <div className="space-y-1.5">
+                  {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
+                    <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
+                      <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                      <span className="font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
+                    </div>
+                  ))}
+                  {totalKeluar === 0 && <p className="text-caption text-ink-faint dark:text-gray-500">Belum ada pengeluaran.</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
         <SectionTitle className="mt-6" count={list.length}>Mutasi Kas Besar RT</SectionTitle>
 
@@ -614,7 +688,14 @@ export default function KasRTPage() {
                     <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
-                    <p className="text-caption font-medium text-ink-faint dark:text-gray-400 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      <p className="text-caption font-medium text-ink-faint dark:text-gray-400 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
+                      {k.kategori && (
+                        <span className="text-micro font-semibold px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300 whitespace-nowrap">
+                          {labelKategoriSingkat(k.tipe, k.kategori)}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="text-right shrink-0">

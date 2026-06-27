@@ -378,6 +378,7 @@ export default function KasHadiranPage() {
         nominal: data.nominal,
         keterangan: ket,
         tanggal: data.tanggal,
+        kategori: 'hadiran',   // penerimaan Kas RT dari Kas Hadiran → otomatis terkategori
         saldo_setelah: 0, // dihitung ulang di bawah
       }),
     ]);
