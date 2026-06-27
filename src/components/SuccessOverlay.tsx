@@ -78,11 +78,15 @@ export default function SuccessOverlay({ show, message = 'Berhasil!', submessage
               terima). Menyambung benang honor: motif songket hero → "Giliran
               berikutnya" → perayaan ini. Hanya variant honor. */}
           {honor && (
-            <Crown
-              className="success-pop absolute left-1/2 -top-[18px] z-10 h-7 w-7 -translate-x-1/2 -rotate-[10deg]"
-              style={{ color: 'var(--gold-songket)', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.4))' }}
-              fill="currentColor" strokeWidth={0}
-            />
+            // Posisi & miring di wrapper agar tidak ketiban transform animasi
+            // .success-pop (yang meng-animate scale) — mahkota tetap center & miring.
+            <span className="absolute left-1/2 -top-[18px] z-10 -translate-x-1/2 -rotate-[10deg]">
+              <Crown
+                className="success-pop block h-7 w-7"
+                style={{ color: 'var(--gold-songket)', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.4))' }}
+                fill="currentColor" strokeWidth={0}
+              />
+            </span>
           )}
 
           {/* Lingkaran + centang. Variant honor → cincin emas tipis di tepi. */}

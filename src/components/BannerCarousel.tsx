@@ -418,7 +418,14 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
       <div
         ref={viewportRef}
         className="relative w-full overflow-hidden"
-        style={{ height: viewportH, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y' }}
+        style={{
+          height: viewportH, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y',
+          // Fade halus di tepi kiri/kanan → kartu tetangga yang mengintip MELEBUR
+          // di tepi layar, bukan terpotong garis keras (teks tak lagi "kepotong").
+          // 28px < jarak kartu aktif ke tepi (~32px) → kartu aktif tak tersentuh.
+          maskImage: 'linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%)',
+        }}
         onMouseEnter={() => { hoverRef.current = true; }}
         onMouseLeave={() => { hoverRef.current = false; }}
         onPointerDown={onDown}
