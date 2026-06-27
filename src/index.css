@@ -360,6 +360,24 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
+/* ── Icon tile (Pass 7c) — depth tipis di chip ikon ber-tint ───────────────
+   Menumpang DI ATAS bg-*-100 (warna dari Tailwind) tanpa mengubah tint: sheen
+   putih dari atas + ring halus + contact tipis → chip "tersinari & terangkat",
+   bukan kotak warna datar. Warna-agnostik (emerald/blue/amber/rose semuanya). */
+.icon-tile {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(10, 14, 26, 0.05),
+    0 1px 2px 0 rgba(10, 14, 26, 0.06);
+}
+.dark .icon-tile {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 55%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
 /* Dark elevation premium: di latar gelap bayangan drop tak terbaca & halo putih
    jadi cincin norak → pisahkan kartu lewat (1) ring cahaya tipis di tepi +
    (2) drop GELAP dalam utk kedalaman nyata. Bukan halo putih. */

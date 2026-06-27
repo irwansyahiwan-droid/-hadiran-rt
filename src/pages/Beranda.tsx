@@ -341,7 +341,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       {/* Alert Banner */}
       {talangan > 0 && (
         <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl px-5 py-4">
-          <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
+          <div className="icon-tile w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="flex-1 min-w-0">
@@ -487,7 +487,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
                 className={`press rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < visibleTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
               >
-                <div className={`w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+                <div className={`icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
                   {trx.tipe === 'setor'
                     ? <ArrowUpRight className="w-[18px] h-[18px] text-blue-600 dark:text-blue-400" />
                     : <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-500 dark:text-emerald-400" />
@@ -534,7 +534,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           {...trxDrag.handlers}
         >
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+          <div className={`icon-tile w-11 h-11 rounded-2xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
             {selectedTrx.tipe === 'setor'
               ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               : <ArrowDownLeft className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />}
