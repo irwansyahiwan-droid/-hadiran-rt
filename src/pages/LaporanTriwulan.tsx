@@ -18,7 +18,7 @@ interface Props {
 
 function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number; keluar: number; saldo: number }) {
   return (
-    <div className="rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-3">
+    <div className="rounded-2xl inset-soft p-3">
       <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">{judul}</p>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-caption">

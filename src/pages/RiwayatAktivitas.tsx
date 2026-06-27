@@ -260,7 +260,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               </div>
                             )}
                             {hasMore && (
-                              <div className="space-y-1.5 bg-gray-50 dark:bg-gray-800/60 rounded-xl p-2.5">
+                              <div className="space-y-1.5 inset-soft rounded-xl p-2.5">
                                 {v.changes.map((c, i) => (
                                   <div key={i} className="flex items-center gap-1.5 text-micro flex-wrap">
                                     <span className="text-ink-faint dark:text-gray-400 font-medium">{c.label}:</span>

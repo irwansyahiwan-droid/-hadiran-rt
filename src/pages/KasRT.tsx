@@ -660,7 +660,7 @@ export default function KasRTPage() {
             </div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100 leading-snug">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</p>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-2.5 mt-3">
+            <div className="inset-soft rounded-2xl p-4 space-y-2.5 mt-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Tipe</span>
                 <span className={`text-sm font-semibold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>

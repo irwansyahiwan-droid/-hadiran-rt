@@ -111,7 +111,7 @@ export default function TentangApp({ open, onClose }: Props) {
         <Section icon={Users} title="STRUKTUR PENGURUS RT 004/006">
           <div className="space-y-2">
             {PENGURUS.map((p) => (
-              <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl bg-gray-50 dark:bg-gray-800/60 p-2.5">
+              <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl inset-soft p-2.5">
                 <AvatarPeci nama={p.nama} className="w-10 h-10 rounded-xl" />
                 <div className="min-w-0">
                   <p className="text-micro font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>

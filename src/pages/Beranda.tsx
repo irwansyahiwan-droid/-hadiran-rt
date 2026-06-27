@@ -541,7 +541,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <p className="text-body font-medium text-gray-900 dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
           <p className="text-xs text-ink-faint dark:text-gray-400 mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 space-y-3">
+          <div className="inset-soft rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500 dark:text-gray-400">Jumlah</span>
               <span className={`font-display text-amount font-bold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>

@@ -294,7 +294,15 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
     0 1px 2px 0 rgba(10, 14, 26, 0.07),                       /* contact shadow rapat → kartu menapak */
     0 8px 16px -6px rgba(10, 14, 26, 0.10),                   /* key mid — terkontain (spread neg), bukan fog */
     0 24px 48px -18px rgba(10, 14, 26, 0.18);                 /* ambient float — lebih lega/mewah, tetap rapat */
-  --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.33);
+  /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
+     spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
+     drop datar → glass top + edge crisp + key + ambient lega. */
+  --shadow-float:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(10, 14, 26, 0.07),
+    0 2px 6px -2px rgba(10, 14, 26, 0.12),
+    0 14px 28px -10px rgba(10, 14, 26, 0.18),
+    0 30px 56px -22px rgba(10, 14, 26, 0.24);
 }
 
 /* Soft layered elevation for surfaces */
@@ -328,7 +336,29 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
 /* Pass 7: putih murni dipertahankan lebih lama (0→62%) baru memudar tipis →
    kartu terasa lebih bersih & "menyala" dari atas, fade dasar tetap cool-neutral. */
 html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #FBFDFF 62%, #F1F6FC 100%); }
-.dark .lift { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 58%); }
+/* Pass 7 paritas dark: sheen putih ditahan lebih lama (.05→.07, fade ke 100%) → kartu dark ikut "menyala" dari atas spt light. */
+.dark .lift { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 62%, rgba(255, 255, 255, 0) 100%); }
+
+/* ── Panel inset (Pass 7) — sub-panel "tertanam" di dalam kartu putih ──────
+   Pengganti `bg-gray-50` polos yg jadi paling kusam di samping kartu yg kini
+   lebih nyala. Recessed = inner top-shadow (masuk ke dalam) + hairline halus +
+   dasar tersinari. Terasa "dipahat", bukan kotak abu datar. Pakai di panel
+   KONTEN (baris detail/stat), BUKAN tombol/input. */
+.inset-soft {
+  background-color: #EFF3F8;
+  background-image: linear-gradient(180deg, #EDF1F7 0%, #F5F8FC 100%);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(10, 14, 26, 0.06),
+    inset 0 0 0 1px rgba(10, 14, 26, 0.045),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.8);
+}
+.dark .inset-soft {
+  background-color: rgba(0, 0, 0, 0.18);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
 
 /* Dark elevation premium: di latar gelap bayangan drop tak terbaca & halo putih
    jadi cincin norak → pisahkan kartu lewat (1) ring cahaya tipis di tepi +
@@ -343,12 +373,15 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
   /* Pass 4 (2026-06-19) — paritas "floating glass" dgn light: satu lift 10/24
      diganti dua lapis key+ambient ber-spread negatif. Di gelap separasi tetap
      dari RING cahaya (.12→.13) + ambient gelap yg melayang tanpa melebar. */
+  /* Pass 7 paritas dark: geometri disamakan light (key 8/16, ambient 24/48
+     lebih lega/mewah) + tepi-atas .08→.10 (sedikit lebih "menyala"). Ring
+     cahaya .13 tetap carry separasi di gelap; spread tetap negatif → tak fog. */
   --shadow-card:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),               /* tepi atas "tersinari" — glass edge */
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),               /* tepi atas "tersinari" — glass edge */
     0 0 0 1px rgba(255, 255, 255, 0.13),                      /* ring cahaya → kartu "tercetak" tegas di gelap */
     0 1px 2px rgba(0, 0, 0, 0.5),                             /* contact shadow rapat → kartu menapak */
-    0 6px 12px -4px rgba(0, 0, 0, 0.45),                      /* key mid — terkontain (spread neg) */
-    0 18px 36px -14px rgba(0, 0, 0, 0.66);                    /* ambient float — kedalaman tanpa fog */
+    0 8px 16px -6px rgba(0, 0, 0, 0.45),                      /* key mid — terkontain (spread neg) */
+    0 24px 48px -18px rgba(0, 0, 0, 0.62);                    /* ambient float — lebih lega, kedalaman tanpa fog */
   --shadow-float: 0 18px 48px -12px rgba(0, 0, 0, 0.72);
 }
 
