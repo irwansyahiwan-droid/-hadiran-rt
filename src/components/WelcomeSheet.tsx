@@ -7,7 +7,7 @@ import logoRt from '../assets/logo-rt.svg';
 
 // Sekali tampil per perangkat. Naikkan versi (v2…) bila isi sambutan berubah
 // signifikan & ingin ditampilkan ulang ke semua warga.
-const KEY = 'hadiran-welcome-v1';
+const KEY = 'hadiran-welcome-v2';
 
 const ITEMS = [
   { icon: Wallet,         title: 'Saldo kas',        desc: 'Lihat saldo Kas Hadiran & total yang terkumpul.' },
@@ -50,7 +50,7 @@ export default function WelcomeSheet() {
         <img src={logoRt} alt="" className="w-14 h-14 rounded-2xl object-contain mx-auto mb-3 ring-1 ring-black/5 dark:ring-white/10" />
         <h2 className="text-xl font-bold text-ink dark:text-gray-100 text-center">Selamat datang</h2>
         <p className="text-caption text-ink-sub dark:text-gray-400 text-center mt-1 mb-5">
-          Aplikasi kas &amp; arisan RT 004/006. Di sini kamu bisa:
+          Aplikasi Kas &amp; Hadiran RT 004/006. Di sini Bapak-Bapak / Warga bisa:
         </p>
 
         <div className="space-y-3 mb-4">
