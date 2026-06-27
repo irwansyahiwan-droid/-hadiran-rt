@@ -129,8 +129,12 @@ input, textarea  { caret-color: #1B7249; }
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
   background-color: #E6EAF1;
+  /* Pass 7: bisik brand dinaikkan tipis (0.06→0.085) + tambah whisper sky di
+     sudut kanan-atas (0.05) → kanvas terasa lebih "seger"/airy. Tetap di puncak
+     (atmosferik), BUKAN glow di belakang kartu. Base color #E6EAF1 tak berubah. */
   background-image:
-    radial-gradient(120% 56% at 50% -12%, rgba(16, 185, 129, 0.06) 0%, transparent 55%);
+    radial-gradient(120% 60% at 50% -14%, rgba(16, 185, 129, 0.085) 0%, transparent 56%),
+    radial-gradient(92% 50% at 100% -2%, rgba(56, 189, 248, 0.05) 0%, transparent 54%);
   background-attachment: fixed;
 }
 .dark .app-bg {
@@ -279,12 +283,17 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      Pass 6 (2026-06-25): canvas turun tipis #EEF1F6→#E6EAF1 (gap tonal naik ~3% L,
      "kartu lebih nendang") — resep edge/lift di bawah TETAP, kini bekerja bareng
      gap tonal kecil itu. Tetap airy, bukan balik ke punch #D4DAE4. */
+  /* Pass 7 (2026-06-27): "lebih glowing/mewah/seger" tanpa melanggar 'no glow
+     antar-kartu' — cara premium = cahaya-dari-atas + float lebih lega. Edge
+     0.12→0.09 (lebih bersih, kurang "tercetak"), ambient diperlebar 18→24/36→48
+     dgn alpha sedikit turun (0.19→0.18) tapi spread TETAP negatif → melayang
+     mewah, bukan fog. Inner highlight tetap penuh (kaca disinari). */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(10, 14, 26, 0.12),                         /* tepi crisp 1px → definisi edge, kartu "tercetak" */
-    0 1px 2px 0 rgba(10, 14, 26, 0.08),                       /* contact shadow rapat → kartu menapak */
-    0 6px 12px -4px rgba(10, 14, 26, 0.12),                   /* key mid — terkontain (spread neg), bukan fog */
-    0 18px 36px -14px rgba(10, 14, 26, 0.19);                 /* ambient float — melayang tegas, tetap rapat */
+    0 0 0 1px rgba(10, 14, 26, 0.09),                         /* tepi crisp 1px → definisi edge, lebih bersih */
+    0 1px 2px 0 rgba(10, 14, 26, 0.07),                       /* contact shadow rapat → kartu menapak */
+    0 8px 16px -6px rgba(10, 14, 26, 0.10),                   /* key mid — terkontain (spread neg), bukan fog */
+    0 24px 48px -18px rgba(10, 14, 26, 0.18);                 /* ambient float — lebih lega/mewah, tetap rapat */
   --shadow-float:  0 16px 43px -12px rgba(16, 24, 40, 0.33);
 }
 
@@ -316,7 +325,9 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
    putih, terverifikasi: tak ada .lift non-putih / ber-bg-gradient). Mengisi
    background-image di atas background-color bg-white → tak menyentuh markup.
    Dark: sheen putih sangat halus di tepi atas (top glass) di atas gray-900. */
-html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F4F7FC 100%); }
+/* Pass 7: putih murni dipertahankan lebih lama (0→62%) baru memudar tipis →
+   kartu terasa lebih bersih & "menyala" dari atas, fade dasar tetap cool-neutral. */
+html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #FBFDFF 62%, #F1F6FC 100%); }
 .dark .lift { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 58%); }
 
 /* Dark elevation premium: di latar gelap bayangan drop tak terbaca & halo putih
