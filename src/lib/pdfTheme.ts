@@ -1,4 +1,5 @@
 import type jsPDF from 'jspdf';
+import { LOGO_DATA_URL } from './logoBase64';
 
 /**
  * Tema bersama semua PDF — minimalis clean "startup 2026" (Stripe/Mercury/Linear).
@@ -48,9 +49,18 @@ export function drawMasthead(
 ): number {
   const { W, M } = o;
 
-  // Wordmark kecil ber-letterspace — satu-satunya aksen brand
+  // Logo identitas "46" (letterhead kiri-atas). Opsional — bila gagal, layout
+  // tetap jalan (wordmark di-shift hanya jika logo tampil).
+  const LOGO = 11.5;
+  let textX = M;
+  try {
+    doc.addImage(LOGO_DATA_URL, 'JPEG', M, 8.5, LOGO, LOGO);
+    textX = M + LOGO + 3.5;
+  } catch { /* logo opsional */ }
+
+  // Wordmark kecil ber-letterspace — di samping logo
   doc.setFont('helvetica', 'bold'); doc.setFontSize(7); setColor(doc, C.brand);
-  doc.text('HADIRAN RT  ·  RT 004/006 TANAH BARU — BEJI, DEPOK', M, 16, { charSpace: 0.5 });
+  doc.text('HADIRAN RT  ·  RT 004/006 TANAH BARU — BEJI, DEPOK', textX, 16, { charSpace: 0.5 });
 
   // Meta kanan: kode dokumen + tanggal cetak
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7); setColor(doc, C.faint);
