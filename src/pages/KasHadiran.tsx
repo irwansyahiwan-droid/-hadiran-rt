@@ -26,14 +26,20 @@ import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 interface SetorModalProps {
   saldoHadiran: number;
-  onSave: (data: { nominal: number; keterangan: string; tanggal: string }) => Promise<void>;
+  tarikanList: Tarikan[];
+  onSave: (data: { nominal: number; keterangan: string; tanggal: string; tarikan_id: string | null }) => Promise<void>;
   onClose: () => void;
 }
 
-function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
+function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalProps) {
+  // Tarikan terbaru dulu — setoran umumnya dari tarikan terakhir.
+  const tarikanOpsi = useMemo(() => [...tarikanList].sort((a, b) => b.nomor - a.nomor), [tarikanList]);
   const [nominal, setNominal] = useState(0);
   const [keterangan, setKeterangan] = useState('');
   const [tanggal, setTanggal] = useState(() => new Date().toISOString().split('T')[0]);
+  // Default = tarikan paling baru. WAJIB diisi → setoran selalu ter-link ke tarikan
+  // (kalau tidak, kolom SETOR di PDF alur kas kosong & total tak rekonsiliasi).
+  const [tarikanId, setTarikanId] = useState<string>(() => tarikanOpsi[0]?.id ?? '');
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
   useBackDismiss(true, onClose);
@@ -44,7 +50,7 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
     if (!nominal) return;
     setSaving(true);
     try {
-      await onSave({ nominal, keterangan, tanggal });
+      await onSave({ nominal, keterangan, tanggal, tarikan_id: tarikanId || null });
     } finally {
       setSaving(false);
     }
@@ -64,6 +70,18 @@ function SetorModal({ saldoHadiran, onSave, onClose }: SetorModalProps) {
           </p>
         </div>
         <form onSubmit={submit} className="space-y-3">
+          <div>
+            <label htmlFor="kashadiran-tarikan" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Dari tarikan</label>
+            <select id="kashadiran-tarikan" name="tarikan" value={tarikanId} onChange={e => setTarikanId(e.target.value)} required
+              className="field">
+              {tarikanOpsi.length === 0 && <option value="">— belum ada tarikan selesai —</option>}
+              {tarikanOpsi.map(t => (
+                <option key={t.id} value={t.id}>
+                  #{t.nomor} · {t.sohibul_bait?.nama ?? '—'} · {new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label htmlFor="kashadiran-keterangan" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Keterangan</label>
             <input id="kashadiran-keterangan" name="keterangan" autoComplete="off" type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
@@ -343,7 +361,7 @@ export default function KasHadiranPage() {
   }
 
   // Setor dari Kas Hadiran → Kas RT (catat di dua tabel) + recompute saldo kas_rt.
-  async function handleSetor(data: { nominal: number; keterangan: string; tanggal: string }) {
+  async function handleSetor(data: { nominal: number; keterangan: string; tanggal: string; tarikan_id: string | null }) {
     const saldoBaru = saldo - data.nominal;
     const ket = data.keterangan || 'Setoran dari Kas Hadiran';
     const [tx, kr] = await Promise.all([
@@ -352,6 +370,7 @@ export default function KasHadiranPage() {
         nominal: data.nominal,
         keterangan: ket,
         tanggal: data.tanggal,
+        tarikan_id: data.tarikan_id,   // link ke tarikan → muncul di kolom SETOR PDF alur kas
         saldo_setelah: saldoBaru,
       }),
       supabase.from('kas_rt').insert({
@@ -697,6 +716,7 @@ export default function KasHadiranPage() {
       {showModal && (
         <SetorModal
           saldoHadiran={saldo}
+          tarikanList={tarikanSelesai}
           onSave={handleSetor}
           onClose={() => setShowModal(false)}
         />
