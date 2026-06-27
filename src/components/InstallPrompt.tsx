@@ -68,7 +68,7 @@ export default function InstallPrompt() {
   return (
     <>
       <div
-        className="fixed left-1/2 -translate-x-1/2 z-banner w-[calc(100%-2rem)] max-w-sm rise"
+        className="fixed inset-x-4 mx-auto z-banner w-auto max-w-sm rise"
         style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
       >
         <div

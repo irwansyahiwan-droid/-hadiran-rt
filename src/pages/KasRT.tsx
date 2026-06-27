@@ -446,7 +446,7 @@ export default function KasRTPage() {
 
             {/* Saldo Awal inline info */}
             {saldoAwal > 0 && saldoAwalEntry && (
-              <p className="text-teal-200/80 text-xs mb-4">
+              <p className="text-teal-100/90 text-xs mb-4">
                 Saldo Awal
                 {' · '}
                 {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}

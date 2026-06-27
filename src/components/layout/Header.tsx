@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, X, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
@@ -26,6 +26,16 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   // Listener scroll dibagi pakai (lihat hook).
   const scrolled = useScrolledPast(6);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Banner "Mode Warga" bisa ditutup permanen — pendatang baru tetap lihat,
+  // pengguna lama bebas hilangkan agar konten dapat ruang. Disimpan di localStorage.
+  const [bannerDismissed, setBannerDismissed] = useState(() => {
+    try { return localStorage.getItem('hadiran-warga-banner') === '1'; } catch { return false; }
+  });
+  function dismissBanner() {
+    haptic(8);
+    setBannerDismissed(true);
+    try { localStorage.setItem('hadiran-warga-banner', '1'); } catch { /* abaikan */ }
+  }
   const menuMounted = useExitAnim(menuOpen);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -165,7 +175,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           </div>
         </div>
       </div>
-      {!isBendahara && (
+      {!isBendahara && !bannerDismissed && (
         <div
           className="border-t border-blue-100 bg-blue-50 overflow-hidden px-5 dark:bg-blue-950 dark:border-blue-900 transition-[max-height,opacity] duration-300"
           style={{
@@ -176,9 +186,19 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             transitionTimingFunction: 'var(--ease-out-expo)',
           }}
         >
-          <p className="text-xs text-blue-600 dark:text-blue-300 text-center font-medium max-w-lg mx-auto flex items-center justify-center gap-1.5">
-            <Eye className="w-3.5 h-3.5" /> Mode Warga — hanya bisa melihat data
-          </p>
+          <div className="relative max-w-lg mx-auto flex items-center justify-center">
+            <p className="text-xs text-blue-600 dark:text-blue-300 text-center font-medium flex items-center justify-center gap-1.5">
+              <Eye className="w-3.5 h-3.5" /> Mode Warga — hanya bisa melihat data
+            </p>
+            <button
+              type="button"
+              onClick={dismissBanner}
+              aria-label="Tutup info Mode Warga"
+              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-2 w-8 h-8 flex items-center justify-center text-blue-400 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-300 active:opacity-70"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
     </header>
