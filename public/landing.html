@@ -317,18 +317,38 @@
 <!-- inline coin SVG reused (sumber: src/assets/logo-rt.svg) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <linearGradient id="rtGold" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#F9D451"/><stop offset="0.55" stop-color="#F4C20D"/><stop offset="1" stop-color="#E3A500"/>
+    <linearGradient id="rtBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD22B"/><stop offset="0.52" stop-color="#FAC200"/><stop offset="1" stop-color="#E7A300"/>
     </linearGradient>
-    <radialGradient id="rtSheen" cx="0.5" cy="0.28" r="0.72">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="0.6" stop-color="#FFFFFF" stop-opacity="0"/>
+    <radialGradient id="rtSheen" cx="0.5" cy="0.20" r="0.92">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="rtVig" cx="0.5" cy="0.94" r="0.95">
+      <stop offset="0.5" stop-color="#8C6300" stop-opacity="0"/><stop offset="1" stop-color="#8C6300" stop-opacity="0.30"/>
+    </radialGradient>
+    <linearGradient id="rtDisc" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EDEFF3"/>
+    </linearGradient>
+    <linearGradient id="rtRim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/><stop offset="0.42" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rtNum" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1C7C3A"/><stop offset="1" stop-color="#0D4E22"/>
+    </linearGradient>
+    <filter id="rtDiscShadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="11" stdDeviation="16" flood-color="#6A4900" flood-opacity="0.34"/>
+    </filter>
+    <filter id="rtNumShadow" x="-25%" y="-25%" width="150%" height="170%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#053A16" flood-opacity="0.32"/>
+    </filter>
     <symbol id="coin" viewBox="0 0 640 640">
-      <rect width="640" height="640" fill="url(#rtGold)"/>
+      <rect width="640" height="640" fill="url(#rtBg)"/>
       <rect width="640" height="640" fill="url(#rtSheen)"/>
-      <circle cx="320" cy="320" r="252" fill="none" stroke="#0F6B2E" stroke-width="16"/>
-      <circle cx="320" cy="320" r="230" fill="#FFFFFF"/>
-      <text x="321" y="430" fill="#0F6B2E" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="300" letter-spacing="-6" text-anchor="middle">46</text>
+      <rect width="640" height="640" fill="url(#rtVig)"/>
+      <g filter="url(#rtDiscShadow)"><circle cx="320" cy="320" r="232" fill="url(#rtDisc)"/></g>
+      <circle cx="320" cy="320" r="232" fill="none" stroke="#C58B00" stroke-opacity="0.22" stroke-width="2"/>
+      <circle cx="320" cy="320" r="229" fill="none" stroke="url(#rtRim)" stroke-width="6"/>
+      <g filter="url(#rtNumShadow)"><text x="322" y="433" fill="url(#rtNum)" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="300" letter-spacing="-6" text-anchor="middle">46</text></g>
     </symbol>
   </defs>
 </svg>

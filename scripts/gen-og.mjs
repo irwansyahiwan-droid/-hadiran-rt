@@ -38,13 +38,20 @@ const html = `<!doctype html><html><head><meta charset="utf-8"/>
     <div class="coin">
       <svg viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9D451"/><stop offset=".55" stop-color="#F4C20D"/><stop offset="1" stop-color="#E3A500"/></linearGradient>
-          <radialGradient id="s" cx=".5" cy=".28" r=".72"><stop offset="0" stop-color="#fff" stop-opacity=".30"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+          <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD22B"/><stop offset=".52" stop-color="#FAC200"/><stop offset="1" stop-color="#E7A300"/></linearGradient>
+          <radialGradient id="sh" cx=".5" cy=".20" r=".92"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></radialGradient>
+          <radialGradient id="vg" cx=".5" cy=".94" r=".95"><stop offset=".5" stop-color="#8C6300" stop-opacity="0"/><stop offset="1" stop-color="#8C6300" stop-opacity=".30"/></radialGradient>
+          <linearGradient id="dc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#EDEFF3"/></linearGradient>
+          <linearGradient id="rm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/></linearGradient>
+          <linearGradient id="nm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1C7C3A"/><stop offset="1" stop-color="#0D4E22"/></linearGradient>
+          <filter id="ds" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="11" stdDeviation="16" flood-color="#6A4900" flood-opacity=".34"/></filter>
+          <filter id="ns" x="-25%" y="-25%" width="150%" height="170%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#053A16" flood-opacity=".32"/></filter>
         </defs>
-        <rect width="640" height="640" fill="url(#g)"/><rect width="640" height="640" fill="url(#s)"/>
-        <circle cx="320" cy="320" r="252" fill="none" stroke="#0F6B2E" stroke-width="16"/>
-        <circle cx="320" cy="320" r="230" fill="#fff"/>
-        <text x="321" y="430" fill="#0F6B2E" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="300" letter-spacing="-6" text-anchor="middle">46</text>
+        <rect width="640" height="640" fill="url(#bg)"/><rect width="640" height="640" fill="url(#sh)"/><rect width="640" height="640" fill="url(#vg)"/>
+        <g filter="url(#ds)"><circle cx="320" cy="320" r="232" fill="url(#dc)"/></g>
+        <circle cx="320" cy="320" r="232" fill="none" stroke="#C58B00" stroke-opacity=".22" stroke-width="2"/>
+        <circle cx="320" cy="320" r="229" fill="none" stroke="url(#rm)" stroke-width="6"/>
+        <g filter="url(#ns)"><text x="322" y="433" fill="url(#nm)" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="900" font-size="300" letter-spacing="-6" text-anchor="middle">46</text></g>
       </svg>
     </div>
     <div class="txt">
