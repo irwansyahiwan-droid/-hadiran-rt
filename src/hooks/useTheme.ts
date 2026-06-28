@@ -18,7 +18,7 @@ export function useTheme() {
     // Light: near-putih agar SEAMLESS dgn Header (bg-white/95 ≈ #FDFDFE) —
     // hilangkan seam abu di pucuk layar. Header selalu sticky di atas, jadi
     // tak ada momen hero hijau menyentuh status bar.
-    const color = isDark ? '#030712' : '#FAFBFC';
+    const color = isDark ? '#0A0E1A' : '#FAFBFC'; // dark = kanvas Pass 9 (was #030712)
     document
       .querySelectorAll('meta[name="theme-color"]')
       .forEach((m) => m.setAttribute('content', color));
