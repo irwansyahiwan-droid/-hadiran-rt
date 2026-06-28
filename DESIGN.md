@@ -21,7 +21,7 @@ colors:
   ink: "#0B1220"
   ink-sub: "#374151"
   ink-faint: "#475569"
-  canvas-dark: "#0A0E1A"
+  canvas-dark: "#030712"
 typography:
   display:
     fontFamily: "Sora Variable, Sora, Inter Variable, system-ui, sans-serif"
@@ -123,7 +123,7 @@ Yang sistem ini **tolak**: glassmorphism, glow, dan noise sebagai dekorasi (tim 
 - Satu suara brand emerald; semantik uang satu-hijau/satu-merah/satu-amber.
 - Angka memimpin: Sora + tabular-nums di mana-mana.
 - Kontras tinggi & teks nyaman — untuk warga lansia dan baca di bawah matahari.
-- Dark mode first-class (kanvas #0A0E1A deep cool-dark berdimensi), paritas elevasi dijaga ketat.
+- Dark mode first-class (kanvas #030712), paritas elevasi dijaga ketat.
 - Satu sumber per peran (token, helper, komponen) — anti-drift.
 
 ## 2. Colors
@@ -148,7 +148,7 @@ Palet bertumpu pada satu hijau emerald sebagai suara brand, neutral abu sejuk un
 - **Sunken / Canvas** (#F2F5FA): Background app near-white sejuk (L~96%, Pass 8) — separasi kartu disandar ke floating-glass shadow + edge crisp, bukan gap tonal. WAJIB sama dengan body, token `sunken`, `.app-bg`, dan manifest `background_color` — anti strip beda tone saat overscroll.
 - **Line** (#CFD5DF): Garis/divider tipis (hairline).
 - **Control** (#E2E8F0): Border input/tombol — sedikit lebih kuat dari line.
-- **Canvas Dark** (#0A0E1A): Background app dark mode (gray-950, Pass 9) — deep cool-dark berdimensi (ala Linear/Revolut), bukan true-black; kartu gray-900 (#111827) duduk natural di atasnya, separasi dari ring cahaya.
+- **Canvas Dark** (#030712): Background app dark mode (gray-950).
 
 ### Semantik Uang
 - **Positif/Masuk** (#047857, emerald-700, on-brand).

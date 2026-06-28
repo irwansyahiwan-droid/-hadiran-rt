@@ -67,14 +67,6 @@ export default {
           sub: '#374151',     // teks sekunder (gray-700 — naik dari 600 agar lebih tegas)
           faint: '#475569',   // tanggal / caption (slate-600 — naik dari 500, tetap kebaca jelas)
         },
-        /* ── Kanvas dark (Pass 9, 28 Jun 2026) ──────────────────────────
-           gray-950 di-override #030712 (true-black) → deep cool-dark berdimensi
-           (ala Linear/Revolut) atas permintaan user "dark mode disesuaikan"
-           setelah light jadi near-white premium (Pass 8). SATU sumber utk semua
-           `dark:bg-gray-950` (overlay full-page) — selaras literal `.dark body` /
-           `.app-bg` / theme-color dark (useTheme + index.html). Kartu gray-900
-           (#111827) kini duduk lebih natural di atasnya; ring cahaya .13 carry. */
-        gray: { 950: '#0A0E1A' },
       },
     },
   },

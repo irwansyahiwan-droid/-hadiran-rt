@@ -24,16 +24,16 @@
     </script>
     <!-- Status bar adaptif (di-override dinamis oleh useTheme saat toggle) -->
     <meta name="theme-color" content="#FAFBFC" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0A0E1A" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)" />
     <!-- PWA standalone (iOS) -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Hadiran RT" />
     <!-- Splash standalone iOS (apple-touch-startup-image) — ikon di tengah canvas.
-         Light & dark per device; canvas app kini #F2F5FA / #0A0E1A (Pass 8/9).
-         PNG splash di-bake pd tone lama (#E6EAF1 / #030712) → seam tipis sesaat
-         saat launch iOS standalone; regen aset bila perlu. Tanpa ini blank putih. -->
+         Light & dark per device; canvas app kini #F2F5FA / #030712 (Pass 8). PNG
+         splash di-bake pd tone lama #E6EAF1 → seam tipis sesaat saat launch iOS
+         standalone; regen aset bila perlu. Tanpa ini iOS standalone = blank putih. -->
     <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-640x1136.png" />
     <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-640x1136-dark.png" />
     <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-750x1334.png" />

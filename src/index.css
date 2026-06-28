@@ -101,9 +101,8 @@ input, textarea  { caret-color: #1B7249; }
 .login-bg { background: linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%); }
 .dark .login-bg { background: linear-gradient(160deg, #04231A 0%, #06402E 45%, #02150E 100%); }
 
-/* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950
-   (Pass 9: #030712 → #0A0E1A deep cool-dark berdimensi; lihat tailwind gray.950). */
-.dark body { background-color: #0A0E1A; }
+/* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
+.dark body { background-color: #030712; }
 
 /* A11y: focus ring jelas hanya untuk navigasi keyboard (bukan tap mouse/sentuh) */
 *:focus-visible {
@@ -143,7 +142,7 @@ input, textarea  { caret-color: #1B7249; }
   background-attachment: fixed;
 }
 .dark .app-bg {
-  background-color: #0A0E1A; /* Pass 9: deep cool-dark berdimensi (was #030712 true-black) */
+  background-color: #030712;
   background-image:
     radial-gradient(105% 58% at 50% -10%, rgba(16, 185, 129, 0.30) 0%, transparent 52%),
     radial-gradient(84% 54% at 100% -4%,  rgba(20, 184, 166, 0.22) 0%, transparent 50%),
