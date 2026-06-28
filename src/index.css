@@ -50,8 +50,12 @@ body {
      (pass 4 floating glass) + hairline, BUKAN lagi gap tonal besar.
      Pass 6 (2026-06-25): #EEF1F6 → #E6EAF1 (turun ~3% L). User minta "kartu
      lebih nendang dikit" → kembalikan SEDIKIT gap tonal kartu↔kanvas (lever
-     Linear/Apple) tanpa kehilangan airy — shadow & hairline tetap carry. */
-  background-color: #E6EAF1;
+     Linear/Apple) tanpa kehilangan airy — shadow & hairline tetap carry.
+     Pass 8 (2026-06-28): #E6EAF1 → #F2F5FA (naik ~4% L, near-white sejuk).
+     User minta "putih, bersih, mahal, premium, segar, trend 2026" → kanvas
+     near-white (L~96%, setara Revolut/Jago/Apple); separasi kartu FULL sandar
+     ke floating-glass shadow + edge crisp 1px (Pass 7), BUKAN gap tonal. */
+  background-color: #F2F5FA;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -122,16 +126,16 @@ input, textarea  { caret-color: #1B7249; }
 /* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
    Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
-   Dipakai di wrapper App (kanvas #E6EAF1 — samakan dgn body/sunken/manifest). */
+   Dipakai di wrapper App (kanvas #F2F5FA — samakan dgn body/sunken/manifest). */
 .app-bg {
-  /* Apple clean: kanvas abu netral sejuk RATA. Tanpa aurora tebal & tanpa
+  /* Apple clean: kanvas near-white sejuk RATA. Tanpa aurora tebal & tanpa
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #E6EAF1;
+  background-color: #F2F5FA;
   /* Pass 7: bisik brand dinaikkan tipis (0.06→0.085) + tambah whisper sky di
      sudut kanan-atas (0.05) → kanvas terasa lebih "seger"/airy. Tetap di puncak
-     (atmosferik), BUKAN glow di belakang kartu. Base color #E6EAF1 tak berubah. */
+     (atmosferik), BUKAN glow di belakang kartu. Base color = #F2F5FA (Pass 8). */
   background-image:
     radial-gradient(120% 60% at 50% -14%, rgba(16, 185, 129, 0.085) 0%, transparent 56%),
     radial-gradient(92% 50% at 100% -2%, rgba(56, 189, 248, 0.05) 0%, transparent 54%);

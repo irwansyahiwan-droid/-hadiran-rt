@@ -11,7 +11,7 @@
       "pos": { "role": "semantic", "displayName": "Positif/Masuk", "canonical": "#047857", "tonalRamp": ["#022C20", "#03543C", "#047857", "#059669", "#10B981", "#34D399", "#6EE7B7", "#D1FAE5"] },
       "neg": { "role": "semantic", "displayName": "Negatif/Keluar", "canonical": "#E11D48", "tonalRamp": ["#5C0A1E", "#8A0F2C", "#B8123A", "#E11D48", "#F43F5E", "#FB7185", "#FDA4AF", "#FFE4E6"] },
       "warn": { "role": "semantic", "displayName": "Perhatian/Tunggakan", "canonical": "#B45309", "tonalRamp": ["#451F03", "#7C3D06", "#B45309", "#D97706", "#F59E0B", "#FBBF24", "#FCD34D", "#FEF3C7"] },
-      "sunken": { "role": "neutral", "displayName": "Canvas Sejuk", "canonical": "#E6EAF1", "tonalRamp": ["#0B1220", "#1F2937", "#475569", "#94A3B8", "#CFD5DF", "#E6EAF1", "#F1F6FC", "#FFFFFF"] },
+      "sunken": { "role": "neutral", "displayName": "Canvas Near-White Sejuk", "canonical": "#F2F5FA", "tonalRamp": ["#0B1220", "#1F2937", "#475569", "#94A3B8", "#CFD5DF", "#E6EAF1", "#F2F5FA", "#FFFFFF"] },
       "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0B1220", "tonalRamp": ["#0B1220", "#1F2937", "#374151", "#475569", "#6B7280", "#9CA3AF", "#CFD5DF", "#F3F4F6"] }
     },
     "typographyMeta": {
@@ -110,7 +110,7 @@
       "Do pakai .lift untuk kartu, .inset-soft untuk sub-panel, .float untuk popover.",
       "Do tampilkan saldo minus apa adanya — transparansi di atas estetika.",
       "Do hormati prefers-reduced-motion dan pakai useDialog untuk tiap sheet/modal.",
-      "Do jaga sunken (#E6EAF1) sinkron di body, .app-bg, token, dan manifest."
+      "Do jaga sunken (#F2F5FA) sinkron di body, .app-bg, token, dan manifest."
     ],
     "donts": [
       "Don't pakai glassmorphism, glow, atau noise sebagai dekorasi.",

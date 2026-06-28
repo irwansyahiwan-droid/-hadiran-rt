@@ -58,7 +58,7 @@ export default {
         },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#E6EAF1', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll). Pass 5: #D4DAE4→#EEF1F6 (airy-premium 2026). Pass 6 (25 Jun): #EEF1F6→#E6EAF1, gelap ~3% L atas permintaan user "kartu lebih nendang dikit" — gap tonal naik tipis, tetap airy
+        sunken: '#F2F5FA', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll). Pass 6: #EEF1F6→#E6EAF1 ("kartu lebih nendang"). Pass 8 (28 Jun): #E6EAF1→#F2F5FA near-white sejuk (user: "putih, bersih, premium, segar, trend 2026") — separasi kartu FULL sandar shadow + edge crisp
         line: '#CFD5DF',    // garis/divider tipis. Pass 3: #E6EAF1 dulu LEBIH TERANG dari canvas → border kartu jadi garis terang yg mewashout tepi crisp. Diturunkan ≈ tone canvas agar tak melawan hairline gelap (.lift); divider tetap bersih di atas putih.
         control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */

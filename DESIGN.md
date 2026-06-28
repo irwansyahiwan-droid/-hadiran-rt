@@ -15,7 +15,7 @@ colors:
   setor-500: "#3B82F6"
   gold-songket: "#E8B651"
   surface: "#FFFFFF"
-  sunken: "#E6EAF1"
+  sunken: "#F2F5FA"
   line: "#CFD5DF"
   control: "#E2E8F0"
   ink: "#0B1220"
@@ -112,7 +112,7 @@ components:
 
 **Creative North Star: "Ketenangan Fintech Kampung"**
 
-Hadiran RT meminjam disiplin fintech kelas atas — ketenangan, presisi, kelapangan ala Revolut/Mercury/Jago — lalu menjinakkannya jadi hangat dan lokal. Kanvas abu-netral sejuk (#E6EAF1) yang rata dan tenang menjadi panggung; kartu putih "menyala dari atas" lewat cahaya-dari-atas plus bayangan crisp berlapis, bukan glass berpendar. Angka adalah bintang: nominal rupiah memakai Sora yang tegas dan `tabular-nums` app-wide supaya digit tidak goyang saat count-up atau disusun kolom — seperti running text bank, tapi milik kampung sendiri.
+Hadiran RT meminjam disiplin fintech kelas atas — ketenangan, presisi, kelapangan ala Revolut/Mercury/Jago — lalu menjinakkannya jadi hangat dan lokal. Kanvas near-white sejuk (#F2F5FA, L~96%) yang rata dan tenang menjadi panggung; kartu putih "menyala dari atas" lewat cahaya-dari-atas plus bayangan crisp berlapis, bukan glass berpendar. Angka adalah bintang: nominal rupiah memakai Sora yang tegas dan `tabular-nums` app-wide supaya digit tidak goyang saat count-up atau disusun kolom — seperti running text bank, tapi milik kampung sendiri.
 
 Sistem ini berdiri di atas satu suara brand: hijau emerald deep. Satu hijau, satu merah, satu amber untuk makna uang; tidak ada percampuran red/rose atau green/emerald di satu layar. Identitas lokal dibawa oleh **satu** ornamen yang sangat langka — motif anyaman songket emas pada kartu saldo dan sorot giliran Sohibul Bait — yang berfungsi sebagai stempel kehormatan RT, bukan dekorasi yang ditebar.
 
@@ -145,7 +145,7 @@ Palet bertumpu pada satu hijau emerald sebagai suara brand, neutral abu sejuk un
 - **Ink Sub** (#374151): Teks sekunder yang tegas (gray-700).
 - **Ink Faint** (#475569): Tanggal/caption — slate-600, tetap kebaca jelas (BUKAN abu pudar).
 - **Surface** (#FFFFFF): Latar kartu.
-- **Sunken / Canvas** (#E6EAF1): Background app. WAJIB sama dengan body, token `sunken`, `.app-bg`, dan manifest `background_color` — anti strip beda tone saat overscroll.
+- **Sunken / Canvas** (#F2F5FA): Background app near-white sejuk (L~96%, Pass 8) — separasi kartu disandar ke floating-glass shadow + edge crisp, bukan gap tonal. WAJIB sama dengan body, token `sunken`, `.app-bg`, dan manifest `background_color` — anti strip beda tone saat overscroll.
 - **Line** (#CFD5DF): Garis/divider tipis (hairline).
 - **Control** (#E2E8F0): Border input/tombol — sedikit lebih kuat dari line.
 - **Canvas Dark** (#030712): Background app dark mode (gray-950).
@@ -243,7 +243,7 @@ Semua sheet/modal WAJIB pakai hook `useDialog`: `role="dialog"` + fokus trap/res
 - **Do** pakai `.lift` untuk kartu, `.inset-soft` untuk sub-panel, `.float` untuk popover — depth dari cahaya-dari-atas + bayangan crisp.
 - **Do** tampilkan saldo minus apa adanya bila talangan ditutup dari kas — transparansi di atas estetika.
 - **Do** hormati `prefers-reduced-motion` (setiap animasi punya alternatif crossfade/instan) dan pakai `useDialog` untuk tiap sheet/modal.
-- **Do** jaga `sunken` (#E6EAF1) sinkron di body, `.app-bg`, token, dan manifest.
+- **Do** jaga `sunken` (#F2F5FA) sinkron di body, `.app-bg`, token, dan manifest.
 
 ### Don't:
 - **Don't** pakai glassmorphism, glow, atau noise sebagai dekorasi. Permukaan flat & tegas; depth dari cahaya, bukan kaca berpendar. (Tim secara eksplisit menolak ini.)
