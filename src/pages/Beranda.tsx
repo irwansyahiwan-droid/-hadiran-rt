@@ -268,7 +268,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             {/* Eyebrow */}
             <div className="flex items-center gap-[9px]">
               <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white">Saldo Kas Hadiran</span>
+              <span className="text-micro font-bold uppercase tracking-[0.16em] text-white">Saldo Kas Hadiran</span>
             </div>
 
             {/* Nominal besar + sub-teks */}
@@ -539,24 +539,24 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               : <ArrowDownLeft className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />}
           </div>
-          <p className="text-body font-medium text-gray-900 dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
+          <p className="text-body font-medium text-ink dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
           <p className="text-xs text-ink-faint dark:text-gray-400 mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
           <div className="inset-soft rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Jumlah</span>
+              <span className="text-sm text-ink-faint dark:text-gray-400">Jumlah</span>
               <span className={`font-display text-amount font-bold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
                 {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Saldo Setelah</span>
-              <span className={`text-sm font-semibold ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-700 dark:text-gray-300'}`}>
+              <span className="text-sm text-ink-faint dark:text-gray-400">Saldo Setelah</span>
+              <span className={`text-sm font-semibold ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
                 {maskRp(`${selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Tipe</span>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm text-ink-faint dark:text-gray-400">Tipe</span>
+              <span className="text-sm font-medium text-ink-sub dark:text-gray-300">
                 {selectedTrx.tipe === 'setor' ? 'Setor ke Kas RT' : 'Talangan Lunas'}
               </span>
             </div>
