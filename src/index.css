@@ -292,12 +292,17 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      0.12→0.09 (lebih bersih, kurang "tercetak"), ambient diperlebar 18→24/36→48
      dgn alpha sedikit turun (0.19→0.18) tapi spread TETAP negatif → melayang
      mewah, bukan fog. Inner highlight tetap penuh (kaca disinari). */
+  /* Pass 8b (2026-06-28): kanvas naik ke near-white #F2F5FA (Pass 8) → gap tonal
+     kartu↔kanvas mengecil, kartu terasa "kurang nendang". Restorasi pop lewat
+     EDGE & kedalaman (cara fintech 2026 — BUKAN menggelapkan latar): edge ring
+     .09→.12 (tepi "tercetak" lebih tegas, justru makin kebaca di latar putih),
+     contact .07→.09 (menapak), key .10→.13, ambient .18→.20. LIGHT saja. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(10, 14, 26, 0.09),                         /* tepi crisp 1px → definisi edge, lebih bersih */
-    0 1px 2px 0 rgba(10, 14, 26, 0.07),                       /* contact shadow rapat → kartu menapak */
-    0 8px 16px -6px rgba(10, 14, 26, 0.10),                   /* key mid — terkontain (spread neg), bukan fog */
-    0 24px 48px -18px rgba(10, 14, 26, 0.18);                 /* ambient float — lebih lega/mewah, tetap rapat */
+    0 0 0 1px rgba(10, 14, 26, 0.12),                         /* tepi crisp 1px → definisi edge tegas (pop di latar putih) */
+    0 1px 2px 0 rgba(10, 14, 26, 0.09),                       /* contact shadow rapat → kartu menapak */
+    0 8px 16px -6px rgba(10, 14, 26, 0.13),                   /* key mid — terkontain (spread neg), bukan fog */
+    0 24px 48px -18px rgba(10, 14, 26, 0.20);                 /* ambient float — lebih lega/mewah, tetap rapat */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
