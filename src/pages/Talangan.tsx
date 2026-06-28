@@ -269,13 +269,13 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
+                  <p className="text-body font-semibold text-ink dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
                   <p className="text-xs text-ink-faint dark:text-gray-400 truncate">
                     {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-bold tabular-nums text-gray-700 dark:text-gray-300 whitespace-nowrap">{maskRp(formatRupiahPlain(t.nominal), hidden, 4)}</span>
+                  <span className="text-xs font-bold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">{maskRp(formatRupiahPlain(t.nominal), hidden, 4)}</span>
                   {t.status_lunas && (
                     <Tag tone="success">LUNAS</Tag>
                   )}
@@ -337,7 +337,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       {onBack && (
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 -ml-1 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 active:opacity-70 transition-colors"
+          className="flex items-center gap-1.5 -ml-1 text-sm font-medium text-ink-sub dark:text-gray-300 hover:text-ink dark:hover:text-gray-100 active:opacity-70 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           Kembali
@@ -346,7 +346,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
       {/* Header card */}
       {totalBelumLunas > 0 ? (
-        <div className="relative rounded-2xl overflow-hidden shadow-sm bg-gradient-to-br from-brand via-brand-600 to-brand-500">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-brand via-brand-600 to-brand-500" style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-5">
@@ -378,7 +378,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 text-center">
           <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Semua Talangan Lunas</p>
+          <p className="text-sm font-semibold text-ink-sub dark:text-gray-300">Semua Talangan Lunas</p>
           <p className="text-xs text-ink-faint dark:text-gray-400">{countLunas} talangan tercatat</p>
         </div>
       )}
