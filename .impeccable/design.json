@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-28T00:00:00.000Z",
+  "title": "Design System: Hadiran RT",
+  "extensions": {
+    "colorMeta": {
+      "brand": { "role": "primary", "displayName": "Emerald Deep", "canonical": "#0F4C2E", "tonalRamp": ["#062417", "#0A3A24", "#0F4C2E", "#145D39", "#1B7249", "#2C9A66", "#5FC295", "#C9EEDC"] },
+      "brand-link-dark": { "role": "primary", "displayName": "Teal-Green Tautan (Dark)", "canonical": "#1A9B86", "tonalRamp": ["#06241F", "#0B463C", "#0D6B5E", "#129683", "#1A9B86", "#3DBFAC", "#7FD9CC", "#D2F2EC"] },
+      "setor": { "role": "secondary", "displayName": "Setor Blue (Status)", "canonical": "#1E40AF", "tonalRamp": ["#0B1E5C", "#152F86", "#1E40AF", "#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#DBEAFE"] },
+      "gold-songket": { "role": "tertiary", "displayName": "Emas Songket (Honor)", "canonical": "#E8B651", "tonalRamp": ["#5C4410", "#8A661A", "#B88A2C", "#D9A53E", "#E8B651", "#F0CA7E", "#F6DEAB", "#FBF1D8"] },
+      "pos": { "role": "semantic", "displayName": "Positif/Masuk", "canonical": "#047857", "tonalRamp": ["#022C20", "#03543C", "#047857", "#059669", "#10B981", "#34D399", "#6EE7B7", "#D1FAE5"] },
+      "neg": { "role": "semantic", "displayName": "Negatif/Keluar", "canonical": "#E11D48", "tonalRamp": ["#5C0A1E", "#8A0F2C", "#B8123A", "#E11D48", "#F43F5E", "#FB7185", "#FDA4AF", "#FFE4E6"] },
+      "warn": { "role": "semantic", "displayName": "Perhatian/Tunggakan", "canonical": "#B45309", "tonalRamp": ["#451F03", "#7C3D06", "#B45309", "#D97706", "#F59E0B", "#FBBF24", "#FCD34D", "#FEF3C7"] },
+      "sunken": { "role": "neutral", "displayName": "Canvas Sejuk", "canonical": "#E6EAF1", "tonalRamp": ["#0B1220", "#1F2937", "#475569", "#94A3B8", "#CFD5DF", "#E6EAF1", "#F1F6FC", "#FFFFFF"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#0B1220", "tonalRamp": ["#0B1220", "#1F2937", "#374151", "#475569", "#6B7280", "#9CA3AF", "#CFD5DF", "#F3F4F6"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (Sora)", "purpose": "Nominal hero saldo & judul halaman besar." },
+      "amount": { "displayName": "Amount (Sora)", "purpose": "Nominal menonjol di list/baris; selalu tabular-nums." },
+      "body": { "displayName": "Body (Inter)", "purpose": "Teks utama; readability maksimal." }
+    },
+    "shadows": [
+      { "name": "lift", "value": "inset 0 1px 0 0 rgba(255,255,255,1), 0 0 0 1px rgba(10,14,26,0.09), 0 1px 2px 0 rgba(10,14,26,0.07), 0 8px 16px -6px rgba(10,14,26,0.10), 0 24px 48px -18px rgba(10,14,26,0.18)", "purpose": "Kartu putih default — floating glass, cahaya-dari-atas." },
+      { "name": "float", "value": "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(10,14,26,0.07), 0 2px 6px -2px rgba(10,14,26,0.12), 0 14px 28px -10px rgba(10,14,26,0.18), 0 30px 56px -22px rgba(10,14,26,0.24)", "purpose": "Popover/dropdown/bottom-sheet — melayang lebih tinggi." },
+      { "name": "nav-float", "value": "inset 0 1px 0 0 rgba(255,255,255,0.55), 0 1px 2px 0 rgba(16,24,40,0.10), 0 10px 24px -8px rgba(16,24,40,0.20), 0 22px 44px -18px rgba(16,24,40,0.28)", "purpose": "Kapsul bottom-nav melayang." }
+    ],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default transisi & reveal (ease-out, no bounce)." },
+      { "name": "ease-spring", "value": "cubic-bezier(0.34, 1.4, 0.5, 1)", "purpose": "Elemen 'hidup': pill nav, count-up, success/toast." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "CTA brand utama — gradient emerald hidup dengan glow terukur.",
+      "html": "<button class=\"ds-btn-primary\">Simpan</button>",
+      "css": ".ds-btn-primary { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 15px; color: #fff; border: none; padding: 12px 18px; border-radius: 12px; background-image: linear-gradient(180deg, #18A055 0%, #0F6B40 58%, #0C5E37 100%); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.22), 0 2px 6px -1px rgba(13,80,50,0.35), 0 12px 28px -8px rgba(16,150,80,0.55); transition: transform .15s cubic-bezier(0.34,1.4,0.5,1), box-shadow .2s ease; cursor: pointer; } .ds-btn-primary:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 6px 16px -8px rgba(16,150,80,0.5); } .ds-btn-primary:focus-visible { outline: 2px solid #1B7249; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Aksi netral (Batal/Tutup) — berbingkai, pasangan footer primary.",
+      "html": "<button class=\"ds-btn-secondary\">Batal</button>",
+      "css": ".ds-btn-secondary { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 14px; color: #374151; background: #fff; border: 1px solid #E2E8F0; padding: 12px 18px; border-radius: 12px; transition: background-color .18s ease, transform .15s cubic-bezier(0.34,1.4,0.5,1); cursor: pointer; } .ds-btn-secondary:hover { background: #F9FAFB; } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:focus-visible { outline: 2px solid #1B7249; outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Bilah cari halaman list — 16px (anti-zoom iOS), fokus ring emerald.",
+      "html": "<div class=\"ds-field-wrap\"><svg class=\"ds-field-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#6B7280\" stroke-width=\"2\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m21 21-4.3-4.3\"/></svg><input class=\"ds-field-search\" placeholder=\"Cari warga…\" /></div>",
+      "css": ".ds-field-wrap { position: relative; } .ds-field-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; } .ds-field-search { width: 100%; box-sizing: border-box; padding: 12px 14px 12px 38px; border-radius: 12px; background: #fff; border: 1px solid #E2E8F0; font-family: 'Inter Variable', system-ui, sans-serif; font-size: 16px; color: #0B1220; } .ds-field-search::placeholder { color: #6B7280; } .ds-field-search:focus { outline: none; border-color: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,0.30); }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip-active",
+      "description": "Pill filter — aktif = fill brand emerald, bukan sekadar border.",
+      "html": "<div class=\"ds-chip-row\"><button class=\"ds-chip ds-chip-on\">Semua</button><button class=\"ds-chip\">Lunas</button><button class=\"ds-chip\">Tunggakan</button></div>",
+      "css": ".ds-chip-row { display: flex; gap: 8px; } .ds-chip { font-family: 'Inter Variable', system-ui, sans-serif; font-weight: 600; font-size: 13px; padding: 6px 14px; border-radius: 9999px; background: #fff; color: #374151; border: 1px solid #E2E8F0; cursor: pointer; transition: transform .15s cubic-bezier(0.16,1,0.3,1); } .ds-chip:active { transform: scale(0.96); } .ds-chip-on { background: #0F4C2E; color: #fff; border-color: #0F4C2E; }"
+    },
+    {
+      "name": "Lift Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Kartu putih standar — floating glass + cahaya-dari-atas.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-label\">Saldo Kas RT</div><div class=\"ds-card-amount\">Rp 4.250.000</div></div>",
+      "css": ".ds-card { background-color: #fff; background-image: linear-gradient(180deg, #FFFFFF 0%, #FBFDFF 62%, #F1F6FC 100%); border-radius: 16px; padding: 16px; box-shadow: inset 0 1px 0 0 rgba(255,255,255,1), 0 0 0 1px rgba(10,14,26,0.09), 0 1px 2px 0 rgba(10,14,26,0.07), 0 8px 16px -6px rgba(10,14,26,0.10), 0 24px 48px -18px rgba(10,14,26,0.18); } .ds-card-label { font-family: 'Inter Variable', system-ui, sans-serif; font-size: 13px; color: #475569; margin-bottom: 4px; } .ds-card-amount { font-family: 'Sora Variable', system-ui, sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.018em; color: #0B1220; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Hero Saldo Card",
+      "kind": "custom",
+      "refersTo": "hero-card",
+      "description": "Kartu saldo gradient emerald + motif songket emas (signature).",
+      "html": "<div class=\"ds-hero\"><div class=\"ds-hero-weave\"></div><div class=\"ds-hero-label\">Saldo Hadiran</div><div class=\"ds-hero-amount\">Rp 12.900.000</div></div>",
+      "css": ".ds-hero { position: relative; overflow: hidden; border-radius: 24px; padding: 20px; color: #fff; background-image: radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,0.34) 0%, rgba(45,212,150,0) 55%), linear-gradient(135deg, #0D5B36 0%, #15824C 50%, #1C9A5C 100%); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px -1px rgba(7,30,22,0.34), 0 10px 22px -8px rgba(7,30,22,0.44), 0 26px 48px -18px rgba(7,30,22,0.55); } .ds-hero-weave { position: absolute; inset: 0; pointer-events: none; opacity: 0.8; mix-blend-mode: soft-light; background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M0 16 L16 0 L32 16 L16 32 Z' fill='none' stroke='%23E8B651' stroke-width='1.25'/%3E%3C/svg%3E\"); background-size: 32px 32px; -webkit-mask-image: radial-gradient(150% 100% at 100% 4%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 66%); mask-image: radial-gradient(150% 100% at 100% 4%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 66%); } .ds-hero-label { position: relative; font-family: 'Inter Variable', system-ui, sans-serif; font-size: 13px; opacity: 0.85; } .ds-hero-amount { position: relative; font-family: 'Sora Variable', system-ui, sans-serif; font-weight: 700; font-size: 30px; letter-spacing: -0.018em; font-variant-numeric: tabular-nums; margin-top: 4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Ketenangan Fintech Kampung",
+    "overview": "Hadiran RT meminjam disiplin fintech kelas atas — ketenangan, presisi, kelapangan ala Revolut/Mercury/Jago — lalu menjinakkannya jadi hangat dan lokal. Kanvas abu-netral sejuk menjadi panggung; kartu putih 'menyala dari atas' lewat cahaya-dari-atas plus bayangan crisp berlapis, bukan glass berpendar. Angka adalah bintang: nominal rupiah memakai Sora yang tegas dan tabular-nums app-wide. Sistem berdiri di atas satu suara brand emerald deep; identitas lokal dibawa satu ornamen langka — motif songket emas — sebagai stempel kehormatan RT.",
+    "keyCharacteristics": [
+      "Kanvas abu sejuk rata + kartu putih ber-glass-lift; depth dari cahaya & bayangan, bukan halo.",
+      "Satu suara brand emerald; semantik uang satu-hijau/satu-merah/satu-amber.",
+      "Angka memimpin: Sora + tabular-nums di mana-mana.",
+      "Kontras tinggi & teks nyaman — untuk warga lansia dan baca di bawah matahari.",
+      "Dark mode first-class (kanvas #030712), paritas elevasi dijaga ketat.",
+      "Satu sumber per peran (token, helper, komponen) — anti-drift."
+    ],
+    "rules": [
+      { "name": "The Satu-Suara Rule", "body": "Hanya ada SATU warna brand: emerald deep. Biru setor dan emas gold-songket adalah pengecualian yang scoped ke satu tempat masing-masing — bukan accent tambahan.", "section": "colors" },
+      { "name": "The Satu-Hijau-Satu-Merah-Satu-Amber Rule", "body": "Untuk makna uang: satu hijau (pos), satu merah (neg), satu amber (warn). Jangan campur red/rose dengan green/emerald di satu layar.", "section": "colors" },
+      { "name": "The No-Abu-Pudar Rule", "body": "Teks tidak boleh memakai abu di bawah AA di atas putih. Light gray 'demi elegan' dilarang.", "section": "colors" },
+      { "name": "The Angka-Memimpin Rule", "body": "Nominal rupiah selalu Sora + tabular-nums. Angka adalah konten paling penting; tipografi melayaninya.", "section": "typography" },
+      { "name": "The Cahaya-Dari-Atas Rule", "body": "Permukaan dapat dimensi dari cahaya yang masuk dari atas, bukan dari halo, glow, atau drop shadow tebal.", "section": "elevation" },
+      { "name": "The Paritas-Dark Rule", "body": "Setiap token elevasi punya pasangan dark yang setara. Di gelap, separasi datang dari ring cahaya tepi.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do pakai satu suara brand emerald; pertahankan setor biru & gold-songket emas tetap scoped.",
+      "Do pakai Sora + tabular-nums untuk semua nominal; angka memimpin.",
+      "Do jaga body text >=4.5:1; prioritas teks besar & kontras tinggi.",
+      "Do pakai .lift untuk kartu, .inset-soft untuk sub-panel, .float untuk popover.",
+      "Do tampilkan saldo minus apa adanya — transparansi di atas estetika.",
+      "Do hormati prefers-reduced-motion dan pakai useDialog untuk tiap sheet/modal.",
+      "Do jaga sunken (#E6EAF1) sinkron di body, .app-bg, token, dan manifest."
+    ],
+    "donts": [
+      "Don't pakai glassmorphism, glow, atau noise sebagai dekorasi.",
+      "Don't pakai emas/gold di luar satu pengecualian songket yang disengaja.",
+      "Don't angkat biru setor jadi accent kedua.",
+      "Don't campur red/rose dengan green/emerald di satu layar.",
+      "Don't pakai abu pudar (gray-400 di atas putih) untuk teks.",
+      "Don't pakai border-left/right > 1px sebagai stripe aksen.",
+      "Don't gradient text; emphasis lewat weight/size + warna solid.",
+      "Don't card grid seragam tanpa hierarki atau eyebrow uppercase di tiap section.",
+      "Don't over-round kartu (32px+) atau bikin sheet mentah tanpa useDialog.",
+      "Don't bikin nuansa birokrasi/aplikasi pemerintahan yang kaku."
+    ]
+  }
+}
