@@ -324,6 +324,14 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
 .lift  { box-shadow: var(--shadow-card); }
 .float { box-shadow: var(--shadow-float); }
 
+/* ── Hero "momen warna" — Refined Emerald (29 Jun 2026) ─────────────────────
+   SATU sumber gradient kartu saldo hero se-app: Beranda carousel (saldo slide) +
+   KasRT/Talangan + KasHadiran (default, BUKAN varian setor-biru/slate-negatif).
+   Menyatukan dua hue lama yg tak sinkron (Beranda #24ad5c daun vs sub-page brand
+   #0F4C2E pekat) → satu emerald jewel BERSIH: vibran di atas, deep di bawah
+   (scrim AA hero tetap aman). Jewel/"money green" ala Revolut/Wise, bukan daun. */
+.hero-emerald { background-image: linear-gradient(150deg, #2CC06E 0%, #0F7A47 52%, #064A2C 100%); }
+
 /* Floating glass capsule nav (tren 2026) — bayangan berlapis "melayang" +
    highlight tepi-atas (kaca disinari). Light & dark dipisah: di gelap highlight
    diredam & drop diperdalam agar kapsul tetap "mengambang" tanpa cincin norak. */

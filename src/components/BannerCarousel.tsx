@@ -450,9 +450,8 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const x = (d * spacing).toFixed(2);
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
           const z = Math.round(50 - ad * 10);
-          const grad = isSaldo
-            ? 'linear-gradient(150deg,#24ad5c 0%,#0c6c3a 52%,#064a28 100%)'
-            : promo!.grad;
+          // Saldo: gradient dari util .hero-emerald (satu sumber, index.css) → background inline kosong.
+          const grad = isSaldo ? '' : promo!.grad;
           const Icon = promo?.icon;
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
           const tw = isSaldo ? '' : ({
@@ -471,7 +470,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 if (movedRef.current) { movedRef.current = false; return; }
                 if (!active) goTo(i);
               }}
-              className={`absolute left-1/2 overflow-hidden text-white${isSaldo && heroSweep ? ' sheen-sweep' : ''}`}
+              className={`absolute left-1/2 overflow-hidden text-white${isSaldo ? ' hero-emerald' : ''}${isSaldo && heroSweep ? ' sheen-sweep' : ''}`}
               style={{
                 top: TOP, width: cardW, height: cardH, marginLeft: -cardW / 2,
                 borderRadius: 30, padding: 24, boxSizing: 'border-box', background: grad, color: '#fff',
@@ -509,7 +508,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
               <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.26), inset 0 1px 0 rgba(255,255,255,.36), inset 0 -1px 0 rgba(0,0,0,.18)' }} />
               <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.28), rgba(0,0,0,0) 46%)' }} />
               {/* Scrim ATAS — simetris dgn scrim bawah. Gradient stop teratas (mis.
-                  saldo #24ad5c, target #2cb8a5) terlalu terang utk teks putih
+                  saldo #2CC06E, target #2cb8a5) terlalu terang utk teks putih
                   (eyebrow 11px & desc 14px < 4.5:1). Scrim ini menarik kontras
                   eyebrow/judul/desc ke ≥4.5:1 tanpa mengubah warna brand gradient. */}
               <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,0) 56%)' }} />

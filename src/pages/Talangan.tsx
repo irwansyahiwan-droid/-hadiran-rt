@@ -346,7 +346,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
       {/* Header card */}
       {totalBelumLunas > 0 ? (
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-brand via-brand-600 to-brand-500" style={{ boxShadow: 'var(--hero-shadow)' }}>
+        <div className="relative rounded-2xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-5">

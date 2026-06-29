@@ -407,16 +407,16 @@ export default function KasHadiranPage() {
 
   const sudahSetor = totalSetor > 0;
   const heroGradient = sudahSetor
-    ? 'from-setor via-setor-600 to-setor-500'
+    ? 'bg-gradient-to-br from-setor via-setor-600 to-setor-500'
     : saldo < 0
-      ? 'from-slate-800 via-slate-700 to-slate-500'
-      : 'from-brand via-brand-600 to-brand-500';
+      ? 'bg-gradient-to-br from-slate-800 via-slate-700 to-slate-500'
+      : 'hero-emerald'; // default → satu sumber Refined Emerald (index.css)
 
   return (
     <>
       <div className="space-y-7 pb-2 overflow-x-hidden">
         {/* Header Card */}
-        <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
+        <div className={`relative rounded-3xl overflow-hidden ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-6">
