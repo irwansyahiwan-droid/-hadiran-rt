@@ -697,6 +697,37 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
   .dark .backdrop-blur-xl, .dark .backdrop-blur-md { background-color: #111827 !important; }
 }
 
+/* ── A11y: separasi kartu saat high-contrast / forced-colors ─────────────────
+   Separasi kartu↔kanvas app ini ~1.1:1 tonal → 100% dipikul box-shadow + edge
+   ring. Tapi Windows High-Contrast (forced-colors) MENGABAIKAN box-shadow &
+   gradient → kartu lenyap ke kanvas. Pula sebagian pengguna minta kontras lebih
+   tinggi (prefers-contrast: more). Solusi: kembalikan SEBUAH border nyata —
+   warna sistem saat forced-colors, edge ring dipertegas saat prefers-contrast.
+   Hanya menambah definisi tepi; tak menyentuh markup/arah near-white. */
+@media (forced-colors: active) {
+  .lift, .float, .nav-float {
+    border: 1px solid CanvasText;
+  }
+}
+@media (prefers-contrast: more) {
+  :root {
+    --shadow-card:
+      inset 0 1px 0 0 rgba(255, 255, 255, 1),
+      0 0 0 1px rgba(10, 14, 26, 0.45),
+      0 1px 2px 0 rgba(10, 14, 26, 0.18),
+      0 8px 16px -6px rgba(10, 14, 26, 0.18),
+      0 24px 48px -18px rgba(10, 14, 26, 0.24);
+  }
+  .dark {
+    --shadow-card:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+      0 0 0 1px rgba(255, 255, 255, 0.32),
+      0 1px 2px rgba(0, 0, 0, 0.55),
+      0 8px 16px -6px rgba(0, 0, 0, 0.5),
+      0 24px 48px -18px rgba(0, 0, 0, 0.65);
+  }
+}
+
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

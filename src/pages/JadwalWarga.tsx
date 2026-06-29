@@ -397,7 +397,7 @@ export default function JadwalWargaPage() {
                   >
                     {/* Badge nomor */}
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm ${
-                      isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-400' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
+                      isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
                     }`}>
                       {t.nomor}
                     </div>
@@ -418,7 +418,7 @@ export default function JadwalWargaPage() {
                     {/* Status */}
                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-micro font-semibold rounded-full border shrink-0 ${
                       isSelesai
-                        ? 'text-gray-400 bg-gray-50 dark:bg-gray-800 border-control dark:border-gray-700'
+                        ? 'text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-control dark:border-gray-700'
                         : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/25 border-emerald-200 dark:border-emerald-800/50'
                     }`}>
                       {isSelesai ? <Check className="w-3 h-3" strokeWidth={2.5} /> : <span className="w-1.5 h-1.5 rounded-full bg-current" />}

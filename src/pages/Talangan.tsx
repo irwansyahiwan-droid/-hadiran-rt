@@ -317,7 +317,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     className={`inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 ${
                       deleteConfirmId === t.id
                         ? 'bg-rose-600 text-white'
-                        : 'text-gray-400 dark:text-gray-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20'
                     }`}
                   >
                     {deleteConfirmId === t.id ? 'Hapus?' : <Trash2 className="w-3.5 h-3.5" />}

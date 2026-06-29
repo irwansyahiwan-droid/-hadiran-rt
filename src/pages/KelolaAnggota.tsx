@@ -400,7 +400,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                 }`}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${
-                  w.status_aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400 dark:bg-gray-800'
+                  w.status_aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
                 }`}>
                   {w.nama.charAt(0).toUpperCase()}
                 </div>
