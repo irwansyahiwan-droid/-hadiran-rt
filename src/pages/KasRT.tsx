@@ -393,7 +393,7 @@ export default function KasRTPage() {
 
   return (
     <>
-      <div className="space-y-6 pb-2 page-enter">
+      <div className="space-y-7 pb-2 page-enter">
         {/* Header — di HP: judul di atas, tombol di bawah (anti-kepotong) */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
@@ -518,12 +518,12 @@ export default function KasRTPage() {
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5">
               <p className="text-sm font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</p>
               <AreaTrend points={saldoSeries} />
             </div>
             {monthly.length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
                   <div className="flex items-center gap-1">
@@ -552,7 +552,7 @@ export default function KasRTPage() {
 
         {/* Rekap per kategori — untuk pertanggungjawaban */}
         {!loading && list.length > 0 && (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4 mt-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5 mt-4">
             <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Rekap per Kategori</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Penerimaan */}
@@ -597,7 +597,7 @@ export default function KasRTPage() {
         <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}>
+              <div key={i} className={`flex items-center gap-3 px-5 py-4${i < 4 ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}>
                 <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/4" />
@@ -676,7 +676,7 @@ export default function KasRTPage() {
                     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedRow(k); setConfirmDel(false); }
                   } : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise flex items-center gap-3 px-4 py-4 ${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}
+                  className={`rise flex items-center gap-3 px-5 py-4${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-800">
                     {isMasuk

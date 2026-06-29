@@ -414,7 +414,7 @@ export default function KasHadiranPage() {
 
   return (
     <>
-      <div className="space-y-6 pb-2 overflow-x-hidden">
+      <div className="space-y-7 pb-2 overflow-x-hidden">
         {/* Header Card */}
         <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
@@ -490,7 +490,7 @@ export default function KasHadiranPage() {
         </div>
 
         {/* Alur Kas */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <p className="inline-flex items-center gap-1 text-sm font-bold text-ink dark:text-gray-100">
               Alur Kas Hadiran
@@ -608,7 +608,7 @@ export default function KasHadiranPage() {
                     >
 
                       {/* ── Timeline mini-header ─────────────────────── */}
-                      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                      <div className="flex items-center justify-between px-5 pt-4 pb-2">
                         <div className="flex items-center gap-2">
                           <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
                             talanganInfo.count === 0
@@ -630,7 +630,7 @@ export default function KasHadiranPage() {
                       {/* ── Focal row: penerima + amount (ketuk → detail) ─ */}
                       <button
                         onClick={() => openDetail(t)}
-                        className="w-full flex items-center gap-3 px-4 pb-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
+                        className="w-full flex items-center gap-3 px-5 pb-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
                       >
                         <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
                         <div className="flex-1 min-w-0">

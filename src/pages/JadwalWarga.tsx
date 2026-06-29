@@ -102,7 +102,7 @@ export default function JadwalWargaPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 pb-2">
+      <div className="space-y-7 pb-2">
         {/* Hero */}
         <div className="skeleton h-44 rounded-3xl" />
         {/* Stats */}
@@ -166,7 +166,7 @@ export default function JadwalWargaPage() {
   });
 
   return (
-    <div className="space-y-6 pb-2">
+    <div className="space-y-7 pb-2">
       {/* Hero Card — material/warna disamakan dengan hero Beranda (.hero-card) */}
       {lastTarikan ? (
         <div className="hero-card hero-noise">
@@ -393,7 +393,7 @@ export default function JadwalWargaPage() {
                 return (
                   <div
                     key={t.id}
-                    className={`flex items-center gap-3 p-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
+                    className={`flex items-center gap-3 px-5 py-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
                   >
                     {/* Badge nomor */}
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm ${

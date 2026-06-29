@@ -229,7 +229,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         <div className="flex items-center">
           <button
             onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
-            className="flex-1 min-w-0 flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
+            className="flex-1 min-w-0 flex items-center gap-3 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
           >
             <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
             <div className="flex-1 min-w-0">
@@ -332,7 +332,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="space-y-6 pb-2 page-enter">
+    <div className="space-y-7 pb-2 page-enter">
       {/* Back header — hanya muncul saat dibuka dari Beranda (mode warga) */}
       {onBack && (
         <button
@@ -414,7 +414,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       <CrossFade loading={loading} skeleton={(
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 py-3.5">
+            <div key={i} className="flex items-center gap-3 px-5 py-4">
               <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-2/3" />
