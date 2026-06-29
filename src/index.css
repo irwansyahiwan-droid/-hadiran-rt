@@ -55,7 +55,7 @@ body {
      User minta "putih, bersih, mahal, premium, segar, trend 2026" → kanvas
      near-white (L~96%, setara Revolut/Jago/Apple); separasi kartu FULL sandar
      ke floating-glass shadow + edge crisp 1px (Pass 7), BUKAN gap tonal. */
-  background-color: #F2F5FA;
+  background-color: #EDF1F7;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -132,7 +132,7 @@ input, textarea  { caret-color: #1B7249; }
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #F2F5FA;
+  background-color: #EDF1F7;
   /* Pass 7: bisik brand dinaikkan tipis (0.06→0.085) + tambah whisper sky di
      sudut kanan-atas (0.05) → kanvas terasa lebih "seger"/airy. Tetap di puncak
      (atmosferik), BUKAN glow di belakang kartu. Base color = #F2F5FA (Pass 8). */
@@ -301,21 +301,23 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      look "tercetak"/premium Apple-Linear di kanvas near-white. edge ring
      .12→.15, contact .09→.12, key .13→.15, ambient .20→.22. Spread tetap
      negatif → makin crisp/melayang, BUKAN fog. LIGHT saja. */
+  /* Quiet Premium (2026-06-29): KOMIT ke lajur Apple/Mercury. Separasi kartu kini
+     datang dari STEP TONAL (kanvas #EDF1F7) + ruang, BUKAN ring tebal/5-lapis.
+     Edge ring .15→.035 (whisper: definisi, bukan outline), 5 lapis → 1 soft shadow
+     lega. Inset highlight putih dilepas (kartu sudah putih di kanvas tenang → tak
+     perlu "kaca disinari"). Bayangan = lembut, opacity rendah, blur besar, niat
+     tunggal. Mood mahal datang dari yg DIHILANGKAN, bukan ditumpuk. */
   --shadow-card:
-    inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(10, 14, 26, 0.15),                         /* tepi crisp 1px → definisi edge tegas (pop di latar putih) */
-    0 1px 2px 0 rgba(10, 14, 26, 0.12),                       /* contact shadow rapat → kartu menapak */
-    0 8px 16px -6px rgba(10, 14, 26, 0.15),                   /* key mid — terkontain (spread neg), bukan fog */
-    0 24px 48px -18px rgba(10, 14, 26, 0.22);                 /* ambient float — lebih lega/mewah, tetap rapat */
+    0 0 0 1px rgba(16, 24, 40, 0.035),                       /* whisper edge — definisi halus, bukan outline */
+    0 1px 2px 0 rgba(16, 24, 40, 0.04),                      /* contact tipis → kartu menapak */
+    0 6px 16px -4px rgba(16, 24, 40, 0.07);                  /* satu soft shadow lega → melayang tenang */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
   --shadow-float:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
-    0 0 0 1px rgba(10, 14, 26, 0.07),
-    0 2px 6px -2px rgba(10, 14, 26, 0.12),
-    0 14px 28px -10px rgba(10, 14, 26, 0.18),
-    0 30px 56px -22px rgba(10, 14, 26, 0.24);
+    0 0 0 1px rgba(16, 24, 40, 0.04),
+    0 4px 12px -2px rgba(16, 24, 40, 0.08),
+    0 16px 32px -8px rgba(16, 24, 40, 0.14);
 }
 
 /* Soft layered elevation for surfaces */
@@ -411,13 +413,14 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
   /* Pass 7 paritas dark: geometri disamakan light (key 8/16, ambient 24/48
      lebih lega/mewah) + tepi-atas .08→.10 (sedikit lebih "menyala"). Ring
      cahaya .13 tetap carry separasi di gelap; spread tetap negatif → tak fog. */
+  /* Quiet Premium dark: separasi tetap dari RING cahaya (drop tak terbaca di
+     gelap), tapi diturunkan .13→.10 + 5 lapis → 1 ambient lega. Selaras light. */
   --shadow-card:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),               /* tepi atas "tersinari" — glass edge */
-    0 0 0 1px rgba(255, 255, 255, 0.13),                      /* ring cahaya → kartu "tercetak" tegas di gelap */
-    0 1px 2px rgba(0, 0, 0, 0.5),                             /* contact shadow rapat → kartu menapak */
-    0 8px 16px -6px rgba(0, 0, 0, 0.45),                      /* key mid — terkontain (spread neg) */
-    0 24px 48px -18px rgba(0, 0, 0, 0.62);                    /* ambient float — lebih lega, kedalaman tanpa fog */
-  --shadow-float: 0 18px 48px -12px rgba(0, 0, 0, 0.72);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),               /* glass top edge halus */
+    0 0 0 1px rgba(255, 255, 255, 0.10),                      /* ring cahaya → separasi tenang di gelap */
+    0 4px 12px -2px rgba(0, 0, 0, 0.5),                       /* contact + kedalaman */
+    0 16px 32px -8px rgba(0, 0, 0, 0.6);                      /* satu ambient lega */
+  --shadow-float: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
 }
 
 /* Tactile press feedback — ease-out (bukan spring): feedback tekan harus
