@@ -58,7 +58,7 @@ export default {
         },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#EDF1F7', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color (anti strip beda tone saat overscroll). Pass 8 (28 Jun): #E6EAF1→#F2F5FA near-white. Quiet Premium (29 Jun): #F2F5FA→#EDF1F7 — step tonal kartu↔kanvas dinaikkan (~1.1→1.14:1) supaya kartu naik dari STEP, bukan ring tebal; shadow lalu disederhanakan jadi 1 soft layer. Tetap near-white sejuk.
+        sunken: '#E8ECF3', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). Pass 8 (28 Jun): #E6EAF1→#F2F5FA near-white. Quiet Premium (29 Jun): #F2F5FA→#EDF1F7 — step tonal kartu↔kanvas dinaikkan (~1.1→1.14:1) supaya kartu naik dari STEP, bukan ring tebal; shadow lalu disederhanakan jadi 1 soft layer. Quiet Premium step+ (29 Jun): #EDF1F7→#E8ECF3 — step dilebarkan lagi (~1.14→1.18:1) tanpa nambah shadow; tetap near-white sejuk (L~93%).
         line: '#CFD5DF',    // garis/divider tipis. Pass 3: #E6EAF1 dulu LEBIH TERANG dari canvas → border kartu jadi garis terang yg mewashout tepi crisp. Diturunkan ≈ tone canvas agar tak melawan hairline gelap (.lift); divider tetap bersih di atas putih.
         control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */

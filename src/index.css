@@ -55,7 +55,12 @@ body {
      User minta "putih, bersih, mahal, premium, segar, trend 2026" → kanvas
      near-white (L~96%, setara Revolut/Jago/Apple); separasi kartu FULL sandar
      ke floating-glass shadow + edge crisp 1px (Pass 7), BUKAN gap tonal. */
-  background-color: #EDF1F7;
+  /* Quiet Premium step+ (2026-06-29): #EDF1F7 → #E8ECF3 (turun ~2% L). User
+     "card & canvas masih bisa dimaximalin" → lebarkan STEP kartu↔kanvas (lever
+     Linear/Apple), bukan tambah shadow/fog. Card TETAP putih murni, shadow
+     Quiet Premium (1 soft layer) tak disentuh → kartu 'naik' dari STEP, kanvas
+     tetap near-white sejuk (L~93%). Step ~1.14:1 → ~1.18:1. */
+  background-color: #E8ECF3;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -132,7 +137,7 @@ input, textarea  { caret-color: #1B7249; }
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #EDF1F7;
+  background-color: #E8ECF3; /* Quiet Premium step+ — samakan dgn body/sunken/manifest/landing */
   /* Pass 7: bisik brand dinaikkan tipis (0.06→0.085) + tambah whisper sky di
      sudut kanan-atas (0.05) → kanvas terasa lebih "seger"/airy. Tetap di puncak
      (atmosferik), BUKAN glow di belakang kartu. Base color = #F2F5FA (Pass 8). */
@@ -302,7 +307,7 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      .12→.15, contact .09→.12, key .13→.15, ambient .20→.22. Spread tetap
      negatif → makin crisp/melayang, BUKAN fog. LIGHT saja. */
   /* Quiet Premium (2026-06-29): KOMIT ke lajur Apple/Mercury. Separasi kartu kini
-     datang dari STEP TONAL (kanvas #EDF1F7) + ruang, BUKAN ring tebal/5-lapis.
+     datang dari STEP TONAL (kanvas #E8ECF3) + ruang, BUKAN ring tebal/5-lapis.
      Edge ring .15→.035 (whisper: definisi, bukan outline), 5 lapis → 1 soft shadow
      lega. Inset highlight putih dilepas (kartu sudah putih di kanvas tenang → tak
      perlu "kaca disinari"). Bayangan = lembut, opacity rendah, blur besar, niat
