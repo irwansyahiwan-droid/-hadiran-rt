@@ -189,9 +189,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
 
   const skeleton = (
-      <div className="space-y-6 pb-2">
+      <div className="space-y-7 pb-2">
         <div className="rounded-3xl h-48 skeleton" />
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
           <div className="grid grid-cols-3 divide-x divide-line">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2 px-3">
@@ -203,7 +203,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className={`flex items-center gap-3 px-4 py-[14px] ${i < 3 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 px-5 py-4 ${i < 3 ? 'border-b border-line dark:border-gray-800' : ''}`}>
               <div className="w-11 h-11 rounded-2xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-3/5" />
@@ -221,7 +221,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     {error ? (
     <ErrorState className="pt-10" onRetry={() => load()} retrying={loading} />
     ) : (
-    <div className="space-y-6 pb-2">
+    <div className="space-y-7 pb-2">
       {/* Sapaan + badge status kas */}
       <div className="flex items-end justify-between px-1">
         <div>
@@ -321,7 +321,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       />
 
       {/* Stats Row */}
-      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-4">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
         <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
           <div className="flex flex-col items-center gap-0.5 px-3">
             <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{animAnggota}</span>
@@ -340,7 +340,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
       {/* Alert Banner */}
       {talangan > 0 && (
-        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl px-5 py-4">
+        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl px-5 py-5">
           <div className="icon-tile w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
@@ -382,7 +382,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               // emas songket (selaras motif hero), sisanya tetap baris netral.
               const next = idx === 0;
               return (
-              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-4 py-[14px] ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-5 py-4 ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
                   <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className={`w-11 h-11 rounded-2xl ${next ? 'ring-2 ring-[var(--gold-songket)] ring-offset-2 ring-offset-white dark:ring-offset-gray-900' : ''}`} />
@@ -485,7 +485,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 key={trx.id}
                 onClick={() => { haptic(); setSelectedTrx(trx); }}
                 style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-                className={`press rise w-full flex items-start gap-3 px-4 py-[14px] text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < visibleTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
+                className={`press rise w-full flex items-start gap-3 px-5 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < visibleTrx.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
               >
                 <div className={`icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
                   {trx.tipe === 'setor'
