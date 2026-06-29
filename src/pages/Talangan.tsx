@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, RefreshCw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, RefreshCw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
@@ -231,21 +231,24 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
             className="flex-1 min-w-0 flex items-center gap-3 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
           >
-            <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
+            <AvatarPeci nama={g.nama} className="w-11 h-11 rounded-2xl" />
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-body font-semibold text-ink dark:text-gray-100 truncate flex-1">{g.nama}</p>
-                {g.countBelum > 0 && (
-                  <span className="text-micro text-amber-700 font-medium shrink-0">
-                    {g.countBelum}× @ Rp50.000
-                  </span>
-                )}
-              </div>
-              {g.countBelum > 0 && (
-                <p className="text-xs text-warn dark:text-amber-400 mt-0.5">
-                  {g.countBelum} belum lunas · total {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
+              <p className="text-body font-semibold text-ink dark:text-gray-100 truncate">{g.nama}</p>
+              {g.countBelum > 0 ? (
+                <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
+                  {g.countBelum} belum lunas · {g.countBelum}× Rp50.000
                 </p>
+              ) : (
+                <p className="text-caption text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
               )}
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {g.countBelum > 0 && (
+                <span className="font-display text-amount font-bold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
+                  {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
+                </span>
+              )}
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} strokeWidth={2.25} />
             </div>
           </button>
           {isBendahara && g.countBelum > 0 && (
@@ -265,7 +268,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           <div className="border-t border-line divide-y divide-line dark:divide-gray-800">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-2 px-4 py-3">
-                <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 border border-control dark:border-gray-600 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
+                <div className="icon-tile w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0 text-xs font-bold text-ink-faint dark:text-gray-300">
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
