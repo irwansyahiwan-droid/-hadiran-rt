@@ -296,13 +296,17 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      kartu↔kanvas mengecil, kartu terasa "kurang nendang". Restorasi pop lewat
      EDGE & kedalaman (cara fintech 2026 — BUKAN menggelapkan latar): edge ring
      .09→.12 (tepi "tercetak" lebih tegas, justru makin kebaca di latar putih),
-     contact .07→.09 (menapak), key .10→.13, ambient .18→.20. LIGHT saja. */
+     contact .07→.09 (menapak), key .10→.13, ambient .18→.20. LIGHT saja.
+     Pass 8d (2026-06-29, "masih kurang maksimal"): tepi dipertegas lagi utk
+     look "tercetak"/premium Apple-Linear di kanvas near-white. edge ring
+     .12→.15, contact .09→.12, key .13→.15, ambient .20→.22. Spread tetap
+     negatif → makin crisp/melayang, BUKAN fog. LIGHT saja. */
   --shadow-card:
     inset 0 1px 0 0 rgba(255, 255, 255, 1),                   /* highlight tepi atas → "kaca disinari" */
-    0 0 0 1px rgba(10, 14, 26, 0.12),                         /* tepi crisp 1px → definisi edge tegas (pop di latar putih) */
-    0 1px 2px 0 rgba(10, 14, 26, 0.09),                       /* contact shadow rapat → kartu menapak */
-    0 8px 16px -6px rgba(10, 14, 26, 0.13),                   /* key mid — terkontain (spread neg), bukan fog */
-    0 24px 48px -18px rgba(10, 14, 26, 0.20);                 /* ambient float — lebih lega/mewah, tetap rapat */
+    0 0 0 1px rgba(10, 14, 26, 0.15),                         /* tepi crisp 1px → definisi edge tegas (pop di latar putih) */
+    0 1px 2px 0 rgba(10, 14, 26, 0.12),                       /* contact shadow rapat → kartu menapak */
+    0 8px 16px -6px rgba(10, 14, 26, 0.15),                   /* key mid — terkontain (spread neg), bukan fog */
+    0 24px 48px -18px rgba(10, 14, 26, 0.22);                 /* ambient float — lebih lega/mewah, tetap rapat */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
