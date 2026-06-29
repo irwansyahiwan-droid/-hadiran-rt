@@ -55,12 +55,11 @@ body {
      User minta "putih, bersih, mahal, premium, segar, trend 2026" → kanvas
      near-white (L~96%, setara Revolut/Jago/Apple); separasi kartu FULL sandar
      ke floating-glass shadow + edge crisp 1px (Pass 7), BUKAN gap tonal. */
-  /* Quiet Premium step+ (2026-06-29): #EDF1F7 → #E8ECF3 (turun ~2% L). User
-     "card & canvas masih bisa dimaximalin" → lebarkan STEP kartu↔kanvas (lever
-     Linear/Apple), bukan tambah shadow/fog. Card TETAP putih murni, shadow
-     Quiet Premium (1 soft layer) tak disentuh → kartu 'naik' dari STEP, kanvas
-     tetap near-white sejuk (L~93%). Step ~1.14:1 → ~1.18:1. */
-  background-color: #E8ECF3;
+  /* Putih bersih (2026-06-30): #E8ECF3 → #F4F7FB (naik ~3% L, near-white bersih
+     L~97%). User minta "putih bersih". Step kartu↔kanvas mengecil → separasi
+     GESER ke tepi card (lihat --shadow-card: edge .035→.05). Kanvas clean &
+     lapang ala Apple/Revolut, card tetap kebaca crisp dari edge + soft shadow. */
+  background-color: #F4F7FB;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -137,7 +136,7 @@ input, textarea  { caret-color: #1B7249; }
      grounding gelap → tenang, lapang, profesional. Brand emerald hanya
      "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
      Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #E8ECF3; /* Quiet Premium step+ — samakan dgn body/sunken/manifest/landing */
+  background-color: #F4F7FB; /* Putih bersih — samakan dgn body/sunken/manifest/landing */
   /* Pass 7: bisik brand dinaikkan tipis (0.06→0.085) + tambah whisper sky di
      sudut kanan-atas (0.05) → kanvas terasa lebih "seger"/airy. Tetap di puncak
      (atmosferik), BUKAN glow di belakang kartu. Base color = #F2F5FA (Pass 8). */
@@ -307,14 +306,18 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      .12→.15, contact .09→.12, key .13→.15, ambient .20→.22. Spread tetap
      negatif → makin crisp/melayang, BUKAN fog. LIGHT saja. */
   /* Quiet Premium (2026-06-29): KOMIT ke lajur Apple/Mercury. Separasi kartu kini
-     datang dari STEP TONAL (kanvas #E8ECF3) + ruang, BUKAN ring tebal/5-lapis.
+     datang dari STEP TONAL (kanvas #F4F7FB) + ruang, BUKAN ring tebal/5-lapis.
      Edge ring .15→.035 (whisper: definisi, bukan outline), 5 lapis → 1 soft shadow
      lega. Inset highlight putih dilepas (kartu sudah putih di kanvas tenang → tak
      perlu "kaca disinari"). Bayangan = lembut, opacity rendah, blur besar, niat
      tunggal. Mood mahal datang dari yg DIHILANGKAN, bukan ditumpuk. */
+  /* Putih bersih (2026-06-30): kanvas naik ke near-white #F4F7FB → step kartu↔
+     kanvas mengecil → separasi GESER dari STEP ke TEPI. Edge .035→.05 + contact
+     .04→.05 supaya card putih tetap kebaca crisp di kanvas near-white. Soft shadow
+     .07 tetap (tenang, tak nambah fog). Tetap 1 niat, bukan 5-lapis. */
   --shadow-card:
-    0 0 0 1px rgba(16, 24, 40, 0.035),                       /* whisper edge — definisi halus, bukan outline */
-    0 1px 2px 0 rgba(16, 24, 40, 0.04),                      /* contact tipis → kartu menapak */
+    0 0 0 1px rgba(16, 24, 40, 0.05),                        /* edge — naik dikit: card tetap kebaca di kanvas putih */
+    0 1px 2px 0 rgba(16, 24, 40, 0.05),                      /* contact → kartu menapak */
     0 6px 16px -4px rgba(16, 24, 40, 0.07);                  /* satu soft shadow lega → melayang tenang */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
