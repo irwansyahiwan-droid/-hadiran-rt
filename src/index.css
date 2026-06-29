@@ -343,8 +343,12 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
    background-image di atas background-color bg-white → tak menyentuh markup.
    Dark: sheen putih sangat halus di tepi atas (top glass) di atas gray-900. */
 /* Pass 7: putih murni dipertahankan lebih lama (0→62%) baru memudar tipis →
-   kartu terasa lebih bersih & "menyala" dari atas, fade dasar tetap cool-neutral. */
-html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #FBFDFF 62%, #F1F6FC 100%); }
+   kartu terasa lebih bersih & "menyala" dari atas, fade dasar tetap cool-neutral.
+   Pass 8c (29 Jun): kanvas kini near-white #F2F5FA → fade lama (#F1F6FC) nyaris
+   = kanvas, dasar kartu lebur & "kurang putih". Putih ditahan lebih lama (62→74%)
+   & ujung dinaikkan #F1F6FC→#F6F9FE → kartu PUTIH MAKSIMAL merata; delta vs kanvas
+   membesar → kontras/pop kartu naik TANPA menggelapkan kanvas. */
+html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #FDFEFF 74%, #F6F9FE 100%); }
 /* Pass 7 paritas dark: sheen putih ditahan lebih lama (.05→.07, fade ke 100%) → kartu dark ikut "menyala" dari atas spt light. */
 .dark .lift { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 62%, rgba(255, 255, 255, 0) 100%); }
 
