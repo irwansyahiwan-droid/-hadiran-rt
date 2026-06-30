@@ -177,7 +177,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${bendaharaOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        <div className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div
+          className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}
+          // Collapse = tinggi 0, tapi email/password/submit di dalam TETAP fokusabel
+          // via Tab & terbaca screen reader. `inert` mengeluarkannya dari tab-order
+          // sekaligus a11y tree sampai panel dibuka. (React 18 belum punya tipe
+          // `inert`, jadi di-spread sebagai atribut.)
+          {...(!bendaharaOpen ? ({ inert: '' } as Record<string, string>) : {})}
+        >
           <div className="overflow-hidden">
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
