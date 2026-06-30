@@ -49,7 +49,15 @@ export default function FitAmount({ measure, maxPx = 48, minPx = 30, className =
   }, [measure, maxPx, minPx]);
 
   return (
-    <p ref={ref} className={className} style={{ position: 'relative', fontSize: size, lineHeight: 1.05 }}>
+    <p
+      ref={ref}
+      className={className}
+      // Legibility shadow (hijau-tinta gelap, bukan hitam) — teks putih/rose nominal
+      // duduk di gradient hijau hero yg bagian atasnya terang; tanpa ini kontras
+      // tipis (white ~2.4-4:1, rose negatif gagal) → kurang nyaman utk warga lansia.
+      // Shadow gelap rapat memisahkan glyph dari hijau TANPA mengubah gradient brand.
+      style={{ position: 'relative', fontSize: size, lineHeight: 1.05, textShadow: '0 1px 1px rgba(3,28,18,0.5), 0 1px 10px rgba(3,28,18,0.4), 0 0 2px rgba(3,28,18,0.45)' }}
+    >
       {children}
       {/* Probe pengukur — tak terlihat & di luar alur; font/letter-spacing diwarisi
           dari <p>, fontSize dipaksa maxPx agar rasio skala konsisten. Diklip oleh
