@@ -399,6 +399,27 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
+/* ── Inset row divider (30 Jun 2026 v2, /design-critique) ──────────────────
+   Hairline antar-baris di DALAM kartu putih list (transaksi, jadwal). Dua niat:
+   (1) LEBIH TERANG dari border kartu (`line` #CFD5DF) → boundary kartu memimpin,
+       garis dalam jadi sekunder (perbaiki equal-weight hierarchy).
+   (2) MASUK melewati kolom ikon (left 4.75rem = px-5 1.25 + ikon w-11 2.75 +
+       gap-3 0.75) → sejajar teks, trailing inset ke px-5 → baris terasa "di
+       dalam" kartu, bukan strip menumpuk (pola list iOS/Linear/Mercury).
+   Dipasang via ::after (border tak bisa di-inset). Baris terakhir TANPA class
+   ini (kontrol idx di call-site). */
+.divide-inset { position: relative; }
+.divide-inset::after {
+  content: '';
+  position: absolute;
+  left: 4.75rem;
+  right: 1.25rem;
+  bottom: 0;
+  height: 1px;
+  background: #E0E5EC;          /* lebih terang dari line #CFD5DF */
+}
+.dark .divide-inset::after { background: rgba(255, 255, 255, 0.06); }
+
 /* ── Icon tile (Pass 7c) — depth tipis di chip ikon ber-tint ───────────────
    Menumpang DI ATAS bg-*-100 (warna dari Tailwind) tanpa mengubah tint: sheen
    putih dari atas + ring halus + contact tipis → chip "tersinari & terangkat",
