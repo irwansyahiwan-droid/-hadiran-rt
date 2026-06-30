@@ -59,6 +59,9 @@ function TargetPhoto() {
       <img
         src={rtBendahara}
         alt=""
+        width={859}
+        height={760}
+        loading="lazy"
         className="absolute right-0 top-0 h-full w-[68%] object-cover"
         style={{ objectPosition: '72% center', filter: 'saturate(.9) contrast(1.03)' }}
       />
@@ -88,6 +91,9 @@ function AppPhone() {
         <img
           src={dashboardPhone}
           alt=""
+          width={360}
+          height={779}
+          loading="lazy"
           className="absolute inset-0 h-full w-full object-cover object-top"
           draggable={false}
         />

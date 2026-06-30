@@ -74,6 +74,12 @@ export default function ConfirmBatalTarikan({ open, nomor, loading = false, onCl
           className="field"
         />
 
+        {/* Umumkan ke screen reader saat angka cocok → pengguna tunanetra tahu
+            tombol "Batalkan" sudah aktif (tanpa ini mereka tak punya petunjuk visual). */}
+        <p aria-live="polite" className="sr-only">
+          {cocok ? `Angka cocok. Tombol Batalkan sekarang aktif.` : ''}
+        </p>
+
         <div className="flex gap-3 mt-4">
           <button onClick={onClose} disabled={loading} className="btn-secondary flex-1 py-3 rounded-xl disabled:opacity-60">
             Batal

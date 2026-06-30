@@ -47,7 +47,7 @@ export default function WelcomeSheet() {
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' }}
       >
         <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-5" />
-        <img src={logoRt} alt="" className="w-14 h-14 rounded-2xl object-contain mx-auto mb-3 ring-1 ring-black/5 dark:ring-white/10" />
+        <img src={logoRt} alt="" width={56} height={56} className="w-14 h-14 rounded-2xl object-contain mx-auto mb-3 ring-1 ring-black/5 dark:ring-white/10" />
         <h2 className="text-xl font-bold text-ink dark:text-gray-100 text-center">Selamat datang</h2>
         <p className="text-caption text-ink-sub dark:text-gray-400 text-center mt-1 mb-5">
           Aplikasi Kas &amp; Hadiran RT 004/006. Di sini Bapak-Bapak / Warga bisa:
