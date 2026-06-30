@@ -265,7 +265,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
         {/* Detail entries */}
         {isExpanded && (
-          <div className="border-t border-line divide-y divide-line dark:divide-gray-800">
+          <div className="border-t border-line dark:border-gray-800 list-inset [--di-l:3.75rem] [--di-r:1rem]">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-2 px-4 py-3">
                 <div className="icon-tile w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0 text-xs font-bold text-ink-faint dark:text-gray-300">
@@ -415,7 +415,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       />
 
       <CrossFade loading={loading} skeleton={(
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset [--di-l:4.25rem]">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-5 py-4">
               <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
@@ -441,7 +441,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   Warga dengan Tunggakan Berganda
                 </p>
               </div>
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
                 {berganda.map(g => renderGroup(g))}
               </div>
             </div>
@@ -451,7 +451,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {showBelum && single.length > 0 && (
             <div>
               <SectionTitle className="mt-6" count={single.length}>Daftar Talangan</SectionTitle>
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
                 {single.map(g => renderGroup(g))}
               </div>
             </div>
@@ -461,7 +461,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {showLunas && lunas.length > 0 && (
             <div>
               <SectionTitle className="mt-6" tone="muted" count={lunas.length}>Sudah Lunas</SectionTitle>
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden divide-y divide-line dark:divide-gray-800 opacity-60">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset opacity-60">
                 {lunas.map(g => renderGroup(g, true))}
               </div>
             </div>

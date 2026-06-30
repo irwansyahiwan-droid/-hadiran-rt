@@ -279,7 +279,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         {/* Warga list */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className={`flex items-center gap-3 p-3.5 ${i < 5 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 p-3.5 [--di-l:3.625rem] [--di-r:0.875rem] ${i < 5 ? 'divide-inset' : ''}`}>
               <div className="skeleton w-8 h-8 rounded-xl shrink-0" />
               <div className="flex-1 space-y-1.5">
                 <div className="skeleton h-3.5 w-2/5 rounded-full" />
@@ -392,7 +392,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         {/* Sohibul Bait — baris TERKUNCI di paling atas: penerima, tidak bayar,
             tidak bisa di-tap (hadir/titip/tidak hadir) & di luar hitungan talangan. */}
         {sohibulWarga && (
-          <div className="w-full flex items-center gap-3 p-3.5 border-b border-line dark:border-gray-800 bg-amber-50/60 dark:bg-amber-900/15">
+          <div className="w-full flex items-center gap-3 p-3.5 [--di-l:3.625rem] [--di-r:0.875rem] divide-inset bg-amber-50/60 dark:bg-amber-900/15">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
               {sohibulWarga.nama.charAt(0)}
             </div>
@@ -413,8 +413,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               key={w.id}
               onClick={() => toggle(w.id)}
               aria-label={`${w.nama} — ${ui.label}. Ketuk untuk ganti status`}
-              className={`w-full flex items-center gap-3 p-3.5 text-left transition-colors ${
-                idx < filtered.length - 1 ? 'border-b border-line dark:border-gray-800' : ''
+              className={`w-full flex items-center gap-3 p-3.5 text-left [--di-l:3.625rem] [--di-r:0.875rem] transition-colors ${
+                idx < filtered.length - 1 ? 'divide-inset' : ''
               } ${ui.hover}`}
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ui.ava}`}>
@@ -944,7 +944,7 @@ export default function JadwalPage() {
       <CrossFade loading={loading} skeleton={(
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className={`flex items-center gap-3 px-4 py-4 ${i < 4 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 px-4 py-4 [--di-l:3.5rem] [--di-r:1rem] ${i < 4 ? 'divide-inset' : ''}`}>
               <div className="w-7 h-4 skeleton rounded-lg shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-3/5" />
@@ -969,7 +969,7 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-4 transition-colors duration-200 ${!isLast ? 'border-b border-line dark:border-gray-800' : ''}`}
+                className={`flex items-center gap-3 px-4 py-4 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 style={isSelesai ? { borderLeft: '3px solid #10B981' } : isNext ? { borderLeft: '3px solid #34D399' } : undefined}
               >
                 {/* Nomor kecil */}

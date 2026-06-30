@@ -197,7 +197,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                 <p className="text-micro text-amber-700 dark:text-amber-400 leading-relaxed">
                   Ditandai <b>hadir</b> di tarikan terpilih lalu kas dihitung ulang. Talangan warga lain tidak terpengaruh.
                 </p>
-                <div className="rounded-xl bg-white dark:bg-gray-900 border border-amber-100 dark:border-amber-900/40 divide-y divide-line dark:divide-gray-800 max-h-52 overflow-y-auto">
+                <div className="rounded-xl bg-white dark:bg-gray-900 border border-amber-100 dark:border-amber-900/40 list-inset [--di-l:2.75rem] [--di-r:0.75rem] max-h-52 overflow-y-auto">
                   {selesaiTarikan.map((t) => {
                     const on = pilih.has(t.id);
                     return (
@@ -395,8 +395,8 @@ export default function KelolaAnggota({ open, onClose }: Props) {
               <button
                 key={w.id}
                 onClick={() => { haptic(); setForm({ mode: 'edit', warga: w }); }}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
-                  idx < filtered.length - 1 ? 'border-b border-line dark:border-gray-800' : ''
+                className={`w-full flex items-center gap-3 px-4 py-3.5 text-left [--di-l:4.25rem] [--di-r:1rem] active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
+                  idx < filtered.length - 1 ? 'divide-inset' : ''
                 }`}
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${

@@ -203,7 +203,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className={`flex items-center gap-3 px-5 py-4 ${i < 3 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 px-5 py-4 ${i < 3 ? 'divide-inset' : ''}`}>
               <div className="w-11 h-11 rounded-2xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-3/5" />

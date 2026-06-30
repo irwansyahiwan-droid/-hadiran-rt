@@ -597,7 +597,7 @@ export default function KasRTPage() {
         <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className={`flex items-center gap-3 px-5 py-4${i < 4 ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}>
+              <div key={i} className={`flex items-center gap-3 px-5 py-4 [--di-l:4.25rem]${i < 4 ? ' divide-inset' : ''}`}>
                 <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/4" />
@@ -676,7 +676,7 @@ export default function KasRTPage() {
                     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedRow(k); setConfirmDel(false); }
                   } : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise flex items-center gap-3 px-5 py-4${editable ? 'cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'border-b border-line/70 dark:border-gray-800/50' : ''}`}
+                  className={`rise flex items-center gap-3 px-5 py-4 [--di-l:4.25rem]${editable ? ' cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 >
                   <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-800">
                     {isMasuk

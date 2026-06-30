@@ -112,7 +112,7 @@ export default function JadwalWargaPage() {
         {/* List */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className={`flex items-center gap-3 p-3.5 ${i < 4 ? 'border-b border-line dark:border-gray-800' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 p-3.5 [--di-l:3.875rem] [--di-r:0.875rem] ${i < 4 ? 'divide-inset' : ''}`}>
               <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
               <div className="flex-1 space-y-1.5">
                 <div className="skeleton h-3.5 w-1/2 rounded-full" />
@@ -316,8 +316,8 @@ export default function JadwalWargaPage() {
                 return (
                   <div
                     key={w.id}
-                    className={`flex items-center gap-3 p-3.5 ${
-                      idx < filteredWarga.length - 1 ? 'border-b border-gray-50 dark:border-gray-800' : ''
+                    className={`flex items-center gap-3 p-3.5 [--di-l:5.625rem] [--di-r:0.875rem] ${
+                      idx < filteredWarga.length - 1 ? 'divide-inset' : ''
                     }`}
                   >
                     {/* No */}
@@ -393,7 +393,7 @@ export default function JadwalWargaPage() {
                 return (
                   <div
                     key={t.id}
-                    className={`flex items-center gap-3 px-5 py-4 ${!isLast ? 'border-b border-gray-50 dark:border-gray-800' : ''}`}
+                    className={`flex items-center gap-3 px-5 py-4 [--di-l:4.5rem] ${!isLast ? 'divide-inset' : ''}`}
                   >
                     {/* Badge nomor */}
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm ${

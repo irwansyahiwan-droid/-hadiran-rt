@@ -233,7 +233,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                       key={row.id}
                       onClick={() => { if (hasDetail) { haptic(); setExpanded(isOpen ? null : row.id); } }}
                       style={{ animationDelay: `${Math.min(idx, 8) * 0.03}s` }}
-                      className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left ${hasDetail ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'border-b border-line dark:border-gray-800' : ''}`}
+                      className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left [--di-l:4.25rem] [--di-r:1rem] ${hasDetail ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'divide-inset' : ''}`}
                     >
                       <div className={`w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${ACCENT_CLS[v.accent]}`}>
                         <Icon className="w-4 h-4" />
