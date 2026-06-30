@@ -19,7 +19,8 @@ import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, heroAmountSize } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
+import FitAmount from '../components/FitAmount';
 import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -444,11 +445,16 @@ export default function KasHadiranPage() {
                 </button>
               </div>
             </div>
-            <p className={`font-display ${heroAmountSize(saldo)} font-extrabold tracking-tighter tabular-nums mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+            <FitAmount
+              measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
+              maxPx={48}
+              minPx={30}
+              className={`font-display font-extrabold tracking-tighter tabular-nums mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}
+            >
               {hidden
                 ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                 : <Odometer value={animatedSaldo} />}
-            </p>
+            </FitAmount>
             <p className="text-white/85 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
               <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-emerald-400/20 border border-emerald-300/30 rounded-full text-emerald-100 text-xs font-semibold">
