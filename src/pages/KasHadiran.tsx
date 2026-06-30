@@ -19,7 +19,7 @@ import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, heroAmountSize } from '../lib/utils';
 import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -444,7 +444,7 @@ export default function KasHadiranPage() {
                 </button>
               </div>
             </div>
-            <p className={`font-display text-5xl font-extrabold tracking-tighter tabular-nums mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+            <p className={`font-display ${heroAmountSize(saldo)} font-extrabold tracking-tighter tabular-nums mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {hidden
                 ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                 : <Odometer value={animatedSaldo} />}

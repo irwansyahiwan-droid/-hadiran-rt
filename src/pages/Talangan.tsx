@@ -4,7 +4,7 @@ import ClearButton from '../components/ClearButton';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggalShort, formatRupiahPlain, haptic, maskRp } from '../lib/utils';
+import { formatTanggalShort, formatRupiahPlain, haptic, maskRp, heroAmountSize } from '../lib/utils';
 import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import SectionTitle from '../components/SectionTitle';
@@ -370,7 +370,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   : <Eye className="w-4 h-4 text-white/70" />}
               </button>
             </div>
-            <p className="font-display text-white text-5xl font-extrabold tracking-tighter tabular-nums mb-1">
+            <p className={`font-display text-white ${heroAmountSize(totalBelumLunas)} font-extrabold tracking-tighter tabular-nums mb-1`}>
               {maskRp(`Rp ${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
             </p>
             <p className="text-emerald-300 text-xs">

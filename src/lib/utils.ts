@@ -49,6 +49,19 @@ export function formatRupiahCompact(amount: number): string {
   return `${neg}Rp${a}`;
 }
 
+/** Ukuran nominal hero yang adaptif-panjang — angka kecil tetap megah (text-5xl),
+ *  jutaan turun (text-4xl), ratusan juta turun lagi (text-3xl) → headline saldo
+ *  TAK PERNAH terpotong `overflow-hidden` di HP sempit (≈360px, Android umum).
+ *  Diukur (Playwright @360px): di kartu hero p-5, batas muat ≈288px; "Rp 1.500.000"
+ *  @text-5xl = 304px (meluap). Berbasis nilai FINAL (bukan animasi) → font stabil,
+ *  tak goyang saat count-up. SATU sumber untuk ketiga kartu hero saldo. */
+export function heroAmountSize(value: number): string {
+  const a = Math.abs(value);
+  if (a >= 100_000_000) return 'text-3xl'; // ≥ Rp100jt (mis. "-Rp125.000.000")
+  if (a >= 1_000_000) return 'text-4xl';   // Rp1jt–99jt — kasus paling umum kas RT
+  return 'text-5xl';                        // < Rp1jt — muat penuh, dampak maksimal
+}
+
 /** Sensor nominal saat mode privasi aktif: ganti angka dgn bullet, "Rp" tetap.
  *  `dots` mengatur lebar sensor agar proporsional dgn ukuran teks aslinya. */
 export function maskRp(rendered: string, hidden: boolean, dots = 6): string {

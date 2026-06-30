@@ -7,7 +7,7 @@ import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError, heroAmountSize } from '../lib/utils';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import Odometer from '../components/Odometer';
@@ -471,7 +471,7 @@ export default function KasRTPage() {
                 </button>
               </div>
             </div>
-            <p className={`font-display text-5xl font-extrabold tracking-tighter mb-3 tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
+            <p className={`font-display ${heroAmountSize(saldo)} font-extrabold tracking-tighter mb-3 tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
               {hidden
                 ? maskRp(`Rp${animatedSaldo.toLocaleString('id-ID')}`, hidden, 7)
                 : <Odometer value={animatedSaldo} />}
