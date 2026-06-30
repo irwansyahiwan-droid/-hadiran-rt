@@ -60,7 +60,12 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
           nendang.) Tanpa backdrop-filter juga lebih hemat GPU & tak lagi perlu
           guard prefers-reduced-transparency utk bar ini. Ring tepi dinaikkan
           .06→.08 agar batas kapsul tetap "tercetak" di atas putih solid. Dark = gray-900 solid. */}
-      <div className="nav-float relative max-w-lg mx-auto flex items-stretch h-[70px] rounded-[28px] pointer-events-auto bg-white dark:bg-gray-900 ring-1 ring-black/[0.08] dark:ring-white/10">
+      <div
+        className="nav-float relative max-w-lg mx-auto flex items-stretch h-[70px] rounded-[28px] bg-white dark:bg-gray-900 ring-1 ring-black/[0.08] dark:ring-white/10"
+        // Tucked (scroll turun) = kapsul meluncur keluar layar: matikan interaksi
+        // agar tak ada tap "hantu" yang tertangkap saat nav tak terlihat.
+        style={{ pointerEvents: tucked ? 'none' : 'auto' }}
+      >
         {/* Indikator pill meluncur (spring) — slot selebar tombol, pill di area ikon.
             Row TANPA padding horizontal agar slot = lebar tombol persis. */}
         {activeIndex >= 0 && (

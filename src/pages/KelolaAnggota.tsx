@@ -109,7 +109,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
   return (
     <div className="fixed inset-0 z-modal flex items-end sm:items-center justify-center">
-      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div aria-hidden="true" className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}

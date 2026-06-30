@@ -36,7 +36,7 @@ export default function ConfirmBatalTarikan({ open, nomor, loading = false, onCl
 
   return (
     <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
-      <div className="sheet-backdrop absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={loading ? undefined : onClose} />
+      <div aria-hidden="true" className="sheet-backdrop absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={loading ? undefined : onClose} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
