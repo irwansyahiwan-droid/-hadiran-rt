@@ -269,7 +269,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           <div className="border-t border-line dark:border-gray-800 list-inset [--di-l:3.75rem] [--di-r:1rem]">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-2 px-4 py-3">
-                <div className="icon-tile w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0 text-xs font-bold text-ink-faint dark:text-gray-300">
+                <div className={`icon-tile w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
+                  t.status_lunas
+                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                    : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                }`}>
                   #{t.tarikan?.nomor}
                 </div>
                 <div className="flex-1 min-w-0">
