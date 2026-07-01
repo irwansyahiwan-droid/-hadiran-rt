@@ -783,7 +783,7 @@ export default function KasHadiranPage() {
               {detailLoading ? (
                 <>
                   {/* Skeleton kartu rincian pendapatan */}
-                  <div className="rounded-2xl border border-line dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 px-4 py-3.5 space-y-2.5">
+                  <div className="inset-soft rounded-2xl px-4 py-3.5 space-y-2.5">
                     <div className="skeleton h-2.5 w-40 rounded-full" />
                     {[0, 1, 2, 3].map((i) => (
                       <div key={i} className="flex items-center justify-between">
@@ -808,7 +808,7 @@ export default function KasHadiranPage() {
                 <>
                   {/* Rincian pendapatan real-time — angka sama dgn PDF Pendapatan */}
                   {(detailHadir.length > 0 || detailTitip.length > 0 || detailTidak.length > 0) && (
-                    <div className="rounded-2xl border border-line dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/40 px-4 py-3.5">
+                    <div className="inset-soft rounded-2xl px-4 py-3.5">
                       <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
                       <div className="space-y-1.5 text-sm">
                         <div className="flex items-center justify-between gap-3">
