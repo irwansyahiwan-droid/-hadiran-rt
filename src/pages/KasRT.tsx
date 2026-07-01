@@ -684,10 +684,10 @@ export default function KasRTPage() {
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
                   className={`rise flex items-center gap-3 px-5 py-4 [--di-l:4.25rem]${editable ? ' cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 >
-                  <div className="w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-800">
+                  <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk
-                      ? <ArrowDownLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                      : <ArrowUpRight  className="w-4 h-4 text-gray-500 dark:text-gray-400" />}
+                      ? <ArrowDownLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      : <ArrowUpRight  className="w-4 h-4 text-rose-600 dark:text-rose-400" />}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -697,7 +697,7 @@ export default function KasRTPage() {
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       <p className="text-caption font-medium text-ink-faint dark:text-gray-400 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
                       {k.kategori && (
-                        <span className="text-micro font-semibold px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300 whitespace-nowrap">
+                        <span className="text-micro font-semibold px-1.5 py-0.5 rounded-md border border-line dark:border-gray-700 text-ink-sub dark:text-gray-300 whitespace-nowrap">
                           {labelKategoriSingkat(k.tipe, k.kategori)}
                         </span>
                       )}
