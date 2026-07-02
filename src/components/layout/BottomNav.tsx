@@ -30,22 +30,21 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
 
   return (
     <nav
-      // Floating glass capsule (tren 2026, ala Arc/fintech modern): bar lepas
-      // dari tepi → kapsul membulat melayang. Kaca (blur+saturate) + ring tepi
-      // + bayangan berlapis → terasa "mengambang" di atas konten, bukan bilah
-      // datar menempel dasar. Jarak bawah hormati safe-area (home indicator).
-      className="fixed left-0 right-0 z-40 px-3 pointer-events-none"
+      // Bar DOK bawah (2 Jul 2026, permintaan user — ala Google/myBCA/BYOND BSI):
+      // bar penuh NEMPEL ke tepi bawah layar, bukan lagi kapsul melayang. Latar
+      // bar mengisi sampai belakang home indicator (safe-area = padding DI DALAM
+      // bar, bukan jarak di bawahnya).
+      className="fixed inset-x-0 bottom-0 z-40"
       style={{
-        bottom: 'calc(env(safe-area-inset-bottom) + 6px)',
-        // Sertakan safe-area + margin lebar di geseran → nav bersih total keluar
-        // layar walau di HP dgn home indicator. Opacity fade = jaring pengaman:
-        // andai ada sisa posisi sepiksel pun, tetap tak terlihat. 100% = tinggi nav.
+        // Geser 100% + buffer 8px (sisa hairline/bayangan atas) → nav bersih
+        // total keluar layar; safe-area sudah ikut karena bagian dari tinggi bar.
+        // Opacity fade = jaring pengaman andai ada sisa posisi sepiksel.
         // translate3d (bukan translateY) + backface-hidden + will-change →
         // PAKSA layer GPU stabil. Tanpa ini, iOS Safari kadang tak mempromosikan
-        // fixed+backdrop-filter ke compositor, lalu nav "melompat ke atas-tengah"
+        // elemen fixed ke compositor, lalu nav "melompat ke atas-tengah"
         // saat scroll (address-bar muncul/sembunyi me-relayout containing block).
         transform: tucked
-          ? 'translate3d(0, calc(100% + env(safe-area-inset-bottom) + 2.5rem), 0)'
+          ? 'translate3d(0, calc(100% + 8px), 0)'
           : 'translate3d(0, 0, 0)',
         opacity: tucked ? 0 : 1,
         transition: 'transform 0.32s var(--ease-out-expo), opacity 0.26s ease',
@@ -54,18 +53,20 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
         backfaceVisibility: 'hidden',
       }}
     >
-      {/* Permukaan SOLID (bukan kaca): putih murni → kapsul "pop" tegas di atas
-          konten apa pun, tak ada warna latar yg menembus & menode bar. (Sebelumnya
-          bg-white/82 + backdrop-blur; user minta non-transparan agar putih lebih
-          nendang.) Tanpa backdrop-filter juga lebih hemat GPU & tak lagi perlu
-          guard prefers-reduced-transparency utk bar ini. Ring tepi dinaikkan
-          .06→.08 agar batas kapsul tetap "tercetak" di atas putih solid. Dark = gray-900 solid. */}
+      {/* Permukaan SOLID putih penuh selebar layar (dark = gray-900), pemisah
+          cuma hairline + bayangan naik tipis via .nav-dock — bar dok datar ala
+          app bank, tanpa ring/radius kapsul. Slot tombol tetap max-w-lg di
+          tengah agar sejajar kolom konten di layar lebar. */}
       <div
-        className="nav-float relative max-w-lg mx-auto flex items-stretch h-[70px] rounded-[28px] bg-white dark:bg-gray-900 ring-1 ring-black/[0.08] dark:ring-white/10"
-        // Tucked (scroll turun) = kapsul meluncur keluar layar: matikan interaksi
+        className="nav-dock bg-white dark:bg-gray-900"
+        // Tucked (scroll turun) = bar meluncur keluar layar: matikan interaksi
         // agar tak ada tap "hantu" yang tertangkap saat nav tak terlihat.
-        style={{ pointerEvents: tucked ? 'none' : 'auto' }}
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          pointerEvents: tucked ? 'none' : 'auto',
+        }}
       >
+      <div className="relative max-w-lg mx-auto flex items-stretch h-[70px]">
         {/* Indikator pill meluncur (spring) — slot selebar tombol, pill di area ikon.
             Row TANPA padding horizontal agar slot = lebar tombol persis. */}
         {activeIndex >= 0 && (
@@ -115,6 +116,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
             </button>
           );
         })}
+      </div>
       </div>
     </nav>
   );

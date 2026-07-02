@@ -362,6 +362,20 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
     0 24px 48px -18px rgba(0, 0, 0, 0.7);
 }
 
+/* Bar nav DOK bawah (2 Jul 2026, ala Google/myBCA/BYOND BSI) — nempel penuh ke
+   tepi bawah layar, bukan kapsul melayang. Pemisah dari konten = hairline atas
+   + bayangan NAIK tipis saja (bar dok tak butuh drop berlapis ke bawah). */
+.nav-dock {
+  box-shadow:
+    0 -1px 0 0 rgba(16, 24, 40, 0.07),            /* hairline atas */
+    0 -8px 24px -12px rgba(16, 24, 40, 0.12);     /* ambient naik tipis */
+}
+.dark .nav-dock {
+  box-shadow:
+    0 -1px 0 0 rgba(255, 255, 255, 0.09),
+    0 -8px 24px -12px rgba(0, 0, 0, 0.6);
+}
+
 /* Surface top-light (Pass 4, 2026-06-19) — permukaan card putih bukan flat:
    cahaya dari atas (putih murni) meredup TIPIS ke bawah → kartu punya dimensi
    "glass" ala Revolut/Mercury, bukan kertas datar. Hanya .lift (semua = card
@@ -764,7 +778,7 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
    warna sistem saat forced-colors, edge ring dipertegas saat prefers-contrast.
    Hanya menambah definisi tepi; tak menyentuh markup/arah near-white. */
 @media (forced-colors: active) {
-  .lift, .float, .nav-float {
+  .lift, .float, .nav-float, .nav-dock {
     border: 1px solid CanvasText;
   }
 }
