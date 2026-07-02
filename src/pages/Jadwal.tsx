@@ -259,7 +259,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
   if (loadingAbsensi) {
     return (
-      <div className="space-y-6 pb-20">
+      <div className="space-y-7 pb-2">
         {/* Back header */}
         <div className="flex items-center gap-3">
           <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
@@ -293,7 +293,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-7 pb-2">
       {/* Back header */}
       <div className="flex items-center gap-3">
         <button onClick={onBack} aria-label="Kembali" className="press w-11 h-11 -ml-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -875,7 +875,7 @@ export default function JadwalPage() {
   }
 
   return (
-    <div className="space-y-6 pb-2 page-enter">
+    <div className="space-y-7 pb-2 page-enter">
       <SuccessOverlay
         show={showSuccess}
         variant="honor"

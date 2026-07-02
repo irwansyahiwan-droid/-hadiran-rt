@@ -350,7 +350,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-4 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}>
+      <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}>
         <p className="text-xs text-ink-faint dark:text-gray-400 px-1">{aktifCount} aktif · {list.length} total</p>
 
         {/* Search */}
