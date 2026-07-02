@@ -471,7 +471,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {showLunas && lunas.length > 0 && (
             <div>
               <SectionTitle className="mt-6" tone="muted" count={lunas.length}>Sudah Lunas</SectionTitle>
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset opacity-60">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
                 {lunas.map(g => renderGroup(g, true))}
               </div>
             </div>
