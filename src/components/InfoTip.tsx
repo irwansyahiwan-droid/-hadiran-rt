@@ -83,13 +83,13 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
         onClick={(e) => { e.stopPropagation(); e.preventDefault(); haptic(); setOpen((o) => !o); }}
         aria-label={`Apa itu ${label}?`}
         aria-expanded={open}
-        className={`press inline-flex items-center justify-center w-5 h-5 rounded-full transition-colors ${trigger}`}
+        className={`press relative inline-flex items-center justify-center w-5 h-5 rounded-full transition-colors before:absolute before:-inset-3 before:content-[''] ${trigger}`}
       >
         <Info className="w-3.5 h-3.5" strokeWidth={2.25} />
       </button>
       {open && createPortal(
         <>
-          <span className="fixed inset-0 z-[60]" onClick={(e) => { e.stopPropagation(); setOpen(false); }} />
+          <span className="fixed inset-0 z-tooltip" aria-hidden="true" onClick={(e) => { e.stopPropagation(); setOpen(false); }} />
           <span
             ref={popRef}
             role="tooltip"
@@ -101,7 +101,7 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
               width: pos?.width ?? POP_W,
               opacity: pos ? 1 : 0,
             }}
-            className="pop-menu z-[61] p-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float text-left normal-case tracking-normal"
+            className="pop-menu z-tooltip p-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float text-left normal-case tracking-normal"
           >
             <span className="block text-caption font-bold text-ink dark:text-gray-100 mb-0.5">{label}</span>
             <span className="block text-caption font-normal text-ink-sub dark:text-gray-300 leading-relaxed">{children}</span>

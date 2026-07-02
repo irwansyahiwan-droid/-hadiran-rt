@@ -177,7 +177,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       </div>
       {!isBendahara && !bannerDismissed && (
         <div
-          className="border-t border-blue-100 bg-blue-50 overflow-hidden px-5 dark:bg-blue-950 dark:border-blue-900 transition-[max-height,opacity] duration-300"
+          className="border-t border-line bg-gray-50 overflow-hidden px-5 dark:bg-gray-800/60 dark:border-gray-800 transition-[max-height,opacity] duration-300"
           style={{
             maxHeight: scrolled ? '0px' : '40px',
             opacity: scrolled ? 0 : 1,
@@ -187,14 +187,14 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           }}
         >
           <div className="relative max-w-lg mx-auto flex items-center justify-center">
-            <p className="text-xs text-blue-600 dark:text-blue-300 text-center font-medium flex items-center justify-center gap-1.5">
+            <p className="text-xs text-ink-sub dark:text-gray-300 text-center font-medium flex items-center justify-center gap-1.5">
               <Eye className="w-3.5 h-3.5" /> Mode Warga — hanya bisa melihat data
             </p>
             <button
               type="button"
               onClick={dismissBanner}
               aria-label="Tutup info Mode Warga"
-              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-2 w-8 h-8 flex items-center justify-center text-blue-400 hover:text-blue-600 dark:text-blue-500 dark:hover:text-blue-300 active:opacity-70"
+              className="press relative -mr-2 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-ink-sub dark:text-gray-500 dark:hover:text-gray-300 active:opacity-70 before:absolute before:-inset-1.5 before:content-['']"
             >
               <X className="w-3.5 h-3.5" />
             </button>

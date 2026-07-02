@@ -7,16 +7,20 @@ export default {
       /* ── Tangga z-index app (SATU sumber, anti-tabrak) ─────────────
          Tier overlay global dari bawah ke atas. Dua tier terbawah pakai
          default Tailwind agar tak ada nilai kembar:
+           z-30  = fab     → FAB, sengaja DI BAWAH nav agar tertutup backdrop saat form terbuka
            z-40  = nav     → Header + BottomNav + scrim dismiss-nya
            z-50  = overlay → bottom-sheet, full-page overlay, dropdown menu
          lalu token bernama untuk tier di atasnya:
-           z-banner = prompt app-level (Install / PWA update)
-           z-modal  = modal di ATAS overlay (form bertumpuk) + SuccessOverlay + WelcomeSheet
-           z-toast  = Toaster — SELALU paling atas & sendirian (jangan ada yg menyamai) */
+           z-banner  = prompt app-level (Install / PWA update)
+           z-modal   = modal di ATAS overlay (form bertumpuk) + SuccessOverlay + WelcomeSheet
+           z-toast   = Toaster — SELALU paling atas & sendirian (jangan ada yg menyamai)
+           z-tooltip = InfoTip portal — HARUS di atas toast agar tak pernah tertutup modal/toast manapun */
       zIndex: {
+        fab: '30',
         banner: '55',
         modal: '60',
         toast: '70',
+        tooltip: '80',
       },
       fontFamily: {
         // Display = Sora (judul & nominal hero). Body default tetap Inter (di body CSS).

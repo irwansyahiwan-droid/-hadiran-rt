@@ -293,7 +293,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
                     className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
-                      confirmId === t.id ? 'bg-rose-600' : 'btn-brand'
+                      confirmId === t.id ? 'bg-brand' : 'btn-brand'
                     }`}
                   >
                     {processingId === t.id ? (
@@ -398,14 +398,14 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama warga…"
           inputMode="search"
           enterKeyHint="search"
-          className="w-full pl-10 pr-11 py-2.5 rounded-2xl bg-white dark:bg-gray-900 border border-control dark:border-gray-700 text-sm dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition duration-200"
+          className="field-search pr-11"
         />
         {search && (
           <ClearButton onClick={() => setSearch('')} />

@@ -8,6 +8,7 @@ import Tag from '../components/Tag';
 import ClearButton from '../components/ClearButton';
 import InfoTip from '../components/InfoTip';
 import ErrorState from '../components/ErrorState';
+import EmptyState from '../components/EmptyState';
 
 type SubTab = 'anggota' | 'jadwal';
 
@@ -255,8 +256,8 @@ export default function JadwalWargaPage() {
           <div className="grid grid-cols-4 gap-2">
             {[
               { label: 'Selesai', value: selesaiAnggotaCount, color: 'text-emerald-700 dark:text-emerald-400' },
-              { label: 'Hadir', value: hadirCount, color: 'text-blue-600 dark:text-blue-400' },
-              { label: 'Titip', value: titipCount, color: 'text-indigo-600 dark:text-indigo-400' },
+              { label: 'Hadir', value: hadirCount, color: 'text-emerald-700 dark:text-emerald-400' },
+              { label: 'Titip', value: titipCount, color: 'text-blue-600 dark:text-blue-400' },
               { label: 'Tidak', value: tidakHadirCount, color: 'text-rose-600 dark:text-rose-400' },
             ].map(s => (
               <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
@@ -305,7 +306,7 @@ export default function JadwalWargaPage() {
           {/* Warga list */}
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {filteredWarga.length === 0 ? (
-              <p className="text-sm text-ink-faint dark:text-gray-400 text-center py-8">Tidak ditemukan</p>
+              <EmptyState icon={Search} title="Tidak ditemukan" subtitle="Coba kata kunci lain." />
             ) : (
               filteredWarga.map((w, idx) => {
                 const st = absensiMap[w.id];
@@ -382,9 +383,7 @@ export default function JadwalWargaPage() {
 
           {/* List */}
           {allTarikan.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-32 gap-2">
-              <p className="text-sm text-ink-faint dark:text-gray-400">Belum ada jadwal</p>
-            </div>
+            <EmptyState icon={CalendarDays} title="Belum ada jadwal" subtitle="Jadwal tarikan akan muncul di sini." />
           ) : (
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
               {allTarikan.map((t, idx) => {

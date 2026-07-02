@@ -145,8 +145,8 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           </div>
 
           {wargaError && (
-            <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5 mt-2">
-              <p className="text-sm text-red-600 dark:text-red-400 font-medium">{wargaError}</p>
+            <div role="alert" className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-xl px-4 py-2.5 mt-2">
+              <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">{wargaError}</p>
             </div>
           )}
 
@@ -238,8 +238,8 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
               {/* Error */}
               {error && (
-                <div role="alert" className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-2.5">
-                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+                <div role="alert" className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-xl px-4 py-2.5">
+                  <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">{error}</p>
                 </div>
               )}
 

@@ -76,7 +76,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-5 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
+      <main className="max-w-lg mx-auto px-4 py-4 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* Hero */}
         <div className="text-center pt-2 pb-1">
           <img src={logoRt} alt="Logo RT 004/006" className="w-20 h-20 rounded-3xl object-cover mx-auto mb-3 shadow-xl shadow-emerald-300/40 ring-1 ring-white/60" />
@@ -127,7 +127,7 @@ export default function TentangApp({ open, onClose }: Props) {
           <ul className="space-y-2.5">
             {SUMBER.map((s) => (
               <li key={s.b} className="flex gap-2.5">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{s.b}:</b> {s.t}
                 </p>

@@ -56,7 +56,7 @@ export default function WelcomeSheet() {
         <div className="space-y-3 mb-4">
           {ITEMS.map(({ icon: Icon, title, desc }) => (
             <div key={title} className="flex items-start gap-3">
-              <span className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+              <span className="icon-tile w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
                 <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" strokeWidth={2} />
               </span>
               <div className="min-w-0">
@@ -67,7 +67,7 @@ export default function WelcomeSheet() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2.5 mb-5 rounded-xl bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5">
+        <div className="flex items-center gap-2.5 mb-5 rounded-xl inset-soft px-3.5 py-2.5">
           <Eye className="w-4 h-4 text-ink-faint dark:text-gray-400 shrink-0" />
           <p className="text-caption text-ink-sub dark:text-gray-400 leading-snug">
             Ketuk ikon mata di kartu saldo untuk menyembunyikan nominal.

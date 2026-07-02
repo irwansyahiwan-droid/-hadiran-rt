@@ -62,9 +62,9 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 min-w-0">
-            <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${tercapai ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+            <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${tercapai ? 'bg-emerald-500/15 dark:bg-emerald-400/15' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
               {tercapai
-                ? <Trophy className="w-4 h-4 text-amber-500" />
+                ? <Trophy className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 : <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />}
             </span>
             <div className="min-w-0">
@@ -93,13 +93,13 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           aria-label={`Progress target ${target.keterangan || 'Kas RT'}`}
         >
           <div
-            className={`h-full w-full origin-left rounded-full transition-transform duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-400 to-emerald-600'}`}
+            className={`h-full w-full origin-left rounded-full transition-transform duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-emerald-500 to-brand' : 'bg-gradient-to-r from-emerald-400 to-emerald-600'}`}
             style={{ transform: `scaleX(${Math.min(pct, 100) / 100})` }}
           />
         </div>
 
         <div className="flex items-center justify-between mt-2.5">
-          <span className={`inline-flex items-center gap-1 text-xs font-bold ${tercapai ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+          <span className={`inline-flex items-center gap-1 text-xs font-bold ${tercapai ? 'text-emerald-700 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
             {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">

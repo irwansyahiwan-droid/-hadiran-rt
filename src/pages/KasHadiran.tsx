@@ -513,21 +513,21 @@ export default function KasHadiranPage() {
             </span>
           </div>
           <div className="space-y-2">
-            <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
+            <div className="divide-inset [--di-l:2.5rem] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
               <span className="text-sm font-bold tabular-nums text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
+            <div className="divide-inset [--di-l:2.5rem] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
               <span className="text-sm font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800">
+            <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
@@ -609,17 +609,17 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className="rise lift bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 overflow-hidden"
-                      style={{ animationDelay: `${Math.min(idx, 10) * 0.05}s`, ...(talanganInfo.count === 0 ? { borderLeft: '3px solid #10B981' } : {}) }}
+                      className={`rise lift bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 overflow-hidden ${talanganInfo.count === 0 ? 'border-l-4 border-l-emerald-500' : ''}`}
+                      style={{ animationDelay: `${Math.min(idx, 10) * 0.05}s` }}
                     >
 
                       {/* ── Timeline mini-header ─────────────────────── */}
                       <div className="flex items-center justify-between px-5 pt-4 pb-2">
                         <div className="flex items-center gap-2">
-                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
+                          <div className={`icon-tile w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
                             talanganInfo.count === 0
                               ? 'bg-emerald-500 text-white'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                              : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
                           }`}>
                             {t.nomor}
                           </div>

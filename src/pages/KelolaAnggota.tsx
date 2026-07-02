@@ -165,6 +165,8 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         {mode === 'edit' && (
           <button
             onClick={() => setAktif((a) => !a)}
+            role="switch"
+            aria-checked={aktif}
             className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 mb-4"
           >
             <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
@@ -181,6 +183,8 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           <div className="mb-4 rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/60 dark:bg-amber-900/15 overflow-hidden">
             <button
               onClick={() => setSusulan((s) => !s)}
+              role="switch"
+              aria-checked={susulan}
               className="w-full flex items-center justify-between gap-2 px-3.5 py-3 text-left"
             >
               <span className="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-300">

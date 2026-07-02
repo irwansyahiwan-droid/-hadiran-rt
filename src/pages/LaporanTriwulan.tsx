@@ -249,9 +249,9 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
               </div>
 
               <div className="flex items-center gap-2 text-micro text-gray-500 dark:text-gray-400">
-                <span className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">{r.tarikanSelesai} tarikan</span>
-                <span className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">{r.talanganLunas} talangan lunas</span>
-                <span className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">{r.jumlahTransaksi} transaksi</span>
+                <span className="px-2 py-1 rounded-lg inset-soft">{r.tarikanSelesai} tarikan</span>
+                <span className="px-2 py-1 rounded-lg inset-soft">{r.talanganLunas} talangan lunas</span>
+                <span className="px-2 py-1 rounded-lg inset-soft">{r.jumlahTransaksi} transaksi</span>
               </div>
 
               <div className="flex gap-2">
@@ -268,7 +268,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 </button>
                 <button
                   onClick={() => cetak(r)}
-                  className="press min-h-[44px] px-4 py-3 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-1.5"
+                  className="btn-secondary press min-h-[44px] px-4 py-3 rounded-2xl flex items-center justify-center gap-1.5"
                   aria-label={`Unduh PDF ${r.label}`}
                 >
                   <Download className="w-4 h-4" /> PDF

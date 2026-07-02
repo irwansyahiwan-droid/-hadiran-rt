@@ -94,7 +94,7 @@ export default function BackupRestore({ open, onClose }: Props) {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
+      <main className="max-w-lg mx-auto px-4 py-4 space-y-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* Backup */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
           <div className="flex items-center gap-2 mb-1">
@@ -114,7 +114,7 @@ export default function BackupRestore({ open, onClose }: Props) {
           {lastBackup && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {lastBackup.map((r) => (
-                <span key={r.table} className="text-micro px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                <span key={r.table} className="text-micro px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
                   {r.table}: {r.count}
                 </span>
               ))}
@@ -140,7 +140,7 @@ export default function BackupRestore({ open, onClose }: Props) {
           {!pending ? (
             <button
               onClick={() => { haptic(); fileRef.current?.click(); }}
-              className="press w-full min-h-[44px] py-3 rounded-2xl border-2 border-control dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition flex items-center justify-center gap-2"
+              className="btn-secondary press w-full min-h-[44px] py-3 rounded-2xl flex items-center justify-center gap-2"
             >
               <Upload className="w-4 h-4" /> Pilih File Backup
             </button>
@@ -151,7 +151,7 @@ export default function BackupRestore({ open, onClose }: Props) {
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {ringkasBackup(pending).map((r) => (
-                  <span key={r.table} className="text-micro px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                  <span key={r.table} className="text-micro px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
                     {r.table}: {r.count}
                   </span>
                 ))}
@@ -177,7 +177,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                 <button
                   onClick={() => { setPending(null); setKonfirmasi(''); }}
                   disabled={restoring}
-                  className="press px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 disabled:opacity-60"
+                  className="btn-secondary press px-4 py-3 rounded-xl disabled:opacity-60"
                 >
                   Batal
                 </button>
