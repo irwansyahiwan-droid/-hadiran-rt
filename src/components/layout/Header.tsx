@@ -89,9 +89,12 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       }`}
       style={{
         paddingTop: 'env(safe-area-inset-top)',
+        /* MATERIAL-FLAT (2 Jul): glow lebar 20px saat scroll diganti elevasi
+           on-scroll ala Material — hairline (sudah dari border-b) + drop kecil
+           terkontain. Saat di puncak: tanpa bayangan (flat, nyatu kanvas). */
         boxShadow: scrolled
-          ? '0 4px 20px -6px rgba(16,24,40,0.18)'
-          : '0 1px 3px rgba(0,0,0,0.06)',
+          ? '0 1px 2px rgba(16,24,40,0.05), 0 4px 12px -8px rgba(16,24,40,0.12)'
+          : 'none',
         transition: 'box-shadow 0.3s var(--ease-out-expo), background-color 0.3s',
       }}
     >

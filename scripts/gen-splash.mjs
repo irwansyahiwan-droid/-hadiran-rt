@@ -5,8 +5,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 const svg = readFileSync(new URL('../src/assets/logo-rt.svg', import.meta.url), 'utf8');
 
-// Selaras index.html: light=#EAEFF6 (canvas Step-restore 30 Jun = manifest background_color), dark=#030712 (theme-color dark)
-const BG = { light: '#EAEFF6', dark: '#030712' };
+// Selaras index.html: light=#ECF1F7 (canvas MATERIAL-FLAT 2 Jul = manifest background_color), dark=#030712 (theme-color dark)
+const BG = { light: '#ECF1F7', dark: '#030712' };
 
 // 8 ukuran sesuai apple-touch-startup-image di index.html
 const SIZES = [

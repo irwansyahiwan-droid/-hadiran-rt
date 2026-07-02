@@ -62,7 +62,15 @@ body {
      (lever premium ala Mercury/Linear) → edge ring DIRELAKSASI lagi (lihat
      --shadow-card). Hasil: card putih "pop" tenang dari tone, bukan outline; field
      sedikit lebih cool → anti-glare, lebih nyaman di mata. */
-  background-color: #EAEFF6;
+  /* MATERIAL-FLAT (2026-07-02): akar "feel ga dapat-dapat" ternyata BUKAN nilai
+     L kanvas (9 pass naik-turun L94↔97 tak pernah selesai) — tapi DUA BAHASA
+     visual campur: nav/pill/banner sudah flat ala Google/myBCA/BYOND, sementara
+     kartu & kanvas masih "floating glass" (bayangan berlapis + top-light +
+     inset berpahat). Komit penuh ke bahasa flat Google-light: kanvas #ECF1F7
+     (nada Gmail/Google apps) RATA tanpa radial whisper; kartu putih MURNI flat
+     ber-hairline; bayangan tinggal satu contact whisper. Separasi = step tonal
+     + hairline + geometri, titik. Jangan tambah lapisan lagi. */
+  background-color: #ECF1F7;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -135,18 +143,12 @@ input, textarea  { caret-color: #1B7249; }
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
    Dipakai di wrapper App (kanvas #F2F5FA — samakan dgn body/sunken/manifest). */
 .app-bg {
-  /* Apple clean: kanvas near-white sejuk RATA. Tanpa aurora tebal & tanpa
-     grounding gelap → tenang, lapang, profesional. Brand emerald hanya
-     "berbisik" (alpha 0.06) di puncak agar tak steril, tak muddy.
-     Kontras kartu putih murni dari step tonal netral + bayangan crisp (.lift). */
-  background-color: #EAEFF6; /* Step-restore — samakan dgn body/sunken/manifest/landing */
-  /* Pass 7: bisik brand dinaikkan tipis (0.06→0.085) + tambah whisper sky di
-     sudut kanan-atas (0.05) → kanvas terasa lebih "seger"/airy. Tetap di puncak
-     (atmosferik), BUKAN glow di belakang kartu. Base color = #F2F5FA (Pass 8). */
-  background-image:
-    radial-gradient(120% 60% at 50% -14%, rgba(16, 185, 129, 0.085) 0%, transparent 56%),
-    radial-gradient(92% 50% at 100% -2%, rgba(56, 189, 248, 0.05) 0%, transparent 54%);
-  background-attachment: fixed;
+  /* MATERIAL-FLAT (2 Jul): kanvas Google-light #ECF1F7 benar-benar RATA —
+     radial whisper emerald+sky DIHAPUS (hijau di atas abu sejuk = zona
+     transisi muddy, biang rasa "kurang bersih"). Ala Gmail/myBCA/BYOND:
+     kanvas polos, kartu putih flat, atmosfer datang dari konten & warna
+     hero — bukan dari aura di latar. Samakan dgn body/sunken/manifest/landing. */
+  background-color: #ECF1F7;
 }
 .dark .app-bg {
   background-color: #030712;
@@ -178,15 +180,13 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   /* Emerald lebih segar/hidup (tetap deep di kiri-atas agar teks putih lolos kontras) */
   --hero-gradient: linear-gradient(135deg, #0D5B36 0%, #15824C 50%, #1C9A5C 100%);
   --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.34) 0%, rgba(45, 212, 150, 0) 55%);
-  /* Pass 4 cohesion (2026-06-20) — hero ikut bahasa "floating glass" .lift:
-     satu drop 20/50px diganti berlapis (contact + key + ambient ber-spread
-     negatif, terkontain) + inset highlight tepi-atas spt .lift → hero & kartu
-     putih jadi satu keluarga elevasi. Nada tetap green-ink (rgba 7,30,22). */
+  /* MATERIAL-FLAT (2 Jul): resep glass 4-lapis (inset highlight + ambient .55)
+     dibuang — hero sub-page kini pakai bayangan yang SAMA dgn kartu saldo aktif
+     di BannerCarousel (flat-BYOND, sudah "nyatu" duluan menurut user): dua drop
+     terkontain nada netral+green-ink. Hero se-app = satu keluarga bayangan. */
   --hero-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),   /* tepi atas tersinari → glass */
-    0 2px 4px -1px rgba(7, 30, 22, 0.34),         /* contact rapat → menapak */
-    0 10px 22px -8px rgba(7, 30, 22, 0.44),       /* key mid — terkontain */
-    0 26px 48px -18px rgba(7, 30, 22, 0.55);      /* ambient float — melayang */
+    0 6px 16px -12px rgba(0, 0, 0, 0.28),
+    0 18px 40px -22px rgba(15, 40, 30, 0.40);
   --hero-divider: rgba(255, 255, 255, 0.16);
 }
 
@@ -319,10 +319,13 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      dikrek utk kanvas near-white DIRELAKSASI lagi (.05→.035 edge, .05→.04 contact)
      → whisper definisi, bukan outline keras. Soft shadow .07 tetap (tenang, tak
      nambah fog). Tetap 1 niat, bukan 5-lapis. */
+  /* MATERIAL-FLAT (2 Jul): kartu TIDAK melayang lagi — bahasa Google/myBCA/
+     BYOND = flat tonal. Edge ring dibuang (kartu sudah punya border-line asli
+     di markup → satu tepi saja, bukan dobel), soft-float 6/16 dibuang. Sisa
+     SATU contact whisper ala myBCA agar kartu "menapak" tipis. Separasi kini
+     100% dari step tonal (#FFF vs #ECF1F7) + hairline + geometri rounded. */
   --shadow-card:
-    0 0 0 1px rgba(16, 24, 40, 0.035),                       /* edge — whisper: definisi, bukan outline (tone sudah memisah) */
-    0 1px 2px 0 rgba(16, 24, 40, 0.04),                      /* contact → kartu menapak */
-    0 6px 16px -4px rgba(16, 24, 40, 0.07);                  /* satu soft shadow lega → melayang tenang */
+    0 1px 2px 0 rgba(16, 24, 40, 0.04);                      /* contact whisper — satu-satunya bayangan kartu */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
@@ -376,46 +379,22 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
     0 -8px 24px -12px rgba(0, 0, 0, 0.6);
 }
 
-/* Surface top-light (Pass 4, 2026-06-19) — permukaan card putih bukan flat:
-   cahaya dari atas (putih murni) meredup TIPIS ke bawah → kartu punya dimensi
-   "glass" ala Revolut/Mercury, bukan kertas datar. Hanya .lift (semua = card
-   putih, terverifikasi: tak ada .lift non-putih / ber-bg-gradient). Mengisi
-   background-image di atas background-color bg-white → tak menyentuh markup.
-   Dark: sheen putih sangat halus di tepi atas (top glass) di atas gray-900. */
-/* Pass 7: putih murni dipertahankan lebih lama (0→62%) baru memudar tipis →
-   kartu terasa lebih bersih & "menyala" dari atas, fade dasar tetap cool-neutral.
-   Pass 8c (29 Jun): kanvas kini near-white #F2F5FA → fade lama (#F1F6FC) nyaris
-   = kanvas, dasar kartu lebur & "kurang putih". Putih ditahan lebih lama (62→74%)
-   & ujung dinaikkan #F1F6FC→#F6F9FE → kartu PUTIH MAKSIMAL merata; delta vs kanvas
-   membesar → kontras/pop kartu naik TANPA menggelapkan kanvas.
-   Putih & bersih (2026-07-01): user minta kartu lebih putih/bersih. Putih murni
-   ditahan lebih lama (74→84%) & ujung dinaikkan #F6F9FE→#FAFCFE (nyaris putih,
-   whisper cool tipis agar top-light tetap berdimensi, bukan flat). Kartu terbaca
-   sebagai lembar putih bersih; delta vs kanvas #EAEFF6 justru NAIK → pop makin
-   tegas tanpa menyentuh bayangan/kanvas. LIGHT saja. */
-html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #FEFFFF 84%, #FAFCFE 100%); }
-/* Pass 7 paritas dark: sheen putih ditahan lebih lama (.05→.07, fade ke 100%) → kartu dark ikut "menyala" dari atas spt light. */
-.dark .lift { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 62%, rgba(255, 255, 255, 0) 100%); }
+/* MATERIAL-FLAT (2 Jul): top-light gradient kartu (light & dark) DIHAPUS.
+   Riwayat panjang pass 4→8c→"putih & bersih" di atasnya intinya terus menahan
+   putih makin lama — ujungnya memang PUTIH MURNI FLAT ala Gmail/myBCA/BYOND.
+   Kartu = bg-white polos dari markup; .lift kini hanya membawa contact whisper
+   (--shadow-card). Jangan pasang ulang sheen/top-light di permukaan kartu. */
 
-/* ── Panel inset (Pass 7) — sub-panel "tertanam" di dalam kartu putih ──────
-   Pengganti `bg-gray-50` polos yg jadi paling kusam di samping kartu yg kini
-   lebih nyala. Recessed = inner top-shadow (masuk ke dalam) + hairline halus +
-   dasar tersinari. Terasa "dipahat", bukan kotak abu datar. Pakai di panel
-   KONTEN (baris detail/stat), BUKAN tombol/input. */
+/* ── Panel inset — sub-panel tonal DATAR di dalam kartu putih ──────────────
+   MATERIAL-FLAT (2 Jul): efek "dipahat" (inner-shadow + hairline + gradient)
+   dibuang — bahasa Google/myBCA = surface-container polos: satu fill tonal
+   sejuk, tanpa tepi, tanpa dimensi. Pakai di panel KONTEN (baris detail/stat),
+   BUKAN tombol/input (itu tetap bg-gray-50 / .field). */
 .inset-soft {
   background-color: #EFF3F8;
-  background-image: linear-gradient(180deg, #EDF1F7 0%, #F5F8FC 100%);
-  box-shadow:
-    inset 0 1px 2px 0 rgba(10, 14, 26, 0.06),
-    inset 0 0 0 1px rgba(10, 14, 26, 0.045),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.8);
 }
 .dark .inset-soft {
-  background-color: rgba(0, 0, 0, 0.18);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%);
-  box-shadow:
-    inset 0 1px 2px 0 rgba(0, 0, 0, 0.4),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.045);
 }
 
 /* ── Inset row divider (30 Jun 2026 v2, /design-critique) ──────────────────
@@ -449,23 +428,12 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
 .dark .divide-inset::after,
 .dark .list-inset > * + *::before { background: rgba(255, 255, 255, 0.06); }
 
-/* ── Icon tile (Pass 7c) — depth tipis di chip ikon ber-tint ───────────────
-   Menumpang DI ATAS bg-*-100 (warna dari Tailwind) tanpa mengubah tint: sheen
-   putih dari atas + ring halus + contact tipis → chip "tersinari & terangkat",
-   bukan kotak warna datar. Warna-agnostik (emerald/blue/amber/rose semuanya). */
-.icon-tile {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 55%);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.55),
-    inset 0 0 0 1px rgba(10, 14, 26, 0.05),
-    0 1px 2px 0 rgba(10, 14, 26, 0.06);
-}
-.dark .icon-tile {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 55%);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-}
+/* ── Icon tile — chip ikon tonal DATAR (Material 3) ────────────────────────
+   MATERIAL-FLAT (2 Jul): sheen + ring + contact dibuang — chip ikon = tint
+   bg-*-100 polos dari Tailwind di call-site, persis tonal chip Google/myBCA.
+   Kelas .icon-tile DIPERTAHANKAN di markup sebagai penanda semantik (tint
+   masuk/keluar/lunas), tapi kini no-op visual — jangan tambah depth lagi. */
+.icon-tile { /* flat — tint dari call-site sudah cukup */ }
 
 /* Dark elevation premium: di latar gelap bayangan drop tak terbaca & halo putih
    jadi cincin norak → pisahkan kartu lewat (1) ring cahaya tipis di tepi +
@@ -485,11 +453,12 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
      cahaya .13 tetap carry separasi di gelap; spread tetap negatif → tak fog. */
   /* Quiet Premium dark: separasi tetap dari RING cahaya (drop tak terbaca di
      gelap), tapi diturunkan .13→.10 + 5 lapis → 1 ambient lega. Selaras light. */
+  /* MATERIAL-FLAT dark (2 Jul): glass top-edge & ambient besar dibuang —
+     paritas dgn light yg kini flat. Di gelap separasi tetap butuh RING cahaya
+     tipis (drop tak terbaca) + satu contact utk kedalaman minimum. */
   --shadow-card:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),               /* glass top edge halus */
-    0 0 0 1px rgba(255, 255, 255, 0.10),                      /* ring cahaya → separasi tenang di gelap */
-    0 4px 12px -2px rgba(0, 0, 0, 0.5),                       /* contact + kedalaman */
-    0 16px 32px -8px rgba(0, 0, 0, 0.6);                      /* satu ambient lega */
+    0 0 0 1px rgba(255, 255, 255, 0.08),                      /* ring cahaya → separasi tenang di gelap */
+    0 1px 2px 0 rgba(0, 0, 0, 0.4);                           /* contact whisper */
   --shadow-float: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
 }
 
@@ -518,13 +487,15 @@ html:not(.dark) .lift { background-image: linear-gradient(180deg, #FFFFFF 0%, #F
     border-radius: 0.75rem;   /* = rounded-xl (token ada, bukan nilai baru) */
     background-image: linear-gradient(180deg, #18A055 0%, #0F6B40 58%, #0C5E37 100%);
     color: #fff;
+    /* MATERIAL-FLAT (2 Jul): glow emerald besar 12/28 dibuang — di dunia kartu
+       flat, CTA cukup menonjol dari warna brand + contact tipis (ala myBCA/
+       BYOND). Glossy top edge tetap (satu-satunya kilap, khusus CTA primer). */
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.22),       /* glossy top edge */
-      0 2px 6px -1px rgba(13, 80, 50, 0.35),
-      0 12px 28px -8px rgba(16, 150, 80, 0.55);         /* glow emerald (brand) */
+      0 2px 6px -1px rgba(13, 80, 50, 0.30);
     transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease;
   }
-  .btn-brand:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 6px 16px -8px rgba(16,150,80,0.5); }
+  .btn-brand:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 1px 3px -1px rgba(13,80,50,0.3); }
 
   /* ── Secondary button (aksi netral: Batal/Tutup di footer modal) ───────
      SATU sumber untuk tombol sekunder berbingkai yang sebelumnya disalin

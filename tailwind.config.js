@@ -62,8 +62,8 @@ export default {
         },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#EAEFF6', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). Pass 8 (28 Jun): #E6EAF1→#F2F5FA near-white. Quiet Premium (29 Jun): #F2F5FA→#EDF1F7 step naik. Quiet Premium step+ (29 Jun): #EDF1F7→#E8ECF3. Putih bersih (30 Jun): #E8ECF3→#F4F7FB near-white L~97%. Step-restore (30 Jun v2): #F4F7FB→#EAEFF6 — near-white bikin card putih lebur; step tonal dibuka lagi (zona Quiet Premium) → separasi balik ke TONE, edge ring direlaksasi (.05→.035) di --shadow-card.
-        line: '#CFD5DF',    // garis/divider tipis. Pass 3: #E6EAF1 dulu LEBIH TERANG dari canvas → border kartu jadi garis terang yg mewashout tepi crisp. Diturunkan ≈ tone canvas agar tak melawan hairline gelap (.lift); divider tetap bersih di atas putih.
+        sunken: '#ECF1F7', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). MATERIAL-FLAT (2 Jul): #EAEFF6→#ECF1F7 (nada Gmail/Google apps) + seluruh sistem kartu pindah ke bahasa FLAT ala Google/myBCA/BYOND — kanvas rata tanpa whisper radial, kartu putih murni ber-hairline, bayangan tinggal satu contact whisper. 9 pass naik-turun L kanvas tak pernah selesai karena akar masalahnya dua bahasa visual campur (nav/pill/banner sudah flat, kartu masih floating-glass) — bukan nilai L. Jangan tuning L lagi.
+        line: '#DAE0E8',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk): definisi, bukan bingkai. Tetap lebih gelap dari kanvas #ECF1F7 & terbaca di atas putih.
         control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
         ink: {
