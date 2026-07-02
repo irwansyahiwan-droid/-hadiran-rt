@@ -274,6 +274,7 @@ export default function JadwalWargaPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Cari nama warga…"
+              aria-label="Cari nama warga"
               inputMode="search"
               enterKeyHint="search"
               className="field-search pr-11"

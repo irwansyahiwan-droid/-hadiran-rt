@@ -86,7 +86,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
           <div>
             <label htmlFor="kashadiran-keterangan" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Keterangan</label>
             <input id="kashadiran-keterangan" name="keterangan" autoComplete="off" type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
-              placeholder="Setoran bulan Mei 2026"
+              placeholder="Contoh: Setoran bulan Mei 2026…"
               className="field" />
           </div>
           <div className="grid grid-cols-2 gap-3">

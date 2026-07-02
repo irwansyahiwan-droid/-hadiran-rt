@@ -123,7 +123,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               value={keterangan}
               onChange={(e) => setKeterangan(e.target.value)}
               required
-              placeholder="Contoh: Iuran warga bulan Juni"
+              placeholder="Contoh: Iuran warga bulan Juni…"
               className="field"
             />
           </div>
@@ -632,6 +632,7 @@ export default function KasRTPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari keterangan…"
+              aria-label="Cari mutasi kas"
               inputMode="search"
               enterKeyHint="search"
               className="field-search pr-11"

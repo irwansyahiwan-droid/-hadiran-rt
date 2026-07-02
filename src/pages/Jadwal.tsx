@@ -380,6 +380,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama…"
+          aria-label="Cari nama warga"
           inputMode="search"
           enterKeyHint="search"
           className="field-search pr-11"
