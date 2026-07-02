@@ -93,7 +93,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             <div>
               <label htmlFor="kashadiran-nominal" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">Rp</span>
                 <input id="kashadiran-nominal" name="nominal" autoComplete="off" type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
                   onChange={e => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)} required
                   className="field pl-9 pr-3" />
@@ -667,7 +667,14 @@ export default function KasHadiranPage() {
                           </span>
                           <span className="font-semibold">{t.total_hadir}/{t.total_warga} hadir</span>
                         </div>
-                        <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                        <div
+                          className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden"
+                          role="progressbar"
+                          aria-valuenow={Math.round(Math.min(pctHadir, 100))}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`Kehadiran tarikan #${t.nomor}`}
+                        >
                           <div
                             className="h-full w-full origin-left bg-emerald-400 dark:bg-emerald-500 rounded-full transition-transform duration-700 ease-out"
                             style={{ transform: `scaleX(${Math.min(pctHadir, 100) / 100})` }}

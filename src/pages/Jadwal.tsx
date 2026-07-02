@@ -393,7 +393,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             tidak bisa di-tap (hadir/titip/tidak hadir) & di luar hitungan talangan. */}
         {sohibulWarga && (
           <div className="w-full flex items-center gap-3 p-3.5 [--di-l:3.625rem] [--di-r:0.875rem] divide-inset bg-amber-50/60 dark:bg-amber-900/15">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+            <div className="icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
               {sohibulWarga.nama.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
@@ -417,7 +417,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
                 idx < filtered.length - 1 ? 'divide-inset' : ''
               } ${ui.hover}`}
             >
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ui.ava}`}>
+              <div className={`icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ui.ava}`}>
                 {w.nama.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
@@ -444,7 +444,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Sticky action buttons — melayang di atas nav kapsul (puncak nav ≈
           safe+76px). +1.75rem menyamai jarak FAB/konten → bersih dari nav. */}
       <div
-        className="fixed left-0 right-0 px-5 z-30"
+        className="fixed left-0 right-0 px-5 z-fab"
         style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 1.75rem)' }}
       >
         <div className="max-w-lg mx-auto space-y-2">
@@ -463,7 +463,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             <button
               onClick={handleBatalkanClick}
               disabled={saving || cancelling}
-              className="w-full py-3 rounded-full font-bold text-sm shadow-sm active:scale-[0.97] transition duration-150 disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
+              className="press w-full py-3 rounded-full font-bold text-sm shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
             >
               {cancelling
                 ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan…</>
@@ -907,7 +907,7 @@ export default function JadwalPage() {
                   showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
                 }
               }}
-              className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition"
+              className="press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               <FileText className="w-4 h-4" /> PDF
             </button>
@@ -916,7 +916,7 @@ export default function JadwalPage() {
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
               aria-label="Tambah jadwal tarikan"
-              className="flex items-center gap-1.5 btn-brand text-sm font-semibold px-3 py-2 rounded-xl active:scale-[0.97] transition"
+              className="press flex items-center gap-1.5 btn-brand text-sm font-semibold px-3 py-2 rounded-xl"
             >
               <Plus className="w-4 h-4" /> Jadwal
             </button>

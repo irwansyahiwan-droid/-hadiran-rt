@@ -403,8 +403,8 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                   idx < filtered.length - 1 ? 'divide-inset' : ''
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${
-                  w.status_aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                <div className={`icon-tile w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${
+                  w.status_aktif ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
                 }`}>
                   {w.nama.charAt(0).toUpperCase()}
                 </div>

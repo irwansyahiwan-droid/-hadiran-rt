@@ -184,7 +184,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
         {/* Hint: tiap baris bisa diketuk untuk penjelasan alur */}
         {!loading && rows.length > 0 && (
-          <div className="flex items-center gap-2 text-[11.5px] text-ink-faint dark:text-gray-400 px-1">
+          <div className="flex items-center gap-2 text-micro text-ink-faint dark:text-gray-400 px-1">
             <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <span>Ketuk satu aktivitas untuk lihat penjelasan alur &amp; pencatatannya.</span>
           </div>
@@ -194,7 +194,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         {loading ? (
           <div className="space-y-2">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 px-4 py-3.5 flex items-center gap-3">
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-4 py-3.5 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/5" />
@@ -235,7 +235,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                       style={{ animationDelay: `${Math.min(idx, 8) * 0.03}s` }}
                       className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left [--di-l:4.25rem] [--di-r:1rem] ${hasDetail ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'divide-inset' : ''}`}
                     >
-                      <div className={`w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${ACCENT_CLS[v.accent]}`}>
+                      <div className={`icon-tile w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${ACCENT_CLS[v.accent]}`}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0">

@@ -326,7 +326,7 @@ export default function JadwalWargaPage() {
                       {idx + 1}
                     </span>
                     {/* Avatar */}
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ava}`}>
+                    <div className={`icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ava}`}>
                       {w.nama.charAt(0)}
                     </div>
                     {/* Nama */}

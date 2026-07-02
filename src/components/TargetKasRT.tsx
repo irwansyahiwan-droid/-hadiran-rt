@@ -50,10 +50,12 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
   const sisa = Math.max(0, target.nominal - saldo);
 
   let deadline: string | null = null;
+  let deadlineLewat = false;
   if (target.tanggal) {
     const d = new Date(target.tanggal);
     const hari = Math.ceil((d.getTime() - Date.now()) / 86400000);
     const tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    deadlineLewat = hari < 0 && !tercapai;
     deadline = hari >= 0 ? `${tgl} · ${hari} hari lagi` : `${tgl} · lewat`;
   }
 
@@ -110,7 +112,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
         <div className="flex items-center justify-between mt-1.5 text-micro text-gray-500 dark:text-gray-400">
           <span>{tercapai ? `Lebih ${formatRupiahPlain(saldo - target.nominal)}` : `Kurang ${formatRupiahPlain(sisa)}`}</span>
           {deadline && (
-            <span className="inline-flex items-center gap-1"><CalendarClock className="w-3 h-3" />{deadline}</span>
+            <span className={`inline-flex items-center gap-1 ${deadlineLewat ? 'text-warn dark:text-amber-400 font-semibold' : ''}`}><CalendarClock className="w-3 h-3" />{deadline}</span>
           )}
         </div>
       </div>
@@ -187,7 +189,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
             <div>
               <label htmlFor="target-nominal" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal Target</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">Rp</span>
                 <input
                   id="target-nominal"
                   name="nominal-target"

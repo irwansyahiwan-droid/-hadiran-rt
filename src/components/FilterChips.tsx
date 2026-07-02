@@ -97,7 +97,7 @@ export default function FilterChips<T extends string, S extends string = string>
 
           {sortOpen && (
             /* Penangkap klik di luar → tutup */
-            <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
+            <div className="fixed inset-0 z-40" aria-hidden="true" onClick={() => setSortOpen(false)} />
           )}
           {sortMounted && (
             <>

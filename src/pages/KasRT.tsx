@@ -89,7 +89,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 key={t}
                 type="button"
                 onClick={() => pilihTipe(t)}
-                className={`py-2.5 rounded-xl text-sm font-semibold border transition ${
+                className={`press py-2.5 rounded-xl text-sm font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
                       ? 'bg-emerald-500 text-white border-emerald-500'
@@ -132,7 +132,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <div>
               <label htmlFor="kasrt-nominal" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">Rp</span>
                 <input
                   id="kasrt-nominal"
                   name="nominal"
