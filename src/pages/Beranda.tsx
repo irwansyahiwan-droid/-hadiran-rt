@@ -281,7 +281,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <p className="mt-2.5 text-[0.78rem] font-medium leading-relaxed text-white/95">
                 Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
                 {lastDelta > 0 && (
-                  <span className="ml-1.5 inline-flex items-center gap-0.5 align-middle font-semibold text-emerald-200/90">
+                  <span className="ml-1.5 inline-flex items-center gap-0.5 align-middle font-semibold text-emerald-100">
                     <TrendingUp className="h-3 w-3" strokeWidth={2.5} />
                     {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
                   </span>
@@ -293,27 +293,27 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <div className="mt-auto grid grid-cols-3 border-t border-white/15 pt-[18px]">
               <button
                 onClick={(e) => { e.stopPropagation(); onNavigate('kas'); }}
-                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
+                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/15 px-0.5 active:opacity-80"
               >
                 <Wallet className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] font-medium text-white/95">Terkumpul</span>
-                <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
+                <span className="mt-0.5 text-[11px] font-medium text-white/95">Terkumpul</span>
+                <span className="whitespace-nowrap text-[clamp(0.64rem,2.9vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onNavigate('talangan'); }}
-                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/14 px-0.5 active:opacity-80"
+                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/15 px-0.5 active:opacity-80"
               >
                 <ArrowLeftRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] font-medium text-white/95">Talangan</span>
-                <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
+                <span className="mt-0.5 text-[11px] font-medium text-white/95">Talangan</span>
+                <span className="whitespace-nowrap text-[clamp(0.64rem,2.9vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onNavigate('kas-rt'); }}
                 className="press flex w-full min-w-0 flex-col items-center gap-1 px-0.5 active:opacity-80"
               >
                 <ArrowUpRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[10px] font-medium text-white/95">Setor Kas RT</span>
-                <span className="whitespace-nowrap text-[clamp(0.6rem,2.7vw,0.72rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
+                <span className="mt-0.5 text-[11px] font-medium text-white/95">Setor Kas RT</span>
+                <span className="whitespace-nowrap text-[clamp(0.64rem,2.9vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
             </div>
           </>
