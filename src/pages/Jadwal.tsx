@@ -232,21 +232,21 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }
 
   // Batalkan hasil "Simpan & Hitung" — kembalikan tarikan ke status terjadwal
-  // dan hapus SEMUA data turunannya (absensi, talangan, transaksi kas tarikan ini).
+  // dan hapus SEMUA data turunannya (absensi, talangan, transaksi kas tarikan
+  // ini). Lewat RPC atomik: server mengarsipkan snapshot pemulihan (absensi +
+  // talangan + nama warga) ke audit_log DULU, baru menghapus — satu transaksi,
+  // koneksi putus di tengah tak meninggalkan data setengah terhapus.
   async function batalkan() {
     setCancelling(true);
     try {
-      const tarikanId = tarikan.id;
-      await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
-      await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
-      // Hapus kas masuk + talangan masuk yang terkait tarikan ini
-      await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId);
-      await supabase.from('tarikan').update({
-        status: 'dijadwalkan',
-        total_hadir: 0,
-        total_terkumpul: 0,
-      }).eq('id', tarikanId);
+      const { error } = await supabase.rpc('batalkan_tarikan', {
+        p_tarikan_id: tarikan.id,
+        p_hapus: false,
+      });
+      if (error) throw error;
       onCancelled();
+    } catch {
+      showToast('Gagal membatalkan. Cek koneksi lalu coba lagi — tidak ada data yang terhapus.', 'error');
     } finally {
       setCancelling(false);
     }

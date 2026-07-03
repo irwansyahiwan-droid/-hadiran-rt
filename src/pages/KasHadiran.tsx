@@ -308,20 +308,23 @@ export default function KasHadiranPage() {
     setDetailLoading(false);
   }
 
-  // Batalkan "Simpan & Hitung" — kembalikan tarikan ke status terjadwal
-  // dan hapus data turunannya (absensi, talangan, transaksi kas tarikan ini).
+  // Batalkan "Simpan & Hitung" — kembalikan tarikan ke status terjadwal dan
+  // hapus data turunannya. Lewat RPC atomik: server mengarsipkan snapshot
+  // pemulihan (absensi + talangan + nama warga) ke audit_log DULU, baru
+  // menghapus — satu transaksi, tak bisa setengah jalan.
   async function batalkanTarikan(t: Tarikan) {
     setProcessingId(t.id);
     try {
-      await supabase.from('absensi').delete().eq('tarikan_id', t.id);
-      await supabase.from('talangan').delete().eq('tarikan_id', t.id);
-      await supabase.from('transaksi_kas').delete().eq('tarikan_id', t.id);
-      await supabase.from('tarikan').update({
-        status: 'dijadwalkan', total_hadir: 0, total_terkumpul: 0,
-      }).eq('id', t.id);
+      const { error } = await supabase.rpc('batalkan_tarikan', {
+        p_tarikan_id: t.id,
+        p_hapus: false,
+      });
+      if (error) throw error;
       await load();
       setBatalTarikan(null); // tutup dialog pengaman
       showToast(`Tarikan #${t.nomor} dibatalkan`, 'info');
+    } catch {
+      showToast('Gagal membatalkan. Cek koneksi lalu coba lagi — tidak ada data yang terhapus.', 'error');
     } finally {
       setProcessingId(null);
     }
@@ -334,17 +337,21 @@ export default function KasHadiranPage() {
   }
 
   // Hapus tarikan sepenuhnya (semua data turunan). Pola undo: hapus permanen
-  // baru dijalankan 5 dtk kemudian bila tak diurungkan.
+  // baru dijalankan 5 dtk kemudian bila tak diurungkan. RPC atomik yang sama
+  // dgn batalkan (p_hapus) → snapshot pemulihan terarsip dulu di audit_log.
   function hapusTarikan(t: Tarikan) {
     setConfirmHapusId(null);
     setTarikanSelesai(prev => prev.filter(x => x.id !== t.id)); // optimistik
     showUndo(
       `Tarikan #${t.nomor} dihapus`,
       async () => {
-        await supabase.from('absensi').delete().eq('tarikan_id', t.id);
-        await supabase.from('talangan').delete().eq('tarikan_id', t.id);
-        await supabase.from('transaksi_kas').delete().eq('tarikan_id', t.id);
-        await supabase.from('tarikan').delete().eq('id', t.id);
+        const { error } = await supabase.rpc('batalkan_tarikan', {
+          p_tarikan_id: t.id,
+          p_hapus: true,
+        });
+        if (error) {
+          showToast('Gagal menghapus. Cek koneksi — tidak ada data yang terhapus.', 'error');
+        }
         await load();
       },
       { onUndo: () => load() },

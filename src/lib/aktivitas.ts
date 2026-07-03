@@ -112,6 +112,23 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
   };
 
   switch (row.table_name) {
+    // Arsip pemulihan yang ditulis fungsi batalkan_tarikan() SEBELUM data
+    // dihapus — berisi seluruh absensi + talangan (dgn nama warga). Bila
+    // terjadi salah-batal, pemulihan manual membaca entri ini, bukan kertas.
+    case 'tarikan_snapshot': {
+      const snap = old as { tarikan?: Record<string, unknown>; absensi?: unknown[]; talangan?: unknown[]; mode?: string };
+      const nomor = str((snap.tarikan ?? {}).nomor);
+      const nAbs = Array.isArray(snap.absensi) ? snap.absensi.length : 0;
+      const nTal = Array.isArray(snap.talangan) ? snap.talangan.length : 0;
+      const modeLabel = snap.mode === 'hapus' ? 'dihapus' : 'dibatalkan';
+      return {
+        title: `Arsip Pemulihan Tarikan #${nomor}`,
+        detail: `${nAbs} absensi & ${nTal} talangan terarsip`,
+        amount: num((snap.tarikan ?? {}).total_terkumpul),
+        changes, actor, accent: 'blue', actionLabel, tableLabel: 'Tarikan',
+        penjelasan: `Tarikan #${nomor} ${modeLabel}. Sebelum data dihapus, seluruh daftar hadir & talangan diarsipkan di sini secara permanen — bila perlu pemulihan, datanya lengkap di arsip ini (bukan lagi dari catatan kertas).`,
+      };
+    }
     case 'transaksi_kas': {
       const tipeRaw = str(data.tipe);
       const tipe = TIPE_KAS[tipeRaw] ?? 'Transaksi Kas';
