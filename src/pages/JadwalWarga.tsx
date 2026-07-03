@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Search, X, Check, Coins, Users, CalendarDays } from 'lucide-react';
+import { FileText, Search, X, Check, Coins, Users, CalendarDays, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -307,7 +307,12 @@ export default function JadwalWargaPage() {
           {/* Warga list */}
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {filteredWarga.length === 0 ? (
-              <EmptyState icon={Search} title="Tidak ditemukan" subtitle="Coba kata kunci lain." />
+              <EmptyState
+                icon={Search}
+                title="Tidak ditemukan"
+                subtitle="Coba kata kunci lain."
+                action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setWargaFilter('semua'); } }}
+              />
             ) : (
               filteredWarga.map((w, idx) => {
                 const st = absensiMap[w.id];

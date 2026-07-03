@@ -13,7 +13,7 @@
 /* Judul section/halaman naik kelas: Sora + tracking sedikit rapat (display besar
    terasa lebih solid). Body & teks kecil TETAP Inter (di-set di `body`). */
 @layer base {
-  h1, h2 { font-family: var(--font-display); letter-spacing: -0.018em; }
+  h1, h2 { font-family: var(--font-display); letter-spacing: -0.018em; text-wrap: balance; }
 }
 /* Util eksplisit untuk elemen non-heading yang ingin Sora (mis. nominal hero). */
 .font-display { font-family: var(--font-display); }

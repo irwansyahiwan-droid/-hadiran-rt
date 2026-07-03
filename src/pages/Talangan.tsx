@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, RefreshCw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
@@ -489,6 +489,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   : statusFilter === 'belum'
                     ? 'Tidak ada talangan yang belum lunas.'
                     : 'Semua warga sudah memenuhi kehadiran.'}
+              action={search || statusFilter !== 'semua'
+                ? { label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setStatusFilter('semua'); } }
+                : undefined}
             />
           )}
         </>

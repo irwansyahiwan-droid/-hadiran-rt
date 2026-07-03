@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Users, Search, X, RefreshCw, UserPlus, Pencil,
+  ArrowLeft, Users, Search, X, RefreshCw, RotateCcw, UserPlus, Pencil,
   CheckCircle2, Phone, Home, History, AlertTriangle,
 } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
@@ -392,6 +392,9 @@ export default function KelolaAnggota({ open, onClose }: Props) {
               icon={Users}
               title={list.length === 0 ? 'Belum ada anggota' : 'Tidak ada hasil'}
               subtitle={list.length === 0 ? 'Tambahkan anggota RT lewat tombol di bawah.' : 'Coba kata kunci lain.'}
+              action={list.length > 0
+                ? { label: 'Hapus pencarian', icon: RotateCcw, onClick: () => setSearch('') }
+                : undefined}
             />
           </div>
         ) : (

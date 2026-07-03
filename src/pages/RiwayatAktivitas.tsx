@@ -216,6 +216,9 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
               subtitle={rows.length === 0
                 ? 'Setiap perubahan kas, tarikan, & talangan akan tercatat di sini secara otomatis.'
                 : 'Coba ubah filter atau kata kunci pencarian.'}
+              action={rows.length > 0
+                ? { label: 'Reset filter', icon: RotateCcw, onClick: () => { setFilter('semua'); setSearch(''); } }
+                : undefined}
             />
           </div>
         ) : (
