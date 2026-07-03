@@ -16,7 +16,14 @@ let lastY = typeof window !== 'undefined' ? window.scrollY : 0;
 let attached = false;
 
 function handleScroll() {
-  const y = window.scrollY;
+  /* iOS Safari rubber-band: mentok atas/bawah lalu memantul membuat scrollY
+     keluar rentang (negatif / lewat maksimum) lalu balik sendiri — tanpa
+     clamp, pantulan itu terbaca "naik lalu turun" dan nav/FAB ikut
+     muncul-sembunyi cepat (terlihat melompat). Clamp ke rentang dokumen
+     valid → selama pantulan nilai konstan, tak ada event arah palsu. */
+  const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const y = Math.min(Math.max(0, window.scrollY), max);
+  if (y === lastY) return;
   const prev = lastY;
   lastY = y;
   listeners.forEach((fn) => fn(y, prev));
