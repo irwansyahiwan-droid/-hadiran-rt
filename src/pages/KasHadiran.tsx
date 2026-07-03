@@ -609,7 +609,7 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className={`rise lift bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 overflow-hidden ${talanganInfo.count === 0 ? 'border-l-4 border-l-emerald-500' : ''}`}
+                      className="rise lift bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 overflow-hidden"
                       style={{ animationDelay: `${Math.min(idx, 10) * 0.05}s` }}
                     >
 
@@ -618,7 +618,7 @@ export default function KasHadiranPage() {
                         <div className="flex items-center gap-2">
                           <div className={`icon-tile w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
                             talanganInfo.count === 0
-                              ? 'bg-emerald-500 text-white'
+                              ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
                               : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
                           }`}>
                             {t.nomor}
@@ -652,14 +652,14 @@ export default function KasHadiranPage() {
                           <p className="text-amount font-semibold tabular-nums text-pos dark:text-emerald-400">
                             +{formatRupiahPlain(sohibulTerima)}
                           </p>
-                          <span className="inline-block mt-0.5 px-2 py-0.5 text-micro font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700 rounded-full">
+                          <span className="block mt-0.5 text-micro font-medium text-ink-faint dark:text-gray-400">
                             Dapat Arisan
                           </span>
                         </div>
                       </button>
 
                       {/* ── Progress bar + kas info ───────────────────── */}
-                      <div className="px-4 pb-4">
+                      <div className="px-5 pb-4">
                         <div className="flex items-center justify-between text-sm text-ink-sub dark:text-gray-400 mb-2">
                           <span>
                             Kas Hadiran{' '}
@@ -685,7 +685,7 @@ export default function KasHadiranPage() {
                       {/* ── Actions ──────────────────────────────────
                           PDF pendapatan tersedia untuk semua (termasuk warga);
                           Absensi, Batalkan & Hapus khusus bendahara. */}
-                      <div className="flex items-center gap-x-4 px-4 pb-3 pt-3 border-t border-line dark:border-gray-800">
+                      <div className="flex items-center gap-x-4 px-5 pb-3 pt-3 border-t border-line dark:border-gray-800">
                         <button
                           onClick={() => handlePendapatanPDF(t)}
                           disabled={pdfLoading === t.id}
