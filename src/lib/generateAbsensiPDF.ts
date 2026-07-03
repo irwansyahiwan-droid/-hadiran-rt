@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSignatures, drawFooter, C,
+  TABLE, drawMasthead, drawStatStrip, drawSignatures, drawFooter, C, alignHeadFoot,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -48,18 +48,20 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
   titipS.forEach((t) => rows.push([String(n++), t.nama, 'Titip']));
   tidakS.forEach((t) => rows.push([String(n++), t.nama, t.lunas ? 'Talangan Lunas' : 'Talangan']));
 
+  const ABS_COL = {
+    0: { cellWidth: 12, halign: 'center' as const },
+    1: { cellWidth: 'auto' as const },
+    2: { cellWidth: 40, halign: 'center' as const },
+  };
   autoTable(doc, {
     ...TABLE,
     startY: Y + 7,
     head: [['NO', 'NAMA ANGGOTA', 'STATUS']],
     body: rows,
     margin: { left: M, right: M },
-    columnStyles: {
-      0: { cellWidth: 12, halign: 'center' },
-      1: { cellWidth: 'auto' },
-      2: { cellWidth: 40, halign: 'center' },
-    },
+    columnStyles: ABS_COL,
     didParseCell(data) {
+      alignHeadFoot(data, ABS_COL);
       if (data.section !== 'body' || data.column.index !== 2) return;
       const s = rows[data.row.index]?.[2] ?? '';
       if (s === 'Hadir') { data.cell.styles.textColor = C.pos; data.cell.styles.fontStyle = 'bold'; }

@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
-import { TABLE, drawMasthead, drawFooter, fmtNum } from './pdfTheme';
+import { TABLE, drawMasthead, drawFooter, fmtNum, alignHeadFoot } from './pdfTheme';
 import { formatAktivitas, formatWaktu } from './aktivitas';
 import type { AktivitasLog } from './types';
 
@@ -33,6 +33,13 @@ export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'
     ];
   });
 
+  const AKT_COL = {
+    0: { cellWidth: 8, halign: 'center' as const },
+    1: { cellWidth: 34 },
+    2: { cellWidth: 'auto' as const },
+    3: { cellWidth: 28 },
+    4: { cellWidth: 26, halign: 'right' as const },
+  };
   autoTable(doc, {
     ...TABLE,
     startY: Y + 7,
@@ -40,13 +47,8 @@ export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'
     body,
     margin: { left: M, right: M },
     bodyStyles: { ...TABLE.bodyStyles, valign: 'top' },
-    columnStyles: {
-      0: { cellWidth: 8, halign: 'center' },
-      1: { cellWidth: 34 },
-      2: { cellWidth: 'auto' },
-      3: { cellWidth: 28 },
-      4: { cellWidth: 26, halign: 'right' },
-    },
+    columnStyles: AKT_COL,
+    didParseCell: (data) => alignHeadFoot(data, AKT_COL),
   });
 
   const H = doc.internal.pageSize.getHeight();

@@ -1,4 +1,5 @@
 import type jsPDF from 'jspdf';
+import type { CellHookData, Styles } from 'jspdf-autotable';
 import { LOGO_DATA_URL } from './logoBase64';
 
 /**
@@ -139,6 +140,19 @@ export const TABLE = {
     lineWidth: { top: 0.35 }, lineColor: C.ink,
   },
 };
+
+/**
+ * Samakan halign HEADER & FOOT dengan columnStyles body — autoTable tidak
+ * menerapkan columnStyles ke section head/foot, jadi tanpa ini judul kolom
+ * angka (rata kanan/tengah) melenceng dari datanya. Panggil di awal
+ * didParseCell; halign eksplisit per-sel (mis. foot "TOTAL" colSpan) tidak
+ * ditimpa karena hanya sel yang masih default-kiri yang disesuaikan.
+ */
+export function alignHeadFoot(data: CellHookData, cols: Record<number, Partial<Styles>>): void {
+  if (data.section !== 'head' && data.section !== 'foot') return;
+  const h = cols[data.column.index]?.halign;
+  if (h && data.cell.styles.halign === 'left') data.cell.styles.halign = h;
+}
 
 export interface SummaryLine { label: string; value: string; tone?: keyof typeof C }
 

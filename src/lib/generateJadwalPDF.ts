@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
-import { TABLE, drawMasthead, drawSignatures, drawFooter, C } from './pdfTheme';
+import { TABLE, drawMasthead, drawSignatures, drawFooter, C, alignHeadFoot } from './pdfTheme';
 import type { Tarikan } from './types';
 
 const STATUS: Record<string, string> = {
@@ -41,19 +41,21 @@ export function generateJadwalPDF(list: Tarikan[]) {
     STATUS[t.status] ?? t.status,
   ]);
 
+  const JDW_COL = {
+    0: { cellWidth: 12, halign: 'center' as const },
+    1: { cellWidth: 'auto' as const },
+    2: { cellWidth: 48 },
+    3: { cellWidth: 28, halign: 'center' as const },
+  };
   autoTable(doc, {
     ...TABLE,
     startY: Y + 7,
     head: [['NO', 'SOHIBUL BAIT', 'TANGGAL', 'STATUS']],
     body: rows,
     margin: { left: M, right: M },
-    columnStyles: {
-      0: { cellWidth: 12, halign: 'center' },
-      1: { cellWidth: 'auto' },
-      2: { cellWidth: 48 },
-      3: { cellWidth: 28, halign: 'center' },
-    },
+    columnStyles: JDW_COL,
     didParseCell(data) {
+      alignHeadFoot(data, JDW_COL);
       if (data.section !== 'body') return;
       if (data.column.index === 3) {
         const s = rows[data.row.index]?.[3] ?? '';

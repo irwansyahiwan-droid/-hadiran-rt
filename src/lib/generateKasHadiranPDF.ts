@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum,
+  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -44,6 +44,16 @@ export function generateKasHadiranPDF(
   ], W, M);
 
   // ── Tabel per tarikan ─────────────────────────────────────
+  const KAS_COL = {
+    0: { cellWidth: 9,  halign: 'center' as const },
+    1: { cellWidth: 26 },
+    2: { cellWidth: 'auto' as const },
+    3: { cellWidth: 13, halign: 'center' as const },
+    4: { cellWidth: 22, halign: 'right' as const },
+    5: { cellWidth: 22, halign: 'right' as const },
+    6: { cellWidth: 22, halign: 'right' as const },
+    7: { cellWidth: 22, halign: 'right' as const },
+  };
   const sorted = [...tarikanList].sort((a, b) => a.nomor - b.nomor);
 
   const totalKas  = sorted.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
@@ -82,17 +92,9 @@ export function generateKasHadiranPDF(
     ]],
     showFoot: 'lastPage',
     margin: { left: M, right: M },
-    columnStyles: {
-      0: { cellWidth: 9,  halign: 'center' },
-      1: { cellWidth: 26 },
-      2: { cellWidth: 'auto' },
-      3: { cellWidth: 13, halign: 'center' },
-      4: { cellWidth: 22, halign: 'right' },
-      5: { cellWidth: 22, halign: 'right' },
-      6: { cellWidth: 22, halign: 'right' },
-      7: { cellWidth: 22, halign: 'right' },
-    },
+    columnStyles: KAS_COL,
     didParseCell(data) {
+      alignHeadFoot(data, KAS_COL);
       if (data.section === 'foot') {
         if (data.column.index === 5 && totalTal > 0) data.cell.styles.textColor = C.neg;
         if (data.column.index === 6 && totalSetor > 0) data.cell.styles.textColor = C.warn;

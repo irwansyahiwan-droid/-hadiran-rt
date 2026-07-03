@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, C, fmtNum,
+  TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
@@ -72,6 +72,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     ]),
     margin: { left: M, right: M },
     columnStyles: COL,
+    didParseCell: (data) => alignHeadFoot(data, COL),
   });
   Y = getY(doc);
 
@@ -94,6 +95,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       margin: { left: M, right: M },
       columnStyles: COL,
       didParseCell(data) {
+        alignHeadFoot(data, COL);
         if (data.section === 'body' && data.column.index === 3) {
           data.cell.styles.textColor = tone === 'pos' ? C.pos : C.neg;
           data.cell.styles.fontStyle = 'bold';

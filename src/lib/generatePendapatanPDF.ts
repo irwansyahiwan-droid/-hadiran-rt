@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum,
+  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
 
@@ -89,6 +89,14 @@ export function generatePendapatanPDF(
   const totalKas     = payingCount * KAS_PER;
   const totalSemua   = payingCount * TOTAL_PER;
 
+  const PDPT_COL = {
+    0: { cellWidth: 8, halign: 'center' as const },
+    1: { cellWidth: 'auto' as const },
+    2: { cellWidth: 26, halign: 'center' as const },
+    3: { cellWidth: 26, halign: 'right' as const },
+    4: { cellWidth: 18, halign: 'right' as const },
+    5: { cellWidth: 22, halign: 'right' as const },
+  };
   autoTable(doc, {
     ...TABLE,
     startY: Y + 7,
@@ -97,15 +105,9 @@ export function generatePendapatanPDF(
     foot: [['', `TOTAL · ${payingCount} pembayar`, '', fmtNum(totalSohibul), fmtNum(totalKas), fmtNum(totalSemua)]],
     showFoot: 'lastPage',
     margin: { left: M, right: M },
-    columnStyles: {
-      0: { cellWidth: 8, halign: 'center' },
-      1: { cellWidth: 'auto' },
-      2: { cellWidth: 26, halign: 'center' },
-      3: { cellWidth: 26, halign: 'right' },
-      4: { cellWidth: 18, halign: 'right' },
-      5: { cellWidth: 22, halign: 'right' },
-    },
+    columnStyles: PDPT_COL,
     didParseCell(data) {
+      alignHeadFoot(data, PDPT_COL);
       if (data.section !== 'body') return;
       const status = tableRows[data.row.index]?.[2] ?? '';
 
