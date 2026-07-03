@@ -454,13 +454,7 @@ export default function KasRTPage() {
                 <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
               </div>
               <div className="flex items-center gap-0.5 -mr-1.5">
-                <button
-                  onClick={handleShareReceipt}
-                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-                  aria-label="Bagikan ringkasan ke WhatsApp"
-                >
-                  <Share2 className="w-4 h-4 text-teal-100/80" />
-                </button>
+                {/* Urutan ikon seragam app-wide: mata (sembunyikan nominal) selalu pertama. */}
                 <button
                   onClick={() => { haptic(); toggleHideAmount(); }}
                   className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
@@ -469,6 +463,13 @@ export default function KasRTPage() {
                   {hidden
                     ? <EyeOff className="w-4 h-4 text-teal-100/80" />
                     : <Eye className="w-4 h-4 text-teal-100/80" />}
+                </button>
+                <button
+                  onClick={handleShareReceipt}
+                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                  aria-label="Bagikan ringkasan ke WhatsApp"
+                >
+                  <Share2 className="w-4 h-4 text-teal-100/80" />
                 </button>
               </div>
             </div>
