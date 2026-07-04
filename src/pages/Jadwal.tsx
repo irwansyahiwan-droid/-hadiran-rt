@@ -54,13 +54,10 @@ const STATUS_UI: Record<AbsensiStatus, { label: string; text: string; ava: strin
   },
 };
 
+// Intl compact id-ID → "50 rb" / "3,45 jt" (pemisah = spasi tak-putus bawaan Intl).
+const kompakFmt = new Intl.NumberFormat('id-ID', { notation: 'compact', maximumFractionDigits: 2 });
 function formatKompak(n: number): string {
-  if (n === 0) return 'Rp0';
-  if (n >= 1_000_000) {
-    const val = (n / 1_000_000).toFixed(2).replace(/\.?0+$/, '').replace('.', ',');
-    return `Rp${val} jt`;
-  }
-  return `Rp${Math.round(n / 1000)}rb`;
+  return `Rp${kompakFmt.format(n)}`;
 }
 
 // ── Absensi View ────────────────────────────────────────────
@@ -377,6 +374,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
+          name="cari-nama"
+          autoComplete="off"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama…"
@@ -414,7 +413,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               key={w.id}
               onClick={() => toggle(w.id)}
               aria-label={`${w.nama} — ${ui.label}. Ketuk untuk ganti status`}
-              className={`w-full flex items-center gap-3 p-3.5 text-left [--di-l:3.625rem] [--di-r:0.875rem] transition-colors ${
+              // ~79 baris: content-visibility lewati render baris di luar layar
+              className={`w-full flex items-center gap-3 p-3.5 text-left [--di-l:3.625rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] transition-colors ${
                 idx < filtered.length - 1 ? 'divide-inset' : ''
               } ${ui.hover}`}
             >
@@ -670,9 +670,9 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           </button>
         </div>
 
-        <label htmlFor="jadwal-add-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-edit-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
         <input
-          id="jadwal-add-tanggal"
+          id="jadwal-edit-tanggal"
           name="tanggal-tarikan"
           type="date"
           value={tanggal}
@@ -680,9 +680,9 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           className="field mb-4"
         />
 
-        <label htmlFor="jadwal-add-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-edit-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
         <select
-          id="jadwal-add-sohibul"
+          id="jadwal-edit-sohibul"
           name="sohibul-bait"
           value={sohibulId}
           onChange={e => setSohibulId(e.target.value)}
@@ -768,9 +768,9 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           </button>
         </div>
 
-        <label htmlFor="jadwal-edit-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-add-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
         <input
-          id="jadwal-edit-tanggal"
+          id="jadwal-add-tanggal"
           name="tanggal-tarikan"
           type="date"
           value={tanggal}
@@ -778,9 +778,9 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           className="field mb-4"
         />
 
-        <label htmlFor="jadwal-edit-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-add-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
         <select
-          id="jadwal-edit-sohibul"
+          id="jadwal-add-sohibul"
           name="sohibul-bait"
           value={sohibulId}
           onChange={e => setSohibulId(e.target.value)}

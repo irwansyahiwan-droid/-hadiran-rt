@@ -89,6 +89,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 key={t}
                 type="button"
                 onClick={() => pilihTipe(t)}
+                aria-pressed={tipe === t}
                 className={`press py-2.5 rounded-xl text-sm font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
@@ -165,7 +166,8 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
                 <span className={`font-bold ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
-                  {formatRupiahPlain(Math.abs(saldoPreview))}
+                  {/* formatRupiahPlain pakai Math.abs → tanda minus ditambah sendiri */}
+                  {(saldoPreview < 0 ? '-' : '') + formatRupiahPlain(saldoPreview)}
                 </span>
               </p>
             </div>
@@ -538,6 +540,8 @@ export default function KasRTPage() {
                       <button
                         key={p}
                         onClick={() => setChartPeriod(p)}
+                        aria-pressed={chartPeriod === p}
+                        aria-label={`${p} bulan terakhir`}
                         className={`press px-2 py-0.5 rounded-md text-micro font-bold transition-colors ${
                           chartPeriod === p ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}
@@ -630,6 +634,8 @@ export default function KasRTPage() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
+              name="cari-mutasi"
+              autoComplete="off"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari keterangan…"
@@ -673,18 +679,17 @@ export default function KasRTPage() {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === displayList.length - 1;
               const editable = isBendahara && k.keterangan !== 'Saldo Awal Kas RT';
+              // Baris bendahara = <button> asli (klik/Enter/Space/fokus bawaan);
+              // baris view-only warga tetap <div> non-interaktif.
+              const Row: React.ElementType = editable ? 'button' : 'div';
               return (
-                <div
+                <Row
                   key={k.id}
+                  type={editable ? 'button' : undefined}
                   onClick={editable ? () => { haptic(); setSelectedRow(k); setConfirmDel(false); } : undefined}
-                  role={editable ? 'button' : undefined}
-                  tabIndex={editable ? 0 : undefined}
                   aria-label={editable ? `Aksi: ${k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}` : undefined}
-                  onKeyDown={editable ? (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedRow(k); setConfirmDel(false); }
-                  } : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise flex items-center gap-3 px-5 py-4 [--di-l:4.25rem]${editable ? ' cursor-pointer active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
+                  className={`rise w-full text-left flex items-center gap-3 px-5 py-4 [--di-l:4.25rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${editable ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 >
                   <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk
@@ -714,7 +719,7 @@ export default function KasRTPage() {
                       Saldo: {maskRp(`${k.saldo_setelah < 0 ? '-' : ''}Rp${Math.abs(k.saldo_setelah).toLocaleString('id-ID')}`, hidden, 4)}
                     </p>
                   </div>
-                </div>
+                </Row>
               );
             })}
           </div>

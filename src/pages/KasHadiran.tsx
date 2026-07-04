@@ -282,30 +282,38 @@ export default function KasHadiranPage() {
     setDetailHadir([]);
     setDetailTitip([]);
     setDetailTidak([]);
-    const [absRes, talRes] = await Promise.all([
-      supabase.from('absensi').select('warga_id, status').eq('tarikan_id', t.id),
-      supabase.from('talangan').select('warga_id, status_lunas').eq('tarikan_id', t.id),
-    ]);
-    const namaMap = new Map(wargaList.map((w) => [w.id, w.nama]));
-    const lunasMap = new Map(
-      (talRes.data as { warga_id: string; status_lunas: boolean }[] ?? []).map((x) => [x.warga_id, x.status_lunas]),
-    );
-    const hadir: { id: string; nama: string }[] = [];
-    const titip: { id: string; nama: string }[] = [];
-    const tidak: { id: string; nama: string; lunas: boolean }[] = [];
-    (absRes.data as { warga_id: string; status: AbsensiStatus }[] ?? []).forEach((a) => {
-      const nama = namaMap.get(a.warga_id) ?? '—';
-      if (a.status === 'hadir') hadir.push({ id: a.warga_id, nama });
-      else if (a.status === 'titip') titip.push({ id: a.warga_id, nama });
-      else tidak.push({ id: a.warga_id, nama, lunas: lunasMap.get(a.warga_id) ?? false });
-    });
-    hadir.sort((a, b) => a.nama.localeCompare(b.nama));
-    titip.sort((a, b) => a.nama.localeCompare(b.nama));
-    tidak.sort((a, b) => Number(a.lunas) - Number(b.lunas) || a.nama.localeCompare(b.nama)); // belum bayar di atas
-    setDetailHadir(hadir);
-    setDetailTitip(titip);
-    setDetailTidak(tidak);
-    setDetailLoading(false);
+    try {
+      const [absRes, talRes] = await Promise.all([
+        supabase.from('absensi').select('warga_id, status').eq('tarikan_id', t.id),
+        supabase.from('talangan').select('warga_id, status_lunas').eq('tarikan_id', t.id),
+      ]);
+      if (absRes.error || talRes.error) throw absRes.error ?? talRes.error;
+      const namaMap = new Map(wargaList.map((w) => [w.id, w.nama]));
+      const lunasMap = new Map(
+        (talRes.data as { warga_id: string; status_lunas: boolean }[] ?? []).map((x) => [x.warga_id, x.status_lunas]),
+      );
+      const hadir: { id: string; nama: string }[] = [];
+      const titip: { id: string; nama: string }[] = [];
+      const tidak: { id: string; nama: string; lunas: boolean }[] = [];
+      (absRes.data as { warga_id: string; status: AbsensiStatus }[] ?? []).forEach((a) => {
+        const nama = namaMap.get(a.warga_id) ?? '—';
+        if (a.status === 'hadir') hadir.push({ id: a.warga_id, nama });
+        else if (a.status === 'titip') titip.push({ id: a.warga_id, nama });
+        else tidak.push({ id: a.warga_id, nama, lunas: lunasMap.get(a.warga_id) ?? false });
+      });
+      hadir.sort((a, b) => a.nama.localeCompare(b.nama));
+      titip.sort((a, b) => a.nama.localeCompare(b.nama));
+      tidak.sort((a, b) => Number(a.lunas) - Number(b.lunas) || a.nama.localeCompare(b.nama)); // belum bayar di atas
+      setDetailHadir(hadir);
+      setDetailTitip(titip);
+      setDetailTidak(tidak);
+    } catch {
+      // Fetch gagal → tutup sheet + beri tahu; tanpa ini skeleton macet selamanya.
+      setDetailTarikan(null);
+      showToast('Gagal memuat detail. Cek koneksi lalu coba lagi.', 'error');
+    } finally {
+      setDetailLoading(false);
+    }
   }
 
   // Batalkan "Simpan & Hitung" — kembalikan tarikan ke status terjadwal dan
@@ -643,7 +651,7 @@ export default function KasHadiranPage() {
                       {/* ── Focal row: penerima + amount (ketuk → detail) ─ */}
                       <button
                         onClick={() => openDetail(t)}
-                        className="w-full flex items-center gap-3 px-5 pb-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
+                        className="w-full flex items-center gap-3 px-5 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
                       >
                         <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
                         <div className="flex-1 min-w-0">
