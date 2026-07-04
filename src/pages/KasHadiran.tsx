@@ -196,6 +196,10 @@ export default function KasHadiranPage() {
   const saldo = hitungSaldoHadiran(totalKasTerkumpul, totalTalanganBelum, totalSetor);
   const animatedSaldo = useCountUp(saldo);
 
+  const today = new Date().toLocaleDateString('id-ID', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+
   // Bagikan ringkasan Kas Hadiran sbg kartu PNG bermerek → grup WA warga.
   async function handleShareReceipt() {
     haptic(12);
@@ -431,6 +435,46 @@ export default function KasHadiranPage() {
   return (
     <>
       <div className="space-y-7 pb-2 overflow-x-hidden">
+        {/* Header — anatomi seragam dgn Jadwal & Kas RT: judul + muat ulang + Ekspor.
+            Di HP judul di atas, toolbar di bawah (anti-kepotong). */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-lg font-bold text-ink dark:text-gray-100">Kas Hadiran</h1>
+            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <ExportMenu
+              align="left"
+              items={[
+                {
+                  label: 'Cetak PDF',
+                  icon: FileText,
+                  onClick: async () => {
+                    try {
+                      const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
+                      generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
+                    } catch {
+                      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
+                    }
+                  },
+                },
+                {
+                  label: 'Ekspor Excel',
+                  icon: Download,
+                  tone: 'text-emerald-600 dark:text-emerald-400',
+                  onClick: async () => {
+                    const { generateKasHadiranExcel } = await import('../lib/generateKasHadiranExcel');
+                    await generateKasHadiranExcel(displayTarikan, talanganMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldo });
+                  },
+                },
+              ]}
+            />
+          </div>
+        </div>
+
         {/* Header Card */}
         <div className={`relative rounded-3xl overflow-hidden ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
@@ -438,8 +482,9 @@ export default function KasHadiranPage() {
           <div className="relative p-6">
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-white/70" />
-                <p className="text-white/75 text-micro font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
+                <Wallet className="w-4 h-4 text-white/80" />
+                {/* white/90: label micro duduk di ujung terang gradient → jaga AA */}
+                <p className="text-white/90 text-micro font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
               </div>
               <div className="flex items-center -mr-2">
                 <button
@@ -448,15 +493,15 @@ export default function KasHadiranPage() {
                   aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 >
                   {hidden
-                    ? <EyeOff className="w-4 h-4 text-white/70" />
-                    : <Eye className="w-4 h-4 text-white/70" />}
+                    ? <EyeOff className="w-4 h-4 text-white/80" />
+                    : <Eye className="w-4 h-4 text-white/80" />}
                 </button>
                 <button
                   onClick={handleShareReceipt}
                   className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
                   aria-label="Bagikan ringkasan ke WhatsApp"
                 >
-                  <Share2 className="w-4 h-4 text-white/70" />
+                  <Share2 className="w-4 h-4 text-white/80" />
                 </button>
               </div>
             </div>
@@ -470,44 +515,13 @@ export default function KasHadiranPage() {
                 ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                 : <Odometer value={animatedSaldo} />}
             </FitAmount>
-            <p className="text-white/85 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
+            <p className="text-white/90 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
               <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-emerald-400/20 border border-emerald-300/30 rounded-full text-emerald-100 text-xs font-semibold">
                 <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
               </span>
             )}
           </div>
-        </div>
-
-        {/* Ekspor (PDF/Excel) disatukan ke satu menu; aksi utama "Setor Kas RT"
-            kini hadir sebagai FAB di zona jempol. */}
-        <div className="flex gap-2">
-          <ExportMenu
-            align="left"
-            items={[
-              {
-                label: 'Cetak PDF',
-                icon: FileText,
-                onClick: async () => {
-                  try {
-                    const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
-                    generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
-                  } catch {
-                    showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-                  }
-                },
-              },
-              {
-                label: 'Ekspor Excel',
-                icon: Download,
-                tone: 'text-emerald-600 dark:text-emerald-400',
-                onClick: async () => {
-                  const { generateKasHadiranExcel } = await import('../lib/generateKasHadiranExcel');
-                  await generateKasHadiranExcel(displayTarikan, talanganMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldo });
-                },
-              },
-            ]}
-          />
         </div>
 
         {/* Alur Kas */}
@@ -664,8 +678,9 @@ export default function KasHadiranPage() {
                           </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-amount font-semibold tabular-nums text-pos dark:text-emerald-400">
-                            +{formatRupiahPlain(sohibulTerima)}
+                          {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
+                          <p className="text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
+                            {formatRupiahPlain(sohibulTerima)}
                           </p>
                           <span className="block mt-0.5 text-micro font-medium text-ink-faint dark:text-gray-400">
                             Dapat Arisan

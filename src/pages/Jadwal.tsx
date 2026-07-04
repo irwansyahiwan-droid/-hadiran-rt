@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Calendar, CheckCircle2, Coins, Lock, Pencil, Plus, RefreshCw,
-  RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
+  ArrowLeft, Calendar, CheckCircle2, Coins, Lock, MoreVertical, Pencil, Plus,
+  RefreshCw, RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
 } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
@@ -18,6 +18,7 @@ import { ringkasAbsensi } from '../lib/absensiHitung';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast } from '../lib/toast';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 
@@ -290,16 +291,18 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }
 
   return (
-    <div className="space-y-7 pb-2">
+    /* pb menyisakan ruang utk tumpukan tombol fixed di bawah (Simpan ± Batalkan)
+       — tanpa ini baris warga terakhir tertutup & tak bisa di-tap. */
+    <div className={`space-y-7 ${tarikan.status === 'selesai' ? 'pb-28' : 'pb-14'}`}>
       {/* Back header */}
       <div className="flex items-center gap-3">
         <button onClick={onBack} aria-label="Kembali" className="press w-11 h-11 -ml-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
           <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
         <div>
-          <p className="text-base font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
-          </p>
+          </h2>
           <p className="text-xs text-ink-faint dark:text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
         </div>
       </div>
@@ -827,6 +830,12 @@ export default function JadwalPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [editingTarikan, setEditingTarikan] = useState<Tarikan | null>(null);
   const [creatingTarikan, setCreatingTarikan] = useState(false);
+  // Sheet aksi sekunder per baris (WA + Revisi) — pola sama dgn baris mutasi
+  // Kas RT, agar baris cukup memuat SATU aksi utama (Proses/Hitung Ulang).
+  const [rowTarikan, setRowTarikan] = useState<Tarikan | null>(null);
+  const rowDrag = useDragDismiss(() => setRowTarikan(null));
+  useBackDismiss(rowTarikan !== null, () => setRowTarikan(null));
+  const rowDlg = useDialog(rowTarikan !== null, { onClose: () => setRowTarikan(null), label: 'Aksi tarikan' });
 
   async function load() {
     setLoading(true);
@@ -970,8 +979,9 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
-                className={`flex items-center gap-3 px-4 py-4 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
-                style={isSelesai ? { borderLeft: '3px solid #10B981' } : isNext ? { borderLeft: '3px solid #34D399' } : undefined}
+                /* Edge kiri = sinyal "giliran berikutnya" SAJA (token brand);
+                   tarikan selesai sudah cukup de-emphasized lewat teks abu. */
+                className={`flex items-center gap-3 px-4 py-4 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l-[3px] border-l-brand-500 dark:border-l-emerald-500' : ''}`}
               >
                 {/* Nomor kecil */}
                 <span className="text-base font-bold text-ink-faint dark:text-gray-400 w-7 shrink-0 text-right tabular-nums">
@@ -1013,26 +1023,15 @@ export default function JadwalPage() {
                           </button>
                         )}
 
-                        {/* Bagikan pengingat ke WhatsApp (tarikan terjadwal) */}
-                        {!isSelesai && (
-                          <button
-                            onClick={() => { haptic(); openWa(null, pesanTarikan(t.nomor, t.tanggal, t.sohibul_bait?.nama ?? '—', t.jumlah_per_orang)); }}
-                            title="Bagikan pengingat ke WhatsApp"
-                            aria-label="Bagikan pengingat ke WhatsApp"
-                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-emerald-600 dark:text-emerald-400 inline-flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-[0.97] transition cursor-pointer"
-                          >
-                            <MessageCircle className="w-[18px] h-[18px]" />
-                          </button>
-                        )}
-
-                        {/* Tombol revisi jadwal */}
+                        {/* Aksi sekunder (WA + Revisi) dilipat ke sheet →
+                            baris tetap lega, nama Sohibul tak cepat terpotong */}
                         <button
-                          onClick={() => setEditingTarikan(t)}
-                          title="Revisi jadwal"
-                          aria-label="Revisi jadwal"
+                          onClick={() => { haptic(); setRowTarikan(t); }}
+                          title="Aksi lainnya"
+                          aria-label={`Aksi lainnya tarikan #${t.nomor}`}
                           className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
                         >
-                          <Pencil className="w-[18px] h-[18px]" />
+                          <MoreVertical className="w-[18px] h-[18px]" />
                         </button>
                       </div>
                     ) : (
@@ -1071,6 +1070,48 @@ export default function JadwalPage() {
           onClose={() => setCreatingTarikan(false)}
           onSaved={() => { setCreatingTarikan(false); load(); }}
         />
+      )}
+
+      {/* Sheet aksi sekunder per tarikan: bagikan WA + revisi jadwal */}
+      {rowTarikan && (
+        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setRowTarikan(null)}>
+          <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div
+            ref={rowDlg.panelRef}
+            {...rowDlg.panelProps}
+            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
+            onClick={(e) => e.stopPropagation()}
+            style={rowDrag.style}
+          >
+            <div className="-mt-2 mb-3 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...rowDrag.handlers}>
+              <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+            </div>
+            <p className="text-base font-bold text-ink dark:text-gray-100 leading-snug">
+              Tarikan #{rowTarikan.nomor} · {rowTarikan.sohibul_bait?.nama ?? '—'}
+            </p>
+            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(rowTarikan.tanggal)}</p>
+            <div className="space-y-2 mt-4">
+              {rowTarikan.status !== 'selesai' && (
+                <button
+                  onClick={() => {
+                    haptic();
+                    openWa(null, pesanTarikan(rowTarikan.nomor, rowTarikan.tanggal, rowTarikan.sohibul_bait?.nama ?? '—', rowTarikan.jumlah_per_orang));
+                    setRowTarikan(null);
+                  }}
+                  className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-sm font-semibold"
+                >
+                  <MessageCircle className="w-4 h-4" /> Bagikan pengingat WhatsApp
+                </button>
+              )}
+              <button
+                onClick={() => { setRowTarikan(null); setEditingTarikan(rowTarikan); }}
+                className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold"
+              >
+                <Pencil className="w-4 h-4" /> Revisi jadwal
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Aksi utama di zona jempol: PROSES tarikan giliran berikutnya →

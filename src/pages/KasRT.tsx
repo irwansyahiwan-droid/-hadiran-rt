@@ -90,7 +90,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 type="button"
                 onClick={() => pilihTipe(t)}
                 aria-pressed={tipe === t}
-                className={`press py-2.5 rounded-xl text-sm font-semibold border transition ${
+                className={`press inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
                       ? 'bg-emerald-500 text-white border-emerald-500'
@@ -98,7 +98,10 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                     : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-control dark:border-gray-700'
                 }`}
               >
-                {t === 'masuk' ? '↓ Pemasukan' : '↑ Pengeluaran'}
+                {/* Ikon lucide (bukan panah unicode) — rima dgn ikon tile mutasi */}
+                {t === 'masuk'
+                  ? <><ArrowDownLeft className="w-4 h-4" /> Pemasukan</>
+                  : <><ArrowUpRight className="w-4 h-4" /> Pengeluaran</>}
               </button>
             ))}
           </div>
@@ -452,8 +455,9 @@ export default function KasRTPage() {
           <div className="relative p-6">
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-2">
-                <Landmark className="w-4 h-4 text-teal-200" />
-                <p className="text-teal-100 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
+                <Landmark className="w-4 h-4 text-white/80" />
+                {/* white/90 (bukan teal-100): seragam dgn hero Kas Hadiran + jaga AA di ujung terang gradient */}
+                <p className="text-white/90 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
               </div>
               <div className="flex items-center gap-0.5 -mr-1.5">
                 {/* Urutan ikon seragam app-wide: mata (sembunyikan nominal) selalu pertama. */}
@@ -463,15 +467,15 @@ export default function KasRTPage() {
                   aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 >
                   {hidden
-                    ? <EyeOff className="w-4 h-4 text-teal-100/80" />
-                    : <Eye className="w-4 h-4 text-teal-100/80" />}
+                    ? <EyeOff className="w-4 h-4 text-white/80" />
+                    : <Eye className="w-4 h-4 text-white/80" />}
                 </button>
                 <button
                   onClick={handleShareReceipt}
                   className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
                   aria-label="Bagikan ringkasan ke WhatsApp"
                 >
-                  <Share2 className="w-4 h-4 text-teal-100/80" />
+                  <Share2 className="w-4 h-4 text-white/80" />
                 </button>
               </div>
             </div>
@@ -488,7 +492,7 @@ export default function KasRTPage() {
 
             {/* Saldo Awal inline info */}
             {saldoAwal > 0 && saldoAwalEntry && (
-              <p className="text-teal-100/90 text-xs mb-4">
+              <p className="text-white/90 text-xs mb-4">
                 Saldo Awal
                 {' · '}
                 {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -501,14 +505,14 @@ export default function KasRTPage() {
               <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
-                  <p className="text-teal-100 text-micro font-semibold uppercase tracking-wide">Total Masuk</p>
+                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Masuk</p>
                 </div>
                 <p className="text-sm font-bold text-white">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-rose-300" />
-                  <p className="text-teal-100 text-micro font-semibold uppercase tracking-wide">Total Keluar</p>
+                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Keluar</p>
                 </div>
                 <p className="text-sm font-bold text-white">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</p>
               </div>
@@ -542,7 +546,7 @@ export default function KasRTPage() {
                         onClick={() => setChartPeriod(p)}
                         aria-pressed={chartPeriod === p}
                         aria-label={`${p} bulan terakhir`}
-                        className={`press px-2 py-0.5 rounded-md text-micro font-bold transition-colors ${
+                        className={`press min-h-[32px] min-w-[36px] px-2 inline-flex items-center justify-center rounded-md text-micro font-bold transition-colors ${
                           chartPeriod === p ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}
                       >
