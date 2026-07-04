@@ -402,7 +402,7 @@ export default function JadwalWargaPage() {
                   >
                     {/* Badge nomor */}
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm ${
-                      isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300' : 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
+                      isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300' : 'bg-emerald-500 text-white'
                     }`}>
                       {t.nomor}
                     </div>

@@ -189,7 +189,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
             <button
               onClick={() => bagikan('snap', snapToCard(snap))}
               disabled={sharingKey !== null}
-              className="press relative w-full min-h-[44px] py-3 rounded-2xl bg-white text-emerald-700 font-bold text-sm shadow-lg shadow-black/10 hover:bg-emerald-50 transition flex items-center justify-center gap-2 disabled:opacity-60"
+              className="press relative w-full min-h-[44px] py-3 rounded-2xl bg-white text-emerald-700 font-bold text-sm hover:bg-emerald-50 transition flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {sharingKey === 'snap' ? (
                 <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan gambar…</>

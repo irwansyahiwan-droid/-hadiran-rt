@@ -79,7 +79,7 @@ export default function TentangApp({ open, onClose }: Props) {
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* Hero */}
         <div className="text-center pt-2 pb-1">
-          <img src={logoRt} alt="Logo RT 004/006" className="w-20 h-20 rounded-3xl object-cover mx-auto mb-3 shadow-xl shadow-emerald-300/40 ring-1 ring-white/60" />
+          <img src={logoRt} alt="Logo RT 004/006" className="w-20 h-20 rounded-3xl object-cover mx-auto mb-3 lift ring-1 ring-black/[0.08] dark:ring-white/10" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Hadiran RT</h2>
           <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5">RT 004/006 · Tanah Baru Beji · Depok</p>
         </div>
