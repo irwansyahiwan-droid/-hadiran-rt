@@ -781,7 +781,7 @@ export default function KasRTPage() {
               </button>
               <button
                 onClick={() => { if (confirmDel) deleteRow(selectedRow); else { setConfirmDel(true); setTimeout(() => setConfirmDel(false), 3000); } }}
-                className={`press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border ${confirmDel ? 'bg-rose-600 text-white border-rose-600' : 'bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900'}`}
+                className={`press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border ${confirmDel ? 'btn-danger border-transparent' : 'bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900'}`}
               >
                 <Trash2 className="w-4 h-4" /> {confirmDel ? 'Yakin hapus?' : 'Hapus'}
               </button>
