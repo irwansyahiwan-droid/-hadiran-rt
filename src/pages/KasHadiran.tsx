@@ -833,7 +833,8 @@ export default function KasHadiranPage() {
                   <div className="space-y-1">
                     <div className="skeleton h-2.5 w-32 rounded-full mb-2.5" />
                     {[0, 1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex items-center gap-2.5 py-1">
+                      <div key={i} className="flex items-center gap-2.5 py-2">
+                        <div className="skeleton h-3 w-5 rounded-full shrink-0" />
                         <div className="skeleton w-8 h-8 rounded-lg shrink-0" />
                         <div className="skeleton h-3.5 flex-1 rounded-full" />
                         <div className="skeleton h-5 w-16 rounded-full shrink-0" />
@@ -869,10 +870,11 @@ export default function KasHadiranPage() {
                   )}
                   {detailTitip.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2.5">Titip · iuran masuk ({detailTitip.length})</p>
-                      <div className="space-y-1">
-                        {detailTitip.map((p) => (
-                          <div key={p.id} className="flex items-center gap-2.5 py-1">
+                      <p className="text-micro font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-1.5">Titip · iuran masuk ({detailTitip.length})</p>
+                      <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
+                        {detailTitip.map((p, i) => (
+                          <div key={p.id} className="flex items-center gap-2.5 py-2">
+                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-500 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
@@ -883,10 +885,11 @@ export default function KasHadiranPage() {
                   )}
                   {detailTidak.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Tidak Hadir / Talangan</p>
-                      <div className="space-y-1">
-                        {detailTidak.map((p) => (
-                          <div key={p.id} className="flex items-center gap-2.5 py-1">
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-1.5">Tidak Hadir / Talangan ({detailTidak.length})</p>
+                      <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
+                        {detailTidak.map((p, i) => (
+                          <div key={p.id} className="flex items-center gap-2.5 py-2">
+                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-500 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
@@ -901,10 +904,11 @@ export default function KasHadiranPage() {
                   )}
                   {detailHadir.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Hadir ({detailHadir.length})</p>
-                      <div className="space-y-1">
-                        {detailHadir.map((p) => (
-                          <div key={p.id} className="flex items-center gap-2.5 py-1">
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-1.5">Hadir ({detailHadir.length})</p>
+                      <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
+                        {detailHadir.map((p, i) => (
+                          <div key={p.id} className="flex items-center gap-2.5 py-2">
+                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-500 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             <Check className="w-4 h-4 text-emerald-500 shrink-0" strokeWidth={2.5} />
