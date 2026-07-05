@@ -20,7 +20,10 @@ export async function outputPdf(doc: jsPDF, filename: string): Promise<void> {
     try {
       const file = new File([blob], filename, { type: 'application/pdf' });
       if (navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: filename });
+        // HANYA files — tanpa title/text. WhatsApp menolak share yang campur
+        // file + title/text ("mental balik" dari WA tanpa lampiran); share
+        // files-only diterima. Nama file sudah deskriptif sebagai pengganti.
+        await navigator.share({ files: [file] });
         return;
       }
     } catch (e) {
