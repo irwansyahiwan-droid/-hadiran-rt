@@ -149,11 +149,12 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           {(['warga', 'bendahara'] as const).map((r) => (
             <button
               key={r}
-              onClick={() => setRole(r)}
-              className={`py-2.5 rounded-xl text-sm font-semibold border transition ${
+              onClick={() => { if (role !== r) haptic(); setRole(r); }}
+              aria-pressed={role === r}
+              className={`press min-h-[44px] py-2.5 rounded-xl text-sm font-semibold border transition ${
                 role === r
-                  ? 'bg-emerald-500 text-white border-emerald-500'
-                  : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
+                  ? 'bg-gradient-to-b from-brand-500 to-brand text-white border-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_4px_12px_-3px_rgba(15,76,46,0.5)]'
+                  : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
               }`}
             >
               {r === 'warga' ? 'Warga' : 'Bendahara'}
@@ -191,7 +192,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                 <History className="w-4 h-4 shrink-0" />
                 Anggota susulan — sudah lunas tarikan lama
               </span>
-              <span className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${susulan ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
+              <span className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${susulan ? 'bg-brand-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
                 <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${susulan ? 'translate-x-4' : 'translate-x-0.5'}`} />
               </span>
             </button>
@@ -211,7 +212,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-left"
                       >
                         <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
-                          on ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 dark:border-gray-600'
+                          on ? 'bg-brand-500 border-brand-500' : 'border-gray-300 dark:border-gray-600'
                         }`}>
                           {on && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
                         </span>

@@ -430,11 +430,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               </div>
               {/* Indikator status: hadir ✓ emerald · titip koin biru · tidak hadir lingkaran kosong */}
               {st === 'hadir' ? (
-                <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-emerald-500 border-emerald-500">
+                <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-pos border-pos">
                   <CheckCircle2 className="w-4 h-4 text-white" />
                 </div>
               ) : st === 'titip' ? (
-                <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-blue-500 border-blue-500">
+                <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-setor-500 border-setor-500">
                   <Coins className="w-3.5 h-3.5 text-white" />
                 </div>
               ) : (

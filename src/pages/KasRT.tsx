@@ -93,8 +93,8 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 className={`press inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
-                      ? 'bg-emerald-500 text-white border-emerald-500'
-                      : 'bg-rose-500 text-white border-rose-500'
+                      ? 'bg-pos text-white border-pos'
+                      : 'bg-neg text-white border-neg'
                     : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-control dark:border-gray-700'
                 }`}
               >
@@ -188,7 +188,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               type="submit"
               disabled={saving || !nominal}
               className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition duration-150 flex items-center justify-center gap-2 ${
-                tipe === 'masuk' ? 'btn-brand' : 'bg-rose-500 hover:bg-rose-600'
+                tipe === 'masuk' ? 'btn-brand' : 'btn-danger'
               }`}
             >
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
