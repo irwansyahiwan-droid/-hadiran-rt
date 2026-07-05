@@ -230,6 +230,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         <div className="flex items-center">
           <button
             onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
+            aria-expanded={isExpanded}
             className="flex-1 min-w-0 flex items-center gap-3 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
           >
             <AvatarPeci nama={g.nama} className="w-11 h-11 rounded-2xl" />
@@ -361,7 +362,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
           <div className="relative p-5">
             <div className="flex items-center justify-between gap-2 mb-1">
-              <p className="inline-flex items-center gap-1 text-emerald-300 text-micro font-bold uppercase tracking-widest">
+              {/* Paritas keluarga hero (KasRT/LaporanTriwulan): label & ikon putih
+                  ber-opacity — emerald-300 di atas gradien vibran kontrasnya lemah. */}
+              <p className="inline-flex items-center gap-1 text-white/85 text-micro font-bold uppercase tracking-widest">
                 Total Talangan Belum Lunas
                 <InfoTip label="Talangan" tone="onDark">
                   Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
@@ -373,21 +376,35 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
               >
                 {hidden
-                  ? <EyeOff className="w-4 h-4 text-white/70" />
-                  : <Eye className="w-4 h-4 text-white/70" />}
+                  ? <EyeOff className="w-4 h-4 text-white/80" />
+                  : <Eye className="w-4 h-4 text-white/80" />}
               </button>
             </div>
             <FitAmount
               measure={`Rp ${totalBelumLunas.toLocaleString('id-ID')}`}
               maxPx={48}
               minPx={30}
-              className="font-display text-white font-extrabold tracking-tighter tabular-nums mb-1"
+              className="font-display text-white font-extrabold tracking-tighter tabular-nums mb-3"
             >
               {maskRp(`Rp ${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
             </FitAmount>
-            <p className="text-emerald-300 text-xs">
-              {countBelum} belum lunas · {countLunas} sudah lunas
-            </p>
+            {/* Dua chip stat ala hero KasRT — struktur > caption polos */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white/10 rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Belum Lunas</p>
+                </div>
+                <p className="text-sm font-bold text-white tabular-nums">{countBelum} talangan</p>
+              </div>
+              <div className="bg-white/10 rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Sudah Lunas</p>
+                </div>
+                <p className="text-sm font-bold text-white tabular-nums">{countLunas} talangan</p>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
@@ -428,10 +445,10 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       />
 
       <CrossFade loading={loading} skeleton={(
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset [--di-l:4.25rem]">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-5 py-4">
-              <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
+              <div className="w-11 h-11 rounded-2xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-2/3" />
                 <div className="h-3 skeleton rounded-lg w-1/2" />
@@ -448,12 +465,10 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {/* Berganda warning */}
           {showBelum && berganda.length > 0 && (
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
-                <p className="text-xs font-bold text-amber-700 uppercase tracking-wide">
-                  Warga dengan Tunggakan Berganda
-                </p>
-              </div>
+              <SectionTitle tone="warn" count={berganda.length}>
+                <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
+                Tunggakan Berganda
+              </SectionTitle>
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
                 {berganda.map(g => renderGroup(g))}
               </div>
