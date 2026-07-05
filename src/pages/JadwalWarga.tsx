@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Search, X, Check, Coins, Users, CalendarDays, RotateCcw } from 'lucide-react';
+import { FileText, Search, X, Check, Coins, HandCoins, Users, CalendarDays, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -9,6 +9,7 @@ import ClearButton from '../components/ClearButton';
 import InfoTip from '../components/InfoTip';
 import ErrorState from '../components/ErrorState';
 import EmptyState from '../components/EmptyState';
+import SectionTitle from '../components/SectionTitle';
 
 type SubTab = 'anggota' | 'jadwal';
 
@@ -210,6 +211,11 @@ export default function JadwalWargaPage() {
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
                 <Check className="w-3 h-3" strokeWidth={2.5} /> {hadirCount} Hadir
               </span>
+              {titipCount > 0 && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
+                  <HandCoins className="w-3 h-3" /> {titipCount} Titip
+                </span>
+              )}
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
                 <X className="w-3 h-3" strokeWidth={2.5} /> {tidakHadirCount} Tidak Hadir
               </span>
@@ -227,26 +233,23 @@ export default function JadwalWargaPage() {
 
       {/* Sub-tab switcher */}
       <div className="flex gap-2">
-        <button
-          onClick={() => setSubTab('anggota')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition ${
-            subTab === 'anggota'
-              ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
-              : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
-          } inline-flex items-center justify-center gap-1.5`}
-        >
-          <Users className="w-4 h-4" /> Daftar Anggota
-        </button>
-        <button
-          onClick={() => setSubTab('jadwal')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition ${
-            subTab === 'jadwal'
-              ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm'
-              : 'bg-white dark:bg-gray-900 text-gray-500 border-control dark:border-gray-700'
-          } inline-flex items-center justify-center gap-1.5`}
-        >
-          <CalendarDays className="w-4 h-4" /> Jadwal Hadiran
-        </button>
+        {([
+          ['anggota', 'Daftar Anggota', Users],
+          ['jadwal', 'Jadwal Hadiran', CalendarDays],
+        ] as const).map(([id, label, Icon]) => (
+          <button
+            key={id}
+            onClick={() => { if (subTab !== id) haptic(); setSubTab(id); }}
+            aria-pressed={subTab === id}
+            className={`press flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-semibold border transition ${
+              subTab === id
+                ? 'bg-gradient-to-b from-brand-500 to-brand text-white border-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_4px_12px_-3px_rgba(15,76,46,0.5)]'
+                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
+            } inline-flex items-center justify-center gap-1.5`}
+          >
+            <Icon className="w-4 h-4" /> {label}
+          </button>
+        ))}
       </div>
 
       {/* Sub-tab: Daftar Anggota */}
@@ -290,11 +293,11 @@ export default function JadwalWargaPage() {
               ] as const).map(([id, label]) => (
                 <button
                   key={id}
-                  onClick={() => setWargaFilter(id)}
+                  onClick={() => { if (wargaFilter !== id) haptic(); setWargaFilter(id); }}
                   aria-pressed={wargaFilter === id}
-                  className={`inline-flex items-center justify-center min-h-[44px] rounded-xl text-xs font-semibold border transition ${
+                  className={`press inline-flex items-center justify-center min-h-[44px] rounded-xl text-xs font-semibold border transition ${
                     wargaFilter === id
-                      ? 'bg-brand text-white border-brand'
+                      ? 'bg-gradient-to-b from-brand-500 to-brand text-white border-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_4px_12px_-3px_rgba(15,76,46,0.5)]'
                       : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
                   }`}
                 >
@@ -359,17 +362,20 @@ export default function JadwalWargaPage() {
       {subTab === 'jadwal' && (
         <div className="space-y-3">
           {/* Header with PDF button */}
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-bold text-gray-700 dark:text-gray-300">Semua Tarikan</p>
-            <button
-              onClick={cetakJadwal}
-              disabled={allTarikan.length === 0}
-              className="press flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
-            >
-              <FileText className="w-3.5 h-3.5" />
-              PDF Jadwal
-            </button>
-          </div>
+          <SectionTitle
+            action={
+              <button
+                onClick={cetakJadwal}
+                disabled={allTarikan.length === 0}
+                className="press flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                PDF Jadwal
+              </button>
+            }
+          >
+            Semua Tarikan
+          </SectionTitle>
 
           {/* Stat cards */}
           <div className="grid grid-cols-3 gap-2">
@@ -402,14 +408,14 @@ export default function JadwalWargaPage() {
                   >
                     {/* Badge nomor */}
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm ${
-                      isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300' : 'bg-emerald-500 text-white'
+                      isSelesai ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300' : 'bg-brand-500 text-white'
                     }`}>
                       {t.nomor}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-semibold truncate ${isSelesai ? 'text-gray-500' : 'text-gray-900 dark:text-gray-100'}`}>
+                      <p className={`text-sm font-semibold truncate ${isSelesai ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
                         {t.sohibul_bait?.nama ?? '—'}
                       </p>
                       <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
