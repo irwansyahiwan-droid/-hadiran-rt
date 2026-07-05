@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
+  TABLE, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
@@ -56,13 +56,8 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Kota Depok${periode}`,
   });
 
-  Y = drawStatStrip(doc, Y, [
-    { label: 'Saldo Bersih Kas', value: rp(stats.saldo) },
-    { label: 'Total Masuk',      value: `+${rp(stats.totalMasuk)}`,  tone: 'pos' },
-    { label: 'Total Keluar',     value: `-${rp(stats.totalKeluar)}`, tone: 'neg' },
-  ], W, M);
-
   // ── Bagian per jenis transaksi ────────────────────────────────
+  // (Strip statistik atas dihapus — angka total sudah di Ringkasan tutup buku.)
   const saldoAwalList = sorted.filter(k => k.keterangan === 'Saldo Awal Kas RT');
   const masukList     = sorted.filter(k => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT');
   const keluarList    = sorted.filter(k => k.tipe === 'keluar');
