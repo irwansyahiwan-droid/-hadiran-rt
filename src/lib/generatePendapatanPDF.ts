@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum, alignHeadFoot,
+  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
 
@@ -137,7 +137,8 @@ export function generatePendapatanPDF(
   });
 
   // ── Rincian pendapatan Sohibul Bait (gaya tutup buku) ─────
-  const afterY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+  // Guard: label + ringkasan (2 baris + total) tetap satu blok utuh
+  const afterY: number = ensureSpace(doc, (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8, 44);
 
   doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
   doc.setTextColor(C.faint[0], C.faint[1], C.faint[2]);
@@ -148,7 +149,7 @@ export function generatePendapatanPDF(
     { label: 'Potongan Admin',   value: `-${rp(potonganAdmin)}`, tone: 'neg' },
   ], { label: 'Pendapatan Bersih', value: rp(pendapatanBersih) }, W, M);
 
-  drawSignatures(doc, sumY + 14, W, M);
+  drawSignatures(doc, ensureSpace(doc, sumY + 14, 36), W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);

@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, C, fmtNum, alignHeadFoot,
+  TABLE, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -31,18 +31,21 @@ export function generateKasHadiranPDF(
   const docCode = `KAS-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  let Y = drawMasthead(doc, {
+  // Periode data = rentang tanggal tarikan pertama–terakhir
+  const byTanggal = [...tarikanList].sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime());
+  const fmtLong = (d: string) =>
+    new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  const periode = byTanggal.length
+    ? ` · Periode ${fmtLong(byTanggal[0].tanggal)} – ${fmtLong(byTanggal[byTanggal.length - 1].tanggal)}`
+    : '';
+
+  const Y = drawMasthead(doc, {
     W, M, docCode, tanggalCetak,
     title: 'Laporan Alur Kas Hadiran',
-    subtitle: 'Rekapitulasi kas masuk, talangan, dan saldo RT 004/006 Tanah Baru, Beji, Kota Depok',
+    subtitle: `Kas masuk, talangan & setoran RT 004/006 Tanah Baru, Beji, Kota Depok${periode}`,
   });
 
-  Y = drawStatStrip(doc, Y, [
-    { label: 'Kas Hadiran Terkumpul', value: rp(stats.totalKasTerkumpul) },
-    { label: 'Talangan Belum Lunas',  value: `-${rp(stats.totalTalanganBelum)}`, tone: 'neg' },
-    { label: 'Saldo Bersih Kas',      value: rp(stats.saldoAktif), tone: stats.saldoAktif < 0 ? 'neg' : 'ink' },
-  ], W, M);
-
+  // (Strip statistik atas dihapus — angka yang sama sudah di Ringkasan tutup buku.)
   // ── Tabel per tarikan ─────────────────────────────────────
   const KAS_COL = {
     0: { cellWidth: 9,  halign: 'center' as const },
@@ -128,13 +131,13 @@ export function generateKasHadiranPDF(
   const afterY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
   const saldoText = (stats.saldoAktif < 0 ? '-' : '') + rp(Math.abs(stats.saldoAktif));
 
-  const sumY = drawSummary(doc, afterY + 6, [
+  const sumY = drawSummary(doc, ensureSpace(doc, afterY + 6, 42), [
     { label: 'Total Kas Terkumpul',        value: rp(stats.totalKasTerkumpul) },
     { label: 'Total Talangan Belum Lunas', value: `-${rp(stats.totalTalanganBelum)}`, tone: 'neg' },
     { label: 'Total Setor ke Kas RT',      value: `-${rp(stats.totalSetor)}`, tone: 'warn' },
   ], { label: 'Saldo Bersih Kas', value: saldoText, tone: stats.saldoAktif < 0 ? 'neg' : 'ink' }, W, M);
 
-  drawSignatures(doc, sumY + 14, W, M);
+  drawSignatures(doc, ensureSpace(doc, sumY + 14, 42), W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);

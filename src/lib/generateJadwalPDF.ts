@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
-import { TABLE, drawMasthead, drawSignatures, drawFooter, C, alignHeadFoot } from './pdfTheme';
+import { TABLE, drawMasthead, drawSignatures, drawFooter, ensureSpace, C, alignHeadFoot } from './pdfTheme';
 import type { Tarikan } from './types';
 
 const STATUS: Record<string, string> = {
@@ -65,8 +65,8 @@ export function generateJadwalPDF(list: Tarikan[]) {
     },
   });
 
-  const afterY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 16;
-  drawSignatures(doc, afterY, W, M);
+  const afterY = ensureSpace(doc, (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 16, 36);
+  drawSignatures(doc, afterY, W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);

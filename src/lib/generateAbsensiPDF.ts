@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSignatures, drawFooter, C, alignHeadFoot,
+  TABLE, drawMasthead, drawStatStrip, drawSignatures, drawFooter, ensureSpace, C, alignHeadFoot,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -72,11 +72,12 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
   });
 
   // ── Total + TTD ───────────────────────────────────────────
-  const afterY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+  // Guard: baris total + blok ttd (dgn dateline) jangan tergambar lewat batas halaman
+  const afterY = ensureSpace(doc, (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8, 52);
   doc.setFontSize(8.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(C.ink[0], C.ink[1], C.ink[2]);
   doc.text(`Total Anggota Tercatat: ${total}`, M, afterY);
 
-  drawSignatures(doc, afterY + 16, W, M);
+  drawSignatures(doc, afterY + 16, W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);
