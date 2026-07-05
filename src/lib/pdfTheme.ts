@@ -81,6 +81,16 @@ export function drawMasthead(
   return 41;
 }
 
+/**
+ * Pastikan sisa ruang halaman cukup untuk blok setinggi `needed` mm;
+ * kalau tidak, mulai halaman baru. Mengembalikan Y tempat blok digambar.
+ */
+export function ensureSpace(doc: jsPDF, y: number, needed: number): number {
+  const H = doc.internal.pageSize.getHeight();
+  if (y + needed > H - 16) { doc.addPage(); return 16; }
+  return y;
+}
+
 export interface Stat { label: string; value: string; tone?: keyof typeof C }
 
 /** Strip statistik: kolom label kecil + angka besar, dipisah hairline vertikal. */
@@ -189,9 +199,14 @@ export function drawSummary(
   return ly + 1;
 }
 
-/** Blok tanda tangan 3 kolom. */
-export function drawSignatures(doc: jsPDF, y: number, W: number, M: number): void {
+/** Blok tanda tangan 3 kolom. `dateline` opsional ("Depok, 5 Juli 2026") di atas kolom kanan. */
+export function drawSignatures(doc: jsPDF, y: number, W: number, M: number, opts?: { dateline?: string }): void {
   const colW = (W - 2 * M) / 3;
+  if (opts?.dateline) {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); setColor(doc, C.sub);
+    doc.text(opts.dateline, M + colW * 2 + colW / 2, y, { align: 'center' });
+    y += 6;
+  }
   SIGNERS.forEach((p, i) => {
     const cx = M + colW * i + colW / 2;
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); setColor(doc, C.faint);
@@ -203,8 +218,13 @@ export function drawSignatures(doc: jsPDF, y: number, W: number, M: number): voi
   });
 }
 
-/** Footer halaman: caption kecil di tengah. */
-export function drawFooter(doc: jsPDF, W: number, H: number, tanggalCetak: string): void {
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); setColor(doc, C.muted);
-  doc.text(`Dicetak ${tanggalCetak}  ·  Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
+/** Footer di SETIAP halaman: caption tengah + nomor halaman kanan (bila multi-halaman). Panggil sekali di akhir. */
+export function drawFooter(doc: jsPDF, W: number, H: number, tanggalCetak: string, M = 14): void {
+  const total = doc.getNumberOfPages();
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); setColor(doc, C.muted);
+    doc.text(`Dicetak ${tanggalCetak}  ·  Hadiran RT Digital System`, W / 2, H - 8, { align: 'center' });
+    if (total > 1) doc.text(`Hal. ${p}/${total}`, W - M, H - 8, { align: 'right' });
+  }
 }

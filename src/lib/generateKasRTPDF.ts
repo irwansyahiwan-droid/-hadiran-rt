@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, C, fmtNum, alignHeadFoot,
+  TABLE, drawMasthead, drawStatStrip, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
@@ -43,10 +43,17 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   const docCode  = `KASRT-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
+  const sorted = [...list].sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime());
+  const fmtLong = (d: string) =>
+    new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+  const periode = sorted.length
+    ? ` · Periode ${fmtLong(sorted[0].tanggal)} – ${fmtLong(sorted[sorted.length - 1].tanggal)}`
+    : '';
+
   let Y = drawMasthead(doc, {
     W, M, docCode, tanggalCetak,
-    title: 'Laporan Kas Besar RT 004/006',
-    subtitle: 'Rekapitulasi kas masuk dan keluar RT 004/006 Tanah Baru, Beji, Kota Depok',
+    title: 'Laporan Pertanggungjawaban Kas RT',
+    subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Kota Depok${periode}`,
   });
 
   Y = drawStatStrip(doc, Y, [
@@ -56,25 +63,25 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   ], W, M);
 
   // ── Bagian per jenis transaksi ────────────────────────────────
-  const sorted = [...list].sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime());
-
   const saldoAwalList = sorted.filter(k => k.keterangan === 'Saldo Awal Kas RT');
   const masukList     = sorted.filter(k => k.tipe === 'masuk' && k.keterangan !== 'Saldo Awal Kas RT');
   const keluarList    = sorted.filter(k => k.tipe === 'keluar');
 
-  Y = sectionLabel(doc, Y + 7, 'Saldo Awal', W, M);
-  autoTable(doc, {
-    ...TABLE,
-    startY: Y,
-    head: [HEAD],
-    body: saldoAwalList.map((k, i) => [
-      String(i + 1), fmtDate(k.tanggal), k.keterangan, fmtNum(k.nominal), fmtNum(k.saldo_setelah),
-    ]),
-    margin: { left: M, right: M },
-    columnStyles: COL,
-    didParseCell: (data) => alignHeadFoot(data, COL),
-  });
-  Y = getY(doc);
+  if (saldoAwalList.length > 0) {
+    Y = sectionLabel(doc, ensureSpace(doc, Y + 7, 30), 'Saldo Awal', W, M);
+    autoTable(doc, {
+      ...TABLE,
+      startY: Y,
+      head: [HEAD],
+      body: saldoAwalList.map((k, i) => [
+        String(i + 1), fmtDate(k.tanggal), k.keterangan, fmtNum(k.nominal), fmtNum(k.saldo_setelah),
+      ]),
+      margin: { left: M, right: M },
+      columnStyles: COL,
+      didParseCell: (data) => alignHeadFoot(data, COL),
+    });
+    Y = getY(doc);
+  }
 
   // Satu sub-bagian per kategori (label "PENERIMAAN/PENGELUARAN — <kategori>" +
   // subtotal + tabel) → laporan berkelompok untuk pertanggungjawaban.
@@ -84,7 +91,8 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   ): number => {
     if (rows.length === 0) return startY;
     const sub = rows.reduce((s, k) => s + k.nominal, 0);
-    const y = sectionLabel(doc, startY + 6, `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone });
+    // Guard: label seksi jangan yatim di dasar halaman (butuh label + kepala tabel + ±2 baris)
+    const y = sectionLabel(doc, ensureSpace(doc, startY + 6, 30), `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone });
     autoTable(doc, {
       ...TABLE,
       startY: y,
@@ -113,13 +121,13 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   }
 
   // ── Ringkasan tutup buku ──────────────────────────────────────
-  Y = drawSummary(doc, Y + 6, [
+  Y = drawSummary(doc, ensureSpace(doc, Y + 6, 42), [
     { label: 'Saldo Awal',        value: rp(stats.saldoAwal) },
     { label: 'Total Pemasukan',   value: `+${rp(stats.totalMasuk)}`,  tone: 'pos' },
     { label: 'Total Pengeluaran', value: `-${rp(stats.totalKeluar)}`, tone: 'neg' },
   ], { label: 'Saldo Bersih', value: rp(stats.saldo) }, W, M);
 
-  drawSignatures(doc, Y + 14, W, M);
+  drawSignatures(doc, ensureSpace(doc, Y + 14, 42), W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);
