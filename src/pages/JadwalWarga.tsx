@@ -226,8 +226,12 @@ export default function JadwalWargaPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-6 text-center">
-          <p className="text-sm text-ink-faint dark:text-gray-400">Belum ada tarikan selesai</p>
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+          <EmptyState
+            icon={CalendarDays}
+            title="Belum ada tarikan selesai"
+            subtitle="Ringkasan kehadiran akan muncul di sini setelah tarikan pertama selesai."
+          />
         </div>
       )}
 
