@@ -234,7 +234,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           >
             <AvatarPeci nama={g.nama} className="w-11 h-11 rounded-2xl" />
             <div className="flex-1 min-w-0">
-              <p className="text-body font-semibold text-ink dark:text-gray-100 truncate">{g.nama}</p>
+              {/* line-clamp-2 (bukan truncate): nama warga panjang melipat ke baris 2,
+                  tidak terpotong — kolom kanan (nominal+chevron+WA) memang lebar. */}
+              <p className="text-body font-semibold text-ink dark:text-gray-100 line-clamp-2 leading-snug break-words">{g.nama}</p>
               {g.countBelum > 0 ? (
                 <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
                   {g.countBelum} belum lunas · {g.countBelum}× Rp50.000
