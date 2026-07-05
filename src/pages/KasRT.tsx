@@ -413,7 +413,7 @@ export default function KasRTPage() {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-              <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
             </button>
             {/* Ekspor (PDF/Excel) disatukan ke satu menu → aksi utama "Tambah"
                 tak tersaingi di toolbar; kini hadir sebagai FAB di zona jempol.

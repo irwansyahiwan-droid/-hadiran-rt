@@ -138,7 +138,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               type="button"
               onClick={() => setShowWargaPassword((p) => !p)}
               aria-label={showWargaPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-              className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+              className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             >
               {showWargaPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -229,7 +229,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     type="button"
                     onClick={() => setShowPassword((p) => !p)}
                     aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                    className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                    className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
