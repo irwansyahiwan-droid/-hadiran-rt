@@ -15,6 +15,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { ringkasAbsensi } from '../lib/absensiHitung';
+import { hitungUlangNomorJadwal } from '../lib/jadwalNomor';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
@@ -852,7 +853,26 @@ export default function JadwalPage() {
           .eq('status_aktif', true)
           .order('nama', { ascending: true }),
       ]);
-      setTarikanList((tarRes.data as Tarikan[]) ?? []);
+      let tarikan = (tarRes.data as Tarikan[]) ?? [];
+
+      // Nomor tarikan = urutan tanggal untuk yang BELUM ditarik; 'selesai'
+      // terkunci. Bila revisi jadwal menggeser urutan (mis. tanggal diundur),
+      // rapikan nomornya di sini agar "tarikan ke-" selalu ikut tanggal. Hanya
+      // bendahara yang menulis — warga view-only ditolak RLS.
+      if (isBendahara) {
+        const changes = hitungUlangNomorJadwal(tarikan);
+        if (changes.length) {
+          await Promise.all(changes.map(c =>
+            supabase.from('tarikan').update({ nomor: c.nomor }).eq('id', c.id)
+          ));
+          const nomorBaru = new Map(changes.map(c => [c.id, c.nomor]));
+          tarikan = tarikan
+            .map(t => (nomorBaru.has(t.id) ? { ...t, nomor: nomorBaru.get(t.id)! } : t))
+            .sort((a, b) => a.nomor - b.nomor);
+        }
+      }
+
+      setTarikanList(tarikan);
       setWargaList((wargaRes.data as Warga[]) ?? []);
     } catch {
       setError(true);
@@ -1024,15 +1044,19 @@ export default function JadwalPage() {
                         )}
 
                         {/* Aksi sekunder (WA + Revisi) dilipat ke sheet →
-                            baris tetap lega, nama Sohibul tak cepat terpotong */}
-                        <button
-                          onClick={() => { haptic(); setRowTarikan(t); }}
-                          title="Aksi lainnya"
-                          aria-label={`Aksi lainnya tarikan #${t.nomor}`}
-                          className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
-                        >
-                          <MoreVertical className="w-[18px] h-[18px]" />
-                        </button>
+                            baris tetap lega, nama Sohibul tak cepat terpotong.
+                            Tarikan yang SUDAH ditarik ('selesai') tak bisa
+                            direvisi jadwalnya — cukup "Hitung Ulang". */}
+                        {!isSelesai && (
+                          <button
+                            onClick={() => { haptic(); setRowTarikan(t); }}
+                            title="Aksi lainnya"
+                            aria-label={`Aksi lainnya tarikan #${t.nomor}`}
+                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
+                          >
+                            <MoreVertical className="w-[18px] h-[18px]" />
+                          </button>
+                        )}
                       </div>
                     ) : (
                       <Tag tone="neutral" className="shrink-0">
