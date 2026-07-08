@@ -21,6 +21,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
 import FitAmount from '../components/FitAmount';
+import CrossFade from '../components/CrossFade';
 import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -475,7 +476,9 @@ export default function KasHadiranPage() {
           </div>
         </div>
 
-        {/* Header Card */}
+        {/* Header Card — di dalam CrossFade: sebelum data siap saldo=0 → hero
+            berkedip "Rp0" (angka salah sesaat, bikin kaget). */}
+        <CrossFade loading={loading} skeleton={<div className="h-[164px] rounded-3xl skeleton" />}>
         <div className={`relative rounded-3xl overflow-hidden ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
@@ -523,6 +526,7 @@ export default function KasHadiranPage() {
             )}
           </div>
         </div>
+        </CrossFade>
 
         {/* Alur Kas */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5 overflow-hidden">

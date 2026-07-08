@@ -348,14 +348,16 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       {onBack && (
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 -ml-1 text-sm font-medium text-ink-sub dark:text-gray-300 hover:text-ink dark:hover:text-gray-100 active:opacity-70 transition-colors"
+          className="flex items-center gap-1.5 -ml-1 min-h-[44px] text-sm font-medium text-ink-sub dark:text-gray-300 hover:text-ink dark:hover:text-gray-100 active:opacity-70 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           Kembali
         </button>
       )}
 
-      {/* Header card */}
+      {/* Header card — di dalam CrossFade: sebelum data siap, totalBelumLunas=0
+          membuat kartu "Semua Talangan Lunas" berkedip (pesan SALAH saat loading). */}
+      <CrossFade loading={loading} skeleton={<div className="h-52 rounded-2xl skeleton" />}>
       {totalBelumLunas > 0 ? (
         <div className="relative rounded-2xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
@@ -414,6 +416,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           <p className="text-xs text-ink-faint dark:text-gray-400">{countLunas} talangan tercatat</p>
         </div>
       )}
+      </CrossFade>
 
       {/* Search */}
       <div className="relative">

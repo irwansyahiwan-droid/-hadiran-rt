@@ -448,7 +448,9 @@ export default function KasRTPage() {
           </div>
         </div>
 
-        {/* Saldo Card — always teal */}
+        {/* Saldo Card — always teal. Di dalam CrossFade: sebelum data siap
+            saldo=0 → hero berkedip "Rp0" (angka salah sesaat). */}
+        <CrossFade loading={loading} skeleton={<div className="h-[218px] rounded-2xl skeleton" />}>
         <div className="relative rounded-2xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
@@ -519,6 +521,7 @@ export default function KasRTPage() {
             </div>
           </div>
         </div>
+        </CrossFade>
 
         {/* Target & progres Kas RT */}
         <TargetKasRT saldo={saldo} />
