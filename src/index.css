@@ -324,8 +324,11 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      di markup → satu tepi saja, bukan dobel), soft-float 6/16 dibuang. Sisa
      SATU contact whisper ala myBCA agar kartu "menapak" tipis. Separasi kini
      100% dari step tonal (#FFF vs #ECF1F7) + hairline + geometri rounded. */
+  /* Pass kontras-tercetak (8 Jul): contact .04→.06 — kartu "menapak" sedikit
+     lebih tegas atas permintaan kontras premium. TETAP satu lapis, tetap flat;
+     bukan pintu balik ke float/edge-ring. */
   --shadow-card:
-    0 1px 2px 0 rgba(16, 24, 40, 0.04);                      /* contact whisper — satu-satunya bayangan kartu */
+    0 1px 2px 0 rgba(16, 24, 40, 0.06);                      /* contact whisper — satu-satunya bayangan kartu */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
@@ -390,11 +393,14 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
    dibuang — bahasa Google/myBCA = surface-container polos: satu fill tonal
    sejuk, tanpa tepi, tanpa dimensi. Pakai di panel KONTEN (baris detail/stat),
    BUKAN tombol/input (itu tetap bg-gray-50 / .field). */
+/* Pass kontras-tercetak (8 Jul): fill #EFF3F8→#E9EEF5 (± setara kanvas, sedikit
+   lebih dalam) — panel di dalam kartu putih sebelumnya nyaris lebur; step tonal
+   dinaikkan agar terbaca jelas sebagai panel. Tetap fill polos tanpa tepi/dimensi. */
 .inset-soft {
-  background-color: #EFF3F8;
+  background-color: #E9EEF5;
 }
 .dark .inset-soft {
-  background-color: rgba(255, 255, 255, 0.045);
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 /* ── Inset row divider (30 Jun 2026 v2, /design-critique) ──────────────────
@@ -421,12 +427,12 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
   left: var(--di-l, 4.75rem);
   right: var(--di-r, 1.25rem);
   height: 1px;
-  background: #E0E5EC;          /* lebih terang dari line #CFD5DF */
+  background: #DCE2EA;          /* lebih terang dari line #D3DAE3 (pass kontras-tercetak 8 Jul) — hierarki boundary-kartu-memimpin tetap terjaga */
 }
 .divide-inset::after { bottom: 0; }
 .list-inset > * + *::before { top: 0; }
 .dark .divide-inset::after,
-.dark .list-inset > * + *::before { background: rgba(255, 255, 255, 0.06); }
+.dark .list-inset > * + *::before { background: rgba(255, 255, 255, 0.08); }
 
 /* ── Icon tile — chip ikon tonal DATAR (Material 3) ────────────────────────
    MATERIAL-FLAT (2 Jul): sheen + ring + contact dibuang — chip ikon = tint
@@ -455,9 +461,11 @@ html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (�
      gelap), tapi diturunkan .13→.10 + 5 lapis → 1 ambient lega. Selaras light. */
   /* MATERIAL-FLAT dark (2 Jul): glass top-edge & ambient besar dibuang —
      paritas dgn light yg kini flat. Di gelap separasi tetap butuh RING cahaya
-     tipis (drop tak terbaca) + satu contact utk kedalaman minimum. */
+     tipis (drop tak terbaca) + satu contact utk kedalaman minimum.
+     Pass kontras-tercetak (8 Jul): ring .08→.10 — paritas dgn hairline light
+     yg naik satu step; tetap dua niat yg sama, bukan lapisan baru. */
   --shadow-card:
-    0 0 0 1px rgba(255, 255, 255, 0.08),                      /* ring cahaya → separasi tenang di gelap */
+    0 0 0 1px rgba(255, 255, 255, 0.10),                      /* ring cahaya → separasi tenang di gelap */
     0 1px 2px 0 rgba(0, 0, 0, 0.4);                           /* contact whisper */
   --shadow-float: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
 }

@@ -63,8 +63,8 @@ export default {
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
         sunken: '#ECF1F7', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). MATERIAL-FLAT (2 Jul): #EAEFF6→#ECF1F7 (nada Gmail/Google apps) + seluruh sistem kartu pindah ke bahasa FLAT ala Google/myBCA/BYOND — kanvas rata tanpa whisper radial, kartu putih murni ber-hairline, bayangan tinggal satu contact whisper. 9 pass naik-turun L kanvas tak pernah selesai karena akar masalahnya dua bahasa visual campur (nav/pill/banner sudah flat, kartu masih floating-glass) — bukan nilai L. Jangan tuning L lagi.
-        line: '#DAE0E8',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk): definisi, bukan bingkai. Tetap lebih gelap dari kanvas #ECF1F7 & terbaca di atas putih.
-        control: '#E2E8F0', // border kontrol (input/tombol) — sedikit lebih kuat dari line
+        line: '#D3DAE3',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk). Pass kontras-tercetak (8 Jul): #DAE0E8→#D3DAE3 — user minta kontras lebih premium; naikkan SATU step di dalam bahasa flat (hairline = lever sah) agar tepi kartu "tercetak", tetap whisper-class bukan bingkai.
+        control: '#CBD5E1', // border kontrol (input/tombol) — slate-300, lebih kuat dari line. Pass kontras-tercetak (8 Jul): #E2E8F0→#CBD5E1 — sebelumnya malah LEBIH TERANG dari line (komentar lama tak lagi benar); kini field/tombol punya tepi jelas ala form fintech, hierarki tepi pulih: control > line > divider baris.
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
         ink: {
           DEFAULT: '#0B1220', // judul / nominal utama (near-black, kontras maksimal)
