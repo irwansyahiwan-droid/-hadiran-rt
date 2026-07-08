@@ -170,18 +170,18 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 Tutup Buku Sekarang
               </p>
             </div>
-            <p className="relative text-micro text-white/65 mb-1">Total Kas RT · {snap.tanggal}</p>
+            <p className="relative text-micro text-white/80 mb-1">Total Kas RT · {snap.tanggal}</p>
             <span className="relative block font-display text-white text-4xl font-extrabold tracking-tighter leading-none tabular-nums mb-3">
               {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
 
             <div className="relative grid grid-cols-2 gap-2 mb-3.5">
               <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-micro text-white/60 uppercase tracking-wide">Kas RT (final)</p>
+                <p className="text-micro text-white/80 uppercase tracking-wide">Kas RT (final)</p>
                 <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-micro text-white/60 uppercase tracking-wide">Hadiran · belum disetor</p>
+                <p className="text-micro text-white/80 uppercase tracking-wide">Hadiran · belum disetor</p>
                 <p className="text-body font-bold text-white/90 tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
               </div>
             </div>

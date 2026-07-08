@@ -68,8 +68,8 @@ export default {
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
         ink: {
           DEFAULT: '#0B1220', // judul / nominal utama (near-black, kontras maksimal)
-          sub: '#374151',     // teks sekunder (gray-700 — naik dari 600 agar lebih tegas)
-          faint: '#475569',   // tanggal / caption (slate-600 — naik dari 500, tetap kebaca jelas)
+          sub: '#1F2937',     // teks sekunder (gray-800 — pass kontras-terbaca 8 Jul: naik dari 700; ≈14.7:1)
+          faint: '#334155',   // tanggal / caption (slate-700 — pass kontras-terbaca 8 Jul: naik dari 600; ≈10.4:1, tangga tetap: ink > sub > faint > gray-400-remap #475569)
         },
       },
     },

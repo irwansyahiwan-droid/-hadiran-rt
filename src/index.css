@@ -164,8 +164,13 @@ input, textarea  { caret-color: #1B7249; }
    agar dark mode (dark:text-gray-400, 83×) tak ikut tergelap & kontrasnya aman.
    Placeholder TIDAK ikut (kelas berbeda) → tetap halus, bukan seperti terisi.
    Specificity html:not(.dark) .text-* (0,2,1) menang tanpa !important. */
-html:not(.dark) .text-gray-400 { color: #6B7280; }  /* gray-400→500: AA lolos (≈4.8:1) */
-html:not(.dark) .text-gray-500 { color: #4B5563; }  /* gray-500→600: tegas (≈7:1) */
+/* Pass kontras-terbaca (8 Jul, lanjutan kontras-tercetak): setelah tepi &
+   panel naik, mata masih kerja keras — biangnya massa teks caption (gray-400
+   188×) yang cuma ≈4.8:1. Seluruh tangga teks naik SATU step lagi (lever sah:
+   warna teks, bukan glass/canvas); kini tak ada teks light-mode di bawah ≈7:1.
+   Ikut selaras dgn ink-sub/faint yang naik di tailwind.config.js. */
+html:not(.dark) .text-gray-400 { color: #475569; }  /* gray-400→slate-600: nyaman (≈7.4:1) */
+html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: tegas (≈10.4:1) */
 
 /* ── Hero card design tokens ─────────────────────────────── */
 :root {
