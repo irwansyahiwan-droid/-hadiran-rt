@@ -546,7 +546,7 @@ export default function KasRTPage() {
                         onClick={() => setChartPeriod(p)}
                         aria-pressed={chartPeriod === p}
                         aria-label={`${p} bulan terakhir`}
-                        className={`press min-h-[32px] min-w-[36px] px-2 inline-flex items-center justify-center rounded-md text-micro font-bold transition-colors ${
+                        className={`press min-h-[44px] min-w-[44px] px-2 inline-flex items-center justify-center rounded-md text-micro font-bold transition-colors ${
                           chartPeriod === p ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}
                       >
