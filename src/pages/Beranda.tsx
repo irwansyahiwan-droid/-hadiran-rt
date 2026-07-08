@@ -13,7 +13,7 @@ import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
-import BannerCarousel from '../components/BannerCarousel';
+import BannerCarousel, { bannerViewportHeight } from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
@@ -190,7 +190,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   const skeleton = (
       <div className="space-y-7 pb-2">
-        <div className="rounded-3xl h-48 skeleton" />
+        {/* Setinggi blok carousel real (bannerViewportHeight) → tanpa layout jump
+            saat skeleton → konten (CrossFade blur tak bisa menutup pergeseran 150px). */}
+        <div className="rounded-3xl skeleton" style={{ height: bannerViewportHeight(window.innerHeight) }} />
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
           <div className="grid grid-cols-3 divide-x divide-line">
             {[...Array(3)].map((_, i) => (
@@ -258,7 +260,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <button
                 onClick={() => load(true)}
                 disabled={refreshing}
-                className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
+                className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-[''] disabled:opacity-60"
                 aria-label="Muat ulang"
               >
                 <RefreshCw className={`h-[18px] w-[18px] text-white/85 ${refreshing ? 'animate-spin' : ''}`} />
@@ -278,7 +280,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                   : <Odometer value={animatedSaldo} />}
               </span>
-              <p className="mt-2.5 text-[0.78rem] font-medium leading-relaxed text-white/95">
+              <p className="mt-2.5 text-caption font-medium leading-relaxed text-white/95">
                 Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
                 {lastDelta > 0 && (
                   <span className="ml-1.5 inline-flex items-center gap-0.5 align-middle font-semibold text-emerald-100">
@@ -296,24 +298,24 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/15 px-0.5 active:opacity-80"
               >
                 <Wallet className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[11px] font-medium text-white/95">Terkumpul</span>
-                <span className="whitespace-nowrap text-[clamp(0.64rem,2.9vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
+                <span className="mt-0.5 text-micro font-medium text-white/95">Terkumpul</span>
+                <span className="whitespace-nowrap text-[clamp(0.72rem,3.1vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onNavigate('talangan'); }}
                 className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/15 px-0.5 active:opacity-80"
               >
                 <ArrowLeftRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[11px] font-medium text-white/95">Talangan</span>
-                <span className="whitespace-nowrap text-[clamp(0.64rem,2.9vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
+                <span className="mt-0.5 text-micro font-medium text-white/95">Talangan</span>
+                <span className="whitespace-nowrap text-[clamp(0.72rem,3.1vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onNavigate('kas-rt'); }}
                 className="press flex w-full min-w-0 flex-col items-center gap-1 px-0.5 active:opacity-80"
               >
                 <ArrowUpRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-[11px] font-medium text-white/95">Setor Kas RT</span>
-                <span className="whitespace-nowrap text-[clamp(0.64rem,2.9vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
+                <span className="mt-0.5 text-micro font-medium text-white/95">Setor Kas RT</span>
+                <span className="whitespace-nowrap text-[clamp(0.72rem,3.1vw,0.78rem)] font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
               </button>
             </div>
           </>

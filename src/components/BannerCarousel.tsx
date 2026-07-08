@@ -26,6 +26,12 @@ function cardHeight(vh: number): number {
   return vh >= 740 ? CARD_H : Math.max(300, Math.round(vh * 0.465));
 }
 
+/** Tinggi total blok carousel (kartu + napas bawah) — diekspor untuk skeleton
+ *  Beranda: placeholder setinggi blok real → konten tak melompat saat data masuk. */
+export function bannerViewportHeight(vh: number): number {
+  return cardHeight(vh) + CARD_GAP;
+}
+
 /** Satu easing untuk semua transisi kartu/sheen/indikator → tak drift antar-tempat. */
 const EASE = 'cubic-bezier(.22,.61,.36,1)';
 /** Drop-shadow gelap halus untuk teks putih di atas gradient/foto — jaga kontras AA tanpa glow berwarna. */

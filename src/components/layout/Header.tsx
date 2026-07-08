@@ -113,13 +113,14 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             }`}
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
           />
-          <h1
+          {/* Brandmark, bukan judul halaman — h1 milik konten tiap page (hindari h1 dobel). */}
+          <p
             className={`font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap transition duration-300 ${
               scrolled ? 'text-body' : 'text-base'
             }`}
           >
             Hadiran RT
-          </h1>
+          </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Tag tone={isBendahara ? 'success' : 'info'} className="tracking-wide">
