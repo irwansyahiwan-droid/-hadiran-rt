@@ -18,6 +18,7 @@ import ExportMenu from '../components/ExportMenu';
 import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
+import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
 import FitAmount from '../components/FitAmount';
@@ -123,18 +124,28 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
 
 // ── Main Page ────────────────────────────────────────────────
 
+interface KasHadiranCache {
+  transaksi: TransaksiKas[];
+  tarikanSelesai: Tarikan[];
+  wargaList: Warga[];
+  totalTalanganBelum: number;
+  talanganMap: Record<string, { count: number; total: number }>;
+}
+
 export default function KasHadiranPage() {
   const { isBendahara } = useAuthContext();
-  const [transaksi, setTransaksi] = useState<TransaksiKas[]>([]);
-  const [tarikanSelesai, setTarikanSelesai] = useState<Tarikan[]>([]);
-  const [wargaList, setWargaList] = useState<Warga[]>([]);
-  const [totalTalanganBelum, setTotalTalanganBelum] = useState(0);
-  const [talanganMap, setTalanganMap] = useState<Record<string, { count: number; total: number }>>({});
+  // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
+  const [cached] = useState(() => getPageCache<KasHadiranCache>('kas-hadiran'));
+  const [transaksi, setTransaksi] = useState<TransaksiKas[]>(cached?.transaksi ?? []);
+  const [tarikanSelesai, setTarikanSelesai] = useState<Tarikan[]>(cached?.tarikanSelesai ?? []);
+  const [wargaList, setWargaList] = useState<Warga[]>(cached?.wargaList ?? []);
+  const [totalTalanganBelum, setTotalTalanganBelum] = useState(cached?.totalTalanganBelum ?? 0);
+  const [talanganMap, setTalanganMap] = useState<Record<string, { count: number; total: number }>>(cached?.talanganMap ?? {});
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [batalTarikan, setBatalTarikan] = useState<Tarikan | null>(null);
   const [confirmHapusId, setConfirmHapusId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [hadiranFilter, setHadiranFilter] = useState<'semua' | 'talangan' | 'lunas'>('semua');
@@ -149,7 +160,9 @@ export default function KasHadiranPage() {
   const detailDlg = useDialog(detailTarikan !== null, { onClose: () => setDetailTarikan(null), label: 'Detail tarikan' });
 
   async function load() {
-    setLoading(true);
+    // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
+    const silent = transaksi.length > 0 || tarikanSelesai.length > 0;
+    if (!silent) setLoading(true);
     setError(false);
     try {
     const [txRes, tarRes, talRes, wargaRes] = await Promise.all([
@@ -177,8 +190,16 @@ export default function KasHadiranPage() {
       return acc;
     }, {});
     setTalanganMap(map);
+    setPageCache<KasHadiranCache>('kas-hadiran', {
+      transaksi: (txRes.data as TransaksiKas[]) ?? [],
+      tarikanSelesai: (tarRes.data as Tarikan[]) ?? [],
+      wargaList: (wargaRes.data as Warga[]) ?? [],
+      totalTalanganBelum: total,
+      talanganMap: map,
+    });
     } catch {
-      setError(true);
+      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      else setError(true);
     } finally {
       setLoading(false);
     }

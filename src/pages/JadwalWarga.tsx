@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react';
 import { FileText, Search, X, Check, Coins, HandCoins, Users, CalendarDays, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getPageCache, setPageCache } from '../lib/pageCache';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
+
+interface JadwalWargaCache {
+  lastTarikan: Tarikan | null;
+  wargaList: Warga[];
+  allTarikan: Tarikan[];
+  absensiMap: Record<string, AbsensiStatus>;
+  talanganLunas: string[]; // Set tak bisa di-JSON-kan → simpan sebagai array
+}
 import Tag from '../components/Tag';
 import ClearButton from '../components/ClearButton';
 import InfoTip from '../components/InfoTip';
@@ -14,19 +23,23 @@ import SectionTitle from '../components/SectionTitle';
 type SubTab = 'anggota' | 'jadwal';
 
 export default function JadwalWargaPage() {
-  const [loading, setLoading] = useState(true);
+  // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
+  const [cached] = useState(() => getPageCache<JadwalWargaCache>('jadwal-warga'));
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>('anggota');
-  const [lastTarikan, setLastTarikan] = useState<Tarikan | null>(null);
-  const [wargaList, setWargaList] = useState<Warga[]>([]);
-  const [allTarikan, setAllTarikan] = useState<Tarikan[]>([]);
-  const [absensiMap, setAbsensiMap] = useState<Record<string, AbsensiStatus>>({});
-  const [talanganLunasSet, setTalanganLunasSet] = useState<Set<string>>(new Set());
+  const [lastTarikan, setLastTarikan] = useState<Tarikan | null>(cached?.lastTarikan ?? null);
+  const [wargaList, setWargaList] = useState<Warga[]>(cached?.wargaList ?? []);
+  const [allTarikan, setAllTarikan] = useState<Tarikan[]>(cached?.allTarikan ?? []);
+  const [absensiMap, setAbsensiMap] = useState<Record<string, AbsensiStatus>>(cached?.absensiMap ?? {});
+  const [talanganLunasSet, setTalanganLunasSet] = useState<Set<string>>(() => new Set(cached?.talanganLunas ?? []));
   const [search, setSearch] = useState('');
   const [wargaFilter, setWargaFilter] = useState<'semua' | 'hadir' | 'titip' | 'tidak'>('semua');
 
   async function load() {
-    setLoading(true);
+    // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
+    const silent = allTarikan.length > 0 || wargaList.length > 0;
+    if (!silent) setLoading(true);
     setError(false);
     try {
 
@@ -53,6 +66,8 @@ export default function JadwalWargaPage() {
       const last = selesaiList.length > 0 ? selesaiList[selesaiList.length - 1] : null;
       setLastTarikan(last);
 
+      const aMap: Record<string, AbsensiStatus> = {};
+      let lunasIds: string[] = [];
       if (last) {
         const [absensiRes, talanganRes] = await Promise.all([
           supabase
@@ -66,7 +81,6 @@ export default function JadwalWargaPage() {
             .eq('status_lunas', true),
         ]);
 
-        const aMap: Record<string, AbsensiStatus> = {};
         // Default semua tidak hadir
         warga.forEach(w => { aMap[w.id] = 'tidak_hadir'; });
         (absensiRes.data ?? []).forEach((a: { warga_id: string; status: string }) => {
@@ -74,14 +88,20 @@ export default function JadwalWargaPage() {
         });
         setAbsensiMap(aMap);
 
-        const lunasSet = new Set<string>(
-          (talanganRes.data ?? []).map((t: { warga_id: string }) => t.warga_id)
-        );
-        setTalanganLunasSet(lunasSet);
+        lunasIds = (talanganRes.data ?? []).map((t: { warga_id: string }) => t.warga_id);
+        setTalanganLunasSet(new Set(lunasIds));
       }
 
+      setPageCache<JadwalWargaCache>('jadwal-warga', {
+        lastTarikan: last,
+        wargaList: warga,
+        allTarikan: tarikanAll,
+        absensiMap: aMap,
+        talanganLunas: lunasIds,
+      });
     } catch {
-      setError(true);
+      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      else setError(true);
     } finally {
       setLoading(false);
     }

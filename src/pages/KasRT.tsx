@@ -6,6 +6,7 @@ import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
+import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '../lib/utils';
 import FitAmount from '../components/FitAmount';
@@ -205,8 +206,10 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
 export default function KasRTPage() {
   const { isBendahara } = useAuthContext();
-  const [list, setList] = useState<KasRT[]>([]);
-  const [loading, setLoading] = useState(true);
+  // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
+  const [cached] = useState(() => getPageCache<KasRT[]>('kas-rt'));
+  const [list, setList] = useState<KasRT[]>(cached ?? []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState<'semua' | 'masuk' | 'keluar'>('semua');
@@ -222,7 +225,9 @@ export default function KasRTPage() {
   const rowDlg = useDialog(selectedRow !== null, { onClose: () => setSelectedRow(null), label: 'Aksi transaksi' });
 
   async function load() {
-    setLoading(true);
+    // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
+    const silent = list.length > 0;
+    if (!silent) setLoading(true);
     setError(false);
     try {
       const { data } = await supabase
@@ -231,8 +236,10 @@ export default function KasRTPage() {
         .order('tanggal', { ascending: true })
         .order('created_at', { ascending: true });
       setList((data as KasRT[]) ?? []);
+      setPageCache('kas-rt', (data as KasRT[]) ?? []);
     } catch {
-      setError(true);
+      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      else setError(true);
     } finally {
       setLoading(false);
     }

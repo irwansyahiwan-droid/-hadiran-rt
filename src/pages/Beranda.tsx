@@ -12,6 +12,7 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
+import { getPageCache, setPageCache } from '../lib/pageCache';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
 import BannerCarousel, { bannerViewportHeight } from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
@@ -30,17 +31,27 @@ interface TrxItem {
   saldoSetelah: number;
 }
 
+interface BerandaCache {
+  summary: DashboardSummary;
+  jadwalList: Tarikan[];
+  trxItems: TrxItem[];
+  lastDelta: number;
+}
+
 interface BerandaProps {
   onNavigate: (tab: string) => void;
 }
 
 export default function Beranda({ onNavigate }: BerandaProps) {
   const { isBendahara, isWargaMode } = useAuthContext();
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [jadwalList, setJadwalList] = useState<Tarikan[]>([]);
-  const [trxItems, setTrxItems] = useState<TrxItem[]>([]);
-  const [lastDelta, setLastDelta] = useState(0);
-  const [loading, setLoading] = useState(true);
+  // SWR: render dari snapshot terakhir (pindah tab / sinyal jelek → data tampil
+  // instan, tanpa skeleton), lalu load() tetap revalidate diam-diam di bawah.
+  const [cached] = useState(() => getPageCache<BerandaCache>('beranda'));
+  const [summary, setSummary] = useState<DashboardSummary | null>(cached?.summary ?? null);
+  const [jadwalList, setJadwalList] = useState<Tarikan[]>(cached?.jadwalList ?? []);
+  const [trxItems, setTrxItems] = useState<TrxItem[]>(cached?.trxItems ?? []);
+  const [lastDelta, setLastDelta] = useState(cached?.lastDelta ?? 0);
+  const [loading, setLoading] = useState(!cached);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
@@ -52,8 +63,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [trxSearch, setTrxSearch] = useState('');
 
   async function load(showRefreshing = false) {
+    // Sudah ada data tampil (dari cache / load sebelumnya) → revalidate
+    // diam-diam: tanpa skeleton, gagal = toast (bukan layar error).
+    const silent = summary !== null;
     if (showRefreshing) setRefreshing(true);
-    else setLoading(true);
+    else if (!silent) setLoading(true);
     setError(false);
 
     try {
@@ -122,10 +136,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     setSummary(summaryData);
     setJadwalList((jadwalRes.data as Tarikan[]) ?? []);
     setTrxItems(withSaldo);
+    setPageCache<BerandaCache>('beranda', {
+      summary: summaryData,
+      jadwalList: (jadwalRes.data as Tarikan[]) ?? [],
+      trxItems: withSaldo,
+      lastDelta: selesaiRows.length ? (selesaiRows[selesaiRows.length - 1].total_terkumpul ?? 0) : 0,
+    });
     } catch {
-      // Pull-to-refresh gagal (data sudah tampil) → jangan hapus dashboard, cukup
-      // beri tahu. Cold load / retry gagal (showRefreshing=false) → error screen.
-      if (showRefreshing) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      // Data sudah tampil (refresh manual / revalidate cache) → jangan hapus
+      // dashboard, cukup beri tahu. Cold load / retry gagal → error screen.
+      if (showRefreshing || silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
       else setError(true);
     } finally {
       setLoading(false);

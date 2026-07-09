@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, X, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
@@ -82,7 +83,11 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
 
   return (
     <header
-      className={`sticky top-0 z-40 backdrop-blur-xl backdrop-saturate-150 transition duration-300 ${
+      // Saat menu hidup: naik SATU step di atas scrim portal z-40 (masih di bawah
+      // tier overlay z-50) — header ber-transform = stacking context sendiri,
+      // jadi z-50 milik dropdown tak bisa menembus keluar; tanpa bump ini scrim
+      // (lebih akhir di DOM) menutup menu & item tak bisa diklik.
+      className={`sticky top-0 ${menuMounted ? 'z-[45]' : 'z-40'} backdrop-blur-xl backdrop-saturate-150 transition duration-300 ${
         scrolled
           ? 'bg-white/80 dark:bg-gray-900/80 border-b border-line/70 dark:border-gray-800/70'
           : 'bg-white/90 dark:bg-gray-900/85 border-b border-transparent'
@@ -96,6 +101,14 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           ? '0 1px 2px rgba(16,24,40,0.05), 0 4px 12px -8px rgba(16,24,40,0.12)'
           : 'none',
         transition: 'box-shadow 0.3s var(--ease-out-expo), background-color 0.3s',
+        /* Paksa layer GPU stabil — sticky ber-backdrop-filter bisa "melompat"
+           di iOS Safari saat address bar muncul/sembunyi (fix sama dgn BottomNav).
+           Transform ini membuat containing block utk descendant fixed → scrim
+           menu HARUS di-portal ke body (lihat createPortal di bawah). */
+        transform: 'translate3d(0, 0, 0)',
+        willChange: 'transform',
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
       }}
     >
       <div
@@ -140,7 +153,12 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
               <MoreVertical className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
 
-            {menuOpen && <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />}
+            {/* Scrim dismiss di-portal ke body: header kini ber-transform (fix iOS)
+                → fixed di dalamnya jadi relatif header, bukan viewport. */}
+            {menuOpen && createPortal(
+              <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />,
+              document.body,
+            )}
             {menuMounted && (
               <>
                 <div

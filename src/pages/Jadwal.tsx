@@ -20,7 +20,8 @@ import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useDragDismiss } from '../hooks/useDragDismiss';
-import { showToast } from '../lib/toast';
+import { showToast, showUndo } from '../lib/toast';
+import { getPageCache, setPageCache } from '../lib/pageCache';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 
 type AbsensiMap = Record<string, AbsensiStatus>;
@@ -129,13 +130,22 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   const { hadirCount, titipCount, tidakCount, talanganTotal } = ringkasAbsensi(wargaList, map, sohibulId);
 
   // Bulk action hanya menyentuh pembayar; status Sohibul Bait dikunci 'hadir'.
+  // Menimpa tandaan ~79 baris sekali tap → selalu tawarkan "Urungkan" (salah
+  // tap Reset di tengah mengabsen = kerja menandai ulang dari nol tanpa ini).
   function setAll(status: AbsensiStatus) {
+    haptic();
+    const before = map; // snapshot utk undo
     setMap(prev => {
       const next: AbsensiMap = { ...prev };
       pembayarList.forEach(w => { next[w.id] = status; });
       if (sohibulId) next[sohibulId] = 'hadir';
       return next;
     });
+    const pesan =
+      status === 'hadir' ? 'Semua ditandai hadir'
+      : status === 'titip' ? 'Semua ditandai titip'
+      : 'Tandaan direset';
+    showUndo(pesan, () => {}, { onUndo: () => setMap(before) });
   }
 
   function toggle(id: string) {
@@ -446,11 +456,12 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         })}
       </div>
 
-      {/* Sticky action buttons — melayang di atas nav kapsul (puncak nav ≈
-          safe+76px). +1.75rem menyamai jarak FAB/konten → bersih dari nav. */}
+      {/* Sticky action buttons — melayang di atas nav dok (bar 70px + safe-area).
+          Offset SAMA dgn FAB & padding-bottom main di App (4.5rem + 1.75rem)
+          → satu garis dasar utk semua aksi melayang. */}
       <div
         className="fixed left-0 right-0 px-5 z-fab"
-        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 1.75rem)' }}
+        style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)' }}
       >
         <div className="max-w-lg mx-auto space-y-2">
           <button
@@ -821,9 +832,11 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
 
 export default function JadwalPage() {
   const { isBendahara } = useAuthContext();
-  const [tarikanList, setTarikanList] = useState<Tarikan[]>([]);
-  const [wargaList, setWargaList] = useState<Warga[]>([]);
-  const [loading, setLoading] = useState(true);
+  // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
+  const [cached] = useState(() => getPageCache<{ tarikanList: Tarikan[]; wargaList: Warga[] }>('jadwal'));
+  const [tarikanList, setTarikanList] = useState<Tarikan[]>(cached?.tarikanList ?? []);
+  const [wargaList, setWargaList] = useState<Warga[]>(cached?.wargaList ?? []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
   const [selectedTarikan, setSelectedTarikan] = useState<Tarikan | null>(null);
   const [navigatingId, setNavigatingId] = useState<string | null>(null);
@@ -839,7 +852,9 @@ export default function JadwalPage() {
   const rowDlg = useDialog(rowTarikan !== null, { onClose: () => setRowTarikan(null), label: 'Aksi tarikan' });
 
   async function load() {
-    setLoading(true);
+    // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
+    const silent = tarikanList.length > 0 || wargaList.length > 0;
+    if (!silent) setLoading(true);
     setError(false);
     try {
       const [tarRes, wargaRes] = await Promise.all([
@@ -874,8 +889,10 @@ export default function JadwalPage() {
 
       setTarikanList(tarikan);
       setWargaList((wargaRes.data as Warga[]) ?? []);
+      setPageCache('jadwal', { tarikanList: tarikan, wargaList: (wargaRes.data as Warga[]) ?? [] });
     } catch {
-      setError(true);
+      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      else setError(true);
     } finally {
       setLoading(false);
     }

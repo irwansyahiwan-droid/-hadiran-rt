@@ -153,8 +153,9 @@ export default function App() {
           onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
         />
-        {/* Nav kini kapsul MELAYANG (h-[70px] + jarak bawah 6px) → butuh ruang lebih
-            agar konten tak ngumpet di belakangnya. 4.5rem nav + gap + napas. */}
+        {/* Nav = bar DOK bawah (h-[70px] + safe-area di dalam bar) → beri ruang
+            agar konten tak ngumpet di belakangnya: 4.5rem bar + 1.75rem napas.
+            Nilai sinkron dgn offset FAB & tombol sticky absensi (satu sistem). */}
         <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)' }}>
           <PullToRefresh onRefresh={handleRefresh}>
             <div {...swipe}>

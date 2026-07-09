@@ -119,13 +119,10 @@ input, textarea  { caret-color: #1B7249; }
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
 .dark body { background-color: #030712; }
 
-/* A11y: focus ring jelas hanya untuk navigasi keyboard (bukan tap mouse/sentuh) */
-*:focus-visible {
-  outline: 2px solid #0F6039;
-  outline-offset: 2px;
-  border-radius: 6px;
-}
-.dark *:focus-visible { outline-color: #34D399; }
+/* (Konsolidasi 10 Jul) Blok `*:focus-visible` kedua dihapus — dobel dgn aturan
+   :is(button,a,...) di atas memakai DUA hijau berbeda (#0F6039 vs #1B7249) dan
+   menimpa input yang sudah punya focus-ring .field sendiri. SATU sumber kini
+   aturan :is(...) di atas. */
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -370,23 +367,8 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
     linear-gradient(150deg, #2CC06E 0%, #0F7A47 52%, #064A2C 100%);
 }
 
-/* Floating glass capsule nav (tren 2026) — bayangan berlapis "melayang" +
-   highlight tepi-atas (kaca disinari). Light & dark dipisah: di gelap highlight
-   diredam & drop diperdalam agar kapsul tetap "mengambang" tanpa cincin norak. */
-.nav-float {
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.55),   /* glass top edge */
-    0 1px 2px 0 rgba(16, 24, 40, 0.10),           /* contact */
-    0 10px 24px -8px rgba(16, 24, 40, 0.20),      /* key — melayang */
-    0 22px 44px -18px rgba(16, 24, 40, 0.28);     /* ambient float */
-}
-.dark .nav-float {
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 1px 2px 0 rgba(0, 0, 0, 0.5),
-    0 10px 24px -8px rgba(0, 0, 0, 0.55),
-    0 24px 48px -18px rgba(0, 0, 0, 0.7);
-}
+/* (.nav-float dihapus 10 Jul — sisa era nav kapsul melayang, tak ada pemakainya
+   sejak nav jadi bar DOK .nav-dock di bawah.) */
 
 /* Bar nav DOK bawah (2 Jul 2026, ala Google/myBCA/BYOND BSI) — nempel penuh ke
    tepi bawah layar, bukan kapsul melayang. Pemisah dari konten = hairline atas
@@ -800,7 +782,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    warna sistem saat forced-colors, edge ring dipertegas saat prefers-contrast.
    Hanya menambah definisi tepi; tak menyentuh markup/arah near-white. */
 @media (forced-colors: active) {
-  .lift, .float, .nav-float, .nav-dock {
+  .lift, .float, .nav-dock {
     border: 1px solid CanvasText;
   }
 }

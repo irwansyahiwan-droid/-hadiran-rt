@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, RefreshCw, RotateC
 import ClearButton from '../components/ClearButton';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
+import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggalShort, formatRupiahPlain, haptic, maskRp } from '../lib/utils';
 import FitAmount from '../components/FitAmount';
@@ -28,8 +29,10 @@ interface WargaGroup {
 
 export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const { isBendahara } = useAuthContext();
-  const [list, setList] = useState<Talangan[]>([]);
-  const [loading, setLoading] = useState(true);
+  // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
+  const [cached] = useState(() => getPageCache<Talangan[]>('talangan'));
+  const [list, setList] = useState<Talangan[]>(cached ?? []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -41,7 +44,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const [talSort, setTalSort] = useState<'tunggakan' | 'nama'>('tunggakan');
 
   async function load() {
-    setLoading(true);
+    // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
+    const silent = list.length > 0;
+    if (!silent) setLoading(true);
     setError(false);
     try {
       const { data } = await supabase
@@ -49,8 +54,10 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         .select('*, warga(*), tarikan(*)')
         .order('created_at', { ascending: true });
       setList((data as Talangan[]) ?? []);
+      setPageCache('talangan', (data as Talangan[]) ?? []);
     } catch {
-      setError(true);
+      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      else setError(true);
     } finally {
       setLoading(false);
     }
