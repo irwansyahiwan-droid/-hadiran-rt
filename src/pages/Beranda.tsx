@@ -275,11 +275,25 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
             {/* Nominal besar + sub-teks */}
             <div className="mt-3.5">
-              <span className={`font-display block text-[clamp(1.9rem,9vw,2.6rem)] font-extrabold leading-none tracking-tighter tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}>
-                {hidden
-                  ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
-                  : <Odometer value={animatedSaldo} />}
-              </span>
+              {/* Saldo minus disengaja (talangan ditutup penuh dari kas). Dulu ditandai
+                  dgn mewarnai SELURUH nominal jadi salmon (text-rose-200) — rona pastel =
+                  sinyal lemah & sumbang di atas jewel-green. Ganti: nominal tetap putih
+                  premium, negatif ditandai chip KATA "Defisit" DI SAMPING angka (lebih
+                  terbaca utk lansia/mata yg sulit bedakan warna) + tanda minus + badge
+                  "Perlu Perhatian" di header. Chip di baris nominal (bukan eyebrow) supaya
+                  tak menabrak tombol mata/refresh yg absolute di kanan-atas. */}
+              <div className="flex flex-wrap items-end gap-x-2.5 gap-y-1">
+                <span className="font-display text-[clamp(1.9rem,9vw,2.6rem)] font-extrabold leading-none tracking-tighter tabular-nums text-white">
+                  {hidden
+                    ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+                    : <Odometer value={animatedSaldo} />}
+                </span>
+                {saldo < 0 && (
+                  <span className="mb-[3px] rounded-full bg-rose-500/90 px-2 py-[3px] text-[10px] font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                    Defisit
+                  </span>
+                )}
+              </div>
               <p className="mt-2.5 text-caption font-medium leading-relaxed text-white/95">
                 Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
                 {lastDelta > 0 && (
