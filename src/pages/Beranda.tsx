@@ -510,7 +510,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   }
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{trx.keterangan}</p>
+                  <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug text-pretty break-words">{trx.keterangan}</p>
                   <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
                   <p className={`text-xs font-medium tabular-nums ${trx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
                     Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
@@ -544,7 +544,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <div
           ref={trxDlg.panelRef}
           {...trxDlg.panelProps}
-          className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 float"
+          className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-[calc(2.5rem+env(safe-area-inset-bottom))] float"
           onClick={e => e.stopPropagation()}
           style={trxDrag.style}
           {...trxDrag.handlers}

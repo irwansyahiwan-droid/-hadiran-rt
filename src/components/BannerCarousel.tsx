@@ -275,6 +275,9 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   const [stopped, setStopped] = useState(false);
   // Bar progress target "ditarik" 0→ratio tiap kali kartu target jadi aktif.
   const [targetFill, setTargetFill] = useState(0);
+  // Pause shimmer loop saat carousel tergulir keluar layar (baseline: jangan
+  // biarkan animasi loop jalan off-screen). Autoplay tetap pakai document.hidden.
+  const [onScreen, setOnScreen] = useState(true);
 
   // Lebar viewport → lebar & spacing kartu (responsif, mobile-first).
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -287,6 +290,14 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
+  }, []);
+  // Amati apakah carousel terlihat → gate shimmer loop (baseline off-screen).
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
   const cardW = Math.min(vw - 44, 326);
   const spacing = Math.round(cardW * 0.82);
@@ -323,7 +334,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     if (index >= count) { setIndex(0); return; }
     idxRef.current = index;
     progRef.current = 0;
-    if (progressBarRef.current) progressBarRef.current.style.width = '0%';
+    if (progressBarRef.current) progressBarRef.current.style.transform = 'scaleX(0)';
     // Kartu target → tarik ulang bar dari 0.
     if (index === targetIdx) {
       setTargetFill(0);
@@ -357,7 +368,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           setIndex(Math.max(0, Math.min(lastI, ni)));
         }
       }
-      if (progressBarRef.current) progressBarRef.current.style.width = `${progRef.current * 100}%`;
+      if (progressBarRef.current) progressBarRef.current.style.transform = `scaleX(${progRef.current})`;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -567,9 +578,9 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
-                  <div className={`mt-[16px] text-[1.5rem] font-extrabold leading-[1.16] tracking-[-.02em] ${tw}`}>{promo!.judul}</div>
+                  <div className={`mt-[16px] text-balance text-[1.5rem] font-extrabold leading-[1.16] tracking-[-.02em] ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
-                    <div className={`mt-[10px] text-[0.9rem] font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
+                    <div className={`mt-[10px] text-pretty text-[0.9rem] font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
 
                   {/* Progress target → kartu target Kas RT. */}
@@ -577,12 +588,12 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                     <div className="mt-auto">
                       <div className="relative h-[9px] overflow-hidden rounded-full bg-white/20">
                         <div
-                          className="absolute left-0 top-0 h-full rounded-full"
+                          className="absolute left-0 top-0 h-full w-full origin-left rounded-full"
                           style={{
-                            width: `${targetFill}%`,
+                            transform: `scaleX(${targetFill / 100})`,
                             background: 'linear-gradient(90deg,#bff0d6,#ffffff)',
                             boxShadow: '0 0 12px rgba(255,255,255,.5)',
-                            transition: reduced ? 'none' : `width 0.95s ${EASE}`,
+                            transition: reduced ? 'none' : `transform 0.95s ${EASE}`,
                           }}
                         />
                       </div>
@@ -610,7 +621,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
               )}
 
               {/* Kilau kaca menyapu — hanya kartu aktif. */}
-              {active && !reduced && <div aria-hidden className="banner-shimmer" />}
+              {active && !reduced && onScreen && <div aria-hidden className="banner-shimmer" />}
             </div>
           );
         })}
@@ -637,7 +648,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                   style={{ width: isActive ? 26 : 7, transition: reduced ? 'none' : `width 0.42s ${EASE}` }}
                 >
                   {isActive && !reduced && !stopped && (
-                    <span ref={progressBarRef} className="block h-full rounded-full bg-brand dark:bg-brand-linkDark" style={{ width: '0%' }} />
+                    <span ref={progressBarRef} className="block h-full w-full origin-left rounded-full bg-brand dark:bg-brand-linkDark" style={{ transform: 'scaleX(0)' }} />
                   )}
                   {(past || (isActive && (reduced || stopped))) && (
                     <span className="block h-full w-full rounded-full bg-brand dark:bg-brand-linkDark" />
