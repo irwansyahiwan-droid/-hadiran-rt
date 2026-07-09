@@ -508,16 +508,28 @@ export default function KasHadiranPage() {
                 </button>
               </div>
             </div>
-            <FitAmount
-              measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
-              maxPx={48}
-              minPx={30}
-              className={`font-display font-extrabold tracking-tighter tabular-nums mb-1 ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}
-            >
-              {hidden
-                ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
-                : <Odometer value={animatedSaldo} />}
-            </FitAmount>
+            {/* Saldo minus disengaja (talangan ditutup penuh dari kas). Selaras hero
+                Beranda (commit 98c2afd): nominal TETAP putih premium — rona salmon
+                (text-rose-200) dulu = sinyal lemah & sumbang, apalagi di atas gradient
+                setor biru. Negatif ditandai chip KATA "Defisit" di samping angka
+                (lebih terbaca utk lansia/mata yg sulit bedakan warna). */}
+            <div className="flex items-end gap-x-2.5 mb-1">
+              <FitAmount
+                measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
+                maxPx={48}
+                minPx={30}
+                className="min-w-0 flex-1 font-display font-extrabold tracking-tighter tabular-nums text-white"
+              >
+                {hidden
+                  ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+                  : <Odometer value={animatedSaldo} />}
+              </FitAmount>
+              {saldo < 0 && (
+                <span className="mb-[6px] shrink-0 rounded-full bg-rose-500/90 px-2 py-[3px] text-[10px] font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                  Defisit
+                </span>
+              )}
+            </div>
             <p className="text-white/90 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
               <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-emerald-400/20 border border-emerald-300/30 rounded-full text-emerald-100 text-xs font-semibold">
