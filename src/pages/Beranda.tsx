@@ -194,7 +194,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             saat skeleton → konten (CrossFade blur tak bisa menutup pergeseran 150px). */}
         <div className="rounded-3xl skeleton" style={{ height: bannerViewportHeight(window.innerHeight) }} />
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
-          <div className="grid grid-cols-3 divide-x divide-line">
+          <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-2 px-3">
                 <div className="h-7 w-12 skeleton rounded-lg" />
