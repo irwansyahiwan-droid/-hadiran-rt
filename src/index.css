@@ -332,8 +332,15 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
   /* Pass kontras-tercetak (8 Jul): contact .04→.06 — kartu "menapak" sedikit
      lebih tegas atas permintaan kontras premium. TETAP satu lapis, tetap flat;
      bukan pintu balik ke float/edge-ring. */
+  /* Pass premium-menapak (9 Jul): 1px/2px/.06 → 2px/4px/-1px/.09, hue → slate-900
+     (15,23,42) yg sedikit lebih sejuk (selaras kanvas cool). Niat: kartu "menapak"
+     lebih mahal & LEBIH LEMBUT di mata — blur 2→4 bikin tepi bawah kartu jadi
+     gradasi halus, bukan garis keras (anti-glare). Spread -1px menahan bayangan
+     tak melebar/berkabut → tetap contact-class, bukan float. TETAP satu lapis,
+     tanpa top-light/edge-ring/sheen. Kanvas L & border TIDAK disentuh (lever itu
+     sengaja ditutup sejak Material-flat — lihat riwayat 9 pass di atas). */
   --shadow-card:
-    0 1px 2px 0 rgba(16, 24, 40, 0.06);                      /* contact whisper — satu-satunya bayangan kartu */
+    0 2px 4px -1px rgba(15, 23, 42, 0.09);                   /* contact whisper — satu-satunya bayangan kartu */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
@@ -476,10 +483,13 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      paritas dgn light yg kini flat. Di gelap separasi tetap butuh RING cahaya
      tipis (drop tak terbaca) + satu contact utk kedalaman minimum.
      Pass kontras-tercetak (8 Jul): ring .08→.10 — paritas dgn hairline light
-     yg naik satu step; tetap dua niat yg sama, bukan lapisan baru. */
+     yg naik satu step; tetap dua niat yg sama, bukan lapisan baru.
+     Pass premium-menapak (9 Jul): contact 1px/2px/.4 → 2px/4px/-1px/.5 (grounding
+     sedikit lebih tegas & lembut, paritas light); ring cahaya .10 tetap carry
+     separasi di gelap. Tetap dua niat yg sama. */
   --shadow-card:
     0 0 0 1px rgba(255, 255, 255, 0.10),                      /* ring cahaya → separasi tenang di gelap */
-    0 1px 2px 0 rgba(0, 0, 0, 0.4);                           /* contact whisper */
+    0 2px 4px -1px rgba(0, 0, 0, 0.5);                        /* contact whisper */
   --shadow-float: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
 }
 
