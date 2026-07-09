@@ -478,7 +478,28 @@ export default function KasHadiranPage() {
 
         {/* Header Card — di dalam CrossFade: sebelum data siap saldo=0 → hero
             berkedip "Rp0" (angka salah sesaat, bikin kaget). */}
-        <CrossFade loading={loading} skeleton={<div className="h-[164px] rounded-3xl skeleton" />}>
+        {/* Skeleton BERBENTUK hero (eyebrow + ikon aksi + nominal + chip) — bukan
+            blok gray polos. Saat load, sisa halaman (Alur, Rekap) render duluan
+            dgn nilai Rp0; blok kosong di posisi hero terbaca "rusak/nyangkut".
+            Bentuk kartu-loading (bg putih + hairline + .lift, seragam dgn skeleton
+            list di bawah) → jelas "kartu saldo sedang dimuat". Tinggi & radius sama
+            dgn hero asli → tak ada layout jump saat CrossFade. */}
+        <CrossFade
+          loading={loading}
+          skeleton={
+            <div className="h-[164px] rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-6">
+              <div className="flex items-center justify-between">
+                <div className="skeleton h-3 w-28 rounded-full" />
+                <div className="flex gap-2">
+                  <div className="skeleton h-9 w-9 rounded-full" />
+                  <div className="skeleton h-9 w-9 rounded-full" />
+                </div>
+              </div>
+              <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
+              <div className="skeleton mt-3 h-6 w-40 rounded-full" />
+            </div>
+          }
+        >
         <div className={`relative rounded-3xl overflow-hidden ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
