@@ -468,7 +468,12 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const c1 = Math.min(ad, 1);
           const active = i === index;
           const scale = (1 - c1 * 0.12) * (pressed && active && !dragging ? 0.985 : 1);
-          const opacity = Number((1 - c1 * 0.62).toFixed(3));
+          // Falloff opacity kartu tetangga. 0.72 (tetangga → 0.28) sengaja lebih
+          // dalam dari 0.62 lama: mask tepi (28px) tak boleh dilebarkan (akan
+          // melarutkan TEPI kartu aktif di HP sempit), jadi legibilitas potongan
+          // teks kartu tetangga yang mengintip di kanan diredam lewat opacity —
+          // peek tetap terlihat sbg "ada lagi", tanpa fragmen kata yang terbaca.
+          const opacity = Number((1 - c1 * 0.72).toFixed(3));
           const ty = (c1 * 10).toFixed(2);
           const x = (d * spacing).toFixed(2);
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
