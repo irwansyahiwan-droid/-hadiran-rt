@@ -1,6 +1,7 @@
 ---
 name: Hadiran RT
-description: Manajemen arisan & kas RT yang tenang, jujur, dan terbaca — ketenangan fintech dengan jiwa kampung.
+description: Manajemen arisan & kas RT yang tenang, jujur, dan terbaca — ketenangan fintech dengan jiwa kampung, dalam bahasa Material-flat (Google/myBCA/BYOND).
+status: Material-flat (pivot 2 Jul 2026). Sumber kebenaran = tailwind.config.js + src/index.css. Regenerasi terakhir 10 Jul 2026.
 colors:
   brand: "#0F4C2E"
   brand-600: "#145D39"
@@ -15,12 +16,16 @@ colors:
   setor-500: "#3B82F6"
   gold-songket: "#E8B651"
   surface: "#FFFFFF"
-  sunken: "#F2F5FA"
-  line: "#CFD5DF"
-  control: "#E2E8F0"
+  sunken: "#ECF1F7"
+  line: "#D3DAE3"
+  control: "#CBD5E1"
+  inset-soft: "#E9EEF5"
+  divider-inset: "#DCE2EA"
   ink: "#0B1220"
-  ink-sub: "#374151"
-  ink-faint: "#475569"
+  ink-sub: "#1F2937"
+  ink-faint: "#334155"
+  gray-400-remap: "#475569"
+  gray-500-remap: "#334155"
   canvas-dark: "#030712"
 typography:
   display:
@@ -60,11 +65,12 @@ typography:
     lineHeight: 1.3
     letterSpacing: "0.02em"
 rounded:
-  control: "12px"
-  card: "16px"
-  hero: "24px"
+  control: "12px"    # input, tombol (rounded-xl)
+  card: "16px"       # panel/kartu padat (rounded-2xl)
+  card-lg: "24px"    # kartu konten & list Beranda (rounded-3xl)
+  hero: "24px"       # kartu saldo gradient (--hero-radius)
   focus: "6px"
-  pill: "9999px"
+  pill: "9999px"     # FAB, chip, tag
 spacing:
   xs: "8px"
   sm: "12px"
@@ -72,187 +78,351 @@ spacing:
   lg: "24px"
 components:
   button-primary:
-    backgroundColor: "{colors.brand-600}"
+    class: ".btn-brand"
+    background: "linear-gradient(180deg, #18A055, #0F6B40, #0C5E37)"
     textColor: "{colors.surface}"
     rounded: "{rounded.control}"
     padding: "12px 16px"
-  button-primary-active:
-    backgroundColor: "{colors.brand}"
+  button-danger:
+    class: ".btn-danger"
+    background: "linear-gradient(180deg, #F43F5E, #E11D48, #BE123C)"
     textColor: "{colors.surface}"
     rounded: "{rounded.control}"
   button-secondary:
-    backgroundColor: "{colors.surface}"
+    class: ".btn-secondary"
+    background: "{colors.surface}"
+    border: "{colors.control}"
     textColor: "{colors.ink-sub}"
     rounded: "{rounded.control}"
     padding: "12px 16px"
   field:
-    backgroundColor: "#F9FAFB"
+    class: ".field"
+    backgroundColor: "#F9FAFB"      # bg-gray-50
+    border: "{colors.control}"
     textColor: "{colors.ink}"
     rounded: "{rounded.control}"
-    padding: "12px 14px"
+    fontSize: "16px"                # anti-zoom iOS
+  field-search:
+    class: ".field-search"
+    backgroundColor: "{colors.surface}"
+    border: "{colors.control}"
+    rounded: "{rounded.control}"
   card:
     backgroundColor: "{colors.surface}"
+    border: "{colors.line}"
+    shadow: ".lift (contact whisper)"
     textColor: "{colors.ink}"
-    rounded: "{rounded.card}"
-    padding: "16px"
+    rounded: "{rounded.card} / {rounded.card-lg}"
+    padding: "16px–20px"
+  inset-panel:
+    class: ".inset-soft"
+    backgroundColor: "{colors.inset-soft}"  # fill datar, TANPA tepi/dimensi
+    rounded: "16px"
   chip-active:
+    class: "FilterChips (aktif)"
     backgroundColor: "{colors.brand}"
     textColor: "{colors.surface}"
     rounded: "{rounded.pill}"
     padding: "6px 14px"
   hero-card:
+    gradient: "{--hero-emerald} / setor-biru / slate-negatif"
     textColor: "{colors.surface}"
+    shadow: "{--hero-shadow}"
     rounded: "{rounded.hero}"
-    padding: "20px"
+    padding: "20px–24px"
+  bottom-nav:
+    class: ".nav-dock"
+    style: "bar dok penuh nempel tepi bawah (BUKAN kapsul melayang)"
 ---
 
 # Design System: Hadiran RT
 
+> **Sumber kebenaran = `tailwind.config.js` + `src/index.css`.** Dokumen ini adalah
+> ringkasan naratif yang harus DISELARASKAN ketika token berubah. Bila ada
+> perbedaan, kode menang — lalu perbarui dokumen ini. Arah aktif: **Material-flat**
+> (pivot 2 Jul 2026). Jangan pasang ulang bahasa "floating-glass" era lama yang
+> sengaja dibongkar (lihat §4 & §6).
+
 ## 1. Overview
 
-**Creative North Star: "Ketenangan Fintech Kampung"**
+**Creative North Star: "Ketenangan Fintech Kampung" — dalam bahasa Material-flat.**
 
-Hadiran RT meminjam disiplin fintech kelas atas — ketenangan, presisi, kelapangan ala Revolut/Mercury/Jago — lalu menjinakkannya jadi hangat dan lokal. Kanvas near-white sejuk (#F2F5FA, L~96%) yang rata dan tenang menjadi panggung; kartu putih "menyala dari atas" lewat cahaya-dari-atas plus bayangan crisp berlapis, bukan glass berpendar. Angka adalah bintang: nominal rupiah memakai Sora yang tegas dan `tabular-nums` app-wide supaya digit tidak goyang saat count-up atau disusun kolom — seperti running text bank, tapi milik kampung sendiri.
+Hadiran RT meminjam disiplin fintech kelas atas — ketenangan, presisi, kelapangan
+ala Google/myBCA/BYOND BSI — lalu menjinakkannya jadi hangat dan lokal. Kanvas abu
+sejuk **#ECF1F7** (nada Gmail/Google apps) yang **rata dan tenang** menjadi panggung;
+kartu **putih murni yang FLAT** dipisahkan dari kanvas oleh **step tonal + satu
+hairline + geometri rounded**, dibantu **satu contact whisper** tipis agar kartu
+"menapak". Bukan kaca berpendar, bukan kertas melayang — permukaan datar yang tegas.
 
-Sistem ini berdiri di atas satu suara brand: hijau emerald deep. Satu hijau, satu merah, satu amber untuk makna uang; tidak ada percampuran red/rose atau green/emerald di satu layar. Identitas lokal dibawa oleh **satu** ornamen yang sangat langka — motif anyaman songket emas pada kartu saldo dan sorot giliran Sohibul Bait — yang berfungsi sebagai stempel kehormatan RT, bukan dekorasi yang ditebar.
+Angka adalah bintang: nominal rupiah memakai **Sora** yang tegas dan `tabular-nums`
+app-wide supaya digit tidak goyang saat count-up atau disusun kolom — seperti running
+text bank, tapi milik kampung sendiri.
 
-Yang sistem ini **tolak**: glassmorphism, glow, dan noise sebagai dekorasi (tim secara eksplisit menolaknya demi permukaan flat & tegas); emas/gold sebagai aksen umum (di luar satu pengecualian songket yang disengaja); formalitas birokrasi yang kaku; dan estetika template AI generik (card grid seragam tanpa hierarki, eyebrow uppercase di tiap section, abu pudar "demi elegan").
+Sistem ini berdiri di atas satu suara brand: **hijau emerald deep**. Satu hijau, satu
+merah, satu amber untuk makna uang; tidak ada percampuran red/rose atau green/emerald
+di satu layar. Identitas lokal dibawa oleh **satu** ornamen yang sangat langka — motif
+anyaman **songket emas** pada kartu saldo dan sorot giliran Sohibul Bait — yang
+berfungsi sebagai stempel kehormatan RT, bukan dekorasi yang ditebar.
+
+**Kenapa flat, dan bukan glass?** Selama berbulan-bulan permukaan kartu naik-turun
+antara kaca berpendar, halo putih, top-light, dan inset berpahat (≥9 pass tuning L
+kanvas). Akar rasa "kurang bersih" ternyata **bukan** nilai L kanvas, tapi **dua
+bahasa visual yang campur**: nav/pill/banner sudah flat sementara kartu masih
+floating-glass. Solusinya komit penuh ke satu bahasa: **flat Google-light**. Depth
+datang dari tone + hairline + ruang, bukan dari lapisan yang ditumpuk.
 
 **Key Characteristics:**
-- Kanvas abu sejuk rata + kartu putih ber-glass-lift; depth dari cahaya & bayangan, bukan halo.
+- Kanvas abu sejuk **rata** (#ECF1F7) + kartu putih **flat ber-hairline**; separasi
+  dari step tonal + hairline + geometri, dibantu satu contact whisper. **Bukan** glow.
 - Satu suara brand emerald; semantik uang satu-hijau/satu-merah/satu-amber.
 - Angka memimpin: Sora + tabular-nums di mana-mana.
 - Kontras tinggi & teks nyaman — untuk warga lansia dan baca di bawah matahari.
-- Dark mode first-class (kanvas #030712), paritas elevasi dijaga ketat.
+- Dark mode first-class (kanvas #030712, dengan aura emerald lembut di `.app-bg`).
 - Satu sumber per peran (token, helper, komponen) — anti-drift.
 
 ## 2. Colors
 
-Palet bertumpu pada satu hijau emerald sebagai suara brand, neutral abu sejuk untuk struktur, dan tiga warna semantik uang yang disiplin. Emas songket berdiri terpisah sebagai warna kehormatan kultural.
+Palet bertumpu pada satu hijau emerald sebagai suara brand, neutral abu sejuk untuk
+struktur, dan tiga warna semantik uang yang disiplin. Emas songket berdiri terpisah
+sebagai warna kehormatan kultural.
 
 ### Primary
-- **Emerald Deep** (#0F4C2E, dengan #145D39 / #1B7249): Suara brand tunggal. Fill chip aktif, judul kuat, tombol primer, gradient hero saldo (#0D5B36 → #15824C → #1C9A5C). Inilah satu-satunya warna identitas — jangan tambah accent kedua.
-- **Teal-Green Tautan** (#0D6B5E, pasangan dark #1A9B86): Tautan "Lihat semua", tab aktif. Hijau yang sedikit kebiruan agar tautan terbaca beda dari fill brand.
+- **Emerald Deep** (`brand` #0F4C2E, dengan #145D39 / #1B7249): Suara brand tunggal.
+  Fill chip aktif, judul kuat, tombol primer, gradient hero saldo. Satu-satunya warna
+  identitas — jangan tambah accent kedua.
+- **Teal-Green Tautan** (`brand-link` #0D6B5E, pasangan dark `brand-linkDark` #1A9B86):
+  Tautan "Lihat semua", tab aktif. Hijau sedikit kebiruan agar beda dari fill brand.
 
-### Secondary
-- **Setor Blue** (#1E40AF, dengan #2563EB / #3B82F6): SINYAL STATUS, bukan accent kedua. Hidup hanya di kartu hero Kas Hadiran saat sudah disetor. Struktur gradient meniru brand. Jangan perluas biru ke tempat lain.
+### Secondary (scoped, BUKAN accent)
+- **Setor Blue** (`setor` #1E40AF, dengan #2563EB / #3B82F6): SINYAL STATUS. Hidup hanya
+  di kartu hero **Kas Hadiran saat sudah disetor**. Jangan perluas biru ke tempat lain.
+- **Emas Songket** (`--gold-songket` #E8B651): Warna HONOR/dekoratif kultural. Hidup
+  HANYA di dua tempat: motif `.songket-weave` pada kartu saldo, dan sorot "Giliran
+  berikutnya" Sohibul Bait (mahkota + cincin avatar) di Beranda. TIDAK PERNAH menyentuh
+  uang/status/nav.
 
-### Tertiary
-- **Emas Songket** (#E8B651): Warna HONOR/dekoratif kultural — identitas RT. Hidup HANYA di dua tempat: motif anyaman `.songket-weave` pada kartu saldo, dan sorot "Giliran berikutnya" Sohibul Bait (mahkota + cincin avatar) di Beranda. TIDAK PERNAH menyentuh uang/status/nav.
-
-### Neutral
+### Neutral (struktur — nilai TERBARU Material-flat)
 - **Ink** (#0B1220): Judul & nominal utama (near-black, kontras maksimal).
-- **Ink Sub** (#374151): Teks sekunder yang tegas (gray-700).
-- **Ink Faint** (#475569): Tanggal/caption — slate-600, tetap kebaca jelas (BUKAN abu pudar).
-- **Surface** (#FFFFFF): Latar kartu.
-- **Sunken / Canvas** (#F2F5FA): Background app near-white sejuk (L~96%, Pass 8) — separasi kartu disandar ke floating-glass shadow + edge crisp, bukan gap tonal. WAJIB sama dengan body, token `sunken`, `.app-bg`, dan manifest `background_color` — anti strip beda tone saat overscroll.
-- **Line** (#CFD5DF): Garis/divider tipis (hairline).
-- **Control** (#E2E8F0): Border input/tombol — sedikit lebih kuat dari line.
-- **Canvas Dark** (#030712): Background app dark mode (gray-950).
+- **Ink Sub** (#1F2937, gray-800): Teks sekunder tegas (≈14.7:1 di atas putih).
+- **Ink Faint** (#334155, slate-700): Tanggal/caption (≈10.4:1) — tetap kebaca jelas,
+  **BUKAN** abu pudar.
+- **Surface** (#FFFFFF): Latar kartu (putih murni, flat).
+- **Sunken / Canvas** (#ECF1F7): Background app, **rata tanpa radial**. WAJIB sama
+  dengan `body`, token `sunken`, `.app-bg`, `landing.html`, dan manifest
+  `background_color` — anti strip beda tone saat overscroll.
+- **Line** (#D3DAE3): Hairline/divider tipis — kini **satu-satunya tepi kartu** (edge
+  ring di shadow dihapus).
+- **Control** (#CBD5E1, slate-300): Border input/tombol — lebih kuat dari `line`.
+  Hierarki tepi: **control > line > divider-baris**.
+- **Inset-soft** (#E9EEF5): Fill sub-panel datar di dalam kartu putih (lihat §4).
+- **Divider-inset** (#DCE2EA): Hairline antar-baris di dalam kartu list (lebih terang
+  dari `line` → boundary kartu memimpin).
+- **Canvas Dark** (#030712, gray-950).
 
 ### Semantik Uang
-- **Positif/Masuk** (#047857, emerald-700, on-brand).
-- **Negatif/Keluar** (#E11D48, rose-600).
-- **Perhatian/Tunggakan** (#B45309, amber-700).
+- **Positif/Masuk** (`pos` #047857, emerald-700, on-brand).
+- **Negatif/Keluar** (`neg` #E11D48, rose-600).
+- **Perhatian/Tunggakan** (`warn` #B45309, amber-700).
 
 ### Named Rules
-**The Satu-Suara Rule.** Hanya ada SATU warna brand: emerald deep. Biru `setor` dan emas `gold-songket` adalah pengecualian yang scoped ke satu tempat masing-masing — bukan accent tambahan. Jangan pernah mengangkat keduanya jadi warna umum.
+**The Satu-Suara Rule.** Hanya ada SATU warna brand: emerald deep. Biru `setor` dan emas
+`gold-songket` adalah pengecualian yang scoped ke satu tempat masing-masing — bukan
+accent tambahan.
 
-**The Satu-Hijau-Satu-Merah-Satu-Amber Rule.** Untuk makna uang: satu hijau (pos), satu merah (neg), satu amber (warn). Jangan campur red/rose dengan green/emerald di satu layar.
+**The Satu-Hijau-Satu-Merah-Satu-Amber Rule.** Untuk makna uang: satu hijau (`pos`),
+satu merah (`neg`), satu amber (`warn`). Jangan campur red/rose dengan green/emerald di
+satu layar.
 
-**The No-Abu-Pudar Rule.** Teks tidak boleh memakai abu di bawah AA di atas putih. `text-gray-400/500` digelapkan satu titik dari satu sumber (→ #6B7280 / #4B5563). Light gray "demi elegan" dilarang — banyak pengguna lansia & baca di bawah matahari.
+**The No-Abu-Pudar Rule.** Teks tidak boleh memakai abu di bawah AA di atas putih. Dari
+SATU titik di `index.css`, `text-gray-400` → **#475569** (≈7.4:1) dan `text-gray-500` →
+**#334155** (≈10.4:1), scoped `html:not(.dark)` agar dark mode tak ikut. Light gray
+"demi elegan" dilarang — banyak pengguna lansia & baca di bawah matahari.
+
+**The Saldo-Defisit Rule.** Saldo minus disengaja (talangan ditutup penuh dari kas).
+Nominal **tetap putih premium** di semua hero (Beranda & Kas Hadiran); negatif ditandai
+**chip kata "Defisit"** di samping angka — BUKAN mewarnai nominal jadi salmon
+(`text-rose-200` = sinyal lemah & sumbang, apalagi di atas gradient setor biru).
 
 ## 3. Typography
 
-**Display Font:** Sora Variable (fallback Inter Variable, system-ui) — grotesk geometrik berkarakter untuk judul & nominal hero.
-**Body Font:** Inter Variable (fallback -apple-system, system-ui) — readability maksimal untuk teks panjang.
+**Display Font:** Sora Variable (fallback Inter Variable, system-ui) — grotesk geometrik
+berkarakter untuk judul & nominal hero.
+**Body Font:** Inter Variable (fallback -apple-system, system-ui) — readability maksimal.
 
-**Character:** Pasangan kontras-tegas: Sora memberi "suara" pada angka & judul (geometrik, solid, sedikit tracking rapat), Inter menjaga keterbacaan tubuh teks. Bukan dua sans humanis yang nyaris kembar. `tabular-nums` aktif app-wide agar angka rupiah tidak goyang.
+**Character:** Pasangan kontras-tegas: Sora memberi "suara" pada angka & judul,
+Inter menjaga keterbacaan tubuh teks. Bukan dua sans humanis yang nyaris kembar.
+`tabular-nums` aktif app-wide (`font-variant-numeric: tabular-nums` di `body`).
+
+### Type Ramp (token `text-*` — font-size SAJA, leading tetap dari utility)
+- **micro** — 11px (0.6875rem), weight 600, tracking 0.02em: badge, nomor, label uppercase mungil.
+- **caption** — 13px (0.8125rem): tanggal, caption, teks sekunder.
+- **body** — 15px (0.9375rem): teks utama list/baris.
+- **amount** — 17px (1.0625rem): nominal menonjol di list & baris.
 
 ### Hierarchy
-- **Display** (Sora 700, clamp ~28–48px, line-height 1.05, tracking -0.018em): Nominal hero saldo, judul halaman besar.
-- **Headline** (Sora 700, ~20px, tracking -0.018em): Judul section/kartu (h1/h2).
-- **Amount** (Sora 600, 17px / `text-amount`): Nominal menonjol di list & baris.
-- **Body** (Inter 400, 15px / `text-body`): Teks utama list/baris. Batasi prosa panjang ≤ 65–75ch.
-- **Caption** (Inter 400, 13px / `text-caption`): Tanggal, caption, teks sekunder.
-- **Micro** (Inter 600, 11px / `text-micro`, tracking 0.02em): Badge kecil, nomor, label uppercase mungil.
+- **Display** (Sora 700, clamp ~28–48px, lh 1.05, tracking -0.018em): nominal hero, judul besar.
+- **Headline** (Sora 700, ~20px, tracking -0.018em): judul section/kartu (`h1/h2` mewarisi `--font-display`).
+- **Amount** (Sora 600, `text-amount`): nominal di list/baris.
+- **Body** (Inter 400, `text-body`): teks utama. Batasi prosa panjang ≤ 65–75ch.
+- **Caption** (Inter 400, `text-caption`): tanggal, teks sekunder.
+- **Micro** (Inter 600, `text-micro`): badge kecil, label uppercase.
 
 ### Named Rules
-**The Angka-Memimpin Rule.** Nominal rupiah selalu Sora + tabular-nums. Angka adalah konten paling penting di app ini; tipografi melayaninya, bukan sebaliknya.
+**The Angka-Memimpin Rule.** Nominal rupiah selalu Sora + `tabular-nums`. Angka adalah
+konten paling penting; tipografi melayaninya. Nominal besar hero pakai `FitAmount`
+(fit-to-width) demi keterbacaan warga lansia — sebesar mungkin, tak terpotong.
 
-**The 16px-Input Rule.** Semua input wajib font-size 16px (dipaksa dari satu titik: `input.text-sm { font-size: 16px }`) agar Safari iOS tidak auto-zoom saat fokus.
+**The 16px-Input Rule.** Semua input wajib font-size 16px (dipaksa dari satu titik:
+`input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px }`) agar Safari iOS
+tidak auto-zoom saat fokus.
 
-## 4. Elevation
+## 4. Elevation — FLAT (bukan glass, bukan kertas melayang)
 
-Sistem ini **flat sebagai bahasa, tapi punya dimensi nyata dari cahaya** — bukan kertas datar, bukan glass berpendar. Pemisahan kartu dari kanvas datang dari kombinasi: (1) step tonal kecil kartu↔kanvas, (2) cahaya-dari-atas (putih murni memudar tipis ke bawah), (3) bayangan crisp berlapis terkontain (spread negatif → melayang, bukan fog). Halo putih dan tint emerald di bayangan sengaja dihapus karena bikin "berkabut/muddy". Dark mode menukar drop shadow (nyaris tak terbaca di gelap) dengan RING cahaya tipis di tepi + drop gelap dalam.
+Bahasa **Material-flat**: separasi kartu dari kanvas datang dari **(1) step tonal**
+(putih #FFF vs kanvas #ECF1F7), **(2) satu hairline** `line` sebagai tepi, **(3)
+geometri rounded**, dibantu **(4) satu contact whisper** tipis agar kartu "menapak".
+Semua yang menumpuk lapisan sudah **dihapus**: halo putih, top-light gradient,
+inset-shadow berpahat, ambient float lebar, edge-ring ganda, sheen di icon-tile.
+
+Di **dark mode**, drop shadow nyaris tak terbaca → separasi dipikul **ring cahaya tipis**
+di tepi + satu contact gelap.
 
 ### Shadow Vocabulary
-- **`.lift`** (`--shadow-card`): Elevasi kartu putih default. Berlapis: inset highlight tepi-atas + ring crisp 1px + contact + key mid + ambient float. Plus `background-image` gradient putih→#F1F6FC (cahaya-dari-atas). Inilah kartu standar app.
-- **`.float`** (`--shadow-float`): Popover, dropdown, bottom-sheet — melayang lebih tinggi dari kartu.
-- **`.nav-float`**: Kapsul bottom-nav melayang (glass top edge + key + ambient).
-- **`.inset-soft`**: Sub-panel "tertanam" di dalam kartu (inner top-shadow + hairline) — pengganti `bg-gray-50` polos untuk baris detail/stat. BUKAN untuk tombol/input.
-- **`.icon-tile`**: Depth tipis di chip ikon ber-tint (sheen + ring) — warna-agnostik, menumpang di atas `bg-*-100` tanpa ubah tint.
-- **`--hero-shadow`**: Kartu hero gradient — keluarga sama dengan `.lift` tapi nada green-ink.
+- **`.lift`** (`--shadow-card`): elevasi kartu putih default.
+  - Light: `0 2px 4px -1px rgba(15,23,42,0.09)` — **satu contact whisper**, itu saja.
+    Kartu = `bg-white` polos dari markup + `border-line`. **Tanpa** `background-image`
+    (top-light dibongkar), tanpa inset highlight, tanpa key/ambient.
+  - Dark: `0 0 0 1px rgba(255,255,255,0.10)` (ring cahaya) + `0 2px 4px -1px rgba(0,0,0,0.5)` (contact).
+- **`.float`** (`--shadow-float`): popover, dropdown, bottom-sheet — melayang lebih tinggi
+  (light = ring .04 + 4/12 .08 + 16/32 .14; dark = `0 16px 40px -10px rgba(0,0,0,0.7)`).
+- **`.nav-dock`**: bar bottom-nav — **hairline atas** + **bayangan NAIK tipis**
+  (`0 -1px 0 rgba(16,24,40,0.07)`, `0 -8px 24px -12px rgba(16,24,40,0.12)`). Bar dok datar,
+  bukan drop berlapis ke bawah.
+- **`.inset-soft`**: sub-panel di dalam kartu putih — **fill tonal DATAR** (#E9EEF5 light /
+  `rgba(255,255,255,0.06)` dark), **tanpa tepi/inner-shadow**. Pengganti `bg-gray-50` untuk
+  baris detail/stat. BUKAN untuk tombol/input.
+- **`.icon-tile`**: penanda semantik chip ikon — **no-op visual** (flat). Warna datang dari
+  tint `bg-*-100` di call-site (masuk/keluar/lunas). Jangan tambah sheen/ring/contact.
+- **`--hero-shadow`**: kartu hero gradient — dua drop terkontain nada netral+green-ink
+  (`0 6px 16px -12px rgba(0,0,0,0.28)`, `0 18px 40px -22px rgba(15,40,30,0.40)`).
 
 ### Named Rules
-**The Cahaya-Dari-Atas Rule.** Permukaan dapat dimensi dari cahaya yang masuk dari atas (putih murni → memudar), bukan dari halo, glow, atau drop shadow tebal. Kalau kartu terlihat "berkabut", highlight/halo-nya terlalu kuat.
+**The Satu-Bahasa Rule.** Seluruh permukaan bicara flat. Kalau sebuah kartu mulai
+"melayang/berkabut", pasti ada lapisan lama yang kembali (top-light, halo, edge-ring,
+inset-shadow) — cabut, jangan seimbangkan dengan menggelapkan kanvas.
 
-**The Paritas-Dark Rule.** Setiap token elevasi punya pasangan dark yang dijaga setara. Di gelap, separasi datang dari ring cahaya tepi, bukan drop shadow.
+**The Paritas-Dark Rule.** Setiap token elevasi punya pasangan dark yang setara. Di gelap,
+separasi datang dari **ring cahaya tepi**, bukan drop shadow.
+
+**The A11y-Fallback Rule.** Separasi tonal ~1.1:1 dipikul shadow → di `forced-colors: active`
+kartu (`.lift/.float/.nav-dock`) mendapat `border: 1px solid CanvasText`; di
+`prefers-contrast: more` shadow dipertegas. Jangan hapus fallback ini.
 
 ## 5. Components
 
 ### Buttons
-- **Shape:** Sudut lembut 12px (`rounded-xl`, `--rounded-control`). Pill (9999px) hanya untuk FAB, chip, tag.
-- **Primary (`.btn-brand`):** Gradient emerald hidup (#18A055 → #0F6B40 → #0C5E37), teks putih, glossy top edge + glow emerald terukur. Padding ~12×16px.
-- **Hover / Active:** `:active` → `scale(0.97)` + bayangan mengkerut (spring press). Feedback tekan instan (ease-out), bukan overshoot karet.
-- **Secondary (`.btn-secondary`):** Border `control`, teks ink-sub, hover bg-gray-50. Netral radius/lebar (call-site pegang `flex-1`/`w-full`). Pasangan footer dua-tombol dengan primary.
-- **Press feedback:** `.press` (scale) untuk tombol umum; `.press-icon` (opacity, transform-safe) untuk tombol ikon yang sudah pakai translate.
+- **Shape:** 12px (`rounded-xl`). Pill (9999px) hanya untuk FAB, chip, tag.
+- **Primary (`.btn-brand`):** gradient emerald `#18A055 → #0F6B40 → #0C5E37`, teks putih,
+  **glossy top edge + contact tipis** (glow emerald besar dibongkar — CTA cukup menonjol dari
+  warna brand). `:active` → `scale(0.97)` spring.
+- **Danger (`.btn-danger`):** pasangan destruktif — gradient `neg` rose
+  `#F43F5E → #E11D48 → #BE123C`, anatomi persis `.btn-brand` (glossy top + contact, flat).
+  Untuk Pulihkan/Batalkan tarikan. Jangan salin manual glow rose lama.
+- **Secondary (`.btn-secondary`):** border `control`, teks ink-sub, hover `bg-gray-50`.
+  Netral radius/lebar (call-site pegang `flex-1`/`w-full`). Pasangan footer dua-tombol.
+- **Press feedback:** `.press` (scale) untuk tombol umum; `.press-icon` (opacity,
+  transform-safe) untuk tombol ikon yang sudah pakai `translate`.
 
-### Chips
-- **Style (FilterChips):** Pill (9999px). Aktif = fill brand emerald + teks putih; non-aktif = netral berbingkai.
-- **State:** Filter (toggle) — aktif jelas via fill brand, bukan sekadar border.
+### Chips (FilterChips)
+- Pill (9999px). Aktif = fill brand emerald + teks putih; non-aktif = netral berbingkai.
+  Aktif jelas via fill, bukan sekadar border.
 
 ### Cards / Containers
-- **Corner Style:** 16px (`--rounded-card`); hero 24px (`--rounded-hero`).
-- **Background:** Putih murni (#FFFFFF) + gradient cahaya-dari-atas (`.lift`).
-- **Shadow Strategy:** `.lift` (lihat Elevation). Sub-panel internal pakai `.inset-soft`, bukan kotak abu datar.
-- **Border:** Hairline `line` (#CFD5DF) bila perlu definisi tepi ekstra; ring crisp 1px sudah ada di shadow.
-- **Internal Padding:** ~16px (`--spacing-md`); hero ~20px.
+- **Corner:** 16px (`rounded-2xl`) untuk panel padat, 24px (`rounded-3xl`) untuk kartu konten
+  & list Beranda; hero 24px. Keduanya dipakai — pilih per berat kartu, jangan over-round (>24px).
+- **Background:** putih murni (#FFFFFF), **flat** (tanpa gradient top-light).
+- **Border:** hairline `line` (#D3DAE3) — tepi tunggal kartu.
+- **Shadow:** `.lift` (satu contact whisper). Sub-panel internal pakai `.inset-soft`
+  (fill datar), bukan kotak abu bergaris.
+- **List rows:** divider antar-baris pakai `.divide-inset`/`.list-inset` (hairline
+  #DCE2EA, di-inset melewati kolom ikon agar sejajar teks).
 
 ### Inputs / Fields
-- **Style (`.field` / `.field-search`):** Radius 12px, `.field` bg-gray-50, `.field-search` bg putih. Border `control`. Teks 16px (anti-zoom iOS).
-- **Focus:** Border #10B981 + ring `0 0 0 2px rgba(16,185,129,0.30)` (setara ring-2 emerald). Caret & accent-color on-brand.
+- **`.field`** (bg-gray-50) untuk form; **`.field-search`** (bg-white) untuk bilah cari.
+  Radius 12px, border `control`, teks 16px (anti-zoom iOS).
+- **Focus:** border #10B981 + ring `0 0 0 2px rgba(16,185,129,0.30)`. Caret & `accent-color`
+  on-brand (#1B7249 light / #1A9B86 dark).
 - **Placeholder:** gray-500 (bukan gray-400) agar tetap lolos kontras.
 
 ### Navigation
-- **Bottom nav:** Kapsul floating glass (`.nav-float`), tren 2026. Ikon aktif solid, tab "Hadiran" (id internal tetap 'kas'). FAB di zona jempol; ExportMenu align kiri. Z-index dari tangga bernama (nav 40 → overlay 50 → banner 55 → modal 60 → toast 70).
-- **Header:** Sticky kaca; gunakan translate3d + backface-hidden + will-change (fix lompat iOS Safari fixed/backdrop-filter).
+- **Bottom nav (`.nav-dock`):** **bar DOK penuh** nempel tepi bawah layar ala
+  Google/myBCA/BYOND — **BUKAN** kapsul melayang. Indikator tab aktif = **pill tonal datar**
+  (Material 3), ikon 24px diam. Tab "Hadiran" (id internal tetap `'kas'`). FAB di zona jempol;
+  `ExportMenu` align kiri. Di Mode Warga tab "Talangan" disembunyikan dari nav.
+- **Header:** sticky kaca; pakai `translate3d + backface-hidden + will-change` (fix lompat iOS
+  Safari fixed/backdrop-filter — berlaku app-wide untuk Header/Toaster/popover/nav).
+- **Z-index (tangga bernama, anti-tabrak):** fab 30 → nav 40 → overlay 50 → banner 55 →
+  modal 60 → toast 70 → tooltip 80.
+- *Catatan:* class `.nav-float` (kapsul melayang) masih ada di `index.css` tapi **tidak
+  dipakai** BottomNav; nav aktif = `.nav-dock`.
 
 ### Hero Card (Signature)
-Kartu saldo gradient emerald (`--hero-gradient`) dengan motif songket emas `.songket-weave` (soft-light, di-mask ke sudut kanan-atas agar nominal kiri tetap bersih), sheen kiri-atas, dan sparkline. Inilah satu-satunya tempat emas songket + biru/emerald hero berkumpul. Dekoratif murni, pointer-events-none.
+Kartu saldo gradient dengan `--hero-shadow`. Tiga varian gradient:
+- **Emerald** (`.hero-emerald`, default) — Refined Emerald, satu sumber se-app.
+- **Setor Biru** (`from-setor via-setor-600 to-setor-500`) — saat Kas Hadiran sudah disetor.
+- **Slate Negatif** — saat saldo < 0 dan belum disetor.
+
+Dekorasi hero: motif songket emas `.songket-weave` (soft-light, di-mask ke sudut kanan-atas
+agar nominal kiri bersih), `.hero-sheen`, sparkline, dan `.hero-sheen-sweep` sekali-muat.
+Saldo negatif → nominal **putih** + chip **"Defisit"** (The Saldo-Defisit Rule). Beranda
+membungkus semua hero dalam `BannerCarousel` (carousel 3D bertumpuk; permukaan flat & tegas
+ala BYOND — user TOLAK glass/glow/noise).
+
+### Login (pengecualian branded)
+Login adalah **satu-satunya** layar yang sengaja memakai bahasa kaca: kanvas gradient mint
+(`.login-bg`), aurora blob mengambang, grain halus, dan kartu `backdrop-blur`. Ini momen
+brand, bukan pelanggaran arah flat — **jangan** "flatkan" jadi abu/putih polos.
 
 ### Dialog (Behavior)
-Semua sheet/modal WAJIB pakai hook `useDialog`: `role="dialog"` + fokus trap/restore + Escape. Animasi masuk `.sheet-panel` (sheetUp, ease-out-expo). Jangan bikin sheet mentah.
+Semua sheet/modal WAJIB pakai hook **`useDialog`**: `role="dialog"` + fokus trap/restore +
+Escape. Animasi masuk `.sheet-panel` (sheetUp, ease-out-expo) + `overscroll-behavior: contain`.
+Jangan bikin sheet mentah.
 
 ## 6. Do's and Don'ts
 
 ### Do:
-- **Do** pakai satu suara brand emerald; pertahankan `setor` biru & `gold-songket` emas tetap scoped ke satu tempat masing-masing.
-- **Do** pakai Sora + `tabular-nums` untuk semua nominal; angka memimpin.
-- **Do** jaga body text ≥4.5:1; gelapkan ke arah ink bila kontras mepet. Prioritas teks besar & kontras tinggi (warga lansia, baca di bawah matahari).
-- **Do** pakai `.lift` untuk kartu, `.inset-soft` untuk sub-panel, `.float` untuk popover — depth dari cahaya-dari-atas + bayangan crisp.
-- **Do** tampilkan saldo minus apa adanya bila talangan ditutup dari kas — transparansi di atas estetika.
-- **Do** hormati `prefers-reduced-motion` (setiap animasi punya alternatif crossfade/instan) dan pakai `useDialog` untuk tiap sheet/modal.
-- **Do** jaga `sunken` (#F2F5FA) sinkron di body, `.app-bg`, token, dan manifest.
+- **Do** pakai satu suara brand emerald; pertahankan `setor` biru & `gold-songket` emas tetap
+  scoped ke satu tempat masing-masing.
+- **Do** pakai Sora + `tabular-nums` untuk semua nominal; angka memimpin. Nominal hero pakai
+  `FitAmount`.
+- **Do** jaga body text ≥4.5:1; gelapkan ke arah ink bila kontras mepet (warga lansia, baca di
+  bawah matahari).
+- **Do** pakai `.lift` untuk kartu (satu contact whisper), `.inset-soft` untuk sub-panel (fill
+  datar), `.float` untuk popover. Separasi dari **tone + hairline + ruang**.
+- **Do** tandai saldo defisit dengan **nominal putih + chip "Defisit"** di setiap hero.
+- **Do** tampilkan saldo minus apa adanya bila talangan ditutup dari kas — transparansi di atas
+  estetika.
+- **Do** hormati `prefers-reduced-motion`, `prefers-reduced-transparency`, `forced-colors`,
+  `prefers-contrast` (semua sudah ditangani di `index.css`) dan pakai `useDialog` untuk tiap
+  sheet/modal.
+- **Do** jaga `sunken` (#ECF1F7) sinkron di `body`, `.app-bg`, token, `landing.html`, & manifest.
 
 ### Don't:
-- **Don't** pakai glassmorphism, glow, atau noise sebagai dekorasi. Permukaan flat & tegas; depth dari cahaya, bukan kaca berpendar. (Tim secara eksplisit menolak ini.)
-- **Don't** pakai emas/gold di luar satu pengecualian songket yang disengaja. Jangan perlakukan songket sebagai pelanggaran "no gold" — dan jangan perluas emas ke tempat lain.
-- **Don't** angkat biru `setor` jadi accent kedua; ia sinyal status di hero Kas Hadiran saja.
-- **Don't** campur red/rose dengan green/emerald di satu layar.
-- **Don't** pakai abu pudar (gray-400 di atas putih) untuk teks "demi elegan".
-- **Don't** pakai border-left/right > 1px sebagai stripe aksen pada kartu/baris/alert.
-- **Don't** gradient text (`background-clip: text`); emphasis lewat weight/size + warna solid.
-- **Don't** card grid seragam tanpa hierarki, eyebrow uppercase di tiap section, atau hero-metric kosong tanpa makna.
-- **Don't** over-round kartu (32px+) atau bikin sheet mentah tanpa `useDialog`.
+- **Don't** pasang ulang bahasa era lama: **floating-glass**, halo putih, **top-light gradient**
+  pada kartu, **inset-shadow berpahat**, **edge-ring** ganda, atau **sheen** di icon-tile. Semua
+  itu sengaja dibongkar di pivot Material-flat (2 Jul 2026).
+- **Don't** pakai glassmorphism/glow/noise sebagai dekorasi di body app. (Login = satu-satunya
+  pengecualian branded.)
+- **Don't** tuning nilai L kanvas untuk mengejar "feel" — akar masalah dulu adalah dua bahasa
+  campur, bukan L. Lever kanvas sengaja ditutup.
+- **Don't** mewarnai nominal saldo jadi salmon (`text-rose-200`) untuk menandai negatif — pakai
+  chip "Defisit".
+- **Don't** pakai emas/gold di luar satu pengecualian songket. Jangan angkat biru `setor` jadi
+  accent kedua.
+- **Don't** campur red/rose dengan green/emerald di satu layar; jangan pakai abu pudar
+  (gray-400 di atas putih) "demi elegan".
+- **Don't** border-left/right > 1px sebagai stripe aksen; jangan gradient text
+  (`background-clip: text`) — emphasis lewat weight/size + warna solid.
+- **Don't** ganti bottom-nav dok jadi kapsul melayang; jangan over-round kartu (>24px); jangan
+  bikin sheet mentah tanpa `useDialog`.
 - **Don't** bikin nuansa birokrasi/aplikasi pemerintahan yang kaku — tetap hangat & manusiawi.
