@@ -820,7 +820,7 @@ export default function KasHadiranPage() {
             </div>
 
             {/* Lists (scrollable) */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 pb-10 space-y-6">
+            <div className="flex-1 overflow-y-auto [overscroll-behavior:contain] px-5 py-4 pb-10 space-y-6">
               {detailLoading ? (
                 <>
                   {/* Skeleton kartu rincian pendapatan */}
