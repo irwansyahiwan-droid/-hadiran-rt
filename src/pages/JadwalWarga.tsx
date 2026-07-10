@@ -267,7 +267,7 @@ export default function JadwalWargaPage() {
             aria-pressed={subTab === id}
             className={`press flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-semibold border transition ${
               subTab === id
-                ? 'bg-gradient-to-b from-brand-500 to-brand text-white border-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_4px_12px_-3px_rgba(15,76,46,0.5)]'
+                ? 'bg-brand text-white border-transparent' /* fill brand DATAR (MATERIAL-FLAT) — gradient+glow pra-flat dihapus */
                 : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
             } inline-flex items-center justify-center gap-1.5`}
           >
@@ -321,7 +321,7 @@ export default function JadwalWargaPage() {
                   aria-pressed={wargaFilter === id}
                   className={`press inline-flex items-center justify-center min-h-[44px] rounded-xl text-xs font-semibold border transition ${
                     wargaFilter === id
-                      ? 'bg-gradient-to-b from-brand-500 to-brand text-white border-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_4px_12px_-3px_rgba(15,76,46,0.5)]'
+                      ? 'bg-brand text-white border-transparent' /* fill brand DATAR (MATERIAL-FLAT) — gradient+glow pra-flat dihapus */
                       : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
                   }`}
                 >

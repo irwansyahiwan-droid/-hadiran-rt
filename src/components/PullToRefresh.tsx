@@ -105,7 +105,8 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
           transition: animating ? 'top 0.3s var(--ease-out-expo), opacity 0.3s' : 'none',
         }}
       >
-        <div className="w-9 h-9 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center ring-1 ring-gray-100 dark:ring-gray-700">
+        {/* .float (token overlay) — bukan shadow-lg mentah; indikator melayang di atas konten. */}
+        <div className="float w-9 h-9 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center ring-1 ring-gray-100 dark:ring-gray-700">
           <RefreshCw
             className={`w-4 h-4 text-emerald-600 dark:text-emerald-400 ${refreshing ? 'animate-spin' : ''}`}
             style={refreshing ? undefined : { transform: `rotate(${progress * 280}deg)` }}

@@ -56,49 +56,47 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   return (
     <main className="login-bg relative min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden">
 
-      {/* Aurora background — blob mengambang lembut (diredam di dark agar tidak menyilaukan) */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="blob absolute -top-24 -left-20 w-72 h-72 rounded-full opacity-50 dark:opacity-25 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #34d399 0%, transparent 70%)' }} />
-        <div className="blob absolute top-1/3 -right-24 w-80 h-80 rounded-full opacity-40 dark:opacity-20 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #10b981 0%, transparent 70%)', animationDelay: '-5s' }} />
-        <div className="blob absolute -bottom-28 left-1/4 w-72 h-72 rounded-full opacity-40 dark:opacity-20 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #6ee7b7 0%, transparent 70%)', animationDelay: '-9s' }} />
-        {/* Grain halus — permukaan terasa "kertas premium", bukan flat digital */}
-        <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06] mix-blend-overlay"
-          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
-      </div>
+      {/* MATERIAL-FLAT (10 Jul): aurora blob + grain + halo logo DIHAPUS — Login
+          adalah layar terakhir yang masih berbahasa "floating glass" pra-flat,
+          padahal seluruh app sudah flat ala BYOND BSI/myBCA (pelajaran 9-pass:
+          dua bahasa campur = biang "kurang mahal"). Identitas kini datang dari
+          kanvas gradient mint brand (.login-bg, DIPERTAHANKAN sesuai keputusan
+          login warga) + kartu putih flat — persis pola login BYOND (hijau +
+          kartu bersih), bukan kaca disinari. */}
 
       {/* Logo area */}
       <div className="relative mb-8 text-center">
         <div className="pop relative mx-auto mb-4 w-20 h-20">
-          {/* Halo lembut di belakang logo — kedalaman, bukan glow norak */}
-          <div className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-emerald-400/25 dark:bg-emerald-500/20 blur-2xl" aria-hidden="true" />
           <img
             src={logoRt}
             alt="Logo RT 004/006"
-            className="relative w-20 h-20 rounded-3xl object-cover ring-1 ring-white/70 dark:ring-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.6)_inset,0_10px_22px_-10px_rgba(5,80,50,0.45),0_24px_48px_-22px_rgba(5,80,50,0.5)]"
+            className="relative w-20 h-20 rounded-3xl object-cover ring-1 ring-black/[0.06] dark:ring-white/10 shadow-sm"
           />
         </div>
         <h1 className="rise font-display text-[1.7rem] font-bold tracking-tight text-gray-900 dark:text-gray-100" style={{ animationDelay: '0.1s' }}>Hadiran RT</h1>
         <p className="rise text-caption text-emerald-700/80 dark:text-emerald-300/70 font-medium mt-1.5" style={{ animationDelay: '0.16s' }}>RT 004/006 · Tanah Baru Beji · Depok</p>
       </div>
 
-      {/* Card — floating glass: hairline + bayangan berlapis (depth, bukan glow) */}
-      <div className="rise relative w-full max-w-sm bg-white/85 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl border border-white/70 dark:border-gray-700/80 p-6 shadow-[0_1px_0_0_rgba(255,255,255,0.7)_inset,0_2px_6px_-2px_rgba(5,80,50,0.18),0_18px_40px_-16px_rgba(5,80,50,0.28),0_36px_64px_-32px_rgba(5,80,50,0.3)]"
+      {/* Card — putih murni FLAT ber-hairline + satu contact whisper (.lift),
+          bahasa yang sama dgn semua kartu app. Kaca (bg/85 + backdrop-blur +
+          bayangan 4 lapis) dihapus — lihat catatan MATERIAL-FLAT di atas. */}
+      <div className="rise relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-6"
         style={{ animationDelay: '0.22s' }}>
         <h2 className="font-display text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-1">Selamat Datang</h2>
         <p className="text-sm text-ink-faint dark:text-gray-400 mb-5">Warga RT 004/006 — silakan masuk</p>
 
-        {/* ── WARGA — pintu utama (istimewa) ───────────────────── */}
-        <div className="relative rounded-2xl p-4 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-gray-900 border border-emerald-200/80 dark:border-emerald-800/40 shadow-[0_8px_28px_-14px_rgba(16,185,129,0.55)]">
+        {/* ── WARGA — pintu utama (istimewa) ───────────────────────
+            Panel tint emerald DATAR (surface-container tonal ala Material) —
+            gradient + glow emerald era pra-flat dihapus; "istimewa" cukup dari
+            tint brand + badge, bukan cahaya. */}
+        <div className="relative rounded-2xl p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200/80 dark:border-emerald-800/40">
           {/* badge sudut */}
-          <span className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-700 text-white text-micro font-bold uppercase tracking-wide shadow-sm shadow-emerald-400/50">
+          <span className="absolute -top-2 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-700 text-white text-micro font-bold uppercase tracking-wide shadow-sm">
             <Sparkles className="w-2.5 h-2.5" /> Akses Cepat
           </span>
 
           <div className="flex items-center gap-2.5 mb-3">
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500 text-white shadow-md shadow-emerald-400/50 shrink-0">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500 text-white shrink-0">
               <Users className="w-5 h-5" />
             </span>
             <div className="min-w-0">
@@ -244,10 +242,12 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               )}
 
               {/* Submit */}
+              {/* Solid ink FLAT (bukan gradient abu + glow era lama) — tombol
+                  sekunder tegas yang tak bersaing dgn CTA brand warga. */}
               <button
                 type="submit"
                 disabled={loading}
-                className="press w-full py-3 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 dark:from-gray-700 dark:to-gray-800 text-white font-semibold text-sm shadow-lg shadow-gray-400/30 hover:from-gray-900 hover:to-black transition disabled:opacity-60 disabled:cursor-not-allowed"
+                className="press w-full py-3 rounded-xl bg-gray-900 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? 'Memproses…' : 'Masuk sebagai Bendahara'}
               </button>

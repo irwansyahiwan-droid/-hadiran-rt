@@ -699,13 +699,8 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 /* Exit lebih cepat dari enter (sistem merespons, bukan menunda). */
 .pop-menu-out { animation: popMenuOut 0.12s var(--ease-out-expo) forwards; pointer-events: none; }
 
-/* Slow-floating aurora blobs (login background) */
-@keyframes floatBlob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33%      { transform: translate(14px, -20px) scale(1.08); }
-  66%      { transform: translate(-16px, 12px) scale(0.94); }
-}
-.blob { animation: floatBlob 15s ease-in-out infinite; }
+/* (.blob/floatBlob dihapus 10 Jul — aurora Login dipensiunkan saat Login ikut
+   MATERIAL-FLAT; tak ada pemakai lain.) */
 
 /* Motif dekoratif banner Beranda — mengambang halus ("hidup"), bukan gerak besar.
    translateY di wrapper-dalam; peek/rotate ditahan elemen luar agar tak bentrok.

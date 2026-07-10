@@ -71,7 +71,7 @@ export default function FilterChips<T extends string, S extends string = string>
               aria-pressed={active}
               className={`press shrink-0 inline-flex items-center justify-center min-h-[44px] px-3.5 rounded-full text-xs font-semibold transition-colors ${
                 active
-                  ? 'bg-gradient-to-b from-brand-500 to-brand text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_4px_12px_-3px_rgba(15,76,46,0.5)]'
+                  ? 'bg-brand text-white' /* fill brand DATAR (MATERIAL-FLAT) — gradient+inset+glow era pra-flat dihapus, selaras filter absensi & pill nav */
                   : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
               }`}
             >
