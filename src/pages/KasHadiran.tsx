@@ -567,7 +567,7 @@ export default function KasHadiranPage() {
                   : <Odometer value={animatedSaldo} />}
               </FitAmount>
               {saldo < 0 && (
-                <span className="mb-[6px] shrink-0 rounded-full bg-rose-500/90 px-2 py-[3px] text-[10px] font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                <span className="mb-[6px] shrink-0 rounded-full bg-rose-500/90 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
                   Defisit
                 </span>
               )}
