@@ -99,7 +99,10 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .btn { transition: none; }
+    .btn:hover, .btn:active { transform: none; }
   }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .hero :focus-visible, .final :focus-visible { outline-color: rgba(255,255,255,.92); }
   body {
     font-family: 'Inter', system-ui, sans-serif;
     background: var(--canvas);
@@ -171,6 +174,11 @@
     transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
   }
   .btn:active { transform: scale(.97); }
+  @media (hover: hover) {
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -8px rgba(0,0,0,.45); }
+    .btn-ghost:hover { background: rgba(255,255,255,.16); }
+    .plus a:hover { text-decoration: underline; }
+  }
   .btn-primary {
     background: #FFFFFF;
     color: var(--emerald-deep);
@@ -434,12 +442,12 @@
 <header class="hero">
   <div class="wrap">
     <span class="badge">Aplikasi Resmi Warga RT 004/006</span>
-    <div class="coin"><svg viewBox="0 0 640 640"><use href="#coin"/></svg></div>
+    <div class="coin"><svg aria-hidden="true" viewBox="0 0 640 640"><use href="#coin"/></svg></div>
     <h1 class="display">Hadiran &amp; kas RT,<br/><span class="g">transparan</span> dari HP</h1>
     <p class="sub">Jadwal tarikan, absensi, talangan, dan kas RT. Semua warga bisa memantau langsung, kapan saja.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="/">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         Buka Aplikasi
       </a>
       <a class="btn btn-ghost" href="#fitur">Lihat Fitur</a>
@@ -449,33 +457,33 @@
 
 <!-- ══════════ BANNER SHOWCASE (mirror kartu carousel di app) ══════════ -->
 <section class="banners">
-  <div class="bn-row">
+  <div class="bn-row" role="region" aria-label="Sorotan fitur, geser untuk melihat" tabindex="0">
     <div class="bn-card bn-target">
-      <div class="bn-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
+      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
       <span class="be">Target Kas RT</span>
       <h3>Bersama menuju Rp25 juta</h3>
       <p>Pantau progres kas RT menuju target bersama warga.</p>
     </div>
     <div class="bn-card bn-absensi">
-      <div class="bn-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></div>
+      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></div>
       <span class="be">Panduan · Absensi</span>
       <h3>Hadir dicatat setiap tarikan</h3>
       <p>Yang tidak hadir otomatis tercatat kena talangan.</p>
     </div>
     <div class="bn-card bn-tarikan">
-      <div class="bn-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4M16.71 13.88l.7.71-2.82 2.82"/></svg></div>
+      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4M16.71 13.88l.7.71-2.82 2.82"/></svg></div>
       <span class="be">Panduan · Tarikan</span>
       <h3>Satu Sohibul Bait per tarikan</h3>
       <p>Iuran semua anggota yang hadir terkumpul untuknya.</p>
     </div>
     <div class="bn-card bn-talangan">
-      <div class="bn-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
       <span class="be">Panduan · Talangan</span>
       <h3>Tidak hadir kena talangan</h3>
       <p>Wajib dilunasi sebelum tarikan berikutnya agar kas sehat.</p>
     </div>
     <div class="bn-card bn-kasrt">
-      <div class="bn-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
+      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
       <span class="be">Panduan · Kas RT</span>
       <h3>Kas besar RT yang terpisah</h3>
       <p>Sebagian setoran masuk ke Kas RT untuk kebutuhan warga.</p>
@@ -492,32 +500,32 @@
 
     <div class="fgrid">
       <div class="flead">
-        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
         <h3>Beranda &amp; Dashboard</h3>
         <p>Saldo kas, uang masuk keluar, dan tarikan berikutnya. Langsung terlihat begitu dibuka.</p>
       </div>
       <div class="fcell">
-        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
         <h3>Jadwal Tarikan</h3><p>Tahu siapa giliran Sohibul Bait dan kapan tanggalnya.</p>
       </div>
       <div class="fcell">
-        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></div>
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></div>
         <h3>Absensi Hadiran</h3><p>Daftar hadir tiap tarikan tercatat rapi, tanpa catatan manual.</p>
       </div>
       <div class="fcell">
-        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <h3>Talangan</h3><p>Tidak hadir tercatat otomatis, status lunas selalu jelas.</p>
       </div>
       <div class="fcell">
-        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1.2"/></svg></div>
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1.2"/></svg></div>
         <h3>Kas Hadiran</h3><p>Rekap iuran terkumpul dan hak Sohibul Bait tiap tarikan.</p>
       </div>
       <div class="fcell tint">
-        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
         <h3>Kas RT</h3><p>Kas besar lingkungan, terpisah dari kas hadiran dan terbuka.</p>
       </div>
       <div class="fcell">
-        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></div>
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></div>
         <h3>Laporan &amp; PDF</h3><p>Laporan triwulan siap diunduh untuk arsip dan rapat warga.</p>
       </div>
     </div>
@@ -531,19 +539,19 @@
     <p class="sec-lead">Bukan sekadar halaman web. Dibuat senyaman aplikasi di HP Anda.</p>
     <div class="plus-card">
       <div class="plus">
-        <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
         <div><h4>Mode Warga</h4><p>Cukup sandi bersama warga untuk masuk. Aman, hanya bisa melihat, tidak bisa mengubah.</p></div>
       </div>
       <div class="plus">
-        <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M12 18h.01"/></svg></div>
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M12 18h.01"/></svg></div>
         <div><h4>Pasang Seperti App</h4><p>Tambahkan ke layar utama HP, Android maupun iPhone. <a href="/panduan-install.html">Lihat panduan</a></p></div>
       </div>
       <div class="plus">
-        <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
         <div><h4>Mode Gelap</h4><p>Tampilan otomatis menyesuaikan terang dan gelap, nyaman siang maupun malam.</p></div>
       </div>
       <div class="plus">
-        <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 4v5h-5"/></svg></div>
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 4v5h-5"/></svg></div>
         <div><h4>Selalu Terbaru</h4><p>Data tersimpan aman di cloud dan diperbarui real-time untuk semua warga.</p></div>
       </div>
     </div>
@@ -557,19 +565,19 @@
     <p class="sec-lead">Pengurus mengelola, warga memantau. Semua dengan akses yang sesuai.</p>
     <div class="roles">
       <div class="role bendahara">
-        <div class="rt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>Bendahara</div>
+        <div class="rt"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>Bendahara</div>
         <ul>
-          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Catat tarikan, absensi &amp; talangan</li>
-          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Kelola kas hadiran &amp; kas RT</li>
-          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Tandai lunas &amp; cetak laporan PDF</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Catat tarikan, absensi &amp; talangan</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Kelola kas hadiran &amp; kas RT</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Tandai lunas &amp; cetak laporan PDF</li>
         </ul>
       </div>
       <div class="role warga">
-        <div class="rt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg>Warga</div>
+        <div class="rt"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg>Warga</div>
         <ul>
-          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Pantau saldo &amp; transparansi kas</li>
-          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cek jadwal tarikan &amp; giliran</li>
-          <li><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Lihat status talangan sendiri, kapan saja</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Pantau saldo &amp; transparansi kas</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cek jadwal tarikan &amp; giliran</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Lihat status talangan sendiri, kapan saja</li>
         </ul>
       </div>
     </div>
@@ -594,7 +602,7 @@
 <section>
   <div class="wrap">
     <div class="secnote">
-      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 0 1 4 0v2"/></svg></div>
+      <div class="si"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 0 1 4 0v2"/></svg></div>
       <div>
         <h3>Data warga aman &amp; privat</h3>
         <p>Aplikasi ini khusus internal RT 004/006, tidak terindeks Google dan tidak terbuka untuk umum. Hanya pengurus yang dapat mengubah data; setiap perubahan tercatat otomatis.</p>
@@ -607,11 +615,11 @@
 <section style="padding-top:8px">
   <div class="wrap">
     <div class="final">
-      <div class="coin" style="width:72px;height:72px;border-radius:16px;margin-bottom:18px"><svg viewBox="0 0 640 640"><use href="#coin"/></svg></div>
+      <div class="coin" style="width:72px;height:72px;border-radius:16px;margin-bottom:18px"><svg aria-hidden="true" viewBox="0 0 640 640"><use href="#coin"/></svg></div>
       <h2>Yuk, pantau kas RT<br/>bareng-bareng</h2>
       <p>Transparansi bikin warga makin guyub. Buka sekarang, gratis dan langsung bisa dipakai.</p>
       <a class="btn btn-primary" href="/" style="display:inline-flex">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         Buka Aplikasi
       </a>
     </div>
@@ -619,7 +627,7 @@
 </section>
 
 <footer>
-  <div class="fcoin"><svg viewBox="0 0 640 640"><use href="#coin"/></svg></div>
+  <div class="fcoin"><svg aria-hidden="true" viewBox="0 0 640 640"><use href="#coin"/></svg></div>
   <strong>Hadiran RT 004/006</strong>
   <div class="fm">Tanah Baru, Beji, Depok</div>
   <div class="fm2">Aplikasi hadiran &amp; kas warga · Dibuat untuk warga, oleh warga.</div>
