@@ -11,12 +11,16 @@ export default {
            z-40  = nav     → Header + BottomNav + scrim dismiss-nya
            z-50  = overlay → bottom-sheet, full-page overlay, dropdown menu
          lalu token bernama untuk tier di atasnya:
+           z-menu    = Header SAAT menu ⋯ hidup — naik di atas scrim portal z-40
+                       (header ber-transform = stacking context; dropdown z-50 di
+                       dalamnya tak bisa menembus keluar), tetap di bawah overlay
            z-banner  = prompt app-level (Install / PWA update)
            z-modal   = modal di ATAS overlay (form bertumpuk) + SuccessOverlay + WelcomeSheet
            z-toast   = Toaster — SELALU paling atas & sendirian (jangan ada yg menyamai)
            z-tooltip = InfoTip portal — HARUS di atas toast agar tak pernah tertutup modal/toast manapun */
       zIndex: {
         fab: '30',
+        menu: '45',
         banner: '55',
         modal: '60',
         toast: '70',

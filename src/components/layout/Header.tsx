@@ -83,11 +83,11 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
 
   return (
     <header
-      // Saat menu hidup: naik SATU step di atas scrim portal z-40 (masih di bawah
-      // tier overlay z-50) — header ber-transform = stacking context sendiri,
-      // jadi z-50 milik dropdown tak bisa menembus keluar; tanpa bump ini scrim
-      // (lebih akhir di DOM) menutup menu & item tak bisa diklik.
-      className={`sticky top-0 ${menuMounted ? 'z-[45]' : 'z-40'} backdrop-blur-xl backdrop-saturate-150 transition duration-300 ${
+      // Saat menu hidup: naik ke tier z-menu (45) di atas scrim portal z-40,
+      // tetap di bawah overlay z-50 — header ber-transform = stacking context
+      // sendiri, jadi z-50 milik dropdown tak bisa menembus keluar; tanpa bump
+      // ini scrim (lebih akhir di DOM) menutup menu & item tak bisa diklik.
+      className={`sticky top-0 ${menuMounted ? 'z-menu' : 'z-40'} backdrop-blur-xl backdrop-saturate-150 transition duration-300 ${
         scrolled
           ? 'bg-white/80 dark:bg-gray-900/80 border-b border-line/70 dark:border-gray-800/70'
           : 'bg-white/90 dark:bg-gray-900/85 border-b border-transparent'

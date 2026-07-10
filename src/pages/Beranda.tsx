@@ -28,8 +28,16 @@ interface TrxItem {
   keterangan: string;
   tanggal: string;
   nominal: number;
-  saldoSetelah: number;
+  /** null = di luar batas kelengkapan jendela fetch (saldo berjalan tak bisa
+      dihitung jujur karena transaksi lebih tua tak ikut terambil). */
+  saldoSetelah: number | null;
 }
+
+// Jendela fetch Beranda — ringkasan, bukan ledger penuh: ambil N terbaru per
+// sumber (setor & talangan lunas), BUKAN seluruh riwayat → payload dashboard
+// tetap datar saat data bertahun-tahun (skala 300 KK). Riwayat & pencarian
+// penuh tetap di tab Hadiran ("Lihat semua").
+const TRX_FETCH = 100;
 
 interface BerandaCache {
   summary: DashboardSummary;
@@ -82,17 +90,22 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       supabase
         .from('transaksi_kas')
         .select('id, keterangan, tanggal, nominal')
-        .eq('tipe', 'setor_kas_rt'),
+        .eq('tipe', 'setor_kas_rt')
+        .order('tanggal', { ascending: false })
+        .limit(TRX_FETCH),
       supabase
         .from('talangan')
         .select('id, nominal, tanggal_lunas, warga:warga_id(nama), tarikan:tarikan_id(nomor)')
         .eq('status_lunas', true)
-        .not('tanggal_lunas', 'is', null),
+        .not('tanggal_lunas', 'is', null)
+        .order('tanggal_lunas', { ascending: false })
+        .limit(TRX_FETCH),
       supabase
         .from('tarikan')
         .select('nomor, total_terkumpul')
         .eq('status', 'selesai')
-        .order('nomor', { ascending: true }),
+        .order('nomor', { ascending: false })
+        .limit(1),
     ]);
 
     // Merge setor + talangan lunas → sort tanggal DESC → limit 20
@@ -117,21 +130,39 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         nominal: t.nominal as number,
       }));
 
-    // Semua transaksi (tanpa batas) — terbaru di atas
+    // Gabungan jendela terbaru per sumber — terbaru di atas
     const sorted = [...setorItems, ...talanganItems]
       .sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
 
-    // Hitung running saldo mundur dari saldo_aktif saat ini
+    // Batas kelengkapan jendela: sumber yang TERPOTONG limit tak membawa
+    // transaksi lebih tua dari baris terakhirnya → saldo berjalan hanya sah
+    // sampai tanggal termuda di antara batas-batas itu. Sumber yang datang
+    // utuh (< limit) tidak membatasi apa pun.
+    let coverage = -Infinity;
+    const setorRaw = (setorRes.data as SetorRow[]) ?? [];
+    if (setorRaw.length === TRX_FETCH) {
+      coverage = Math.max(coverage, new Date(setorRaw[setorRaw.length - 1].tanggal).getTime());
+    }
+    const talRaw = (talanganLunasRes.data as unknown as TalanganLunasRow[]) ?? [];
+    if (talRaw.length === TRX_FETCH && talRaw[talRaw.length - 1].tanggal_lunas) {
+      coverage = Math.max(coverage, new Date(talRaw[talRaw.length - 1].tanggal_lunas as string).getTime());
+    }
+
+    // Hitung running saldo mundur dari saldo_aktif saat ini; di luar batas
+    // kelengkapan → null (baris tetap tampil, angka saldo disembunyikan —
+    // lebih baik tak ada angka daripada angka salah di app uang).
     let saldoCurrent = summaryData.saldo_aktif;
     const withSaldo: TrxItem[] = sorted.map(item => {
-      const saldoSetelah = saldoCurrent;
+      const sah = new Date(item.tanggal).getTime() >= coverage;
+      const saldoSetelah = sah ? saldoCurrent : null;
       saldoCurrent = saldoCurrent - item.nominal;
       return { ...item, saldoSetelah };
     });
 
     // Delta tarikan terakhir → dipakai di sub-teks saldo ("↗ +RpX").
     const selesaiRows = (selesaiRes.data as { nomor: number; total_terkumpul: number | null }[]) ?? [];
-    setLastDelta(selesaiRows.length ? (selesaiRows[selesaiRows.length - 1].total_terkumpul ?? 0) : 0);
+    const lastDeltaVal = selesaiRows[0]?.total_terkumpul ?? 0;
+    setLastDelta(lastDeltaVal);
 
     setSummary(summaryData);
     setJadwalList((jadwalRes.data as Tarikan[]) ?? []);
@@ -140,7 +171,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       summary: summaryData,
       jadwalList: (jadwalRes.data as Tarikan[]) ?? [],
       trxItems: withSaldo,
-      lastDelta: selesaiRows.length ? (selesaiRows[selesaiRows.length - 1].total_terkumpul ?? 0) : 0,
+      lastDelta: lastDeltaVal,
     });
     } catch {
       // Data sudah tampil (refresh manual / revalidate cache) → jangan hapus
@@ -201,8 +232,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   }, [trxItems, trxFilter, trxSort, trxSearch]);
 
   // Beranda = ringkasan, bukan ledger penuh. Batasi render ke 20 teratas →
-  // dashboard tetap ringan saat data tumbuh (target 300 KK); sisanya lewat
-  // "Lihat semua" ke tab Kas. Pencarian/filter tetap atas seluruh data.
+  // dashboard tetap ringan; sisanya lewat "Lihat semua" ke tab Kas.
+  // Pencarian/filter bekerja atas JENDELA yang diambil (TRX_FETCH terbaru per
+  // sumber) — riwayat & pencarian penuh ada di tab Hadiran.
   const TRX_LIMIT = 20;
   const visibleTrx = displayTrx.slice(0, TRX_LIMIT);
   const trxHidden = displayTrx.length - visibleTrx.length;
@@ -512,7 +544,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <EmptyState
               icon={Receipt}
               title="Tidak ada hasil"
-              subtitle="Tidak ada transaksi pada filter ini."
+              subtitle="Tidak ada di transaksi terkini. Riwayat lengkap ada di tab Hadiran."
               action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setTrxFilter('semua'); setTrxSearch(''); } }}
             />
           ) : (
@@ -532,9 +564,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <div className="flex-1 min-w-0">
                   <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug text-pretty break-words">{trx.keterangan}</p>
                   <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
-                  <p className={`text-xs font-medium tabular-nums ${trx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
-                    Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
-                  </p>
+                  {trx.saldoSetelah !== null && (
+                    <p className={`text-xs font-medium tabular-nums ${trx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
+                      Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
+                    </p>
+                  )}
                 </div>
                 <span className={`font-display text-amount font-bold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
                   {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
@@ -584,12 +618,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-ink-faint dark:text-gray-400">Saldo Setelah</span>
-              <span className={`text-sm font-semibold ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
-                {maskRp(`${selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
-              </span>
-            </div>
+            {selectedTrx.saldoSetelah !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-ink-faint dark:text-gray-400">Saldo Setelah</span>
+                <span className={`text-sm font-semibold ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
+                  {maskRp(`${selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <span className="text-sm text-ink-faint dark:text-gray-400">Tipe</span>
               <span className="text-sm font-medium text-ink-sub dark:text-gray-300">
