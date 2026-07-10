@@ -111,10 +111,86 @@ input, textarea  { caret-color: #1B7249; }
   :is(button, a, summary):focus-visible { transition: outline-offset 0.12s var(--ease-out-expo); }
 }
 
-/* ── Kanvas Login: light = gradient mint brand, dark = emerald pekat ──
-   Sebelumnya hardcoded inline (light saja) → dark mode kanvasnya bocor terang. */
-.login-bg { background: linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%); }
-.dark .login-bg { background: linear-gradient(160deg, #04231A 0%, #06402E 45%, #02150E 100%); }
+/* ── Kanvas Login: branded exception — satu-satunya layar glass ──────
+   DESIGN.md §381: Login = momen brand, BUKAN pelanggaran arah flat.
+   Kanvas gradient mint brand + aurora blob mengambang + grain halus +
+   kartu backdrop-blur. Jangan flatkan jadi abu/putih polos. */
+.login-bg {
+  background: linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%);
+  /* Subtle radial highlights ala brand moment */
+  background-image:
+    radial-gradient(ellipse 72% 54% at 68% 14%,  rgba(52, 211, 153, 0.38) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 42% at 16% 80%,  rgba(16, 185, 129, 0.28) 0%, transparent 55%),
+    linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%);
+}
+.dark .login-bg {
+  background-image:
+    radial-gradient(ellipse 72% 54% at 68% 14%,  rgba(6, 78, 49, 0.70) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 42% at 16% 80%,  rgba(4, 52, 33, 0.55) 0%, transparent 55%),
+    linear-gradient(160deg, #04231A 0%, #06402E 45%, #02150E 100%);
+}
+
+/* Aurora blob animation (hanya .login-bg, tidak menyentuh .app-bg) */
+@keyframes loginBlobA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(22px, -18px) scale(1.07); }
+  66%       { transform: translate(-14px, 12px) scale(0.95); }
+}
+@keyframes loginBlobB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(-18px, 20px) scale(1.05); }
+  70%       { transform: translate(16px, -10px) scale(0.97); }
+}
+.login-blob-a { animation: loginBlobA 14s ease-in-out infinite; }
+.login-blob-b { animation: loginBlobB 18s ease-in-out infinite; }
+
+/* Glassmorphism card — KHUSUS Login, tidak boleh di tempat lain */
+.login-card {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 2px 0 0 rgba(255, 255, 255, 0.90) inset,   /* top gloss */
+    0 8px 32px -8px rgba(11, 80, 50, 0.18),
+    0 24px 56px -16px rgba(4, 50, 30, 0.22);
+}
+.dark .login-card {
+  background: rgba(6, 30, 20, 0.72);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.10) inset,
+    0 8px 32px -8px rgba(0, 0, 0, 0.50),
+    0 24px 56px -16px rgba(0, 0, 0, 0.60);
+}
+
+/* Warga section tint — lebih kuat di atas glass card */
+.login-warga-tint {
+  background: rgba(209, 250, 229, 0.65);
+  border: 1px solid rgba(110, 231, 183, 0.50);
+}
+.dark .login-warga-tint {
+  background: rgba(6, 78, 49, 0.30);
+  border: 1px solid rgba(6, 95, 60, 0.50);
+}
+
+/* Noise grain — subtle texture ala premium finance app. Pointer-events none. */
+.login-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.030;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .login-card { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255,255,255,0.97); }
+  .dark .login-card { background: #051a10; }
+}
 
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
 .dark body { background-color: #030712; }
