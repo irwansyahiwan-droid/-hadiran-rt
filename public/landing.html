@@ -120,7 +120,8 @@
       radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.34) 0%, rgba(45,212,150,0) 55%),
       linear-gradient(135deg, var(--emerald-deep) 0%, var(--emerald) 50%, var(--emerald-bright) 100%);
     color: #fff;
-    padding: calc(env(safe-area-inset-top) + 40px) 0 52px;
+    /* Bawah dilebihkan agar strip banner bisa overlap premium ke tepi hero. */
+    padding: calc(env(safe-area-inset-top) + 40px) 0 96px;
     text-align: center;
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
@@ -186,15 +187,21 @@
   /* Mirror kartu carousel app — bahasa flat & tegas yang sama:
      gradient pekat + hairline ring + teks near-putih (sumber: BannerCarousel.tsx).
      Strip geser horizontal (scroll-snap); kartu tetangga sengaja "peek" sebagai
-     penanda bisa digeser. */
-  .banners { padding: 24px 0 4px; }
+     penanda bisa digeser. Posisi: OVERLAP ke tepi bawah hero (margin-top negatif)
+     agar hero + carousel jadi satu unit komposisi; barisan dikunci ke kolom
+     konten (--maxw) supaya tidak full-bleed melenceng di layar lebar; fade mask
+     tepi kiri-kanan sama seperti carousel app. */
+  .banners { padding: 0 0 8px; margin-top: -64px; }
   .bn-row {
     display: flex; gap: 14px;
+    max-width: var(--maxw); margin: 0 auto;
     overflow-x: auto; scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scroll-padding-inline: 20px;
-    padding: 6px 20px 18px;
+    padding: 6px 20px 16px;
     scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
   }
   .bn-row::-webkit-scrollbar { display: none; }
   .bn-card {
