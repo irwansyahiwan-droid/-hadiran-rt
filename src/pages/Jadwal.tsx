@@ -646,8 +646,12 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   const [tanggal, setTanggal] = useState((tarikan.tanggal ?? '').slice(0, 10));
   const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
   const [saving, setSaving] = useState(false);
-  useBackDismiss(true, onClose);
-  const dlg = useDialog(true, { onClose, label: `Revisi jadwal tarikan #${tarikan.nomor}` });
+  // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
+  // lewat drag.dismiss — hook dipakai utk luncuran keluar (handlers tak
+  // disebar; panel form scrollable, drag disediakan sheet ber-handle saja).
+  const drag = useDragDismiss(onClose);
+  useBackDismiss(true, drag.dismiss);
+  const dlg = useDialog(true, { onClose: drag.dismiss, label: `Revisi jadwal tarikan #${tarikan.nomor}` });
 
   // Pastikan sohibul saat ini tetap muncul di dropdown walau tidak aktif lagi
   const options = useMemo(() => {
@@ -673,14 +677,14 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div aria-hidden="true" className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto">
+      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
+      <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
           </div>
-          <button onClick={onClose} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -711,7 +715,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
 
         <div className="flex gap-2.5">
           <button
-            onClick={onClose}
+            onClick={drag.dismiss}
             className="btn-secondary flex-1 py-3 rounded-full"
           >
             Batal
@@ -740,11 +744,13 @@ interface TambahTarikanModalProps {
 }
 
 function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
-  const dlg = useDialog(true, { onClose, label: `Tambah jadwal tarikan #${nextNomor}` });
+  // Exit meluncur — pola sama dgn EditTarikanModal di atas.
+  const drag = useDragDismiss(onClose);
+  const dlg = useDialog(true, { onClose: drag.dismiss, label: `Tambah jadwal tarikan #${nextNomor}` });
   const [tanggal, setTanggal] = useState(() => new Date().toISOString().slice(0, 10));
   const [sohibulId, setSohibulId] = useState('');
   const [saving, setSaving] = useState(false);
-  useBackDismiss(true, onClose);
+  useBackDismiss(true, drag.dismiss);
 
   async function simpan() {
     setSaving(true);
@@ -771,14 +777,14 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div aria-hidden="true" className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto">
+      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
+      <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
           </div>
-          <button onClick={onClose} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -809,7 +815,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
 
         <div className="flex gap-2.5">
           <button
-            onClick={onClose}
+            onClick={drag.dismiss}
             className="btn-secondary flex-1 py-3 rounded-full"
           >
             Batal
@@ -848,8 +854,8 @@ export default function JadwalPage() {
   // Kas RT, agar baris cukup memuat SATU aksi utama (Proses/Hitung Ulang).
   const [rowTarikan, setRowTarikan] = useState<Tarikan | null>(null);
   const rowDrag = useDragDismiss(() => setRowTarikan(null));
-  useBackDismiss(rowTarikan !== null, () => setRowTarikan(null));
-  const rowDlg = useDialog(rowTarikan !== null, { onClose: () => setRowTarikan(null), label: 'Aksi tarikan' });
+  useBackDismiss(rowTarikan !== null, rowDrag.dismiss);
+  const rowDlg = useDialog(rowTarikan !== null, { onClose: rowDrag.dismiss, label: 'Aksi tarikan' });
 
   async function load() {
     // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
@@ -1115,8 +1121,8 @@ export default function JadwalPage() {
 
       {/* Sheet aksi sekunder per tarikan: bagikan WA + revisi jadwal */}
       {rowTarikan && (
-        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setRowTarikan(null)}>
-          <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-50 flex items-end" onClick={rowDrag.dismiss}>
+          <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${rowDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
           <div
             ref={rowDlg.panelRef}
             {...rowDlg.panelProps}

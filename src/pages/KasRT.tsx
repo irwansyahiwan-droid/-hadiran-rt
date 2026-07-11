@@ -46,7 +46,11 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const [kategori, setKategori] = useState<string>(initial?.kategori ?? kategoriDefault(initial?.tipe ?? 'masuk'));
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
-  const dlg = useDialog(true, { onClose, label: isEdit ? 'Edit transaksi Kas RT' : 'Tambah transaksi Kas RT' });
+  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() →
+  // sheet meluncur keluar, bukan lenyap. Back HP didaftarkan DI SINI (bukan
+  // parent) agar ikut jalur luncur yang sama.
+  useBackDismiss(true, drag.dismiss);
+  const dlg = useDialog(true, { onClose: drag.dismiss, label: isEdit ? 'Edit transaksi Kas RT' : 'Tambah transaksi Kas RT' });
 
   // Ganti tipe → pastikan kategori tetap valid utk tipe baru (set default bila tidak).
   function pilihTipe(t: Tipe) {
@@ -68,8 +72,8 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const saldoPreview = tipe === 'masuk' ? saldoSekarang + nominal : saldoSekarang - nominal;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
-      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-50 flex items-end" onClick={drag.dismiss}>
+      <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
@@ -180,7 +184,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           <div className="flex gap-3 pt-1">
             <button
               type="button"
-              onClick={onClose}
+              onClick={drag.dismiss}
               className="btn-secondary flex-1 py-3 rounded-xl"
             >
               Batal
@@ -220,9 +224,9 @@ export default function KasRTPage() {
   const [confirmDel, setConfirmDel] = useState(false);
   const [chartPeriod, setChartPeriod] = useState(6); // bulan terakhir di bar chart
   const rowDrag = useDragDismiss(() => setSelectedRow(null));
-  useBackDismiss(showModal, () => { setEditing(null); setShowModal(false); });
-  useBackDismiss(selectedRow !== null, () => setSelectedRow(null));
-  const rowDlg = useDialog(selectedRow !== null, { onClose: () => setSelectedRow(null), label: 'Aksi transaksi' });
+  // Back HP modal tambah/edit didaftarkan DI DALAM TambahModal (jalur dismiss meluncur).
+  useBackDismiss(selectedRow !== null, rowDrag.dismiss);
+  const rowDlg = useDialog(selectedRow !== null, { onClose: rowDrag.dismiss, label: 'Aksi transaksi' });
 
   async function load() {
     // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
@@ -754,8 +758,8 @@ export default function KasRTPage() {
 
       {/* Aksi baris: detail + Edit + Hapus (bendahara) */}
       {selectedRow && (
-        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setSelectedRow(null)}>
-          <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-50 flex items-end" onClick={rowDrag.dismiss}>
+          <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${rowDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
           <div
             ref={rowDlg.panelRef}
             {...rowDlg.panelProps}

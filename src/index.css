@@ -763,6 +763,15 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 }
 .pop { animation: popIn 0.6s var(--ease-spring) both; }
 
+/* Exit modal TENGAH (pasangan .pop utk dialog centered spt ConfirmBatalTarikan):
+   fade + scale kecil DI TEMPAT — modal tidak meluncur turun (itu bahasa bottom
+   sheet), origin tetap center. Cepat & ease-out: sistem merespons. Ganti kelas
+   .pop → .pop-out saat fase closing (state di call-site), unmount setelahnya. */
+@keyframes popOut {
+  to { opacity: 0; transform: scale(0.96); }
+}
+.pop-out { animation: popOut 0.15s var(--ease-out-expo) forwards; pointer-events: none; }
+
 /* Empty-state center tile — entrance pop LALU mengambang halus (bob) tanpa henti
    → scene "bernapas" selaras blob dekoratif di sekitarnya. Dua animasi pada satu
    transform: pop (0.6s) selesai & ditahan (both), bob delay 0.7s ambil alih.

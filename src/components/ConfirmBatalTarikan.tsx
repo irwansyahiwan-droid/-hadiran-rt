@@ -19,9 +19,19 @@ interface Props {
  * tombol batal aktif. Satu jari mustahil menghapus tanpa sengaja.
  */
 export default function ConfirmBatalTarikan({ open, nomor, loading = false, onClose, onConfirm }: Props) {
-  const dlg = useDialog(open, { onClose, label: `Konfirmasi batalkan Tarikan #${nomor}` });
   const [ketik, setKetik] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Exit modal tengah: fade+scale di tempat (.pop → .pop-out) baru unmount —
+  // bukan meluncur turun (itu bahasa bottom sheet). Idempoten selama closing.
+  const [closing, setClosing] = useState(false);
+  function requestClose() {
+    if (closing) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { onClose(); return; }
+    setClosing(true);
+    window.setTimeout(() => { setClosing(false); onClose(); }, 150);
+  }
+  const dlg = useDialog(open, { onClose: requestClose, label: `Konfirmasi batalkan Tarikan #${nomor}` });
 
   // Reset isian tiap kali dibuka + fokus ke input.
   useEffect(() => {
@@ -36,11 +46,11 @@ export default function ConfirmBatalTarikan({ open, nomor, loading = false, onCl
 
   return (
     <div className="fixed inset-0 z-modal flex items-center justify-center p-4">
-      <div aria-hidden="true" className="sheet-backdrop absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={loading ? undefined : onClose} />
+      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/50 backdrop-blur-sm ${closing ? 'sheet-backdrop-out' : ''}`} onClick={loading ? undefined : requestClose} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
-        className="pop relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5"
+        className={`${closing ? 'pop-out' : 'pop'} relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5`}
       >
         <div className="flex items-start gap-3">
           <span className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
@@ -81,7 +91,7 @@ export default function ConfirmBatalTarikan({ open, nomor, loading = false, onCl
         </p>
 
         <div className="flex gap-3 mt-4">
-          <button onClick={onClose} disabled={loading} className="btn-secondary flex-1 py-3 rounded-xl disabled:opacity-60">
+          <button onClick={requestClose} disabled={loading} className="btn-secondary flex-1 py-3 rounded-xl disabled:opacity-60">
             Batal
           </button>
           <button

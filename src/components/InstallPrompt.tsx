@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { X, Download, Share, Plus } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 import { useDialog } from '../hooks/useDialog';
+import { useDragDismiss } from '../hooks/useDragDismiss';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -14,7 +15,9 @@ export default function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showGuide, setShowGuide] = useState(false);
   const [hidden, setHidden] = useState(true);
-  const guideDlg = useDialog(showGuide, { onClose: () => setShowGuide(false), label: 'Panduan pasang aplikasi di iPhone' });
+  // Exit meluncur + drag beneran (konten pendek, aman handlers di panel penuh).
+  const guideDrag = useDragDismiss(() => setShowGuide(false));
+  const guideDlg = useDialog(showGuide, { onClose: guideDrag.dismiss, label: 'Panduan pasang aplikasi di iPhone' });
 
   const isStandalone =
     typeof window !== 'undefined' &&
@@ -94,13 +97,15 @@ export default function InstallPrompt() {
       </div>
 
       {showGuide && (
-        <div className="fixed inset-0 z-modal flex items-end" onClick={() => setShowGuide(false)}>
-          <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-modal flex items-end" onClick={guideDrag.dismiss}>
+          <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${guideDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
           <div
             ref={guideDlg.panelRef}
             {...guideDlg.panelProps}
             className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
             onClick={(e) => e.stopPropagation()}
+            style={guideDrag.style}
+            {...guideDrag.handlers}
           >
             <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
             <div className="flex items-center gap-3 mb-4">
@@ -123,7 +128,7 @@ export default function InstallPrompt() {
               })}
             </ol>
             <button
-              onClick={() => setShowGuide(false)}
+              onClick={guideDrag.dismiss}
               className="press w-full mt-5 py-3 rounded-xl bg-brand text-white font-bold text-sm"
             >
               Mengerti

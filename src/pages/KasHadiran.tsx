@@ -45,8 +45,9 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   const [tarikanId, setTarikanId] = useState<string>(() => tarikanOpsi[0]?.id ?? '');
   const [saving, setSaving] = useState(false);
   const drag = useDragDismiss(onClose);
-  useBackDismiss(true, onClose);
-  const dlg = useDialog(true, { onClose, label: 'Setor ke Kas Besar RT' });
+  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() → meluncur.
+  useBackDismiss(true, drag.dismiss);
+  const dlg = useDialog(true, { onClose: drag.dismiss, label: 'Setor ke Kas Besar RT' });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,8 +61,8 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
-      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-50 flex items-end" onClick={drag.dismiss}>
+      <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} style={drag.style}>
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
@@ -108,7 +109,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             </div>
           </div>
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose}
+            <button type="button" onClick={drag.dismiss}
               className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
             <button type="submit" disabled={saving || !nominal}
               className="btn-brand flex-1 py-3 text-sm font-semibold disabled:opacity-70 active:scale-[0.97] transition flex items-center justify-center gap-2">
@@ -156,8 +157,8 @@ export default function KasHadiranPage() {
   const [detailTitip, setDetailTitip] = useState<{ id: string; nama: string }[]>([]);
   const [detailTidak, setDetailTidak] = useState<{ id: string; nama: string; lunas: boolean }[]>([]);
   const detailDrag = useDragDismiss(() => setDetailTarikan(null));
-  useBackDismiss(detailTarikan !== null, () => setDetailTarikan(null));
-  const detailDlg = useDialog(detailTarikan !== null, { onClose: () => setDetailTarikan(null), label: 'Detail tarikan' });
+  useBackDismiss(detailTarikan !== null, detailDrag.dismiss);
+  const detailDlg = useDialog(detailTarikan !== null, { onClose: detailDrag.dismiss, label: 'Detail tarikan' });
 
   async function load() {
     // Sudah ada data tampil → revalidate diam-diam: tanpa skeleton, gagal = toast.
@@ -834,8 +835,8 @@ export default function KasHadiranPage() {
 
       {/* Sheet detail tarikan: hadir & tidak hadir + status bayar talangan */}
       {detailTarikan && (
-        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setDetailTarikan(null)}>
-          <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-50 flex items-end" onClick={detailDrag.dismiss}>
+          <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${detailDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
           <div
             ref={detailDlg.panelRef}
             {...detailDlg.panelProps}
@@ -983,7 +984,7 @@ export default function KasHadiranPage() {
             </div>
 
             <button
-              onClick={() => setDetailTarikan(null)}
+              onClick={detailDrag.dismiss}
               className="press absolute top-2 right-2 w-11 h-11 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
               aria-label="Tutup"
             >

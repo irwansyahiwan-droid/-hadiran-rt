@@ -15,6 +15,7 @@ import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useDragDismiss } from '../hooks/useDragDismiss';
 import type { Warga, Tarikan } from '../lib/types';
 
 interface Props {
@@ -44,8 +45,11 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   const [saving, setSaving] = useState(false);
   // Pengaman: anggota yang dinonaktifkan tapi masih punya jadwal tarikan ke depan
   const [jadwalNonaktif, setJadwalNonaktif] = useState<number[] | null>(null);
-  useBackDismiss(true, onClose);
-  const dlg = useDialog(true, { onClose, label: mode === 'edit' ? 'Edit anggota' : 'Tambah anggota' });
+  // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
+  // lewat drag.dismiss (handlers tak disebar; panel form scrollable).
+  const drag = useDragDismiss(onClose);
+  useBackDismiss(true, drag.dismiss);
+  const dlg = useDialog(true, { onClose: drag.dismiss, label: mode === 'edit' ? 'Edit anggota' : 'Tambah anggota' });
 
   const kasNaik = pilih.size * 5000;
 
@@ -109,12 +113,12 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
   return (
     <div className="fixed inset-0 z-modal flex items-end sm:items-center justify-center">
-      <div aria-hidden="true" className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
         className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 5rem)' }}
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 5rem)', ...drag.style }}
       >
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -125,7 +129,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
               {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
             </p>
           </div>
-          <button onClick={onClose} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -251,7 +255,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
         <div className="flex gap-2.5">
           <button
-            onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : onClose}
+            onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : drag.dismiss}
             className="btn-secondary flex-1 py-3 rounded-full"
           >
             Batal

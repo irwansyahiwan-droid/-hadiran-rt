@@ -131,8 +131,9 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
 // ── Sheet edit/set target ──────────────────────────────────
 function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: () => void; onSaved: () => void }) {
   const drag = useDragDismiss(onClose);
-  useBackDismiss(true, onClose);
-  const dlg = useDialog(true, { onClose, label: initial ? 'Ubah target Kas RT' : 'Tetapkan target Kas RT' });
+  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() → meluncur.
+  useBackDismiss(true, drag.dismiss);
+  const dlg = useDialog(true, { onClose: drag.dismiss, label: initial ? 'Ubah target Kas RT' : 'Tetapkan target Kas RT' });
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(initial?.tanggal ?? '');
@@ -157,8 +158,8 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
-      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-50 flex items-end" onClick={drag.dismiss}>
+      <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
