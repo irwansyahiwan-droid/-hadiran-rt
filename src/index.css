@@ -684,10 +684,21 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 @keyframes sheetUp     { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes backdropIn  { from { opacity: 0; } to { opacity: 1; } }
 .sheet-backdrop { animation: backdropIn 0.28s ease-out both; }
+/* Exit backdrop — pasangan luncur-keluar `dismiss()` useDragDismiss: backdrop
+   memudar BERSAMA panel yang turun, bukan pop lenyap saat unmount. Lebih cepat
+   dari enter (exit = sistem merespons, bukan menunda). pointer-events none →
+   tap susulan saat memudar tak nyangkut ke backdrop mati. */
+@keyframes backdropOut { from { opacity: 1; } to { opacity: 0; } }
+.sheet-backdrop-out { animation: backdropOut 0.24s ease-out forwards; pointer-events: none; }
 /* overscroll-behavior: contain → scroll di dalam sheet yang mentok tak
    "merembet" (chain) menggeser halaman di belakangnya. Berlaku utk semua
    bottom-sheet yg panel-nya jadi area scroll (mis. modal Kas RT / Setor). */
-.sheet-panel    { animation: sheetUp 0.4s var(--ease-out-expo) both; overscroll-behavior: contain; }
+/* fill BACKWARDS (bukan both) — alasan sama dgn .page-enter: fill-forwards
+   MENAHAN `transform: translateY(0)` selamanya, dan di cascade nilai animasi
+   menang atas inline style → transform drag-to-dismiss (ikut jari) & luncuran
+   keluar dismiss() tak pernah render. Backwards: begitu entrance selesai,
+   transform kembali ke inline → panel benar-benar mengikuti jari. */
+.sheet-panel    { animation: sheetUp 0.4s var(--ease-out-expo) backwards; overscroll-behavior: contain; }
 
 /* Toast — masuk turun dari atas, keluar NAIK ke atas (arah yg sama → konsisten
    spasial; elemen hilang tanpa transisi terasa "rusak"). Exit lebih cepat &

@@ -3,6 +3,7 @@ import { Wallet, CalendarDays, ArrowLeftRight, Eye, ArrowRight } from 'lucide-re
 import { haptic } from '../lib/utils';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useDragDismiss } from '../hooks/useDragDismiss';
 import logoRt from '../assets/logo-rt.svg';
 
 // Sekali tampil per perangkat. Naikkan versi (v2…) bila isi sambutan berubah
@@ -25,10 +26,17 @@ export default function WelcomeSheet() {
     try { return localStorage.getItem(KEY) !== '1'; } catch { return false; }
   });
 
-  function dismiss() {
-    haptic(12);
+  // Unmount FINAL — dipanggil hook drag setelah panel selesai meluncur keluar.
+  function finalize() {
     try { localStorage.setItem(KEY, '1'); } catch { /* abaikan (storage diblokir) */ }
     setShow(false);
+  }
+
+  // Drag handle beneran (bukan hiasan) + semua jalur tutup meluncur turun.
+  const drag = useDragDismiss(finalize);
+  function dismiss() {
+    haptic(12);               // getar saat NIAT menutup (tap), bukan saat unmount
+    drag.dismiss();
   }
 
   useBackDismiss(show, dismiss);
@@ -38,13 +46,14 @@ export default function WelcomeSheet() {
 
   return (
     <div className="fixed inset-0 z-modal flex items-end" onClick={dismiss}>
-      <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
         className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-6 float"
         onClick={(e) => e.stopPropagation()}
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' }}
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)', ...drag.style }}
+        {...drag.handlers}
       >
         <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-5" />
         <img src={logoRt} alt="" width={56} height={56} className="w-14 h-14 rounded-2xl object-contain mx-auto mb-3 ring-1 ring-black/5 dark:ring-white/10" />

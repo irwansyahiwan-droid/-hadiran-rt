@@ -100,16 +100,20 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
                   blok h-8 yg sejajar persis dgn pill. Aktif tetap DIISI (fill
                   tint) → outline→solid, active terbaca "padat" bukan cuma warna. */}
               <span className="flex items-center justify-center w-16 h-8">
+                {/* Warna 150ms (bukan 300): nav ditekan puluhan kali sehari →
+                    respons harus crisp; gerak "hidup" cukup dari pill spring. */}
                 <Icon
-                  className={`w-6 h-6 transition-colors duration-300 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
+                  className={`w-6 h-6 transition-colors duration-150 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-gray-500 dark:text-gray-500'}`}
                   strokeWidth={isActive ? 2.2 : 2}
                   fill={isActive ? 'currentColor' : 'none'}
-                  style={{ fillOpacity: isActive ? 0.2 : 0, transition: 'fill-opacity 300ms var(--ease-spring)' }}
+                  style={{ fillOpacity: isActive ? 0.2 : 0, transition: 'fill-opacity 200ms ease-out' }}
                 />
               </span>
+              {/* Timing spring DIHAPUS dari warna: kurva overshoot (>1) meng-
+                  extrapolate interpolasi warna melewati target (kilat aneh).
+                  Spring hanya utk transform (pill); warna = ease standar. */}
               <span
-                className={`text-micro leading-none mt-1 transition-colors duration-300 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}
-                style={{ transitionTimingFunction: 'var(--ease-spring)' }}
+                className={`text-micro leading-none mt-1 transition-colors duration-150 ${isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-faint dark:text-gray-400'}`}
               >
                 {label}
               </span>

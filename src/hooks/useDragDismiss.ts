@@ -4,6 +4,7 @@ import { haptic } from '../lib/utils';
 const DISMISS = 100;     // jarak tarik (px) ambang tutup
 const VELOCITY = 0.5;    // px/ms — flick cepat langsung tutup walau jarak pendek
 const DAMP = 0.2;        // resistansi saat menarik ke ATAS (overscroll)
+const EXIT_MS = 300;     // ≈ transisi transform 0.32s — unmount SETELAH panel selesai meluncur
 
 /**
  * Drag-to-dismiss bottom sheet — terasa native (ala iOS/Vaul).
@@ -15,10 +16,18 @@ const DAMP = 0.2;        // resistansi saat menarik ke ATAS (overscroll)
  * - Multi-touch: jari kedua diabaikan → sheet tak melompat saat ganti jari.
  * - Haptic: getar sekali saat menyeberang ambang (maju) + saat benar tertutup.
  * - Damping: tarik ke atas diberi resistansi, bukan dinding mati.
+ * - Exit MELUNCUR: dismiss tidak unmount seketika — panel meneruskan gerak
+ *   turun dari posisi jari (transition retarget, interruptible) baru onClose.
+ *   `dismiss()` diekspos agar tombol/backdrop/Escape memakai luncuran yang
+ *   sama; `dismissing` untuk fade backdrop di call-site (.sheet-backdrop-out).
  */
 export function useDragDismiss(onClose: () => void) {
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
+  const dismissingRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   const startY = useRef(0);
   const lastY = useRef(0);
   const lastT = useRef(0);
@@ -28,8 +37,32 @@ export function useDragDismiss(onClose: () => void) {
   const touchId = useRef<number | null>(null);
   const offsetRef = useRef(0);      // baca offset terkini di onTouchEnd tanpa stale closure
 
+  /* Luncurkan panel keluar layar dari POSISI SEKARANG (offset drag ikut
+     terbawa — transisi transform retarget, bukan keyframe yang restart dari 0),
+     lalu onClose setelah luncuran selesai. Idempoten: panggilan kedua diabaikan. */
+  const dismiss = () => {
+    if (dismissingRef.current) return;
+    // Reduced-motion: transisi global sudah 0.001ms → tutup langsung tanpa delay.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      onCloseRef.current();
+      return;
+    }
+    dismissingRef.current = true;
+    setDismissing(true);
+    offsetRef.current = window.innerHeight;
+    setOffset(window.innerHeight);
+    window.setTimeout(() => {
+      onCloseRef.current();
+      // Reset SETELAH unmount → hook (hidup di level halaman) siap utk buka berikutnya.
+      dismissingRef.current = false;
+      setDismissing(false);
+      offsetRef.current = 0;
+      setOffset(0);
+    }, EXIT_MS);
+  };
+
   const onTouchStart = (e: React.TouchEvent) => {
-    if (active.current) return;     // sudah menyeret → abaikan jari kedua
+    if (active.current || dismissingRef.current) return; // sudah menyeret / sedang keluar → abaikan
     const t = e.touches[0];
     touchId.current = t.identifier;
     startY.current = lastY.current = t.clientY;
@@ -65,22 +98,25 @@ export function useDragDismiss(onClose: () => void) {
     if (!active.current) return;
     active.current = false;
     setDragging(false);
+    armed.current = false;
 
     const flick = vel.current > VELOCITY; // bergerak ke bawah dgn cepat
     if (offsetRef.current > DISMISS || (flick && offsetRef.current > 8)) {
       haptic(12);
-      onClose();
+      dismiss();                    // meneruskan luncuran dari posisi jari
+      return;
     }
 
-    armed.current = false;
     offsetRef.current = 0;
-    setOffset(0);
+    setOffset(0);                   // snap-back (transisi menyala lagi di bawah)
   };
 
   const style: React.CSSProperties = {
     transform: offset > 0 ? `translateY(${offset}px)` : undefined,
     transition: dragging ? 'none' : 'transform 0.32s var(--ease-out-expo)',
+    // Saat meluncur keluar: panel "mati rasa" — tap susulan tak nyangkut.
+    pointerEvents: dismissing ? 'none' : undefined,
   };
 
-  return { handlers: { onTouchStart, onTouchMove, onTouchEnd }, style, dragging };
+  return { handlers: { onTouchStart, onTouchMove, onTouchEnd }, style, dragging, dismissing, dismiss };
 }

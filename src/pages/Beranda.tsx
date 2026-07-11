@@ -64,8 +64,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [error, setError] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<TrxItem | null>(null);
   const trxDrag = useDragDismiss(() => setSelectedTrx(null));
-  useBackDismiss(selectedTrx !== null, () => setSelectedTrx(null));
-  const trxDlg = useDialog(selectedTrx !== null, { onClose: () => setSelectedTrx(null), label: 'Detail transaksi' });
+  // Semua jalur tutup (backdrop, Back HP, Escape) lewat dismiss() yang sama →
+  // sheet selalu MELUNCUR keluar, bukan lenyap seketika (unmount ditunda hook).
+  useBackDismiss(selectedTrx !== null, trxDrag.dismiss);
+  const trxDlg = useDialog(selectedTrx !== null, { onClose: trxDrag.dismiss, label: 'Detail transaksi' });
   const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
   const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
   const [trxSearch, setTrxSearch] = useState('');
@@ -593,8 +595,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
     {/* Transaksi detail bottom sheet */}
     {selectedTrx !== null && (
-      <div className="fixed inset-0 z-50 flex items-end" onClick={() => setSelectedTrx(null)}>
-        <div className="sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="fixed inset-0 z-50 flex items-end" onClick={trxDrag.dismiss}>
+        <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${trxDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
         <div
           ref={trxDlg.panelRef}
           {...trxDlg.panelProps}
