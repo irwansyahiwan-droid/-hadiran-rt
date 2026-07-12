@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, RotateCcw, RefreshCw } from 'lucide-react';
 import { useDialog } from '../hooks/useDialog';
+import { useClosePhase } from '../hooks/useClosePhase';
 import { haptic } from '../lib/utils';
 
 interface Props {
@@ -23,14 +24,8 @@ export default function ConfirmBatalTarikan({ open, nomor, loading = false, onCl
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Exit modal tengah: fade+scale di tempat (.pop → .pop-out) baru unmount —
-  // bukan meluncur turun (itu bahasa bottom sheet). Idempoten selama closing.
-  const [closing, setClosing] = useState(false);
-  function requestClose() {
-    if (closing) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { onClose(); return; }
-    setClosing(true);
-    window.setTimeout(() => { setClosing(false); onClose(); }, 150);
-  }
+  // bukan meluncur turun (itu bahasa bottom sheet).
+  const { closing, requestClose } = useClosePhase(onClose, 150);
   const dlg = useDialog(open, { onClose: requestClose, label: `Konfirmasi batalkan Tarikan #${nomor}` });
 
   // Reset isian tiap kali dibuka + fokus ke input.

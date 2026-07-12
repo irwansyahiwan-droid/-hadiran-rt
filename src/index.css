@@ -727,6 +727,11 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 @keyframes slideInLeft  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 .page-in-right { animation: slideInRight 0.22s var(--ease-out-expo) backwards; }
 .page-in-left  { animation: slideInLeft 0.22s var(--ease-out-expo) backwards; }
+/* Exit sub-page full-screen (Kelola Anggota, Riwayat, dst.): mundur ke arah
+   datangnya (kanan) + fade — spasial konsisten dgn page-in-right. Lebih cepat
+   dari enter (exit = sistem merespons). Tukar kelas via useClosePhase. */
+@keyframes slideOutRight { to { opacity: 0; transform: translateX(20px); } }
+.page-out-right { animation: slideOutRight 0.16s var(--ease-out-expo) forwards; pointer-events: none; }
 
 /* Sukses cinematic — overlay, lingkaran, centang gores, confetti */
 @keyframes successPop {

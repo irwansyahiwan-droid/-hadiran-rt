@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { createPortal } from 'react-dom';
 import { Info } from 'lucide-react';
 import { haptic } from '../lib/utils';
+import { useClosePhase } from '../hooks/useClosePhase';
 
 interface InfoTipProps {
   /** Istilah yang dijelaskan (jadi judul popover + label a11y). */
@@ -33,13 +34,17 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLSpanElement>(null);
 
+  // Exit pop-menu-out (0.12s) baru unmount — paritas dgn menu Header/Ekspor
+  // yang sudah punya fase keluar; popover lenyap instan terasa "rusak".
+  const exit = useClosePhase(() => setOpen(false), 120);
+
   // Escape menutup popover (keyboard).
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') exit.requestClose(); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps -- requestClose stabil via ref
 
   // Hitung posisi fixed dari tombol; clamp horizontal & flip vertikal.
   useLayoutEffect(() => {
@@ -80,7 +85,7 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
       <button
         ref={btnRef}
         type="button"
-        onClick={(e) => { e.stopPropagation(); e.preventDefault(); haptic(); setOpen((o) => !o); }}
+        onClick={(e) => { e.stopPropagation(); e.preventDefault(); haptic(); if (open) exit.requestClose(); else setOpen(true); }}
         aria-label={`Apa itu ${label}?`}
         aria-expanded={open}
         className={`press relative inline-flex items-center justify-center w-5 h-5 rounded-full transition-colors before:absolute before:-inset-3 before:content-[''] ${trigger}`}
@@ -89,7 +94,7 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
       </button>
       {open && createPortal(
         <>
-          <span className="fixed inset-0 z-tooltip" aria-hidden="true" onClick={(e) => { e.stopPropagation(); setOpen(false); }} />
+          <span className="fixed inset-0 z-tooltip" aria-hidden="true" onClick={(e) => { e.stopPropagation(); exit.requestClose(); }} />
           <span
             ref={popRef}
             role="tooltip"
@@ -101,7 +106,7 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
               width: pos?.width ?? POP_W,
               opacity: pos ? 1 : 0,
             }}
-            className="pop-menu z-tooltip p-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float text-left normal-case tracking-normal"
+            className={`${exit.closing ? 'pop-menu-out' : 'pop-menu'} z-tooltip p-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float text-left normal-case tracking-normal`}
           >
             <span className="block text-caption font-bold text-ink dark:text-gray-100 mb-0.5">{label}</span>
             <span className="block text-caption font-normal text-ink-sub dark:text-gray-300 leading-relaxed">{children}</span>

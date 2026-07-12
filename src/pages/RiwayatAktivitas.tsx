@@ -11,6 +11,7 @@ import FilterChips from '../components/FilterChips';
 import { useRealtime } from '../hooks/useRealtime';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useClosePhase } from '../hooks/useClosePhase';
 import { fetchAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -88,9 +89,11 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   // Live: muat ulang saat ada aktivitas baru tercatat
   useRealtime(open ? ['audit_log'] : [], () => { if (open) load(); });
 
-  // Tombol Back HP menutup overlay (bukan keluar app)
-  useBackDismiss(open, onClose);
-  const dlg = useDialog(open, { onClose, label: 'Riwayat aktivitas' });
+  // Tombol Back HP menutup overlay (bukan keluar app). Semua jalur tutup
+  // lewat requestClose → mundur ke kanan (page-out-right) baru unmount.
+  const exit = useClosePhase(onClose, 160);
+  useBackDismiss(open, exit.requestClose);
+  const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Riwayat aktivitas' });
 
   const grouped = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -127,7 +130,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div ref={dlg.panelRef} {...dlg.panelProps} className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
       {/* Header */}
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
@@ -135,7 +138,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
       >
         <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
           <button
-            onClick={() => { haptic(); onClose(); }}
+            onClick={() => { haptic(); exit.requestClose(); }}
             className="press w-11 h-11 flex items-center justify-center -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Kembali"
           >

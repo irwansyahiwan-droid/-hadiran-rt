@@ -16,6 +16,7 @@ import { showToast } from '../lib/toast';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import { useClosePhase } from '../hooks/useClosePhase';
 import type { Warga, Tarikan } from '../lib/types';
 
 interface Props {
@@ -315,8 +316,10 @@ export default function KelolaAnggota({ open, onClose }: Props) {
     if (open) { setSearch(''); load(); }
   }, [open]);
 
-  useBackDismiss(open && !form, onClose);
-  const dlg = useDialog(open && !form, { onClose, label: 'Kelola anggota' });
+  // Exit mundur ke kanan (page-out-right) baru unmount — satu jalur requestClose.
+  const exit = useClosePhase(onClose, 160);
+  useBackDismiss(open && !form, exit.requestClose);
+  const dlg = useDialog(open && !form, { onClose: exit.requestClose, label: 'Kelola anggota' });
 
   const aktifCount = list.filter((w) => w.status_aktif).length;
   const filtered = useMemo(() => {
@@ -328,14 +331,14 @@ export default function KelolaAnggota({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div ref={dlg.panelRef} {...dlg.panelProps} className="fixed inset-0 z-50 bg-sunken dark:bg-gray-950 page-in-right overflow-y-auto">
+    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
       <header
         className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
           <button
-            onClick={() => { haptic(); onClose(); }}
+            onClick={() => { haptic(); exit.requestClose(); }}
             className="press w-11 h-11 flex items-center justify-center -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Kembali"
           >
