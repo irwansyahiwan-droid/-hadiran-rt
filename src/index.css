@@ -223,12 +223,16 @@ input, textarea  { caret-color: #1B7249; }
      hero — bukan dari aura di latar. Samakan dgn body/sunken/manifest/landing. */
   background-color: #ECF1F7;
 }
+/* MATERIAL-FLAT DARK (12 Jul 2026) — menuntaskan keputusan 2 Jul ke sisi gelap.
+   Aura radial (emerald .30 + teal .22 + sky .15) DIHAPUS. Kanvas light sudah
+   diratakan 2 Jul dgn alasan tercatat ("hijau di atas abu = zona transisi muddy"),
+   tapi dark tak pernah ikut → app menyimpan DUA bahasa visual, persis akar yang
+   dulu bikin 9 pass gagal. Efek nyatanya terlihat: kabut hijau di belakang header
+   membuat hero hijau LEBUR ke kanvas hijau — hero kehilangan tepi.
+   Kini kanvas gelap RATA (#030712), separasi datang dari step tonal (kartu
+   gray-900) + ring cahaya + geometri — sama persis dgn logika sisi light. */
 .dark .app-bg {
   background-color: #030712;
-  background-image:
-    radial-gradient(105% 58% at 50% -10%, rgba(16, 185, 129, 0.30) 0%, transparent 52%),
-    radial-gradient(84% 54% at 100% -4%,  rgba(20, 184, 166, 0.22) 0%, transparent 50%),
-    radial-gradient(86% 54% at 0% 6%,     rgba(56, 189, 248, 0.15) 0%, transparent 48%);
 }
 
 /* ── Kontras teks (LIGHT MODE saja) ──────────────────────────────────
@@ -274,6 +278,15 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
   background: var(--hero-glow), var(--hero-gradient);
   box-shadow: var(--hero-shadow);
   overflow: hidden;
+}
+
+/* Pasangan dark .hero-card (JadwalWarga, Laporan Triwulan) — token, bukan kelas
+   baru, supaya SATU jalur tetap: ramp diturunkan sepadan .hero-emerald dan glow
+   sudut diredam (.34 → .18; halo terang di atas near-black = biang silau).
+   Putih di atas stop paling terang (#147044) = 6.1:1 → AA aman. */
+.dark {
+  --hero-gradient: linear-gradient(135deg, #0A4429 0%, #10603A 50%, #147044 100%);
+  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.18) 0%, rgba(45, 212, 150, 0) 55%);
 }
 
 /* Grain/noise overlay — keeps the gradient from looking flat */
@@ -441,6 +454,39 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
   background-image:
     radial-gradient(130% 72% at 0% 0%, rgba(4, 38, 24, 0.48), transparent 55%),
     linear-gradient(150deg, #2CC06E 0%, #0F7A47 52%, #064A2C 100%);
+}
+
+/* ── Permukaan brand di DARK — diredupkan (12 Jul 2026) ────────────────────
+   Gradient hero dirancang untuk kanvas TERANG; dipasang apa adanya di atas
+   near-black ia menyilaukan (chroma penuh + luminansi tinggi = mata "bergetar")
+   dan kartu terasa seperti stiker menyala, bukan permukaan. App dark premium
+   (Revolut/Linear/Mercury/iOS) selalu MENURUNKAN chroma & lightness permukaan
+   brand di dark. Ramp diturunkan satu tingkat; teks putih tetap lolos AA —
+   dihitung, bukan dikira: putih di atas stop TERANG tiap ramp =
+     emerald #1B7A49 → 5.35:1 · setor #2A56B8 → 6.68:1 · slate #3A4759 → 9.4:1
+   (semua ≥4.5:1, syarat teks kecil). Scrim pojok kiri-atas tetap → eyebrow aman. */
+.dark .hero-emerald {
+  background-image:
+    radial-gradient(130% 72% at 0% 0%, rgba(2, 20, 12, 0.42), transparent 55%),
+    linear-gradient(150deg, #1B7A49 0%, #0C5734 52%, #05301D 100%);
+}
+
+/* Dua varian hero KasHadiran. Sebelumnya ditulis sbg untaian utility gradient di
+   call-site (`from-setor via-setor-600 …`) sehingga TAK PUNYA pasangan dark dan
+   hex-nya berserak. Dipindah ke sini agar sekelas .hero-emerald: satu sumber,
+   light + dark sepasang. Nilai LIGHT identik dgn sebelumnya (setor #1E40AF/
+   #2563EB/#3B82F6 · slate-800/700/500) → tampilan terang tidak berubah. */
+.hero-setor {
+  background-image: linear-gradient(to bottom right, #1E40AF 0%, #2563EB 50%, #3B82F6 100%);
+}
+.dark .hero-setor {
+  background-image: linear-gradient(to bottom right, #16306E 0%, #1B3F8F 50%, #2A56B8 100%);
+}
+.hero-slate {
+  background-image: linear-gradient(to bottom right, #1E293B 0%, #334155 50%, #64748B 100%);
+}
+.dark .hero-slate {
+  background-image: linear-gradient(to bottom right, #16202F 0%, #232E42 50%, #3A4759 100%);
 }
 
 /* (.nav-float dihapus 10 Jul — sisa era nav kapsul melayang, tak ada pemakainya

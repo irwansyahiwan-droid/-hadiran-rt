@@ -449,10 +449,13 @@ export default function KasHadiranPage() {
   const pendapatanBersih = pendapatanKotor - POTONGAN_ADMIN;
 
   const sudahSetor = totalSetor > 0;
+  // Ketiganya kini kelas dari index.css (satu sumber, light + dark sepasang).
+  // Dulu dua varian ini untaian utility gradient di sini → tak punya pasangan
+  // dark, jadi biru/slate full-chroma menyala di atas near-black.
   const heroGradient = sudahSetor
-    ? 'bg-gradient-to-br from-setor via-setor-600 to-setor-500'
+    ? 'hero-setor'
     : saldo < 0
-      ? 'bg-gradient-to-br from-slate-800 via-slate-700 to-slate-500'
+      ? 'hero-slate'
       : 'hero-emerald'; // default → satu sumber Refined Emerald (index.css)
 
   return (
