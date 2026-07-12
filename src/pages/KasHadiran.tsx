@@ -584,7 +584,7 @@ export default function KasHadiranPage() {
         </CrossFade>
 
         {/* Alur Kas */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <p className="inline-flex items-center gap-1 text-sm font-bold text-ink dark:text-gray-100">
               Alur Kas Hadiran
@@ -697,7 +697,7 @@ export default function KasHadiranPage() {
                   return (
                     <div
                       key={t.id}
-                      className="rise lift bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 overflow-hidden"
+                      className="rise lift bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 overflow-hidden"
                       style={{ animationDelay: `${Math.min(idx, 10) * 0.05}s` }}
                     >
 

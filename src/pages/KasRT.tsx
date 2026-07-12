@@ -545,12 +545,12 @@ export default function KasRTPage() {
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
               <p className="text-sm font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</p>
               <AreaTrend points={saldoSeries} />
             </div>
             {monthly.length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5">
+              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
                   <div className="flex items-center gap-1">
@@ -581,7 +581,7 @@ export default function KasRTPage() {
 
         {/* Rekap per kategori — untuk pertanggungjawaban */}
         {!loading && list.length > 0 && (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-5 mt-4">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 mt-4">
             <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Rekap per Kategori</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Penerimaan */}
@@ -624,7 +624,7 @@ export default function KasRTPage() {
         <SectionTitle className="mt-6" count={list.length}>Mutasi Kas Besar RT</SectionTitle>
 
         <CrossFade loading={loading} skeleton={(
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {[...Array(5)].map((_, i) => (
               <div key={i} className={`flex items-center gap-3 px-5 py-4 [--di-l:4.25rem]${i < 4 ? ' divide-inset' : ''}`}>
                 <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
@@ -692,7 +692,7 @@ export default function KasRTPage() {
               action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setFilter('semua'); setSearch(''); } }}
             />
           ) : (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {displayList.map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === displayList.length - 1;

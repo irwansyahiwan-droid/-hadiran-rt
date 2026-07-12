@@ -390,21 +390,14 @@ export default function JadwalWargaPage() {
             Semua Tarikan
           </SectionTitle>
 
-          {/* Stat cards */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-              <p className="text-xl font-bold text-gray-500 dark:text-gray-400">{selesaiCount}</p>
-              <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
-            </div>
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-              <p className="text-xl font-bold text-emerald-700 dark:text-emerald-400">{terjadwalCount}</p>
-              <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Terjadwal</p>
-            </div>
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-              <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{allTarikan.length}</p>
-              <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Total</p>
-            </div>
-          </div>
+          {/* Stat cards — StatRow bersama (dialek "N kartu terpisah" yang tersisa di sini) */}
+          <StatRow
+            items={[
+              { label: 'Selesai', value: selesaiCount },
+              { label: 'Terjadwal', value: terjadwalCount, tone: 'pos' },
+              { label: 'Total', value: allTarikan.length },
+            ]}
+          />
 
           {/* List */}
           {allTarikan.length === 0 ? (

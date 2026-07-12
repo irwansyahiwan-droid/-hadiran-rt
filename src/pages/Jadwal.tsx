@@ -540,7 +540,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
 
   return (
     <div className={`transition duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
-      <div className="rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift overflow-hidden">
+      <div className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift overflow-hidden">
         {/* Header — badge sukses + judul + tutup */}
         <div className="flex items-center gap-2.5 px-4 pt-4 pb-3">
           <span className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
@@ -968,25 +968,18 @@ export default function JadwalPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="font-display text-xl font-bold text-gray-500 dark:text-gray-400 tabular-nums">{selesaiCount}</p>
-          <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Selesai</p>
-        </div>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="font-display text-xl font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">{dijadwalCount}</p>
-          <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Terjadwal</p>
-        </div>
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-3 text-center">
-          <p className="font-display text-xl font-bold text-gray-900 dark:text-gray-100 tabular-nums">{tarikanList.length}</p>
-          <p className="text-micro text-ink-faint dark:text-gray-400 font-medium">Total</p>
-        </div>
-      </div>
+      {/* Stats — StatRow bersama (dialek "N kartu terpisah" yang tersisa di sini) */}
+      <StatRow
+        items={[
+          { label: 'Selesai', value: selesaiCount },
+          { label: 'Terjadwal', value: dijadwalCount, tone: 'pos' },
+          { label: 'Total', value: tarikanList.length },
+        ]}
+      />
 
       {/* List — cross-fade skeleton → konten */}
       <CrossFade loading={loading} skeleton={(
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(5)].map((_, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-4 [--di-l:3.5rem] [--di-r:1rem] ${i < 4 ? 'divide-inset' : ''}`}>
               <div className="w-7 h-4 skeleton rounded-lg shrink-0" />
@@ -1004,7 +997,7 @@ export default function JadwalPage() {
       ) : tarikanList.length === 0 ? (
         <EmptyState icon={Calendar} title="Belum ada jadwal" subtitle="Jadwal tarikan akan muncul setelah dibuat oleh bendahara." />
       ) : (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {tarikanList.map((t, idx) => {
             const isLast    = idx === tarikanList.length - 1;
             const isSelesai = t.status === 'selesai';

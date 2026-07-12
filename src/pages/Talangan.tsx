@@ -455,7 +455,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       />
 
       <CrossFade loading={loading} skeleton={(
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-5 py-4">
               <div className="w-11 h-11 rounded-2xl skeleton shrink-0" />
@@ -479,7 +479,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
                 Tunggakan Berganda
               </SectionTitle>
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
+              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
                 {berganda.map(g => renderGroup(g))}
               </div>
             </div>
@@ -489,7 +489,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {showBelum && single.length > 0 && (
             <div>
               <SectionTitle className="mt-6" count={single.length}>Daftar Talangan</SectionTitle>
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
+              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
                 {single.map(g => renderGroup(g))}
               </div>
             </div>
@@ -499,7 +499,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {showLunas && lunas.length > 0 && (
             <div>
               <SectionTitle className="mt-6" tone="muted" count={lunas.length}>Sudah Lunas</SectionTitle>
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
+              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
                 {lunas.map(g => renderGroup(g, true))}
               </div>
             </div>
