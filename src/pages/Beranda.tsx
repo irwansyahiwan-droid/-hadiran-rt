@@ -295,7 +295,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       key={trx.id}
       onClick={() => { haptic(); setSelectedTrx(trx); }}
       style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-      className={`press rise w-full flex items-center gap-3 px-5 py-3.5 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
+      className={`press rise w-full flex items-center gap-3 px-5 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
     >
       <div className={`icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
         {trx.tipe === 'setor'
@@ -305,8 +305,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug truncate">{trx.judul}</p>
-        {/* Baris kedua = konteks (+ tanggal saat daftar tak dikelompokkan). */}
-        <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5 truncate">
+        {/* Baris kedua = konteks (+ tanggal saat daftar tak dikelompokkan).
+            mt-1 (bukan mt-0.5): jarak 2px bikin judul & sub nyaris bersentuhan —
+            biang rasa "rapat" yang dilaporkan. 4px = dua baris terbaca sebagai
+            pasangan, bukan satu gumpalan. */}
+        <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
           {[trx.sub, showDate ? formatTanggal(trx.tanggal) : null].filter(Boolean).join(' · ')}
         </p>
       </div>
@@ -329,7 +332,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         {/* Kepala kelompok: tanggal SEKALI + net hari itu (pola buku besar bank).
             Tanpa fill abu — putih polos + hairline pemisah antar-kelompok, agar
             tetap sebahasa dgn kartu MATERIAL-FLAT (abu disimpan utk kontrol). */}
-        <div className={`flex items-baseline justify-between gap-3 px-5 pt-4 pb-2 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
+        {/* pt-5/pb-3 (bukan pt-4/pb-2): kepala kelompok dulu menempel ke baris
+            pertama di bawahnya (8px) padahal berjarak 16px dari baris sebelumnya —
+            terbaca "jatuh" ke kelompok yang salah. Kini napas atas > bawah, jadi
+            label jelas MILIK kelompok di bawahnya. */}
+        <div className={`flex items-baseline justify-between gap-3 px-5 pt-5 pb-3 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
           <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">{g.label}</span>
           <span className={`text-micro font-bold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
             {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
