@@ -14,6 +14,8 @@ interface JadwalWargaCache {
   talanganLunas: string[]; // Set tak bisa di-JSON-kan → simpan sebagai array
 }
 import Tag from '../components/Tag';
+import FilterChips from '../components/FilterChips';
+import StatRow from '../components/StatRow';
 import ClearButton from '../components/ClearButton';
 import InfoTip from '../components/InfoTip';
 import ErrorState from '../components/ErrorState';
@@ -279,20 +281,15 @@ export default function JadwalWargaPage() {
       {/* Sub-tab: Daftar Anggota */}
       {subTab === 'anggota' && (
         <div className="space-y-3">
-          {/* Stat bar */}
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { label: 'Selesai', value: selesaiAnggotaCount, color: 'text-emerald-700 dark:text-emerald-400' },
-              { label: 'Hadir', value: hadirCount, color: 'text-emerald-700 dark:text-emerald-400' },
-              { label: 'Titip', value: titipCount, color: 'text-blue-600 dark:text-blue-400' },
-              { label: 'Tidak', value: tidakHadirCount, color: 'text-rose-600 dark:text-rose-400' },
-            ].map(s => (
-              <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
-                <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
-                <p className="text-micro text-ink-faint dark:text-gray-400 mt-0.5">{s.label}</p>
-              </div>
-            ))}
-          </div>
+          {/* Stat bar — StatRow bersama (satu kartu berkolom, sama dgn Beranda/Jadwal) */}
+          <StatRow
+            items={[
+              { label: 'Selesai', value: selesaiAnggotaCount, tone: 'pos' },
+              { label: 'Hadir', value: hadirCount, tone: 'pos' },
+              { label: 'Titip', value: titipCount, tone: 'info' },
+              { label: 'Tidak', value: tidakHadirCount, tone: 'neg' },
+            ]}
+          />
 
           {/* Search */}
           <div className="relative">
@@ -311,24 +308,16 @@ export default function JadwalWargaPage() {
 
           {/* Filter status — hanya relevan bila sudah ada tarikan terakhir */}
           {lastTarikan && (
-            <div className="grid grid-cols-4 gap-1.5">
-              {([
-                ['semua', 'Semua'], ['hadir', 'Hadir'], ['titip', 'Titip'], ['tidak', 'Tidak'],
-              ] as const).map(([id, label]) => (
-                <button
-                  key={id}
-                  onClick={() => { if (wargaFilter !== id) haptic(); setWargaFilter(id); }}
-                  aria-pressed={wargaFilter === id}
-                  className={`press inline-flex items-center justify-center min-h-[44px] rounded-xl text-xs font-semibold border transition ${
-                    wargaFilter === id
-                      ? 'bg-brand text-white border-transparent' /* fill brand DATAR (MATERIAL-FLAT) — gradient+glow pra-flat dihapus */
-                      : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <FilterChips
+              options={[
+                { id: 'semua', label: 'Semua' },
+                { id: 'hadir', label: 'Hadir' },
+                { id: 'titip', label: 'Titip' },
+                { id: 'tidak', label: 'Tidak' },
+              ] as const}
+              value={wargaFilter}
+              onChange={setWargaFilter}
+            />
           )}
 
           {/* Warga list */}

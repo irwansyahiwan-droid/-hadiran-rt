@@ -75,6 +75,26 @@ export function formatTanggal(dateStr: string): string {
   });
 }
 
+/**
+ * Label kepala kelompok tanggal untuk daftar transaksi: "Hari ini" / "Kemarin"
+ * untuk dua hari terakhir, selebihnya tanggal penuh. Warga membaca daftar dari
+ * atas, jadi dua hari terdekat lebih cepat dikenali lewat kata daripada angka.
+ * Perbandingan dilakukan pada tanggal LOKAL (bukan UTC) agar tidak meleset
+ * sehari untuk warga di WIB.
+ */
+export function labelTanggalRelatif(dateStr: string): string {
+  const kunci = (d: Date) =>
+    `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  const d = new Date(dateStr);
+  const now = new Date();
+  const kemarin = new Date(now);
+  kemarin.setDate(now.getDate() - 1);
+
+  if (kunci(d) === kunci(now)) return 'Hari ini';
+  if (kunci(d) === kunci(kemarin)) return 'Kemarin';
+  return formatTanggal(dateStr);
+}
+
 export function formatTanggalShort(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString('id-ID', {

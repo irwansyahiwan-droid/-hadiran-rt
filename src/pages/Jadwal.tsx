@@ -7,6 +7,8 @@ import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import Fab from '../components/Fab';
+import FilterChips from '../components/FilterChips';
+import StatRow from '../components/StatRow';
 import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
 import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
@@ -318,20 +320,15 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         </div>
       </div>
 
-      {/* Stats bar */}
-      <div className="grid grid-cols-4 gap-2">
-        {[
-          { label: 'Hadir', value: hadirCount, color: 'text-emerald-700 dark:text-emerald-400' },
-          { label: 'Titip', value: titipCount, color: 'text-blue-600 dark:text-blue-400' },
-          { label: 'Tdk Hadir', value: tidakCount, color: 'text-rose-600 dark:text-rose-400' },
-          { label: 'Talangan', value: formatKompak(talanganTotal), color: 'text-warn dark:text-amber-400' },
-        ].map(s => (
-          <div key={s.label} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 lift p-2.5 text-center">
-            <p className={`text-base font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-micro text-ink-faint dark:text-gray-400 mt-0.5">{s.label}</p>
-          </div>
-        ))}
-      </div>
+      {/* Stats bar — StatRow bersama (satu kartu berkolom, sama dgn Beranda) */}
+      <StatRow
+        items={[
+          { label: 'Hadir', value: hadirCount, tone: 'pos' },
+          { label: 'Titip', value: titipCount, tone: 'info' },
+          { label: 'Tdk Hadir', value: tidakCount, tone: 'neg' },
+          { label: 'Talangan', value: formatKompak(talanganTotal), tone: 'warn' },
+        ]}
+      />
 
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
@@ -366,23 +363,17 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         </button>
       </div>
 
-      {/* Filter tabs */}
-      <div className="grid grid-cols-4 gap-1.5">
-        {(['semua', 'hadir', 'titip', 'belum'] as AbsensiFilter[]).map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            aria-pressed={filter === f}
-            className={`inline-flex items-center justify-center min-h-[44px] rounded-xl text-xs font-semibold border transition ${
-              filter === f
-                ? 'bg-brand text-white border-brand'
-                : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
-            }`}
-          >
-            {f === 'semua' ? 'Semua' : f === 'hadir' ? 'Hadir' : f === 'titip' ? 'Titip' : 'Tidak'}
-          </button>
-        ))}
-      </div>
+      {/* Filter — FilterChips bersama (pill), bukan grid kotak berbingkai buatan sendiri */}
+      <FilterChips
+        options={[
+          { id: 'semua', label: 'Semua' },
+          { id: 'hadir', label: 'Hadir' },
+          { id: 'titip', label: 'Titip' },
+          { id: 'belum', label: 'Tidak' },
+        ] as const}
+        value={filter}
+        onChange={setFilter}
+      />
 
       {/* Search */}
       <div className="relative">

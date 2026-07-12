@@ -6,6 +6,7 @@ import ErrorState from '../components/ErrorState';
 import { showToast } from '../lib/toast';
 import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
+import StatRow from '../components/StatRow';
 import CrossFade from '../components/CrossFade';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -13,7 +14,7 @@ import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
-import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, maskRp } from '../lib/utils';
+import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, labelTanggalRelatif, maskRp } from '../lib/utils';
 import BannerCarousel, { bannerViewportHeight } from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
@@ -25,7 +26,13 @@ import type { DashboardSummary, Tarikan } from '../lib/types';
 interface TrxItem {
   id: string;
   tipe: 'setor' | 'talangan_lunas';
+  /** Kalimat penuh — dipakai untuk PENCARIAN & sheet detail. */
   keterangan: string;
+  /** Judul baris: subjeknya saja (nama warga). Kalimat penuh "Talangan lunas oleh
+      X — Tarikan #N" membungkus 3 baris di HP karena nama terkubur di tengah;
+      dipecah jadi judul (nama) + sub (konteks) supaya daftar bisa dipindai. */
+  judul: string;
+  sub: string | null;
   tanggal: string;
   nominal: number;
   /** null = di luar batas kelengkapan jendela fetch (saldo berjalan tak bisa
@@ -118,19 +125,31 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       id: t.id,
       tipe: 'setor' as const,
       keterangan: t.keterangan,
+      judul: t.keterangan,
+      sub: 'Setor ke Kas RT',
       tanggal: t.tanggal,
       nominal: -t.nominal,
     }));
 
     const talanganItems = (talanganLunasRes.data as unknown as TalanganLunasRow[] ?? [])
       .filter(t => t.tanggal_lunas)
-      .map(t => ({
-        id: t.id,
-        tipe: 'talangan_lunas' as const,
-        keterangan: `Talangan lunas oleh ${t.warga?.nama ?? '-'} — Tarikan #${t.tarikan?.nomor ?? '-'}`,
-        tanggal: t.tanggal_lunas as string,
-        nominal: t.nominal as number,
-      }));
+      .map(t => {
+        const nama = t.warga?.nama ?? '-';
+        const nomor = t.tarikan?.nomor ?? '-';
+        return {
+          id: t.id,
+          tipe: 'talangan_lunas' as const,
+          // Kalimat penuh tetap disimpan → pencarian "talangan" & sheet detail utuh.
+          keterangan: `Talangan lunas oleh ${nama} — Tarikan #${nomor}`,
+          judul: nama,
+          // "Talangan lunas · Tarikan #N" tak muat di kolom teks (terpotong justru di
+          // nomor tarikan — bagian yang paling berguna). Kata "lunas" sudah dibawa
+          // ikon panah-masuk + nominal hijau bertanda plus, jadi ia yang dilepas.
+          sub: `Talangan · Tarikan #${nomor}`,
+          tanggal: t.tanggal_lunas as string,
+          nominal: t.nominal as number,
+        };
+      });
 
     // Gabungan jendela terbaru per sumber — terbaru di atas
     const sorted = [...setorItems, ...talanganItems]
@@ -241,6 +260,85 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const visibleTrx = displayTrx.slice(0, TRX_LIMIT);
   const trxHidden = displayTrx.length - visibleTrx.length;
 
+  // Kelompokkan per tanggal → tanggal ditulis SEKALI sebagai kepala kelompok,
+  // bukan diulang di tiap baris. Tanpa ini daftar jadi tembok baris kembar
+  // ("Talangan lunas oleh … — Tarikan #N", +Rp50.000, tanggal sama) yang mustahil
+  // dipindai. Kepala kelompok juga membawa NET hari itu (pola buku besar bank).
+  // Hanya saat urutan kronologis — pada sort 'nominal' baris tak berurut tanggal,
+  // jadi kelompok tanggal akan menyesatkan; di situ tanggal balik ke per-baris.
+  const trxGroups = useMemo(() => {
+    if (trxSort === 'nominal') return null;
+    const out: { key: string; label: string; net: number; items: TrxItem[] }[] = [];
+    for (const t of visibleTrx) {
+      const key = t.tanggal.slice(0, 10);
+      const last = out[out.length - 1];
+      if (last && last.key === key) {
+        last.items.push(t);
+        last.net += t.nominal;
+      } else {
+        out.push({ key, label: labelTanggalRelatif(t.tanggal), net: t.nominal, items: [t] });
+      }
+    }
+    return out;
+  }, [visibleTrx, trxSort]);
+
+
+  /**
+   * Satu baris transaksi. `showDate` hanya true saat daftar TIDAK dikelompokkan
+   * (sort 'nominal'); di mode kelompok tanggal sudah dipikul kepala kelompok, jadi
+   * mengulangnya di tiap baris = derau. Saldo berjalan juga tak lagi di baris —
+   * sudah ada di sheet detail (satu ketuk), dan di daftar ia hanya menambah
+   * kolom angka ketiga yang bersaing dengan nominal.
+   */
+  const trxRow = (trx: TrxItem, idx: number, lastInGroup: boolean, showDate: boolean) => (
+    <button
+      key={trx.id}
+      onClick={() => { haptic(); setSelectedTrx(trx); }}
+      style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
+      className={`press rise w-full flex items-center gap-3 px-5 py-3.5 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
+    >
+      <div className={`icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+        {trx.tipe === 'setor'
+          ? <ArrowUpRight className="w-[18px] h-[18px] text-blue-600 dark:text-blue-400" />
+          : <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-500 dark:text-emerald-400" />
+        }
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug truncate">{trx.judul}</p>
+        {/* Baris kedua = konteks (+ tanggal saat daftar tak dikelompokkan). */}
+        <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5 truncate">
+          {[trx.sub, showDate ? formatTanggal(trx.tanggal) : null].filter(Boolean).join(' · ')}
+        </p>
+      </div>
+      <span className={`font-display text-amount font-bold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
+        {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
+      </span>
+    </button>
+  );
+
+  const renderTrxRows = () => {
+    // Sort 'nominal' → baris tak berurut kronologis, kelompok tanggal menyesatkan.
+    if (!trxGroups) {
+      return visibleTrx.map((trx, idx) =>
+        trxRow(trx, idx, idx === visibleTrx.length - 1, true),
+      );
+    }
+    let idx = 0;
+    return trxGroups.map((g, gi) => (
+      <div key={g.key}>
+        {/* Kepala kelompok: tanggal SEKALI + net hari itu (pola buku besar bank).
+            Tanpa fill abu — putih polos + hairline pemisah antar-kelompok, agar
+            tetap sebahasa dgn kartu MATERIAL-FLAT (abu disimpan utk kontrol). */}
+        <div className={`flex items-baseline justify-between gap-3 px-5 pt-4 pb-2 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
+          <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">{g.label}</span>
+          <span className={`text-micro font-bold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
+            {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
+          </span>
+        </div>
+        {g.items.map((trx, ii) => trxRow(trx, idx++, ii === g.items.length - 1, false))}
+      </div>
+    ));
+  };
 
   const skeleton = (
       <div className="space-y-7 pb-2">
@@ -327,8 +425,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <span className="text-micro font-bold uppercase tracking-[0.16em] text-white">Saldo Kas Hadiran</span>
             </div>
 
-            {/* Nominal besar + sub-teks */}
-            <div className="mt-3.5">
+            {/* Nominal besar + sub-teks.
+                Rongga tengah kartu dulu menganga: footer stat ditahan mt-auto ke dasar
+                sementara konten atas pendek → satu lubang ~130px, kartu terasa melar.
+                Sparkline sempat dicoba untuk mengisinya, tapi datanya memang tak
+                berbentuk (tiap tarikan mengumpulkan nominal SAMA → garis lurus datar);
+                grafik yang tak bercerita = hiasan yang terlihat rusak. Solusinya ruang,
+                bukan isi: blok nominal DIPUSATKAN di sisa ruang (flex-1 + justify-center)
+                → celah terbagi rata atas-bawah dan terbaca sebagai napas yang disengaja,
+                bukan lubang. Anatomi jadi: eyebrow di atas, angka di tengah, stat di dasar. */}
+            <div className="flex flex-1 flex-col justify-center">
               {/* Saldo minus disengaja (talangan ditutup penuh dari kas). Dulu ditandai
                   dgn mewarnai SELURUH nominal jadi salmon (text-rose-200) — rona pastel =
                   sinyal lemah & sumbang di atas jewel-green. Ganti: nominal tetap putih
@@ -348,19 +454,27 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   </span>
                 )}
               </div>
-              <p className="mt-2.5 text-caption font-medium leading-relaxed text-white/95">
-                Total terkumpul {maskRp(formatRupiahPlain(kasHadiran), hidden, 5)} · {summary?.jumlah_tarikan ?? 0} tarikan · {summary?.jumlah_anggota ?? 0} anggota
-                {lastDelta > 0 && (
-                  <span className="ml-1.5 inline-flex items-center gap-0.5 align-middle font-semibold text-emerald-100">
-                    <TrendingUp className="h-3 w-3" strokeWidth={2.5} />
-                    {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
-                  </span>
+              {/* Sub-teks dulu menabrak 4 fakta jadi satu kalimat yang membungkus dua
+                  baris — dan TIGA di antaranya sudah tampil di layar yang sama (Terkumpul
+                  di footer hero, tarikan & anggota di kartu statistik). Sisakan yang
+                  benar-benar baru: delta tarikan terakhir. Satu kalimat, satu maksud. */}
+              <p className="mt-2.5 flex items-center gap-1 text-caption font-medium text-white/95">
+                {lastDelta > 0 ? (
+                  <>
+                    <TrendingUp className="h-3.5 w-3.5 shrink-0 text-emerald-100" strokeWidth={2.5} />
+                    <span className="font-semibold text-emerald-100">
+                      {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
+                    </span>
+                    <span className="text-white/80">dari tarikan terakhir</span>
+                  </>
+                ) : (
+                  <span className="text-white/80">Belum ada tarikan selesai</span>
                 )}
               </p>
             </div>
 
-            {/* Baris stat 3-kolom — ditahan ke dasar kartu (mt-auto). */}
-            <div className="mt-auto grid grid-cols-3 border-t border-white/15 pt-[18px]">
+            {/* Baris stat 3-kolom — di dasar kartu (blok nominal di atas sudah flex-1). */}
+            <div className="grid grid-cols-3 border-t border-white/15 pt-[18px]">
               <button
                 onClick={(e) => { e.stopPropagation(); onNavigate('kas'); }}
                 className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/15 px-0.5 active:opacity-80"
@@ -391,22 +505,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       />
 
       {/* Stats Row */}
-      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
-        <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{animAnggota}</span>
-            <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Anggota</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{animTarikan}</span>
-            <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Tarikan</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 px-3">
-            <span className="font-display text-2xl font-bold text-ink dark:text-gray-100 tabular-nums">{animTerjadwal}</span>
-            <span className="text-xs text-ink-sub dark:text-gray-400 font-medium">Terjadwal</span>
-          </div>
-        </div>
-      </div>
+      <StatRow
+        items={[
+          { label: 'Anggota', value: animAnggota },
+          { label: 'Tarikan', value: animTarikan },
+          { label: 'Terjadwal', value: animTerjadwal },
+        ]}
+      />
 
       {/* Alert Banner */}
       {talangan > 0 && (
@@ -550,33 +655,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setTrxFilter('semua'); setTrxSearch(''); } }}
             />
           ) : (
-            visibleTrx.map((trx, idx) => (
-              <button
-                key={trx.id}
-                onClick={() => { haptic(); setSelectedTrx(trx); }}
-                style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-                className={`press rise w-full flex items-start gap-3 px-5 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${idx < visibleTrx.length - 1 ? 'divide-inset' : ''}`}
-              >
-                <div className={`icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 mt-0.5 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
-                  {trx.tipe === 'setor'
-                    ? <ArrowUpRight className="w-[18px] h-[18px] text-blue-600 dark:text-blue-400" />
-                    : <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-500 dark:text-emerald-400" />
-                  }
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug text-pretty break-words">{trx.keterangan}</p>
-                  <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(trx.tanggal)}</p>
-                  {trx.saldoSetelah !== null && (
-                    <p className={`text-xs font-medium tabular-nums ${trx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
-                      Saldo: {maskRp(`${trx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(trx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
-                    </p>
-                  )}
-                </div>
-                <span className={`font-display text-amount font-bold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
-                  {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
-                </span>
-              </button>
-            ))
+            renderTrxRows()
           )}
           {trxHidden > 0 && (
             <button

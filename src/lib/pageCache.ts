@@ -8,7 +8,10 @@
 // harus dikonversi array dulu di call-site. VER dinaikkan bila bentuk data
 // halaman berubah (deploy baru tak membaca snapshot lama yang beda bentuk).
 
-const VER = 'v1';
+// v2 (12 Jul 2026): TrxItem Beranda dapat field baru `judul`/`sub` (baris daftar
+// dipecah jadi nama + konteks). Snapshot v1 tak punya keduanya → judul baris akan
+// kosong sampai revalidate selesai. Naikkan VER, bukan tambal fallback di render.
+const VER = 'v2';
 const key = (k: string) => `hadiran-cache-${VER}:${k}`;
 
 const mem = new Map<string, unknown>();
