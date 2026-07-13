@@ -219,6 +219,9 @@ sekunder `.btn-secondary` (border `control` #CBD5E1). Form pakai `.field`
    diganti konstanta tunggal `HERO_MIN_H` (164): skeleton pakai `height`, hero
    asli pakai `min-height` — drift mati, dan jump saat FitAmount menyusut
    (angka panjang → hero natural ~146px < skeleton) ikut hilang.
+4. **[SELESAI 13 Jul] `load()` cek error Supabase** (susulan sapu se-app):
+   fetch gagal kini `throw` → ErrorState/toast, bukan rekap kosong palsu +
+   cache tertimpa.
 
 Selain tiga poin ini, layar sudah memenuhi baseline (AA teks 0 temuan, 44px
 tap target, skeleton berbentuk, useDialog, reduced-motion). **Jangan** mencari

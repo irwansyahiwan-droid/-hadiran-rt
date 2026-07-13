@@ -125,3 +125,6 @@ ungu ke chart (emerald = masuk, rose = keluar, titik).
    `rounded-3xl` (ikut `--hero-radius` 24px); `rounded-full` di submit
    TambahModal dihapus — radius kini dari `.btn-brand`/`.btn-danger` (12px),
    seragam SetorModal.
+6. **[SELESAI 13 Jul] `load()` cek error Supabase** (susulan sapu se-app):
+   fetch gagal kini `throw` → ErrorState/toast, bukan mutasi kosong palsu +
+   cache tertimpa.

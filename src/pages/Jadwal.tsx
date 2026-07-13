@@ -174,17 +174,23 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       const r = ringkasAbsensi(wargaList, map, sohibulId);
       const { pembayarCount, kasTotal: kasTerkumpul, talanganIds } = r;
 
+      // Rantai tulis uang 4 tabel — Supabase TIDAK melempar saat gagal, jadi
+      // TIAP langkah wajib cek error + throw; tanpa ini catch/toast di bawah
+      // tak pernah tercapai & koneksi putus di tengah = data setengah tertulis
+      // dengan layar sukses. (Fix penuh = RPC atomik spt batalkan_tarikan.)
       // Simpan status lunas yang sudah ada sebelum menghapus (agar tidak ter-reset saat Hitung Ulang)
-      const { data: existingLunas } = await supabase
+      const { data: existingLunas, error: eLunas } = await supabase
         .from('talangan')
         .select('warga_id, tanggal_lunas')
         .eq('tarikan_id', tarikanId)
         .eq('status_lunas', true);
+      if (eLunas) throw eLunas;
       const lunasMap = new Map<string, string | null>(
         (existingLunas ?? []).map(t => [t.warga_id, t.tanggal_lunas as string | null])
       );
 
-      await supabase.from('absensi').delete().eq('tarikan_id', tarikanId);
+      const eDelAbs = (await supabase.from('absensi').delete().eq('tarikan_id', tarikanId)).error;
+      if (eDelAbs) throw eDelAbs;
 
       // Simpan status apa adanya (hadir / titip / tidak_hadir) untuk SEMUA anggota.
       const absensiRows = wargaList.map(w => ({
@@ -192,22 +198,28 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         warga_id: w.id,
         status: map[w.id] ?? 'tidak_hadir',
       }));
-      if (absensiRows.length)
-        await supabase.from('absensi').insert(absensiRows);
+      if (absensiRows.length) {
+        const { error } = await supabase.from('absensi').insert(absensiRows);
+        if (error) throw error;
+      }
 
-      await supabase.from('talangan').delete().eq('tarikan_id', tarikanId);
-      if (talanganIds.length)
-        await supabase.from('talangan').insert(talanganIds.map(warga_id => ({
+      const eDelTal = (await supabase.from('talangan').delete().eq('tarikan_id', tarikanId)).error;
+      if (eDelTal) throw eDelTal;
+      if (talanganIds.length) {
+        const { error } = await supabase.from('talangan').insert(talanganIds.map(warga_id => ({
           tarikan_id: tarikanId,
           warga_id,
           nominal: 50000,
           status_lunas: lunasMap.has(warga_id),
           tanggal_lunas: lunasMap.get(warga_id) ?? null,
         })));
+        if (error) throw error;
+      }
 
-      await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk');
-      if (pembayarCount)
-        await supabase.from('transaksi_kas').insert({
+      const eDelTx = (await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk')).error;
+      if (eDelTx) throw eDelTx;
+      if (pembayarCount) {
+        const { error } = await supabase.from('transaksi_kas').insert({
           tipe: 'kas_masuk',
           nominal: kasTerkumpul,
           keterangan: `Kas hadiran tarikan #${tarikan.nomor} (${pembayarCount} pembayar × Rp5.000)`,
@@ -215,12 +227,15 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           tarikan_id: tarikanId,
           saldo_setelah: 0,
         });
+        if (error) throw error;
+      }
 
-      await supabase.from('tarikan').update({
+      const eUpd = (await supabase.from('tarikan').update({
         status: 'selesai',
         total_hadir: hadirIds.length,
         total_terkumpul: kasTerkumpul,
-      }).eq('id', tarikanId);
+      }).eq('id', tarikanId)).error;
+      if (eUpd) throw eUpd;
 
       onSaved({
         tarikanNomor: tarikan.nomor,
@@ -656,10 +671,15 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   async function simpan() {
     setSaving(true);
     try {
-      await supabase
+      // Supabase tak melempar — tanpa cek ini modal tertutup "sukses" walau gagal.
+      const { error } = await supabase
         .from('tarikan')
         .update({ tanggal, sohibul_bait_id: sohibulId || null })
         .eq('id', tarikan.id);
+      if (error) {
+        showToast('Gagal menyimpan revisi. Cek koneksi lalu coba lagi.', 'error');
+        return;
+      }
       onSaved();
     } finally {
       setSaving(false);
@@ -707,7 +727,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         <div className="flex gap-2.5">
           <button
             onClick={drag.dismiss}
-            className="btn-secondary flex-1 py-3 rounded-full"
+            className="btn-secondary flex-1 py-3 rounded-xl"
           >
             Batal
           </button>
@@ -746,7 +766,8 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
   async function simpan() {
     setSaving(true);
     try {
-      await supabase.from('tarikan').insert({
+      // Supabase tak melempar — throw manual agar catch/toast gagal benar-benar jalan.
+      const { error } = await supabase.from('tarikan').insert({
         nomor: nextNomor,
         tanggal,
         sohibul_bait_id: sohibulId || null,
@@ -756,6 +777,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         total_hadir: 0,
         total_terkumpul: 0,
       });
+      if (error) throw error;
       showToast(`Tarikan #${nextNomor} ditambahkan`);
       haptic(12);
       onSaved();
@@ -807,7 +829,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         <div className="flex gap-2.5">
           <button
             onClick={drag.dismiss}
-            className="btn-secondary flex-1 py-3 rounded-full"
+            className="btn-secondary flex-1 py-3 rounded-xl"
           >
             Batal
           </button>
@@ -865,6 +887,9 @@ export default function JadwalPage() {
           .eq('status_aktif', true)
           .order('nama', { ascending: true }),
       ]);
+      // Supabase tak melempar — tanpa cek ini fetch gagal jadi "Belum ada
+      // jadwal" palsu + cache tertimpa kosong.
+      if (tarRes.error || wargaRes.error) throw tarRes.error ?? wargaRes.error;
       let tarikan = (tarRes.data as Tarikan[]) ?? [];
 
       // Nomor tarikan = urutan tanggal untuk yang BELUM ditarik; 'selesai'
@@ -934,7 +959,11 @@ export default function JadwalPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Jadwal Tarikan</h1>
-          <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{selesaiCount} selesai · {dijadwalCount} terjadwal</p>
+          {/* Cold load: CrossFade hanya membungkus list → tanpa guard, caption
+              & StatRow mengklaim "0" sesaat (angka salah, kelas sama "Rp0"). */}
+          <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
+            {loading ? 'Memuat…' : `${selesaiCount} selesai · ${dijadwalCount} terjadwal`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -971,9 +1000,9 @@ export default function JadwalPage() {
       {/* Stats — StatRow bersama (dialek "N kartu terpisah" yang tersisa di sini) */}
       <StatRow
         items={[
-          { label: 'Selesai', value: selesaiCount },
-          { label: 'Terjadwal', value: dijadwalCount, tone: 'pos' },
-          { label: 'Total', value: tarikanList.length },
+          { label: 'Selesai', value: loading ? '—' : selesaiCount },
+          { label: 'Terjadwal', value: loading ? '—' : dijadwalCount, tone: 'pos' },
+          { label: 'Total', value: loading ? '—' : tarikanList.length },
         ]}
       />
 
@@ -1039,7 +1068,7 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm disabled:opacity-70 ${
+                            className={`flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm disabled:opacity-70 ${
                               isNext
                                 ? 'btn-brand'
                                 : 'bg-emerald-50 text-brand border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800'

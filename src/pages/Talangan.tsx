@@ -55,10 +55,13 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     if (!silent) setLoading(true);
     setError(false);
     try {
-      const { data } = await supabase
+      const { data, error: eLoad } = await supabase
         .from('talangan')
         .select('*, warga(*), tarikan(*)')
         .order('created_at', { ascending: true });
+      // Supabase tak melempar — tanpa cek ini fetch gagal jadi "Semua Talangan
+      // Lunas" / daftar kosong palsu + cache tertimpa.
+      if (eLoad) throw eLoad;
       setList((data as Talangan[]) ?? []);
       setPageCache('talangan', (data as Talangan[]) ?? []);
     } catch {

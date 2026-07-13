@@ -182,6 +182,10 @@ export default function KasHadiranPage() {
       supabase.from('talangan').select('tarikan_id, nominal').eq('status_lunas', false),
       supabase.from('warga').select('*').eq('status_aktif', true).order('nama', { ascending: true }),
     ]);
+    // Supabase tak melempar — cek error per hasil; tanpa ini fetch gagal jadi
+    // rekap kosong palsu + cache tertimpa.
+    const resErr = txRes.error ?? tarRes.error ?? talRes.error ?? wargaRes.error;
+    if (resErr) throw resErr;
     setTransaksi((txRes.data as TransaksiKas[]) ?? []);
     setTarikanSelesai((tarRes.data as Tarikan[]) ?? []);
     setWargaList((wargaRes.data as Warga[]) ?? []);

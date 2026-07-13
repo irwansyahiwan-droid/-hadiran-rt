@@ -115,3 +115,6 @@ larangan glass/glow, abu pudar, pure black, emoji, ganti font, sheet tanpa
    "Lunas semua" sengaja tidak di-min-height (wujud pendek memang beda kartu).
 4. **[SELESAI 13 Jul] Radius hero ikut token.** `rounded-2xl` → `rounded-3xl`
    (24px, seragam `--hero-radius` & keluarga hero).
+5. **[SELESAI 13 Jul] `load()` cek error Supabase** (susulan sapu se-app):
+   fetch gagal kini `throw` → ErrorState/toast, bukan daftar kosong palsu +
+   cache tertimpa.

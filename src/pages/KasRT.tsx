@@ -239,11 +239,14 @@ export default function KasRTPage() {
     if (!silent) setLoading(true);
     setError(false);
     try {
-      const { data } = await supabase
+      const { data, error: eLoad } = await supabase
         .from('kas_rt')
         .select('*')
         .order('tanggal', { ascending: true })
         .order('created_at', { ascending: true });
+      // Supabase tak melempar — tanpa cek ini fetch gagal jadi mutasi kosong
+      // palsu + cache tertimpa.
+      if (eLoad) throw eLoad;
       setList((data as KasRT[]) ?? []);
       setPageCache('kas-rt', (data as KasRT[]) ?? []);
     } catch {
