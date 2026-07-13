@@ -16,13 +16,33 @@ interface Layer { id: number; close: () => void }
 const stack: Layer[] = [];
 let seq = 0;
 let inited = false;
-let ignorePop = false;
+
+/* ── Serialisasi operasi history ──────────────────────────────────────────
+   `history.back()` cuma MENJADWALKAN traversal (asinkron), sedangkan
+   `pushState` berjalan sinkron. Tanpa serialisasi, urutan back()→pushState
+   (layer ditutup programatik lalu layer lain langsung buka; StrictMode dev
+   men-double effect dgn pola yang sama) membuat traversal mendarat SETELAH
+   push → posisi history terdampar DI BELAKANG entri push, dan back()
+   berikutnya melempar keluar app (dev: about:blank, blank total).
+   Solusi: back kiriman kita dihitung (pendingBack); push/back lanjutan
+   diantrikan dan baru dijalankan setelah popstate traversal-nya tiba. */
+let pendingBack = 0;
+const opQueue: Array<() => void> = [];
+
+function runOrQueue(op: () => void) {
+  if (pendingBack > 0) opQueue.push(op);
+  else op();
+}
+
+function flushQueue() {
+  while (pendingBack === 0 && opQueue.length > 0) opQueue.shift()!();
+}
 
 function init() {
   if (inited || typeof window === 'undefined') return;
   inited = true;
   window.addEventListener('popstate', () => {
-    if (ignorePop) { ignorePop = false; return; }
+    if (pendingBack > 0) { pendingBack -= 1; flushQueue(); return; } // pop kiriman kita sendiri
     const top = stack.pop();
     if (top) top.close();
   });
@@ -33,13 +53,12 @@ function registerBack(close: () => void): () => void {
   init();
   const id = ++seq;
   stack.push({ id, close });
-  window.history.pushState({ backId: id }, '');
+  runOrQueue(() => window.history.pushState({ backId: id }, ''));
   return () => {
     const i = stack.findIndex((e) => e.id === id);
     if (i === -1) return;          // sudah ditutup via tombol Back HP
     stack.splice(i, 1);
-    ignorePop = true;              // jangan jalankan close lagi saat kita pop sendiri
-    window.history.back();
+    runOrQueue(() => { pendingBack += 1; window.history.back(); });
   };
 }
 
