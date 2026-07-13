@@ -55,7 +55,10 @@
      shadow kartu = satu contact whisper (MATERIAL-FLAT 2 Jul).
      Radius: kartu besar 24 / tile 16 / ikon & tombol 12 / pill full. */
   :root {
-    color-scheme: light dark;
+    /* Terang saja, mengikuti app: app default terang apa pun tema HP (gelap hanya
+       bila warga memilihnya lewat toggle di dalam app). Landing tak punya toggle,
+       jadi dark mode otomatis di sini cuma bikin nada melompat saat warga masuk. */
+    color-scheme: light;
     --emerald-deep: #0D5B36;
     --emerald: #15824C;
     --emerald-bright: #1C9A5C;
@@ -76,24 +79,6 @@
     --hero-shadow: 0 6px 16px -12px rgba(0, 0, 0, 0.28), 0 18px 40px -22px rgba(15, 40, 30, 0.40);
     --maxw: 560px;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --canvas: #030712;
-      --surface: #111827;
-      --line: #1F2937;
-      --row: #1F2937;
-      --ink: #F9FAFB;
-      --ink-sub: #D1D5DB;
-      --ink-faint: #9CA3AF;
-      --accent: #1A9B86;
-      --tile-bg: rgba(26, 155, 134, 0.14);
-      --tile-ink: #1A9B86;
-      --cell-tint: rgba(26, 155, 134, 0.10);
-      --alt-bg: linear-gradient(180deg, #111827 0%, #030712 100%);
-      --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.10), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
-    }
-  }
-
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) {
@@ -548,7 +533,7 @@
       </div>
       <div class="plus">
         <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
-        <div><h4>Mode Gelap</h4><p>Tampilan otomatis menyesuaikan terang dan gelap, nyaman siang maupun malam.</p></div>
+        <div><h4>Mode Gelap</h4><p>Tampilan terang dipakai secara bawaan. Ingin gelap? Ganti sendiri lewat menu di dalam aplikasi.</p></div>
       </div>
       <div class="plus">
         <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 4v5h-5"/></svg></div>

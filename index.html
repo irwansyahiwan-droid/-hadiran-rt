@@ -11,46 +11,45 @@
     <!-- Aplikasi internal warga — JANGAN di-index mesin pencari. Nama warga &
          data kas tidak boleh muncul di hasil Google. Diperkuat oleh robots.txt. -->
     <meta name="robots" content="noindex, nofollow" />
-    <!-- Pasang tema SEBELUM paint pertama: tanpa ini pengguna dark mode melihat
-         kilatan putih tiap buka app (class .dark baru dipasang React setelah bundle).
-         Logika harus sama dgn useTheme: localStorage > preferensi OS. -->
+    <!-- Status bar mengikuti tema PILIHAN warga, bukan OS (di-override dinamis
+         oleh useTheme saat toggle, dan oleh inline script di bawah saat load). -->
+    <meta name="theme-color" content="#FAFBFC" />
+    <!-- Pasang tema SEBELUM paint pertama: tanpa ini pengguna yang memilih gelap
+         melihat kilatan putih tiap buka app (class .dark baru dipasang React
+         setelah bundle). Logika harus sama dgn useTheme: TERANG kecuali warga
+         sendiri yang menyimpan pilihan 'dark' — preferensi OS diabaikan. -->
     <script>
       try {
-        var t = localStorage.getItem('hadiran-theme');
-        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('hadiran-theme') === 'dark') {
           document.documentElement.classList.add('dark');
+          document
+            .querySelectorAll('meta[name="theme-color"]')
+            .forEach(function (m) { m.setAttribute('content', '#030712'); });
         }
       } catch (e) { /* abaikan (mis. storage diblokir) */ }
     </script>
-    <!-- Status bar adaptif (di-override dinamis oleh useTheme saat toggle) -->
-    <meta name="theme-color" content="#FAFBFC" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#030712" media="(prefers-color-scheme: dark)" />
     <!-- PWA standalone (iOS) -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Hadiran RT" />
     <!-- Splash standalone iOS (apple-touch-startup-image) — ikon di tengah canvas.
-         Light & dark per device. PNG sudah di-bake pada tone kanvas AKTIF #ECF1F7
-         (diverifikasi pixel 10 Jul) / #030712 — sinkron body/sunken/manifest.
-         Bila kanvas berubah lagi: regen aset splash. Tanpa ini iOS standalone =
-         blank putih. -->
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-640x1136.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-640x1136-dark.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-750x1334.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-750x1334-dark.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-828x1792.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-828x1792-dark.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1170x2532.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1170x2532-dark.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1179x2556.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1179x2556-dark.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1242x2688.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1242x2688-dark.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1284x2778.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1284x2778-dark.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: light) and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1290x2796.png" />
-    <link rel="apple-touch-startup-image" media="(prefers-color-scheme: dark) and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1290x2796-dark.png" />
+         TERANG saja, tanpa varian per tema OS: iOS memilih splash sebelum halaman
+         jalan, jadi ia tak bisa tahu pilihan tema warga di localStorage. Karena app
+         kini default terang, splash terang = tebakan yang benar untuk hampir semua
+         warga (yang memilih gelap sendiri lihat splash terang sesaat — trade-off
+         sadar, lebih baik daripada splash gelap untuk semua pengguna HP dark).
+         PNG di-bake pada tone kanvas AKTIF #ECF1F7 (diverifikasi pixel 10 Jul) —
+         sinkron body/sunken/manifest. Bila kanvas berubah: regen via
+         scripts/gen-splash.mjs. Tanpa ini iOS standalone = blank putih. -->
+    <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-640x1136.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-750x1334.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-828x1792.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1170x2532.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1179x2556.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1242x2688.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1284x2778.png" />
+    <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1290x2796.png" />
     <meta property="og:title" content="Hadiran RT 004/006" />
     <meta property="og:description" content="Aplikasi manajemen arisan &amp; kas RT 004/006, Tanah Baru Beji, Depok" />
     <meta property="og:image" content="https://hadiran-rt.vercel.app/og-hadiran.jpg" />

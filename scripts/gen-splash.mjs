@@ -1,12 +1,14 @@
-// Splash apple-touch-startup-image: ikon di tengah canvas (light & dark).
+// Splash apple-touch-startup-image: ikon di tengah canvas.
+// Terang saja — app default terang & iOS tak bisa membaca pilihan tema warga
+// sebelum halaman jalan (lihat komentar splash di index.html).
 // Sumber kebenaran = src/assets/logo-rt.svg. Jalankan: node scripts/gen-splash.mjs
 import { chromium } from 'playwright';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const svg = readFileSync(new URL('../src/assets/logo-rt.svg', import.meta.url), 'utf8');
 
-// Selaras index.html: light=#ECF1F7 (canvas MATERIAL-FLAT 2 Jul = manifest background_color), dark=#030712 (theme-color dark)
-const BG = { light: '#ECF1F7', dark: '#030712' };
+// Selaras index.html: #ECF1F7 (canvas MATERIAL-FLAT 2 Jul = manifest background_color)
+const BG = '#ECF1F7';
 
 // 8 ukuran sesuai apple-touch-startup-image di index.html
 const SIZES = [
@@ -16,15 +18,13 @@ const SIZES = [
 
 const browser = await chromium.launch();
 
-async function render(w, h, mode) {
+async function render(w, h) {
   const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 1 });
   const tile = Math.round(Math.min(w, h) * 0.30);      // ikon ~30% sisi pendek
   const radius = Math.round(tile * 0.2237);            // squircle ala iOS
-  const shadow = mode === 'light'
-    ? `box-shadow:0 ${Math.round(tile*0.06)}px ${Math.round(tile*0.14)}px rgba(31,41,55,.18)`
-    : '';
+  const shadow = `box-shadow:0 ${Math.round(tile*0.06)}px ${Math.round(tile*0.14)}px rgba(31,41,55,.18)`;
   await page.setContent(
-    `<!doctype html><html><body style="margin:0;width:${w}px;height:${h}px;background:${BG[mode]};` +
+    `<!doctype html><html><body style="margin:0;width:${w}px;height:${h}px;background:${BG};` +
     `display:flex;align-items:center;justify-content:center">` +
     `<div style="width:${tile}px;height:${tile}px;border-radius:${radius}px;overflow:hidden;${shadow}">` +
     svg.replace('<svg ', `<svg width="${tile}" height="${tile}" `) +
@@ -38,9 +38,8 @@ async function render(w, h, mode) {
 }
 
 for (const [w, h] of SIZES) {
-  writeFileSync(new URL(`../public/splash/splash-${w}x${h}.png`, import.meta.url), await render(w, h, 'light'));
-  writeFileSync(new URL(`../public/splash/splash-${w}x${h}-dark.png`, import.meta.url), await render(w, h, 'dark'));
-  console.log(`ok → splash-${w}x${h} (light+dark)`);
+  writeFileSync(new URL(`../public/splash/splash-${w}x${h}.png`, import.meta.url), await render(w, h));
+  console.log(`ok → splash-${w}x${h}`);
 }
 
 await browser.close();

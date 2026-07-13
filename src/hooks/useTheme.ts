@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 
 export function useTheme() {
-  // Belum pernah toggle → ikut preferensi OS (logika sama dgn inline script
-  // di index.html yang memasang .dark sebelum paint pertama — jaga tetap sinkron).
+  // Belum pernah toggle → TERANG, apa pun preferensi OS. Warga yang mampir dari
+  // link landing/WA harus selalu melihat tampilan yang sama; gelap hanya bila
+  // dipilih sendiri lewat toggle. Logika sama dgn inline script di index.html
+  // yang memasang .dark sebelum paint pertama — jaga tetap sinkron.
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === 'undefined') return false;
-    const stored = localStorage.getItem('hadiran-theme');
-    if (stored !== null) return stored === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return localStorage.getItem('hadiran-theme') === 'dark';
   });
 
   useEffect(() => {
