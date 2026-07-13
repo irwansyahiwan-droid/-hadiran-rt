@@ -399,14 +399,14 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             </FitAmount>
             {/* Dua chip stat ala hero KasRT — struktur > caption polos */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/10 rounded-xl p-3">
+              <div className="bg-black/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
                   <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Belum Lunas</p>
                 </div>
                 <p className="text-sm font-bold text-white tabular-nums">{countBelum} talangan</p>
               </div>
-              <div className="bg-white/10 rounded-xl p-3">
+              <div className="bg-black/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
                   <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Sudah Lunas</p>

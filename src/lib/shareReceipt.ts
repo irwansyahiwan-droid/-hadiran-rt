@@ -86,9 +86,9 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   ctx.fillRect(0, 0, W, H);
 
   // Kartu hero — "Refined Emerald" (SATU sumber dgn .hero-emerald di index.css:
-  // jewel money-green #2CC06E→#0F7A47→#064A2C), bukan gradient brand-deep lama.
+  // jewel money-green #157A45→#0F7A47→#064A2C), bukan gradient brand-deep lama.
   const grad = ctx.createLinearGradient(20, 20, W - 60, 230);
-  grad.addColorStop(0, '#2CC06E');
+  grad.addColorStop(0, '#157A45');
   grad.addColorStop(0.52, '#0F7A47');
   grad.addColorStop(1, '#064A2C');
   ctx.fillStyle = grad;

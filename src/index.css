@@ -454,14 +454,16 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    Menyatukan dua hue lama yg tak sinkron (Beranda #24ad5c daun vs sub-page brand
    #0F4C2E pekat) → satu emerald jewel BERSIH: vibran di atas, deep di bawah
    (scrim AA hero tetap aman). Jewel/"money green" ala Revolut/Wise, bukan daun. */
-/* Scrim AA pojok kiri-atas (/design-critique 8 Jul): zona start #2CC06E terlalu
-   terang utk teks putih kecil (eyebrow "SALDO KAS HADIRAN" ≈2.4:1, gagal AA).
-   Radial gelap tipis menurunkan HANYA pojok itu ke ≈5:1; jewel vibran di badan
-   kartu tak tersentuh (scrim habis di ~55%). Bahasa sama dgn scrim foto promo. */
+/* Scrim AA pojok kiri-atas (/design-critique 8 Jul): zona start dulu #2CC06E,
+   terlalu terang utk teks putih kecil (eyebrow ≈2.4:1). Radial gelap tipis
+   menurunkan HANYA pojok itu; sejak 13 Jul stop start ikut diredupkan ke
+   #157A45 (lihat catatan di dalam rule). Bahasa sama dgn scrim foto promo. */
 .hero-emerald {
   background-image:
     radial-gradient(130% 72% at 0% 0%, rgba(4, 38, 24, 0.48), transparent 55%),
-    linear-gradient(150deg, #2CC06E 0%, #0F7A47 52%, #064A2C 100%);
+    /* Stop terang #2CC06E → #157A45 (13 Jul): sampel piksel membuktikan teks
+       white/90 di zona terang cuma 3.9:1 — selaras peredupan --hero-gradient. */
+    linear-gradient(150deg, #157A45 0%, #0F7A47 52%, #064A2C 100%);
 }
 
 /* ── Permukaan brand di DARK — diredupkan (12 Jul 2026) ────────────────────
@@ -485,7 +487,9 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    light + dark sepasang. Nilai LIGHT identik dgn sebelumnya (setor #1E40AF/
    #2563EB/#3B82F6 · slate-800/700/500) → tampilan terang tidak berubah. */
 .hero-setor {
-  background-image: linear-gradient(to bottom right, #1E40AF 0%, #2563EB 50%, #3B82F6 100%);
+  /* Ramp diredupkan 1 step (13 Jul): stop terang lama #3B82F6 bikin putih pun
+     cuma 3.7:1 di zona teks — kini terburuk #2563EB = 5.2:1 utk teks putih. */
+  background-image: linear-gradient(to bottom right, #1E3A8A 0%, #1D4ED8 50%, #2563EB 100%);
 }
 .dark .hero-setor {
   background-image: linear-gradient(to bottom right, #16306E 0%, #1B3F8F 50%, #2A56B8 100%);

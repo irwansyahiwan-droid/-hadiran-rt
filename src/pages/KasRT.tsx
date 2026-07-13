@@ -515,14 +515,14 @@ export default function KasRTPage() {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/10 rounded-xl p-3">
+              <div className="bg-black/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
                   <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Masuk</p>
                 </div>
                 <p className="text-sm font-bold text-white">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</p>
               </div>
-              <div className="bg-white/10 rounded-xl p-3">
+              <div className="bg-black/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-rose-300" />
                   <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Keluar</p>

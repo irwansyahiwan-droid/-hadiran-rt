@@ -54,7 +54,7 @@ export default {
         /* ── Semantik nominal: SATU hijau, SATU merah, SATU amber ──────
            Hindari campur red/rose & green/emerald di satu layar. */
         pos: '#047857',   // uang masuk / positif  (emerald-700, on-brand)
-        neg: '#E11D48',   // uang keluar / negatif (rose-600) — SATU merah: selaras rose light & dark-rose-400
+        neg: '#BE123C',   // uang keluar / negatif (rose-700) — SATU merah: rose-600 gagal AA di rose-50/kanvas (4,0–4,3:1), dark tetap rose-400
         warn: '#B45309',  // tunggakan / perhatian (amber-700)
         /* ── Status SETOR (kartu hero Kas Hadiran saat sudah disetor) ──
            Biru = sinyal status, BUKAN accent kedua. Hanya dipakai di hero

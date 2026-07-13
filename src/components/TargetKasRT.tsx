@@ -101,7 +101,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
         </div>
 
         <div className="flex items-center justify-between mt-2.5">
-          <span className={`inline-flex items-center gap-1 text-xs font-bold ${tercapai ? 'text-emerald-700 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-400">
             {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">

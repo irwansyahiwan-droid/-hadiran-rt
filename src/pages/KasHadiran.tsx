@@ -571,14 +571,14 @@ export default function KasHadiranPage() {
                   : <Odometer value={animatedSaldo} />}
               </FitAmount>
               {saldo < 0 && (
-                <span className="mb-[6px] shrink-0 rounded-full bg-rose-500/90 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                <span className="mb-[6px] shrink-0 rounded-full bg-rose-600 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
                   Defisit
                 </span>
               )}
             </div>
-            <p className="text-white/90 text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
+            <p className="text-white text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
             {saldo <= 0 && totalSetor > 0 && (
-              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-emerald-400/20 border border-emerald-300/30 rounded-full text-emerald-100 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-emerald-100 text-xs font-semibold">
                 <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
               </span>
             )}
@@ -596,7 +596,7 @@ export default function KasHadiranPage() {
               </InfoTip>
             </p>
             <span
-              className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 rounded-full text-white text-micro font-bold"
+              className="flex items-center gap-1 px-2.5 py-1 bg-emerald-700 rounded-full text-white text-micro font-bold"
               aria-label={`${tarikanSelesai.length} tarikan selesai`}
             >
               {tarikanSelesai.length}

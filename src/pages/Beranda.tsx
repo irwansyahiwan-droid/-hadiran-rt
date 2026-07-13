@@ -223,7 +223,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   // kritis & pesannya BEDA dari banner → "Perlu Perhatian" (bukan duplikat).
   const kasStatus =
     saldo < 0
-      ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
+      ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
       : talangan > 0
         ? { label: 'Kas Aktif', dot: 'bg-gray-400 dark:bg-gray-500', text: 'text-gray-600 dark:text-gray-300', bg: 'bg-gray-100 dark:bg-gray-800' }
         : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' };
@@ -456,7 +456,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     : <Odometer value={animatedSaldo} />}
                 </span>
                 {saldo < 0 && (
-                  <span className="mb-[3px] rounded-full bg-rose-500/90 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                  <span className="mb-[3px] rounded-full bg-rose-600 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
                     Defisit
                   </span>
                 )}
@@ -472,7 +472,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     <span className="font-semibold text-emerald-100">
                       {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
                     </span>
-                    <span className="text-white/80">dari tarikan terakhir</span>
+                    <span className="text-white/90">dari tarikan terakhir</span>
                   </>
                 ) : (
                   <span className="text-white/80">Belum ada tarikan selesai</span>

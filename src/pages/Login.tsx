@@ -103,7 +103,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         </h1>
         <p
           className="rise mt-1.5 text-[0.8125rem] font-semibold
-                     text-emerald-700/90 dark:text-emerald-300/80
+                     text-emerald-800 dark:text-emerald-300/80
                      drop-shadow-sm"
           style={{ animationDelay: '0.14s' }}
         >
@@ -112,7 +112,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
         {/* Tagline — bikin momen brand */}
         <p
-          className="rise mt-2 text-xs text-emerald-800/60 dark:text-emerald-200/50 font-medium"
+          className="rise mt-2 text-xs text-emerald-800 dark:text-emerald-200/80 font-medium"
           style={{ animationDelay: '0.18s' }}
         >
           Transparansi kas &amp; kehadiran warga
@@ -134,7 +134,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         {/* ── WARGA — pintu utama (istimewa) ──────────────────────── */}
         <div className="login-warga-tint relative rounded-2xl p-4">
           {/* badge sudut */}
-          <span className="absolute -top-2.5 right-3 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[0.6875rem] font-bold uppercase tracking-wide shadow-sm">
+          <span className="absolute -top-2.5 right-3 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-700 text-white text-[0.6875rem] font-bold uppercase tracking-wide shadow-sm">
             <Sparkles className="w-2.5 h-2.5" /> Akses Cepat
           </span>
 
@@ -144,14 +144,16 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Masuk sebagai Warga</p>
-              <p className="text-[0.75rem] text-emerald-700/90 dark:text-emerald-300/80 font-medium">
+              <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-300/80 font-medium">
                 Lihat saldo, jadwal, absensi &amp; talangan
               </p>
             </div>
           </div>
 
           {/* Petunjuk */}
-          <div className="flex items-start gap-2 mb-3 rounded-xl bg-emerald-100/70 dark:bg-emerald-900/30 border border-emerald-200/60 dark:border-emerald-700/30 px-3 py-2.5">
+          {/* Panel SOLID (bukan /70): di atas blob aurora, tint transparan blend
+              jadi hijau sedang → teks emerald-800 cuma 3,5:1 (sampel piksel). */}
+          <div className="flex items-start gap-2 mb-3 rounded-xl bg-emerald-100 dark:bg-emerald-900 border border-emerald-200/60 dark:border-emerald-700/30 px-3 py-2.5">
             <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
             <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-200 leading-snug">
               Tanpa daftar. Cukup ketik kata{' '}
@@ -323,7 +325,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       </div>
 
       {/* Footer note */}
-      <p className="rise relative z-10 text-xs text-emerald-800/50 dark:text-emerald-200/40 mt-5 text-center" style={{ animationDelay: '0.32s' }}>
+      <p className="rise relative z-10 text-xs text-emerald-800 dark:text-emerald-200/70 mt-5 text-center" style={{ animationDelay: '0.32s' }}>
         Bendahara lupa password? Hubungi pengurus RT
       </p>
     </main>

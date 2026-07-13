@@ -230,18 +230,18 @@ export default function JadwalWargaPage() {
 
             {/* Badges */}
             <div className="flex gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                 <Check className="w-3 h-3" strokeWidth={2.5} /> {hadirCount} Hadir
               </span>
               {titipCount > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                   <HandCoins className="w-3 h-3" /> {titipCount} Titip
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                 <X className="w-3 h-3" strokeWidth={2.5} /> {tidakHadirCount} Tidak Hadir
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-white text-micro font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                 <Coins className="w-3 h-3" /> {formatRupiahPlain(iuranTerkumpul)}
               </span>
             </div>
@@ -335,7 +335,7 @@ export default function JadwalWargaPage() {
                 const ava =
                   st === 'hadir' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
                   : st === 'titip' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                  : 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400';
+                  : 'bg-rose-50 dark:bg-rose-900/25 text-rose-700 dark:text-rose-400';
                 return (
                   <div
                     key={w.id}
