@@ -94,8 +94,10 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           aria-valuemax={100}
           aria-label={`Progress target ${target.keterangan || 'Kas RT'}`}
         >
+          {/* Mulai dari emerald-600: fill informatif (role=progressbar) wajib ≥3:1
+              vs track gray-100 (WCAG 1.4.11) — ujung from-emerald-400 lama 1,8:1 */}
           <div
-            className={`h-full w-full origin-left rounded-full transition-transform duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-emerald-500 to-brand' : 'bg-gradient-to-r from-emerald-400 to-emerald-600'}`}
+            className={`h-full w-full origin-left rounded-full transition-transform duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-emerald-600 to-brand' : 'bg-gradient-to-r from-emerald-600 to-emerald-700'}`}
             style={{ transform: `scaleX(${Math.min(pct, 100) / 100})` }}
           />
         </div>

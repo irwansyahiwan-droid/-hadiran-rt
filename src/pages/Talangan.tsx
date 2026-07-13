@@ -5,7 +5,7 @@ import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggalShort, formatRupiahPlain, haptic, maskRp } from '../lib/utils';
+import { formatTanggalShort, formatRupiahPlain, haptic, maskRp, pesanError } from '../lib/utils';
 import FitAmount from '../components/FitAmount';
 import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
@@ -26,6 +26,12 @@ interface WargaGroup {
   totalBelum: number;
   countBelum: number;
 }
+
+// Tinggi dasar hero tunggakan (px) — SATU sumber utk skeleton (height) & hero
+// asli (min-height) agar CrossFade bebas layout-jump (pola HERO_MIN_H
+// KasHadiran). Kartu "Semua Talangan Lunas" sengaja TIDAK di-min-height —
+// wujud pendek itu memang beda kartu, bukan drift.
+const HERO_MIN_H = 208;
 
 export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const { isBendahara } = useAuthContext();
@@ -70,11 +76,17 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     setConfirmId(null);
     try {
       const today = new Date().toISOString().split('T')[0];
-      await supabase
+      // Supabase TIDAK melempar saat gagal — tanpa cek error, koneksi putus
+      // tetap toast "Ditandai lunas" padahal data tak berubah (toast bohong).
+      const { error: eUpd } = await supabase
         .from('talangan')
         .update({ status_lunas: true, tanggal_lunas: today })
         .eq('id', t.id);
-      await supabase.from('transaksi_kas').insert({
+      if (eUpd) {
+        showToast(pesanError(eUpd, 'Gagal menandai lunas. Cek koneksi lalu coba lagi.'), 'error');
+        return;
+      }
+      const { error: eTx } = await supabase.from('transaksi_kas').insert({
         tipe: 'talangan_masuk',
         nominal: t.nominal,
         keterangan: `Talangan lunas — ${t.warga?.nama ?? ''} (Tarikan #${t.tarikan?.nomor ?? ''})`,
@@ -83,6 +95,13 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         tarikan_id: t.tarikan_id,
         saldo_setelah: 0,
       });
+      if (eTx) {
+        // Status lunas sudah tersimpan tapi catatan kas gagal — muat ulang agar
+        // layar jujur menampilkan keadaan sebenarnya, jangan klaim sukses.
+        showToast(pesanError(eTx, 'Lunas tercatat, tapi catatan kas gagal. Coba ulangi.'), 'error');
+        load();
+        return;
+      }
       load();
       showToast('Ditandai lunas');
     } finally {
@@ -104,16 +123,26 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     setProcessingId(t.id);
     setCancelConfirmId(null);
     try {
-      await supabase
+      // Cek error tiap langkah (Supabase tak melempar) — jangan toast sukses palsu.
+      const { error: eUpd } = await supabase
         .from('talangan')
         .update({ status_lunas: false, tanggal_lunas: null })
         .eq('id', t.id);
-      await supabase
+      if (eUpd) {
+        showToast(pesanError(eUpd, 'Gagal membatalkan pelunasan. Cek koneksi lalu coba lagi.'), 'error');
+        return;
+      }
+      const { error: eDel } = await supabase
         .from('transaksi_kas')
         .delete()
         .eq('tipe', 'talangan_masuk')
         .eq('warga_id', t.warga_id)
         .eq('tarikan_id', t.tarikan_id);
+      if (eDel) {
+        showToast(pesanError(eDel, 'Status dibatalkan, tapi catatan kas gagal dihapus. Coba ulangi.'), 'error');
+        load();
+        return;
+      }
       load();
       showToast('Pelunasan dibatalkan', 'info');
     } finally {
@@ -363,10 +392,32 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       )}
 
       {/* Header card — di dalam CrossFade: sebelum data siap, totalBelumLunas=0
-          membuat kartu "Semua Talangan Lunas" berkedip (pesan SALAH saat loading). */}
-      <CrossFade loading={loading} skeleton={<div className="h-52 rounded-2xl skeleton" />}>
+          membuat kartu "Semua Talangan Lunas" berkedip (pesan SALAH saat loading).
+          Guard error && list kosong: load pertama tanpa cache yang GAGAL juga
+          bikin totalBelumLunas=0 → tanpa guard, hero mengklaim "Semua Talangan
+          Lunas" padahal data tak termuat (ErrorState tampil di bawah). */}
+      {!(error && list.length === 0) && (
+      <CrossFade
+        loading={loading}
+        skeleton={
+          /* Skeleton BERBENTUK hero (eyebrow + mata + nominal + dua chip stat),
+             seragam pola KasHadiran — bukan blok abu polos. Tinggi via HERO_MIN_H. */
+          <div style={{ height: HERO_MIN_H }} className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5">
+            <div className="flex items-center justify-between">
+              <div className="skeleton h-3 w-44 rounded-full" />
+              <div className="skeleton h-9 w-9 rounded-full" />
+            </div>
+            <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="skeleton h-[62px] rounded-xl" />
+              <div className="skeleton h-[62px] rounded-xl" />
+            </div>
+          </div>
+        }
+      >
       {totalBelumLunas > 0 ? (
-        <div className="relative rounded-2xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)' }}>
+        /* rounded-3xl: ikut --hero-radius 24px, seragam keluarga hero (KasHadiran) */
+        <div className="relative rounded-3xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-5">
@@ -424,6 +475,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         </div>
       )}
       </CrossFade>
+      )}
 
       {/* Search */}
       <div className="relative">

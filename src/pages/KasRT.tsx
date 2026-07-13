@@ -192,7 +192,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <button
               type="submit"
               disabled={saving || !nominal}
-              className={`flex-1 py-3 rounded-full text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition duration-150 flex items-center justify-center gap-2 ${
+              className={`flex-1 py-3 text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition duration-150 flex items-center justify-center gap-2 ${
                 tipe === 'masuk' ? 'btn-brand' : 'btn-danger'
               }`}
             >
@@ -207,6 +207,11 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 }
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
+
+// Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
+// (min-height), pola HERO_MIN_H KasHadiran. Baris "Saldo Awal" kondisional
+// menambah tinggi natural — itu data-driven, bukan drift.
+const HERO_MIN_H = 218;
 
 export default function KasRTPage() {
   const { isBendahara } = useAuthContext();
@@ -460,9 +465,33 @@ export default function KasRTPage() {
         </div>
 
         {/* Saldo Card — always teal. Di dalam CrossFade: sebelum data siap
-            saldo=0 → hero berkedip "Rp0" (angka salah sesaat). */}
-        <CrossFade loading={loading} skeleton={<div className="h-[218px] rounded-2xl skeleton" />}>
-        <div className="relative rounded-2xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)' }}>
+            saldo=0 → hero berkedip "Rp0" (angka salah sesaat). Guard error &&
+            list kosong: load pertama tanpa cache yang GAGAL juga bikin saldo=0
+            → tanpa guard hero mengklaim "Rp0" padahal data tak termuat. */}
+        {!(error && list.length === 0) && (
+        <CrossFade
+          loading={loading}
+          skeleton={
+            /* Skeleton BERBENTUK hero (eyebrow + dua aksi + nominal + dua chip
+               stat), pola KasHadiran — bukan blok abu polos. */
+            <div style={{ height: HERO_MIN_H }} className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-6">
+              <div className="flex items-center justify-between">
+                <div className="skeleton h-3 w-36 rounded-full" />
+                <div className="flex gap-2">
+                  <div className="skeleton h-9 w-9 rounded-full" />
+                  <div className="skeleton h-9 w-9 rounded-full" />
+                </div>
+              </div>
+              <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="skeleton h-[62px] rounded-xl" />
+                <div className="skeleton h-[62px] rounded-xl" />
+              </div>
+            </div>
+          }
+        >
+        {/* rounded-3xl: ikut --hero-radius 24px, seragam keluarga hero (KasHadiran) */}
+        <div className="relative rounded-3xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-6">
@@ -492,16 +521,26 @@ export default function KasRTPage() {
                 </button>
               </div>
             </div>
-            <FitAmount
-              measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
-              maxPx={48}
-              minPx={30}
-              className={`font-display font-extrabold tracking-tighter mb-3 tabular-nums ${saldo < 0 ? 'text-rose-200' : 'text-white'}`}
-            >
-              {hidden
-                ? maskRp(`Rp${animatedSaldo.toLocaleString('id-ID')}`, hidden, 7)
-                : <Odometer value={animatedSaldo} />}
-            </FitAmount>
+            {/* The Saldo-Defisit Rule (selaras Beranda & KasHadiran): nominal
+                TETAP putih premium; negatif ditandai chip KATA "Defisit" —
+                rona salmon (text-rose-200) = sinyal lemah & gagal kontras. */}
+            <div className="flex items-end gap-x-2.5 mb-3">
+              <FitAmount
+                measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
+                maxPx={48}
+                minPx={30}
+                className="min-w-0 flex-1 font-display font-extrabold tracking-tighter tabular-nums text-white"
+              >
+                {hidden
+                  ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+                  : <Odometer value={animatedSaldo} />}
+              </FitAmount>
+              {saldo < 0 && (
+                <span className="mb-[6px] shrink-0 rounded-full bg-rose-600 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                  Defisit
+                </span>
+              )}
+            </div>
 
             {/* Saldo Awal inline info */}
             {saldoAwal > 0 && saldoAwalEntry && (
@@ -533,6 +572,7 @@ export default function KasRTPage() {
           </div>
         </div>
         </CrossFade>
+        )}
 
         {/* Target & progres Kas RT */}
         <TargetKasRT saldo={saldo} />
@@ -569,9 +609,11 @@ export default function KasRTPage() {
                     ))}
                   </div>
                 </div>
+                {/* Dot legend sinkron warna bar MonthlyBars (emerald-600/rose-500,
+                    ≥3:1 di atas putih — WCAG 1.4.11 non-teks) */}
                 <div className="flex items-center gap-2 text-micro font-medium mb-2">
-                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-500" />Masuk</span>
-                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-rose-400" />Keluar</span>
+                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-600" />Masuk</span>
+                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-rose-500" />Keluar</span>
                 </div>
                 <MonthlyBars data={monthly} />
               </div>
