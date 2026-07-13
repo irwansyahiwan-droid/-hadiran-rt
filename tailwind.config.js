@@ -55,7 +55,7 @@ export default {
            Hindari campur red/rose & green/emerald di satu layar. */
         pos: '#047857',   // uang masuk / positif  (emerald-700, on-brand)
         neg: '#BE123C',   // uang keluar / negatif (rose-700) — SATU merah: rose-600 gagal AA di rose-50/kanvas (4,0–4,3:1), dark tetap rose-400
-        warn: '#B45309',  // tunggakan / perhatian (amber-700)
+        warn: '#92400E',  // tunggakan / perhatian (amber-800) — amber-700 gagal AA di kanvas/banner (4,3–4,4:1)
         /* ── Status SETOR (kartu hero Kas Hadiran saat sudah disetor) ──
            Biru = sinyal status, BUKAN accent kedua. Hanya dipakai di hero
            Kas Hadiran. Struktur DEFAULT/600/500 mirror brand utk pola gradient. */

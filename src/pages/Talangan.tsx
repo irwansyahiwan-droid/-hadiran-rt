@@ -250,7 +250,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   {g.countBelum} belum lunas · {g.countBelum}× Rp50.000
                 </p>
               ) : (
-                <p className="text-caption text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
+                <p className="text-caption text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
               )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -373,7 +373,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             <div className="flex items-center justify-between gap-2 mb-1">
               {/* Paritas keluarga hero (KasRT/LaporanTriwulan): label & ikon putih
                   ber-opacity — emerald-300 di atas gradien vibran kontrasnya lemah. */}
-              <p className="inline-flex items-center gap-1 text-white/85 text-micro font-bold uppercase tracking-widest">
+              <p className="inline-flex items-center gap-1 text-white text-micro font-bold uppercase tracking-widest">
                 Total Talangan Belum Lunas
                 <InfoTip label="Talangan" tone="onDark">
                   Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.

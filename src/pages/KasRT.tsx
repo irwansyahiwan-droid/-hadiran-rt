@@ -100,7 +100,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                     ? t === 'masuk'
                       ? 'bg-pos text-white border-pos'
                       : 'bg-neg text-white border-neg'
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-control dark:border-gray-700'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
                 }`}
               >
                 {/* Ikon lucide (bukan panah unicode) — rima dgn ikon tile mutasi */}

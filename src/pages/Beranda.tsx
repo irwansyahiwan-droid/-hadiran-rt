@@ -528,7 +528,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
-            <p className="text-xs text-amber-700 dark:text-amber-400/80 mt-0.5">
+            <p className="text-xs text-amber-800 dark:text-amber-400/80 mt-0.5">
               Total {maskRp(formatRupiahPlain(talangan), hidden, 4)} belum diselesaikan
             </p>
           </div>

@@ -173,7 +173,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 Tutup Buku Sekarang
               </p>
             </div>
-            <p className="relative text-micro text-white/90 mb-1">Total Kas RT · {snap.tanggal}</p>
+            <p className="relative text-micro text-white mb-1">Total Kas RT · {snap.tanggal}</p>
             <span className="relative block font-display text-white text-4xl font-extrabold tracking-tighter leading-none tabular-nums mb-3">
               {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
@@ -183,11 +183,11 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   (white/10): white/10 menaikkan latar ke #2C8758 → putih SOLID pun cuma
                   4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1. */}
               <div className="rounded-2xl bg-black/10 px-3 py-2">
-                <p className="text-micro text-white/90 uppercase tracking-wide">Kas RT (final)</p>
+                <p className="text-micro text-white uppercase tracking-wide">Kas RT (final)</p>
                 <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="rounded-2xl bg-black/10 px-3 py-2">
-                <p className="text-micro text-white/90 uppercase tracking-wide">Hadiran · belum disetor</p>
+                <p className="text-micro text-white uppercase tracking-wide">Hadiran · belum disetor</p>
                 <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
               </div>
             </div>
