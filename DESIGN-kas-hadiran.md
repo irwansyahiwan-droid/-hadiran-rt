@@ -215,8 +215,10 @@ sekunder `.btn-secondary` (border `control` #CBD5E1). Form pakai `.field`
    sekali, seluruh section Rekap lenyap tanpa penjelasan. Kini ada `EmptyState`
    terkomposisi ("Belum ada tarikan selesai…"); error load pertama tanpa cache
    juga tertangkap `ErrorState` di cabang yang sama.
-3. **Jaga sinkron tinggi skeleton hero.** `h-[164px]` hardcoded — setiap kali
-   anatomi hero berubah, ukur ulang agar CrossFade bebas layout-jump.
+3. **[SELESAI 13 Jul] Sinkron tinggi skeleton hero.** `h-[164px]` hardcoded
+   diganti konstanta tunggal `HERO_MIN_H` (164): skeleton pakai `height`, hero
+   asli pakai `min-height` — drift mati, dan jump saat FitAmount menyusut
+   (angka panjang → hero natural ~146px < skeleton) ikut hilang.
 
 Selain tiga poin ini, layar sudah memenuhi baseline (AA teks 0 temuan, 44px
 tap target, skeleton berbentuk, useDialog, reduced-motion). **Jangan** mencari

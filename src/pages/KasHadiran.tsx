@@ -125,6 +125,12 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
 
 // ── Main Page ────────────────────────────────────────────────
 
+// Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
+// (min-height) agar CrossFade bebas layout-jump. FitAmount bisa menyusut
+// (30–48px) → tinggi natural hero bervariasi ~146–166px; min-height menahan
+// lantai sama dgn skeleton. Ubah di sini bila anatomi hero berubah.
+const HERO_MIN_H = 164;
+
 interface KasHadiranCache {
   transaksi: TransaksiKas[];
   tarikanSelesai: Tarikan[];
@@ -507,12 +513,12 @@ export default function KasHadiranPage() {
             blok gray polos. Saat load, sisa halaman (Alur, Rekap) render duluan
             dgn nilai Rp0; blok kosong di posisi hero terbaca "rusak/nyangkut".
             Bentuk kartu-loading (bg putih + hairline + .lift, seragam dgn skeleton
-            list di bawah) → jelas "kartu saldo sedang dimuat". Tinggi & radius sama
-            dgn hero asli → tak ada layout jump saat CrossFade. */}
+            list di bawah) → jelas "kartu saldo sedang dimuat". Tinggi & radius
+            sinkron via HERO_MIN_H → tak ada layout jump saat CrossFade. */}
         <CrossFade
           loading={loading}
           skeleton={
-            <div className="h-[164px] rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-6">
+            <div style={{ height: HERO_MIN_H }} className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-6">
               <div className="flex items-center justify-between">
                 <div className="skeleton h-3 w-28 rounded-full" />
                 <div className="flex gap-2">
@@ -525,7 +531,7 @@ export default function KasHadiranPage() {
             </div>
           }
         >
-        <div className={`relative rounded-3xl overflow-hidden ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)' }}>
+        <div className={`relative rounded-3xl overflow-hidden ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}>
           <div className="hero-sheen pointer-events-none absolute inset-0" />
 
           <div className="relative p-6">
