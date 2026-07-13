@@ -169,23 +169,26 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           <div className="rise hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
             <div className="relative flex items-center gap-2 mb-2.5">
               <CalendarCheck className="w-4 h-4 text-emerald-200" strokeWidth={2.2} />
-              <p className="text-micro font-bold uppercase text-white/85" style={{ letterSpacing: '0.14em' }}>
+              <p className="text-micro font-bold uppercase text-white" style={{ letterSpacing: '0.14em' }}>
                 Tutup Buku Sekarang
               </p>
             </div>
-            <p className="relative text-micro text-white/80 mb-1">Total Kas RT · {snap.tanggal}</p>
+            <p className="relative text-micro text-white/90 mb-1">Total Kas RT · {snap.tanggal}</p>
             <span className="relative block font-display text-white text-4xl font-extrabold tracking-tighter leading-none tabular-nums mb-3">
               {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
 
             <div className="relative grid grid-cols-2 gap-2 mb-3.5">
-              <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-micro text-white/80 uppercase tracking-wide">Kas RT (final)</p>
+              {/* Panel di ATAS gradient harus RECESSED (black/10), bukan diterangkan
+                  (white/10): white/10 menaikkan latar ke #2C8758 → putih SOLID pun cuma
+                  4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1. */}
+              <div className="rounded-2xl bg-black/10 px-3 py-2">
+                <p className="text-micro text-white/90 uppercase tracking-wide">Kas RT (final)</p>
                 <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
-              <div className="rounded-2xl bg-white/10 px-3 py-2">
-                <p className="text-micro text-white/80 uppercase tracking-wide">Hadiran · belum disetor</p>
-                <p className="text-body font-bold text-white/90 tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
+              <div className="rounded-2xl bg-black/10 px-3 py-2">
+                <p className="text-micro text-white/90 uppercase tracking-wide">Hadiran · belum disetor</p>
+                <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
               </div>
             </div>
 

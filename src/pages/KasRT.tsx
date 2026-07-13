@@ -597,7 +597,7 @@ export default function KasRTPage() {
                       <span className="font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
-                  {totalMasuk === 0 && <p className="text-caption text-ink-faint dark:text-gray-500">Belum ada penerimaan.</p>}
+                  {totalMasuk === 0 && <p className="text-caption text-ink-faint dark:text-gray-400">Belum ada penerimaan.</p>}
                 </div>
               </div>
               {/* Pengeluaran */}
@@ -613,7 +613,7 @@ export default function KasRTPage() {
                       <span className="font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
-                  {totalKeluar === 0 && <p className="text-caption text-ink-faint dark:text-gray-500">Belum ada pengeluaran.</p>}
+                  {totalKeluar === 0 && <p className="text-caption text-ink-faint dark:text-gray-400">Belum ada pengeluaran.</p>}
                 </div>
               </div>
             </div>

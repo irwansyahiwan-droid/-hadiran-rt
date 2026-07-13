@@ -195,7 +195,7 @@ export default function JadwalWargaPage() {
       {lastTarikan ? (
         <div className="hero-card hero-noise">
           <div className="relative p-5 space-y-3">
-            <p className="inline-flex items-center gap-1 text-emerald-200 text-micro font-bold uppercase tracking-widest">
+            <p className="inline-flex items-center gap-1 text-emerald-100 text-micro font-bold uppercase tracking-widest">
               Tarikan Terakhir
               <InfoTip label="Tarikan" tone="onDark">
                 Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima total iuran anggota.
@@ -205,7 +205,7 @@ export default function JadwalWargaPage() {
               <p className="text-white text-lg font-bold leading-tight">
                 Tarikan ke-{lastTarikan.nomor} · {formatTanggal(lastTarikan.tanggal)}
               </p>
-              <p className="text-emerald-200 text-sm mt-0.5">
+              <p className="text-emerald-100 text-sm mt-0.5">
                 Sohibul Bait
                 <InfoTip label="Sohibul Bait" tone="onDark" className="mx-1">
                   Anggota yang menerima seluruh hasil tarikan pada giliran ini (penerima arisan).

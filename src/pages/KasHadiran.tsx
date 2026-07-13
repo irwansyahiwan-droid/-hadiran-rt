@@ -936,7 +936,7 @@ export default function KasHadiranPage() {
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailTitip.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-2.5 py-2">
-                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-500 shrink-0">{i + 1}</span>
+                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
@@ -951,7 +951,7 @@ export default function KasHadiranPage() {
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailTidak.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-2.5 py-2">
-                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-500 shrink-0">{i + 1}</span>
+                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
@@ -970,7 +970,7 @@ export default function KasHadiranPage() {
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailHadir.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-2.5 py-2">
-                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-500 shrink-0">{i + 1}</span>
+                            <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             <Check className="w-4 h-4 text-emerald-500 shrink-0" strokeWidth={2.5} />

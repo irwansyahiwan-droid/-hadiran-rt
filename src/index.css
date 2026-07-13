@@ -259,9 +259,17 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      pernah menyentuh uang/status/nav — `warn` (#B45309) tetap satu-satunya
      amber SEMANTIK. Dipisah persis seperti `setor` biru yang juga scoped. */
   --gold-songket: #E8B651;
-  /* Emerald lebih segar/hidup (tetap deep di kiri-atas agar teks putih lolos kontras) */
-  --hero-gradient: linear-gradient(135deg, #0D5B36 0%, #15824C 50%, #1C9A5C 100%);
-  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.34) 0%, rgba(45, 212, 150, 0) 55%);
+  /* Emerald segar TAPI lolos AA di seluruh bidang, bukan cuma di kiri-atas.
+     Pass kontras-hero (13 Jul): ramp lama berhenti di #1C9A5C — putih SOLID pun
+     cuma 3.60:1 di sana, jadi caption (white/80, emerald-200) mendarat 2.8–3.2:1;
+     opacity tak bisa menyelamatkan, stop-nya sendiri yang kelewat terang. Ramp
+     diturunkan ke #157A45 (putih 5.38:1, white/90 4.70:1). Glow sudut ikut diredam
+     .34 → .20 karena titik TERBURUK ternyata kanan-ATAS (glow menumpuk di atas stop
+     tengah = 3.43:1), bukan ujung gradient — meredupkan ramp saja tak menyembuhkan.
+     Pola sama sudah dipakai di ramp dark (glow .18). Verifikasi = sampel piksel asli
+     di bawah teks (Playwright 390px), bukan hitung token di atas kertas. */
+  --hero-gradient: linear-gradient(135deg, #0D5B36 0%, #137A46 50%, #157A45 100%);
+  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.20) 0%, rgba(45, 212, 150, 0) 55%);
   /* MATERIAL-FLAT (2 Jul): resep glass 4-lapis (inset highlight + ambient .55)
      dibuang — hero sub-page kini pakai bayangan yang SAMA dgn kartu saldo aktif
      di BannerCarousel (flat-BYOND, sudah "nyatu" duluan menurut user): dua drop
