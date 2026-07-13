@@ -767,8 +767,10 @@ export default function KasHadiranPage() {
                           aria-valuemax={100}
                           aria-label={`Kehadiran tarikan #${t.nomor}`}
                         >
+                          {/* emerald-600: fill informatif (role=progressbar) wajib ≥3:1
+                              vs track gray-100 (WCAG 1.4.11) — emerald-400 cuma 1,8:1 */}
                           <div
-                            className="h-full w-full origin-left bg-emerald-400 dark:bg-emerald-500 rounded-full transition-transform duration-700 ease-out"
+                            className="h-full w-full origin-left bg-emerald-600 dark:bg-emerald-500 rounded-full transition-transform duration-700 ease-out"
                             style={{ transform: `scaleX(${Math.min(pctHadir, 100) / 100})` }}
                           />
                         </div>
@@ -816,6 +818,22 @@ export default function KasHadiranPage() {
               )}
             </div>
           </div>
+        )}
+
+        {/* Belum ada tarikan sama sekali → tanpa blok ini section Rekap lenyap
+            tanpa penjelasan (layar terbaca "kosong/rusak" di awal periode).
+            Error load pertama (tanpa cache) juga tertangkap di sini — cabang
+            ErrorState di atas hanya hidup bila sudah ada tarikan tampil. */}
+        {!loading && tarikanSelesai.length === 0 && (
+          error ? (
+            <ErrorState onRetry={() => load()} retrying={loading} />
+          ) : (
+            <EmptyState
+              icon={Coins}
+              title="Belum ada tarikan selesai"
+              subtitle="Rekap per tarikan muncul setelah tarikan pertama dihitung di halaman Absensi."
+            />
+          )
         )}
       </div>
 
