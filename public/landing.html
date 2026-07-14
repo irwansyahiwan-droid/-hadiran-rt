@@ -128,7 +128,7 @@
       radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.20) 0%, rgba(45,212,150,0) 55%),
       linear-gradient(135deg, var(--emerald-deep) 0%, var(--emerald) 50%, var(--emerald-bright) 100%);
     color: #fff;
-    /* Bawah dilebihkan agar strip banner bisa overlap premium ke tepi hero. */
+    /* Bawah dilebihkan agar strip showcase HP bisa overlap premium ke tepi hero. */
     padding: calc(env(safe-area-inset-top) + 40px) 0 96px;
     text-align: center;
     border-bottom-left-radius: 24px;
@@ -202,11 +202,11 @@
   /* Mirror kartu carousel app — bahasa flat & tegas yang sama:
      gradient pekat + hairline ring + teks near-putih (sumber: BannerCarousel.tsx).
      Strip geser horizontal (scroll-snap); kartu tetangga sengaja "peek" sebagai
-     penanda bisa digeser. Posisi: OVERLAP ke tepi bawah hero (margin-top negatif)
-     agar hero + carousel jadi satu unit komposisi; barisan dikunci ke kolom
-     konten (--maxw) supaya tidak full-bleed melenceng di layar lebar; fade mask
-     tepi kiri-kanan sama seperti carousel app. */
-  .banners { padding: 0 0 8px; margin-top: -64px; }
+     penanda bisa digeser. Posisi: di bawah showcase HP (slot overlap hero
+     kini milik .shots); barisan dikunci ke kolom konten (--maxw) supaya tidak
+     full-bleed melenceng di layar lebar; fade mask tepi kiri-kanan sama
+     seperti carousel app. */
+  .banners { padding: 24px 0 8px; }
   .bn-row {
     display: flex; gap: 14px;
     max-width: var(--maxw); margin: 0 auto;
@@ -331,9 +331,15 @@
 
   /* ─────────── SHOWCASE — tangkapan layar asli app ───────────
      Frame HP bezel ink (#0B1220) + strip scroll-snap yang sama dengan banner
-     (peek, mask fade, dots). Gambar = WebP 780px (turunan public/screenshots,
+     (peek, mask fade, dots). Mengambil slot overlap ke tepi bawah hero
+     (margin-top negatif) sebagai bukti visual pertama; banner turun ke bawahnya.
+     Gambar = WebP 780px (turunan public/screenshots,
      regen: scripts/capture-screenshots.mjs lalu scripts/gen-shots-webp.mjs). */
-  .shots { padding-top: 8px; }
+  .shots { padding: 0 0 8px; margin-top: -64px; }
+  .shots-note {
+    text-align: center; font-size: 13px; color: var(--ink-faint);
+    margin-top: 12px; padding: 0 20px;
+  }
   .ph-row {
     display: flex; gap: 18px;
     max-width: var(--maxw); margin: 0 auto;
@@ -525,9 +531,29 @@
   </div>
 </header>
 
+<!-- ══════════ SHOWCASE — TANGKAPAN LAYAR ASLI (overlap hero) ══════════ -->
+<section class="shots">
+  <div class="ph-row" data-snap data-hero style="animation-delay:.36s" role="region" aria-label="Tangkapan layar aplikasi, geser untuk melihat" tabindex="0">
+    <figure class="ph">
+      <div class="ph-frame"><img src="/screenshots/1-beranda-sm.webp" width="780" height="1688" loading="eager" fetchpriority="high" decoding="async" alt="Tangkapan layar Beranda: kartu saldo kas hadiran dan statistik anggota" /></div>
+      <figcaption><b>Beranda</b><span>Saldo kas dan ringkasan terkini</span></figcaption>
+    </figure>
+    <figure class="ph">
+      <div class="ph-frame"><img src="/screenshots/2-jadwal-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Jadwal: ringkasan tarikan terakhir dan daftar absensi warga" /></div>
+      <figcaption><b>Jadwal &amp; Absensi</b><span>Kehadiran tiap tarikan tercatat rapi</span></figcaption>
+    </figure>
+    <figure class="ph">
+      <div class="ph-frame"><img src="/screenshots/3-kas-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Kas RT: saldo bersih dan progres target akhir tahun" /></div>
+      <figcaption><b>Kas RT</b><span>Progres menuju target bersama</span></figcaption>
+    </figure>
+  </div>
+  <div class="bn-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+  <p class="shots-note" data-hero style="animation-delay:.44s">Tangkapan layar asli mode Warga. Datanya tampil apa adanya.</p>
+</section>
+
 <!-- ══════════ BANNER SHOWCASE (mirror kartu carousel di app) ══════════ -->
 <section class="banners">
-  <div class="bn-row" data-snap data-hero style="animation-delay:.36s" role="region" aria-label="Sorotan fitur, geser untuk melihat" tabindex="0">
+  <div class="bn-row rv" data-snap role="region" aria-label="Sorotan fitur, geser untuk melihat" tabindex="0">
     <div class="bn-card bn-target">
       <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
       <span class="be">Target Kas RT</span>
@@ -603,29 +629,6 @@
   </div>
 </section>
 
-<!-- ══════════ SHOWCASE — TANGKAPAN LAYAR ASLI ══════════ -->
-<section class="shots">
-  <div class="wrap">
-    <p class="eyebrow rv">Tampilan Asli</p>
-    <h2 class="sec-title display rv" style="--d:50ms">Persis begini di HP Anda</h2>
-    <p class="sec-lead rv" style="--d:100ms">Tangkapan layar asli dari mode Warga, bukan rekaan. Datanya tampil apa adanya.</p>
-  </div>
-  <div class="ph-row rv" data-snap role="region" aria-label="Tangkapan layar aplikasi, geser untuk melihat" tabindex="0">
-    <figure class="ph">
-      <div class="ph-frame"><img src="/screenshots/1-beranda-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Beranda: kartu saldo kas hadiran dan statistik anggota" /></div>
-      <figcaption><b>Beranda</b><span>Saldo kas dan ringkasan terkini</span></figcaption>
-    </figure>
-    <figure class="ph">
-      <div class="ph-frame"><img src="/screenshots/2-jadwal-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Jadwal: ringkasan tarikan terakhir dan daftar absensi warga" /></div>
-      <figcaption><b>Jadwal &amp; Absensi</b><span>Kehadiran tiap tarikan tercatat rapi</span></figcaption>
-    </figure>
-    <figure class="ph">
-      <div class="ph-frame"><img src="/screenshots/3-kas-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Kas RT: saldo bersih dan progres target akhir tahun" /></div>
-      <figcaption><b>Kas RT</b><span>Progres menuju target bersama</span></figcaption>
-    </figure>
-  </div>
-  <div class="bn-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
-</section>
 
 <!-- ══════════ KEUNGGULAN ══════════ -->
 <section class="alt">
