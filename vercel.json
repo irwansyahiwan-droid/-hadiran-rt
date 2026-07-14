@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/info", "destination": "/landing.html" },
+    { "source": "/warta", "destination": "/warta.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
