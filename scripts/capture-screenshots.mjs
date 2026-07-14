@@ -15,6 +15,8 @@ const ctx = await browser.newContext({
   serviceWorkers: 'block', // cegah SW PWA serve index lama → preloadError reload-loop
 });
 const page = await ctx.newPage();
+// Lewati WelcomeSheet onboarding — kunci sama dgn audit-kontras (WelcomeSheet.tsx).
+await page.addInitScript(() => localStorage.setItem('hadiran-welcome-v2', '1'));
 page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log('  [console]', m.type(), m.text().slice(0, 200)); });
 page.on('pageerror', (e) => console.log('  [pageerror]', e.message.slice(0, 200)));
 page.on('load', () => console.log('  [load]', page.url()));

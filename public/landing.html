@@ -329,6 +329,38 @@
   .fcell h3 { font-family: 'Sora', sans-serif; font-size: 14.5px; font-weight: 700; margin-bottom: 3px; letter-spacing: -.01em; }
   .fcell p { font-size: 12.8px; color: var(--ink-faint); line-height: 1.45; }
 
+  /* ─────────── SHOWCASE — tangkapan layar asli app ───────────
+     Frame HP bezel ink (#0B1220) + strip scroll-snap yang sama dengan banner
+     (peek, mask fade, dots). Gambar = WebP 780px (turunan public/screenshots,
+     regen: scripts/capture-screenshots.mjs lalu scripts/gen-shots-webp.mjs). */
+  .shots { padding-top: 8px; }
+  .ph-row {
+    display: flex; gap: 18px;
+    max-width: var(--maxw); margin: 0 auto;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 20px;
+    padding: 8px 20px 20px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+  }
+  .ph-row::-webkit-scrollbar { display: none; }
+  .ph { scroll-snap-align: center; flex: 0 0 66%; max-width: 270px; }
+  .ph-frame {
+    border-radius: 34px; padding: 8px;
+    background: #0B1220;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.09), 0 16px 38px -22px rgba(15,40,30,.45);
+  }
+  .ph-frame img {
+    display: block; width: 100%; height: auto;
+    border-radius: 26px; aspect-ratio: 1170 / 2532;
+    background: var(--canvas);
+  }
+  .ph figcaption { text-align: center; margin-top: 12px; }
+  .ph figcaption b { display: block; font-family: 'Sora', sans-serif; font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
+  .ph figcaption span { font-size: 12.8px; color: var(--ink-faint); }
+
   /* Keunggulan — satu kartu list dgn pembatas baris inset (bahasa list app) */
   .alt { background: var(--alt-bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .plus-card {
@@ -495,7 +527,7 @@
 
 <!-- ══════════ BANNER SHOWCASE (mirror kartu carousel di app) ══════════ -->
 <section class="banners">
-  <div class="bn-row" data-hero style="animation-delay:.36s" role="region" aria-label="Sorotan fitur, geser untuk melihat" tabindex="0">
+  <div class="bn-row" data-snap data-hero style="animation-delay:.36s" role="region" aria-label="Sorotan fitur, geser untuk melihat" tabindex="0">
     <div class="bn-card bn-target">
       <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
       <span class="be">Target Kas RT</span>
@@ -569,6 +601,30 @@
       </div>
     </div>
   </div>
+</section>
+
+<!-- ══════════ SHOWCASE — TANGKAPAN LAYAR ASLI ══════════ -->
+<section class="shots">
+  <div class="wrap">
+    <p class="eyebrow rv">Tampilan Asli</p>
+    <h2 class="sec-title display rv" style="--d:50ms">Persis begini di HP Anda</h2>
+    <p class="sec-lead rv" style="--d:100ms">Tangkapan layar asli dari mode Warga, bukan rekaan. Datanya tampil apa adanya.</p>
+  </div>
+  <div class="ph-row rv" data-snap role="region" aria-label="Tangkapan layar aplikasi, geser untuk melihat" tabindex="0">
+    <figure class="ph">
+      <div class="ph-frame"><img src="/screenshots/1-beranda-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Beranda: kartu saldo kas hadiran dan statistik anggota" /></div>
+      <figcaption><b>Beranda</b><span>Saldo kas dan ringkasan terkini</span></figcaption>
+    </figure>
+    <figure class="ph">
+      <div class="ph-frame"><img src="/screenshots/2-jadwal-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Jadwal: ringkasan tarikan terakhir dan daftar absensi warga" /></div>
+      <figcaption><b>Jadwal &amp; Absensi</b><span>Kehadiran tiap tarikan tercatat rapi</span></figcaption>
+    </figure>
+    <figure class="ph">
+      <div class="ph-frame"><img src="/screenshots/3-kas-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Kas RT: saldo bersih dan progres target akhir tahun" /></div>
+      <figcaption><b>Kas RT</b><span>Progres menuju target bersama</span></figcaption>
+    </figure>
+  </div>
+  <div class="bn-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
 </section>
 
 <!-- ══════════ KEUNGGULAN ══════════ -->
@@ -689,10 +745,12 @@
   }
 
   // Dots mengikuti kartu yang paling dekat ke tengah strip (rAF-throttled).
-  const row = document.querySelector('.bn-row');
-  const dots = [...document.querySelectorAll('.bn-dots i')];
-  if (row && dots.length) {
-    const cards = [...row.querySelectorAll('.bn-card')];
+  // Berlaku untuk semua strip [data-snap] yang punya sibling .bn-dots.
+  document.querySelectorAll('[data-snap]').forEach((row) => {
+    const wrap = row.parentElement.querySelector('.bn-dots');
+    if (!wrap) return;
+    const dots = [...wrap.children];
+    const cards = [...row.children];
     let raf = 0;
     const sync = () => {
       raf = 0;
@@ -706,7 +764,7 @@
     };
     row.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(sync); }, { passive: true });
     sync();
-  }
+  });
 })();
 </script>
 
