@@ -221,6 +221,42 @@
   .isi h3 { font-family: 'Fraunces', serif; font-size: 19.5px; font-weight: 620; letter-spacing: -0.005em; }
   .isi p { grid-column: 2; font-size: 14.5px; color: var(--ink-soft); line-height: 1.55; }
 
+  /* ── Galeri foto: tangkapan layar asli, dipajang seperti foto tempel koran.
+     File sama dgn showcase /info (public/screenshots/*-sm.webp);
+     regen: scripts/capture-screenshots.mjs lalu scripts/gen-shots-webp.mjs ── */
+  .galeri {
+    display: flex; gap: 18px;
+    margin: 0 -22px;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 22px;
+    padding: 30px 22px 12px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
+  }
+  .galeri::-webkit-scrollbar { display: none; }
+  .foto { scroll-snap-align: center; flex: 0 0 68%; max-width: 250px; }
+  .foto:nth-child(odd) .foto-bingkai { transform: rotate(-1.1deg); }
+  .foto:nth-child(even) .foto-bingkai { transform: rotate(1.1deg); }
+  .foto-bingkai {
+    background: #FBF7EA;
+    border: 1.5px solid var(--ink);
+    padding: 7px;
+    box-shadow: 0 16px 30px -20px rgba(23,36,27,.6);
+  }
+  .foto-bingkai img {
+    display: block; width: 100%; height: auto;
+    aspect-ratio: 1170 / 2532; background: #ECF1F7;
+  }
+  .foto figcaption { margin-top: 12px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .foto figcaption b { font-family: 'Fraunces', serif; font-weight: 640; font-size: 15px; color: var(--ink); }
+  .galeri-kredit {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 13.5px; color: var(--gold-ink);
+    text-align: center; margin-top: 14px;
+  }
+
   /* ── Tata tertib: kartu berbingkai ganda seperti lembar peraturan ── */
   .tatib {
     position: relative; background: var(--paper);
@@ -417,6 +453,22 @@
         <li><span class="n" aria-hidden="true">06</span><h3>Kas RT</h3><p>Kas besar lingkungan, terpisah dari kas hadiran, dengan kategori pemasukan dan pengeluaran.</p></li>
         <li><span class="n" aria-hidden="true">07</span><h3>Laporan &amp; PDF</h3><p>Laporan siap unduh untuk arsip pengurus dan dibagikan di grup warga.</p></li>
       </ol>
+
+      <div class="galeri" role="region" aria-label="Tangkapan layar aplikasi, geser untuk melihat" tabindex="0">
+        <figure class="foto">
+          <div class="foto-bingkai"><img src="/screenshots/1-beranda-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Beranda: kartu saldo kas hadiran dan statistik anggota" /></div>
+          <figcaption><b>Beranda.</b> Saldo kas dan ringkasan terkini, terlihat begitu dibuka.</figcaption>
+        </figure>
+        <figure class="foto">
+          <div class="foto-bingkai"><img src="/screenshots/2-jadwal-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Jadwal: ringkasan tarikan terakhir dan daftar absensi warga" /></div>
+          <figcaption><b>Jadwal &amp; Absensi.</b> Kehadiran tiap tarikan tercatat rapi.</figcaption>
+        </figure>
+        <figure class="foto">
+          <div class="foto-bingkai"><img src="/screenshots/3-kas-sm.webp" width="780" height="1688" loading="lazy" decoding="async" alt="Tangkapan layar Kas RT: saldo bersih dan progres target akhir tahun" /></div>
+          <figcaption><b>Kas RT.</b> Progres menuju target bersama warga.</figcaption>
+        </figure>
+      </div>
+      <p class="galeri-kredit">Foto: tangkapan layar asli mode Warga, data tampil apa adanya.</p>
     </div>
   </section>
 
