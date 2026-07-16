@@ -957,18 +957,15 @@ export default function JadwalPage() {
       )}
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Jadwal Tarikan</h1>
-          {/* Cold load: CrossFade hanya membungkus list → tanpa guard, caption
-              & StatRow mengklaim "0" sesaat (angka salah, kelas sama "Rp0"). */}
-          <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
-            {loading ? 'Memuat…' : `${selesaiCount} selesai · ${dijadwalCount} terjadwal`}
-          </p>
-        </div>
+        {/* Tanpa caption angka — StatRow tepat di bawah sudah memuat
+            selesai/terjadwal/total; satu fakta satu suara. */}
+        <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">Jadwal Tarikan</h1>
         <div className="flex items-center gap-2">
           <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
           </button>
+          {/* Icon-only (pola tombol unduh Riwayat Aktivitas) — tiga aksi lepas
+              bikin judul patah baris di 390px. */}
           {isBendahara && tarikanList.length > 0 && (
             <button
               onClick={async () => {
@@ -980,9 +977,11 @@ export default function JadwalPage() {
                   showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
                 }
               }}
-              className="press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+              title="Unduh PDF"
+              aria-label="Unduh PDF jadwal"
+              className="press w-11 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
             >
-              <FileText className="w-4 h-4" /> PDF
+              <FileText className="w-4 h-4" />
             </button>
           )}
           {isBendahara && (

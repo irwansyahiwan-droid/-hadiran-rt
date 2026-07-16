@@ -278,8 +278,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   tidak terpotong — kolom kanan (nominal+chevron+WA) memang lebar. */}
               <p className="text-body font-semibold text-ink dark:text-gray-100 line-clamp-2 leading-snug break-words">{g.nama}</p>
               {g.countBelum > 0 ? (
-                <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
-                  {g.countBelum} belum lunas · {g.countBelum}× Rp50.000
+                /* Cukup jumlahnya — "N× Rp50.000" mengulang total di kolom kanan
+                   (dan membocorkan nominal saat mode sembunyi-angka aktif).
+                   Frasa pendek: kolom teks tinggal ~93px saat tombol WA tampil. */
+                <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5 truncate">
+                  {g.countBelum} belum lunas
                 </p>
               ) : (
                 <p className="text-caption text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
