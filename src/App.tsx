@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, lazy, Suspense } from 'react';
-import { RefreshCw } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
 import { useBackDismiss } from './hooks/useBackDismiss';
@@ -103,6 +102,24 @@ export default function App() {
     return () => { cancelAnimationFrame(raf); clearTimeout(t1); clearTimeout(t2); };
   }, [activeTab]);
 
+  // Fade + hapus splash pra-React (#app-splash di index.html) begitu sesi auth
+  // siap. Satu frame ditahan agar shell app ter-commit dulu → serah-terima
+  // splash → konten mulus tanpa kedip kanvas. Fallback timer menjamin terhapus
+  // walau transitionend tak firing.
+  useEffect(() => {
+    if (auth.loading) return;
+    const el = document.getElementById('app-splash');
+    if (!el) return;
+    let removed = false;
+    const remove = () => { if (!removed) { removed = true; el.remove(); } };
+    const raf = requestAnimationFrame(() => {
+      el.classList.add('as-hide');
+      el.addEventListener('transitionend', remove, { once: true });
+    });
+    const fallback = setTimeout(remove, 700);
+    return () => { cancelAnimationFrame(raf); clearTimeout(fallback); };
+  }, [auth.loading]);
+
   if (auth.loading) {
     // Splash ber-brand (logo + nama) > spinner telanjang: first impression
     // terasa "produk", bukan halaman loading generik.
@@ -113,9 +130,10 @@ export default function App() {
           alt=""
           className="pop h-16 w-16 rounded-2xl object-contain ring-1 ring-black/[0.06] dark:ring-white/10 shadow-sm"
         />
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-4">
           <p className="text-base font-semibold tracking-tight text-ink dark:text-gray-100">Hadiran RT</p>
-          <RefreshCw className="w-5 h-5 text-emerald-500 animate-spin" />
+          {/* Shimmer bar (bahasa .skeleton), bukan spinner — sinkron dgn #app-splash. */}
+          <div className="as-bar" aria-hidden="true" />
         </div>
       </div>
     );
