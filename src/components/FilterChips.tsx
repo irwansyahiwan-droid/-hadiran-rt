@@ -72,7 +72,13 @@ export default function FilterChips<T extends string, S extends string = string>
               className={`press shrink-0 inline-flex items-center justify-center min-h-[44px] px-3.5 rounded-full text-xs font-semibold transition-colors ${
                 active
                   ? 'bg-brand text-white' /* fill brand DATAR (MATERIAL-FLAT) — gradient+inset+glow era pra-flat dihapus, selaras filter absensi & pill nav */
-                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 border border-control dark:border-gray-700'
+                  /* dark:text-gray-400 (5.74:1 di fill gray-800) SENGAJA — bukan gray-300.
+                     gray-300 (~10:1) pernah dicoba 18 Jul & DITOLAK: terang-di-atas-gelap
+                     menimbulkan halation (silau) DAN membuat chip inaktif bersaing dgn chip
+                     aktif → hierarki rancu. Simetri kontras light↔dark itu keliru: gelap-di-
+                     atas-terang tak silau, kebalikannya silau. Audit akan lapor 4.06 utk chip
+                     ini — itu FP sampel BORDER gray-700, bukan fill. Jangan "perbaiki" lagi. */
+                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
               }`}
             >
               {f.label}
