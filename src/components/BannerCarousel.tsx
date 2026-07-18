@@ -474,6 +474,11 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           // teks kartu tetangga yang mengintip di kanan diredam lewat opacity —
           // peek tetap terlihat sbg "ada lagi", tanpa fragmen kata yang terbaca.
           const opacity = Number((1 - c1 * 0.72).toFixed(3));
+          // Konten (eyebrow/judul/desc/nominal) memudar LEBIH CEPAT dari kartunya:
+          // kartu tetangga menyisakan tepi warna bersih (peek "ada lagi") TANPA
+          // fragmen kata yang terbaca — memenuhi niat asli di komentar opacity di
+          // atas. Teks menyingkap mulus saat kartu maju (feel wallet bertumpuk).
+          const contentOpacity = Number(Math.max(0, 1 - c1 * 1.35).toFixed(3));
           const ty = (c1 * 10).toFixed(2);
           const x = (d * spacing).toFixed(2);
           const ry = (Math.max(-1, Math.min(1, d)) * -7).toFixed(2);
@@ -553,12 +558,13 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                    selaras dgn aria-hidden kartu (tak ada focusable di dalam aria-hidden). */
                 <div
                   className="relative z-[3] flex h-full flex-col"
+                  style={{ opacity: contentOpacity, transition: dragging ? 'none' : 'opacity 0.42s ease' }}
                   {...(!active ? ({ inert: '' } as Record<string, string>) : {})}
                 >
                   {heroSlide}
                 </div>
               ) : (
-                <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW }}>
+                <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW, opacity: contentOpacity, transition: dragging ? 'none' : 'opacity 0.42s ease' }}>
                   {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
                   {promo!.cta && onNavigate && (
                     <button
