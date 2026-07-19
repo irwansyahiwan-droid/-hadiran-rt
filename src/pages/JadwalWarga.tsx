@@ -24,6 +24,12 @@ import SectionTitle from '../components/SectionTitle';
 
 type SubTab = 'anggota' | 'jadwal';
 
+// Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
+// (min-height), pola HERO_MIN_H KasHadiran/KasRT/Talangan. Nama Sohibul Bait
+// panjang & chip "Titip" kondisional menambah tinggi natural — itu data-driven,
+// bukan drift. Ubah di sini bila anatomi hero berubah.
+const HERO_MIN_H = 198;
+
 export default function JadwalWargaPage() {
   // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
   const [cached] = useState(() => getPageCache<JadwalWargaCache>('jadwal-warga'));
@@ -127,11 +133,55 @@ export default function JadwalWargaPage() {
   if (loading) {
     return (
       <div className="space-y-7 pb-2">
-        {/* Hero */}
-        <div className="skeleton h-44 rounded-3xl" />
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-2">
-          {[0, 1, 2].map((i) => <div key={i} className="skeleton h-20 rounded-2xl" />)}
+        {/* Hero — bentuk kartu + ANATOMI asli (eyebrow, judul, sub Sohibul Bait,
+            baris kehadiran, progress, chip), tinggi via HERO_MIN_H. Versi lama:
+            slab abu h-44 polos = 22px lebih pendek dari hero asli, dan blok di
+            bawahnya (grid 3×h-20) tak menyerupai baris toggle 44px yang asli. */}
+        <div
+          style={{ height: HERO_MIN_H }}
+          className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5 space-y-3"
+        >
+          <div className="skeleton h-2.5 w-32 rounded-full" />
+          <div className="space-y-1.5">
+            <div className="skeleton h-4 w-3/4 rounded-full" />
+            <div className="skeleton h-3 w-2/3 rounded-full" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <div className="skeleton h-2.5 w-20 rounded-full" />
+              <div className="skeleton h-2.5 w-24 rounded-full" />
+            </div>
+            <div className="skeleton h-2 w-full rounded-full" />
+          </div>
+          <div className="flex gap-2">
+            <div className="skeleton h-6 w-24 rounded-full" />
+            <div className="skeleton h-6 w-28 rounded-full" />
+            <div className="skeleton h-6 w-20 rounded-full" />
+          </div>
+        </div>
+        {/* Sub-tab switcher (2 tombol, min-h 44) */}
+        <div className="flex gap-2">
+          {[0, 1].map((i) => <div key={i} className="skeleton flex-1 min-h-[44px] rounded-xl" />)}
+        </div>
+        <div className="space-y-3">
+        {/* StatRow 4 kolom — cermin markup StatRow (tight: px-3 py-4) */}
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-3 py-4">
+          {/* h-7 = line-height text-xl (28px); h-[15px] = text-xs leading-tight
+              → tinggi total sama persis dgn StatRow asli (79px), tanpa drift. */}
+          <div className="grid grid-cols-4 divide-x divide-line dark:divide-gray-800">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="flex flex-col items-center gap-0.5 px-1.5">
+                <div className="skeleton h-7 w-8 rounded-lg" />
+                <div className="skeleton h-[15px] w-10 rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Search (.field-search = 46px) */}
+        <div className="skeleton h-[46px] rounded-xl" />
+        {/* Filter chips */}
+        <div className="flex items-center gap-1.5">
+          {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton min-h-[44px] w-[4.5rem] rounded-full" />)}
         </div>
         {/* List */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
@@ -144,6 +194,7 @@ export default function JadwalWargaPage() {
               </div>
             </div>
           ))}
+        </div>
         </div>
       </div>
     );
@@ -193,7 +244,7 @@ export default function JadwalWargaPage() {
     <div className="space-y-7 pb-2">
       {/* Hero Card — material/warna disamakan dengan hero Beranda (.hero-card) */}
       {lastTarikan ? (
-        <div className="hero-card hero-noise">
+        <div className="hero-card hero-noise" style={{ minHeight: HERO_MIN_H }}>
           <div className="relative p-5 space-y-3">
             <p className="inline-flex items-center gap-1 text-emerald-100 text-micro font-bold uppercase tracking-widest">
               Tarikan Terakhir
