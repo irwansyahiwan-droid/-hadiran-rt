@@ -15,7 +15,7 @@ import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../li
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { fetchDashboardSummary, formatRupiahPlain, formatTanggal, haptic, labelTanggalRelatif, maskRp } from '../lib/utils';
-import BannerCarousel, { bannerViewportHeight } from '../components/BannerCarousel';
+import BannerCarousel, { BannerSkeleton } from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
@@ -354,9 +354,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
   const skeleton = (
       <div className="space-y-7 pb-2">
-        {/* Setinggi blok carousel real (bannerViewportHeight) → tanpa layout jump
-            saat skeleton → konten (CrossFade blur tak bisa menutup pergeseran 150px). */}
-        <div className="rounded-3xl skeleton" style={{ height: bannerViewportHeight(window.innerHeight) }} />
+        {/* Geometri + anatomi kartu asli, satu sumber di BannerCarousel → tanpa
+            layout jump saat skeleton → konten. (Versi lama: slab polos setinggi
+            bannerViewportHeight saja — kurang 46px krn indikator tak dihitung,
+            dan 44px lebih lebar dari kartu asli, jadi konten melompat & menyempit.) */}
+        <BannerSkeleton vh={window.innerHeight} />
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
           <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
             {[...Array(3)].map((_, i) => (

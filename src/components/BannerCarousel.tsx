@@ -26,10 +26,75 @@ function cardHeight(vh: number): number {
   return vh >= 740 ? CARD_H : Math.max(300, Math.round(vh * 0.465));
 }
 
-/** Tinggi total blok carousel (kartu + napas bawah) — diekspor untuk skeleton
- *  Beranda: placeholder setinggi blok real → konten tak melompat saat data masuk. */
-export function bannerViewportHeight(vh: number): number {
+/** Tinggi viewport carousel (kartu + napas bawah), TANPA baris indikator. */
+function bannerViewportHeight(vh: number): number {
   return cardHeight(vh) + CARD_GAP;
+}
+
+/** Tinggi baris indikator story: tombol minHeight 44 + pt-0.5 (2). */
+const INDICATOR_H = 46;
+
+/** Tinggi TOTAL blok (viewport kartu + baris indikator). `bannerViewportHeight`
+ *  saja TIDAK cukup untuk skeleton — indikator ada di luar viewport, jadi memakai
+ *  viewport-height bikin lompatan 46px saat skeleton → konten (terukur 18 Jul). */
+function bannerBlockHeight(vh: number): number {
+  return bannerViewportHeight(vh) + INDICATOR_H;
+}
+
+/**
+ * Skeleton carousel — SATU SUMBER dgn kartu asli (dipakai Beranda saat loading).
+ * Sengaja ditaruh di file ini supaya geometri (lebar/tinggi/radius/padding/offset
+ * + tinggi indikator) tak bisa drift dari carousel-nya. Meniru bukan cuma ukuran
+ * tapi juga ANATOMI kartu saldo (eyebrow, nominal, footer 3 kolom) — slab abu polos
+ * seukuran layar adalah dialek skeleton "malas" yang tak sejalan dgn skeleton daftar
+ * & statistik yang sudah berstruktur.
+ */
+export function BannerSkeleton({ vh }: { vh: number }) {
+  const bar = 'rounded-full bg-line dark:bg-gray-700';
+  return (
+    <div style={{ height: bannerBlockHeight(vh) }}>
+      <div
+        className="mx-auto skeleton flex flex-col"
+        style={{
+          // Rumus lebar IDENTIK dgn cardW: min(viewport - 44, 326).
+          width: 'min(calc(100% - 44px), 326px)',
+          height: cardHeight(vh),
+          marginTop: TOP,
+          borderRadius: 30,
+          padding: 24,
+          boxSizing: 'border-box',
+        }}
+      >
+        {/* eyebrow: titik status + label */}
+        <div className="flex items-center gap-2.5">
+          <span className={`h-2.5 w-2.5 shrink-0 ${bar}`} />
+          <span className={`h-2.5 w-32 ${bar}`} />
+        </div>
+        {/* nominal besar + sub-teks */}
+        <div className="flex flex-1 flex-col justify-center gap-3">
+          <span className="h-8 w-3/4 rounded-xl bg-line dark:bg-gray-700" />
+          <span className={`h-3 w-3/5 ${bar}`} />
+        </div>
+        {/* footer 3 kolom (Terkumpul / Talangan / Setor Kas RT) */}
+        <div className="grid grid-cols-3 gap-3 border-t border-control pt-4 dark:border-gray-700">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex flex-col items-center gap-2">
+              <span className="h-3.5 w-3.5 rounded-md bg-line dark:bg-gray-700" />
+              <span className={`h-2 w-11 ${bar}`} />
+              <span className={`h-2.5 w-14 ${bar}`} />
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* baris indikator story: satu pill aktif + dot sisanya */}
+      <div className="flex items-center justify-center gap-1.5" style={{ height: INDICATOR_H }}>
+        <span className={`h-1 w-[26px] ${bar}`} />
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <span key={i} className={`h-1 w-[7px] ${bar}`} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /** Satu easing untuk semua transisi kartu/sheen/indikator → tak drift antar-tempat. */
