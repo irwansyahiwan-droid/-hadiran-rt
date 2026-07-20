@@ -587,7 +587,12 @@ export default function KasHadiranPage() {
               )}
             </div>
             <p className="text-white text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
-            {saldo <= 0 && totalSetor > 0 && (
+            {/* Caption WAJIB ikut warna hero: hero jadi biru (hero-setor) tiap
+                `sudahSetor` (totalSetor>0) tanpa peduli tanda saldo. Dulu pill ini
+                digating `saldo<=0` → saat saldo POSITIF + sudah setor, hero biru
+                tampil TANPA keterangan (warga lihat angka sama hijau di Beranda,
+                biru di sini, tanpa sebab). Samakan syarat pill = syarat warna biru. */}
+            {sudahSetor && (
               <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-emerald-100 text-xs font-semibold">
                 <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
               </span>
