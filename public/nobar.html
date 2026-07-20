@@ -101,8 +101,8 @@ try { if (localStorage.getItem('nobar-theme') === 'light') document.documentElem
     --ink: #0B1220;
     --sub: #334155;
     --faint: #526078;
-    --gold: #A16207;
-    --gold-deep: #854D0E;
+    --gold: #92400E;
+    --gold-deep: #78350F;
     --pitch: #15803D;
     --pitch-deep: #166534;
     --glow-l: rgba(125, 170, 240, 0.18);
@@ -201,7 +201,9 @@ try { if (localStorage.getItem('nobar-theme') === 'light') document.documentElem
   }
   html.light .hero .cup {
     background: none;
-    color: var(--gold); -webkit-text-fill-color: var(--gold);
+    /* Backdrop hero terang lebih gelap dari kartu (~L .60) — butuh emas setingkat
+       lebih pekat dari --gold agar tetap ≥4.5:1 di 15px. */
+    color: var(--gold-deep); -webkit-text-fill-color: var(--gold-deep);
   }
   .hero h1 {
     font-size: clamp(54px, 16.5vw, 82px);
@@ -356,7 +358,8 @@ try { if (localStorage.getItem('nobar-theme') === 'light') document.documentElem
   .gal figcaption {
     position: absolute; inset: auto 0 0 0;
     padding: 34px 16px 12px;
-    background: linear-gradient(to top, rgba(3, 8, 16, 0.86), transparent);
+    /* Stop tengah menjaga zona glyph tetap pekat di atas foto langit terang. */
+    background: linear-gradient(to top, rgba(3, 8, 16, 0.88), rgba(3, 8, 16, 0.5) 55%, transparent);
     font-size: 14px; font-weight: 700; color: #fff;
     text-align: left;
   }
