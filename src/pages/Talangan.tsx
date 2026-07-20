@@ -290,7 +290,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {g.countBelum > 0 && (
-                <span className="font-display text-amount font-bold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
+                <span className="font-display text-amount font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
                   {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                 </span>
               )}

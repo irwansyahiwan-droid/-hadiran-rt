@@ -751,7 +751,7 @@ export default function KasHadiranPage() {
                         </div>
                         <div className="text-right shrink-0">
                           {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
-                          <p className="text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
+                          <p className="font-display text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
                             {formatRupiahPlain(sohibulTerima)}
                           </p>
                           <span className="block mt-0.5 text-micro font-medium text-ink-faint dark:text-gray-400">
