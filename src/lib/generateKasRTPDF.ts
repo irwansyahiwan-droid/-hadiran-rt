@@ -25,14 +25,22 @@ function getY(doc: jsPDF): number {
   return (doc as unknown as DocWithTable).lastAutoTable.finalY;
 }
 
+// Kolom "SALDO (Rp)" DIHAPUS (21 Jul 2026). Laporan ini sengaja dikelompokkan
+// per kategori (lihat renderKategori), sementara `saldo_setelah` adalah saldo
+// berjalan KRONOLOGIS global — di dalam satu seksi ia meloncat naik-turun
+// (mis. Donasi Rawat Inap: 8.770.000 → 16.002.000) karena transaksi kategori
+// lain terjadi di antaranya. Angkanya benar, tapi mustahil direkonsiliasi di
+// dalam seksi → pembaca (warga/auditor) membacanya sebagai salah hitung pada
+// dokumen pertanggungjawaban bertanda tangan. Rekonsiliasi sudah dipikul
+// subtotal per kategori + blok Ringkasan di akhir. Saldo berjalan yang sah
+// tetap tersedia di Ekspor Excel (sheet "Mutasi", kronologis datar).
 const COL = {
   0: { cellWidth: 8,    halign: 'center' as const },
   1: { cellWidth: 22 },
   2: { cellWidth: 'auto' as const },
   3: { cellWidth: 30,   halign: 'right' as const },
-  4: { cellWidth: 30,   halign: 'right' as const },
 };
-const HEAD = ['NO', 'TANGGAL', 'KETERANGAN', 'JUMLAH (Rp)', 'SALDO (Rp)'];
+const HEAD = ['NO', 'TANGGAL', 'KETERANGAN', 'JUMLAH (Rp)'];
 
 export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -69,7 +77,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       startY: Y,
       head: [HEAD],
       body: saldoAwalList.map((k, i) => [
-        String(i + 1), fmtDate(k.tanggal), k.keterangan, fmtNum(k.nominal), fmtNum(k.saldo_setelah),
+        String(i + 1), fmtDate(k.tanggal), k.keterangan, fmtNum(k.nominal),
       ]),
       margin: { left: M, right: M },
       columnStyles: COL,
@@ -93,7 +101,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       startY: y,
       head: [HEAD],
       body: rows.map((k, i) => [
-        String(i + 1), fmtDate(k.tanggal), k.keterangan, `${sign}${fmtNum(k.nominal)}`, fmtNum(k.saldo_setelah),
+        String(i + 1), fmtDate(k.tanggal), k.keterangan, `${sign}${fmtNum(k.nominal)}`,
       ]),
       margin: { left: M, right: M },
       columnStyles: COL,
