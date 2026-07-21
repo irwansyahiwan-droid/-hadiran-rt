@@ -26,6 +26,7 @@ import AreaTrend from '../components/charts/AreaTrend';
 import TargetKasRT from '../components/TargetKasRT';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { kategoriOpsi, kategoriDefault, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
+import type { ReceiptRow } from '../lib/shareReceipt';
 import type { KasRT } from '../lib/types';
 
 type Tipe = 'masuk' | 'keluar';
@@ -297,16 +298,31 @@ export default function KasRTPage() {
     const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
     try {
       const { shareReceipt } = await import('../lib/shareReceipt');
+      // Kartu warga dulu hanya memuat TOTAL (masuk/keluar/saldo) → pertanyaan
+      // paling sering di grup WA, "uang RT dipakai untuk apa?", tak terjawab;
+      // jawabannya cuma ada di PDF A4 yang justru payah dibaca di HP. Kini
+      // rincian per kategori (taksonomi yang sama dgn rekap in-app & PDF)
+      // ikut di kartu → transparansi tanpa memaksa warga membuka PDF.
+      const rows: ReceiptRow[] = [
+        { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
+        { label: 'Penerimaan', value: '+' + formatRupiahPlain(totalMasuk), kind: 'section', tone: 'pos' },
+      ];
+      for (const o of KATEGORI_MASUK) {
+        const n = rekapKategori.masuk[o.key] ?? 0;
+        if (n > 0) rows.push({ label: o.short, value: '+' + formatRupiahPlain(n), tone: 'pos' });
+      }
+      rows.push({ label: 'Pengeluaran', value: '-' + formatRupiahPlain(totalKeluar), kind: 'section', tone: 'neg' });
+      for (const o of KATEGORI_KELUAR) {
+        const n = rekapKategori.keluar[o.key] ?? 0;
+        if (n > 0) rows.push({ label: o.short, value: '-' + formatRupiahPlain(n), tone: 'neg' });
+      }
+      rows.push({ label: 'Saldo Bersih', value: fmtSaldo, kind: 'total' });
+
       await shareReceipt({
         title: 'Ringkasan Kas Besar RT 004 / RW 006',
         amountLabel: 'Saldo Bersih Kas RT',
         amount: fmtSaldo,
-        rows: [
-          { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
-          { label: 'Total Masuk', value: '+' + formatRupiahPlain(totalMasuk) },
-          { label: 'Total Keluar', value: '-' + formatRupiahPlain(totalKeluar) },
-          { label: 'Saldo Bersih', value: fmtSaldo },
-        ],
+        rows,
         shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${fmtSaldo}\n— Hadiran RT`,
       });
     } catch {

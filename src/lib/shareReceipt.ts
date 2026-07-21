@@ -3,6 +3,15 @@ import { LOGO_DATA_URL } from './logoBase64';
 export interface ReceiptRow {
   label: string;
   value: string;
+  /**
+   * Bentuk baris. Tanpa `kind` = baris detail polos (perilaku lama, dipakai
+   * Jadwal & Kas Hadiran) — jangan diubah.
+   *   'section' = kepala kelompok + subtotal di kanan (mis. PENERIMAAN)
+   *   'total'   = baris kesimpulan bertekanan berpita tint (mis. Saldo Bersih)
+   */
+  kind?: 'section' | 'total';
+  /** Warna nilai: hijau (uang masuk) / merah (uang keluar). Default ink. */
+  tone?: 'pos' | 'neg';
 }
 
 export interface ReceiptList {
@@ -61,7 +70,16 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
 
   // Tinggi dinamis: baris detail + (opsional) kartu daftar nama + footer.
   const rowsCardTop = 250;
-  const rowsCardH = 36 * data.rows.length + 16;
+  // Mode BERSEKSI aktif hanya bila ada baris ber-`kind` (kartu Kas RT dgn
+  // rincian kategori). Tanpa itu → geometri & tipografi lama persis, supaya
+  // struk Jadwal/Kas Hadiran tidak ikut berubah.
+  const hasGroups = data.rows.some((r) => r.kind);
+  const H_SECTION = 34, H_DETAIL = 32, H_TOTAL = 46;
+  const rowH = (r: ReceiptRow) =>
+    r.kind === 'section' ? H_SECTION : r.kind === 'total' ? H_TOTAL : H_DETAIL;
+  const rowsCardH = hasGroups
+    ? data.rows.reduce((s, r) => s + rowH(r), 0) + 24
+    : 36 * data.rows.length + 16;
   let contentBottom = rowsCardTop + rowsCardH;
 
   const items = data.list?.items ?? [];
@@ -148,27 +166,88 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   ctx.lineWidth = 1;
   roundRect(ctx, 20.5, y + 0.5, W - 41, rowsCardH - 1, 20);
   ctx.stroke();
-  y += 26;
-  data.rows.forEach((row, i) => {
-    ctx.fillStyle = '#334155'; // ink-faint (kontras-terbaca, bukan gray-500 lama)
-    ctx.font = `500 13px ${rupiahFont}`;
-    ctx.textAlign = 'left';
-    ctx.fillText(row.label, 40, y);
-    ctx.fillStyle = '#0B1220'; // ink
-    ctx.font = `700 13px ${rupiahFont}`;
-    ctx.textAlign = 'right';
-    ctx.fillText(row.value, W - 40, y);
-    ctx.textAlign = 'left';
-    // Divider inset antar-baris (lebih terang dari border kartu — pola list app)
-    if (i < data.rows.length - 1) {
-      ctx.strokeStyle = '#DCE2EA';
-      ctx.beginPath();
-      ctx.moveTo(40, y + 18);
-      ctx.lineTo(W - 40, y + 18);
-      ctx.stroke();
-    }
-    y += 36;
-  });
+  if (!hasGroups) {
+    y += 26;
+    data.rows.forEach((row, i) => {
+      ctx.fillStyle = '#334155'; // ink-faint (kontras-terbaca, bukan gray-500 lama)
+      ctx.font = `500 13px ${rupiahFont}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(row.label, 40, y);
+      ctx.fillStyle = '#0B1220'; // ink
+      ctx.font = `700 13px ${rupiahFont}`;
+      ctx.textAlign = 'right';
+      ctx.fillText(row.value, W - 40, y);
+      ctx.textAlign = 'left';
+      // Divider inset antar-baris (lebih terang dari border kartu — pola list app)
+      if (i < data.rows.length - 1) {
+        ctx.strokeStyle = '#DCE2EA';
+        ctx.beginPath();
+        ctx.moveTo(40, y + 18);
+        ctx.lineTo(W - 40, y + 18);
+        ctx.stroke();
+      }
+      y += 36;
+    });
+  } else {
+    // ── Mode berseksi: PENERIMAAN/PENGELUARAN + rincian kategori + total ──
+    // Tipografi sengaja SATU step lebih besar dari mode lama (detail 13→14,
+    // total 17): kartu ini dibaca warga (banyak lansia) di grup WA, bukan
+    // dipindai bendahara. Warna nilai pakai tangga kontras app — pos #047857
+    // (≈4.9:1), neg #BE123C (≈6.0:1), label #334155 (≈10.4:1) → AA aman.
+    const POS = '#047857', NEG = '#BE123C';
+    const toneColor = (r: ReceiptRow) => (r.tone === 'pos' ? POS : r.tone === 'neg' ? NEG : '#0B1220');
+    let ry = y + 12;
+    data.rows.forEach((row, i) => {
+      const h = rowH(row);
+      const cy = ry + h / 2;
+
+      if (row.kind === 'section') {
+        // Hairline pemisah DI ATAS kepala kelompok (bukan antar tiap baris) →
+        // rincian terbaca menempel pada kelompoknya, bukan deretan seragam.
+        if (i > 0) {
+          ctx.strokeStyle = '#DCE2EA';
+          ctx.beginPath();
+          ctx.moveTo(40, ry);
+          ctx.lineTo(W - 40, ry);
+          ctx.stroke();
+        }
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#475569';
+        ctx.font = `700 12px ${rupiahFont}`;
+        try { ctx.letterSpacing = '1px'; } catch { /* browser lama */ }
+        ctx.fillText(row.label.toUpperCase(), 40, cy);
+        try { ctx.letterSpacing = '0px'; } catch { /* noop */ }
+        ctx.textAlign = 'right';
+        ctx.fillStyle = toneColor(row);
+        ctx.font = `700 14px ${rupiahFont}`;
+        ctx.fillText(row.value, W - 40, cy);
+      } else if (row.kind === 'total') {
+        ctx.fillStyle = '#ECFDF5';
+        roundRect(ctx, 32, ry + 4, W - 64, h - 10, 12);
+        ctx.fill();
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#065F46';
+        ctx.font = `700 15px ${rupiahFont}`;
+        ctx.fillText(row.label, 44, cy);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = row.value.trim().startsWith('-') ? NEG : '#065F46';
+        ctx.font = `800 17px ${displayFont}`;
+        ctx.fillText(row.value, W - 44, cy);
+      } else {
+        // Detail kategori — diindent 12px supaya jelas "milik" kelompok di atasnya.
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#334155';
+        ctx.font = `500 14px ${rupiahFont}`;
+        ctx.fillText(fitText(ctx, row.label, W - 80 - 128), 52, cy);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = toneColor(row);
+        ctx.font = `700 14px ${rupiahFont}`;
+        ctx.fillText(row.value, W - 40, cy);
+      }
+      ctx.textAlign = 'left';
+      ry += h;
+    });
+  }
 
   // Kartu daftar nama bernomor (mis. tidak hadir) — untuk kontrol cek-fisik
   if (items.length) {
