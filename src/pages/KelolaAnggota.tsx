@@ -379,9 +379,14 @@ export default function KelolaAnggota({ open, onClose }: Props) {
 
         {/* List */}
         {loading ? (
-          <div className="space-y-2">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 px-4 py-3.5 flex items-center gap-3">
+          // Skeleton MENCERMINKAN geometri list asli (satu kartu rounded-3xl +
+          // baris divide-inset, px-4 py-3.5, --di-l/--di-r sama) → tak ada "lompat"
+          // saat skeleton → konten. Sebelumnya: 6 kartu rounded-2xl terpisah
+          // (space-y-2) yang menyatu jadi satu kartu saat data datang — melanggar
+          // standar anti-jump app (lihat BannerSkeleton di Beranda).
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className={`flex items-center gap-3 px-4 py-3.5 [--di-l:4.25rem] [--di-r:1rem] ${i < 7 ? 'divide-inset' : ''}`}>
                 <div className="w-10 h-10 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/5" />
