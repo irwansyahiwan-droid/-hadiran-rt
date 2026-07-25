@@ -624,25 +624,25 @@ export default function KasHadiranPage() {
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="text-sm font-bold tabular-nums text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
+              <span className="text-sm font-display font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
             <div className="divide-inset [--di-l:2.5rem] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
-              <span className="text-sm font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
+              <span className="text-sm font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
-              <span className="text-sm font-semibold tabular-nums text-blue-600 dark:text-blue-400">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
+              <span className="text-sm font-display font-semibold tabular-nums text-blue-600 dark:text-blue-400">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-base font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+              <span className={`text-base font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
@@ -946,19 +946,19 @@ export default function KasHadiranPage() {
                       <div className="space-y-1.5 text-sm">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × {formatRupiahPlain(SOHIBUL_PER)}</span>
-                          <span className="font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
+                          <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Potongan admin</span>
-                          <span className="font-semibold tabular-nums text-neg dark:text-rose-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
+                          <span className="font-display font-semibold tabular-nums text-neg dark:text-rose-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-line dark:border-gray-800">
                           <span className="font-bold text-ink dark:text-gray-100">Bersih diterima SB</span>
-                          <span className="font-bold tabular-nums text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
+                          <span className="font-display font-bold tabular-nums text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kas Hadiran tarikan ini</span>
-                          <span className="font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
+                          <span className="font-display font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
                         </div>
                       </div>
                     </div>

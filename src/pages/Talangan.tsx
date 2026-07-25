@@ -328,7 +328,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-bold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">{maskRp(formatRupiahPlain(t.nominal), hidden, 4)}</span>
+                  <span className="text-xs font-display font-semibold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">{maskRp(formatRupiahPlain(t.nominal), hidden, 4)}</span>
                   {t.status_lunas && (
                     <Tag tone="success">LUNAS</Tag>
                   )}

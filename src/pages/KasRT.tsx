@@ -649,13 +649,13 @@ export default function KasRTPage() {
               <div className="inset-soft rounded-xl p-3">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Penerimaan</span>
-                  <span className="text-caption font-bold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
+                  <span className="text-caption font-display font-bold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
                 </div>
                 <div className="space-y-1.5">
                   {KATEGORI_MASUK.filter((o) => (rekapKategori.masuk[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
                       <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
-                      <span className="font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
+                      <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
                   {totalMasuk === 0 && <p className="text-caption text-ink-faint dark:text-gray-400">Belum ada penerimaan.</p>}
@@ -665,13 +665,13 @@ export default function KasRTPage() {
               <div className="inset-soft rounded-xl p-3">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Pengeluaran</span>
-                  <span className="text-caption font-bold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
+                  <span className="text-caption font-display font-bold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
                 </div>
                 <div className="space-y-1.5">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
                       <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
-                      <span className="font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
+                      <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
                   {totalKeluar === 0 && <p className="text-caption text-ink-faint dark:text-gray-400">Belum ada pengeluaran.</p>}
