@@ -162,7 +162,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   ctx.fillStyle = '#FFFFFF';
   roundRect(ctx, 20, y, W - 40, rowsCardH, 20);
   ctx.fill();
-  ctx.strokeStyle = '#D3DAE3'; // line — tepi kartu "tercetak"
+  ctx.strokeStyle = '#C5CFDB'; // line — tepi kartu "tercetak"
   ctx.lineWidth = 1;
   roundRect(ctx, 20.5, y + 0.5, W - 41, rowsCardH - 1, 20);
   ctx.stroke();
@@ -180,7 +180,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
       ctx.textAlign = 'left';
       // Divider inset antar-baris (lebih terang dari border kartu — pola list app)
       if (i < data.rows.length - 1) {
-        ctx.strokeStyle = '#DCE2EA';
+        ctx.strokeStyle = '#D1DAE5';
         ctx.beginPath();
         ctx.moveTo(40, y + 18);
         ctx.lineTo(W - 40, y + 18);
@@ -205,7 +205,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
         // Hairline pemisah DI ATAS kepala kelompok (bukan antar tiap baris) →
         // rincian terbaca menempel pada kelompoknya, bukan deretan seragam.
         if (i > 0) {
-          ctx.strokeStyle = '#DCE2EA';
+          ctx.strokeStyle = '#D1DAE5';
           ctx.beginPath();
           ctx.moveTo(40, ry);
           ctx.lineTo(W - 40, ry);
@@ -254,7 +254,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     ctx.fillStyle = '#FFFFFF';
     roundRect(ctx, 20, listCardTop, W - 40, listCardH, 20);
     ctx.fill();
-    ctx.strokeStyle = '#D3DAE3';
+    ctx.strokeStyle = '#C5CFDB';
     ctx.lineWidth = 1;
     roundRect(ctx, 20.5, listCardTop + 0.5, W - 41, listCardH - 1, 20);
     ctx.stroke();
