@@ -563,7 +563,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
   left: var(--di-l, 4.75rem);
   right: var(--di-r, 1.25rem);
   height: 1px;
-  background: #DCE2EA;          /* lebih terang dari line #D3DAE3 (pass kontras-tercetak 8 Jul) — hierarki boundary-kartu-memimpin tetap terjaga */
+  background: #D1DAE5;          /* lebih terang dari line #C5CFDB (pass Etched Premium 26 Jul: #DCE2EA→#D1DAE5, ikut naik serempak edge-family) — hierarki boundary-kartu-memimpin tetap terjaga */
 }
 .divide-inset::after { bottom: 0; }
 .list-inset > * + *::before { top: 0; }

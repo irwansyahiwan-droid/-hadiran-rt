@@ -226,12 +226,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   // Belum Lunas" di bawah sudah membawa pesannya → chip TIDAK mengulang
   // "Ada Tunggakan" (dedup), cukup netral "Kas Aktif". Saldo minus tetap
   // kritis & pesannya BEDA dari banner → "Perlu Perhatian" (bukan duplikat).
+  // Pass "Etched Premium" (26 Jul): tiap pill status dapat hairline ring tone-nya
+  // sendiri (ring-inset) → terbaca "chip tercetak", bukan fill datar. Varian netral
+  // "Kas Aktif" dulu paling pudar (gray-100 + dot gray-400 + teks gray-600 = blob abu)
+  // → dipindah ke SLATE sejuk yang sadar-kanvas: teks & dot dinaikkan agar tegas.
   const kasStatus =
     saldo < 0
-      ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
+      ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20', ring: 'ring-rose-600/20 dark:ring-rose-400/20' }
       : talangan > 0
-        ? { label: 'Kas Aktif', dot: 'bg-gray-400 dark:bg-gray-500', text: 'text-gray-600 dark:text-gray-300', bg: 'bg-gray-100 dark:bg-gray-800' }
-        : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' };
+        ? { label: 'Kas Aktif', dot: 'bg-slate-500 dark:bg-slate-400', text: 'text-slate-700 dark:text-slate-200', bg: 'bg-slate-100 dark:bg-slate-800', ring: 'ring-slate-500/25 dark:ring-slate-400/25' }
+        : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20', ring: 'ring-emerald-600/20 dark:ring-emerald-400/20' };
   // Entrance hero (count-up, sheen sweep, draw-on sparkline) hanya pada
   // kunjungan pertama sesi — balik ke Beranda via tab/back tak mengulanginya.
   const firstHero = useFirstPlay('beranda-hero');
@@ -396,7 +400,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <p className="text-caption text-ink-faint dark:text-gray-400">{greeting},</p>
           <h1 className="text-xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
         </div>
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-micro font-bold ${kasStatus.bg} ${kasStatus.text}`}>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-micro font-bold ring-1 ring-inset ${kasStatus.bg} ${kasStatus.text} ${kasStatus.ring}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${kasStatus.dot}`} />
           {kasStatus.label}
         </span>
