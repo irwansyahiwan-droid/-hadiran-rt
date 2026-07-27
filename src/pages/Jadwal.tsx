@@ -574,11 +574,11 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         <div className="grid grid-cols-2 divide-x divide-line dark:divide-gray-800 border-t border-line dark:border-gray-800">
           <div className="px-4 py-3 min-w-0">
             <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400">Kas Terkumpul</p>
-            <p className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
+            <p className="font-display text-amount font-semibold text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
           </div>
           <div className="px-4 py-3 min-w-0">
             <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400">Sohibul Terima</p>
-            <p className="text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
+            <p className="font-display text-amount font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
           </div>
         </div>
 
