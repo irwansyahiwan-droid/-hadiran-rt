@@ -209,14 +209,16 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           }}
         >
           <div className="relative max-w-lg mx-auto flex items-center justify-center">
-            <p className="text-xs text-ink-sub dark:text-gray-300 text-center font-medium flex items-center justify-center gap-1.5">
-              <Eye className="w-3.5 h-3.5" /> Mode Warga — hanya bisa melihat data
-            </p>
+            {/* Chip read-only "tercetak" (ring-inset, bahasa Etched Premium) —
+                mata brand-emerald = percikan identitas, bukan strip abu mati. */}
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-sub dark:text-gray-200 bg-white dark:bg-gray-900/50 ring-1 ring-inset ring-line dark:ring-gray-700 rounded-full pl-2.5 pr-3 py-1">
+              <Eye className="w-3.5 h-3.5 text-brand-link dark:text-brand-linkDark" /> Mode Warga — hanya bisa melihat data
+            </span>
             <button
               type="button"
               onClick={dismissBanner}
               aria-label="Tutup info Mode Warga"
-              className="press relative -mr-2 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-ink-sub dark:text-gray-500 dark:hover:text-gray-300 active:opacity-70 before:absolute before:-inset-1.5 before:content-['']"
+              className="press absolute right-0 -mr-2 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-ink-sub dark:text-gray-500 dark:hover:text-gray-300 active:opacity-70 before:absolute before:-inset-1.5 before:content-['']"
             >
               <X className="w-3.5 h-3.5" />
             </button>
