@@ -472,8 +472,11 @@ export default function KasHadiranPage() {
     <>
       <div className="space-y-7 pb-2 overflow-x-hidden">
         {/* Header — anatomi seragam dgn Jadwal & Kas RT: judul + muat ulang + Ekspor.
-            Di HP judul di atas, toolbar di bawah (anti-kepotong). */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            SATU baris juga di HP (dulu bertumpuk): judul "Kas Hadiran" + toolbar
+            (44px ikon + Ekspor ±130px) muat di 358px, dan tumpukan itu menambah
+            ±56px chrome di atas hero — di layar 844px, kartu saldo baru mulai
+            lewat separuh layar. Judul min-w-0 → aman kalau judul memanjang. */}
+        <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-ink dark:text-gray-100">Kas Hadiran</h1>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
@@ -619,14 +622,17 @@ export default function KasHadiranPage() {
             </span>
           </div>
           <div className="space-y-2">
-            <div className="divide-inset [--di-l:2.5rem] flex items-center justify-between py-2">
+            {/* --di-r:0 — default 1.25rem dipakai utk baris list yg kontainernya
+                TANPA padding; di sini kartu sudah p-5, jadi inset kanan ganda
+                bikin hairline berhenti ±20px sebelum nominal (kelihatan salah). */}
+            <div className="divide-inset [--di-l:2.5rem] [--di-r:0px] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
               <span className="text-sm font-display font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
-            <div className="divide-inset [--di-l:2.5rem] flex items-center justify-between py-2">
+            <div className="divide-inset [--di-l:2.5rem] [--di-r:0px] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
@@ -638,7 +644,12 @@ export default function KasHadiranPage() {
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
-              <span className="text-sm font-display font-semibold tabular-nums text-blue-600 dark:text-blue-400">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
+              {/* Nominal NETRAL, bukan biru: DESIGN.stitch §2 mengunci Setor Blue
+                  sebagai sinyal STATUS (hero Kas Hadiran) — biru tak boleh
+                  menyentuh nilai uang, kalau tidak panel ini punya 4 keluarga
+                  warna (hijau/amber/biru/rose) dan biru diam-diam jadi aksen
+                  kedua. Ikon biru dipertahankan sbg penanda kategori "transfer". */}
+              <span className="text-sm font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
@@ -742,11 +753,16 @@ export default function KasHadiranPage() {
                       {/* ── Focal row: penerima + amount (ketuk → detail) ─ */}
                       <button
                         onClick={() => openDetail(t)}
-                        className="w-full flex items-center gap-3 px-5 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
+                        className="w-full flex items-start gap-3 px-5 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
                       >
-                        <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl" />
+                        <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-base font-bold text-ink dark:text-gray-100 leading-tight">
+                          {/* items-start + clamp 2 baris: nama panjang ("Saman Suryadi
+                              (Mono)") dulu membungkus 2 baris sementara blok nominal
+                              tetap center → nominal nyangkut di tengah nama & "Lihat
+                              detail" terdorong keluar ritme. Sekarang nama & nominal
+                              rata ATAS, apa pun panjang namanya. */}
+                          <p className="text-base font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">

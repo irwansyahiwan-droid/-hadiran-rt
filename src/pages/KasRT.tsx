@@ -368,6 +368,14 @@ export default function KasRTPage() {
   // Seri saldo kronologis untuk area tren.
   const saldoSeries = useMemo(() => list.map((k) => k.saldo_setelah), [list]);
 
+  /** Penanda ujung grafik tren (kiri = transaksi terlama, kanan = terbaru). */
+  const trenUjung = (k?: KasRT) => ({
+    label: k ? new Date(k.tanggal).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' }) : '',
+    nilai: k ? (k.saldo_setelah < 0 ? '-' : '') + formatRupiahPlain(k.saldo_setelah) : '',
+  });
+  const trenAwal = trenUjung(list[0]);
+  const trenAkhir = trenUjung(list[list.length - 1]);
+
   // Rekap per kategori (pertanggungjawaban) — Saldo Awal dikecualikan.
   const rekapKategori = useMemo(() => {
     const masuk: Record<string, number> = {};
@@ -435,8 +443,9 @@ export default function KasRTPage() {
   return (
     <>
       <div className="space-y-7 pb-2 page-enter">
-        {/* Header — di HP: judul di atas, tombol di bawah (anti-kepotong) */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Header — SATU baris juga di HP (sinkron Kas Hadiran): judul + toolbar
+            muat di 358px, dan tumpukan lama menambah ±56px chrome sebelum hero. */}
+        <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <h1 className="inline-flex items-center gap-1 text-lg font-bold text-ink dark:text-gray-100">
               Kas RT
@@ -607,10 +616,18 @@ export default function KasRTPage() {
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
               <p className="text-sm font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</p>
               <AreaTrend points={saldoSeries} />
+              {/* Kaki grafik — sebelumnya kartu ini cuma garis: tanpa sumbu, tanpa
+                  periode, tanpa nilai, dan AreaTrend aria-hidden → pembaca layar
+                  kehilangan kartunya utuh. Dua penanda ujung sudah cukup membuat
+                  bentuk garis bisa dibaca sbg angka, tanpa membangun sumbu penuh. */}
+              <div className="flex items-baseline justify-between gap-2 mt-2 text-micro font-medium text-ink-faint dark:text-gray-400">
+                <span>{trenAwal.label} · {maskRp(trenAwal.nilai, hidden, 4)}</span>
+                <span className="text-right">{trenAkhir.label} · {maskRp(trenAkhir.nilai, hidden, 4)}</span>
+              </div>
             </div>
             {monthly.length > 0 && (
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
                   <p className="text-sm font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
                   <div className="flex items-center gap-1">
                     {[3, 6, 12].map((p) => (
@@ -619,11 +636,13 @@ export default function KasRTPage() {
                         onClick={() => setChartPeriod(p)}
                         aria-pressed={chartPeriod === p}
                         aria-label={`${p} bulan terakhir`}
-                        className={`press min-h-[44px] min-w-[44px] px-2 inline-flex items-center justify-center rounded-md text-micro font-bold transition-colors ${
+                        className={`press min-h-[44px] min-w-[44px] px-2 inline-flex items-center justify-center rounded-md text-micro font-bold whitespace-nowrap transition-colors ${
                           chartPeriod === p ? 'bg-brand text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         }`}
                       >
-                        {p}B
+                        {/* "3 bln", bukan "3B" — singkatan sandi utk pembaca lansia;
+                            aria-label sudah benar, label visualnya yang tertinggal. */}
+                        {p} bln
                       </button>
                     ))}
                   </div>

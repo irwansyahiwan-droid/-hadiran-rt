@@ -52,11 +52,13 @@ export default function FitAmount({ measure, maxPx = 48, minPx = 30, className =
     <p
       ref={ref}
       className={className}
-      // Legibility shadow (hijau-tinta gelap, bukan hitam) — teks putih/rose nominal
-      // duduk di gradient hijau hero yg bagian atasnya terang; tanpa ini kontras
-      // tipis (white ~2.4-4:1, rose negatif gagal) → kurang nyaman utk warga lansia.
-      // Shadow gelap rapat memisahkan glyph dari hijau TANPA mengubah gradient brand.
-      style={{ position: 'relative', fontSize: size, lineHeight: 1.05, textShadow: '0 1px 1px rgba(3,28,18,0.5), 0 1px 10px rgba(3,28,18,0.4), 0 0 2px rgba(3,28,18,0.45)' }}
+      // Legibility shadow SATU lapis (hijau-tinta gelap, bukan hitam) — teks putih
+      // nominal duduk di gradient hijau hero. Dulu 3 lapis (termasuk blur 10px):
+      // itu halo, dan halo dilarang DESIGN.stitch §7 — angka paling penting di app
+      // justru jadi satu-satunya elemen ber-emboss. Ramp hero sudah diredupkan di
+      // pass kontras 13 Jul (#157A45, putih lolos AA tanpa bantuan shadow), jadi
+      // sisanya cuma pemisah glyph tipis: 1px, tanpa sebaran.
+      style={{ position: 'relative', fontSize: size, lineHeight: 1.05, textShadow: '0 1px 2px rgba(3,28,18,0.35)' }}
     >
       {children}
       {/* Probe pengukur — tak terlihat & di luar alur; font/letter-spacing diwarisi
