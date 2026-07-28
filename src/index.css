@@ -640,7 +640,16 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.22),       /* glossy top edge */
       0 2px 6px -1px rgba(13, 80, 50, 0.30);
-    transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease;
+    transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease, filter 0.2s ease;
+  }
+  /* Hover CTA = filter, BUKAN font-weight. `font-weight: 800` melebarkan label
+     1,75px & menggeser ikon panah 0,88px (ukur Playwright) — itu properti
+     LAYOUT, jadi tiap frame transisi memicu reflow, bukan komposit. Di iOS
+     :hover juga nyangkut setelah diketuk → tombol "menebal" permanen di HP.
+     Digerbang `hover: hover` supaya HP tidak pernah membayarnya, dan dipasang
+     kembar di .btn-danger — anatomi keduanya memang sengaja PERSIS. */
+  @media (hover: hover) and (pointer: fine) {
+    .btn-brand:hover, .btn-danger:hover { filter: brightness(1.07); }
   }
   .btn-brand:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 1px 3px -1px rgba(13,80,50,0.3); }
 
@@ -657,7 +666,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
       0 2px 6px -1px rgba(136, 19, 55, 0.30);
-    transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease;
+    transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease, filter 0.2s ease;
   }
   .btn-danger:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 1px 3px -1px rgba(136,19,55,0.3); }
 
@@ -785,6 +794,58 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 @keyframes slideInLeft  { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
 .page-in-right { animation: slideInRight 0.22s var(--ease-out-expo) backwards; }
 .page-in-left  { animation: slideInLeft 0.22s var(--ease-out-expo) backwards; }
+
+/* ── Premium 2026 Micro-interactions (Spotlight & Shake) ────────────── */
+.login-spotlight { position: relative; }
+
+/* Digerbang `hover: hover` + `pointer: fine`: app ini dibuka warga lewat HP,
+   di sana hover tak pernah menyala — jadi layar sentuh tidak perlu memuat
+   maupun me-repaint gradient ini sama sekali. */
+@media (hover: hover) and (pointer: fine) {
+  .login-spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Ikut rounded-3xl kartu. Menggantikan `overflow: hidden` di induk, yang
+       ikut memotong shake field & focus ring anak-anaknya. */
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      500px circle at var(--mouse-x, 50%) var(--mouse-y, 0px),
+      rgba(255, 255, 255, 0.25),
+      transparent 40%
+    );
+    /* z-index 0, BUKAN 10. Di z-10 lapisan ini mengecat putih 25% DI ATAS
+       tulisan: sampel piksel Playwright (kursor tepat di teks) → pemisah
+       "atau" 7.30 : 1 jatuh ke 4.06 : 1 (GAGAL AA), subtitle 8.76 → 5.58.
+       Di z-0 cahaya menyapu PERMUKAAN kartu di bawah teks — efeknya utuh,
+       kontras justru naik karena latar di belakang teks ikut terang. */
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .login-spotlight > * { position: relative; z-index: 1; }
+  .login-spotlight:hover::before { opacity: 1; }
+  .dark .login-spotlight::before {
+    background: radial-gradient(
+      500px circle at var(--mouse-x, 50%) var(--mouse-y, 0px),
+      rgba(255, 255, 255, 0.05),
+      transparent 40%
+    );
+  }
+}
+
+/* Shake kredensial salah. Tanpa fill-mode → transform balik ke none saat
+   selesai (tak meninggalkan containing block). Amplitudo ±4px aman: elemen
+   yang digoyang selalu duduk di dalam padding kartu, bukan mepet tepi. */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+.shake {
+  animation: shake 0.3s var(--ease-out-expo);
+}
 /* Exit sub-page full-screen (Kelola Anggota, Riwayat, dst.): mundur ke arah
    datangnya (kanan) + fade — spasial konsisten dgn page-in-right. Lebih cepat
    dari enter (exit = sistem merespons). Tukar kelas via useClosePhase. */

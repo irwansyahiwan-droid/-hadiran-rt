@@ -25,6 +25,26 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   const [wargaError, setWargaError] = useState('');
   const [bendaharaOpen, setBendaharaOpen] = useState(false);
 
+  // Micro-interactions Premium 2026
+  const [shakeWarga, setShakeWarga] = useState(false);
+  const [shakeAdmin, setShakeAdmin] = useState(false);
+
+  // Lepas dulu, pasang lagi di frame berikutnya — kalau kelas `shake` masih
+  // menempel (dua kali salah beruntun) animasi tak akan restart sendiri.
+  function goyang(set: (v: boolean) => void) {
+    set(false);
+    requestAnimationFrame(() => set(true));
+  }
+
+  // Posisi spotlight ditulis LANGSUNG sebagai CSS var di node-nya. Lewat
+  // useState, tiap gerakan mouse me-render ulang seluruh Login (~60×/detik)
+  // padahal yang berubah cuma satu variabel gradient.
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  }
+
   function handleWargaSubmit() {
     haptic(12);
     if (wargaPassword.trim().toLowerCase() === WARGA_PASSWORD) {
@@ -33,6 +53,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
     } else {
       // Jangan reset field, biarkan warga memperbaiki ketikannya
       setWargaError('Password warga salah. Silakan ketik: warga');
+      goyang(setShakeWarga);
     }
   }
 
@@ -49,7 +70,10 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
     setError('');
     setLoading(true);
     const err = await onLogin(email.trim(), password);
-    if (err) setError('Email atau password salah.');
+    if (err) {
+      setError('Email atau password salah.');
+      goyang(setShakeAdmin);
+    }
     setLoading(false);
   }
 
@@ -121,8 +145,9 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
       {/* ── Glassmorphism Card — branded exception DESIGN.md §381 ── */}
       <div
-        className="rise login-card relative w-full max-w-sm rounded-3xl p-6 z-10"
+        className="rise login-card login-spotlight relative w-full max-w-sm rounded-3xl p-6 z-10"
         style={{ animationDelay: '0.22s' }}
+        onMouseMove={handleMouseMove}
       >
         <h2 className="font-display text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-0.5">
           Selamat Datang
@@ -169,7 +194,10 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           </div>
 
           <label htmlFor="warga-password" className="sr-only">Password Warga</label>
-          <div className="relative">
+          <div
+            className={`relative ${shakeWarga ? 'shake' : ''}`}
+            onAnimationEnd={() => setShakeWarga(false)}
+          >
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/70" />
             <input
               id="warga-password"
@@ -236,7 +264,12 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         </button>
 
         <div
-          className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'}`}
+          // Shake dipasang di panel, BUKAN di tiap field: field-nya `w-full` di
+          // dalam wrapper `overflow-hidden` (mesin collapse), jadi geseran 4px
+          // terpotong di tepi. Panel duduk di dalam padding kartu → aman, dan
+          // satu goyangan utuh lebih terbaca daripada dua elemen bergerak.
+          className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'} ${shakeAdmin ? 'shake' : ''}`}
+          onAnimationEnd={() => setShakeAdmin(false)}
           // Collapse = tinggi 0, tapi email/password/submit di dalam TETAP fokusabel
           // via Tab & terbaca screen reader. `inert` mengeluarkannya dari tab-order
           // sekaligus a11y tree sampai panel dibuka. (React 18 belum punya tipe
