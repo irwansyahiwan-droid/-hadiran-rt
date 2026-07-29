@@ -92,7 +92,7 @@ export default function BackupRestore({ open, onClose }: Props) {
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <DatabaseBackup className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Backup &amp; Restore</h1>
+            <h1 className="text-balance text-base font-bold text-gray-900 dark:text-gray-100 truncate">Backup &amp; Restore</h1>
           </div>
         </div>
       </header>
@@ -104,7 +104,7 @@ export default function BackupRestore({ open, onClose }: Props) {
             <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">Backup Data</h2>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+          <p className="text-pretty text-xs text-gray-500 dark:text-gray-400 mb-4">
             Unduh seluruh data (anggota, tarikan, absensi, talangan, kas) sebagai satu file JSON. Simpan baik-baik sebagai cadangan.
           </p>
           <button
@@ -129,11 +129,11 @@ export default function BackupRestore({ open, onClose }: Props) {
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-rose-200/70 dark:border-rose-900/40 lift p-5">
           <div className="flex items-center gap-2 mb-1">
             <Upload className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">Pulihkan (Restore)</h2>
+            <h2 className="text-balance text-sm font-bold text-gray-900 dark:text-gray-100">Pulihkan (Restore)</h2>
           </div>
           <div className="flex items-start gap-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200/60 dark:border-rose-800/40 rounded-xl p-3 mb-4">
             <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-            <p className="text-xs text-rose-700 dark:text-rose-300 leading-relaxed">
+            <p className="text-pretty text-xs text-rose-700 dark:text-rose-300 leading-relaxed">
               Memulihkan akan <b>mengganti seluruh data saat ini</b> dengan isi file backup. Tindakan ini tidak bisa dibatalkan — pastikan kamu sudah membuat backup terbaru lebih dulu.
             </p>
           </div>

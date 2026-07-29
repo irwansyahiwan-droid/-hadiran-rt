@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Trash2, Eye, EyeOff, Share2, RotateCcw } from 'lucide-react';
+import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
@@ -12,6 +12,7 @@ import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '..
 import FitAmount from '../components/FitAmount';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
+import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import Odometer from '../components/Odometer';
 import SmartInsight from '../components/SmartInsight';
 import CrossFade from '../components/CrossFade';
@@ -227,7 +228,7 @@ export default function KasRTPage() {
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<KasRT | null>(null);
   const [selectedRow, setSelectedRow] = useState<KasRT | null>(null);
-  const [confirmDel, setConfirmDel] = useState(false);
+  const [hapusRow, setHapusRow] = useState<KasRT | null>(null);
   const [chartPeriod, setChartPeriod] = useState(6); // bulan terakhir di bar chart
   const rowDrag = useDragDismiss(() => setSelectedRow(null));
   // Back HP modal tambah/edit didaftarkan DI DALAM TambahModal (jalur dismiss meluncur).
@@ -425,7 +426,7 @@ export default function KasRTPage() {
   // Hapus transaksi Kas RT dengan pola undo (hapus permanen setelah 5 dtk bila tak diurungkan).
   function deleteRow(row: KasRT) {
     setSelectedRow(null);
-    setConfirmDel(false);
+    setHapusRow(null);
     setList(prev => prev.filter(x => x.id !== row.id)); // optimistik
     showUndo(
       'Transaksi dihapus',
@@ -723,7 +724,16 @@ export default function KasRTPage() {
           {error ? (
           <ErrorState onRetry={() => load()} retrying={loading} />
         ) : list.length === 0 ? (
-          <EmptyState icon={Landmark} title="Belum ada transaksi" subtitle="Transaksi akan muncul setelah data pertama ditambahkan." />
+          <EmptyState
+            icon={Landmark}
+            title="Belum ada transaksi"
+            subtitle={isBendahara
+              ? 'Catat pemasukan atau pengeluaran pertama Kas RT di sini.'
+              : 'Transaksi akan muncul setelah dicatat bendahara.'}
+            action={isBendahara
+              ? { label: 'Tambah transaksi', icon: Plus, onClick: () => { setEditing(null); setShowModal(true); } }
+              : undefined}
+          />
         ) : (
           <>
           {/* Cari + filter tipe + sort mutasi */}
@@ -784,7 +794,7 @@ export default function KasRTPage() {
                 <Row
                   key={k.id}
                   type={editable ? 'button' : undefined}
-                  onClick={editable ? () => { haptic(); setSelectedRow(k); setConfirmDel(false); } : undefined}
+                  onClick={editable ? () => { haptic(); setSelectedRow(k); } : undefined}
                   aria-label={editable ? `Aksi: ${k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}` : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
                   className={`rise w-full text-left flex items-center gap-3 px-5 py-4 [--di-l:4.25rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${editable ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
@@ -874,15 +884,33 @@ export default function KasRTPage() {
                 <Pencil className="w-4 h-4" /> Edit
               </button>
               <button
-                onClick={() => { if (confirmDel) deleteRow(selectedRow); else { setConfirmDel(true); setTimeout(() => setConfirmDel(false), 3000); } }}
-                className={`press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border ${confirmDel ? 'btn-danger border-transparent' : 'bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900'}`}
+                onClick={() => setHapusRow(selectedRow)}
+                className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900"
               >
-                <Trash2 className="w-4 h-4" /> {confirmDel ? 'Yakin hapus?' : 'Hapus'}
+                <Trash2 className="w-4 h-4" /> Hapus
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Hapus transaksi = dialog konfirmasi, bukan tekan-dua-kali di tombol yang
+          sama (jempol gampang mendarat dua kali). Tanpa gerbang ketik-ulang:
+          penghapusan baru dieksekusi setelah jeda undo di notifikasi. */}
+      <ConfirmDestruktif
+        open={!!hapusRow}
+        title="Hapus transaksi ini?"
+        description={<>
+          {hapusRow?.keterangan || (hapusRow?.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')} senilai{' '}
+          <b>{formatRupiahPlain(hapusRow?.nominal ?? 0)}</b> dihapus dari Kas RT dan saldo dihitung ulang.
+          Ada jeda 5 detik untuk mengurungkan lewat tombol Urungkan di notifikasi.
+        </>}
+        confirmLabel="Hapus"
+        loadingLabel="Menghapus…"
+        icon={Trash2}
+        onClose={() => setHapusRow(null)}
+        onConfirm={() => { if (hapusRow) deleteRow(hapusRow); }}
+      />
 
       {/* Aksi utama di zona jempol */}
       {isBendahara && (

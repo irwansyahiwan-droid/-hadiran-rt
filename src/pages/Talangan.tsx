@@ -13,6 +13,7 @@ import SectionTitle from '../components/SectionTitle';
 import InfoTip from '../components/InfoTip';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
+import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import Tag from '../components/Tag';
 import FilterChips from '../components/FilterChips';
 import CrossFade from '../components/CrossFade';
@@ -42,8 +43,10 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const [error, setError] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
-  const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  // Aksi merusak (batalkan pelunasan / hapus talangan) lewat dialog konfirmasi,
+  // bukan tekan-dua-kali di tombol yang sama — jempol gampang mendarat 2×.
+  const [batalRow, setBatalRow] = useState<Talangan | null>(null);
+  const [hapusRow, setHapusRow] = useState<Talangan | null>(null);
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'semua' | 'belum' | 'lunas'>('semua');
@@ -124,7 +127,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   // Batalkan pembayaran talangan — kembalikan ke "belum lunas" & hapus transaksi kasnya
   async function batalkanBayar(t: Talangan) {
     setProcessingId(t.id);
-    setCancelConfirmId(null);
+    setBatalRow(null);
     try {
       // Cek error tiap langkah (Supabase tak melempar) — jangan toast sukses palsu.
       const { error: eUpd } = await supabase
@@ -154,18 +157,15 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   }
 
   function handleBatalClick(t: Talangan) {
-    if (cancelConfirmId === t.id) {
-      batalkanBayar(t);
-    } else {
-      setCancelConfirmId(t.id);
-      setTimeout(() => setCancelConfirmId(prev => prev === t.id ? null : prev), 3000);
-    }
+    setConfirmId(null);
+    setHapusRow(null);
+    setBatalRow(t);
   }
 
   // Hapus data talangan (beserta transaksi kas pembayarannya bila ada).
   // Pakai pola undo: sembunyikan dulu, hapus permanen setelah 5 dtk bila tak diurungkan.
   function hapusTalangan(t: Talangan) {
-    setDeleteConfirmId(null);
+    setHapusRow(null);
     setList(prev => prev.filter(x => x.id !== t.id)); // optimistik
     showUndo(
       'Talangan dihapus',
@@ -186,13 +186,8 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
   function handleHapusClick(t: Talangan) {
     setConfirmId(null);
-    setCancelConfirmId(null);
-    if (deleteConfirmId === t.id) {
-      hapusTalangan(t);
-    } else {
-      setDeleteConfirmId(t.id);
-      setTimeout(() => setDeleteConfirmId(prev => prev === t.id ? null : prev), 3000);
-    }
+    setBatalRow(null);
+    setHapusRow(t);
   }
 
   // Group by warga
@@ -350,15 +345,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBatalClick(t)}
                     disabled={processingId === t.id}
-                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
-                      cancelConfirmId === t.id
-                        ? 'bg-rose-600 text-white'
-                        : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                    }`}
+                    className="inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                   >
                     {processingId === t.id ? (
                       <><RefreshCw className="w-3 h-3 animate-spin" />Memproses…</>
-                    ) : cancelConfirmId === t.id ? 'Yakin batal?' : 'Batalkan'}
+                    ) : 'Batalkan'}
                   </button>
                 )}
                 {isBendahara && (
@@ -367,13 +358,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     disabled={processingId === t.id}
                     title="Hapus data talangan"
                     aria-label="Hapus data talangan"
-                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 ${
-                      deleteConfirmId === t.id
-                        ? 'bg-rose-600 text-white'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20'
-                    }`}
+                    className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
                   >
-                    {deleteConfirmId === t.id ? 'Hapus?' : <Trash2 className="w-3.5 h-3.5" />}
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
@@ -582,6 +569,35 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         </>
         )}
       </CrossFade>
+
+      <ConfirmDestruktif
+        open={!!batalRow}
+        title="Batalkan pelunasan talangan?"
+        description={<>
+          Talangan Tarikan #{batalRow?.tarikan?.nomor} senilai <b>{formatRupiahPlain(batalRow?.nominal ?? 0)}</b> kembali
+          jadi <b>belum lunas</b> dan catatan kas masuknya dihapus. Bisa ditandai lunas lagi kapan saja.
+        </>}
+        confirmLabel="Batalkan"
+        loadingLabel="Membatalkan…"
+        icon={RotateCcw}
+        loading={!!batalRow && processingId === batalRow.id}
+        onClose={() => setBatalRow(null)}
+        onConfirm={() => { if (batalRow) batalkanBayar(batalRow); }}
+      />
+
+      <ConfirmDestruktif
+        open={!!hapusRow}
+        title="Hapus data talangan?"
+        description={<>
+          Talangan Tarikan #{hapusRow?.tarikan?.nomor} senilai <b>{formatRupiahPlain(hapusRow?.nominal ?? 0)}</b> dihapus
+          beserta catatan kas pembayarannya. Ada jeda 5 detik untuk mengurungkan lewat tombol Urungkan di notifikasi.
+        </>}
+        confirmLabel="Hapus"
+        loadingLabel="Menghapus…"
+        icon={Trash2}
+        onClose={() => setHapusRow(null)}
+        onConfirm={() => { if (hapusRow) hapusTalangan(hapusRow); }}
+      />
     </div>
   );
 }

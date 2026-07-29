@@ -12,7 +12,7 @@ import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import Odometer from '../components/Odometer';
 import Tag from '../components/Tag';
-import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
+import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import Fab from '../components/Fab';
 import ExportMenu from '../components/ExportMenu';
 import { showToast, showUndo } from '../lib/toast';
@@ -68,7 +68,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
         <div>
-          <h3 className="text-base font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h3>
+          <h3 className="text-balance text-base font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h3>
           <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
             Saldo hadiran: <span className="font-semibold text-emerald-700 dark:text-emerald-400">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
@@ -151,7 +151,7 @@ export default function KasHadiranPage() {
   const [pdfLoading, setPdfLoading] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [batalTarikan, setBatalTarikan] = useState<Tarikan | null>(null);
-  const [confirmHapusId, setConfirmHapusId] = useState<string | null>(null);
+  const [hapusTarget, setHapusTarget] = useState<Tarikan | null>(null);
   const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -377,7 +377,7 @@ export default function KasHadiranPage() {
 
   // Buka dialog pengaman (wajib ketik nomor tarikan) — cegah salah-pencet.
   function handleBatalkanClick(t: Tarikan) {
-    setConfirmHapusId(null);
+    setHapusTarget(null);
     setBatalTarikan(t);
   }
 
@@ -385,7 +385,7 @@ export default function KasHadiranPage() {
   // baru dijalankan 5 dtk kemudian bila tak diurungkan. RPC atomik yang sama
   // dgn batalkan (p_hapus) → snapshot pemulihan terarsip dulu di audit_log.
   function hapusTarikan(t: Tarikan) {
-    setConfirmHapusId(null);
+    setHapusTarget(null);
     setTarikanSelesai(prev => prev.filter(x => x.id !== t.id)); // optimistik
     showUndo(
       `Tarikan #${t.nomor} dihapus`,
@@ -405,12 +405,7 @@ export default function KasHadiranPage() {
 
   function handleHapusClick(t: Tarikan) {
     setBatalTarikan(null);
-    if (confirmHapusId === t.id) {
-      hapusTarikan(t);
-    } else {
-      setConfirmHapusId(t.id);
-      setTimeout(() => setConfirmHapusId(prev => (prev === t.id ? null : prev)), 3500);
-    }
+    setHapusTarget(t);
   }
 
   // Setor dari Kas Hadiran → Kas RT (catat di dua tabel) + recompute saldo kas_rt.
@@ -833,13 +828,11 @@ export default function KasHadiranPage() {
                           <button
                             onClick={() => handleHapusClick(t)}
                             disabled={processingId === t.id}
-                            aria-label="Hapus tarikan"
-                            className={`flex items-center gap-1 min-h-[44px] text-xs font-medium ml-auto transition-colors disabled:opacity-50 ${
-                              confirmHapusId === t.id ? 'text-rose-600' : 'text-ink-faint dark:text-gray-500 hover:text-rose-500'
-                            }`}
+                            aria-label={`Hapus tarikan #${t.nomor}`}
+                            className="flex items-center gap-1.5 min-h-[44px] text-xs font-medium ml-auto transition-colors disabled:opacity-50 text-ink-faint dark:text-gray-500 hover:text-rose-500"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
-                            {confirmHapusId === t.id && 'Yakin hapus?'}
+                            Hapus
                           </button>
                         )}
                       </div>
@@ -877,12 +870,43 @@ export default function KasHadiranPage() {
         />
       )}
 
-      <ConfirmBatalTarikan
+      <ConfirmDestruktif
         open={!!batalTarikan}
-        nomor={batalTarikan?.nomor ?? 0}
+        title={`Batalkan hasil Tarikan #${batalTarikan?.nomor ?? 0}?`}
+        description={<>
+          Tindakan ini <b>menghapus absensi, talangan, &amp; kas masuk</b> tarikan #{batalTarikan?.nomor ?? 0} dan
+          <b> tidak bisa di-undo</b>. Pemulihan hanya bisa manual.
+        </>}
+        typeToConfirm={{
+          value: String(batalTarikan?.nomor ?? 0),
+          hint: <>Ketik angka <span className="font-bold text-rose-600 dark:text-rose-400">{batalTarikan?.nomor ?? 0}</span> untuk konfirmasi</>,
+        }}
+        confirmLabel="Batalkan"
+        loadingLabel="Membatalkan…"
+        icon={RotateCcw}
         loading={!!batalTarikan && processingId === batalTarikan.id}
         onClose={() => setBatalTarikan(null)}
         onConfirm={() => { if (batalTarikan) batalkanTarikan(batalTarikan); }}
+      />
+
+      {/* Hapus tarikan = lebih merusak daripada Batalkan (baris jadwalnya ikut
+          hilang), jadi pengamannya minimal setara: dialog + ketik ulang nomor. */}
+      <ConfirmDestruktif
+        open={!!hapusTarget}
+        title={`Hapus Tarikan #${hapusTarget?.nomor ?? 0}?`}
+        description={<>
+          Tarikan #{hapusTarget?.nomor ?? 0} dihapus dari jadwal beserta <b>absensi, talangan, &amp; kas masuknya</b>.
+          Ada jeda 5 detik untuk mengurungkan lewat tombol Urungkan di notifikasi.
+        </>}
+        typeToConfirm={{
+          value: String(hapusTarget?.nomor ?? 0),
+          hint: <>Ketik angka <span className="font-bold text-rose-600 dark:text-rose-400">{hapusTarget?.nomor ?? 0}</span> untuk konfirmasi</>,
+        }}
+        confirmLabel="Hapus"
+        loadingLabel="Menghapus…"
+        icon={Trash2}
+        onClose={() => setHapusTarget(null)}
+        onConfirm={() => { if (hapusTarget) hapusTarikan(hapusTarget); }}
       />
 
       {/* Sheet detail tarikan: hadir & tidak hadir + status bayar talangan */}

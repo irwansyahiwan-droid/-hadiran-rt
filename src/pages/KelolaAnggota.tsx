@@ -204,7 +204,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
             {susulan && (
               <div className="px-3.5 pb-3.5 space-y-2">
-                <p className="text-micro text-amber-700 dark:text-amber-400 leading-relaxed">
+                <p className="text-pretty text-micro text-amber-700 dark:text-amber-400 leading-relaxed">
                   Ditandai <b>hadir</b> di tarikan terpilih lalu kas dihitung ulang. Talangan warga lain tidak terpengaruh.
                 </p>
                 <div className="rounded-xl bg-white dark:bg-gray-900 border border-amber-100 dark:border-amber-900/40 list-inset [--di-l:2.75rem] [--di-r:0.75rem] max-h-52 overflow-y-auto">
@@ -247,7 +247,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             <p className="flex items-center gap-2 text-sm font-bold text-rose-700 dark:text-rose-300">
               <AlertTriangle className="w-4 h-4 shrink-0" /> Masih punya jadwal ke depan
             </p>
-            <p className="text-xs text-rose-600 dark:text-rose-400/90 mt-1 leading-relaxed">
+            <p className="text-pretty text-xs text-rose-600 dark:text-rose-400/90 mt-1 leading-relaxed">
               {initial?.nama} masih jadi Sohibul Bait di {jadwalNonaktif.length} tarikan:{' '}
               <b>#{jadwalNonaktif.join(', #')}</b>. Setelah dinonaktifkan, jangan lupa ganti Sohibul Bait tarikan tersebut lewat <b>Revisi jadwal</b>.
             </p>

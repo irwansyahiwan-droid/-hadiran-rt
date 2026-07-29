@@ -11,7 +11,7 @@ import FilterChips from '../components/FilterChips';
 import StatRow from '../components/StatRow';
 import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
-import ConfirmBatalTarikan from '../components/ConfirmBatalTarikan';
+import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import CrossFade from '../components/CrossFade';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
@@ -495,9 +495,20 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         </div>
       </div>
 
-      <ConfirmBatalTarikan
+      <ConfirmDestruktif
         open={confirmCancel}
-        nomor={tarikan.nomor}
+        title={`Batalkan hasil Tarikan #${tarikan.nomor}?`}
+        description={<>
+          Tindakan ini <b>menghapus absensi, talangan, &amp; kas masuk</b> tarikan #{tarikan.nomor} dan
+          <b> tidak bisa di-undo</b>. Pemulihan hanya bisa manual.
+        </>}
+        typeToConfirm={{
+          value: String(tarikan.nomor),
+          hint: <>Ketik angka <span className="font-bold text-rose-600 dark:text-rose-400">{tarikan.nomor}</span> untuk konfirmasi</>,
+        }}
+        confirmLabel="Batalkan"
+        loadingLabel="Membatalkan…"
+        icon={RotateCcw}
         loading={cancelling}
         onClose={() => setConfirmCancel(false)}
         onConfirm={batalkan}
@@ -1023,7 +1034,16 @@ export default function JadwalPage() {
         {error ? (
         <ErrorState onRetry={() => load()} retrying={loading} />
       ) : tarikanList.length === 0 ? (
-        <EmptyState icon={Calendar} title="Belum ada jadwal" subtitle="Jadwal tarikan akan muncul setelah dibuat oleh bendahara." />
+        <EmptyState
+          icon={Calendar}
+          title="Belum ada jadwal"
+          subtitle={isBendahara
+            ? 'Buat jadwal tarikan pertama — Sohibul Bait & tanggalnya.'
+            : 'Jadwal tarikan akan muncul setelah dibuat oleh bendahara.'}
+          action={isBendahara
+            ? { label: 'Tambah jadwal', icon: Plus, onClick: () => { haptic(); setCreatingTarikan(true); } }
+            : undefined}
+        />
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {tarikanList.map((t, idx) => {

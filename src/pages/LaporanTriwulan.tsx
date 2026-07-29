@@ -147,7 +147,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           </button>
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Tutup Buku Triwulan</h1>
+            <h1 className="text-balance text-base font-bold text-gray-900 dark:text-gray-100 truncate">Tutup Buku Triwulan</h1>
           </div>
           <button
             onClick={() => { haptic(); setLoading(true); load(); }}
@@ -160,7 +160,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
-        <p className="text-xs text-gray-500 dark:text-gray-400 px-1">
+        <p className="text-pretty text-xs text-gray-500 dark:text-gray-400 px-1">
           Tutup buku <span className="font-semibold">sekarang</span> untuk posisi kas terkini, atau pilih per triwulan. Bagikan sebagai gambar (PNG) langsung ke grup WhatsApp, atau unduh PDF.
         </p>
 

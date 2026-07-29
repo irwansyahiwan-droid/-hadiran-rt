@@ -89,7 +89,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Tentang */}
         <Section icon={BookOpen} title="TENTANG APLIKASI">
-          <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
+          <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
             Aplikasi Hadiran RT 004/006 adalah sistem digital untuk mengelola iuran tarikan bergilir antar warga
             (sistem <b>Sohibul Bait</b>), kas hadiran, talangan anggota, serta sinkronisasi setoran ke Kas Besar RT 004/006.
             Tujuannya: <b>transparansi penuh</b> bagi seluruh warga &amp; <b>kemudahan kerja Bendahara</b>.
@@ -141,7 +141,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Model Keamanan & Data */}
         <Section icon={ShieldCheck} title="MODEL KEAMANAN & DATA">
-          <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300 mb-3">
+          <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300 mb-3">
             Keamanan data dirancang sejak awal, bukan tambalan:
           </p>
           <ul className="space-y-2.5">
