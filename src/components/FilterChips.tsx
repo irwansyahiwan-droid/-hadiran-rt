@@ -60,7 +60,11 @@ export default function FilterChips<T extends string, S extends string = string>
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div className={`flex items-center gap-1.5 ${wrap ? 'flex-wrap' : ''}`}>
+      {/* min-w-0 + geser mendatar: tanpa ini grup chip (anak-anaknya shrink-0)
+          meluber keluar kotaknya dan tombol sort ber-`ml-auto` duduk DI ATAS
+          chip terakhir — terlihat di 375px, dan di 360px halaman ikut bisa
+          di-scroll ke samping. py-1 memberi ruang ring fokus saat digeser. */}
+      <div className={`flex items-center gap-1.5 min-w-0 ${wrap ? 'flex-wrap' : 'scroll-x-clean scroll-x-fade py-1 -my-1'}`}>
         {options.map((f) => {
           const active = value === f.id;
           return (

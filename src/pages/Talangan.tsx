@@ -265,27 +265,34 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           <button
             onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
             aria-expanded={isExpanded}
-            className="flex-1 min-w-0 flex items-center gap-3 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
+            className="flex-1 min-w-0 flex items-center gap-2.5 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
           >
-            <AvatarPeci nama={g.nama} className="w-11 h-11 rounded-2xl" />
+            {/* Avatar 36 (bukan 44) & padding 16 (bukan 20): baris ini menanggung
+                5 blok shrink-0 sekaligus (avatar, nominal, chevron, tombol WA).
+                Audit 29 Jul: kolom nama tersisa 76px @390 / 46px @360 → nama DAN
+                caption "N belum lunas" dua-duanya terpotong di semua lebar. */}
+            <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
             <div className="flex-1 min-w-0">
-              {/* line-clamp-2 (bukan truncate): nama warga panjang melipat ke baris 2,
-                  tidak terpotong — kolom kanan (nominal+chevron+WA) memang lebar. */}
+              {/* line-clamp-2 (bukan truncate): nama warga panjang melipat ke baris 2. */}
               <p className="text-body font-semibold text-ink dark:text-gray-100 line-clamp-2 leading-snug break-words">{g.nama}</p>
               {g.countBelum > 0 ? (
                 /* Cukup jumlahnya — "N× Rp50.000" mengulang total di kolom kanan
                    (dan membocorkan nominal saat mode sembunyi-angka aktif).
-                   Frasa pendek: kolom teks tinggal ~93px saat tombol WA tampil. */
-                <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5 truncate">
+                   Tanpa `truncate`: di 360px kolom ini 80px sedangkan frasanya
+                   butuh ~85px → dulu jadi "2 belum lu…". Melipat ke baris 2 lebih
+                   jujur daripada elipsis pada caption sependek ini. */
+                <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5 leading-snug">
                   {g.countBelum} belum lunas
                 </p>
               ) : (
                 <p className="text-caption text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
               )}
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               {g.countBelum > 0 && (
-                <span className="font-display text-amount font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
+                /* text-body, bukan text-amount: ini total kelompok (ringkasan),
+                   nominal per talangan tetap tampil di baris detail saat dibuka. */
+                <span className="font-display text-body font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
                   {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                 </span>
               )}

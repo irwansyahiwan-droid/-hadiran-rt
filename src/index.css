@@ -630,6 +630,24 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    (mis. FAB & chip yang sengaja pill). Tombol full-width tanpa rounded-*
    mewarisi radius default ini → satu bentuk seragam. */
 @layer components {
+  /* Baris kontrol yang boleh digeser mendatar (mis. deretan chip filter) tanpa
+     scrollbar yang mengotori baris. WAJIB dipakai bareng `min-w-0` di elemen
+     flex, kalau tidak isinya meluber keluar & ketiban tetangganya — persis
+     yang terjadi di FilterChips pada layar 360–375px (audit 29 Jul). */
+  .scroll-x-clean {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
+  }
+  .scroll-x-clean::-webkit-scrollbar { display: none; }
+  /* Tepi kanan memudar → chip yang terpotong terbaca sebagai "masih ada lagi,
+     geser", bukan sebagai chip rusak yang kena potong kotak. */
+  .scroll-x-fade {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  }
+
   .btn-brand {
     border-radius: 0.75rem;   /* = rounded-xl (token ada, bukan nilai baru) */
     background-image: linear-gradient(180deg, #18A055 0%, #0F6B40 58%, #0C5E37 100%);

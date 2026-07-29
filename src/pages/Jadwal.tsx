@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Coins, Lock, MoreVertical, Pencil, Plus,
-  RefreshCw, RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
+  Play, RefreshCw, RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
 } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
-import Fab from '../components/Fab';
 import FilterChips from '../components/FilterChips';
 import StatRow from '../components/StatRow';
 import Tag from '../components/Tag';
@@ -1082,19 +1081,32 @@ export default function JadwalPage() {
                           >
                             <RefreshCw className={`w-[18px] h-[18px] ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                           </button>
-                        ) : (
-                          // Semua tarikan terjadwal punya tombol Proses — tinggal klik saat pertemuan
+                        ) : isNext ? (
+                          // Giliran berikutnya = satu-satunya baris yang tombolnya BERLABEL.
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className={`flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm disabled:opacity-70 ${
-                              isNext
-                                ? 'btn-brand'
-                                : 'bg-emerald-50 text-brand border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800'
-                            }`}
+                            className="btn-brand flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm disabled:opacity-70"
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses…' : 'Proses'}
+                          </button>
+                        ) : (
+                          /* Tarikan terjadwal lain: tombol ikon saja. Pil berlabel di
+                             SETIAP baris memakan ±56px sehingga nama Sohibul tersisa
+                             138px @390 / 108px @360 dan nama panjang ("Nisan Nasrullah
+                             ( Icang )") terpotong — audit 29 Jul. Ikon Play ≠ ikon ⟳
+                             milik "Hitung Ulang" supaya dua aksi ini tak tertukar. */
+                          <button
+                            onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
+                            disabled={navigatingId === t.id}
+                            title="Proses tarikan"
+                            aria-label={`Proses tarikan #${t.nomor}`}
+                            className="w-11 h-11 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-brand dark:text-emerald-300 inline-flex items-center justify-center active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
+                          >
+                            {navigatingId === t.id
+                              ? <RefreshCw className="w-[18px] h-[18px] animate-spin" />
+                              : <Play className="w-[18px] h-[18px]" strokeWidth={2.2} />}
                           </button>
                         )}
 
@@ -1193,16 +1205,10 @@ export default function JadwalPage() {
         </div>
       )}
 
-      {/* Aksi utama di zona jempol: PROSES tarikan giliran berikutnya →
-          langsung ke layar hitung & simpan absensi. Tambah jadwal ada di header. */}
-      {isBendahara && nextDijadwal && (
-        <Fab
-          icon={RefreshCw}
-          label="Proses"
-          ariaLabel={`Proses tarikan #${nextDijadwal.nomor} — hitung & simpan absensi`}
-          onClick={() => { setNavigatingId(nextDijadwal.id); setSelectedTarikan(nextDijadwal); }}
-        />
-      )}
+      {/* FAB "Proses" DIBUANG (audit 29 Jul): di halaman ini dia menutup tombol
+          aksi milik salah satu baris (tumpang tindih 44×39px, area tap penuh)
+          dan isinya duplikat — baris giliran berikutnya sudah punya tombol
+          "Proses" berlabel brand sendiri, ditambah edge kiri sebagai penanda. */}
     </div>
   );
 }
