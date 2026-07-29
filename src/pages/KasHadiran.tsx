@@ -748,16 +748,20 @@ export default function KasHadiranPage() {
                       {/* ── Focal row: penerima + amount (ketuk → detail) ─ */}
                       <button
                         onClick={() => openDetail(t)}
-                        className="w-full flex items-start gap-3 px-5 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
+                        className="w-full flex items-start gap-2.5 px-4 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
                       >
-                        <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-12 h-12 rounded-2xl shrink-0" />
+                        <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl shrink-0" />
                         <div className="flex-1 min-w-0">
                           {/* items-start + clamp 2 baris: nama panjang ("Saman Suryadi
                               (Mono)") dulu membungkus 2 baris sementara blok nominal
                               tetap center → nominal nyangkut di tengah nama & "Lihat
                               detail" terdorong keluar ritme. Sekarang nama & nominal
                               rata ATAS, apa pun panjang namanya. */}
-                          <p className="text-base font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2">
+                          {/* break-words: nama ber-nickname ("Saman Suryadi ( Mono )")
+                              pecah per-token panjang di kolom ~115px sehingga butuh
+                              3 baris lalu kena clamp — nickname-nya hilang padahal
+                              itu yang dikenal warga. */}
+                          <p className="text-base font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">

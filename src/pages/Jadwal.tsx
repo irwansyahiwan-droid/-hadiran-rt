@@ -1055,20 +1055,35 @@ export default function JadwalPage() {
                 key={t.id}
                 /* Edge kiri = sinyal "giliran berikutnya" SAJA (token brand);
                    tarikan selesai sudah cukup de-emphasized lewat teks abu. */
-                className={`flex items-center gap-3 px-4 py-4 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l-[3px] border-l-brand-500 dark:border-l-emerald-500' : ''}`}
+                className={`flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l-[3px] border-l-brand-500 dark:border-l-emerald-500' : ''}`}
               >
                 {/* Nomor kecil */}
                 <span className="text-base font-bold text-ink-faint dark:text-gray-400 w-7 shrink-0 text-right tabular-nums">
                   {String(t.nomor).padStart(2, '0')}.
                 </span>
 
-                {/* Info + action inline */}
+                {/* Nama + tanggal = satu blok RAPAT. Tombol aksi pindah ke level
+                    baris (bukan sebaris dengan nama): saat tombol 44px ikut di
+                    dalam baris nama, kotak baris pertama jadi setinggi 44px dan
+                    tanggal terlempar ±30px ke bawah — nama & tanggalnya terbaca
+                    seperti dua hal terpisah, tinggi baris ±98px. */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className={`text-base font-semibold truncate ${isSelesai ? 'text-ink-sub dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
-                      {t.sohibul_bait?.nama ?? '—'}
-                    </p>
+                  {/* line-clamp-2, bukan truncate: kolom ini 103–178px, sedangkan
+                      nama ber-nickname ("Nisan Nasrullah ( Icang )") butuh ~200px.
+                      Nickname justru bagian yang dikenal warga — lebih baik baris
+                      tumbuh 1 baris daripada nama dipotong elipsis. */}
+                  <p className={`text-base font-semibold line-clamp-2 leading-snug break-words ${isSelesai ? 'text-ink-sub dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                    {t.sohibul_bait?.nama ?? '—'}
+                  </p>
+                  <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">
+                    {formatTanggal(t.tanggal)}
+                    {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
+                      <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>
+                    )}
+                  </p>
+                </div>
 
+                <div className="shrink-0">
                     {isBendahara ? (
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isSelesai ? (
@@ -1126,17 +1141,10 @@ export default function JadwalPage() {
                         )}
                       </div>
                     ) : (
-                      <Tag tone="neutral" className="shrink-0">
+                      <Tag tone="neutral">
                         {isSelesai ? 'Selesai' : 'Terjadwal'}
                       </Tag>
                     )}
-                  </div>
-                  <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">
-                    {formatTanggal(t.tanggal)}
-                    {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
-                      <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>
-                    )}
-                  </p>
                 </div>
               </div>
             );
