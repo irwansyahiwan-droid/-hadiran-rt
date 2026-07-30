@@ -40,6 +40,31 @@ interface TrxItem {
   saldoSetelah: number | null;
 }
 
+const BULAN_ID = 'januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember';
+
+/**
+ * Judul baris untuk setoran ke Kas RT = PERIODENYA saja ("Juli 2026").
+ *
+ * Keterangan yang ditulis bendahara berbunyi "Setoran kas Hadiran Ke Kas RT
+ * bulan Juli 2026" — 45 karakter yang dua pertiganya sudah dikatakan ulang oleh
+ * sub barisnya ("Setor ke Kas RT") dan oleh tile panah + nominal merahnya.
+ * Diukur di 360px, kolom judul hanya 96px sementara teks itu butuh 4 baris:
+ * `line-clamp-2` memotongnya, dan menaikkan ke 3 baris pun tak menolong. Jadi
+ * yang dipangkas adalah PENGULANGANNYA, bukan tinggi barisnya — sisa yang benar-
+ * benar informatif cuma periodenya.
+ *
+ * Keterangan ASLI tidak diubah: ia tetap dipakai pencarian, sheet detail, PDF,
+ * dan Excel. Kalau tak ada bulan yang bisa dikenali (mis. "Kas hadiran di rumah
+ * Bpk Tagor"), judulnya dibiarkan utuh apa adanya — lebih baik panjang daripada
+ * mengarang.
+ */
+function judulSetor(keterangan: string): string {
+  const m = keterangan.match(new RegExp(`(${BULAN_ID})\\s+(\\d{4})`, 'i'));
+  if (!m) return keterangan;
+  const bulan = m[1][0].toUpperCase() + m[1].slice(1).toLowerCase();
+  return `${bulan} ${m[2]}`;
+}
+
 // Jendela fetch Beranda — ringkasan, bukan ledger penuh: ambil N terbaru per
 // sumber (setor & talangan lunas), BUKAN seluruh riwayat → payload dashboard
 // tetap datar saat data bertahun-tahun (skala 300 KK). Riwayat & pencarian
@@ -132,7 +157,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       id: t.id,
       tipe: 'setor' as const,
       keterangan: t.keterangan,
-      judul: t.keterangan,
+      judul: judulSetor(t.keterangan),
       sub: 'Setor ke Kas RT',
       tanggal: t.tanggal,
       nominal: -t.nominal,
