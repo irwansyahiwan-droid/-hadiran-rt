@@ -678,8 +678,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
-            <p className="text-xs text-amber-800 dark:text-amber-400/80 mt-0.5">
-              Total <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(talangan), hidden, 4)}</span> belum diselesaikan
+            {/* Sub = ANGKANYA saja. "Total … belum diselesaikan" mengulang judul
+                tepat di atasnya ("Talangan Belum Lunas"), dan panjangnya itu yang
+                memecah kalimat jadi 2 baris di 360px. Bentuk label-lalu-angka juga
+                memberi nominal bobot yang seharusnya — ia satu-satunya informasi
+                baru di kartu ini. */}
+            <p className="font-display text-caption font-bold tabular-nums text-amber-800 dark:text-amber-300 mt-0.5">
+              {maskRp(formatRupiahPlain(talangan), hidden, 4)}
             </p>
           </div>
           <button
@@ -725,7 +730,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                       fill="currentColor" strokeWidth={0}
                     />
                   )}
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-500 text-white text-micro font-bold rounded-full flex items-center justify-center shadow-sm">
+                  {/* Nomor tarikan = penanda urut, bukan aksen. Dulu fill
+                      brand-500 putih: warna brand paling menyala di baris ini
+                      dipakai untuk data paling remeh, dan di baris pertama ia
+                      bersaing dgn mahkota + cincin emas songket + tag "Giliran
+                      berikutnya" (4 ornamen pada avatar 44px). Kini chip netral
+                      ber-hairline — tetap terbaca di atas avatar (fill putih,
+                      bukan abu yg melebur ke avatar), tapi diam. Sejalan nomor
+                      tarikan di Kas Hadiran & Jadwal warga yang juga netral. */}
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-white dark:bg-gray-800 text-ink-sub dark:text-gray-300 ring-1 ring-line dark:ring-gray-700 text-micro font-bold rounded-full flex items-center justify-center shadow-sm">
                     {j.nomor}
                   </span>
                 </div>
