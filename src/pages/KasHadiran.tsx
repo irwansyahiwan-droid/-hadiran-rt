@@ -70,7 +70,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
         <div>
           <h3 className="text-balance text-base font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h3>
           <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
-            Saldo hadiran: <span className="font-semibold text-emerald-700 dark:text-emerald-400">{formatRupiahPlain(saldoHadiran)}</span>
+            Saldo hadiran: <span className="font-display font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
         </div>
         <form onSubmit={submit} className="space-y-3">
@@ -785,7 +785,7 @@ export default function KasHadiranPage() {
                         <div className="flex items-center justify-between text-sm text-ink-sub dark:text-gray-400 mb-2">
                           <span>
                             Kas Hadiran{' '}
-                            <span className="font-semibold tabular-nums text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
+                            <span className="font-display font-semibold tabular-nums text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
                           </span>
                           <span className="font-semibold">{t.total_hadir}/{t.total_warga} hadir</span>
                         </div>
@@ -989,7 +989,7 @@ export default function KasHadiranPage() {
                       <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
                       <div className="space-y-1.5 text-sm">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × {formatRupiahPlain(SOHIBUL_PER)}</span>
+                          <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × <span className="font-display tabular-nums">{formatRupiahPlain(SOHIBUL_PER)}</span></span>
                           <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">

@@ -351,7 +351,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             label jelas MILIK kelompok di bawahnya. */}
         <div className={`flex items-baseline justify-between gap-3 px-5 pt-5 pb-3 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
           <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">{g.label}</span>
-          <span className={`text-micro font-bold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
+          <span className={`font-display text-micro font-bold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
             {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
           </span>
         </div>
@@ -484,7 +484,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 {lastDelta > 0 ? (
                   <>
                     <TrendingUp className="h-3.5 w-3.5 shrink-0 text-emerald-100" strokeWidth={2.5} />
-                    <span className="font-semibold text-emerald-100">
+                    <span className="font-display font-semibold tabular-nums text-emerald-100">
                       {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
                     </span>
                     <span className="text-white/90">dari tarikan terakhir</span>
@@ -544,7 +544,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
             <p className="text-xs text-amber-800 dark:text-amber-400/80 mt-0.5">
-              Total {maskRp(formatRupiahPlain(talangan), hidden, 4)} belum diselesaikan
+              Total <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(talangan), hidden, 4)}</span> belum diselesaikan
             </p>
           </div>
           <button
@@ -724,7 +724,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             {selectedTrx.saldoSetelah !== null && (
               <div className="flex items-center justify-between">
                 <span className="text-sm text-ink-faint dark:text-gray-400">Saldo Setelah</span>
-                <span className={`text-sm font-semibold ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
+                <span className={`font-display text-sm font-semibold tabular-nums ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
                   {maskRp(`${selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
                 </span>
               </div>

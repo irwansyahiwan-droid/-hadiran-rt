@@ -32,7 +32,7 @@ export default function SmartInsight({ label, current, previous, className = '' 
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-caption font-bold text-gray-800 dark:text-gray-100 leading-tight">
-          {label} <span className="tabular-nums">{formatRupiahPlain(current)}</span>
+          {label} <span className="font-display tabular-nums">{formatRupiahPlain(current)}</span>
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1">
           {pct === null ? (

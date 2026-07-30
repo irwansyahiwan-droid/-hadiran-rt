@@ -284,7 +284,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                       </div>
                       <div className="flex flex-col items-end gap-1.5 shrink-0">
                         {v.amount != null && v.amount !== 0 && (
-                          <span className={`text-body font-bold tabular-nums ${
+                          <span className={`font-display text-amount font-semibold tabular-nums ${
                             v.accent === 'rose' ? 'text-neg dark:text-rose-400' : v.accent === 'emerald' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'
                           }`}>
                             {formatRupiahPlain(v.amount)}

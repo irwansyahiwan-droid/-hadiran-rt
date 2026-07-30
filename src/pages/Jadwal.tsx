@@ -629,7 +629,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-100 dark:border-amber-900/30">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
             <p className="text-micro text-amber-700 dark:text-amber-400 font-medium">
-              Talangan keluar {formatRupiahPlain(result.talanganTotal)}
+              Talangan keluar <span className="font-display tabular-nums">{formatRupiahPlain(result.talanganTotal)}</span>
             </p>
           </div>
         )}

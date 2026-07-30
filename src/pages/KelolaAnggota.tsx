@@ -234,7 +234,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                   })}
                 </div>
                 <p className="text-micro font-semibold text-emerald-700 dark:text-emerald-400">
-                  {pilih.size} tarikan dipilih · Kas Hadiran +{formatRupiahPlain(kasNaik)}
+                  {pilih.size} tarikan dipilih · Kas Hadiran <span className="font-display tabular-nums">+{formatRupiahPlain(kasNaik)}</span>
                 </p>
               </div>
             )}

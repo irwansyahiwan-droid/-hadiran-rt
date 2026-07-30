@@ -26,17 +26,17 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-500" /> Masuk
           </span>
-          <span className="font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
+          <span className="font-display font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
         </div>
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <ArrowUpRight className="w-3.5 h-3.5 text-rose-500" /> Keluar
           </span>
-          <span className="font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
+          <span className="font-display font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
         </div>
         <div className="flex items-center justify-between text-caption pt-1.5 border-t border-control dark:border-gray-700">
           <span className="font-semibold text-gray-700 dark:text-gray-300">Saldo akhir</span>
-          <span className={`font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
+          <span className={`font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}
           </span>
         </div>
@@ -184,11 +184,11 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1. */}
               <div className="rounded-2xl bg-black/10 px-3 py-2">
                 <p className="text-micro text-white uppercase tracking-wide">Kas RT (final)</p>
-                <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
+                <p className="text-caption font-display font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="rounded-2xl bg-black/10 px-3 py-2">
                 <p className="text-micro text-white uppercase tracking-wide">Hadiran · belum disetor</p>
-                <p className="text-body font-bold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
+                <p className="text-caption font-display font-bold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
               </div>
             </div>
 
@@ -249,7 +249,10 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              {/* 1 kolom di HP (bukan 2): di 360px panel cuma 120px dalam, nominal
+                  7 digit + label "Keluar" tak muat → angka terpotong. Pola sama
+                  "Rekap per Kategori" Kas RT: grid-cols-1 sm:grid-cols-2. */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Ledger judul="Kas Hadiran" masuk={r.hadiranMasuk} keluar={r.hadiranKeluar} saldo={r.hadiranSaldoAkhir} />
                 <Ledger judul="Kas RT" masuk={r.rtMasuk} keluar={r.rtKeluar} saldo={r.rtSaldoAkhir} />
               </div>

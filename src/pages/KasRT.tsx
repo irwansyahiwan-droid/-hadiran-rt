@@ -175,7 +175,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800/40'}`}>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
-                <span className={`font-bold ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
+                <span className={`font-display font-bold tabular-nums ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
                   {/* formatRupiahPlain pakai Math.abs → tanda minus ditambah sendiri */}
                   {(saldoPreview < 0 ? '-' : '') + formatRupiahPlain(saldoPreview)}
                 </span>
@@ -578,7 +578,7 @@ export default function KasRTPage() {
                 {' · '}
                 {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                 {' · '}
-                {maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}
+                <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}</span>
               </p>
             )}
 
@@ -588,14 +588,16 @@ export default function KasRTPage() {
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
                   <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Masuk</p>
                 </div>
-                <p className="text-sm font-display font-bold text-white">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</p>
+                {/* text-caption (13px), bukan text-sm mentah: di 360px nominal 8 digit
+                    di panel setengah-lebar meluber 3px keluar kotak black/10. */}
+                <p className="text-caption font-display font-bold text-white tabular-nums">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</p>
               </div>
               <div className="bg-black/10 rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-1">
                   <TrendingDown className="w-3.5 h-3.5 text-rose-300" />
                   <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Keluar</p>
                 </div>
-                <p className="text-sm font-display font-bold text-white">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</p>
+                <p className="text-caption font-display font-bold text-white tabular-nums">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</p>
               </div>
             </div>
           </div>
@@ -823,7 +825,7 @@ export default function KasRTPage() {
                     <p className={`font-display text-amount font-semibold tabular-nums ${isMasuk ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                       {maskRp(`${isMasuk ? '+' : '-'}${formatRupiahPlain(k.nominal)}`, hidden, 4)}
                     </p>
-                    <p className={`text-xs font-medium tabular-nums mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
+                    <p className={`font-display text-xs font-medium tabular-nums mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
                       Saldo: {maskRp(`${k.saldo_setelah < 0 ? '-' : ''}Rp${Math.abs(k.saldo_setelah).toLocaleString('id-ID')}`, hidden, 4)}
                     </p>
                   </div>
@@ -871,7 +873,7 @@ export default function KasRTPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-ink-faint dark:text-gray-400">Nominal</span>
-                <span className={`text-base font-bold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
+                <span className={`font-display text-base font-bold tabular-nums ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                   {maskRp(`${selectedRow.tipe === 'masuk' ? '+' : '-'}${formatRupiahPlain(selectedRow.nominal)}`, hidden, 4)}
                 </span>
               </div>
@@ -902,7 +904,7 @@ export default function KasRTPage() {
         title="Hapus transaksi ini?"
         description={<>
           {hapusRow?.keterangan || (hapusRow?.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')} senilai{' '}
-          <b>{formatRupiahPlain(hapusRow?.nominal ?? 0)}</b> dihapus dari Kas RT dan saldo dihitung ulang.
+          <b className="font-display tabular-nums">{formatRupiahPlain(hapusRow?.nominal ?? 0)}</b> dihapus dari Kas RT dan saldo dihitung ulang.
           Ada jeda 5 detik untuk mengurungkan lewat tombol Urungkan di notifikasi.
         </>}
         confirmLabel="Hapus"

@@ -680,7 +680,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                         <span className="font-extrabold tabular-nums">
                           {done
                             ? <span className="inline-flex items-center gap-1"><Check className="h-3 w-3" strokeWidth={3} />Target tercapai</span>
-                            : <>{Math.round(ratio)}% · <span className="font-semibold text-white/90">kurang {formatRupiahPlain(sisa)}</span></>}
+                            : <>{Math.round(ratio)}% · <span className="font-semibold text-white/90">kurang <span className="font-display tabular-nums">{formatRupiahPlain(sisa)}</span></span></>}
                         </span>
                         <span className="inline-flex items-center gap-1.5 text-white/90">
                           <CalendarClock className="h-3 w-3" /> {fmtDeadline(TARGET_DEADLINE)}

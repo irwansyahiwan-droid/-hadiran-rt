@@ -293,7 +293,7 @@ export default function JadwalWargaPage() {
                 <X className="w-3 h-3" strokeWidth={2.5} /> {tidakHadirCount} Tidak Hadir
               </span>
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
-                <Coins className="w-3 h-3" /> {formatRupiahPlain(iuranTerkumpul)}
+                <Coins className="w-3 h-3" /> <span className="font-display tabular-nums">{formatRupiahPlain(iuranTerkumpul)}</span>
               </span>
             </div>
           </div>

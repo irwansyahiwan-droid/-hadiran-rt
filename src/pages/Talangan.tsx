@@ -581,7 +581,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         open={!!batalRow}
         title="Batalkan pelunasan talangan?"
         description={<>
-          Talangan Tarikan #{batalRow?.tarikan?.nomor} senilai <b>{formatRupiahPlain(batalRow?.nominal ?? 0)}</b> kembali
+          Talangan Tarikan #{batalRow?.tarikan?.nomor} senilai <b className="font-display tabular-nums">{formatRupiahPlain(batalRow?.nominal ?? 0)}</b> kembali
           jadi <b>belum lunas</b> dan catatan kas masuknya dihapus. Bisa ditandai lunas lagi kapan saja.
         </>}
         confirmLabel="Batalkan"
@@ -596,7 +596,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         open={!!hapusRow}
         title="Hapus data talangan?"
         description={<>
-          Talangan Tarikan #{hapusRow?.tarikan?.nomor} senilai <b>{formatRupiahPlain(hapusRow?.nominal ?? 0)}</b> dihapus
+          Talangan Tarikan #{hapusRow?.tarikan?.nomor} senilai <b className="font-display tabular-nums">{formatRupiahPlain(hapusRow?.nominal ?? 0)}</b> dihapus
           beserta catatan kas pembayarannya. Ada jeda 5 detik untuk mengurungkan lewat tombol Urungkan di notifikasi.
         </>}
         confirmLabel="Hapus"

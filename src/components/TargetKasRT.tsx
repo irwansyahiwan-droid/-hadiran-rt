@@ -71,7 +71,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{target.keterangan || 'Target Kas RT'}</p>
-              <p className="text-micro text-gray-500 dark:text-gray-400">Target {formatRupiahPlain(target.nominal)}</p>
+              <p className="text-micro text-gray-500 dark:text-gray-400">Target <span className="font-display tabular-nums">{formatRupiahPlain(target.nominal)}</span></p>
             </div>
           </div>
           {isBendahara && (
@@ -106,13 +106,18 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-400">
             {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
+          <span className="font-display text-xs text-gray-500 dark:text-gray-400 tabular-nums">
             {formatRupiahPlain(Math.max(0, saldo))} / {formatRupiahPlain(target.nominal)}
           </span>
         </div>
 
         <div className="flex items-center justify-between mt-1.5 text-micro text-gray-500 dark:text-gray-400">
-          <span>{tercapai ? `Lebih ${formatRupiahPlain(saldo - target.nominal)}` : `Kurang ${formatRupiahPlain(sisa)}`}</span>
+          <span>
+            {tercapai ? 'Lebih ' : 'Kurang '}
+            <span className="font-display tabular-nums">
+              {formatRupiahPlain(tercapai ? saldo - target.nominal : sisa)}
+            </span>
+          </span>
           {deadline && (
             <span className={`inline-flex items-center gap-1 ${deadlineLewat ? 'text-warn dark:text-amber-400 font-semibold' : ''}`}><CalendarClock className="w-3 h-3" />{deadline}</span>
           )}
