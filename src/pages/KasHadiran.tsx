@@ -112,7 +112,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             <button type="button" onClick={drag.dismiss}
               className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
             <button type="submit" disabled={saving || !nominal}
-              className="btn-brand flex-1 py-3 text-sm font-semibold disabled:opacity-70 active:scale-[0.97] transition flex items-center justify-center gap-2">
+              className="btn-brand flex-1 py-3 text-sm font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
               {saving ? 'Menyimpan…' : 'Setor'}
             </button>

@@ -339,7 +339,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
-                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 shrink-0 whitespace-nowrap ${
                       confirmId === t.id ? 'bg-brand' : 'btn-brand'
                     }`}
                   >

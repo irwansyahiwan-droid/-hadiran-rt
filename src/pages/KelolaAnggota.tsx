@@ -266,8 +266,10 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           <button
             onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
             disabled={saving || !nama.trim()}
-            className={`flex-1 py-3 rounded-full text-white text-sm font-bold active:scale-[0.97] transition disabled:opacity-60 flex items-center justify-center gap-2 ${
-              jadwalNonaktif ? 'bg-rose-600' : 'btn-brand'
+            className={`flex-1 py-3 rounded-full text-white text-sm font-bold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
+              /* btn-danger, bukan bg-rose-600 tangan: satu sumber CTA merah →
+                 ikut state nonaktif ber-fill abu (label tetap terbaca). */
+              jadwalNonaktif ? 'btn-danger' : 'btn-brand'
             }`}
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}

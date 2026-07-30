@@ -472,7 +472,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || cancelling}
-            className="btn-brand w-full py-3.5 font-bold text-sm disabled:opacity-70 flex items-center justify-center gap-2"
+            className="btn-brand w-full py-3.5 font-bold text-sm flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             {saving ? 'Menghitung…' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
@@ -639,7 +639,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           <button
             onClick={share}
             disabled={sharing}
-            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-2.5 text-xs font-semibold disabled:opacity-60"
+            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-2.5 text-xs font-semibold"
           >
             <Share2 className="w-3.5 h-3.5" /> {sharing ? 'Menyiapkan…' : 'Bagikan PNG'}
           </button>
@@ -744,7 +744,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="btn-brand flex-1 py-3 text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan…' : 'Simpan Revisi'}
@@ -846,7 +846,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="btn-brand flex-1 py-3 text-sm font-bold disabled:opacity-60 flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan…' : 'Simpan Tarikan'}
@@ -1101,7 +1101,7 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className="btn-brand flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm disabled:opacity-70"
+                            className="btn-brand flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm"
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses…' : 'Proses'}

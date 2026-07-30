@@ -194,7 +194,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <button
               type="submit"
               disabled={saving || !nominal}
-              className={`flex-1 py-3 text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 disabled:opacity-70 transition duration-150 flex items-center justify-center gap-2 ${
+              className={`flex-1 py-3 text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 flex items-center justify-center gap-2 ${
                 tipe === 'masuk' ? 'btn-brand' : 'btn-danger'
               }`}
             >
