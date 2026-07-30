@@ -111,6 +111,11 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <img
             src={logoRt}
             alt="Logo RT 004/006"
+            width={88}
+            height={88}
+            /* Aset paling atas-lipatan di layar pertama app — naikkan di antrean
+               fetch, jangan biarkan bersaing dgn request lain. */
+            fetchPriority="high"
             className="relative w-[5.5rem] h-[5.5rem] rounded-3xl object-cover
                        ring-2 ring-white/80 dark:ring-white/20
                        shadow-[0_4px_20px_-4px_rgba(11,80,50,0.35)]"
@@ -131,7 +136,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                      drop-shadow-sm"
           style={{ animationDelay: '0.14s' }}
         >
-          RT 004/006 · Tanah Baru Beji · Depok
+          RT&nbsp;004/006 · Tanah Baru Beji · Depok
         </p>
 
         {/* Tagline — bikin momen brand */}
@@ -153,7 +158,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           Selamat Datang
         </h2>
         <p className="text-[0.8125rem] text-gray-500 dark:text-gray-400 mb-5">
-          Warga RT 004/006 — silakan masuk
+          Warga RT&nbsp;004/006 — silakan masuk
         </p>
 
         {/* ── WARGA — pintu utama (istimewa) ──────────────────────── */}

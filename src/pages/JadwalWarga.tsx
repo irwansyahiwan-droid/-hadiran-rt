@@ -390,7 +390,9 @@ export default function JadwalWargaPage() {
                 return (
                   <div
                     key={w.id}
-                    className={`flex items-center gap-3 p-3.5 [--di-l:5.625rem] [--di-r:0.875rem] ${
+                    // ~79 baris: content-visibility lewati render baris di luar layar
+                    // (sama seperti daftar absensi bendahara di Jadwal.tsx).
+                    className={`flex items-center gap-3 p-3.5 [--di-l:5.625rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] ${
                       idx < filteredWarga.length - 1 ? 'divide-inset' : ''
                     }`}
                   >

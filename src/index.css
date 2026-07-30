@@ -26,6 +26,12 @@ html {
   /* Hilangkan kilat abu bawaan saat tap (iOS/Android) — feedback sentuh sudah
      ditangani .press (spring scale) + haptic, highlight ganda terasa murahan. */
   -webkit-tap-highlight-color: transparent;
+  /* Buang tunda ~300ms "tunggu double-tap-zoom" yang browser mobile sisipkan
+     sebelum setiap tap diteruskan. Tanpa ini tiap tombol terasa lambat sekejap —
+     sinyal "app murah" paling kuat di app touch-first, dan yang paling terasa
+     buat warga lansia. Pinch-zoom TETAP jalan (yang dimatikan hanya double-tap),
+     jadi ini bukan `user-scalable=no`: aksesibilitas zoom tidak dikorbankan. */
+  touch-action: manipulation;
   /* Native control (date picker, scrollbar, autofill, form fields) ikut tema →
      di dark mode tidak lagi muncul panel putih nyilau. Pasangan .dark di bawah. */
   color-scheme: light;

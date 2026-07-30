@@ -451,7 +451,7 @@ export default function KasRTPage() {
             <h1 className="inline-flex items-center gap-1 text-lg font-bold text-ink dark:text-gray-100">
               Kas RT
               <InfoTip label="Kas RT">
-                Kas besar RT 004/006. Sebagian iuran tiap tarikan (Rp5.000/anggota) disetor ke sini untuk kebutuhan RT — terpisah dari Kas Hadiran.
+                Kas besar RT&nbsp;004/006. Sebagian iuran tiap tarikan (Rp5.000/anggota) disetor ke sini untuk kebutuhan RT — terpisah dari Kas Hadiran.
               </InfoTip>
             </h1>
             <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>

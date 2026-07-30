@@ -87,7 +87,10 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       // tetap di bawah overlay z-50 — header ber-transform = stacking context
       // sendiri, jadi z-50 milik dropdown tak bisa menembus keluar; tanpa bump
       // ini scrim (lebih akhir di DOM) menutup menu & item tak bisa diklik.
-      className={`sticky top-0 ${menuMounted ? 'z-menu' : 'z-40'} backdrop-blur-xl backdrop-saturate-150 transition duration-300 ${
+      // `transition` utility sengaja TIDAK dipasang di sini: properti + durasi
+      // sudah ditulis eksplisit di `style.transition` di bawah, dan inline style
+      // menang atas class → utility-nya cuma jadi kode mati yang menyesatkan.
+      className={`sticky top-0 ${menuMounted ? 'z-menu' : 'z-40'} backdrop-blur-xl backdrop-saturate-150 ${
         scrolled
           ? 'bg-white/80 dark:bg-gray-900/80 border-b border-line/70 dark:border-gray-800/70'
           : 'bg-white/90 dark:bg-gray-900/85 border-b border-transparent'
@@ -111,8 +114,15 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
         backfaceVisibility: 'hidden',
       }}
     >
+      {/* Gestur "header menyusut" HANYA lewat padding di baris ini. Padding memang
+          properti layout, tapi `scrolled` itu boolean ambang (useScrolledPast(6)),
+          bukan nilai per-frame → satu layout pass tiap kali ambang dilewati, bukan
+          tiap frame scroll. Yang dulu ikut dianimasikan (tinggi logo & font-size
+          wordmark) sudah dilepas: keduanya me-reflow teks brandmark di titik ambang
+          → wordmark tampak "gemetar" sekejap. Sekarang logo menyusut lewat transform
+          (dikomposit GPU, nol reflow) & wordmark tetap satu ukuran. */}
       <div
-        className={`flex items-center justify-between max-w-lg mx-auto px-4 transition duration-300 ${
+        className={`flex items-center justify-between max-w-lg mx-auto px-4 transition-[padding] duration-300 ${
           scrolled ? 'py-2' : 'py-3'
         }`}
         style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
@@ -120,18 +130,21 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
         <div className="flex items-center gap-2.5">
           <img
             src={logoRT}
-            alt="Logo RT"
-            className={`object-contain rounded-full shadow-sm ring-1 ring-black/[0.08] dark:ring-white/10 transition duration-300 ${
-              scrolled ? 'h-8 w-8' : 'h-9 w-9'
+            /* Brandmark dekoratif: wordmark "Hadiran RT" di sebelahnya sudah
+               menyuarakan nama yang sama → alt teks bikin SR membacanya dobel. */
+            alt=""
+            width={36}
+            height={36}
+            /* Kotak layout tetap 36px (h-9); penyusutan ke 32px dilakukan transform
+               scale 8/9. origin-left → tepi kiri logo diam, jarak ke wordmark tak
+               bergeser. */
+            className={`h-9 w-9 shrink-0 object-contain rounded-full shadow-sm ring-1 ring-black/[0.08] dark:ring-white/10 origin-left transition-transform duration-300 ${
+              scrolled ? 'scale-[0.889]' : 'scale-100'
             }`}
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
           />
           {/* Brandmark, bukan judul halaman — h1 milik konten tiap page (hindari h1 dobel). */}
-          <p
-            className={`font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap transition duration-300 ${
-              scrolled ? 'text-body' : 'text-base'
-            }`}
-          >
+          <p className="text-base font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap">
             Hadiran RT
           </p>
         </div>
@@ -156,7 +169,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             {/* Scrim dismiss di-portal ke body: header kini ber-transform (fix iOS)
                 → fixed di dalamnya jadi relatif header, bukan viewport. */}
             {menuOpen && createPortal(
-              <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />,
+              <div aria-hidden="true" className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />,
               document.body,
             )}
             {menuMounted && (

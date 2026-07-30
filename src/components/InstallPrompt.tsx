@@ -78,7 +78,7 @@ export default function InstallPrompt() {
           className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800"
           style={{ boxShadow: 'var(--shadow-float)' }}
         >
-          <img src={logoRt} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
+          <img src={logoRt} alt="" width={40} height={40} className="w-10 h-10 rounded-xl object-cover shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Pasang Hadiran RT</p>
             <p className="text-micro text-gray-500 dark:text-gray-400">Akses cepat dari layar utama HP</p>
@@ -109,7 +109,7 @@ export default function InstallPrompt() {
           >
             <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
             <div className="flex items-center gap-3 mb-4">
-              <img src={logoRt} alt="" className="w-11 h-11 rounded-2xl object-cover" />
+              <img src={logoRt} alt="" width={44} height={44} className="w-11 h-11 rounded-2xl object-cover" />
               <div>
                 <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Pasang di iPhone</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Wajib pakai browser <b>Safari</b></p>

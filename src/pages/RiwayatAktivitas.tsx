@@ -130,8 +130,12 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
   if (!open) return null;
 
+  // overscroll-contain: overlay ini scroll sendiri & menutupi penuh layar — tanpa
+  // ini scroll yang mentok di ujung daftar diteruskan ke halaman di belakangnya
+  // (halaman induk ikut bergeser / pull-to-refresh terpicu). `.sheet-panel` sudah
+  // punya ini; overlay full-screen tidak lewat kelas itu.
   return (
-    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
+    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
       <OverlayHeader
         icon={History}
         title="Riwayat Aktivitas"

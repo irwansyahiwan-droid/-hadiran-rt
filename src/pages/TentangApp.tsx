@@ -26,7 +26,9 @@ const PENGURUS = [
 ];
 
 const SUMBER = [
-  { b: 'Master Anggota', t: '70 KK aktif RT 004/006' },
+  // \u00A0 eksplisit, BUKAN &nbsp;: ini string JS biasa, entity HTML hanya
+  // diterjemahkan di dalam JSX. "70 KK" & "RT 004/006" jangan pecah antar baris.
+  { b: 'Master Anggota', t: '70\u00A0KK aktif RT\u00A0004/006' },
   { b: 'Spreadsheet Hadiran', t: 'Jadwal, Absensi, Kas, Talangan' },
   { b: 'Spreadsheet Laporan Kas RT', t: 'sinkron real-time; sumber dana setoran = Iuran Anggota Hadiran' },
 ];
@@ -66,16 +68,16 @@ export default function TentangApp({ open, onClose }: Props) {
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* Hero */}
         <div className="text-center pt-2 pb-1">
-          <img src={logoRt} alt="Logo RT 004/006" className="w-20 h-20 rounded-3xl object-cover mx-auto mb-3 lift ring-1 ring-black/[0.08] dark:ring-white/10" />
+          <img src={logoRt} alt="Logo RT 004/006" width={80} height={80} className="w-20 h-20 rounded-3xl object-cover mx-auto mb-3 lift ring-1 ring-black/[0.08] dark:ring-white/10" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Hadiran RT</h2>
-          <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5">RT 004/006 · Tanah Baru Beji · Depok</p>
+          <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5">RT&nbsp;004/006 · Tanah Baru Beji · Depok</p>
         </div>
 
         {/* Tentang */}
         <Section icon={BookOpen} title="TENTANG APLIKASI">
           <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
-            Aplikasi Hadiran RT 004/006 adalah sistem digital untuk mengelola iuran tarikan bergilir antar warga
-            (sistem <b>Sohibul Bait</b>), kas hadiran, talangan anggota, serta sinkronisasi setoran ke Kas Besar RT 004/006.
+            Aplikasi Hadiran RT&nbsp;004/006 adalah sistem digital untuk mengelola iuran tarikan bergilir antar warga
+            (sistem <b>Sohibul Bait</b>), kas hadiran, talangan anggota, serta sinkronisasi setoran ke Kas Besar RT&nbsp;004/006.
             Tujuannya: <b>transparansi penuh</b> bagi seluruh warga &amp; <b>kemudahan kerja Bendahara</b>.
           </p>
         </Section>
@@ -95,7 +97,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </Section>
 
         {/* Pengurus */}
-        <Section icon={Users} title="STRUKTUR PENGURUS RT 004/006">
+        <Section icon={Users} title="STRUKTUR PENGURUS RT&nbsp;004/006">
           <div className="space-y-2">
             {PENGURUS.map((p) => (
               <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl inset-soft p-2.5">
@@ -142,7 +144,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Footer */}
         <div className="text-center pt-2 pb-1 space-y-1.5">
-          <p className="text-micro text-ink-faint dark:text-gray-400">© 2026 RT 004/006 Tanah Baru, Beji, Kota Depok</p>
+          <p className="text-micro text-ink-faint dark:text-gray-400">© 2026 RT&nbsp;004/006 Tanah Baru, Beji, Kota Depok</p>
           <p className="text-caption text-gray-500 dark:text-gray-400 inline-flex items-center justify-center gap-1">
             Dibuat oleh <b className="text-gray-700 dark:text-gray-200">Irwansyah (Bendahara)</b>, untuk warga
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
