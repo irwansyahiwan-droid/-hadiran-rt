@@ -21,8 +21,8 @@ import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
-import FitAmount from '../components/FitAmount';
 import CrossFade from '../components/CrossFade';
+import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -454,14 +454,6 @@ export default function KasHadiranPage() {
   const pendapatanBersih = pendapatanKotor - POTONGAN_ADMIN;
 
   const sudahSetor = totalSetor > 0;
-  // SATU warna hero utk seluruh app (30 Jul): hijau brand, apa pun statusnya.
-  // Dulu tiga ramp di halaman ini saja — biru `hero-setor` (sudah setor) dan
-  // slate `hero-slate` (saldo minus). Akibatnya angka yang SAMA tampil hijau di
-  // Beranda dan biru di sini, dan pada layar ini biru "sudah setor" beradu
-  // dengan pil merah "Defisit" — dua penanda, dua arah. Status sudah punya
-  // pembawa pesan sendiri yang lebih terbaca: chip "Sudah disetor ke Kas RT"
-  // dan pil "Defisit". Warna kartu kembali jadi identitas, bukan status.
-  const heroGradient = 'hero-emerald';
 
   return (
     <>
@@ -533,68 +525,46 @@ export default function KasHadiranPage() {
             </div>
           }
         >
-        <div className={`relative rounded-3xl overflow-hidden ${heroGradient}`} style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}>
-          <div className="hero-sheen pointer-events-none absolute inset-0" />
-
-          <div className="relative p-6">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <div className="flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-white/80" />
-                {/* white/90: label micro duduk di ujung terang gradient → jaga AA */}
-                <p className="text-white/90 text-micro font-bold uppercase tracking-widest">Saldo Kas Hadiran</p>
-              </div>
-              <div className="flex items-center -mr-2">
-                <button
-                  onClick={() => { haptic(); toggleHideAmount(); }}
-                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-                  aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
-                >
-                  {hidden
-                    ? <EyeOff className="w-4 h-4 text-white/80" />
-                    : <Eye className="w-4 h-4 text-white/80" />}
-                </button>
-                <button
-                  onClick={handleShareReceipt}
-                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-                  aria-label="Bagikan ringkasan ke WhatsApp"
-                >
-                  <Share2 className="w-4 h-4 text-white/80" />
-                </button>
-              </div>
-            </div>
-            {/* Saldo minus disengaja (talangan ditutup penuh dari kas). Selaras hero
-                Beranda (commit 98c2afd): nominal TETAP putih premium — rona salmon
-                (text-rose-200) dulu = sinyal lemah & sumbang, apalagi di atas gradient
-                setor biru. Negatif ditandai chip KATA "Defisit" di samping angka
-                (lebih terbaca utk lansia/mata yg sulit bedakan warna). */}
-            <div className="flex items-end gap-x-2.5 mb-1">
-              <FitAmount
-                measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
-                maxPx={48}
-                minPx={30}
-                className="min-w-0 flex-1 font-display font-extrabold tracking-tighter tabular-nums text-white"
-              >
-                {hidden
-                  ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
-                  : <Odometer value={animatedSaldo} />}
-              </FitAmount>
-              {saldo < 0 && (
-                <span className="mb-[6px] shrink-0 rounded-full bg-rose-700 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
-                  Defisit
-                </span>
-              )}
-            </div>
-            <p className="text-white text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
-            {/* Chip ini kini SATU-SATUNYA pembawa kabar "sudah setor" (dulu hero
-                ikut jadi biru). Panel di atas hero pakai bg-black/25 — aturan
-                kontras 13 Jul: panel di hero gelapkan, jangan terangkan. */}
-            {sudahSetor && (
-              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-white text-xs font-semibold">
-                <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
-              </span>
-            )}
-          </div>
-        </div>
+        {/* Anatomi hero = komponen bersama HeroSaldo (30 Jul). SENGAJA tanpa kaki
+            statistik: kartu "Alur Kas Hadiran" persis di bawahnya sudah memuat
+            Terkumpul/Talangan/Setoran — satu fakta satu suara. */}
+        <HeroSaldo
+          icon={Wallet}
+          label="Saldo Kas Hadiran"
+          minHeight={HERO_MIN_H}
+          measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
+          amount={hidden
+            ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+            : <Odometer value={animatedSaldo} />}
+          /* Saldo minus disengaja (talangan ditutup penuh dari kas). Nominal TETAP
+             putih premium; negatif ditandai chip KATA "Defisit" — rona salmon
+             (text-rose-200) dulu = sinyal lemah utk mata yg sulit bedakan warna. */
+          status={saldo < 0 ? (
+            <span className="mb-[6px] shrink-0 rounded-full bg-rose-700 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+              Defisit
+            </span>
+          ) : undefined}
+          caption={`${tarikanSelesai.length} tarikan terlaksana`}
+          actions={
+            <>
+              <HeroAction
+                icon={hidden ? EyeOff : Eye}
+                label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+                onClick={() => { haptic(); toggleHideAmount(); }}
+              />
+              <HeroAction icon={Share2} label="Bagikan ringkasan ke WhatsApp" onClick={handleShareReceipt} />
+            </>
+          }
+        >
+          {/* Chip ini kini SATU-SATUNYA pembawa kabar "sudah setor" (dulu hero
+              ikut jadi biru). Panel di atas hero pakai bg-black/25 — aturan
+              kontras 13 Jul: panel di hero gelapkan, jangan terangkan. */}
+          {sudahSetor && (
+            <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-white text-xs font-semibold">
+              <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
+            </span>
+          )}
+        </HeroSaldo>
         </CrossFade>
 
         {/* Alur Kas */}

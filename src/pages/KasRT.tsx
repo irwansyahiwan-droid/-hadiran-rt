@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '../lib/utils';
-import FitAmount from '../components/FitAmount';
+import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import ConfirmDestruktif from '../components/ConfirmDestruktif';
@@ -512,96 +512,57 @@ export default function KasRTPage() {
                 </div>
               </div>
               <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="skeleton h-[62px] rounded-xl" />
-                <div className="skeleton h-[62px] rounded-xl" />
+              {/* Kaki kolom bergaris (bukan lagi 2 kotak) — cermin HeroStats. */}
+              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-line dark:border-gray-700 pt-[18px]">
+                <div className="skeleton h-8 rounded-xl" />
+                <div className="skeleton h-8 rounded-xl" />
               </div>
             </div>
           }
         >
-        {/* rounded-3xl: ikut --hero-radius 24px, seragam keluarga hero (KasHadiran) */}
-        <div className="relative rounded-3xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}>
-          <div className="hero-sheen pointer-events-none absolute inset-0" />
-
-          <div className="relative p-6">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <div className="flex items-center gap-2">
-                <Landmark className="w-4 h-4 text-white/80" />
-                {/* white/90 (bukan teal-100): seragam dgn hero Kas Hadiran + jaga AA di ujung terang gradient */}
-                <p className="text-white/90 text-xs font-semibold tracking-widest uppercase">Saldo Bersih Kas RT</p>
-              </div>
-              <div className="flex items-center gap-0.5 -mr-1.5">
-                {/* Urutan ikon seragam app-wide: mata (sembunyikan nominal) selalu pertama. */}
-                <button
-                  onClick={() => { haptic(); toggleHideAmount(); }}
-                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-                  aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
-                >
-                  {hidden
-                    ? <EyeOff className="w-4 h-4 text-white/80" />
-                    : <Eye className="w-4 h-4 text-white/80" />}
-                </button>
-                <button
-                  onClick={handleShareReceipt}
-                  className="press w-11 h-11 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-                  aria-label="Bagikan ringkasan ke WhatsApp"
-                >
-                  <Share2 className="w-4 h-4 text-white/80" />
-                </button>
-              </div>
-            </div>
-            {/* The Saldo-Defisit Rule (selaras Beranda & KasHadiran): nominal
-                TETAP putih premium; negatif ditandai chip KATA "Defisit" —
-                rona salmon (text-rose-200) = sinyal lemah & gagal kontras. */}
-            <div className="flex items-end gap-x-2.5 mb-3">
-              <FitAmount
-                measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
-                maxPx={48}
-                minPx={30}
-                className="min-w-0 flex-1 font-display font-extrabold tracking-tighter tabular-nums text-white"
-              >
-                {hidden
-                  ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
-                  : <Odometer value={animatedSaldo} />}
-              </FitAmount>
-              {saldo < 0 && (
-                <span className="mb-[6px] shrink-0 rounded-full bg-rose-700 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
-                  Defisit
-                </span>
-              )}
-            </div>
-
-            {/* Saldo Awal inline info */}
-            {saldoAwal > 0 && saldoAwalEntry && (
-              <p className="text-white/90 text-xs mb-4">
-                Saldo Awal
-                {' · '}
-                {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                {' · '}
-                <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}</span>
-              </p>
-            )}
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-black/10 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
-                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Masuk</p>
-                </div>
-                {/* text-caption (13px), bukan text-sm mentah: di 360px nominal 8 digit
-                    di panel setengah-lebar meluber 3px keluar kotak black/10. */}
-                <p className="text-caption font-display font-bold text-white tabular-nums">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</p>
-              </div>
-              <div className="bg-black/10 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <TrendingDown className="w-3.5 h-3.5 text-rose-300" />
-                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Total Keluar</p>
-                </div>
-                <p className="text-caption font-display font-bold text-white tabular-nums">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Anatomi hero = komponen bersama HeroSaldo (30 Jul). Dua panel
+            bg-black/10 diganti kaki kolom bergaris (HeroStats) — bentuk yang
+            sama dgn hero Beranda; kotak-di-dalam-kotak adalah dialek kedua. */}
+        <HeroSaldo
+          icon={Landmark}
+          label="Saldo Bersih Kas RT"
+          minHeight={HERO_MIN_H}
+          measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
+          amount={hidden
+            ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
+            : <Odometer value={animatedSaldo} />}
+          /* The Saldo-Defisit Rule (selaras Beranda & KasHadiran): nominal TETAP
+             putih premium; negatif ditandai chip KATA "Defisit". */
+          status={saldo < 0 ? (
+            <span className="mb-[6px] shrink-0 rounded-full bg-rose-700 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+              Defisit
+            </span>
+          ) : undefined}
+          caption={saldoAwal > 0 && saldoAwalEntry ? (
+            <>
+              Saldo Awal
+              {' \u00b7 '}
+              {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+              {' \u00b7 '}
+              <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}</span>
+            </>
+          ) : undefined}
+          actions={
+            <>
+              {/* Urutan ikon seragam app-wide: mata (sembunyikan nominal) selalu pertama. */}
+              <HeroAction
+                icon={hidden ? EyeOff : Eye}
+                label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+                onClick={() => { haptic(); toggleHideAmount(); }}
+              />
+              <HeroAction icon={Share2} label="Bagikan ringkasan ke WhatsApp" onClick={handleShareReceipt} />
+            </>
+          }
+          stats={[
+            { icon: TrendingUp, label: 'Total Masuk', value: maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4) },
+            { icon: TrendingDown, label: 'Total Keluar', value: maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4) },
+          ]}
+        />
         </CrossFade>
         )}
 

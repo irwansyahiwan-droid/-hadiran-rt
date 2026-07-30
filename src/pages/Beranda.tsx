@@ -8,6 +8,7 @@ import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
 import StatRow from '../components/StatRow';
 import CrossFade from '../components/CrossFade';
+import { HeroStats } from '../components/HeroSaldo';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
@@ -638,33 +639,17 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               </p>
             </div>
 
-            {/* Baris stat 3-kolom — di dasar kartu (blok nominal di atas sudah flex-1). */}
-            <div className="grid grid-cols-3 border-t border-white/15 pt-[18px]">
-              <button
-                onClick={(e) => { e.stopPropagation(); onNavigate('kas'); }}
-                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/15 px-0.5 active:opacity-80"
-              >
-                <Wallet className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-micro font-medium text-white/95">Terkumpul</span>
-                <span className="whitespace-nowrap text-[clamp(0.72rem,3.1vw,0.78rem)] font-display font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4)}</span>
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); onNavigate('talangan'); }}
-                className="press flex w-full min-w-0 flex-col items-center gap-1 border-r border-white/15 px-0.5 active:opacity-80"
-              >
-                <ArrowLeftRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-micro font-medium text-white/95">Talangan</span>
-                <span className="whitespace-nowrap text-[clamp(0.72rem,3.1vw,0.78rem)] font-display font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4)}</span>
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); onNavigate('kas-rt'); }}
-                className="press flex w-full min-w-0 flex-col items-center gap-1 px-0.5 active:opacity-80"
-              >
-                <ArrowUpRight className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />
-                <span className="mt-0.5 text-micro font-medium text-white/95">Setor Kas RT</span>
-                <span className="whitespace-nowrap text-[clamp(0.72rem,3.1vw,0.78rem)] font-display font-extrabold tabular-nums text-white">{maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4)}</span>
-              </button>
-            </div>
+            {/* Kaki stat — di dasar kartu (blok nominal di atas sudah flex-1).
+                Markup-nya kini milik `HeroStats`, komponen yang sama dipakai hero
+                Kas RT & Talangan; kartu ini yang jadi acuan bentuknya. */}
+            <HeroStats
+              className="pt-[18px]"
+              items={[
+                { icon: Wallet, label: 'Terkumpul', value: maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas') },
+                { icon: ArrowLeftRight, label: 'Talangan', value: maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('talangan') },
+                { icon: ArrowUpRight, label: 'Setor Kas RT', value: maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas-rt') },
+              ]}
+            />
           </>
         }
       />

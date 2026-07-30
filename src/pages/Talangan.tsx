@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggalShort, formatRupiahPlain, haptic, maskRp, pesanError } from '../lib/utils';
-import FitAmount from '../components/FitAmount';
+import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import SectionTitle from '../components/SectionTitle';
@@ -408,67 +408,41 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               <div className="skeleton h-9 w-9 rounded-full" />
             </div>
             <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="skeleton h-[62px] rounded-xl" />
-              <div className="skeleton h-[62px] rounded-xl" />
+            {/* Kaki kolom bergaris (bukan lagi 2 kotak) — cermin HeroStats. */}
+            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-line dark:border-gray-700 pt-[18px]">
+              <div className="skeleton h-8 rounded-xl" />
+              <div className="skeleton h-8 rounded-xl" />
             </div>
           </div>
         }
       >
       {totalBelumLunas > 0 ? (
-        /* rounded-3xl: ikut --hero-radius 24px, seragam keluarga hero (KasHadiran) */
-        <div className="relative rounded-3xl overflow-hidden hero-emerald" style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}>
-          <div className="hero-sheen pointer-events-none absolute inset-0" />
-
-          <div className="relative p-5">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              {/* Paritas keluarga hero (KasRT/LaporanTriwulan): label & ikon putih
-                  ber-opacity — emerald-300 di atas gradien vibran kontrasnya lemah. */}
-              <p className="inline-flex items-center gap-1 text-white text-micro font-bold uppercase tracking-widest">
-                Total Talangan Belum Lunas
-                <InfoTip label="Talangan" tone="onDark">
-                  Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
-                </InfoTip>
-              </p>
-              <button
-                onClick={() => { haptic(); toggleHideAmount(); }}
-                className="press w-11 h-11 flex items-center justify-center -mr-2 -mt-1 rounded-full hover:bg-white/10 transition-colors"
-                aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
-              >
-                {hidden
-                  ? <EyeOff className="w-4 h-4 text-white/80" />
-                  : <Eye className="w-4 h-4 text-white/80" />}
-              </button>
-            </div>
-            {/* "Rp750.000" TANPA spasi — satu-satunya tempat di app yang dulu
-                menulis `Rp ` berspasi, dan justru di nominal sebesar hero. */}
-            <FitAmount
-              measure={`Rp${totalBelumLunas.toLocaleString('id-ID')}`}
-              maxPx={48}
-              minPx={30}
-              className="font-display text-white font-extrabold tracking-tighter tabular-nums mb-3"
-            >
-              {maskRp(`Rp${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
-            </FitAmount>
-            {/* Dua chip stat ala hero KasRT — struktur > caption polos */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-black/10 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
-                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Belum Lunas</p>
-                </div>
-                <p className="text-sm font-bold text-white tabular-nums">{countBelum} talangan</p>
-              </div>
-              <div className="bg-black/10 rounded-xl p-3">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
-                  <p className="text-white/90 text-micro font-semibold uppercase tracking-wide">Sudah Lunas</p>
-                </div>
-                <p className="text-sm font-bold text-white tabular-nums">{countLunas} talangan</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        /* Anatomi hero = komponen bersama HeroSaldo (30 Jul). Dua panel bg-black/10
+           diganti kaki kolom bergaris (HeroStats), bentuk yang sama dgn Beranda &
+           Kas RT. "Rp750.000" TANPA spasi — halaman ini satu-satunya yang dulu
+           menulis `Rp ` berspasi, dan justru di nominal sebesar hero. */
+        <HeroSaldo
+          label="Total Talangan Belum Lunas"
+          minHeight={HERO_MIN_H}
+          info={
+            <InfoTip label="Talangan" tone="onDark">
+              Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
+            </InfoTip>
+          }
+          measure={`Rp${totalBelumLunas.toLocaleString('id-ID')}`}
+          amount={maskRp(`Rp${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
+          actions={
+            <HeroAction
+              icon={hidden ? EyeOff : Eye}
+              label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+              onClick={() => { haptic(); toggleHideAmount(); }}
+            />
+          }
+          stats={[
+            { icon: AlertTriangle, label: 'Belum Lunas', value: `${countBelum} talangan` },
+            { icon: CheckCircle2, label: 'Sudah Lunas', value: `${countLunas} talangan` },
+          ]}
+        />
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 text-center">
           <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
