@@ -454,14 +454,14 @@ export default function KasHadiranPage() {
   const pendapatanBersih = pendapatanKotor - POTONGAN_ADMIN;
 
   const sudahSetor = totalSetor > 0;
-  // Ketiganya kini kelas dari index.css (satu sumber, light + dark sepasang).
-  // Dulu dua varian ini untaian utility gradient di sini → tak punya pasangan
-  // dark, jadi biru/slate full-chroma menyala di atas near-black.
-  const heroGradient = sudahSetor
-    ? 'hero-setor'
-    : saldo < 0
-      ? 'hero-slate'
-      : 'hero-emerald'; // default → satu sumber Refined Emerald (index.css)
+  // SATU warna hero utk seluruh app (30 Jul): hijau brand, apa pun statusnya.
+  // Dulu tiga ramp di halaman ini saja — biru `hero-setor` (sudah setor) dan
+  // slate `hero-slate` (saldo minus). Akibatnya angka yang SAMA tampil hijau di
+  // Beranda dan biru di sini, dan pada layar ini biru "sudah setor" beradu
+  // dengan pil merah "Defisit" — dua penanda, dua arah. Status sudah punya
+  // pembawa pesan sendiri yang lebih terbaca: chip "Sudah disetor ke Kas RT"
+  // dan pil "Defisit". Warna kartu kembali jadi identitas, bukan status.
+  const heroGradient = 'hero-emerald';
 
   return (
     <>
@@ -585,13 +585,11 @@ export default function KasHadiranPage() {
               )}
             </div>
             <p className="text-white text-xs">{tarikanSelesai.length} tarikan terlaksana</p>
-            {/* Caption WAJIB ikut warna hero: hero jadi biru (hero-setor) tiap
-                `sudahSetor` (totalSetor>0) tanpa peduli tanda saldo. Dulu pill ini
-                digating `saldo<=0` → saat saldo POSITIF + sudah setor, hero biru
-                tampil TANPA keterangan (warga lihat angka sama hijau di Beranda,
-                biru di sini, tanpa sebab). Samakan syarat pill = syarat warna biru. */}
+            {/* Chip ini kini SATU-SATUNYA pembawa kabar "sudah setor" (dulu hero
+                ikut jadi biru). Panel di atas hero pakai bg-black/25 — aturan
+                kontras 13 Jul: panel di hero gelapkan, jangan terangkan. */}
             {sudahSetor && (
-              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-emerald-100 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-white text-xs font-semibold">
                 <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
               </span>
             )}

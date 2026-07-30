@@ -308,21 +308,38 @@ export default function JadwalWargaPage() {
         </div>
       )}
 
-      {/* Sub-tab switcher */}
-      <div className="flex gap-2">
+      {/* Sub-tab switcher — SEGMENTED CONTROL: satu lintasan ber-hairline, pil
+          brand meluncur di dalamnya. Dulu dua tombol terpisah (satu fill gelap,
+          satu outline) → terbaca sbg pasangan CTA primer+sekunder ("lakukan
+          ini"), bukan sbg dua tampilan yang sedang dipilih. Satu wadah = satu
+          pilihan (pola sama dgn pil aktif di bottom nav). */}
+      <div
+        role="tablist"
+        aria-label="Tampilan jadwal"
+        className="relative flex rounded-2xl border border-control dark:border-gray-700 bg-white dark:bg-gray-900 p-1"
+      >
+        {/* Pil aktif meluncur — 2 segmen, jadi 0% / 100% dari setengah lebar. */}
+        <span
+          aria-hidden
+          className="absolute inset-y-1 left-1 rounded-xl bg-brand transition-transform duration-300"
+          style={{
+            width: 'calc(50% - 0.25rem)',
+            transform: subTab === 'anggota' ? 'translateX(0)' : 'translateX(100%)',
+            transitionTimingFunction: 'var(--ease-spring)',
+          }}
+        />
         {([
           ['anggota', 'Daftar Anggota', Users],
           ['jadwal', 'Jadwal Hadiran', CalendarDays],
         ] as const).map(([id, label, Icon]) => (
           <button
             key={id}
+            role="tab"
             onClick={() => { if (subTab !== id) haptic(); setSubTab(id); }}
-            aria-pressed={subTab === id}
-            className={`press flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-semibold border transition ${
-              subTab === id
-                ? 'bg-brand text-white border-transparent' /* fill brand DATAR (MATERIAL-FLAT) — gradient+glow pra-flat dihapus */
-                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
-            } inline-flex items-center justify-center gap-1.5`}
+            aria-selected={subTab === id}
+            className={`press relative z-10 flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-semibold transition-colors inline-flex items-center justify-center gap-1.5 ${
+              subTab === id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+            }`}
           >
             <Icon className="w-4 h-4" /> {label}
           </button>
@@ -335,7 +352,10 @@ export default function JadwalWargaPage() {
           {/* Stat bar — StatRow bersama (satu kartu berkolom, sama dgn Beranda/Jadwal) */}
           <StatRow
             items={[
-              { label: 'Selesai', value: selesaiAnggotaCount, tone: 'pos' },
+              /* 'Selesai' netral (ink): dulu hijau sama persis dgn 'Hadir', dan
+                 angkanya pun kerap kembar → dua kolom terbaca satu hal. Hijau
+                 kini hanya berarti KEHADIRAN. */
+              { label: 'Selesai', value: selesaiAnggotaCount, tone: 'ink' },
               { label: 'Hadir', value: hadirCount, tone: 'pos' },
               { label: 'Titip', value: titipCount, tone: 'info' },
               { label: 'Tidak', value: tidakHadirCount, tone: 'neg' },

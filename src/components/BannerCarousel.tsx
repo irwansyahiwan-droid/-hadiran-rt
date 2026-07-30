@@ -87,10 +87,11 @@ export function BannerSkeleton({ vh }: { vh: number }) {
         </div>
       </div>
       {/* baris indikator story: satu pill aktif + dot sisanya */}
-      <div className="flex items-center justify-center gap-1.5" style={{ height: INDICATOR_H }}>
-        <span className={`h-1 w-[26px] ${bar}`} />
+      {/* mx-[9px] + gap 0 = geometri PERSIS indikator asli (kotak sentuh 24px). */}
+      <div className="flex items-center justify-center" style={{ height: INDICATOR_H }}>
+        <span className={`h-1 w-[26px] mx-[9px] ${bar}`} />
         {[0, 1, 2, 3, 4, 5].map((i) => (
-          <span key={i} className={`h-1 w-[7px] ${bar}`} />
+          <span key={i} className={`h-1 w-[7px] mx-[9px] ${bar}`} />
         ))}
       </div>
     </div>
@@ -708,7 +709,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
       {/* Indikator "story" tersegmen — aktif melebar + bar progress mengisi;
           yang sudah lewat terisi penuh. */}
       {count > 1 && (
-        <div className="flex items-center justify-center gap-1.5 pt-0.5">
+        <div className="flex items-center justify-center pt-0.5">
           {Array.from({ length: count }).map((_, i) => {
             const isActive = i === index;
             const past = i < index;
@@ -719,7 +720,11 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 aria-label={`Ke slide ${i + 1}`}
                 aria-current={isActive}
                 className="press grid place-items-center"
-                style={{ minHeight: 44, paddingTop: 16, paddingBottom: 16 }}
+                // padding-x 8.5 + gap 0 di baris → kotak sentuh 24px persis dan
+                // BERSINGGUNGAN, tidak bertumpuk (WCAG 2.5.8 AA). Dulu lebar
+                // tombol = lebar dot (7px) → praktis tak bisa diketuk (audit
+                // 30 Jul). Dot-nya sendiri tetap 7px: yang tumbuh cuma ruang.
+                style={{ minHeight: 44, paddingTop: 16, paddingBottom: 16, paddingLeft: 9, paddingRight: 9 }}
               >
                 <span
                   className="block h-1 overflow-hidden rounded-full bg-brand/20 dark:bg-brand-linkDark/25"

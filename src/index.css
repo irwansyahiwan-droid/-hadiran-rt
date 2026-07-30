@@ -487,25 +487,11 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
     linear-gradient(150deg, #1B7A49 0%, #0C5734 52%, #05301D 100%);
 }
 
-/* Dua varian hero KasHadiran. Sebelumnya ditulis sbg untaian utility gradient di
-   call-site (`from-setor via-setor-600 …`) sehingga TAK PUNYA pasangan dark dan
-   hex-nya berserak. Dipindah ke sini agar sekelas .hero-emerald: satu sumber,
-   light + dark sepasang. Nilai LIGHT identik dgn sebelumnya (setor #1E40AF/
-   #2563EB/#3B82F6 · slate-800/700/500) → tampilan terang tidak berubah. */
-.hero-setor {
-  /* Ramp diredupkan 1 step (13 Jul): stop terang lama #3B82F6 bikin putih pun
-     cuma 3.7:1 di zona teks — kini terburuk #2563EB = 5.2:1 utk teks putih. */
-  background-image: linear-gradient(to bottom right, #1E3A8A 0%, #1D4ED8 50%, #2563EB 100%);
-}
-.dark .hero-setor {
-  background-image: linear-gradient(to bottom right, #16306E 0%, #1B3F8F 50%, #2A56B8 100%);
-}
-.hero-slate {
-  background-image: linear-gradient(to bottom right, #1E293B 0%, #334155 50%, #64748B 100%);
-}
-.dark .hero-slate {
-  background-image: linear-gradient(to bottom right, #16202F 0%, #232E42 50%, #3A4759 100%);
-}
+/* (.hero-setor biru & .hero-slate abu DIHAPUS 30 Jul — dua ramp itu memakai
+   WARNA sebagai penanda status di KasHadiran, sehingga saldo yang sama tampil
+   hijau di Beranda tapi biru/abu di halamannya sendiri, dan biru "sudah setor"
+   beradu dengan pil merah "Defisit". Status kini dibawa chip + pil kata; hero
+   se-app satu warna: .hero-emerald. Jangan pasang ulang ramp per-status.) */
 
 /* (.nav-float dihapus 10 Jul — sisa era nav kapsul melayang, tak ada pemakainya
    sejak nav jadi bar DOK .nav-dock di bawah.) */

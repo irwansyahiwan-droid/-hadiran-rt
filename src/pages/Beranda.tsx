@@ -554,32 +554,40 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         heroSweep={firstHero}
         heroSlide={
           <>
-            {/* Aksi pojok kanan-atas — sembunyikan nominal & muat ulang. Absolut
-                relatif area konten (di dalam padding kartu) → sejajar eyebrow. */}
-            <div className="absolute right-0 top-0 flex items-center gap-2.5">
-              <button
-                onClick={() => { haptic(); toggleHideAmount(); }}
-                className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
-                aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
-              >
-                {hidden
-                  ? <EyeOff className="h-[18px] w-[18px] text-white/85" />
-                  : <Eye className="h-[18px] w-[18px] text-white/85" />}
-              </button>
-              <button
-                onClick={() => load(true)}
-                disabled={refreshing}
-                className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-[''] disabled:opacity-60"
-                aria-label="Muat ulang"
-              >
-                <RefreshCw className={`h-[18px] w-[18px] text-white/85 ${refreshing ? 'animate-spin' : ''}`} />
-              </button>
-            </div>
-
-            {/* Eyebrow */}
-            <div className="flex items-center gap-[9px]">
-              <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
-              <span className="text-micro font-bold uppercase tracking-[0.16em] text-white">Saldo Kas Hadiran</span>
+            {/* Baris atas: eyebrow + aksi (sembunyikan nominal, muat ulang).
+                Dulu tombolnya `absolute right-0 top-0` → di 360px eyebrow yang
+                lebih panjang MENABRAK tombol mata (terukur 15px tumpang tindih,
+                audit 30 Jul). Kini satu baris flex: eyebrow `min-w-0` mengalah,
+                tombol `shrink-0` — lebar layar apa pun, tak bisa saling timpa. */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-[9px]">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
+                {/* Label ikut lebar layar: di 360px ruang sisa cuma 121px sedang
+                    label butuh 148px pada 11px/0.16em → kata "SALDO" akan hilang
+                    ditelan ellipsis. clamp menyusutkan huruf ~2px di HP tersempit
+                    (dan tracking sedikit dirapatkan) supaya TIGA katanya utuh, lalu
+                    kembali ke 11px begitu ada ruang. truncate = jaring pengaman. */}
+                <span className="truncate text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
+              </div>
+              <div className="flex shrink-0 items-center gap-2.5">
+                <button
+                  onClick={() => { haptic(); toggleHideAmount(); }}
+                  className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
+                  aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
+                >
+                  {hidden
+                    ? <EyeOff className="h-[18px] w-[18px] text-white/85" />
+                    : <Eye className="h-[18px] w-[18px] text-white/85" />}
+                </button>
+                <button
+                  onClick={() => load(true)}
+                  disabled={refreshing}
+                  className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-[''] disabled:opacity-60"
+                  aria-label="Muat ulang"
+                >
+                  <RefreshCw className={`h-[18px] w-[18px] text-white/85 ${refreshing ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
             </div>
 
             {/* Nominal besar + sub-teks.

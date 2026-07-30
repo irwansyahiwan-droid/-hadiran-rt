@@ -440,13 +440,15 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   : <Eye className="w-4 h-4 text-white/80" />}
               </button>
             </div>
+            {/* "Rp750.000" TANPA spasi — satu-satunya tempat di app yang dulu
+                menulis `Rp ` berspasi, dan justru di nominal sebesar hero. */}
             <FitAmount
-              measure={`Rp ${totalBelumLunas.toLocaleString('id-ID')}`}
+              measure={`Rp${totalBelumLunas.toLocaleString('id-ID')}`}
               maxPx={48}
               minPx={30}
               className="font-display text-white font-extrabold tracking-tighter tabular-nums mb-3"
             >
-              {maskRp(`Rp ${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
+              {maskRp(`Rp${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
             </FitAmount>
             {/* Dua chip stat ala hero KasRT — struktur > caption polos */}
             <div className="grid grid-cols-2 gap-3">

@@ -164,7 +164,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         </div>
 
         {/* Filter chips */}
-        <FilterChips options={FILTERS} value={filter} onChange={setFilter} wrap />
+        <FilterChips options={FILTERS} value={filter} onChange={setFilter} />
 
         {/* Hint: tiap baris bisa diketuk untuk penjelasan alur */}
         {!loading && rows.length > 0 && (

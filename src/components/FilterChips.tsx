@@ -24,8 +24,6 @@ interface FilterChipsProps<T extends string, S extends string> {
   onChange: (id: T) => void;
   /** Tombol sort opsional di kanan (ml-auto). */
   sort?: SortProp<S>;
-  /** Bungkus chip agar membungkus ke baris baru (mis. Riwayat dgn banyak filter). */
-  wrap?: boolean;
   className?: string;
 }
 
@@ -39,7 +37,6 @@ export default function FilterChips<T extends string, S extends string = string>
   value,
   onChange,
   sort,
-  wrap,
   className = '',
 }: FilterChipsProps<T, S>) {
   const [sortOpen, setSortOpen] = useState(false);
@@ -59,13 +56,18 @@ export default function FilterChips<T extends string, S extends string = string>
     : '';
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      {/* min-w-0 + geser mendatar: tanpa ini grup chip (anak-anaknya shrink-0)
-          meluber keluar kotaknya dan tombol sort ber-`ml-auto` duduk DI ATAS
-          chip terakhir — terlihat di 375px, dan di 360px halaman ikut bisa
-          di-scroll ke samping. py-1 memberi ruang ring fokus saat digeser. */}
-      <div className={`flex items-center gap-1.5 min-w-0 ${wrap ? 'flex-wrap' : 'scroll-x-clean scroll-x-fade py-1 -my-1'}`}>
-        {options.map((f) => {
+    /* SATU baris flex yang MEMBUNGKUS — chip & tombol urutan bersaudara langsung
+       (30 Jul). Dua perubahan sekaligus, dan keduanya saling bergantung:
+       (1) varian geser-mendatar + fade tepi dibuang. Di 360–390px fade itu
+           menelan chip ketiga ("Lunas" di Talangan & Kas Hadiran) sampai separuh
+           → terbaca seperti kontrol rusak; filter yang tak terlihat = tak ada.
+       (2) grup chip TIDAK lagi dibungkus div sendiri. Waktu grupnya terpisah,
+           chip membungkus di dalam kotaknya sementara tombol sort tetap
+           menggantung di kanan baris pertama → lubang menganga berbentuk L.
+       Sekarang semua ikut satu aliran: chip mengisi kiri, sort `ml-auto` menempel
+       kanan (baris pertama bila muat, baris terakhir bila membungkus). */
+    <div className={`flex flex-wrap items-center gap-x-1.5 gap-y-2 ${className}`}>
+      {options.map((f) => {
           const active = value === f.id;
           return (
             <button
@@ -88,8 +90,7 @@ export default function FilterChips<T extends string, S extends string = string>
               {f.label}
             </button>
           );
-        })}
-      </div>
+      })}
 
       {sort && 'options' in sort && (
         <div className="relative ml-auto shrink-0">
