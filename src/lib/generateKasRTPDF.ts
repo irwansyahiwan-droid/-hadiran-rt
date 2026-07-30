@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
   TABLE, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
+  drawContinuationHeader, SIGN_H,
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
@@ -103,7 +104,9 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       body: rows.map((k, i) => [
         String(i + 1), fmtDate(k.tanggal), k.keterangan, `${sign}${fmtNum(k.nominal)}`,
       ]),
-      margin: { left: M, right: M },
+      /* top 26 = ruang untuk label "(lanjutan)" di halaman sambungan (hanya
+         berlaku utk halaman kedua dst; halaman pertama pakai startY). */
+      margin: { left: M, right: M, top: 26 },
       columnStyles: COL,
       didParseCell(data) {
         alignHeadFoot(data, COL);
@@ -111,6 +114,17 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
           data.cell.styles.textColor = tone === 'pos' ? C.pos : C.neg;
           data.cell.styles.fontStyle = 'bold';
         }
+      },
+      /* Seksi yang menyambung ke halaman berikutnya WAJIB menyebut induknya.
+         Tanpa ini halaman baru dibuka oleh kepala kolom polos (NO/TANGGAL/…)
+         sehingga baris sisanya jadi baris tak bertuan — pada dokumen
+         pertanggungjawaban bertanda tangan itu cacat, bukan sekadar kurang
+         rapi. Subtotal TIDAK diulang di sini: nilainya milik seluruh seksi,
+         dan menempelkannya di "(lanjutan)" gampang terbaca sebagai subtotal
+         baris sambungan saja. */
+      didDrawPage(data) {
+        if (data.pageNumber === 1) return;
+        sectionLabel(doc, 14, `${prefix} — ${label} (lanjutan)`, W, M);
       },
     });
     return getY(doc);
@@ -124,13 +138,34 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   }
 
   // ── Ringkasan tutup buku ──────────────────────────────────────
-  Y = drawSummary(doc, ensureSpace(doc, Y + 6, 42), [
+  // "Total Penerimaan", bukan "Total Pemasukan": label seksi di atas memakai
+  // PENERIMAAN/PENGELUARAN. Satu dokumen tak boleh punya dua kosakata untuk
+  // pos yang sama — auditor membacanya sebagai dua hal berbeda.
+  const ringkasan: Parameters<typeof drawSummary>[2] = [
     { label: 'Saldo Awal',        value: rp(stats.saldoAwal) },
-    { label: 'Total Pemasukan',   value: `+${rp(stats.totalMasuk)}`,  tone: 'pos' },
+    { label: 'Total Penerimaan',  value: `+${rp(stats.totalMasuk)}`,  tone: 'pos' },
     { label: 'Total Pengeluaran', value: `-${rp(stats.totalKeluar)}`, tone: 'neg' },
-  ], { label: 'Saldo Bersih', value: rp(stats.saldo) }, W, M);
+  ];
+  const saldoBersih = { label: 'Saldo Bersih', value: rp(stats.saldo) };
+  Y = drawSummary(doc, ensureSpace(doc, Y + 6, 42), ringkasan, saldoBersih, W, M);
 
-  drawSignatures(doc, ensureSpace(doc, Y + 14, 42), W, M, { dateline: `Depok, ${tanggalCetak}` });
+  // Tanda tangan: jaga ruangnya seukuran blok NYATA (SIGN_H). Kalau tetap harus
+  // pindah halaman, lembar itu dibuat BISA BERDIRI SENDIRI — kepala lanjutan
+  // (identitas + kode dokumen) plus ringkasan tutup buku dicetak ulang di
+  // atasnya. Tanda tangan harus duduk bersama angka yang disahkannya; lembar
+  // tanda tangan kosong tak mengesahkan apa pun dan gampang tertukar.
+  const halamanSebelum = doc.getNumberOfPages();
+  let ttdY = ensureSpace(doc, Y + 14, SIGN_H);
+  if (doc.getNumberOfPages() > halamanSebelum) {
+    const headY = drawContinuationHeader(doc, {
+      W, M,
+      title: 'Laporan Pertanggungjawaban Kas RT',
+      subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Kota Depok${periode} · ${docCode}`,
+    });
+    const recapY = sectionLabel(doc, headY + 8, 'Ringkasan Tutup Buku', W, M);
+    ttdY = drawSummary(doc, recapY, ringkasan, saldoBersih, W, M) + 18;
+  }
+  drawSignatures(doc, ttdY, W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);

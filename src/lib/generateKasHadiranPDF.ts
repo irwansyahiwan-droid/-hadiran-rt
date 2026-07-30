@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
+  TABLE, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, SIGN_H, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -137,7 +137,7 @@ export function generateKasHadiranPDF(
     { label: 'Total Setor ke Kas RT',      value: `-${rp(stats.totalSetor)}`, tone: 'warn' },
   ], { label: 'Saldo Bersih Kas', value: saldoText, tone: stats.saldoAktif < 0 ? 'neg' : 'ink' }, W, M);
 
-  drawSignatures(doc, ensureSpace(doc, sumY + 14, 42), W, M, { dateline: `Depok, ${tanggalCetak}` });
+  drawSignatures(doc, ensureSpace(doc, sumY + 14, SIGN_H), W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);

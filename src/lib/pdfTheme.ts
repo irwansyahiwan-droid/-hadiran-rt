@@ -199,6 +199,37 @@ export function drawSummary(
   return ly + 1;
 }
 
+/**
+ * Kepala halaman LANJUTAN — versi ramping masthead untuk halaman kedua dst.
+ *
+ * Dipakai saat sebuah blok (mis. tanda tangan) jatuh ke halaman baru: halaman
+ * yang memuat tanda tangan TIDAK boleh anonim. Tanpa identitas dokumen, lembar
+ * tanda tangan yang terlepas dari berkas tak bisa dipertanggungjawabkan —
+ * siapa pun bisa menukarnya dengan lampiran lain. Mengembalikan Y awal konten.
+ */
+export function drawContinuationHeader(
+  doc: jsPDF,
+  o: { W: number; M: number; title: string; subtitle: string },
+): number {
+  const { W, M } = o;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9); setColor(doc, C.ink);
+  doc.text(o.title, M, 16);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(7); setColor(doc, C.faint);
+  doc.text(o.subtitle, M, 20.5);
+  doc.text('lanjutan', W - M, 16, { align: 'right' });
+  setDraw(doc, C.line); doc.setLineWidth(0.3);
+  doc.line(M, 24, W - M, 24);
+  return 24;
+}
+
+/**
+ * Tinggi NYATA blok tanda tangan (mm) — dateline 6 + peran → garis 16 →
+ * nama 5,5 + napas bawah. Dipakai sebagai `needed` di ensureSpace supaya blok
+ * tak dipindah ke halaman baru padahal masih muat (dulu dijaga 42mm untuk blok
+ * ~34mm → laporan sering berakhir dengan halaman tanda tangan nyaris kosong).
+ */
+export const SIGN_H = 34;
+
 /** Blok tanda tangan 3 kolom. `dateline` opsional ("Depok, 5 Juli 2026") di atas kolom kanan. */
 export function drawSignatures(doc: jsPDF, y: number, W: number, M: number, opts?: { dateline?: string }): void {
   const colW = (W - 2 * M) / 3;

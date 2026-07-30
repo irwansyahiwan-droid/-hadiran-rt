@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
+  TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, ensureSpace, SIGN_H, C, fmtNum, alignHeadFoot,
 } from './pdfTheme';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
 
@@ -149,7 +149,7 @@ export function generatePendapatanPDF(
     { label: 'Potongan Admin',   value: `-${rp(potonganAdmin)}`, tone: 'neg' },
   ], { label: 'Pendapatan Bersih', value: rp(pendapatanBersih) }, W, M);
 
-  drawSignatures(doc, ensureSpace(doc, sumY + 14, 36), W, M, { dateline: `Depok, ${tanggalCetak}` });
+  drawSignatures(doc, ensureSpace(doc, sumY + 14, SIGN_H), W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);
