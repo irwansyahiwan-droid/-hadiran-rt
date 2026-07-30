@@ -728,11 +728,14 @@ export default function KasHadiranPage() {
                       {/* ── Timeline mini-header ─────────────────────── */}
                       <div className="flex items-center justify-between px-5 pt-4 pb-2">
                         <div className="flex items-center gap-2">
-                          <div className={`icon-tile w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
-                            talanganInfo.count === 0
-                              ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                              : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                          }`}>
+                          {/* Nomor tarikan = IDENTITAS, bukan status. Dulu ia
+                              diwarnai emerald/amber menurut ada-tidaknya talangan
+                              — padahal chip di ujung baris yang sama sudah
+                              mengatakannya dengan KATA ("11 belum bayar" /
+                              "Lunas semua"). Satu fakta dua sandi: warna jadi
+                              tebakan, dan ambernya bukan token `warn` mana pun.
+                              Kini netral (abu = penanda, sesuai sistem warna). */}
+                          <div className="icon-tile w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
