@@ -846,7 +846,10 @@ export default function KasHadiranPage() {
                             onClick={() => handleHapusClick(t)}
                             disabled={processingId === t.id}
                             aria-label={`Hapus tarikan #${t.nomor}`}
-                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold ml-auto transition-colors disabled:opacity-50 text-ink-faint dark:text-gray-500 hover:bg-gray-50 hover:text-rose-600 dark:hover:bg-gray-800/60"
+                            /* dark:text-gray-400, BUKAN gray-500: gray-500 di atas
+                               gray-900 cuma 3,67:1 — ketangkap audit kontras deep
+                               sbg satu-satunya cacat fill nyata dari 1842 sampel. */
+                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold ml-auto transition-colors disabled:opacity-50 text-ink-faint dark:text-gray-400 hover:bg-gray-50 hover:text-rose-600 dark:hover:bg-gray-800/60"
                           >
                             <Trash2 className="w-4 h-4" />
                             Hapus

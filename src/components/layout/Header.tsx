@@ -218,7 +218,10 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
               type="button"
               onClick={dismissBanner}
               aria-label="Tutup info Mode Warga"
-              className="press absolute right-0 -mr-2 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-ink-sub dark:text-gray-500 dark:hover:text-gray-300 active:opacity-70 before:absolute before:-inset-1.5 before:content-['']"
+              /* dark:text-gray-400 (bukan gray-500): ikon kontrol wajib ≥3:1
+                 (WCAG 1.4.11). gray-500 di atas fill banner gelap (gray-800/60
+                 di atas gray-900 ≈ #192231) cuma 2,8:1 — di bawah ambang. */
+              className="press absolute right-0 -mr-2 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-ink-sub dark:text-gray-400 dark:hover:text-gray-200 active:opacity-70 before:absolute before:-inset-1.5 before:content-['']"
             >
               <X className="w-3.5 h-3.5" />
             </button>
