@@ -19,12 +19,17 @@ interface FabProps {
  *  .press (spring) → konsisten dgn CTA utama lain. z-30 → di bawah sheet/modal
  *  (z-50) sehingga tertutup backdrop saat form terbuka.
  *
- *  PINTAR (Material 3 2026): mengkerut jadi bulat ikon-saja saat scroll turun
- *  (beri ruang baca list), memanjang lagi dengan label saat scroll naik/berhenti. */
+ *  PINTAR (Material 3 2026): MENYINGKIR saat scroll turun, kembali dengan label
+ *  saat scroll naik/berhenti. Dulu ia hanya mengkerut jadi bulat — tetap
+ *  melayang di jalur nominal rata-kanan, dan di "Rekap per Kategori" Kas RT ia
+ *  memotong angka "+Rp17.566.000" (terlihat di screenshot 390px). Di app kas,
+ *  tak boleh ada elemen yang menutupi nominal: itu angka yang dicari warga. */
 export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, overNav = true }: FabProps) {
-  // Mengkerut jadi bulat ikon-saja saat scroll turun; memanjang lagi saat
-  // scroll naik / diam (900ms). Listener scroll dibagi pakai (lihat hook).
-  const compact = useScrollHide({ threshold: 80, idleExpandMs: 900 });
+  /* Menyingkir saat scroll turun, kembali saat scroll NAIK. `idleExpandMs`
+     sengaja TIDAK dipakai: dengan ia, FAB balik 900ms setelah gulir berhenti —
+     tepat pada detik warga berdiam untuk MEMBACA nominal, jadi ia menutupi
+     angka itu lagi dan tujuan menyingkirnya batal. Naik = niat ke aksi. */
+  const compact = useScrollHide({ threshold: 80 });
 
   return (
     // Wrapper fixed TERPISAH dari tombol: translate3d + backface-hidden +
@@ -40,15 +45,25 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
         bottom: overNav
           ? 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)'
           : 'calc(env(safe-area-inset-bottom) + 1.25rem)',
-        transform: 'translate3d(0, 0, 0)',
+        /* Menyingkir = translate pada WRAPPER (bukan tombol): transform inline
+           di tombol akan menimpa scale .press:active. Nilai 0 tetap dipakai
+           saat tampil supaya kunci lapisan GPU tak pernah lepas. */
+        transform: compact ? 'translate3d(0, 150%, 0)' : 'translate3d(0, 0, 0)',
+        opacity: compact ? 0 : 1,
+        pointerEvents: compact ? 'none' : undefined,
+        transition: 'transform 0.28s var(--ease-out-expo), opacity 0.2s ease',
         willChange: 'transform',
         WebkitBackfaceVisibility: 'hidden',
         backfaceVisibility: 'hidden',
       }}
+      aria-hidden={compact}
     >
     <button
       onClick={() => { haptic(); onClick(); }}
       aria-label={ariaLabel ?? label}
+      /* Saat menyingkir wrapper-nya aria-hidden — jangan tinggalkan tombol yang
+         masih bisa di-Tab (fokus mendarat di elemen tak terlihat). */
+      tabIndex={compact ? -1 : undefined}
       className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-sm font-bold overflow-hidden"
       style={{ transition: 'box-shadow 0.2s ease, transform 0.15s var(--ease-spring)' }}
     >

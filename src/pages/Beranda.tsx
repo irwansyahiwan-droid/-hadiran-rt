@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight, RotateCcw, Crown } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight, ChevronDown, RotateCcw, Crown } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -78,6 +78,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
   const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
   const [trxSearch, setTrxSearch] = useState('');
+  /** Lipatan baris sejenis yang sedang dibuka (kunci: tanggal|sub|indeks). */
+  const [openFold, setOpenFold] = useState<Set<string>>(() => new Set());
 
   async function load(showRefreshing = false) {
     // Sudah ada data tampil (dari cache / load sebelumnya) → revalidate
@@ -299,7 +301,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
    * sudah ada di sheet detail (satu ketuk), dan di daftar ia hanya menambah
    * kolom angka ketiga yang bersaing dengan nominal.
    */
-  const trxRow = (trx: TrxItem, idx: number, lastInGroup: boolean, showDate: boolean) => (
+  const trxRow = (trx: TrxItem, idx: number, lastInGroup: boolean, showDate: boolean, hideSub = false) => (
     <button
       key={trx.id}
       onClick={() => { haptic(); setSelectedTrx(trx); }}
@@ -322,15 +324,118 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             mt-1 (bukan mt-0.5): jarak 2px bikin judul & sub nyaris bersentuhan —
             biang rasa "rapat" yang dilaporkan. 4px = dua baris terbaca sebagai
             pasangan, bukan satu gumpalan. */}
-        <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
-          {[trx.sub, showDate ? formatTanggal(trx.tanggal) : null].filter(Boolean).join(' · ')}
-        </p>
+        {/* `hideSub` = baris ini anak sebuah lipatan yang terbuka: konteksnya
+            ("Talangan · Tarikan #12") sudah tercetak di baris induk persis di
+            atasnya, jadi mengulangnya di 9 baris berturut-turut hanya derau. */}
+        {!(hideSub && !showDate) && (
+          <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
+            {[trx.sub, showDate ? formatTanggal(trx.tanggal) : null].filter(Boolean).join(' · ')}
+          </p>
+        )}
       </div>
       <span className={`font-display text-amount font-semibold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
         {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
       </span>
     </button>
   );
+
+  /**
+   * Baris LIPATAN: satu baris mewakili deretan transaksi sejenis (mis. 8 talangan
+   * Tarikan #11 di tanggal yang sama). Identitas baris ini adalah KELOMPOKNYA,
+   * jadi judul = konteks ("Talangan · Tarikan #11") dan sub = jumlah warga +
+   * beberapa nama; nominal = jumlahnya. Dibuka satu ketuk → baris aslinya muncul
+   * apa adanya (nama sebagai judul, aturan lama tetap berlaku).
+   */
+  const trxFoldRow = (run: { key: string; sub: string; items: TrxItem[]; total: number }, idx: number, lastInGroup: boolean) => {
+    const open = openFold.has(run.key);
+    const seg = run.sub.split(' · ');
+    const judul = seg.length > 1 ? seg[seg.length - 1] : run.sub;
+    const jenis = seg.length > 1 ? seg.slice(0, -1).join(' · ') : null;
+    // "warga" hanya benar untuk talangan (satu baris = satu orang); pos lain
+    // dihitung sebagai transaksi supaya subnya tak pernah bohong.
+    const satuan = /talangan/i.test(run.sub) ? 'warga' : 'transaksi';
+    return (
+      <div key={run.key}>
+        <button
+          onClick={() => {
+            haptic();
+            setOpenFold((prev) => {
+              const next = new Set(prev);
+              if (next.has(run.key)) next.delete(run.key); else next.add(run.key);
+              return next;
+            });
+          }}
+          aria-expanded={open}
+          style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
+          className={`press rise w-full flex items-center gap-3 px-5 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
+        >
+          <div className="icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
+            <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
+          </div>
+          {/* Hierarki dibalik dari `sub` aslinya: NOMOR TARIKAN jadi judul, jenis
+              + jumlah jadi sub. Baris ini menanggung 4 kolom (tile, teks, nominal,
+              chevron); judul "Talangan · Tarikan #12" selalu terpotong justru di
+              nomornya — bagian yang paling berguna. "Tarikan #12" pendek, muat,
+              dan tetap identitas yang benar untuk sebuah lipatan. */}
+          <div className="flex-1 min-w-0">
+            <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug truncate">{judul}</p>
+            <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
+              {[jenis, `${run.items.length} ${satuan}`].filter(Boolean).join(' · ')}
+            </p>
+          </div>
+          <span className="font-display text-amount font-semibold shrink-0 tabular-nums text-pos dark:text-emerald-400">
+            {maskRp(`+Rp${run.total.toLocaleString('id-ID')}`, hidden, 4)}
+          </span>
+          <ChevronDown className={`w-4 h-4 -ml-1 -mr-1 shrink-0 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
+        </button>
+        {open && run.items.map((trx, ii) => trxRow(trx, idx, lastInGroup && ii === run.items.length - 1, false, true))}
+      </div>
+    );
+  };
+
+  /**
+   * Pecah baris sebuah kelompok tanggal menjadi deretan sejenis. Sejenis =
+   * `sub` sama (mis. "Talangan · Tarikan #11") DAN arah nominal sama; hanya
+   * dilipat bila anggotanya ≥ FOLD_MIN, karena melipat 2 baris jadi 1 baris +
+   * penunjuk buka bukan penghematan.
+   *
+   * TIDAK dilipat saat ada kata pencarian: di situ warga sedang mencari SATU
+   * nama, dan nama justru yang tersembunyi di balik lipatan.
+   */
+  const FOLD_MIN = 3;
+  const buildRuns = (items: TrxItem[], groupKey: string) => {
+    type Run = { kind: 'run'; key: string; sub: string; items: TrxItem[]; total: number };
+    const out: ({ kind: 'one'; item: TrxItem } | Run)[] = [];
+    if (trxSearch.trim()) return items.map((item) => ({ kind: 'one' as const, item }));
+
+    /* Dikumpulkan per-KUNCI di seluruh kelompok tanggal, BUKAN per deret
+       beruntun. Di satu tanggal, talangan Tarikan #11 & #12 saling menyela
+       (urutannya jam pelunasan), jadi versi "deret beruntun" cuma melipat
+       sebagian → satu baris lipatan berdampingan dgn 4 baris sejenis yang tak
+       terlipat: lebih rancu daripada tak melipat sama sekali. */
+    const bucket = new Map<string, TrxItem[]>();
+    for (const t of items) {
+      const k = `${t.sub}|${Math.sign(t.nominal)}`;
+      const arr = bucket.get(k);
+      if (arr) arr.push(t); else bucket.set(k, [t]);
+    }
+    const sudah = new Set<string>();
+    for (const t of items) {
+      const k = `${t.sub}|${Math.sign(t.nominal)}`;
+      const anggota = bucket.get(k) as TrxItem[];
+      if (!t.sub || anggota.length < FOLD_MIN) { out.push({ kind: 'one', item: t }); continue; }
+      if (sudah.has(k)) continue;          // sudah diwakili baris lipatan di posisi pertamanya
+      sudah.add(k);
+      out.push({
+        kind: 'run',
+        key: `${groupKey}|${k}`,
+        sub: t.sub,
+        items: anggota,
+        total: anggota.reduce((s, x) => s + x.nominal, 0),
+      });
+    }
+    return out;
+  };
 
   const renderTrxRows = () => {
     // Sort 'nominal' → baris tak berurut kronologis, kelompok tanggal menyesatkan.
@@ -355,7 +460,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
           </span>
         </div>
-        {g.items.map((trx, ii) => trxRow(trx, idx++, ii === g.items.length - 1, false))}
+        {buildRuns(g.items, g.key).map((r, ri, arr) => {
+          const last = ri === arr.length - 1;
+          return r.kind === 'run'
+            ? trxFoldRow(r, idx++, last)
+            : trxRow(r.item, idx++, last, false);
+        })}
       </div>
     ));
   };
