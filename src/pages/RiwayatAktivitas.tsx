@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Search, History, Plus, Pencil, Trash2,
+  Search, History, Plus, Pencil, Trash2,
   CheckCircle2, RotateCcw, ArrowRight, RefreshCw, Download,
   ChevronDown, Route, Lightbulb,
 } from 'lucide-react';
+import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -131,40 +132,15 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
   return (
     <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
-      {/* Header */}
-      <header
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
-          <button
-            onClick={() => { haptic(); exit.requestClose(); }}
-            className="press w-11 h-11 flex items-center justify-center -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Kembali"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          </button>
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <History className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Riwayat Aktivitas</h1>
-          </div>
-          <button
-            onClick={exportPDF}
-            className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            title="Ekspor PDF"
-            aria-label="Ekspor PDF"
-          >
-            <Download className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          </button>
-          <button
-            onClick={() => { haptic(); setLoading(true); load(); }}
-            className="press w-11 h-11 flex items-center justify-center -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Muat ulang"
-          >
-            <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </header>
+      <OverlayHeader
+        icon={History}
+        title="Riwayat Aktivitas"
+        onBack={exit.requestClose}
+        actions={<>
+          <OverlayAction icon={Download} label="Ekspor PDF" onClick={exportPDF} />
+          <OverlayAction icon={RefreshCw} label="Muat ulang" onClick={() => { setLoading(true); load(); }} spinning={loading} />
+        </>}
+      />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* Search */}

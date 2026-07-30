@@ -7,6 +7,9 @@ interface FabProps {
   label: string;
   icon?: LucideIcon;
   ariaLabel?: string;
+  /** Halaman overlay (Kelola Anggota dll.) tak punya bottom-nav → FAB duduk
+   *  lebih rendah. Default true = ada nav yang harus dilewati. */
+  overNav?: boolean;
 }
 
 /** Floating Action Button — aksi-buat utama di ZONA JEMPOL (kanan-bawah),
@@ -18,7 +21,7 @@ interface FabProps {
  *
  *  PINTAR (Material 3 2026): mengkerut jadi bulat ikon-saja saat scroll turun
  *  (beri ruang baca list), memanjang lagi dengan label saat scroll naik/berhenti. */
-export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel }: FabProps) {
+export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, overNav = true }: FabProps) {
   // Mengkerut jadi bulat ikon-saja saat scroll turun; memanjang lagi saat
   // scroll naik / diam (900ms). Listener scroll dibagi pakai (lihat hook).
   const compact = useScrollHide({ threshold: 80, idleExpandMs: 900 });
@@ -34,7 +37,9 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel }: Fa
     <div
       className="fixed right-4 z-fab"
       style={{
-        bottom: 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)',
+        bottom: overNav
+          ? 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)'
+          : 'calc(env(safe-area-inset-bottom) + 1.25rem)',
         transform: 'translate3d(0, 0, 0)',
         willChange: 'transform',
         WebkitBackfaceVisibility: 'hidden',

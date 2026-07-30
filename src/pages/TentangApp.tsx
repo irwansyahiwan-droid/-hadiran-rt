@@ -1,4 +1,5 @@
-import { ArrowLeft, BookOpen, Coins, Users, Link2, Heart, ShieldCheck } from 'lucide-react';
+import { BookOpen, Coins, Users, Link2, Heart, ShieldCheck } from 'lucide-react';
+import OverlayHeader from '../components/layout/OverlayHeader';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
@@ -60,24 +61,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
   return (
     <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
-      <header
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
-          <button
-            onClick={() => { haptic(); exit.requestClose(); }}
-            className="press w-11 h-11 flex items-center justify-center -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Kembali"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          </button>
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Tentang Aplikasi</h1>
-          </div>
-        </div>
-      </header>
+      <OverlayHeader icon={BookOpen} title="Tentang Aplikasi" onBack={exit.requestClose} />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* Hero */}

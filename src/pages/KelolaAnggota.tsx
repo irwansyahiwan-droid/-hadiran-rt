@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, Users, Search, X, RefreshCw, RotateCcw, UserPlus, Pencil,
+  Users, Search, X, RefreshCw, RotateCcw, UserPlus, Pencil,
   CheckCircle2, Phone, Home, History, AlertTriangle,
 } from 'lucide-react';
+import Fab from '../components/Fab';
+import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -332,31 +334,12 @@ export default function KelolaAnggota({ open, onClose }: Props) {
 
   return (
     <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
-      <header
-        className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        <div className="flex items-center gap-2 max-w-lg mx-auto px-4 py-3">
-          <button
-            onClick={() => { haptic(); exit.requestClose(); }}
-            className="press w-11 h-11 flex items-center justify-center -ml-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Kembali"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          </button>
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 truncate">Kelola Anggota</h1>
-          </div>
-          <button
-            onClick={() => { haptic(); load(); }}
-            className="press w-11 h-11 flex items-center justify-center -mr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Muat ulang"
-          >
-            <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </header>
+      <OverlayHeader
+        icon={Users}
+        title="Kelola Anggota"
+        onBack={exit.requestClose}
+        actions={<OverlayAction icon={RefreshCw} label="Muat ulang" onClick={load} spinning={loading} />}
+      />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}>
         <p className="text-xs text-ink-faint dark:text-gray-400 px-1">{aktifCount} aktif · {list.length} total</p>
@@ -445,14 +428,17 @@ export default function KelolaAnggota({ open, onClose }: Props) {
         )}
       </main>
 
-      {/* FAB Tambah */}
-      <button
-        onClick={() => { haptic(); setForm({ mode: 'add', warga: null }); }}
-        className="btn-brand fixed left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-3.5 rounded-full font-bold text-sm active:scale-[0.97] transition"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}
-      >
-        <UserPlus className="w-4 h-4" /> Tambah Anggota
-      </button>
+      {/* FAB Tambah — komponen Fab, bukan tombol tangan: versi lama duduk di
+          TENGAH tanpa whitespace-nowrap (labelnya patah 2 baris di 360px), tanpa
+          kerut-saat-scroll, dan tanpa kunci lapisan GPU (FAB fixed ikut terseret
+          di iOS Safari). overNav=false karena halaman overlay tak punya nav. */}
+      <Fab
+        label="Tambah Anggota"
+        icon={UserPlus}
+        ariaLabel="Tambah anggota"
+        overNav={false}
+        onClick={() => setForm({ mode: 'add', warga: null })}
+      />
 
       {form && (
         <AnggotaFormModal
