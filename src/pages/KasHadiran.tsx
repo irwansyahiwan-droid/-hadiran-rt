@@ -809,22 +809,32 @@ export default function KasHadiranPage() {
                       {/* ── Actions ──────────────────────────────────
                           PDF pendapatan tersedia untuk semua (termasuk warga);
                           Absensi, Batalkan & Hapus khusus bendahara. */}
-                      <div className="flex items-center gap-x-4 px-5 pb-3 pt-3 border-t border-line dark:border-gray-800">
+                      {/* Aksi kartu dulu tak punya WAJAH tombol: `text-xs`
+                          `text-ink-sub` `font-medium` + ikon 14px = seberat teks
+                          caption, tanpa `.press`, tanpa haptic. Padahal ini
+                          berulang di 13 kartu, jadi tiap kartu berakhir dgn
+                          strip yang terbaca sebagai label, bukan aksi. Kini:
+                          aksi bersama (PDF, dipakai warga juga) memakai kosakata
+                          tautan app — `text-brand-link font-semibold`, sama dgn
+                          footer "Lihat semua" Beranda; aksi bendahara tetap
+                          netral (hierarki) tapi ikut dapat .press + ukuran ramp
+                          `text-caption` biar terbaca warga lansia. */}
+                      <div className="flex items-center gap-x-3 px-5 pb-3 pt-3 border-t border-line dark:border-gray-800">
                         <button
-                          onClick={() => handlePendapatanPDF(t)}
+                          onClick={() => { haptic(); handlePendapatanPDF(t); }}
                           disabled={pdfLoading === t.id}
-                          className="flex items-center gap-1.5 min-h-[44px] text-xs text-ink-sub dark:text-gray-400 font-medium hover:text-emerald-600 transition-colors disabled:opacity-50"
+                          className="press flex items-center gap-1.5 min-h-[44px] -mx-1.5 px-1.5 rounded-lg text-caption font-semibold text-brand-link dark:text-brand-linkDark hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors disabled:opacity-50"
                         >
-                          <FileText className={`w-3.5 h-3.5 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
+                          <FileText className={`w-4 h-4 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
                           {pdfLoading === t.id ? 'Memuat…' : 'PDF Pendapatan'}
                         </button>
                         {isBendahara && (
                           <button
-                            onClick={() => handleBatalkanClick(t)}
+                            onClick={() => { haptic(); handleBatalkanClick(t); }}
                             disabled={processingId === t.id}
-                            className="flex items-center gap-1.5 min-h-[44px] text-xs font-medium transition-colors disabled:opacity-50 text-ink-sub dark:text-gray-400 hover:text-amber-600"
+                            className="press flex items-center gap-1.5 min-h-[44px] px-1.5 rounded-lg text-caption font-semibold transition-colors disabled:opacity-50 text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-amber-700 dark:hover:bg-gray-800/60"
                           >
-                            <RotateCcw className={`w-3.5 h-3.5 ${processingId === t.id ? 'animate-spin' : ''}`} />
+                            <RotateCcw className={`w-4 h-4 ${processingId === t.id ? 'animate-spin' : ''}`} />
                             Batalkan
                           </button>
                         )}
@@ -833,9 +843,9 @@ export default function KasHadiranPage() {
                             onClick={() => handleHapusClick(t)}
                             disabled={processingId === t.id}
                             aria-label={`Hapus tarikan #${t.nomor}`}
-                            className="flex items-center gap-1.5 min-h-[44px] text-xs font-medium ml-auto transition-colors disabled:opacity-50 text-ink-faint dark:text-gray-500 hover:text-rose-500"
+                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold ml-auto transition-colors disabled:opacity-50 text-ink-faint dark:text-gray-500 hover:bg-gray-50 hover:text-rose-600 dark:hover:bg-gray-800/60"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                             Hapus
                           </button>
                         )}
