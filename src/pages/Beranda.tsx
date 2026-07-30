@@ -761,7 +761,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </button>
           }
         >
-          Transaksi Terakhir
+          {/* "Transaksi", bukan "Transaksi Terakhir": diukur di 360px, judul +
+              chip 3 digit (103) memakan 200px dari anggaran 201px → pecah 2
+              baris, padahal seksi kembarnya ("Jadwal Berikutnya" + chip 5) tetap
+              1 baris. Kata "Terakhir" pun sudah dikatakan chip sort "Terbaru"
+              tepat di bawahnya dan oleh tombol "Lihat semua" di sampingnya. */}
+          Transaksi
         </SectionTitle>
         {trxItems.length > 0 && (
           <div className="space-y-2 mb-3">
