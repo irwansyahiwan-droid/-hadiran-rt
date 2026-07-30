@@ -970,8 +970,12 @@ export default function JadwalPage() {
         {/* Tanpa caption angka — StatRow tepat di bawah sudah memuat
             selesai/terjadwal/total; satu fakta satu suara. */}
         <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">Jadwal Tarikan</h1>
-        <div className="flex items-center gap-2">
-          <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        {/* gap-1.5 + tombol muat-ulang 40px (kotak sentuh tetap 44 lewat
+            before:-inset-1): di 360px judul kurang 5px dan berakhir
+            "Jadwal Tarika…" (audit 30 Jul). Delapan piksel yang dibebaskan di
+            sini cukup, tanpa mengecilkan huruf judul. */}
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button onClick={load} aria-label="Muat ulang" className="press relative w-10 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors before:absolute before:-inset-1 before:content-['']">
             <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
           </button>
           {/* Icon-only (pola tombol unduh Riwayat Aktivitas) — tiga aksi lepas

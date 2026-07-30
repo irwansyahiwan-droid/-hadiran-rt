@@ -70,7 +70,12 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
                 : <Target className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />}
             </span>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{target.keterangan || 'Target Kas RT'}</p>
+              {/* line-clamp-2, bukan truncate: keterangan target itu teks bebas
+                  dari bendahara. Default "Target Saldo Kas RT Akhir Tahun" saja
+                  sudah kurang 3px di 360px → kata terakhir hilang jadi "…Tahu…".
+                  Judul = identitas kartu; biarkan melipat (pola sama judul
+                  transaksi Beranda). */}
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug">{target.keterangan || 'Target Kas RT'}</p>
               <p className="text-micro text-gray-500 dark:text-gray-400">Target <span className="font-display tabular-nums">{formatRupiahPlain(target.nominal)}</span></p>
             </div>
           </div>
