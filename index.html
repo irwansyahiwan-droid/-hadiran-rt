@@ -6,6 +6,12 @@
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Handshake ke Supabase dimulai saat HTML masih di-parse. Tanpa ini DNS +
+         TLS ke origin itu baru jalan setelah bundel JS dieksekusi — di jaringan
+         warga (latensi ~400 ms) itu ±1 detik mati sebelum byte data pertama.
+         URL disuntik Vite dari VITE_SUPABASE_URL saat build. -->
+    <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
+    <link rel="dns-prefetch" href="%VITE_SUPABASE_URL%" />
     <title>Hadiran RT 004/006</title>
     <meta name="description" content="Aplikasi manajemen arisan & kas RT 004/006, Tanah Baru Beji, Depok — jadwal tarikan, absensi, talangan, dan laporan kas transparan." />
     <!-- Aplikasi internal warga — JANGAN di-index mesin pencari. Nama warga &

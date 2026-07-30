@@ -111,13 +111,38 @@ export default function App() {
     const el = document.getElementById('app-splash');
     if (!el) return;
     let removed = false;
+    let raf = 0;
+    let fallback: ReturnType<typeof setTimeout> | undefined;
     const remove = () => { if (!removed) { removed = true; el.remove(); } };
-    const raf = requestAnimationFrame(() => {
-      el.classList.add('as-hide');
-      el.addEventListener('transitionend', remove, { once: true });
-    });
-    const fallback = setTimeout(remove, 700);
-    return () => { cancelAnimationFrame(raf); clearTimeout(fallback); };
+    const mulaiFade = () => {
+      raf = requestAnimationFrame(() => {
+        el.classList.add('as-hide');
+        el.addEventListener('transitionend', remove, { once: true });
+      });
+      fallback = setTimeout(remove, 700);
+    };
+    /* Stylesheet utama kini non-blocking (lihat plugin css-non-blocking di
+       vite.config.ts) supaya splash tercat ~1,8 detik lebih awal. Konsekuensinya
+       splash TAK BOLEH dibuang sebelum CSS terpasang — kalau tidak, warga melihat
+       kilatan konten tanpa gaya. Di dev CSS masuk lewat JS (tak ada link), jadi
+       langsung jalan; jaring 3 detik menjaga splash tak pernah menyandera app
+       kalau onload tak firing (mis. CSS dari cache tanpa event). */
+    const w = window as unknown as { __cssReady?: boolean };
+    if (import.meta.env.DEV || w.__cssReady) {
+      mulaiFade();
+      return () => { cancelAnimationFrame(raf); clearTimeout(fallback); };
+    }
+    let done = false;
+    const lanjut = () => { if (!done) { done = true; mulaiFade(); } };
+    document.addEventListener('css-siap', lanjut, { once: true });
+    const jaring = setTimeout(lanjut, 3000);
+    return () => {
+      done = true;
+      document.removeEventListener('css-siap', lanjut);
+      clearTimeout(jaring);
+      cancelAnimationFrame(raf);
+      clearTimeout(fallback);
+    };
   }, [auth.loading]);
 
   if (auth.loading) {
