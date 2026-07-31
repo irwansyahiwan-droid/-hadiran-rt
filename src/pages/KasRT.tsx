@@ -416,12 +416,22 @@ export default function KasRTPage() {
       });
       if (error) { showToast(pesanError(error, 'Gagal menyimpan transaksi.'), 'error'); return; }
     }
-    await recomputeKasRTSaldo();
+    /* Transaksinya SUDAH tersimpan di titik ini; yang bisa gagal tinggal hitung
+       ulang saldo berjalan. Karena itu jangan batalkan alurnya — tutup modal &
+       muat ulang seperti biasa, tapi katakan apa adanya bahwa kolom "Saldo:"
+       belum tentu mutakhir. Diam di sini = angka basi yang terlihat sah. */
+    let saldoOk = true;
+    try {
+      await recomputeKasRTSaldo();
+    } catch (e) {
+      saldoOk = false;
+      showToast(pesanError(e, 'Transaksi tersimpan, tapi saldo berjalan gagal dihitung ulang. Muat ulang halaman.'), 'error');
+    }
     setShowModal(false);
     const wasEdit = !!editing;
     setEditing(null);
     await load();
-    showToast(wasEdit ? 'Transaksi diperbarui' : data.tipe === 'masuk' ? 'Pemasukan tersimpan' : 'Pengeluaran tersimpan');
+    if (saldoOk) showToast(wasEdit ? 'Transaksi diperbarui' : data.tipe === 'masuk' ? 'Pemasukan tersimpan' : 'Pengeluaran tersimpan');
   }
 
   // Hapus transaksi Kas RT dengan pola undo (hapus permanen setelah 5 dtk bila tak diurungkan).
@@ -435,7 +445,12 @@ export default function KasRTPage() {
         const { data: del, error } = await supabase.from('kas_rt').delete().eq('id', row.id).select();
         if (error) { showToast(pesanError(error, 'Gagal menghapus transaksi.'), 'error'); await load(); return; }
         if (!del || del.length === 0) { showToast('Gagal menghapus — policy DELETE kas_rt belum aktif di database', 'error'); await load(); return; }
-        await recomputeKasRTSaldo();
+        // Baris sudah terhapus; sisa risikonya cuma saldo berjalan yang basi.
+        try {
+          await recomputeKasRTSaldo();
+        } catch (e) {
+          showToast(pesanError(e, 'Baris terhapus, tapi saldo berjalan gagal dihitung ulang. Muat ulang halaman.'), 'error');
+        }
         await load();
       },
       { onUndo: () => load() },

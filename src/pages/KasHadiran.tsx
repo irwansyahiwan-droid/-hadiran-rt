@@ -439,10 +439,18 @@ export default function KasHadiranPage() {
       showToast('Gagal menyetor: ' + (tx.error?.message ?? kr.error?.message ?? ''), 'error');
       return;
     }
-    await recomputeKasRTSaldo();
+    // Setoran SUDAH tercatat di dua ledger; sisa risikonya saldo berjalan Kas RT
+    // yang basi — itu harus dikatakan, bukan ditelan diam-diam.
+    let saldoOk = true;
+    try {
+      await recomputeKasRTSaldo();
+    } catch (e) {
+      saldoOk = false;
+      showToast('Setoran tersimpan, tapi saldo berjalan Kas RT gagal dihitung ulang. Muat ulang halaman. ' + (e instanceof Error ? e.message : ''), 'error');
+    }
     setShowModal(false);
     load();
-    showToast('Setoran ke Kas RT tersimpan');
+    if (saldoOk) showToast('Setoran ke Kas RT tersimpan');
   }
 
   const hidden = useHideAmount();
