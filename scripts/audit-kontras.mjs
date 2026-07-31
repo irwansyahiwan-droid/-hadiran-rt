@@ -75,20 +75,32 @@ async function samplePixels(page, shotB64, points) {
   }, { b64: shotB64, pts: points });
 }
 
+/* INSET wajib: sampel lama menempel 1–2px dari tepi elemen, jadi yang terbaca
+   justru BORDER/RING 1px-nya, bukan fill di belakang teks. Itu sumber tunggal
+   false-positive menahun audit ini — chip filter gelap dilaporkan 4,06:1 (sampel
+   border gray-700) padahal fill-nya gray-800 = 5,74:1, pil "WARGA" 4,3–4,47
+   (sampel ring biru), Tag 4,07 (ring rose), btn-secondary 4,27 (border-control).
+   Tim sempat "memperbaiki" chip-nya sekali dan DITOLAK user karena silau — yang
+   salah memang alatnya. Border di app ini ≤2px, jadi inset 3px sudah keluar dari
+   zona border DAN dari zona `ring-inset`, tapi masih di dalam fill. */
+const INSET = 3;
+
 function perimeterPoints(r, fontSize) {
   // Sampel di KETINGGIAN BARIS TEKS (mid-y) — fair utk gradient vertikal
   // (teks tombol duduk di tengah, bukan di tepi atas fill).
   const my = r.y + r.h / 2;
+  const inX = Math.min(INSET, Math.max(1, r.w / 2 - 1));   // elemen sempit: jangan lewat tengah
+  const inY = Math.min(INSET, Math.max(1, r.h / 2 - 1));
   const pts = [
-    [r.x + 1, my], [r.x + 2, my], [r.x + r.w - 1, my], [r.x + r.w - 2, my],
-    [r.x + 1, my - 3], [r.x + r.w - 1, my - 3], [r.x + 1, my + 3], [r.x + r.w - 1, my + 3],
+    [r.x + inX, my], [r.x + inX + 1, my], [r.x + r.w - inX, my], [r.x + r.w - inX - 1, my],
+    [r.x + inX, my - 3], [r.x + r.w - inX, my - 3], [r.x + inX, my + 3], [r.x + r.w - inX, my + 3],
   ];
   // elemen pendek (± satu baris): tepi atas/bawah masih di zona teks
   if (r.h < fontSize * 2.2) {
     const n = 6;
     for (let i = 0; i <= n; i++) {
-      const x = r.x + 2 + (i * (r.w - 4)) / n;
-      pts.push([x, r.y + 1], [x, r.y + r.h - 1]);
+      const x = r.x + inX + (i * (r.w - 2 * inX)) / n;
+      pts.push([x, r.y + inY], [x, r.y + r.h - inY]);
     }
   }
   return pts.map(([x, y]) => [Math.max(0, Math.min(389, x)), Math.max(0, Math.min(843, y))]);

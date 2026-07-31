@@ -84,17 +84,24 @@ async function samplePixels(page, shotB64, points) {
   }, { b64: shotB64, pts: points });
 }
 
+/* Inset 3px — alasan lengkap di scripts/audit-kontras.mjs: sampel yang menempel
+   1–2px dari tepi membaca BORDER/RING 1px, bukan fill. Dua berkas ini WAJIB
+   memakai geometri sampel yang sama, kalau tidak hasil keduanya tak sebanding. */
+const INSET = 3;
+
 function perimeterPoints(r, fontSize) {
   const my = r.y + r.h / 2;
+  const inX = Math.min(INSET, Math.max(1, r.w / 2 - 1));
+  const inY = Math.min(INSET, Math.max(1, r.h / 2 - 1));
   const pts = [
-    [r.x + 1, my], [r.x + 2, my], [r.x + r.w - 1, my], [r.x + r.w - 2, my],
-    [r.x + 1, my - 3], [r.x + r.w - 1, my - 3], [r.x + 1, my + 3], [r.x + r.w - 1, my + 3],
+    [r.x + inX, my], [r.x + inX + 1, my], [r.x + r.w - inX, my], [r.x + r.w - inX - 1, my],
+    [r.x + inX, my - 3], [r.x + r.w - inX, my - 3], [r.x + inX, my + 3], [r.x + r.w - inX, my + 3],
   ];
   if (r.h < fontSize * 2.2) {
     const n = 6;
     for (let i = 0; i <= n; i++) {
-      const x = r.x + 2 + (i * (r.w - 4)) / n;
-      pts.push([x, r.y + 1], [x, r.y + r.h - 1]);
+      const x = r.x + inX + (i * (r.w - 2 * inX)) / n;
+      pts.push([x, r.y + inY], [x, r.y + r.h - inY]);
     }
   }
   return pts.map(([x, y]) => [Math.max(0, Math.min(389, x)), Math.max(0, Math.min(843, y))]);
