@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Search, X, Check, Coins, HandCoins, Users, CalendarDays, RotateCcw } from 'lucide-react';
+import { FileText, Search, X, Check, Coins, HandCoins, Users, CalendarDays, RotateCcw, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
@@ -16,6 +16,7 @@ interface JadwalWargaCache {
 import Tag from '../components/Tag';
 import FilterChips from '../components/FilterChips';
 import StatRow from '../components/StatRow';
+import PageHeader from '../components/layout/PageHeader';
 import ClearButton from '../components/ClearButton';
 import InfoTip from '../components/InfoTip';
 import ErrorState from '../components/ErrorState';
@@ -242,6 +243,18 @@ export default function JadwalWargaPage() {
 
   return (
     <div className="space-y-7 pb-2">
+      {/* Kepala halaman = PageHeader bersama (30 Jul). Halaman ini dulu SATU-
+          SATUNYA tab tanpa judul — langsung hero, tanpa nama & tanpa muat-ulang,
+          padahal tab-nya bernama "Jadwal" dan isinya dua tampilan berbeda. */}
+      <PageHeader
+        title="Jadwal Tarikan"
+        actions={
+          <button onClick={() => load()} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        }
+      />
+
       {/* Hero Card — material/warna disamakan dengan hero Beranda (.hero-card) */}
       {lastTarikan ? (
         <div className="hero-card hero-noise" style={{ minHeight: HERO_MIN_H }}>

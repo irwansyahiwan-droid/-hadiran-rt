@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
@@ -7,6 +7,7 @@ import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggalShort, formatRupiahPlain, haptic, maskRp, pesanError } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
+import PageHeader from '../components/layout/PageHeader';
 import { openWa, pesanTalangan } from '../lib/waReminder';
 import AvatarPeci from '../components/AvatarPeci';
 import SectionTitle from '../components/SectionTitle';
@@ -380,16 +381,22 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="space-y-7 pb-2 page-enter">
-      {/* Back header — hanya muncul saat dibuka dari Beranda (mode warga) */}
-      {onBack && (
-        <button
-          onClick={onBack}
-          className="flex items-center gap-1.5 -ml-1 min-h-[44px] text-sm font-medium text-ink-sub dark:text-gray-300 hover:text-ink dark:hover:text-gray-100 active:opacity-70 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Kembali
-        </button>
-      )}
+      {/* Kepala halaman = PageHeader bersama (30 Jul). Dulu halaman ini cuma
+          menampilkan baris "← Kembali" TANPA nama halaman — warga yang masuk
+          lewat pintasan Beranda mendarat di layar tanpa identitas. Panah kembali
+          tetap hanya muncul di mode warga (bendahara membukanya sbg tab). */}
+      <PageHeader
+        title="Talangan"
+        onBack={onBack}
+        /* InfoTip istilah pindah ke sini dari label hero: dua tooltip berisi
+           kalimat yang SAMA di satu layar itu pengulangan, dan tempatnya yang
+           benar adalah di sebelah nama halamannya. */
+        info={
+          <InfoTip label="Talangan">
+            Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
+          </InfoTip>
+        }
+      />
 
       {/* Header card — di dalam CrossFade: sebelum data siap, totalBelumLunas=0
           membuat kartu "Semua Talangan Lunas" berkedip (pesan SALAH saat loading).
@@ -424,11 +431,6 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         <HeroSaldo
           label="Total Talangan Belum Lunas"
           minHeight={HERO_MIN_H}
-          info={
-            <InfoTip label="Talangan" tone="onDark">
-              Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
-            </InfoTip>
-          }
           measure={`Rp${totalBelumLunas.toLocaleString('id-ID')}`}
           amount={maskRp(`Rp${animatedTotal.toLocaleString('id-ID')}`, hidden, 7)}
           actions={

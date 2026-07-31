@@ -12,6 +12,7 @@ import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
 import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import CrossFade from '../components/CrossFade';
+import PageHeader from '../components/layout/PageHeader';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
@@ -965,16 +966,16 @@ export default function JadwalPage() {
       {lastResult && (
         <ResultCard result={lastResult} onDismiss={() => setLastResult(null)} />
       )}
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        {/* Tanpa caption angka — StatRow tepat di bawah sudah memuat
-            selesai/terjadwal/total; satu fakta satu suara. */}
-        <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">Jadwal Tarikan</h1>
-        {/* gap-1.5 + tombol muat-ulang 40px (kotak sentuh tetap 44 lewat
-            before:-inset-1): di 360px judul kurang 5px dan berakhir
-            "Jadwal Tarika…" (audit 30 Jul). Delapan piksel yang dibebaskan di
-            sini cukup, tanpa mengecilkan huruf judul. */}
-        <div className="flex shrink-0 items-center gap-1.5">
+      {/* Kepala halaman = PageHeader bersama (30 Jul). Tanpa subjudul angka —
+          StatRow tepat di bawah sudah memuat selesai/terjadwal/total; satu
+          fakta satu suara. */}
+      <PageHeader
+        title="Jadwal Tarikan"
+        /* Tombol muat-ulang 40px lebar (kotak sentuh tetap 44 lewat
+           before:-inset-1): di 360px judul kurang 5px dan berakhir
+           "Jadwal Tarika…" (audit 30 Jul). Delapan piksel yang dibebaskan
+           cukup, tanpa mengecilkan huruf judul. */
+        actions={<>
           <button onClick={load} aria-label="Muat ulang" className="press relative w-10 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors before:absolute before:-inset-1 before:content-['']">
             <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -993,7 +994,7 @@ export default function JadwalPage() {
               }}
               title="Unduh PDF"
               aria-label="Unduh PDF jadwal"
-              className="press w-11 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="press relative w-10 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 before:absolute before:-inset-1 before:content-['']"
             >
               <FileText className="w-4 h-4" />
             </button>
@@ -1002,13 +1003,13 @@ export default function JadwalPage() {
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
               aria-label="Tambah jadwal tarikan"
-              className="press flex items-center gap-1.5 btn-brand text-sm font-semibold px-3 py-2 rounded-xl"
+              className="press flex items-center gap-1.5 btn-brand text-sm font-semibold px-2.5 py-2 rounded-xl"
             >
               <Plus className="w-4 h-4" /> Jadwal
             </button>
           )}
-        </div>
-      </div>
+        </>}
+      />
 
       {/* Stats — StatRow bersama (dialek "N kartu terpisah" yang tersisa di sini) */}
       <StatRow

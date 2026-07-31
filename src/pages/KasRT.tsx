@@ -10,6 +10,7 @@ import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
+import PageHeader from '../components/layout/PageHeader';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import ConfirmDestruktif from '../components/ConfirmDestruktif';
@@ -444,19 +445,17 @@ export default function KasRTPage() {
   return (
     <>
       <div className="space-y-7 pb-2 page-enter">
-        {/* Header — SATU baris juga di HP (sinkron Kas Hadiran): judul + toolbar
-            muat di 358px, dan tumpukan lama menambah ±56px chrome sebelum hero. */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="inline-flex items-center gap-1 text-lg font-bold text-ink dark:text-gray-100">
-              Kas RT
-              <InfoTip label="Kas RT">
-                Kas besar RT&nbsp;004/006. Sebagian iuran tiap tarikan (Rp5.000/anggota) disetor ke sini untuk kebutuhan RT — terpisah dari Kas Hadiran.
-              </InfoTip>
-            </h1>
-            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
+        {/* Kepala halaman = PageHeader bersama (30 Jul). Tetap SATU baris di HP;
+            tumpukan dua baris dulu menambah ±56px chrome sebelum hero. */}
+        <PageHeader
+          title="Kas RT"
+          subtitle={`Per ${today}`}
+          info={
+            <InfoTip label="Kas RT">
+              Kas besar RT&nbsp;004/006. Sebagian iuran tiap tarikan (Rp5.000/anggota) disetor ke sini untuk kebutuhan RT — terpisah dari Kas Hadiran.
+            </InfoTip>
+          }
+          actions={<>
             <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -490,8 +489,8 @@ export default function KasRTPage() {
                 },
               ]}
             />
-          </div>
-        </div>
+          </>}
+        />
 
         {/* Saldo Card — always teal. Di dalam CrossFade: sebelum data siap
             saldo=0 → hero berkedip "Rp0" (angka salah sesaat). Guard error &&

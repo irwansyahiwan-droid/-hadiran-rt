@@ -336,6 +336,12 @@ kartu (`.lift/.float/.nav-dock`) mendapat `border: 1px solid CanvasText`; di
 ### Chips (FilterChips)
 - Pill (9999px). Aktif = fill brand emerald + teks putih; non-aktif = netral berbingkai.
   Aktif jelas via fill, bukan sekadar border.
+- Baris chip **MEMBUNGKUS** (`flex-wrap`), tidak menggeser mendatar. Varian geser + fade
+  tepi dihapus 30 Jul 2026: di 360–390px fade menelan chip ketiga sampai separuh dan
+  terbaca seperti kontrol rusak — filter yang tak terlihat sama saja tidak ada. Chip dan
+  tombol urutan wajib **bersaudara langsung** dalam satu wadah; kalau grup chip dibungkus
+  div sendiri, ia membungkus di dalam kotaknya sementara sort menggantung di kanan baris
+  pertama → lubang berbentuk L.
 
 ### Cards / Containers
 - **Corner:** 16px (`rounded-2xl`) untuk panel padat, 24px (`rounded-3xl`) untuk kartu konten
@@ -367,16 +373,37 @@ kartu (`.lift/.float/.nav-dock`) mendapat `border: 1px solid CanvasText`; di
   dipakai** BottomNav; nav aktif = `.nav-dock`.
 
 ### Hero Card (Signature)
-Kartu saldo gradient dengan `--hero-shadow`. Tiga varian gradient:
-- **Emerald** (`.hero-emerald`, default) — Refined Emerald, satu sumber se-app.
-- **Setor Biru** (`from-setor via-setor-600 to-setor-500`) — saat Kas Hadiran sudah disetor.
-- **Slate Negatif** — saat saldo < 0 dan belum disetor.
+Kartu saldo gradient dengan `--hero-shadow`. **SATU varian: `.hero-emerald`** — warna hero
+adalah IDENTITAS, bukan status. Varian `.hero-setor` (biru, saat sudah disetor) dan
+`.hero-slate` (abu, saat saldo minus) dihapus 30 Jul 2026: saldo yang sama tampil hijau di
+Beranda tapi biru di halamannya sendiri, dan biru "sudah setor" beradu dengan pil merah
+"Defisit" di kartu yang sama. Status dibawa **kata**: chip "Sudah disetor ke Kas RT" dan pil
+"Defisit". Jangan pasang ulang ramp per-status.
+
+**Anatomi = `src/components/HeroSaldo.tsx`** (Kas Hadiran, Kas RT, Talangan), urutan baca
+dijamin: label (+InfoTip, +aksi) → nominal `FitAmount` (+pil status) → keterangan → kaki
+statistik. Label `min-w-0` + aksi `shrink-0` supaya tak bisa saling timpa di 360px; ukuran
+label ikut `clamp(0.575rem, 2.55vw, 0.6875rem)`.
+- Kaki hero = **`HeroStats`** — kolom bergaris (`border-t` + `border-r` antar kolom), 2–3
+  kolom, opsional `onClick` jadi tombol navigasi. Panel `bg-black/10` bertumpuk **dilarang**:
+  kotak-di-dalam-kotak itu dialek kedua sekaligus permukaan di atas permukaan.
+- Hero Beranda tidak memakai `HeroSaldo` (bingkainya milik `BannerCarousel`) tapi WAJIB
+  memakai `HeroStats` yang sama — kartu itu acuan bentuknya.
+- Kas Hadiran sengaja **tanpa** kaki: kartu "Alur Kas Hadiran" di bawahnya sudah memuat
+  angka yang sama.
 
 Dekorasi hero: motif songket emas `.songket-weave` (soft-light, di-mask ke sudut kanan-atas
-agar nominal kiri bersih), `.hero-sheen`, sparkline, dan `.hero-sheen-sweep` sekali-muat.
+agar nominal kiri bersih), `.hero-sheen`, dan `.hero-sheen-sweep` sekali-muat.
 Saldo negatif → nominal **putih** + chip **"Defisit"** (The Saldo-Defisit Rule). Beranda
 membungkus semua hero dalam `BannerCarousel` (carousel 3D bertumpuk; permukaan flat & tegas
 ala BYOND — user TOLAK glass/glow/noise).
+
+### Kepala Halaman (PageHeader)
+`src/components/layout/PageHeader.tsx` — satu anatomi untuk halaman DI DALAM cangkang app:
+`[kembali] judul (+InfoTip) / subjudul` di kiri, aksi menempel kanan, SATU baris di HP.
+Dipakai Kas Hadiran, Kas RT, Jadwal (bendahara & warga), Talangan. Beranda dikecualikan
+(sapaan + pil status = kepala khas layar rumah). Halaman overlay layar-penuh memakai
+`OverlayHeader` yang sticky & ber-safe-area, bukan ini.
 
 ### Login (pengecualian branded)
 Login adalah **satu-satunya** layar yang sengaja memakai bahasa kaca: kanvas gradient mint

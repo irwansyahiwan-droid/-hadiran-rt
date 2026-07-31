@@ -23,6 +23,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
 import CrossFade from '../components/CrossFade';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
+import PageHeader from '../components/layout/PageHeader';
 import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
 
 // ── Setor Modal ────────────────────────────────────────────
@@ -458,17 +459,13 @@ export default function KasHadiranPage() {
   return (
     <>
       <div className="space-y-7 pb-2 overflow-x-hidden">
-        {/* Header — anatomi seragam dgn Jadwal & Kas RT: judul + muat ulang + Ekspor.
-            SATU baris juga di HP (dulu bertumpuk): judul "Kas Hadiran" + toolbar
-            (44px ikon + Ekspor ±130px) muat di 358px, dan tumpukan itu menambah
-            ±56px chrome di atas hero — di layar 844px, kartu saldo baru mulai
-            lewat separuh layar. Judul min-w-0 → aman kalau judul memanjang. */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-lg font-bold text-ink dark:text-gray-100">Kas Hadiran</h1>
-            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Per {today}</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
+        {/* Kepala halaman = PageHeader bersama (30 Jul). Tetap SATU baris di HP:
+            judul + toolbar (ikon 44px + Ekspor ±130px) muat di 358px; tumpukan
+            dua baris dulu menambah ±56px chrome di atas hero. */}
+        <PageHeader
+          title="Kas Hadiran"
+          subtitle={`Per ${today}`}
+          actions={<>
             <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -498,8 +495,8 @@ export default function KasHadiranPage() {
                 },
               ]}
             />
-          </div>
-        </div>
+          </>}
+        />
 
         {/* Header Card — di dalam CrossFade: sebelum data siap saldo=0 → hero
             berkedip "Rp0" (angka salah sesaat, bikin kaget). */}
