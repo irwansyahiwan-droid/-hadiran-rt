@@ -84,6 +84,15 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     supabase.from('talangan').select('nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
   ]);
 
+  // Supabase TIDAK melempar saat gagal → tanpa cek ini, HTTP 500 pulang sebagai
+  // `data: null` dan `?? []` mengubahnya jadi "tidak ada transaksi". Akibatnya
+  // fatal untuk halaman ini: layar menampilkan "Belum ada data" (padahal buku
+  // penuh) DAN angka nol itu ikut mengalir ke PDF & kartu PNG tutup buku yang
+  // dibagikan bendahara ke grup WA. Lebih baik melempar → ErrorState + tombol
+  // "Coba lagi" daripada laporan nol yang terlihat sah.
+  const gagal = trxRes.error ?? rtRes.error ?? tarikanRes.error ?? talanganRes.error;
+  if (gagal) throw gagal;
+
   const map = new Map<string, RekapTriwulan>();
   const get = (b: Bagian): RekapTriwulan => {
     let r = map.get(b.key);
@@ -172,6 +181,15 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
     supabase.from('tarikan').select('tanggal, status, total_terkumpul').eq('status', 'selesai'),
     supabase.from('talangan').select('nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
   ]);
+
+  // Supabase TIDAK melempar saat gagal → tanpa cek ini, HTTP 500 pulang sebagai
+  // `data: null` dan `?? []` mengubahnya jadi "tidak ada transaksi". Akibatnya
+  // fatal untuk halaman ini: layar menampilkan "Belum ada data" (padahal buku
+  // penuh) DAN angka nol itu ikut mengalir ke PDF & kartu PNG tutup buku yang
+  // dibagikan bendahara ke grup WA. Lebih baik melempar → ErrorState + tombol
+  // "Coba lagi" daripada laporan nol yang terlihat sah.
+  const gagal = trxRes.error ?? rtRes.error ?? tarikanRes.error ?? talanganRes.error;
+  if (gagal) throw gagal;
 
   const snap: SnapshotKas = {
     tanggal: cutoff.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),

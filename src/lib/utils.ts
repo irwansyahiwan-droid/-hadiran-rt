@@ -130,6 +130,12 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
     supabase.from('transaksi_kas').select('tipe, nominal'),
   ]);
 
+  // Sama seperti helper laporan: `.select()` tak melempar, jadi tanpa cek ini
+  // satu query gagal jadi ringkasan Rp0 yang tampil sebagai fakta di hero
+  // Beranda. Pemanggilnya (Beranda.load) sudah menangkap & memasang ErrorState.
+  const gagal = wargaRes.error ?? tarikanRes.error ?? talanganRes.error ?? transaksiRes.error;
+  if (gagal) throw gagal;
+
   const jumlahAnggota = wargaRes.count ?? 0;
   const tarikanList = tarikanRes.data ?? [];
   const talanganList = talanganRes.data ?? [];
