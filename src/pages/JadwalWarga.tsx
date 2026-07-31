@@ -64,6 +64,14 @@ export default function JadwalWargaPage() {
           .order('nama', { ascending: true }),
       ]);
 
+      // Supabase TIDAK melempar saat gagal — tanpa cek ini, HTTP 500/koneksi
+      // putus berubah jadi array kosong dan halaman mengklaim "Belum ada tarikan
+      // selesai" + statistik 0 (pernyataan SALAH tentang data), lalu snapshot
+      // kosong itu ikut ditulis ke pageCache sehingga kebohongannya bertahan
+      // antar-navigasi. Pola cek-per-hasil ini sudah dipakai Beranda, Talangan,
+      // Kas Hadiran & Kas RT — halaman ini satu-satunya yang terlewat.
+      if (tarRes.error || wargaRes.error) throw tarRes.error ?? wargaRes.error;
+
       const tarikanAll = (tarRes.data as Tarikan[]) ?? [];
       const warga = (wargaRes.data as Warga[]) ?? [];
 
@@ -89,6 +97,8 @@ export default function JadwalWargaPage() {
             .eq('tarikan_id', last.id)
             .eq('status_lunas', true),
         ]);
+
+        if (absensiRes.error || talanganRes.error) throw absensiRes.error ?? talanganRes.error;
 
         // Default semua tidak hadir
         warga.forEach(w => { aMap[w.id] = 'tidak_hadir'; });
@@ -407,12 +417,27 @@ export default function JadwalWargaPage() {
           {/* Warga list */}
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {filteredWarga.length === 0 ? (
-              <EmptyState
-                icon={Search}
-                title="Tidak ditemukan"
-                subtitle="Coba kata kunci lain."
-                action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setWargaFilter('semua'); } }}
-              />
+              /* Kosong karena TAK ADA DATA ≠ kosong karena pencarian. Dulu layar
+                 ini selalu bilang "Tidak ditemukan · Coba kata kunci lain" +
+                 tombol "Reset filter" — padahal saat daftar anggota memang masih
+                 kosong (RT baru, atau bendahara belum menambah warga) tak ada
+                 kata kunci yang diketik dan tak ada filter yang bisa direset:
+                 diagnosis salah, perintah salah, tombolnya mati. Pola pembeda
+                 ini sudah dipakai Talangan, Riwayat, Beranda & Kelola Anggota. */
+              wargaList.length === 0 ? (
+                <EmptyState
+                  icon={Users}
+                  title="Belum ada anggota"
+                  subtitle="Daftar anggota muncul setelah bendahara menambahkan warga."
+                />
+              ) : (
+                <EmptyState
+                  icon={Search}
+                  title="Tidak ditemukan"
+                  subtitle="Coba kata kunci lain."
+                  action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setWargaFilter('semua'); } }}
+                />
+              )
             ) : (
               filteredWarga.map((w, idx) => {
                 const st = absensiMap[w.id];

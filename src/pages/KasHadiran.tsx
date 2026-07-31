@@ -230,6 +230,10 @@ export default function KasHadiranPage() {
   const saldo = hitungSaldoHadiran(totalKasTerkumpul, totalTalanganBelum, totalSetor);
   const animatedSaldo = useCountUp(saldo);
 
+  // Muat gagal DAN tak ada apa pun yang bisa ditampilkan (tanpa cache) — satu
+  // sumber untuk dua gerbang di bawah supaya ErrorState tak tampil dua kali.
+  const gagalTotal = error && transaksi.length === 0 && tarikanSelesai.length === 0;
+
   const today = new Date().toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric',
   });
@@ -498,6 +502,17 @@ export default function KasHadiranPage() {
           </>}
         />
 
+        {/* Muat GAGAL & belum ada data sama sekali → JANGAN render hero + Alur Kas.
+            Tanpa gerbang ini halaman menyatakan "Rp0", "0 tarikan terlaksana",
+            dan neraca "Total Bersih Rp0" berwarna hijau sehat — pernyataan
+            keliru tentang UANG, jenis kesalahan terburuk untuk app kas. Warga
+            bersinyal jelek melihatnya sebagai fakta. ErrorState-nya dulu ada,
+            tapi jauh di bawah layar (di seksi Rekap). Gerbang ini pola yang
+            sama dgn Kas RT baris ~499. */}
+        {gagalTotal ? (
+          <ErrorState onRetry={() => load()} retrying={loading} />
+        ) : (
+        <>
         {/* Header Card — di dalam CrossFade: sebelum data siap saldo=0 → hero
             berkedip "Rp0" (angka salah sesaat, bikin kaget). */}
         {/* Skeleton BERBENTUK hero (eyebrow + ikon aksi + nominal + chip) — bukan
@@ -619,6 +634,9 @@ export default function KasHadiranPage() {
             </div>
           </div>
         </div>
+
+        </>
+        )}
 
         {/* Rekap Per Tarikan */}
         {tarikanSelesai.length > 0 && (
@@ -833,7 +851,7 @@ export default function KasHadiranPage() {
             tanpa penjelasan (layar terbaca "kosong/rusak" di awal periode).
             Error load pertama (tanpa cache) juga tertangkap di sini — cabang
             ErrorState di atas hanya hidup bila sudah ada tarikan tampil. */}
-        {!loading && tarikanSelesai.length === 0 && (
+        {!loading && !gagalTotal && tarikanSelesai.length === 0 && (
           error ? (
             <ErrorState onRetry={() => load()} retrying={loading} />
           ) : (
