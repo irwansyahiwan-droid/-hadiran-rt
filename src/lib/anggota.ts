@@ -76,6 +76,15 @@ export interface RecomputeResult {
  * Tidak menyentuh baris absensi mana pun. Talangan diubah minimal-diff
  * (hanya tambah/hapus yang benar-benar berubah; status lunas dipertahankan).
  */
+/** Lempar bila hasil query/tulis Supabase membawa error. Supabase TIDAK melempar
+ *  sendiri: tanpa ini, tulisan yang gagal (koneksi putus, RLS menolak, constraint)
+ *  lewat begitu saja dan pemanggilnya tetap melapor "berhasil". Di jalur ini
+ *  akibatnya buku kas bergerak di layar tapi tidak di database. */
+function wajibSukses<T extends { error: unknown }>(res: T, langkah: string): T {
+  if (res.error) throw res.error instanceof Error ? res.error : new Error(`Gagal ${langkah}`);
+  return res;
+}
+
 export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResult> {
   // 1) Data tarikan (untuk Sohibul Bait, nomor, tanggal)
   const { data: tarikan, error: tErr } = await supabase
@@ -87,17 +96,19 @@ export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResu
   const sohibulId = tarikan.sohibul_bait_id ?? '';
 
   // 2) Anggota aktif
-  const { data: wargaRows } = await supabase
+  const wargaRes = wajibSukses(await supabase
     .from('warga')
     .select('id')
-    .eq('status_aktif', true);
+    .eq('status_aktif', true), 'membaca daftar anggota');
+  const wargaRows = wargaRes.data;
   const activeIds = (wargaRows ?? []).map((w) => w.id as string);
 
   // 3) Kehadiran (sumber kebenaran = absensi tersimpan di DB)
-  const { data: absRows } = await supabase
+  const absRes = wajibSukses(await supabase
     .from('absensi')
     .select('warga_id, status')
-    .eq('tarikan_id', tarikanId);
+    .eq('tarikan_id', tarikanId), 'membaca absensi');
+  const absRows = absRes.data;
   const statusMap: Record<string, AbsensiStatus> = {};
   (absRows ?? []).forEach((a) => {
     statusMap[a.warga_id as string] = a.status as AbsensiStatus;
@@ -115,22 +126,23 @@ export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResu
   const talanganSet = new Set(talanganIds);
 
   // 4) Talangan — MINIMAL DIFF (jaga history & status lunas yang asli)
-  const { data: existingTal } = await supabase
+  const talRes = wajibSukses(await supabase
     .from('talangan')
     .select('id, warga_id')
-    .eq('tarikan_id', tarikanId);
+    .eq('tarikan_id', tarikanId), 'membaca talangan');
+  const existingTal = talRes.data;
   const existingWarga = new Set((existingTal ?? []).map((t) => t.warga_id as string));
 
   // Hapus talangan warga yang kini hadir / bukan pembayar lagi
   const toRemove = (existingTal ?? [])
     .filter((t) => !talanganSet.has(t.warga_id as string))
     .map((t) => t.id as string);
-  if (toRemove.length) await supabase.from('talangan').delete().in('id', toRemove);
+  if (toRemove.length) wajibSukses(await supabase.from('talangan').delete().in('id', toRemove), 'menghapus talangan lama');
 
   // Tambah talangan untuk pembayar absen yang belum punya baris
   const toAdd = talanganIds.filter((id) => !existingWarga.has(id));
   if (toAdd.length)
-    await supabase.from('talangan').insert(
+    wajibSukses(await supabase.from('talangan').insert(
       toAdd.map((warga_id) => ({
         tarikan_id: tarikanId,
         warga_id,
@@ -138,37 +150,38 @@ export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResu
         status_lunas: false,
         tanggal_lunas: null,
       }))
-    );
+    ), 'menambah talangan');
 
   // 5) Kas Hadiran masuk — UPDATE bila ada (audit lebih bersih: nominal lama → baru)
   const keterangan = `Kas hadiran tarikan #${tarikan.nomor} (${pembayarCount} pembayar × Rp5.000)`;
-  const { data: kasRow } = await supabase
+  const kasRowRes = wajibSukses(await supabase
     .from('transaksi_kas')
     .select('id')
     .eq('tarikan_id', tarikanId)
     .eq('tipe', 'kas_masuk')
-    .maybeSingle();
+    .maybeSingle(), 'membaca kas masuk');
+  const kasRow = kasRowRes.data;
   if (kasRow) {
-    await supabase
+    wajibSukses(await supabase
       .from('transaksi_kas')
       .update({ nominal: kasTerkumpul, keterangan })
-      .eq('id', kasRow.id);
+      .eq('id', kasRow.id), 'memperbarui kas masuk');
   } else if (pembayarCount) {
-    await supabase.from('transaksi_kas').insert({
+    wajibSukses(await supabase.from('transaksi_kas').insert({
       tipe: 'kas_masuk',
       nominal: kasTerkumpul,
       keterangan,
       tanggal: tarikan.tanggal,
       tarikan_id: tarikanId,
       saldo_setelah: 0,
-    });
+    }), 'mencatat kas masuk');
   }
 
   // 6) Update ringkasan tarikan
-  await supabase
+  wajibSukses(await supabase
     .from('tarikan')
     .update({ status: 'selesai', total_hadir: hadirCount, total_terkumpul: kasTerkumpul })
-    .eq('id', tarikanId);
+    .eq('id', tarikanId), 'memperbarui ringkasan tarikan');
 
   return {
     nomor: tarikan.nomor as number,
@@ -195,12 +208,12 @@ export async function backfillAnggotaSusulan(
 ): Promise<SusulanResult> {
   let kasNaik = 0;
   for (const tarikanId of tarikanIds) {
-    await supabase
+    wajibSukses(await supabase
       .from('absensi')
       .upsert(
         { tarikan_id: tarikanId, warga_id: wargaId, status: 'hadir' },
         { onConflict: 'tarikan_id,warga_id' }
-      );
+      ), 'menandai hadir untuk anggota susulan');
     await recomputeTarikan(tarikanId);
     kasNaik += IURAN_KAS;
   }

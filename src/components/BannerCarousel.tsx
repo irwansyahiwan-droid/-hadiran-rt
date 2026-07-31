@@ -60,7 +60,7 @@ export function BannerSkeleton({ vh }: { vh: number }) {
           width: 'min(calc(100% - 44px), 326px)',
           height: cardHeight(vh),
           marginTop: TOP,
-          borderRadius: 30,
+          borderRadius: 'var(--hero-radius)',
           padding: 24,
           boxSizing: 'border-box',
         }}
@@ -572,7 +572,13 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
               className={`absolute left-1/2 overflow-hidden text-white${isSaldo ? ' hero-emerald' : ''}${isSaldo && heroSweep ? ' sheen-sweep' : ''}`}
               style={{
                 top: TOP, width: cardW, height: cardH, marginLeft: -cardW / 2,
-                borderRadius: 30, padding: 24, boxSizing: 'border-box', background: grad, color: '#fff',
+                /* --hero-radius (24px), BUKAN 30 tulis-tangan: hero saldo di
+                   Jadwal/Hadiran/Kas RT semuanya 24px, jadi kartu paling terlihat
+                   di app justru satu-satunya yang menyimpang — dan DESIGN.stitch
+                   §7 melarang radius kartu di atas 24px. Enam lapis kartu ini
+                   (kartu, dua scrim, ring dalam, songket, skeleton) HARUS memakai
+                   nilai yang sama; kalau salah satu tertinggal, sudutnya bertingkat. */
+                borderRadius: 'var(--hero-radius)', padding: 24, boxSizing: 'border-box', background: grad, color: '#fff',
                 transform: `translateX(${x}px) translateY(${ty}px) scale(${scale.toFixed(3)}) rotateY(${ry}deg)`,
                 opacity, zIndex: z, willChange: 'transform, opacity',
                 transition: dragging ? 'none' : `transform 0.62s ${EASE}, opacity 0.45s ease, box-shadow 0.45s ease`,
@@ -604,17 +610,17 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
 
               {/* Permukaan bersih & tegas: hanya hairline tepi tipis + scrim bawah ringan
                   agar teks legibel. Tanpa gloss/noise/vignette berat. */}
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.26), inset 0 1px 0 rgba(255,255,255,.36), inset 0 -1px 0 rgba(0,0,0,.18)' }} />
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to top, rgba(0,0,0,.28), rgba(0,0,0,0) 46%)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 'var(--hero-radius)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.26), inset 0 1px 0 rgba(255,255,255,.36), inset 0 -1px 0 rgba(0,0,0,.18)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 'var(--hero-radius)', background: 'linear-gradient(to top, rgba(0,0,0,.28), rgba(0,0,0,0) 46%)' }} />
               {/* Scrim ATAS — simetris dgn scrim bawah. Gradient stop teratas (mis.
                   saldo #2CC06E, target #2cb8a5) terlalu terang utk teks putih
                   (eyebrow 11px & desc 14px < 4.5:1). Scrim ini menarik kontras
                   eyebrow/judul/desc ke ≥4.5:1 tanpa mengubah warna brand gradient. */}
-              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 30, background: 'linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,0) 56%)' }} />
+              <div className="pointer-events-none absolute inset-0" style={{ borderRadius: 'var(--hero-radius)', background: 'linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,0) 56%)' }} />
 
               {/* Motif anyaman ketupat (songket) — identitas RT, HANYA kartu saldo.
                   Di bawah konten z-[3]; di-mask ke sudut kanan-atas → nominal kiri bersih. */}
-              {isSaldo && <div aria-hidden className="songket-weave pointer-events-none absolute inset-0" style={{ borderRadius: 30 }} />}
+              {isSaldo && <div aria-hidden className="songket-weave pointer-events-none absolute inset-0" style={{ borderRadius: 'var(--hero-radius)' }} />}
 
               {/* ---------- KONTEN ---------- */}
               {isSaldo ? (
