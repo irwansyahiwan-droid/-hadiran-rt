@@ -6,6 +6,7 @@ import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
 import { useScrolledPast } from '../../hooks/useScrollDirection';
 import Tag from '../Tag';
+import InfoTip from '../InfoTip';
 import type { Role } from '../../hooks/useAuth';
 
 interface HeaderProps {
@@ -149,9 +150,22 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Tag tone={isBendahara ? 'success' : 'info'} className="tracking-wide">
-            {isBendahara ? 'BENDAHARA' : 'WARGA'}
-          </Tag>
+          {/* Pil peran + penjelasannya. Banner "Mode Warga" di bawah bisa ditutup
+              PERMANEN (localStorage) — sebelum ini, sekali ditutup keterangan
+              "hanya bisa melihat" hilang selamanya dan tak ada tempat lain yang
+              menjelaskan kenapa tak ada tombol ubah. Pil peran selalu tampak,
+              jadi di sinilah keterangan itu seharusnya tinggal. */}
+          <span className="inline-flex items-center gap-1">
+            <Tag tone={isBendahara ? 'success' : 'info'} className="tracking-wide">
+              {isBendahara ? 'BENDAHARA' : 'WARGA'}
+            </Tag>
+            {!isBendahara && (
+              <InfoTip label="Mode Warga" align="right">
+                Anda masuk sebagai warga: semua data bisa dilihat, tapi tidak bisa diubah.
+                Untuk mencatat atau memperbaiki data, hubungi bendahara RT.
+              </InfoTip>
+            )}
+          </span>
 
           {/* Menu overflow — rapikan semua aksi ke sini agar judul tidak terdesak */}
           <div className="relative">
