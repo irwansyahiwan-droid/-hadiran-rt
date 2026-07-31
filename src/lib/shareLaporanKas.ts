@@ -1,4 +1,5 @@
 import { LOGO_DATA_URL } from './logoBase64';
+import { bagikanFileGambar } from './shareReceipt';
 
 /**
  * Data satu kartu laporan kas (dipakai untuk "Tutup Buku Sekarang" maupun
@@ -202,23 +203,6 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob gagal'))), 'image/png'),
   );
   const file = new File([blob], 'laporan-kas-hadiran-rt.png', { type: 'image/png' });
-
-  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-  if (nav.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], text: d.shareText, title: 'Hadiran RT' });
-      return;
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return; // user batal
-    }
-  }
-
-  // Fallback: unduh PNG + buka WhatsApp dengan teks
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'laporan-kas-hadiran-rt.png';
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
-  window.open(`https://wa.me/?text=${encodeURIComponent(d.shareText)}`, '_blank');
+  // Satu jalur share utk semua kartu PNG (files-only — lihat bagikanFileGambar).
+  await bagikanFileGambar(file, d.shareText);
 }

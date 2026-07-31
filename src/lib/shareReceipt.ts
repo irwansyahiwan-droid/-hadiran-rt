@@ -28,6 +28,103 @@ export interface ReceiptData {
   shareText: string;    // teks pendamping saat share
 }
 
+/** Geometri kartu struk — MURNI (tanpa canvas/DOM) supaya bisa diuji.
+ *
+ *  Kalau tinggi ini salah, isi struk terpotong atau mengambang di PNG yang
+ *  dibagikan bendahara ke grup WA — dan tak ada yang menyadarinya sampai sudah
+ *  tersebar. Konstanta di sini adalah SATU SUMBER: `shareReceipt()` menggambar
+ *  memakai nilai yang dikembalikan fungsi ini, bukan angka tulis-tangan.
+ */
+export const STRUK = {
+  W: 380,
+  rowsCardTop: 250,
+  H_SECTION: 34,
+  H_DETAIL: 32,
+  H_TOTAL: 46,
+  LIST_GAP: 14,
+  LIST_TOP_PAD: 18,
+  LIST_HEAD_H: 22,
+  LIST_ITEM_H: 24,
+  LIST_BOT_PAD: 14,
+  FOOTER: 52,
+} as const;
+
+export interface GeometriStruk {
+  /** true = ada baris ber-`kind` → mode berseksi. */
+  hasGroups: boolean;
+  rowsCardH: number;
+  listCardTop: number;
+  listCardH: number;
+  /** Tinggi total kanvas. */
+  H: number;
+}
+
+export function hitungGeometriStruk(data: Pick<ReceiptData, 'rows' | 'list'>): GeometriStruk {
+  const {
+    rowsCardTop, H_SECTION, H_DETAIL, H_TOTAL,
+    LIST_GAP, LIST_TOP_PAD, LIST_HEAD_H, LIST_ITEM_H, LIST_BOT_PAD, FOOTER,
+  } = STRUK;
+
+  // Mode BERSEKSI aktif hanya bila ada baris ber-`kind` (kartu Kas RT dgn
+  // rincian kategori). Tanpa itu → geometri lama PERSIS, supaya struk
+  // Jadwal/Kas Hadiran tidak ikut berubah. Sifat opt-in ini dikunci uji.
+  const hasGroups = data.rows.some((r) => r.kind);
+  const rowH = (r: ReceiptRow) =>
+    r.kind === 'section' ? H_SECTION : r.kind === 'total' ? H_TOTAL : H_DETAIL;
+  const rowsCardH = hasGroups
+    ? data.rows.reduce((s, r) => s + rowH(r), 0) + 24
+    : 36 * data.rows.length + 16;
+
+  let contentBottom = rowsCardTop + rowsCardH;
+  const items = data.list?.items ?? [];
+  let listCardTop = 0, listCardH = 0;
+  if (items.length) {
+    listCardTop = contentBottom + LIST_GAP;
+    listCardH = LIST_TOP_PAD + LIST_HEAD_H + items.length * LIST_ITEM_H + LIST_BOT_PAD;
+    contentBottom = listCardTop + listCardH;
+  }
+  return { hasGroups, rowsCardH, listCardTop, listCardH, H: contentBottom + FOOTER };
+}
+
+/** Bentuk minimal `navigator` yang dipakai saat membagikan — supaya bisa diuji. */
+export interface NavBagikan {
+  canShare?: (d: { files?: File[] }) => boolean;
+  share?: (d: { files?: File[]; text?: string; title?: string }) => Promise<void>;
+}
+
+/**
+ * Bagikan file gambar. Web Share API dulu; gagal/tak didukung → unduh + buka WA.
+ *
+ * WAJIB files-only: WhatsApp MENOLAK share yang mencampur file dengan
+ * `title`/`text` — sharenya "mental balik" tanpa lampiran, jadi bendahara
+ * mengira kartunya terkirim padahal grup cuma menerima teks. Aturan yang sama
+ * sudah dipakai `pdfOut.ts`; dua pembuat kartu PNG (struk & laporan kas) dulu
+ * masih menyertakan title/text. Nama file sudah deskriptif sebagai gantinya.
+ * Teks pendamping tetap dipakai di jalur fallback wa.me.
+ */
+export async function bagikanFileGambar(
+  file: File,
+  shareText: string,
+  nav: NavBagikan = navigator as NavBagikan,
+): Promise<'share' | 'batal' | 'fallback'> {
+  if (nav.canShare?.({ files: [file] }) && nav.share) {
+    try {
+      await nav.share({ files: [file] });
+      return 'share';
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') return 'batal'; // user batal
+    }
+  }
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  return 'fallback';
+}
+
 const rupiahFont = "'Inter Variable', Inter, system-ui, -apple-system, sans-serif";
 // Nominal & brand memakai Sora (font-display app) → struk share = suara visual
 // yang sama dgn hero in-app, bukan Inter polos.
@@ -68,29 +165,12 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   // jatuh ke font sistem (struk terlihat "bukan app kita").
   try { await document.fonts.ready; } catch { /* lanjut dgn fallback */ }
 
-  // Tinggi dinamis: baris detail + (opsional) kartu daftar nama + footer.
-  const rowsCardTop = 250;
-  // Mode BERSEKSI aktif hanya bila ada baris ber-`kind` (kartu Kas RT dgn
-  // rincian kategori). Tanpa itu → geometri & tipografi lama persis, supaya
-  // struk Jadwal/Kas Hadiran tidak ikut berubah.
-  const hasGroups = data.rows.some((r) => r.kind);
-  const H_SECTION = 34, H_DETAIL = 32, H_TOTAL = 46;
+  // Geometri dari satu sumber murni (teruji) — bukan hitungan tulis-tangan.
+  const { hasGroups, rowsCardH, listCardTop, listCardH, H } = hitungGeometriStruk(data);
+  const { rowsCardTop, H_SECTION, H_DETAIL, H_TOTAL, LIST_TOP_PAD, LIST_HEAD_H, LIST_ITEM_H } = STRUK;
   const rowH = (r: ReceiptRow) =>
     r.kind === 'section' ? H_SECTION : r.kind === 'total' ? H_TOTAL : H_DETAIL;
-  const rowsCardH = hasGroups
-    ? data.rows.reduce((s, r) => s + rowH(r), 0) + 24
-    : 36 * data.rows.length + 16;
-  let contentBottom = rowsCardTop + rowsCardH;
-
   const items = data.list?.items ?? [];
-  const LIST_GAP = 14, LIST_TOP_PAD = 18, LIST_HEAD_H = 22, LIST_ITEM_H = 24, LIST_BOT_PAD = 14;
-  let listCardTop = 0, listCardH = 0;
-  if (items.length) {
-    listCardTop = contentBottom + LIST_GAP;
-    listCardH = LIST_TOP_PAD + LIST_HEAD_H + items.length * LIST_ITEM_H + LIST_BOT_PAD;
-    contentBottom = listCardTop + listCardH;
-  }
-  const H = contentBottom + 52; // ruang footer
 
   const scale = Math.min(3, window.devicePixelRatio || 2) * 1.5;
   const canvas = document.createElement('canvas');
@@ -288,24 +368,5 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob gagal'))), 'image/png')
   );
   const file = new File([blob], 'hadiran-rt.png', { type: 'image/png' });
-
-  // Web Share API dengan file (Android/iOS modern → bisa pilih WhatsApp)
-  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-  if (nav.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], text: data.shareText, title: 'Hadiran RT' });
-      return;
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return; // user batal
-    }
-  }
-
-  // Fallback: unduh gambar + buka WhatsApp dengan teks
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'hadiran-rt.png';
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
-  window.open(`https://wa.me/?text=${encodeURIComponent(data.shareText)}`, '_blank');
+  await bagikanFileGambar(file, data.shareText);
 }
