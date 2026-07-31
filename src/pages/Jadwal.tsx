@@ -17,6 +17,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { ringkasAbsensi } from '../lib/absensiHitung';
+import { simpanTarikanSelesai } from '../lib/simpanTarikan';
 import { hitungUlangNomorJadwal } from '../lib/jadwalNomor';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -166,87 +167,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   async function simpan() {
     setSaving(true);
     try {
-      const tarikanId = tarikan.id;
-      const hadirIds  = pembayarList.filter(w => map[w.id] === 'hadir').map(w => w.id); // total_hadir = pembayar hadir (Sohibul di luar akuntansi)
-
-      // Semua hitungan uang & talangan dari satu sumber teruji → layar, PDF,
-      // dan data tersimpan tak pernah beda rumus.
-      const r = ringkasAbsensi(wargaList, map, sohibulId);
-      const { pembayarCount, kasTotal: kasTerkumpul, talanganIds } = r;
-
-      // Rantai tulis uang 4 tabel — Supabase TIDAK melempar saat gagal, jadi
-      // TIAP langkah wajib cek error + throw; tanpa ini catch/toast di bawah
-      // tak pernah tercapai & koneksi putus di tengah = data setengah tertulis
-      // dengan layar sukses. (Fix penuh = RPC atomik spt batalkan_tarikan.)
-      // Simpan status lunas yang sudah ada sebelum menghapus (agar tidak ter-reset saat Hitung Ulang)
-      const { data: existingLunas, error: eLunas } = await supabase
-        .from('talangan')
-        .select('warga_id, tanggal_lunas')
-        .eq('tarikan_id', tarikanId)
-        .eq('status_lunas', true);
-      if (eLunas) throw eLunas;
-      const lunasMap = new Map<string, string | null>(
-        (existingLunas ?? []).map(t => [t.warga_id, t.tanggal_lunas as string | null])
-      );
-
-      const eDelAbs = (await supabase.from('absensi').delete().eq('tarikan_id', tarikanId)).error;
-      if (eDelAbs) throw eDelAbs;
-
-      // Simpan status apa adanya (hadir / titip / tidak_hadir) untuk SEMUA anggota.
-      const absensiRows = wargaList.map(w => ({
-        tarikan_id: tarikanId,
-        warga_id: w.id,
-        status: map[w.id] ?? 'tidak_hadir',
-      }));
-      if (absensiRows.length) {
-        const { error } = await supabase.from('absensi').insert(absensiRows);
-        if (error) throw error;
-      }
-
-      const eDelTal = (await supabase.from('talangan').delete().eq('tarikan_id', tarikanId)).error;
-      if (eDelTal) throw eDelTal;
-      if (talanganIds.length) {
-        const { error } = await supabase.from('talangan').insert(talanganIds.map(warga_id => ({
-          tarikan_id: tarikanId,
-          warga_id,
-          nominal: 50000,
-          status_lunas: lunasMap.has(warga_id),
-          tanggal_lunas: lunasMap.get(warga_id) ?? null,
-        })));
-        if (error) throw error;
-      }
-
-      const eDelTx = (await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk')).error;
-      if (eDelTx) throw eDelTx;
-      if (pembayarCount) {
-        const { error } = await supabase.from('transaksi_kas').insert({
-          tipe: 'kas_masuk',
-          nominal: kasTerkumpul,
-          keterangan: `Kas hadiran tarikan #${tarikan.nomor} (${pembayarCount} pembayar × Rp5.000)`,
-          tanggal: tarikan.tanggal,
-          tarikan_id: tarikanId,
-          saldo_setelah: 0,
-        });
-        if (error) throw error;
-      }
-
-      const eUpd = (await supabase.from('tarikan').update({
-        status: 'selesai',
-        total_hadir: hadirIds.length,
-        total_terkumpul: kasTerkumpul,
-      }).eq('id', tarikanId)).error;
-      if (eUpd) throw eUpd;
-
-      onSaved({
-        tarikanNomor: tarikan.nomor,
-        hadirCount: r.hadirCount,
-        titipCount: r.titipCount,
-        tidakCount: r.talanganCount, // yang kena talangan
-        kasTotal: r.kasTotal,
-        talanganTotal: r.talanganTotal,
-        sohibulBaitTerima: r.sohibulBaitTerima,
-        tidakHadirNama: r.tidakHadirNama, // nama pembayar 'tidak_hadir' (hadir & titip bebas)
-      });
+      // Rantai tulis 4 tabel + aturan "status lunas tak boleh ter-reset" kini
+      // tinggal di src/lib/simpanTarikan.ts supaya bisa diuji tanpa merender
+      // React — lihat simpanTarikan.test.ts. Perilakunya sama persis.
+      onSaved(await simpanTarikanSelesai(tarikan, wargaList, map, sohibulId));
     } catch {
       // Penyimpanan gagal (mis. koneksi putus) → JANGAN diam: beri tahu & tahan
       // di layar absensi supaya bendahara bisa tekan "Simpan & Hitung" lagi.
