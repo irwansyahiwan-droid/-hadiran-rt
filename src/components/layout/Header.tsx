@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, X, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, X, WifiOff, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
 import { useScrolledPast } from '../../hooks/useScrollDirection';
+import { useOnline } from '../../hooks/useOnline';
 import Tag from '../Tag';
 import InfoTip from '../InfoTip';
 import type { Role } from '../../hooks/useAuth';
@@ -27,6 +28,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   // Header menyusut + shadow/blur menguat saat halaman tergeser >6px dari puncak.
   // Listener scroll dibagi pakai (lihat hook).
   const scrolled = useScrolledPast(6);
+  const online = useOnline();
   const [menuOpen, setMenuOpen] = useState(false);
   // Banner "Mode Warga" bisa ditutup permanen — pendatang baru tetap lihat,
   // pengguna lama bebas hilangkan agar konten dapat ruang. Disimpan di localStorage.
@@ -224,6 +226,25 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           </div>
         </div>
       </div>
+      {/* Strip LURING — hanya ada saat perangkat benar-benar terputus, jadi nol
+          biaya ruang ketika online. Kenapa perlu: app ini merender dari snapshot
+          (pola SWR pageCache), sehingga tanpa sinyal layar tetap menampilkan
+          nominal LAMA yang terlihat persis seperti data terkini — terukur 31 Jul:
+          Rp4.485.000 tampil sama saja offline maupun online, tanpa satu pun tanda.
+          Untuk app kas, angka yang mungkin basi wajib mengaku. Tidak bisa
+          ditutup: begitu sinyal kembali, strip ini hilang sendiri. */}
+      {!online && (
+        <div
+          role="status"
+          className="border-t border-amber-200/70 bg-amber-50 px-5 py-1.5 dark:border-amber-800/40 dark:bg-amber-900/25"
+        >
+          <p className="mx-auto flex max-w-lg items-center justify-center gap-1.5 text-center text-micro font-semibold text-warn dark:text-amber-300">
+            <WifiOff className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            Tanpa sinyal — angka yang tampil salinan terakhir
+          </p>
+        </div>
+      )}
+
       {!isBendahara && !bannerDismissed && (
         <div
           className="border-t border-line bg-gray-50 overflow-hidden px-5 dark:bg-gray-800/60 dark:border-gray-800 transition-[max-height,opacity] duration-300"

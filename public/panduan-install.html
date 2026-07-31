@@ -10,7 +10,12 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     background: #E8ECF2;
     color: #0F172A;
-    width: 560px;
+    /* 560px itu lebar POSTER (buat di-screenshot & dibagikan), tapi halaman ini
+       ditautkan dari landing & Warta sebagai "Lihat panduan" — warga membukanya
+       DI HP. Lebar mati 560 membuatnya bisa digeser ke samping 200px di layar
+       360px. min() menjaga tampilan poster di layar lebar sekaligus muat di HP. */
+    width: min(560px, 100%);
+    margin-inline: auto;
   }
   .poster { padding: 26px 24px 30px; }
   .header {

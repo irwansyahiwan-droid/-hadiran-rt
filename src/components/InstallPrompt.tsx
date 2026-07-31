@@ -85,7 +85,9 @@ export default function InstallPrompt() {
           </div>
           <button
             onClick={isIos ? () => setShowGuide(true) : install}
-            className="press shrink-0 inline-flex items-center gap-1.5 bg-brand text-white text-xs font-bold px-3 py-2 rounded-xl"
+            /* min-h 44: aksi UTAMA banner ini sempat 32px tinggi — di bawah
+               kontrak 44px yang dipatuhi seluruh app (lihat FilterChips). */
+            className="press shrink-0 inline-flex min-h-[44px] items-center gap-1.5 bg-brand text-white text-xs font-bold px-3.5 py-2 rounded-xl"
           >
             <Download className="w-3.5 h-3.5" />
             Pasang
