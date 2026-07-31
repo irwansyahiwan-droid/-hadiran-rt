@@ -25,6 +25,12 @@ import SectionTitle from '../components/SectionTitle';
 
 type SubTab = 'anggota' | 'jadwal';
 
+/** Dua sub-tab + ikonnya — dipakai tombol tablist DAN navigasi panah. */
+const SUB_TABS = [
+  ['anggota', 'Daftar Anggota', Users],
+  ['jadwal', 'Jadwal Hadiran', CalendarDays],
+] as const;
+
 // Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
 // (min-height), pola HERO_MIN_H KasHadiran/KasRT/Talangan. Nama Sohibul Bait
 // panjang & chip "Titip" kondisional menambah tinggi natural — itu data-driven,
@@ -351,15 +357,29 @@ export default function JadwalWargaPage() {
             transitionTimingFunction: 'var(--ease-spring)',
           }}
         />
-        {([
-          ['anggota', 'Daftar Anggota', Users],
-          ['jadwal', 'Jadwal Hadiran', CalendarDays],
-        ] as const).map(([id, label, Icon]) => (
+        {(SUB_TABS).map(([id, label, Icon], i) => (
           <button
             key={id}
             role="tab"
-            onClick={() => { if (subTab !== id) haptic(); setSubTab(id); }}
+            id={`subtab-${id}`}
             aria-selected={subTab === id}
+            aria-controls={`panel-${id}`}
+            /* Roving tabindex: hanya tab TERPILIH yang masuk urutan Tab —
+               syarat pola tabs WAI-ARIA. Tanpa ini pembaca layar mengumumkan
+               "tab 1 dari 2" (janji navigasi panah) padahal panah tak berfungsi
+               dan Tab malah menyapu keduanya. */
+            tabIndex={subTab === id ? 0 : -1}
+            onClick={() => { if (subTab !== id) haptic(); setSubTab(id); }}
+            onKeyDown={(e) => {
+              const arah = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+              if (!arah) return;
+              e.preventDefault();
+              const next = SUB_TABS[(i + arah + SUB_TABS.length) % SUB_TABS.length][0];
+              haptic();
+              setSubTab(next);
+              // Fokus ikut pindah (aktivasi otomatis — hanya 2 panel, ringan).
+              document.getElementById(`subtab-${next}`)?.focus();
+            }}
             className={`press relative z-10 flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-semibold transition-colors inline-flex items-center justify-center gap-1.5 ${
               subTab === id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
             }`}
@@ -371,7 +391,7 @@ export default function JadwalWargaPage() {
 
       {/* Sub-tab: Daftar Anggota */}
       {subTab === 'anggota' && (
-        <div className="space-y-3">
+        <div className="space-y-3" role="tabpanel" id="panel-anggota" aria-labelledby="subtab-anggota">
           {/* Stat bar — StatRow bersama (satu kartu berkolom, sama dgn Beranda/Jadwal) */}
           <StatRow
             items={[
@@ -484,7 +504,7 @@ export default function JadwalWargaPage() {
 
       {/* Sub-tab: Jadwal Hadiran */}
       {subTab === 'jadwal' && (
-        <div className="space-y-3">
+        <div className="space-y-3" role="tabpanel" id="panel-jadwal" aria-labelledby="subtab-jadwal">
           {/* Header with PDF button */}
           <SectionTitle
             action={
