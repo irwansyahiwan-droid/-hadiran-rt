@@ -26,3 +26,6 @@ dist-ssr
 .env.local
 .vercel
 .env*
+
+# Keluaran sapuan audit (screenshot) — lokal saja
+.audit-*/

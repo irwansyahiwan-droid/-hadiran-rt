@@ -9,7 +9,15 @@
     "lint": "eslint .",
     "test": "vitest run",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "periksa": "npm run typecheck && npm run lint && npm run test",
+    "audit:keadaan": "CAP_URL=http://localhost:5199 node scripts/audit-keadaan.mjs",
+    "audit:sheet": "CAP_URL=http://localhost:5199 node scripts/audit-sheet-geometri.mjs",
+    "audit:publik": "CAP_URL=http://localhost:5199 node scripts/audit-publik.mjs",
+    "audit:kontras": "CAP_URL=http://localhost:5199 node scripts/audit-kontras.mjs",
+    "audit:lebar": "CAP_URL=http://localhost:5199 node scripts/audit-lebar-nominal.mjs",
+    "audit:muat": "APP_URL=http://localhost:5199 node scripts/audit-muat.mjs",
+    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

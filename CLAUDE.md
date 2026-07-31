@@ -44,3 +44,33 @@ Aplikasi manajemen arisan & kas RT (RT 004/006).
 ### Kas RT
 - Sebagian setoran masuk ke Kas Besar RT
 - Kas RT terpisah dari Kas Hadiran 1
+## Alat Audit
+
+Sebelum commit — cepat, tanpa browser:
+
+```
+npm run periksa      # typecheck + lint + 80 test
+```
+
+Sapuan browser (butuh build produksi hidup: `npm run build && npx vite preview --port 5199`):
+
+```
+npm run audit        # keadaan + sheet + publik (44 pemeriksaan)
+```
+
+| Perintah | Yang diperiksa | Kenapa ada |
+|---|---|---|
+| `audit:keadaan` | Layar saat data KOSONG & saat muat GAGAL (warga + bendahara + overlay) | Semua audit lain jalan lawan DB penuh, jadi EmptyState/ErrorState tak pernah dirender. **App kas dilarang menyatakan nominal saat gagal muat.** |
+| `audit:sheet` | Geometri sheet/modal/popover di 360px | Form di dalam bottom-sheet tak pernah diukur; kontrol bisa meluber keluar panel |
+| `audit:publik` | landing / warta / nobar / panduan-install, light+dark | HTML statis di `public/` tak tersentuh audit app, padahal wajah pertama |
+| `audit:kontras` | Kontras piksel-nyata (sampel screenshot) | Token tak bisa dipercaya; warna final = hasil blend |
+| `audit:lebar` | Nominal "Rp" terpotong/meluber di 360px | `<span>` inline punya clientWidth 0 → scrollWidth buta |
+| `audit:muat` | FCP & siap-pakai (CPU 4× lambat, 400 kbps) | Warga pakai Android kelas bawah, sinyal seadanya |
+
+**Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
+bukan kodenya. Sudah terjadi 4×: sampel kena border 1px, aturan dialog dikenakan ke halaman
+penuh, probe mengambil dialog di belakang sheet, dan `.sr-only` terbaca "terpotong".
+
+**Jebakan Supabase yang berulang:** `.select()` TIDAK melempar saat gagal — ia mengembalikan
+`{data: null, error}`. Tiap `?? []` tanpa cek `res.error` mengubah kegagalan jadi "tidak ada
+data". Cek di halaman TIDAK cukup; helper di `src/lib/` juga wajib melempar.
