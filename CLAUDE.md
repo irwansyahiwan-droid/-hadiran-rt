@@ -69,11 +69,16 @@ npm run audit        # keadaan + sheet + publik + masuk (49 pemeriksaan)
 | `audit:masuk` | Gerbang masuk & keluar saat jaringan busuk (chunk gagal, request menggantung, logout luring) | Semua audit lain menguji layar SESUDAH masuk. **Tombol "Masuk" yang terkunci tak menyisakan jalan lain sama sekali**, dan kegagalan jaringan yang dilaporkan sebagai "password salah" bikin bendahara mengganti sandi yang sudah benar |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
-bukan kodenya. Sudah terjadi 6×: sampel kena border 1px, aturan dialog dikenakan ke halaman
+bukan kodenya. Sudah terjadi 7×: sampel kena border 1px, aturan dialog dikenakan ke halaman
 penuh, probe mengambil dialog di belakang sheet, `.sr-only` terbaca "terpotong", pola rute
 `supabase-*.js` meleset dari nama asli `vendor-supabase-*.js` (sapuan diam-diam menguji jalur
-ONLINE lalu "lolos"), dan klik ditolak karena panel collapse masih beranimasi. Karena itu tiap
-gangguan jaringan di `audit-masuk.mjs` menghitung berapa kali benar-benar terpasang.
+ONLINE lalu "lolos"), klik ditolak karena panel collapse masih beranimasi, dan klik pembuka
+panel mendarat SEBELUM hidrasi lalu tak berbuat apa-apa. Karena itu tiap gangguan jaringan di
+`audit-masuk.mjs` menghitung berapa kali benar-benar terpasang, dan tiap prasyarat UI ditunggu
+sampai MENGAKU tercapai (`aria-expanded="true"`), bukan diasumsikan dari satu klik.
+
+**Sapuan wajib diarahkan ke produksi sekali sebelum dianggap benar** (`CAP_URL=https://hadiran-rt.vercel.app`):
+localhost instan menyembunyikan seluruh kelas bug balapan-hidrasi.
 
 **Jebakan auth:** `fetch` yang MENGGANTUNG tidak pernah reject sendiri. `await` telanjang di
 jalur auth = spinner abadi; semua panggilan auth wajib lewat `batasWaktu()` di

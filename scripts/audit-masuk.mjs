@@ -78,10 +78,23 @@ async function ujiMasuk(nama, pasang, harap) {
   const page = await ctx.newPage();
   await page.goto(URL_APP, { waitUntil: 'domcontentloaded' });
 
-  await page.getByRole('button', { name: /bendahara/i }).first().click();
-  // Panel bendahara membuka dengan transisi tinggi — tanpa jeda, Playwright
-  // menolak klik ("element is not stable") dan sapuan mati sebelum menguji apa pun.
-  await page.waitForTimeout(700);
+  // Panel bendahara adalah collapse ber-`inert`. Dua jebakan berbeda:
+  //   - transisi tinggi → Playwright menolak klik ("element is not stable");
+  //   - di jaringan NYATA, klik yang mendarat sebelum hidrasi tidak berbuat
+  //     apa-apa, panel tetap tertutup + inert, dan klik "Masuk" ditolak
+  //     selamanya sampai timeout. Localhost menyembunyikan ini karena instan.
+  // Jadi jangan percaya satu klik — tunggu panel MENGAKU terbuka.
+  const toggle = page.getByRole('button', { name: /bendahara/i }).first();
+  await toggle.waitFor({ state: 'visible' });
+  for (let i = 0; i < 12 && (await toggle.getAttribute('aria-expanded')) !== 'true'; i++) {
+    await toggle.click({ timeout: 5000 }).catch(() => {});
+    await page.waitForTimeout(600);
+  }
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+    lapor(`masuk/${nama}`, ['PROBE CACAT: panel bendahara tak pernah terbuka — tak ada yang diuji']);
+    await ctx.close();
+    return;
+  }
   await page.locator('#login-email').fill('bendahara@rt.test');
   await page.locator('#login-password').fill('sandi-benar-banget');
 
