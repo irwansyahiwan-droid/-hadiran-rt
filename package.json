@@ -17,7 +17,8 @@
     "audit:kontras": "CAP_URL=http://localhost:5199 node scripts/audit-kontras.mjs",
     "audit:lebar": "CAP_URL=http://localhost:5199 node scripts/audit-lebar-nominal.mjs",
     "audit:muat": "APP_URL=http://localhost:5199 node scripts/audit-muat.mjs",
-    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik"
+    "audit:masuk": "CAP_URL=http://localhost:5199 node scripts/audit-masuk.mjs",
+    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

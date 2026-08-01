@@ -49,13 +49,13 @@ Aplikasi manajemen arisan & kas RT (RT 004/006).
 Sebelum commit — cepat, tanpa browser:
 
 ```
-npm run periksa      # typecheck + lint + 80 test
+npm run periksa      # typecheck + lint + 95 test
 ```
 
 Sapuan browser (butuh build produksi hidup: `npm run build && npx vite preview --port 5199`):
 
 ```
-npm run audit        # keadaan + sheet + publik (44 pemeriksaan)
+npm run audit        # keadaan + sheet + publik + masuk (49 pemeriksaan)
 ```
 
 | Perintah | Yang diperiksa | Kenapa ada |
@@ -66,10 +66,18 @@ npm run audit        # keadaan + sheet + publik (44 pemeriksaan)
 | `audit:kontras` | Kontras piksel-nyata (sampel screenshot) | Token tak bisa dipercaya; warna final = hasil blend |
 | `audit:lebar` | Nominal "Rp" terpotong/meluber di 360px | `<span>` inline punya clientWidth 0 → scrollWidth buta |
 | `audit:muat` | FCP & siap-pakai (CPU 4× lambat, 400 kbps) | Warga pakai Android kelas bawah, sinyal seadanya |
+| `audit:masuk` | Gerbang masuk & keluar saat jaringan busuk (chunk gagal, request menggantung, logout luring) | Semua audit lain menguji layar SESUDAH masuk. **Tombol "Masuk" yang terkunci tak menyisakan jalan lain sama sekali**, dan kegagalan jaringan yang dilaporkan sebagai "password salah" bikin bendahara mengganti sandi yang sudah benar |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
-bukan kodenya. Sudah terjadi 4×: sampel kena border 1px, aturan dialog dikenakan ke halaman
-penuh, probe mengambil dialog di belakang sheet, dan `.sr-only` terbaca "terpotong".
+bukan kodenya. Sudah terjadi 6×: sampel kena border 1px, aturan dialog dikenakan ke halaman
+penuh, probe mengambil dialog di belakang sheet, `.sr-only` terbaca "terpotong", pola rute
+`supabase-*.js` meleset dari nama asli `vendor-supabase-*.js` (sapuan diam-diam menguji jalur
+ONLINE lalu "lolos"), dan klik ditolak karena panel collapse masih beranimasi. Karena itu tiap
+gangguan jaringan di `audit-masuk.mjs` menghitung berapa kali benar-benar terpasang.
+
+**Jebakan auth:** `fetch` yang MENGGANTUNG tidak pernah reject sendiri. `await` telanjang di
+jalur auth = spinner abadi; semua panggilan auth wajib lewat `batasWaktu()` di
+`src/lib/authSesi.ts`, dan "Keluar" wajib membuang sesi lokal tanpa syarat.
 
 **Jebakan Supabase yang berulang:** `.select()` TIDAK melempar saat gagal — ia mengembalikan
 `{data: null, error}`. Tiap `?? []` tanpa cek `res.error` mengubah kegagalan jadi "tidak ada
