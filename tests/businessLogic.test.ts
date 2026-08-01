@@ -83,7 +83,10 @@ const h = vi.hoisted(() => {
 vi.mock('../src/lib/supabase', () => ({ supabase: h.supabase }));
 
 // Impor KODE ASLI (utils memakai supabase yang sudah di-mock di atas)
-import { fetchDashboardSummary, formatRupiah, formatRupiahPlain } from '../src/lib/utils';
+import { formatRupiah, formatRupiahPlain } from '../src/lib/utils';
+// fetchDashboardSummary pindah ke lib/dashboard (31 Jul) supaya klien Supabase
+// tak lagi terseret ke jalur kritis boot lewat lib/utils yang dipakai Login.
+import { fetchDashboardSummary } from '../src/lib/dashboard';
 import { ringkasAbsensi } from '../src/lib/absensiHitung';
 import type { AbsensiStatus, Warga } from '../src/lib/types';
 

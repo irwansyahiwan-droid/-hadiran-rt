@@ -50,9 +50,24 @@ export default defineConfig({
         // berubah, jadi saat deploy ulang warga yang sudah pernah buka memakai
         // ulang cache vendor (repeat-load PWA lebih ringan). Lib berat lain
         // (jspdf/exceljs/html2canvas) tetap lazy lewat dynamic import.
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-supabase': ['@supabase/supabase-js'],
+        /* Bentuk FUNGSI, bukan objek. Dgn bentuk objek, Rollup menaruh helper
+           `__vitePreload` (modul virtual milik Vite) ke dalam chunk
+           `vendor-supabase` — dan karena entry meng-import helper itu SECARA
+           STATIS, seluruh 34 KB klien Supabase ikut terseret ke jalur kritis
+           boot walaupun kodenya sudah dipanggil lewat `import()` dinamis.
+           Terukur 400 kbps/CPU 4×: chunk itu selesai di 3369 ms dari 4138 ms
+           sampai kolom sandi bisa dipakai. Bentuk fungsi hanya memindahkan
+           paket node_modules yang disebut, sehingga modul virtual tetap di
+           entry dan Supabase benar-benar jadi lazy. */
+        manualChunks(id) {
+          /* Helper `__vitePreload` (modul VIRTUAL Vite) dipakai entry secara
+             STATIS. Kalau Rollup membiarkannya menumpang di chunk lain, chunk
+             itu ikut jadi wajib-boot. Dipaksa ke vendor-react — satu-satunya
+             vendor yang memang dibutuhkan sejak paint pertama. */
+          if (id.includes('preload-helper')) return 'vendor-react';
+          if (id.includes('/node_modules/@supabase/')) return 'vendor-supabase';
+          if (/\/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor-react';
+          return undefined;
         },
       },
     },
