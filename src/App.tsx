@@ -102,6 +102,30 @@ export default function App() {
     return () => { cancelAnimationFrame(raf); clearTimeout(t1); clearTimeout(t2); };
   }, [activeTab]);
 
+  /* Pra-unduh isi app SELAGI warga mengetik sandi.
+     Diukur 31 Jul di 400 kbps/latensi 400 ms: sesudah tombol Masuk ditekan,
+     cangkang app muncul dalam ±0,5 detik tapi ANGKA baru tampil di ±4,3 detik —
+     karena chunk Beranda, klien Supabase, dan belasan chunk ikon baru mulai
+     diunduh saat itu juga. Padahal antara layar Login tercat dan tombol ditekan
+     ada beberapa detik mengetik: bandwidth yang menganggur.
+
+     Dijalankan saat idle supaya tak berebut dgn render Login, dan dilewati bila
+     pengguna menyalakan mode hemat data (`saveData`) — di sana unduhan spekulatif
+     justru merugikan. Kegagalan diabaikan: ini murni percepatan, bukan syarat. */
+  useEffect(() => {
+    if (auth.loading || auth.user || wargaMode) return; // hanya saat MENUNGGU di layar Login
+    const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
+    if (nav.connection?.saveData) return;
+    const jalan = () => {
+      import('./pages/Beranda').catch(() => {});
+      import('./lib/supabase').catch(() => {});
+    };
+    const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    if (ric) { const id = ric(jalan, { timeout: 2500 }); return () => (window as unknown as { cancelIdleCallback?: (i: number) => void }).cancelIdleCallback?.(id); }
+    const t = setTimeout(jalan, 1200);
+    return () => clearTimeout(t);
+  }, [auth.loading, auth.user, wargaMode]);
+
   // Fade + hapus splash pra-React (#app-splash di index.html) begitu sesi auth
   // siap. Satu frame ditahan agar shell app ter-commit dulu → serah-terima
   // splash → konten mulus tanpa kedip kanvas. Fallback timer menjamin terhapus

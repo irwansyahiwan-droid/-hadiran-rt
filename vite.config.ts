@@ -59,6 +59,12 @@ export default defineConfig({
            sampai kolom sandi bisa dipakai. Bentuk fungsi hanya memindahkan
            paket node_modules yang disebut, sehingga modul virtual tetap di
            entry dan Supabase benar-benar jadi lazy. */
+        /* Gabungkan chunk remah. Terukur 31 Jul di 400 kbps/latensi 400 ms:
+           sesudah gate warga, 25 chunk JS diunduh — 21 di antaranya ≤2 KB dan
+           totalnya cuma 22 KB. Yang mahal BUKAN byte-nya melainkan 21 perjalanan
+           bolak-balik; tiap ikon lucide jadi berkas sendiri. Rollup menyatukan
+           chunk di bawah ambang ini ke tetangganya. */
+        experimentalMinChunkSize: 12_000,
         manualChunks(id) {
           /* Helper `__vitePreload` (modul VIRTUAL Vite) dipakai entry secara
              STATIS. Kalau Rollup membiarkannya menumpang di chunk lain, chunk
