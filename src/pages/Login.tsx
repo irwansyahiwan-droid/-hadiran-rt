@@ -69,12 +69,22 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
     haptic(12);
     setError('');
     setLoading(true);
-    const err = await onLogin(email.trim(), password);
-    if (err) {
-      setError('Email atau password salah.');
+    try {
+      // Pesan datang matang dari useAuth — jangan ratakan lagi jadi "password
+      // salah", sebab sebab jaringan dan sebab kredensial butuh tindakan beda.
+      const err = await onLogin(email.trim(), password);
+      if (err) {
+        setError(err);
+        goyang(setShakeAdmin);
+      }
+    } catch {
+      setError('Terjadi kesalahan. Coba lagi.');
       goyang(setShakeAdmin);
+    } finally {
+      // `finally`, bukan baris terakhir: tombol yang terkunci "Memproses…"
+      // selamanya membuat bendahara buntu total — tak ada jalan selain tutup app.
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
