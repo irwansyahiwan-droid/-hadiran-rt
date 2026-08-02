@@ -34,6 +34,12 @@ export function pesanError(error: unknown, fallback = 'Terjadi kesalahan. Coba l
   if (code === '23502') return 'Ada kolom wajib yang masih kosong.';
   if (code === '42501' || msg.includes('row-level security') || msg.includes('permission')) return 'Akses ditolak. Pastikan kamu masuk sebagai Bendahara.';
   if (msg.includes('failed to fetch') || msg.includes('network')) return 'Koneksi bermasalah. Periksa internet lalu coba lagi.';
+  // Request dipotong oleh batas sabar di `lib/supabase.ts` — jaringan hidup tapi
+  // tak menjawab. Bedakan dari putus total: yang ini pantas dicoba lagi.
+  const nama = (error as { name?: string } | null | undefined)?.name ?? '';
+  if (nama === 'TimeoutError' || nama === 'AbortError' || msg.includes('abort')) {
+    return 'Server lama tak menjawab. Coba lagi.';
+  }
 
   return fallback;
 }
