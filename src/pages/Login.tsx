@@ -270,7 +270,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           type="button"
           onClick={() => { haptic(); setBendaharaOpen((o) => !o); }}
           aria-expanded={bendaharaOpen}
-          className="press w-full flex items-center justify-between px-1 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300"
+          className="press w-full flex items-center justify-between min-h-[44px] px-1 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300"
         >
           <span className="flex items-center gap-2">
             <Lock className="w-4 h-4 text-gray-400" /> Masuk sebagai Bendahara

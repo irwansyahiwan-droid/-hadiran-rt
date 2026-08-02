@@ -59,7 +59,7 @@ export default function ExportMenu({ items, align = 'right' }: ExportMenuProps) 
         onClick={() => { haptic(); setOpen((o) => !o); }}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-sm font-semibold px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+        className="press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-sm font-semibold min-h-[44px] px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
       >
         <Download className="w-4 h-4" />
         Ekspor

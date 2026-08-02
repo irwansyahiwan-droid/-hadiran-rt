@@ -967,7 +967,7 @@ export default function JadwalPage() {
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
               aria-label="Tambah jadwal tarikan"
-              className="press flex items-center gap-1.5 btn-brand text-sm font-semibold px-2.5 py-2 rounded-xl"
+              className="press flex items-center gap-1.5 btn-brand text-sm font-semibold min-h-[44px] px-2.5 py-2 rounded-xl"
             >
               <Plus className="w-4 h-4" /> Jadwal
             </button>
