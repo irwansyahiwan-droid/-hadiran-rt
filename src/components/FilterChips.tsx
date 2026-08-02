@@ -84,7 +84,7 @@ export default function FilterChips<T extends string, S extends string = string>
                      aktif → hierarki rancu. Simetri kontras light↔dark itu keliru: gelap-di-
                      atas-terang tak silau, kebalikannya silau. Audit akan lapor 4.06 utk chip
                      ini — itu FP sampel BORDER gray-700, bukan fill. Jangan "perbaiki" lagi. */
-                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-gray-700'
+                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-control-dark'
               }`}
             >
               {f.label}
@@ -100,7 +100,7 @@ export default function FilterChips<T extends string, S extends string = string>
             aria-haspopup="listbox"
             aria-expanded={sortOpen}
             aria-label={`Urutkan: ${sortLabel}`}
-            className="press inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
+            className="press inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark"
           >
             <ArrowDownUp className="w-3.5 h-3.5" />
             {sortLabel}
@@ -148,7 +148,7 @@ export default function FilterChips<T extends string, S extends string = string>
           type="button"
           onClick={() => { haptic(); sort.onCycle(); }}
           aria-label={`Urutkan: ${sort.label}`}
-          className="press ml-auto shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-gray-700"
+          className="press ml-auto shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark"
         >
           <ArrowDownUp className="w-3.5 h-3.5" />
           {sort.label}

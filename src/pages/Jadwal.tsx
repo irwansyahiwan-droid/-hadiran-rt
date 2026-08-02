@@ -335,7 +335,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         </button>
         <button
           onClick={() => setAll('tidak_hadir')}
-          className="flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset
@@ -958,7 +958,7 @@ export default function JadwalPage() {
               }}
               title="Unduh PDF"
               aria-label="Unduh PDF jadwal"
-              className="press relative w-10 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 before:absolute before:-inset-1 before:content-['']"
+              className="press relative w-10 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 before:absolute before:-inset-1 before:content-['']"
             >
               <FileText className="w-4 h-4" />
             </button>
@@ -1061,7 +1061,7 @@ export default function JadwalPage() {
                             disabled={navigatingId === t.id}
                             title="Hitung Ulang"
                             aria-label="Hitung Ulang"
-                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
+                            className="w-11 h-11 rounded-xl border border-control dark:border-control-dark text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
                           >
                             <RefreshCw className={`w-[18px] h-[18px] ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                           </button>
@@ -1103,7 +1103,7 @@ export default function JadwalPage() {
                             onClick={() => { haptic(); setRowTarikan(t); }}
                             title="Aksi lainnya"
                             aria-label={`Aksi lainnya tarikan #${t.nomor}`}
-                            className="w-11 h-11 rounded-xl border border-control dark:border-gray-700 text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
+                            className="w-11 h-11 rounded-xl border border-control dark:border-control-dark text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
                           >
                             <MoreVertical className="w-[18px] h-[18px]" />
                           </button>
@@ -1173,7 +1173,7 @@ export default function JadwalPage() {
               )}
               <button
                 onClick={() => { setRowTarikan(null); setEditingTarikan(rowTarikan); }}
-                className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold"
+                className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-sm font-semibold"
               >
                 <Pencil className="w-4 h-4" /> Revisi jadwal
               </button>

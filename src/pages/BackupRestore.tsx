@@ -157,7 +157,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                   onChange={(e) => setKonfirmasi(e.target.value)}
                   placeholder={KATA_KONFIRMASI}
                   autoCapitalize="characters"
-                  className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-neg dark:focus:ring-rose-400 transition"
+                  className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-neg dark:focus:ring-rose-400 transition"
                 />
               </div>
               <div className="flex items-center gap-2">

@@ -947,7 +947,7 @@ export default function KasHadiranPage() {
                   <button
                     onClick={handleAbsensiPDF}
                     aria-label="Cetak daftar hadir PDF"
-                    className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-ink-sub dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm"
+                    className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm"
                   >
                     <FileText className="w-4 h-4" /> PDF Absensi
                   </button>

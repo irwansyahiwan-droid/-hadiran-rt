@@ -35,7 +35,7 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
           </span>
           <span className="font-display font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
         </div>
-        <div className="flex items-center justify-between text-caption pt-1.5 border-t border-control dark:border-gray-700">
+        <div className="flex items-center justify-between text-caption pt-1.5 border-t border-control dark:border-control-dark">
           <span className="font-semibold text-gray-700 dark:text-gray-300">Saldo akhir</span>
           <span className={`font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}

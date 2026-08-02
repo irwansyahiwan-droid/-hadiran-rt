@@ -227,7 +227,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               }}
               placeholder="Ketik: warga"
               className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/70 dark:bg-black/20
-                         border border-emerald-200/80 dark:border-emerald-700/40
+                         border border-emerald-600 dark:border-emerald-500
                          text-sm text-gray-900 dark:text-gray-100
                          placeholder-gray-400 dark:placeholder-gray-500
                          focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
@@ -311,7 +311,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     placeholder="contoh@email.com"
                     required={bendaharaOpen}
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/60 dark:bg-black/20
-                               border border-gray-200/80 dark:border-gray-700
+                               border border-control dark:border-control-dark
                                text-sm text-gray-900 dark:text-gray-100
                                placeholder-gray-400 dark:placeholder-gray-500
                                focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
@@ -335,7 +335,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     placeholder="••••••••"
                     required={bendaharaOpen}
                     className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/60 dark:bg-black/20
-                               border border-gray-200/80 dark:border-gray-700
+                               border border-control dark:border-control-dark
                                text-sm text-gray-900 dark:text-gray-100
                                placeholder-gray-400 dark:placeholder-gray-500
                                focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400

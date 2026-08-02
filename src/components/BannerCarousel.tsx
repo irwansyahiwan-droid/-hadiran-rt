@@ -76,7 +76,7 @@ export function BannerSkeleton({ vh }: { vh: number }) {
           <span className={`h-3 w-3/5 ${bar}`} />
         </div>
         {/* footer 3 kolom (Terkumpul / Talangan / Setor Kas RT) */}
-        <div className="grid grid-cols-3 gap-3 border-t border-control pt-4 dark:border-gray-700">
+        <div className="grid grid-cols-3 gap-3 border-t border-control pt-4 dark:border-control-dark">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex flex-col items-center gap-2">
               <span className="h-3.5 w-3.5 rounded-md bg-line dark:bg-gray-700" />

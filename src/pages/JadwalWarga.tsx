@@ -345,7 +345,7 @@ export default function JadwalWargaPage() {
       <div
         role="tablist"
         aria-label="Tampilan jadwal"
-        className="relative flex rounded-2xl border border-control dark:border-gray-700 bg-white dark:bg-gray-900 p-1"
+        className="relative flex rounded-2xl border border-control dark:border-control-dark bg-white dark:bg-gray-900 p-1"
       >
         {/* Pil aktif meluncur — 2 segmen, jadi 0% / 100% dari setengah lebar. */}
         <span
@@ -511,7 +511,7 @@ export default function JadwalWargaPage() {
               <button
                 onClick={cetakJadwal}
                 disabled={allTarikan.length === 0}
-                className="press flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-gray-700 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                className="press flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
               >
                 <FileText className="w-3.5 h-3.5" />
                 PDF Jadwal

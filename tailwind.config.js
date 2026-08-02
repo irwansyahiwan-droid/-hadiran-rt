@@ -68,7 +68,17 @@ export default {
         surface: '#FFFFFF',
         sunken: '#ECF1F7', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). MATERIAL-FLAT (2 Jul): #EAEFF6→#ECF1F7 (nada Gmail/Google apps) + seluruh sistem kartu pindah ke bahasa FLAT ala Google/myBCA/BYOND — kanvas rata tanpa whisper radial, kartu putih murni ber-hairline, bayangan tinggal satu contact whisper. 9 pass naik-turun L kanvas tak pernah selesai karena akar masalahnya dua bahasa visual campur (nav/pill/banner sudah flat, kartu masih floating-glass) — bukan nilai L. Jangan tuning L lagi.
         line: '#C5CFDB',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk). Pass kontras-tercetak (8 Jul): #DAE0E8→#D3DAE3 — user minta kontras lebih premium; naikkan SATU step di dalam bahasa flat (hairline = lever sah) agar tepi kartu "tercetak", tetap whisper-class bukan bingkai. Pass "Etched Premium" (26 Jul): #D3DAE3→#C5CFDB — user minta warna/kontras lebih mahal (trend 2026); tepi kartu dinaikkan SATU step lagi (lever hairline yg sama, BUKAN glass/shadow) agar "tercetak" ala Linear/Stripe/Mercury light. Edge-family digelapkan serempak menjaga hierarki control > line > divider.
-        control: '#B8C4D3', // border kontrol (input/tombol) — slate-300, lebih kuat dari line. Pass kontras-tercetak (8 Jul): #E2E8F0→#CBD5E1 — sebelumnya malah LEBIH TERANG dari line (komentar lama tak lagi benar); kini field/tombol punya tepi jelas ala form fintech, hierarki tepi pulih: control > line > divider baris. Pass "Etched Premium" (26 Jul): #CBD5E1→#B8C4D3 — ikut naik serempak dgn line agar tepi field/tombol tetap paling tegas.
+        /* border kontrol (input/tombol) — lebih kuat dari line. Riwayat: #E2E8F0→#CBD5E1
+           (8 Jul, dulu malah LEBIH TERANG dari line) → #B8C4D3 (26 Jul "Etched Premium",
+           naik serempak dgn line menjaga hierarki control > line > divider).
+           Pass NON-TEKS (2 Agu): #B8C4D3→#64748B. Bukan tuning rasa — #B8C4D3 cuma
+           1,56:1 lawan kanvas & 1,77:1 lawan kartu putih, sedangkan fill field
+           (bg-gray-50) cuma 1,03:1, jadi kolom isian tak punya penanda apa pun yang
+           lolos §1.4.11: 34 dari 34 gagal. #64748B = 4,19 / 4,76 (margin lega supaya
+           tak jatuh lagi kalau kanvas disetel ulang). Tetap hairline 1px — lever yang
+           sama, bukan bingkai. `.dark` ikut naik: gray-700 #374151 hanya 1,72:1 lawan
+           sheet gelap. Diukur: scripts/audit-kontras-nonteks.mjs. */
+        control: { DEFAULT: '#64748B', dark: '#6B7280' },
         /* ── Teks (semua lolos kontras AA di atas putih) ────────────── */
         ink: {
           DEFAULT: '#0B1220', // judul / nominal utama (near-black, kontras maksimal)

@@ -723,7 +723,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      ubah bentuk, hanya menambah hover + spring-press (paritas tactile dgn
      .btn-brand). Pasangan visual btn-brand di footer dua-tombol. */
   .btn-secondary {
-    @apply border border-control dark:border-gray-700
+    @apply border border-control dark:border-control-dark
            text-sm font-semibold text-gray-600 dark:text-gray-300
            hover:bg-gray-50 dark:hover:bg-gray-800;
     transition: background-color 0.18s ease, transform 0.15s var(--ease-spring);
@@ -737,13 +737,13 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      padding kiri/kanan di call-site (utilities layer menang). */
   .field {
     @apply w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800
-           border border-control dark:border-gray-700
+           border border-control dark:border-control-dark
            text-sm text-gray-900 dark:text-gray-100
            placeholder-gray-500 dark:placeholder-gray-400;
   }
   .field-search {
     @apply w-full pl-9 pr-9 py-3 rounded-xl bg-white dark:bg-gray-900
-           border border-control dark:border-gray-700
+           border border-control dark:border-control-dark
            text-sm dark:text-gray-100
            placeholder-gray-500 dark:placeholder-gray-400;
   }

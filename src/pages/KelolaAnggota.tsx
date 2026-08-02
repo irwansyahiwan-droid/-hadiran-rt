@@ -165,7 +165,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
               className={`press min-h-[44px] py-2.5 rounded-xl text-sm font-semibold border transition ${
                 role === r
                   ? 'bg-brand text-white border-transparent' /* fill brand DATAR (MATERIAL-FLAT) — gradient+glow pra-flat dihapus */
-                  : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-gray-700'
+                  : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-control-dark'
               }`}
             >
               {r === 'warga' ? 'Warga' : 'Bendahara'}
@@ -179,7 +179,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             onClick={() => setAktif((a) => !a)}
             role="switch"
             aria-checked={aktif}
-            className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-gray-700 mb-4"
+            className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark mb-4"
           >
             <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
