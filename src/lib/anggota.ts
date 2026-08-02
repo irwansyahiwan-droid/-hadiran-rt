@@ -220,6 +220,27 @@ export async function backfillAnggotaSusulan(
   return { tarikanCount: tarikanIds.length, kasNaik };
 }
 
+/**
+ * Nomor tarikan MENDATANG yang masih memasang anggota ini sebagai Sohibul Bait.
+ * Kosong = aman dinonaktifkan.
+ *
+ * MELEMPAR bila query gagal. Ini penjaga yang gagal-TERTUTUP: sebelumnya
+ * querynya inline di form dan hanya mengambil `data`, jadi koneksi putus
+ * menghasilkan `null` → daftar dianggap kosong → penjaga diam-diam mati dan
+ * anggota yang masih dijadwalkan menerima arisan tetap dinonaktifkan. Dengan
+ * melempar, pemanggil menahan aksi dan menyuruh coba lagi.
+ */
+export async function jadwalSohibulMendatang(wargaId: string): Promise<number[]> {
+  const { data, error } = await supabase
+    .from('tarikan')
+    .select('nomor')
+    .eq('sohibul_bait_id', wargaId)
+    .neq('status', 'selesai')
+    .order('nomor', { ascending: true });
+  if (error) throw error;
+  return ((data ?? []) as { nomor: number }[]).map((t) => t.nomor);
+}
+
 /** Ambil daftar anggota (aktif & nonaktif) untuk halaman Kelola Anggota. */
 export async function fetchAnggota(): Promise<Warga[]> {
   const { data, error } = await supabase

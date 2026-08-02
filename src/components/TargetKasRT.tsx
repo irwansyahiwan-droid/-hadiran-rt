@@ -12,15 +12,23 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
   const { isBendahara } = useAuthContext();
   const [target, setTarget] = useState<Target_ | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [gagal, setGagal] = useState(false);
   const [editing, setEditing] = useState(false);
 
   async function load() {
-    setTarget(await getTargetKasRT());
+    try {
+      setTarget(await getTargetKasRT());
+    } catch {
+      // Gagal baca ≠ target belum ada. Menawarkan "Tetapkan Target" di sini
+      // membuat bendahara meng-upsert di atas target lama yang masih hidup.
+      setGagal(true);
+    }
     setLoaded(true);
   }
   useEffect(() => { load(); }, []);
 
   if (!loaded) return null;
+  if (gagal) return null; // kartu opsional — sembunyikan, jangan mengarang keadaan
   if (!target && !isBendahara) return null;
 
   // Kosong → ajakan set target (bendahara saja)

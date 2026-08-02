@@ -19,7 +19,7 @@ const ambil = (): Res => antrean.shift() ?? { data: [], error: null };
 // saat di-`await` (thenable) — meniru bentuk PostgrestFilterBuilder.
 function builder(): Record<string, unknown> {
   const b: Record<string, unknown> = {};
-  for (const m of ['select', 'insert', 'update', 'delete', 'upsert', 'eq', 'in', 'order']) {
+  for (const m of ['select', 'insert', 'update', 'delete', 'upsert', 'eq', 'neq', 'in', 'order']) {
     b[m] = () => b;
   }
   b.single = () => Promise.resolve(ambil());
@@ -32,7 +32,7 @@ vi.mock('./supabase', () => ({
   supabase: { from: () => builder() },
 }));
 
-const { recomputeTarikan } = await import('./anggota');
+const { recomputeTarikan, jadwalSohibulMendatang } = await import('./anggota');
 
 const TARIKAN = { data: { id: 't1', nomor: 3, tanggal: '2026-07-01', sohibul_bait_id: 'w1' }, error: null };
 const WARGA = { data: [{ id: 'w1' }, { id: 'w2' }, { id: 'w3' }], error: null };
@@ -78,5 +78,28 @@ describe('recomputeTarikan — kegagalan tulis tidak boleh diam', () => {
     // w1 = Sohibul (di luar akuntansi) → pembayar = w2 & w3
     expect(r.pembayarCount).toBe(2);
     expect(r.talanganCount).toBe(1); // hanya w3 'tidak_hadir'
+  });
+});
+
+/**
+ * Penjaga "anggota ini masih Sohibul Bait di tarikan mendatang". Ia harus
+ * gagal-TERTUTUP: kalau querynya gagal dan hasilnya dianggap daftar kosong,
+ * penjaga diam-diam mati dan anggota yang masih dijadwalkan MENERIMA arisan
+ * tetap dinonaktifkan — tarikan itu lalu kehilangan penerimanya.
+ */
+describe('jadwalSohibulMendatang — penjaga nonaktif harus gagal-tertutup', () => {
+  it('MELEMPAR saat query gagal, bukan mengembalikan daftar kosong', async () => {
+    antrean = [{ data: null, error: { message: 'network' } }];
+    await expect(jadwalSohibulMendatang('w9')).rejects.toBeTruthy();
+  });
+
+  it('daftar kosong hanya berarti benar-benar tak ada jadwal mendatang', async () => {
+    antrean = [{ data: [], error: null }];
+    await expect(jadwalSohibulMendatang('w9')).resolves.toEqual([]);
+  });
+
+  it('mengembalikan nomor tarikan yang menahan penonaktifan', async () => {
+    antrean = [{ data: [{ nomor: 8 }, { nomor: 12 }], error: null }];
+    await expect(jadwalSohibulMendatang('w9')).resolves.toEqual([8, 12]);
   });
 });

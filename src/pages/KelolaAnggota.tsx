@@ -12,6 +12,7 @@ import Tag from '../components/Tag';
 import { supabase } from '../lib/supabase';
 import {
   fetchAnggota, tambahAnggota, updateAnggota, backfillAnggotaSusulan,
+  jadwalSohibulMendatang,
 } from '../lib/anggota';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -70,15 +71,18 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
     // Pengaman: menonaktifkan anggota yang masih jadi Sohibul di tarikan ke depan
     if (mode === 'edit' && initial && initial.status_aktif && !aktif && !forceNonaktif) {
       setSaving(true);
-      const { data } = await supabase
-        .from('tarikan')
-        .select('nomor')
-        .eq('sohibul_bait_id', initial.id)
-        .neq('status', 'selesai')
-        .order('nomor', { ascending: true });
+      let nomorMendatang: number[];
+      try {
+        nomorMendatang = await jadwalSohibulMendatang(initial.id);
+      } catch {
+        // Penjaga gagal-tertutup: tak tahu = jangan nonaktifkan.
+        setSaving(false);
+        showToast('Gagal memeriksa jadwal Sohibul. Cek koneksi lalu coba lagi.', 'error');
+        return;
+      }
       setSaving(false);
-      if (data && data.length) {
-        setJadwalNonaktif(data.map((t) => t.nomor as number));
+      if (nomorMendatang.length) {
+        setJadwalNonaktif(nomorMendatang);
         return; // tahan dulu, tampilkan peringatan
       }
     }

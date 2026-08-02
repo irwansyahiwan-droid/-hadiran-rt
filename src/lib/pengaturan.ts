@@ -10,12 +10,21 @@ export interface TargetKasRT {
 
 const KEY_TARGET = 'target_kas_rt';
 
+/**
+ * Baca target Kas RT. MELEMPAR bila query gagal.
+ *
+ * Supabase tak melempar sendiri: tanpa cek `error`, koneksi putus mengembalikan
+ * `{data: null}` yang di sini tak bisa dibedakan dari "target memang belum
+ * diatur". Layar lalu menawarkan form kosong, dan bendahara yang mengisinya
+ * meng-upsert target baru di atas target lama yang sebenarnya masih ada.
+ */
 export async function getTargetKasRT(): Promise<TargetKasRT | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('pengaturan')
     .select('value')
     .eq('key', KEY_TARGET)
     .maybeSingle();
+  if (error) throw error;
   const v = data?.value as Partial<TargetKasRT> | undefined;
   if (!v || !v.nominal) return null;
   return {

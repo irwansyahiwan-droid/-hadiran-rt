@@ -18,6 +18,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { ringkasAbsensi } from '../lib/absensiHitung';
 import { simpanTarikanSelesai } from '../lib/simpanTarikan';
+import { fetchAbsensiTersimpan } from '../lib/absensiTersimpan';
 import { hitungUlangNomorJadwal } from '../lib/jadwalNomor';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
@@ -95,23 +96,34 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [loadingAbsensi, setLoadingAbsensi] = useState(true);
+  const [absensiError, setAbsensiError] = useState(false);
+  const [muatUlang, setMuatUlang] = useState(0);
   useBackDismiss(true, onBack); // tombol Back HP keluar dari editor absensi
 
   useEffect(() => {
     async function loadExisting() {
       const sohibulId = tarikan.sohibul_bait_id ?? '';
       if (tarikan.status === 'selesai') {
-        const { data } = await supabase
-          .from('absensi')
-          .select('warga_id, status')
-          .eq('tarikan_id', tarikan.id);
+        // Gagal baca TIDAK boleh lolos jadi peta kosong: layar mengawali semua
+        // anggota 'tidak_hadir', jadi tanpa baris penimpa satu tap Simpan
+        // menuliskan talangan Rp50.000 ke seluruh warga. Lihat komentar di
+        // lib/absensiTersimpan.ts.
+        let tersimpan: Record<string, AbsensiStatus>;
+        try {
+          tersimpan = await fetchAbsensiTersimpan(tarikan.id);
+        } catch {
+          setAbsensiError(true);
+          setLoadingAbsensi(false);
+          return;
+        }
         const init: AbsensiMap = {};
         wargaList.forEach(w => { init[w.id] = 'tidak_hadir'; });
-        (data ?? []).forEach((a: { warga_id: string; status: string }) => {
-          init[a.warga_id] = a.status as AbsensiStatus;
+        Object.entries(tersimpan).forEach(([wargaId, status]) => {
+          init[wargaId] = status;
         });
         // Sohibul Bait penerima → selalu 'hadir' (di luar akuntansi talangan).
         if (sohibulId) init[sohibulId] = 'hadir';
+        setAbsensiError(false);
         setMap(init);
       } else {
         const init: AbsensiMap = {};
@@ -122,7 +134,13 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       setLoadingAbsensi(false);
     }
     loadExisting();
-  }, [tarikan, wargaList]);
+  }, [tarikan, wargaList, muatUlang]);
+
+  function cobaMuatAbsensi() {
+    setAbsensiError(false);
+    setLoadingAbsensi(true);
+    setMuatUlang((n) => n + 1);
+  }
 
   // Pembayar = semua anggota KECUALI Sohibul Bait (Sohibul tidak bayar).
   const sohibulId = tarikan.sohibul_bait_id ?? '';
@@ -205,6 +223,28 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   function handleBatalkanClick() {
     haptic(8);
     setConfirmCancel(true); // buka dialog pengaman (wajib ketik nomor tarikan)
+  }
+
+  // Absensi tarikan selesai gagal dibaca → JANGAN tampilkan editor. Peta kosong
+  // di layar ini terlihat sah ("semua tidak hadir") dan bisa disimpan.
+  if (absensiError) {
+    return (
+      <div className="space-y-7 pb-2">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => { haptic(); onBack(); }}
+            aria-label="Kembali"
+            className="press w-9 h-9 rounded-xl border border-line dark:border-gray-800/60 flex items-center justify-center shrink-0"
+          >
+            <ArrowLeft className="w-[18px] h-[18px] text-gray-600 dark:text-gray-300" />
+          </button>
+          <h2 className="text-base font-display font-bold text-ink dark:text-gray-100">
+            Absensi Tarikan #{tarikan.nomor}
+          </h2>
+        </div>
+        <ErrorState onRetry={cobaMuatAbsensi} retrying={loadingAbsensi} />
+      </div>
+    );
   }
 
   if (loadingAbsensi) {
