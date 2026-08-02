@@ -141,7 +141,12 @@ export async function newCtx(browser, theme, { bendahara = false, welcome = fals
 export async function loginWarga(page) {
   const pw = page.locator('#warga-password');
   await pw.waitFor({ timeout: 15000 });
-  await pw.click();
+  /* focus(), BUKAN click(): di viewport sempit (320px) & saat teks diperbesar,
+     pemeriksaan aktionabilitas Playwright menolak klik karena tombol mata
+     `w-11 h-11` dianggap menghalangi — padahal elementFromPoint di tengah kolom
+     benar-benar mengenai INPUT. focus() tak butuh hit-test dan TETAP menyisakan
+     sifat penting sapuan ini: 'warga' diketik betulan, tombol per tombol. */
+  await pw.focus();
   await pw.pressSequentially('warga', { delay: 60 });
   await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
   for (let i = 0; i < 30; i++) {

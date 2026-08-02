@@ -130,7 +130,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
         }`}
         style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 min-w-0">
           <img
             src={logoRT}
             /* Brandmark dekoratif: wordmark "Hadiran RT" di sebelahnya sudah
@@ -147,7 +147,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
           />
           {/* Brandmark, bukan judul halaman — h1 milik konten tiap page (hindari h1 dobel). */}
-          <p className="text-base font-semibold tracking-tight text-gray-900 dark:text-gray-100 whitespace-nowrap">
+          <p className="text-base font-semibold tracking-tight text-gray-900 dark:text-gray-100 truncate">
             Hadiran RT
           </p>
         </div>
