@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
-const OUT = process.env.OUT_DIR || '.';
+const OUT = process.env.OUT_DIR || '.audit-kontras';
 mkdirSync(OUT, { recursive: true });
 
 function lum([r, g, b]) {

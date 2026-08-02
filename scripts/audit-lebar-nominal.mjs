@@ -23,7 +23,7 @@ import { chromium } from 'playwright';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
-const OUT = process.env.OUT_DIR || '.';
+const OUT = process.env.OUT_DIR || '.audit-lebar';
 const W = +(process.env.W || 360);
 mkdirSync(OUT, { recursive: true });
 

@@ -10,7 +10,7 @@ import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
-const OUT = process.env.OUT_DIR || '.';
+const OUT = process.env.OUT_DIR || '.audit-kontras-deep';
 mkdirSync(OUT, { recursive: true });
 
 const env = readFileSync(new globalThis.URL('../.env', import.meta.url), 'utf8');

@@ -49,13 +49,13 @@ Aplikasi manajemen arisan & kas RT (RT 004/006).
 Sebelum commit — cepat, tanpa browser:
 
 ```
-npm run periksa      # typecheck + lint + 95 test
+npm run periksa      # typecheck + lint + 117 test
 ```
 
 Sapuan browser (butuh build produksi hidup: `npm run build && npx vite preview --port 5199`):
 
 ```
-npm run audit        # keadaan + sheet + publik + masuk (49 pemeriksaan)
+npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 ```
 
 | Perintah | Yang diperiksa | Kenapa ada |
@@ -67,6 +67,7 @@ npm run audit        # keadaan + sheet + publik + masuk (49 pemeriksaan)
 | `audit:lebar` | Nominal "Rp" terpotong/meluber di 360px | `<span>` inline punya clientWidth 0 → scrollWidth buta |
 | `audit:muat` | FCP & siap-pakai (CPU 4× lambat, 400 kbps) | Warga pakai Android kelas bawah, sinyal seadanya |
 | `audit:masuk` | Gerbang masuk & keluar saat jaringan busuk (chunk gagal, request menggantung, logout luring) | Semua audit lain menguji layar SESUDAH masuk. **Tombol "Masuk" yang terkunci tak menyisakan jalan lain sama sekali**, dan kegagalan jaringan yang dilaporkan sebagai "password salah" bikin bendahara mengganti sandi yang sudah benar |
+| `audit:tulis` | Tombol simpan saat request tulis MENGGANTUNG (Kas RT + Kelola Anggota) | `audit:keadaan` menguji BACA gagal, `audit:masuk` menguji auth — jalur TULIS, satu-satunya tempat uang benar-benar dicatat, tak tersentuh keduanya. **`try/finally` ada di semua jalur tulis tapi tak menolong: `finally` tak pernah tercapai kalau janjinya tak pernah selesai** |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
 bukan kodenya. Sudah terjadi 7×: sampel kena border 1px, aturan dialog dikenakan ke halaman
@@ -80,9 +81,12 @@ sampai MENGAKU tercapai (`aria-expanded="true"`), bukan diasumsikan dari satu kl
 **Sapuan wajib diarahkan ke produksi sekali sebelum dianggap benar** (`CAP_URL=https://hadiran-rt.vercel.app`):
 localhost instan menyembunyikan seluruh kelas bug balapan-hidrasi.
 
-**Jebakan auth:** `fetch` yang MENGGANTUNG tidak pernah reject sendiri. `await` telanjang di
-jalur auth = spinner abadi; semua panggilan auth wajib lewat `batasWaktu()` di
-`src/lib/authSesi.ts`, dan "Keluar" wajib membuang sesi lokal tanpa syarat.
+**Jebakan jaringan menggantung:** `fetch` yang MENGGANTUNG tidak pernah reject sendiri, dan
+`try/finally` tak menolong — `finally` tak pernah tercapai. Dua penjaga, jangan dilepas:
+`buatFetchBerbatas()` di `src/lib/fetchBerbatas.ts` dipasang di klien Supabase (menjaga SEMUA
+baca & tulis, termasuk kode yang belum ditulis), dan `batasWaktu()` di `src/lib/authSesi.ts`
+untuk jalur auth yang berjalan SEBELUM klien itu ada. "Keluar" wajib membuang sesi lokal
+tanpa syarat.
 
 **Jebakan Supabase yang berulang:** `.select()` TIDAK melempar saat gagal — ia mengembalikan
 `{data: null, error}`. Tiap `?? []` tanpa cek `res.error` mengubah kegagalan jadi "tidak ada

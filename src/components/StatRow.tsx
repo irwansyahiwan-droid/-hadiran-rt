@@ -5,9 +5,9 @@ type StatTone = 'ink' | 'pos' | 'info' | 'neg' | 'warn';
 
 const TONE: Record<StatTone, string> = {
   ink:  'text-ink dark:text-gray-100',
-  pos:  'text-emerald-700 dark:text-emerald-400',
+  pos:  'text-pos dark:text-emerald-400',
   info: 'text-blue-600 dark:text-blue-400',      /* status 'titip' — sejajar Tag tone info */
-  neg:  'text-rose-600 dark:text-rose-400',
+  neg:  'text-neg dark:text-rose-400',
   warn: 'text-warn dark:text-amber-400',
 };
 

@@ -19,9 +19,9 @@ export default function SmartInsight({ label, current, previous, className = '' 
 
   const tone =
     dir === 'up'
-      ? { ic: TrendingUp, c: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
+      ? { ic: TrendingUp, c: 'text-pos dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' }
       : dir === 'down'
-      ? { ic: TrendingDown, c: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
+      ? { ic: TrendingDown, c: 'text-neg dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' }
       : { ic: Minus, c: 'text-gray-500 dark:text-gray-400', bg: 'bg-gray-50 dark:bg-gray-800' };
   const Ic = tone.ic;
 
