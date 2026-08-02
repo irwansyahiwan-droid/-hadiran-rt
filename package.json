@@ -15,6 +15,7 @@
     "audit:sheet": "CAP_URL=http://localhost:5199 node scripts/audit-sheet-geometri.mjs",
     "audit:publik": "CAP_URL=http://localhost:5199 node scripts/audit-publik.mjs",
     "audit:kontras": "CAP_URL=http://localhost:5199 node scripts/audit-kontras.mjs",
+    "audit:kontras-nonteks": "CAP_URL=http://localhost:5199 node scripts/audit-kontras-nonteks.mjs",
     "audit:lebar": "CAP_URL=http://localhost:5199 node scripts/audit-lebar-nominal.mjs",
     "audit:muat": "APP_URL=http://localhost:5199 node scripts/audit-muat.mjs",
     "audit:masuk": "CAP_URL=http://localhost:5199 node scripts/audit-masuk.mjs",

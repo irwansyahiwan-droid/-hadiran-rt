@@ -109,6 +109,16 @@ input, textarea  { caret-color: #1B7249; }
 :is(button, a, summary, [role="button"], [tabindex]):focus-visible {
   outline: 2px solid #1B7249;
   outline-offset: 2px;
+  /* Cincin pemisah di celah outline-offset — WAJIB, bukan hiasan.
+     Ring hijau polos di atas permukaan HIJAU (kartu di dalam hero saldo,
+     kanvas login) cuma 1,26–1,98:1: praktis hilang bagi pengguna papan ketik.
+     Satu warna outline tak mungkin aman di semua permukaan, jadi kontras
+     dijamin oleh PASANGAN terang+gelap yang selalu bersebelahan.
+     Diukur: scripts/audit-kontras-nonteks.mjs (§2.4.13, ambang 3:1).
+     PUTIH untuk KEDUA tema — bukan kelalaian. Cincin gelap sempat dipakai di
+     mode gelap dan tetap gagal (hitam #030712 lawan hero hijau gelap = 2,4:1);
+     permukaan mode gelap semuanya gelap, jadi putih justru yang selalu aman. */
+  box-shadow: 0 0 0 2px #FFFFFF;
 }
 .dark :is(button, a, summary, [role="button"], [tabindex]):focus-visible {
   outline-color: #1A9B86;
@@ -737,12 +747,18 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
            text-sm dark:text-gray-100
            placeholder-gray-500 dark:placeholder-gray-400;
   }
-  /* Fokus: setara ring-2 emerald + border-emerald-500. Ditulis raw CSS
-     karena directive Tailwind tidak menerima opacity-modifier slash. */
+  /* Fokus field: cincin PADAT, bukan alpha 30%. Versi lama
+     (border #10B981 + ring rgba(16,185,129,.30)) cuma 1,29–1,71:1 lawan latar
+     → SETIAP input/select di app gagal §2.4.13, di terang maupun gelap.
+     Warna ikut token semantik `pos`/emerald-400 supaya tetap satu bahasa. */
   .field:focus, .field-search:focus {
     outline: none;
-    border-color: #10B981;
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.30);
+    border-color: #047857;
+    box-shadow: 0 0 0 2px #047857;
+  }
+  .dark .field:focus, .dark .field-search:focus {
+    border-color: #34D399;
+    box-shadow: 0 0 0 2px #34D399;
   }
 }
 

@@ -230,7 +230,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                          border border-emerald-200/80 dark:border-emerald-700/40
                          text-sm text-gray-900 dark:text-gray-100
                          placeholder-gray-400 dark:placeholder-gray-500
-                         focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500
+                         focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
                          transition backdrop-blur-sm"
             />
             <button
@@ -314,7 +314,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                                border border-gray-200/80 dark:border-gray-700
                                text-sm text-gray-900 dark:text-gray-100
                                placeholder-gray-400 dark:placeholder-gray-500
-                               focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500
+                               focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
                                transition backdrop-blur-sm"
                   />
                 </div>
@@ -338,7 +338,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                                border border-gray-200/80 dark:border-gray-700
                                text-sm text-gray-900 dark:text-gray-100
                                placeholder-gray-400 dark:placeholder-gray-500
-                               focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500
+                               focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
                                transition backdrop-blur-sm"
                   />
                   <button
