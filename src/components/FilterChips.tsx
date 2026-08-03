@@ -129,7 +129,7 @@ export default function FilterChips<T extends string, S extends string = string>
                       className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 text-sm text-left transition-colors ${
                         selected
                           ? 'font-semibold text-brand-link dark:text-brand-linkDark'
-                          : 'font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/60'
+                          : 'font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-800/60 dark:active:bg-gray-700'
                       }`}
                     >
                       {o.label}

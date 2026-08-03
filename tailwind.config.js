@@ -2,6 +2,24 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
+  /* ── `hover:` DIGERBANG `@media (hover: hover)` ────────────────────────
+     App ini touch-first: warga membukanya di HP, dan di HP `:hover` tak
+     pernah berarti "kursor di atas" — ia NYANGKUT setelah diketuk sampai
+     ada ketukan di tempat lain. Baris yang baru ditinggalkan tetap terlihat
+     ter-highlight, jadi terbaca "masih terpilih" padahal tidak.
+
+     Ini BUKAN masalah baru: `.btn-brand`/`.btn-danger` di index.css sudah
+     digerbang tangan persis karena ini ("tombol menebal permanen di HP").
+     Yang tak pernah ikut = 106 utility `hover:` Tailwind di seluruh app,
+     karena Tailwind 3 memancarkan `:hover` telanjang secara default. Satu
+     flag menutup semuanya sekaligus; di desktop nol perubahan.
+
+     PRASYARAT yang sudah dipenuhi lebih dulu: 6 kontrol yang dulu cuma
+     punya `hover:` (item ExportMenu & FilterChips, 3 tombol borongan
+     absensi Jadwal, tombol hapus Talangan) diberi `active:`/`.press`.
+     Tanpa itu, menggerbang hover justru membuat keenamnya bisu total di
+     HP — satu-satunya perangkat yang dipakai warga. */
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
       /* ── Tangga z-index app (SATU sumber, anti-tabrak) ─────────────

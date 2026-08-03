@@ -366,7 +366,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     disabled={processingId === t.id}
                     title="Hapus data talangan"
                     aria-label="Hapus data talangan"
-                    className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
+                    className="press inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 active:bg-rose-50 dark:hover:bg-rose-900/20 dark:active:bg-rose-900/20"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
