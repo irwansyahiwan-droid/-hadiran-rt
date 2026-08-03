@@ -44,15 +44,6 @@ export function pesanError(error: unknown, fallback = 'Terjadi kesalahan. Coba l
   return fallback;
 }
 
-/** Rupiah ringkas untuk tempat sempit: Rp1,7jt / Rp850rb / Rp500. */
-export function formatRupiahCompact(amount: number): string {
-  const neg = amount < 0 ? '-' : '';
-  const a = Math.abs(amount);
-  if (a >= 1_000_000) return `${neg}Rp${(a / 1_000_000).toFixed(1).replace('.0', '').replace('.', ',')}jt`;
-  if (a >= 1_000) return `${neg}Rp${Math.round(a / 1_000)}rb`;
-  return `${neg}Rp${a}`;
-}
-
 /** Sensor nominal saat mode privasi aktif: ganti angka dgn bullet, "Rp" tetap.
  *  `dots` mengatur lebar sensor agar proporsional dgn ukuran teks aslinya. */
 export function maskRp(rendered: string, hidden: boolean, dots = 6): string {
