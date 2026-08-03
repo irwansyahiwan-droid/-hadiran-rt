@@ -628,8 +628,10 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
   const [saving, setSaving] = useState(false);
   // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
-  // lewat drag.dismiss — hook dipakai utk luncuran keluar (handlers tak
-  // disebar; panel form scrollable, drag disediakan sheet ber-handle saja).
+  // lewat drag.dismiss. Handlers disebar HANYA di batang handle, bukan di panel:
+  // panelnya form yang bisa di-scroll, dan itulah sebabnya sheet form KasRT &
+  // KasHadiran juga memasang handle — batang itu satu-satunya tanda visual bahwa
+  // lembar ini bisa disapu turun.
   const drag = useDragDismiss(onClose);
   useBackDismiss(true, drag.dismiss);
   const dlg = useDialog(true, { onClose: drag.dismiss, label: `Revisi jadwal tarikan #${tarikan.nomor}` });
@@ -665,6 +667,9 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
       <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto">
+        <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
+          <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+        </div>
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
@@ -767,6 +772,9 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
       <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90vh] overflow-y-auto">
+        <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
+          <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+        </div>
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>

@@ -236,7 +236,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
                         {/* Expand: penjelasan alur + diff */}
                         {isOpen && hasDetail && (
-                          <div className="mt-2 space-y-2">
+                          <div className="reveal mt-2 space-y-2">
                             {v.penjelasan && (
                               <div className="flex items-start gap-2 bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 rounded-xl p-2.5">
                                 <Route className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />

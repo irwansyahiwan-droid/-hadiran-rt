@@ -798,6 +798,39 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 }
 .rise { animation: riseIn 0.5s var(--ease-out-expo) both; }
 
+/* ── Isi yang lahir DI TEMPAT (akordeon dibuka, pesan galat muncul) ──────────
+   Bukan layar/lembar baru, jadi bukan `.rise` (10px, 0.5s — itu untuk daftar
+   yang masuk panggung) dan bukan `.sheet-panel`. Sampai 3 Agu tiga permukaan
+   ini `{kondisi && …}` telanjang: isi MELETUS ada tanpa transisi sama sekali —
+   satu-satunya tempat tersisa di app yang masih begitu, dan justru yang paling
+   sering diketuk warga (baris Talangan & Riwayat).
+
+   TINGGI SENGAJA TIDAK DIANIMASIKAN. Tinggi properti LAYOUT → tiap frame memicu
+   reflow seluruh daftar (69 anggota di Talangan), dan warga pakai Android kelas
+   bawah. Layout langsung final; yang mengendap masuk cuma opacity + 4px turun,
+   arah yang sama dengan arah bukanya, jadi terbaca "muncul dari balik header"
+   bukan "melompat". 180ms: jauh di bawah ambang 300ms, lebih cepat dari sheet
+   (400ms) karena ini isi in-place, bukan permukaan baru.
+
+   `.reveal-fade` = varian TRANSFORM-SAFE, kembaran `.press-icon`: dipakai
+   elemen yang centering-nya sudah memakai transform (mis. ClearButton dengan
+   -translate-y-1/2). Animasi ber-transform di sana akan menimpa translate itu →
+   tombol loncat dari tengah saat lahir. Di sini geraknya opacity saja. */
+@keyframes revealIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes revealFadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* `backwards`, BUKAN `both` — alasan yang sama dgn `.page-enter` di atas: `both`
+   menahan `transform: translateY(0)` selamanya, dan elemen ber-transform jadi
+   containing block bagi keturunan `position: fixed`. Hari ini semua pemakainya
+   aman (ConfirmDestruktif Talangan dirender di tingkat halaman, di luar blok
+   ini), tapi kelas ini dibuat untuk dipasang di sembarang blok yang dibuka —
+   pemakai berikutnya tak akan tahu kalau `both` diam-diam melabuhkan sheet-nya
+   ke baris, bukan ke layar. Setelah selesai, tak ada gaya yang disisakan. */
+.reveal      { animation: revealIn 0.18s var(--ease-out-expo) backwards; }
+.reveal-fade { animation: revealFadeIn 0.14s var(--ease-out-expo) backwards; }
+
 /* Bottom sheet — slide up + backdrop fade */
 @keyframes sheetUp     { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes backdropIn  { from { opacity: 0; } to { opacity: 1; } }

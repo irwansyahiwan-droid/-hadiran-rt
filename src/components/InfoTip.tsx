@@ -30,7 +30,10 @@ const GAP = 6;       // jarak popover ke tombol
  */
 export default function InfoTip({ label, children, tone = 'default', align = 'left', className = '' }: InfoTipProps) {
   const [open, setOpen] = useState(false);
-  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
+  /** `originX/originY` = titik jangkar animasi tumbuh (lihat `place()`). */
+  const [pos, setPos] = useState<
+    { top: number; left: number; width: number; originX: number; originY: 'top' | 'bottom' } | null
+  >(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLSpanElement>(null);
 
@@ -61,8 +64,16 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
       // Vertikal: di bawah tombol; flip ke atas bila tak muat & atas cukup.
       let top = b.bottom + GAP;
       const h = popRef.current?.offsetHeight ?? 0;
-      if (h && top + h > vh - EDGE && b.top - GAP - h >= EDGE) top = b.top - GAP - h;
-      setPos({ top, left, width });
+      const flip = !!h && top + h > vh - EDGE && b.top - GAP - h >= EDGE;
+      if (flip) top = b.top - GAP - h;
+      // Jangkar animasi = TOMBOL, bukan pusat popover. Popover ini satu-satunya
+      // di app yang di-clamp ke tepi layar (menu lain sejajar trigger & cukup
+      // pakai utility origin-top-right), jadi pusatnya bisa jauh meleset dari
+      // ikon "i" yang baru saja diketuk — popover lalu terbaca tumbuh dari
+      // ruang kosong. Ambil pusat tombol dalam koordinat popover, lalu tahan
+      // 12px dari tepi supaya jangkar tak pernah nempel sudut membulat.
+      const originX = Math.max(12, Math.min(b.left + b.width / 2 - left, width - 12));
+      setPos({ top, left, width, originX, originY: flip ? 'bottom' : 'top' });
     };
     place();
     const raf = requestAnimationFrame(place); // ukur ulang setelah tinggi diketahui
@@ -105,6 +116,7 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
               left: pos?.left ?? 0,
               width: pos?.width ?? POP_W,
               opacity: pos ? 1 : 0,
+              transformOrigin: pos ? `${pos.originX}px ${pos.originY}` : 'center',
             }}
             className={`${exit.closing ? 'pop-menu-out' : 'pop-menu'} z-tooltip p-3 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float text-left normal-case tracking-normal`}
           >

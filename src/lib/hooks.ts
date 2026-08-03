@@ -1,5 +1,47 @@
 import { useState, useEffect, useRef, useReducer } from 'react';
 
+/* ── Tinggi layar & hero ringkas ─────────────────────────────────
+ * Dipakai BERSAMA oleh kartu saldo (Beranda), skeleton-nya, dan rumus tinggi
+ * kartu di BannerCarousel. Ditaruh di sini, bukan di BannerCarousel, semata agar
+ * berkas komponen tak mengekspor non-komponen (fast-refresh). Yang penting tetap
+ * dijaga: definisinya cuma SATU di seluruh app. */
+
+/** Ambang "hero ringkas". 700px = di bawah iPhone SE (667) & Android 640, di atas
+ *  HP 2026 terpendek sekalipun. */
+const VH_RINGKAS = 700;
+
+/** Layar sependek ini butuh hero RINGKAS: kaki stat 3 kolom (Terkumpul/Talangan/
+ *  Setor Kas RT) dilepas dari kartu saldo.
+ *
+ *  Kenapa kaki stat yang dikorbankan, bukan tinggi kartu saja: isi kartu hero TIDAK
+ *  reflow. Tingginya boleh diperkecil, isinya tidak ikut menyusut — terukur 3 Agu,
+ *  celah caption ke garis kaki stat turun linear 43px (kartu 344) → 1px (kartu 259),
+ *  jadi memendekkan kartu di bawah ~290px cuma membuat teks bertumpuk garis. Padahal
+ *  di 360×640 blok hero menghabiskan layar pertama sampai NOL konten mengintip di
+ *  atas bar nav — warga tak dapat sinyal apa pun bahwa masih ada isi di bawah.
+ *
+ *  Ketiga angka itu bukan hilang: masing-masing punya halaman sendiri (Hadiran,
+ *  Talangan, Kas RT) dan tap di kaki stat memang cuma jalan pintas ke sana.
+ *
+ *  Tiga tempat WAJIB membaca fungsi ini — kartu asli, skeleton, dan cardHeight.
+ *  Kalau salah satu memakai ambang sendiri, skeleton & kartu beda tinggi → layar
+ *  meloncat saat data datang. */
+export function heroRingkas(vh: number): boolean {
+  return vh < VH_RINGKAS;
+}
+
+/** Tinggi layar yang ikut resize/rotasi. Satu implementasi untuk semua pembaca:
+ *  dua listener terpisah pernah jadi sumber drift geometri hero. */
+export function useTinggiLayar(): number {
+  const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800);
+  useEffect(() => {
+    const onResize = () => setVh(window.innerHeight);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return vh;
+}
+
 /* ── Sembunyikan nominal (privasi, ala bank app) ─────────────────
  * State global ringan: tersimpan di localStorage & disinkronkan ke semua
  * komponen yang pakai (hero Beranda & Kas RT) lewat listener — sekali toggle

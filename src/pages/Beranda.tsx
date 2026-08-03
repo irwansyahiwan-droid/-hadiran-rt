@@ -12,7 +12,7 @@ import { HeroStats } from '../components/HeroSaldo';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
-import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay, heroRingkas, useTinggiLayar } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { formatRupiahPlain, formatTanggal, haptic, labelTanggalRelatif, maskRp } from '../lib/utils';
@@ -86,6 +86,9 @@ interface BerandaProps {
 
 export default function Beranda({ onNavigate }: BerandaProps) {
   const { isBendahara, isWargaMode } = useAuthContext();
+  // Tinggi layar (ikut rotasi) → kartu saldo & skeleton-nya membaca angka yang SAMA.
+  const vh = useTinggiLayar();
+  const ringkas = heroRingkas(vh);
   // SWR: render dari snapshot terakhir (pindah tab / sinyal jelek → data tampil
   // instan, tanpa skeleton), lalu load() tetap revalidate diam-diam di bawah.
   const [cached] = useState(() => getPageCache<BerandaCache>('beranda'));
@@ -503,7 +506,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             layout jump saat skeleton → konten. (Versi lama: slab polos setinggi
             bannerViewportHeight saja — kurang 46px krn indikator tak dihitung,
             dan 44px lebih lebar dari kartu asli, jadi konten melompat & menyempit.) */}
-        <BannerSkeleton vh={window.innerHeight} />
+        <BannerSkeleton vh={vh} />
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
           <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
             {[...Array(3)].map((_, i) => (
@@ -642,15 +645,25 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
             {/* Kaki stat — di dasar kartu (blok nominal di atas sudah flex-1).
                 Markup-nya kini milik `HeroStats`, komponen yang sama dipakai hero
-                Kas RT & Talangan; kartu ini yang jadi acuan bentuknya. */}
-            <HeroStats
-              className="pt-[18px]"
-              items={[
-                { icon: Wallet, label: 'Terkumpul', value: maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas') },
-                { icon: ArrowLeftRight, label: 'Talangan', value: maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('talangan') },
-                { icon: ArrowUpRight, label: 'Setor Kas RT', value: maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas-rt') },
-              ]}
-            />
+                Kas RT & Talangan; kartu ini yang jadi acuan bentuknya.
+
+                DILEPAS di layar pendek (heroRingkas, <700px): di 360×640 blok hero
+                menelan seluruh layar pertama sampai nol konten mengintip di atas bar
+                nav. Ketiga angka ini yang paling murah dikorbankan — masing-masing
+                punya halaman sendiri, dan tap di kaki stat ini memang cuma jalan
+                pintas ke sana. Syaratnya WAJIB sama dgn BannerSkeleton & cardHeight
+                (ketiganya baca heroRingkas), kalau tidak layar meloncat saat data
+                datang. */}
+            {!ringkas && (
+              <HeroStats
+                className="pt-[18px]"
+                items={[
+                  { icon: Wallet, label: 'Terkumpul', value: maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas') },
+                  { icon: ArrowLeftRight, label: 'Talangan', value: maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('talangan') },
+                  { icon: ArrowUpRight, label: 'Setor Kas RT', value: maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas-rt') },
+                ]}
+              />
+            )}
           </>
         }
       />

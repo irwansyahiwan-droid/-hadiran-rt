@@ -5,6 +5,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { formatRupiahPlain, haptic } from '../lib/utils';
+import { heroRingkas, useTinggiLayar } from '../lib/hooks';
 import rtBendahara from '../assets/rt-bendahara.jpg';
 import dashboardPhone from '../assets/dashboard-phone.jpg';
 
@@ -21,9 +22,17 @@ const TOP = 8;          // offset atas kartu di dalam viewport
 const CARD_GAP = 18;    // sisa tinggi viewport di luar kartu (TOP + napas bawah)
 
 /** Tinggi kartu efektif menurut tinggi viewport. ≥740px → 344 persis (HP modern,
- *  desain tak berubah). Di bawah itu skala ~46.5% tinggi layar, lantai 300px. */
+ *  desain tak berubah). 700–739 → skala ~46.5% tinggi layar. <700 → mode ringkas:
+ *  kaki stat sudah lepas (~82px), jadi lantainya boleh jauh lebih rendah tanpa
+ *  bikin isi bertumpuk — 226px masih menyisakan napas di atas caption.
+ *
+ *  Loncatan di ambang 700 (326 → 245) memang besar, dan itu memang MAKSUDNYA: yang
+ *  hilang persis setinggi kaki stat yang ikut dilepas di titik yang sama. Satu HP
+ *  punya satu tinggi layar, jadi loncatan ini tak pernah terlihat sebagai animasi. */
 function cardHeight(vh: number): number {
-  return vh >= 740 ? CARD_H : Math.max(300, Math.round(vh * 0.465));
+  if (vh >= 740) return CARD_H;
+  if (!heroRingkas(vh)) return Math.max(300, Math.round(vh * 0.465));
+  return Math.max(226, Math.round(vh * 0.35));
 }
 
 /** Tinggi viewport carousel (kartu + napas bawah), TANPA baris indikator. */
@@ -75,16 +84,21 @@ export function BannerSkeleton({ vh }: { vh: number }) {
           <span className="h-8 w-3/4 rounded-xl bg-line dark:bg-gray-700" />
           <span className={`h-3 w-3/5 ${bar}`} />
         </div>
-        {/* footer 3 kolom (Terkumpul / Talangan / Setor Kas RT) */}
-        <div className="grid grid-cols-3 gap-3 border-t border-control pt-4 dark:border-control-dark">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
-              <span className="h-3.5 w-3.5 rounded-md bg-line dark:bg-gray-700" />
-              <span className={`h-2 w-11 ${bar}`} />
-              <span className={`h-2.5 w-14 ${bar}`} />
-            </div>
-          ))}
-        </div>
+        {/* footer 3 kolom (Terkumpul / Talangan / Setor Kas RT) — ikut lepas di
+            layar pendek, PERSIS seperti kartu aslinya. Kalau syarat ini beda dgn
+            kartu, skeleton jadi lebih tinggi dari isinya → layar meloncat saat
+            data datang, cacat yang justru mau dicegah komponen ini. */}
+        {!heroRingkas(vh) && (
+          <div className="grid grid-cols-3 gap-3 border-t border-control pt-4 dark:border-control-dark">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <span className="h-3.5 w-3.5 rounded-md bg-line dark:bg-gray-700" />
+                <span className={`h-2 w-11 ${bar}`} />
+                <span className={`h-2.5 w-14 ${bar}`} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       {/* baris indikator story: satu pill aktif + dot sisanya */}
       {/* mx-[9px] + gap 0 = geometri PERSIS indikator asli (kotak sentuh 24px). */}
@@ -369,12 +383,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   const spacing = Math.round(cardW * 0.82);
 
   // Tinggi layar → tinggi kartu (shrink di HP pendek). Lacak resize/rotasi.
-  const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800);
-  useEffect(() => {
-    const onResize = () => setVh(window.innerHeight);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+  const vh = useTinggiLayar();
   const cardH = cardHeight(vh);
   const viewportH = cardH + CARD_GAP;
 

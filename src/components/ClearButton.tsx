@@ -13,6 +13,11 @@ interface ClearButtonProps {
  * ukuran target, ikon, & feedback tekan. Pasangkan dengan input ber-`pr-11` agar
  * teks tak menabrak tombol. Feedback via `press-icon` (opacity, transform-safe →
  * tidak menimpa -translate-y-1/2 yang memusatkan tombol secara vertikal).
+ *
+ * Lahirnya juga memudar (`reveal-fade`): call-site selalu `{search && <Clear…/>}`,
+ * jadi dulu tombol MELETUS ada di huruf pertama yang diketik — persis di titik
+ * mata sedang menatap. Varian fade dipilih, bukan `.reveal`, dengan alasan yang
+ * sama seperti `press-icon`: transform apa pun di sini menimpa -translate-y-1/2.
  */
 export default function ClearButton({ onClick, label = 'Bersihkan pencarian' }: ClearButtonProps) {
   return (
@@ -20,7 +25,7 @@ export default function ClearButton({ onClick, label = 'Bersihkan pencarian' }: 
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="press-icon absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center"
+      className="press-icon reveal-fade absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center"
     >
       <X className="w-4 h-4 text-gray-400" />
     </button>

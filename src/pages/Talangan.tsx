@@ -314,7 +314,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
         {/* Detail entries */}
         {isExpanded && (
-          <div className="border-t border-line dark:border-gray-800 list-inset [--di-l:3.75rem] [--di-r:1rem]">
+          <div className="reveal border-t border-line dark:border-gray-800 list-inset [--di-l:3.75rem] [--di-r:1rem]">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-2 px-4 py-3">
                 <div className={`icon-tile w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
