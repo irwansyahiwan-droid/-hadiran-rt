@@ -154,26 +154,47 @@ export default function JadwalWargaPage() {
             baris kehadiran, progress, chip), tinggi via HERO_MIN_H. Versi lama:
             slab abu h-44 polos = 22px lebih pendek dari hero asli, dan blok di
             bawahnya (grid 3×h-20) tak menyerupai baris toggle 44px yang asli. */}
+        {/* `minHeight`, BUKAN `height`: tinggi tetap MENGUNCI skeleton ke 198px
+            padahal hero asli 253px di ≤360px (chip melipat 2 baris) — 55px yang
+            hilang itu mendorong seluruh halaman saat data datang, dan itulah
+            seluruh CLS 0,146 layar ini. Dengan min-height, anatominya sendiri
+            yang menentukan tinggi & ikut melipat di titik yang SAMA, jadi
+            HERO_MIN_H kembali jadi lantai (persis perannya di hero asli), bukan
+            angka yang harus ditebak ulang tiap kali anatomi berubah. */}
         <div
-          style={{ height: HERO_MIN_H }}
+          style={{ minHeight: HERO_MIN_H }}
           className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5 space-y-3"
         >
-          <div className="skeleton h-2.5 w-32 rounded-full" />
-          <div className="space-y-1.5">
+          {/* Tinggi tiap blok = tinggi KOTAK BARIS aslinya (diukur 360px: eyebrow
+              20, judul 68, progres 28). Batang skeleton sengaja lebih tipis dari
+              huruf, jadi kalau blok pembungkusnya tak dipatok, skeleton berakhir
+              48px lebih pendek dari hero yang digantikannya — itu sisa geseran
+              yang tak hilang hanya dengan membetulkan pelipatan chip.
+
+              Judul memakai `max-[389px]:` karena judul & baris Sohibul Bait
+              MELIPAT di bawah 390px (68px) dan tidak di atasnya (46px). Angkanya
+              bukan tebakan: 390 persis titik chip berhenti melipat juga, dan
+              tinggi hero terukur 253 vs 198 di dua sisi ambang itu. */}
+          <div className="skeleton h-5 w-32 rounded-full" />
+          <div className="h-[46px] max-[389px]:h-[68px] space-y-1.5">
             <div className="skeleton h-4 w-3/4 rounded-full" />
             <div className="skeleton h-3 w-2/3 rounded-full" />
           </div>
-          <div className="space-y-1.5">
+          <div className="h-7 space-y-1.5">
             <div className="flex items-center justify-between">
               <div className="skeleton h-2.5 w-20 rounded-full" />
               <div className="skeleton h-2.5 w-24 rounded-full" />
             </div>
             <div className="skeleton h-2 w-full rounded-full" />
           </div>
-          <div className="flex gap-2">
-            <div className="skeleton h-6 w-24 rounded-full" />
-            <div className="skeleton h-6 w-28 rounded-full" />
-            <div className="skeleton h-6 w-20 rounded-full" />
+          {/* `flex-wrap` + lebar disalin dari chip ASLI (diukur 360px: 82 / 107 /
+              99 px, lintasan 288 → melipat 2 baris). Tanpa `flex-wrap` skeleton
+              memampatkan chipnya jadi satu baris sementara hero asli melipat →
+              skeleton 32px lebih pendek dari yang digantikannya. */}
+          <div className="flex gap-2 flex-wrap">
+            <div className="skeleton h-[25px] w-[82px] rounded-full" />
+            <div className="skeleton h-[25px] w-[107px] rounded-full" />
+            <div className="skeleton h-[25px] w-[99px] rounded-full" />
           </div>
         </div>
         {/* Sub-tab switcher (2 tombol, min-h 44) */}
