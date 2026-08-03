@@ -503,21 +503,26 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    beradu dengan pil merah "Defisit". Status kini dibawa chip + pil kata; hero
    se-app satu warna: .hero-emerald. Jangan pasang ulang ramp per-status.) */
 
-/* (.nav-float dihapus 10 Jul — sisa era nav kapsul melayang, tak ada pemakainya
-   sejak nav jadi bar DOK .nav-dock di bawah.) */
+/* (.nav-float dihapus 10 Jul. Nav sempat jadi bar DOK `.nav-dock` 2 Jul, lalu
+   kembali ke kapsul melayang 3 Agu sebagai `.nav-pill` di bawah — kelas lama
+   `.nav-float` & `.nav-dock` dua-duanya sudah tak ada, jangan dihidupkan lagi.) */
 
-/* Bar nav DOK bawah (2 Jul 2026, ala Google/myBCA/BYOND BSI) — nempel penuh ke
-   tepi bawah layar, bukan kapsul melayang. Pemisah dari konten = hairline atas
-   + bayangan NAIK tipis saja (bar dok tak butuh drop berlapis ke bawah). */
-.nav-dock {
+/* Bar nav KAPSUL MELAYANG (3 Agu 2026, permintaan user — ala GitHub Mobile).
+   Menggantikan `.nav-dock` (bar penuh nempel tepi bawah, 2 Jul). Karena kini
+   melayang, ia butuh bayangan MENGELILINGI — bukan hairline atas seperti dok.
+   Hairline tetap ada sebagai tepi tercetak, sejalan bahasa kartu Material-flat:
+   satu contact whisper + ring tipis, bukan glow berlapis. */
+.nav-pill {
   box-shadow:
-    0 -1px 0 0 rgba(16, 24, 40, 0.07),            /* hairline atas */
-    0 -8px 24px -12px rgba(16, 24, 40, 0.12);     /* ambient naik tipis */
+    0 0 0 1px rgba(16, 24, 40, 0.06),
+    0 2px 4px -1px rgba(15, 23, 42, 0.09),
+    0 12px 28px -14px rgba(15, 23, 42, 0.30);
 }
-.dark .nav-dock {
+.dark .nav-pill {
   box-shadow:
-    0 -1px 0 0 rgba(255, 255, 255, 0.09),
-    0 -8px 24px -12px rgba(0, 0, 0, 0.6);
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 2px 4px -1px rgba(0, 0, 0, 0.5),
+    0 12px 28px -14px rgba(0, 0, 0, 0.75);
 }
 
 /* MATERIAL-FLAT (2 Jul): top-light gradient kartu (light & dark) DIHAPUS.
@@ -1107,7 +1112,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    warna sistem saat forced-colors, edge ring dipertegas saat prefers-contrast.
    Hanya menambah definisi tepi; tak menyentuh markup/arah near-white. */
 @media (forced-colors: active) {
-  .lift, .float, .nav-dock {
+  .lift, .float, .nav-pill {
     border: 1px solid CanvasText;
   }
 }
