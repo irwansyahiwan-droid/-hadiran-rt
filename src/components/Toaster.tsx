@@ -13,6 +13,16 @@ const EXIT_MS = 200; // selaras durasi .toast-out
 
 export default function Toaster() {
   const [items, setItems] = useState<ToastItem[]>([]);
+  /* Pengumuman untuk pembaca layar SENGAJA dipisah dari toast yang terlihat.
+     Sebelumnya `role="status"` menempel di wadah toast yang baru DIRENDER saat
+     toast pertama muncul — pembaca layar butuh region-nya sudah ada di DOM
+     SEBELUM isinya berubah, jadi VoiceOver/TalkBack sering diam sama sekali:
+     bendahara menekan simpan lalu hening, tak ada cara tahu berhasil.
+     Dipisah juga melindungi dari dua hal lain: animasi keluar mencabut teks di
+     tengah pembacaan, dan galat yang butuh `assertive` tak bisa dibedakan
+     kalau semua toast berbagi satu region `polite`. */
+  const [umumSopan, setUmumSopan] = useState('');
+  const [umumPenting, setUmumPenting] = useState('');
   // id toast yg sedang memainkan exit (slide naik + fade) sebelum dilepas.
   // id = number (counter di lib/toast) — Set<number> selaras dgn ToastItem.id.
   const [leaving, setLeaving] = useState<Set<number>>(new Set());
@@ -27,10 +37,23 @@ export default function Toaster() {
     }, EXIT_MS);
   };
 
+  /* Kosongkan dulu baru isi: teks yang SAMA persis dua kali tidak mengubah DOM,
+     dan region live yang tak berubah tidak diumumkan ulang. */
+  const umumkan = (pesan: string, penting: boolean) => {
+    const set = penting ? setUmumPenting : setUmumSopan;
+    set('');
+    setTimeout(() => set(pesan), 60);
+  };
+
   useEffect(() => {
     return subscribeToast((t) => {
       haptic(8);
       setItems((prev) => [...prev, t]);
+      /* Toast beraksi (mis. "Urungkan") menutup diri dalam ~2,6 detik. Pemakai
+         pembaca layar tak melihatnya, jadi keberadaan tombol itu harus ikut
+         diucapkan — kalau tidak, jalan untuk membatalkan absensi massal lewat
+         begitu saja tanpa pernah diketahui. */
+      umumkan(t.actionLabel ? `${t.message}. Tombol ${t.actionLabel} tersedia.` : t.message, t.type === 'error');
       // commit ditunda (guard mencegah jalan bila sudah di-undo)
       setTimeout(() => dismiss(t.id, () => t.onExpire?.()), t.duration ?? 2600);
     });
@@ -41,12 +64,29 @@ export default function Toaster() {
     dismiss(t.id, () => t.onAction?.());
   };
 
-  if (items.length === 0) return null;
+  return (
+    <>
+      {/* Region live PERMANEN — harus tetap terpasang meski tak ada toast.
+          Jangan gabungkan lagi ke wadah toast di bawah. */}
+      <p className="sr-only" role="status" aria-live="polite">{umumSopan}</p>
+      <p className="sr-only" role="alert" aria-live="assertive">{umumPenting}</p>
+      {items.length > 0 && <ToastStack items={items} leaving={leaving} onAction={handleAction} />}
+    </>
+  );
+}
 
+function ToastStack({
+  items, leaving, onAction,
+}: {
+  items: ToastItem[];
+  leaving: Set<number>;
+  onAction: (t: ToastItem) => void;
+}) {
   return (
     <div
-      role="status"
-      aria-live="polite"
+      /* Sengaja TANPA role/aria-live: pengumuman sudah ditangani region live
+         permanen di atas. Wadah ini konten biasa, jadi tak diumumkan otomatis
+         (tak ada pembacaan dobel) tapi tombol aksinya tetap bisa dijelajahi. */
       className="fixed left-1/2 z-toast flex flex-col items-center gap-2 w-[calc(100%-2rem)] max-w-sm pointer-events-none"
       style={{
         top: 'calc(env(safe-area-inset-top) + 12px)',
@@ -74,7 +114,7 @@ export default function Toaster() {
             <p className="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-100">{t.message}</p>
             {t.actionLabel && (
               <button
-                onClick={() => handleAction(t)}
+                onClick={() => onAction(t)}
                 className="press shrink-0 -mr-1 px-3 py-1.5 rounded-xl text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
               >
                 {t.actionLabel}

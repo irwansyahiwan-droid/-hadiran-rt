@@ -18,6 +18,10 @@ const tabs: { id: TabName; label: string; icon: LucideIcon }[] = [
   { id: 'kas-rt',   label: 'Kas RT',   icon: Building2 },
 ];
 
+/** Label tab = SATU sumber, dipakai bar nav DAN judul dokumen (App.tsx).
+ *  Jangan salin daftar di atas ke tempat lain. */
+export const labelTab = (id: TabName) => tabs.find((t) => t.id === id)?.label ?? '';
+
 export default function BottomNav({ active, onChange, isWargaMode }: BottomNavProps) {
   // Warga tidak punya tab Talangan — diakses lewat tombol "Lihat" di Beranda
   const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;

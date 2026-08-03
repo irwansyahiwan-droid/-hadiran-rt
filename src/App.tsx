@@ -12,7 +12,7 @@ import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import InstallPrompt from './components/InstallPrompt';
 import Toaster from './components/Toaster';
 import WelcomeSheet from './components/WelcomeSheet';
-import type { TabName } from './components/layout/BottomNav';
+import { labelTab, type TabName } from './components/layout/BottomNav';
 import logoRT from './assets/logo-rt.svg';
 
 // Code-splitting per halaman → first load ringan di HP warga; tiap tab/overlay
@@ -91,6 +91,17 @@ export default function App() {
 
   // Tombol Back HP di tab non-Beranda → kembali ke Beranda (bukan keluar app).
   useBackDismiss(activeTab !== 'beranda', () => changeTab('beranda'));
+
+  /* Judul dokumen ikut tab aktif. App satu-halaman tak pernah mengganti judul
+     sendiri: sebelumnya kelima layar sama-sama "Hadiran RT 004/006", padahal
+     judul inilah yang diumumkan pembaca layar tiap pindah layar dan yang muncul
+     di riwayat/pengalih tab HP. Layar Login sengaja memakai judul dasar. */
+  const cangkangTampil = !!auth.user || wargaMode;
+  useEffect(() => {
+    const dasar = 'Hadiran RT 004/006';
+    const nama = cangkangTampil ? labelTab(activeTab) : '';
+    document.title = nama ? `${nama} · ${dasar}` : dasar;
+  }, [activeTab, cangkangTampil]);
 
   // Restorasi posisi scroll saat pindah tab (best-effort untuk konten yang dimuat async).
   useEffect(() => {
