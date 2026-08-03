@@ -57,17 +57,27 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
       }}
     >
       {/* KAPSUL MELAYANG (3 Agu 2026, permintaan user — ala GitHub Mobile).
-          Menggantikan bar dok penuh 2 Jul. Tinggi TOTAL sengaja dijaga tetap
-          70px + safe-area (kapsul 58 + napas bawah 12) karena angka itu dipakai
-          ulang di empat tempat sebagai `4.5rem`: padding-bawah <main> App, Fab,
-          tombol sticky Absensi Jadwal, dan prompt PWA/Install. Mengubah tinggi
-          di sini tanpa menyentuh keempatnya = konten ngumpet di belakang nav. */}
+          Menggantikan bar dok penuh 2 Jul.
+
+          JARAK BAWAH: safe-area TIDAK ditumpuk penuh. Versi pertama memakai
+          `safe-area + 12px` — di iPhone itu 34 + 12 = 46px, dan kapsulnya
+          terbaca mengambang kelewat tinggi (keluhan user: "kurang ke bawah").
+          Bar melayang memang tak perlu menghindari seluruh zona home indicator
+          seperti bar dok yang harus mengecat sampai dasar; GitHub Mobile pun
+          duduk tepat di atas garis indikator. Jadi safe-area dipotong 16px dan
+          diberi lantai 8px: iPhone ≈ 18px, layar tanpa notch = 8px.
+
+          Tinggi TOTAL nav jadi ≤70px + safe-area — tetap AMAN terhadap `4.5rem`
+          yang dipakai ulang di empat tempat (padding-bawah <main> App, Fab,
+          tombol sticky Absensi Jadwal, prompt PWA/Install), karena nav kini
+          memakan LEBIH SEDIKIT ruang, bukan lebih banyak. Yang berbahaya cuma
+          arah sebaliknya: menaikkan tinggi tanpa menyentuh keempatnya. */}
       <div
         className="px-3"
         // Tucked (scroll turun) = bar meluncur keluar layar: matikan interaksi
         // agar tak ada tap "hantu" yang tertangkap saat nav tak terlihat.
         style={{
-          paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)',
+          paddingBottom: 'max(8px, calc(env(safe-area-inset-bottom) - 16px))',
           pointerEvents: tucked ? 'none' : 'auto',
         }}
       >
