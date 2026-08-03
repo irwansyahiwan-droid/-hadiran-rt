@@ -104,15 +104,26 @@
     <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1242x2688.png" />
     <link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1284x2778.png" />
     <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/splash-1290x2796.png" />
+    <!-- Kartu pratinjau saat link dibagikan di grup WA/Telegram. `og:site_name`
+         yang mengisi baris kecil di atas judul kartu — tanpa itu WhatsApp
+         menampilkan domain mentah "hadiran-rt.vercel.app" di situ.
+         Ukuran og:image WAJIB ukuran ASLI berkas (1920×1008, diukur `file`);
+         sebelumnya tertulis 1200×630 dan angka palsu itulah yang dipakai
+         WhatsApp untuk memesan kotak gambar → hasilnya terpotong. -->
+    <meta property="og:site_name" content="Hadiran RT 004/006" />
+    <meta property="og:locale" content="id_ID" />
     <meta property="og:title" content="Hadiran RT 004/006" />
-    <meta property="og:description" content="Aplikasi manajemen arisan &amp; kas RT 004/006, Tanah Baru Beji, Depok" />
+    <meta property="og:description" content="Jadwal tarikan, absensi, talangan &amp; kas RT yang transparan — langsung dari HP, tanpa install." />
     <meta property="og:image" content="https://hadiran-rt.vercel.app/og-hadiran.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1920" />
+    <meta property="og:image:height" content="1008" />
+    <meta property="og:image:alt" content="Hadiran RT 004/006 — arisan &amp; kas warga dalam genggaman" />
     <meta property="og:url" content="https://hadiran-rt.vercel.app/" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Hadiran RT 004/006" />
+    <meta name="twitter:description" content="Jadwal tarikan, absensi, talangan &amp; kas RT yang transparan — langsung dari HP, tanpa install." />
     <meta name="twitter:image" content="https://hadiran-rt.vercel.app/og-hadiran.jpg" />
   </head>
   <body>

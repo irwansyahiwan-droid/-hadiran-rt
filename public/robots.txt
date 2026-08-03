@@ -10,3 +10,44 @@ Allow: /landing.html
 Allow: /og-hadiran.jpg
 Allow: /favicon.png
 Allow: /icon-192.png
+
+# ---------------------------------------------------------------------------
+# Perayap PRATINJAU pesan (bukan mesin pencari) — WAJIB boleh baca "/".
+#
+# Sebelumnya seluruh perayap kena "Disallow: /" di atas, termasuk WhatsApp.
+# Akibatnya link https://hadiran-rt.vercel.app/ yang dibagikan di grup WA
+# tampil POLOS: WA membaca robots.txt lebih dulu, ditolak, lalu tak pernah
+# mengambil HTML-nya sama sekali — jadi <title>, deskripsi, dan og:image yang
+# sudah lengkap di index.html tak pernah terbaca. Kartu pratinjau akhirnya cuma
+# memuat URL mentah.
+#
+# Perayap di bawah TIDAK membangun indeks publik; mereka hanya merender kartu
+# di dalam percakapan. index.html adalah cangkang statis — nol data warga
+# (semua nominal & nama baru dimuat dari Supabase setelah login), jadi
+# membukanya tidak membocorkan apa pun.
+#
+# Googlebot & kawan-kawan TETAP kena "Disallow: /" di grup "*" di atas,
+# diperkuat <meta name="robots" content="noindex, nofollow"> di index.html.
+# Grup spesifik menang atas "*", jadi tiap perayap di sini butuh "Allow: /"
+# sendiri — mereka mengabaikan grup "*" sepenuhnya.
+# ---------------------------------------------------------------------------
+User-agent: WhatsApp
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: Slackbot-LinkExpanding
+Allow: /
+
+User-agent: Discordbot
+Allow: /
