@@ -71,13 +71,19 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 | `audit:muat` | FCP & siap-pakai (CPU 4× lambat, 400 kbps) | Warga pakai Android kelas bawah, sinyal seadanya |
 | `audit:masuk` | Gerbang masuk & keluar saat jaringan busuk (chunk gagal, request menggantung, logout luring) | Semua audit lain menguji layar SESUDAH masuk. **Tombol "Masuk" yang terkunci tak menyisakan jalan lain sama sekali**, dan kegagalan jaringan yang dilaporkan sebagai "password salah" bikin bendahara mengganti sandi yang sudah benar |
 | `audit:tulis` | Tombol simpan saat request tulis MENGGANTUNG (Kas RT + Kelola Anggota) | `audit:keadaan` menguji BACA gagal, `audit:masuk` menguji auth — jalur TULIS, satu-satunya tempat uang benar-benar dicatat, tak tersentuh keduanya. **`try/finally` ada di semua jalur tulis tapi tak menolong: `finally` tak pernah tercapai kalau janjinya tak pernah selesai** |
+| `audit:mati` | Keterbacaan label tombol saat `disabled` (terang+gelap, warga+bendahara) | Kedua audit kontras MELEWATI kontrol nonaktif secara eksplisit — sah, karena WCAG 1.4.3 mengecualikannya. Tapi "tak wajib" bukan "boleh tak terbaca", dan pengecualian itu berarti keadaan nonaktif **tak pernah diukur sekali pun**. Yang tersembunyi di baliknya: tombol masuk bendahara 3,79:1 saat "Memproses…", 3 tombol teks Kas Hadiran 2,2–2,7:1, dan perbaikan `.btn-brand:disabled` yang ternyata cuma dihitung untuk mode TERANG (4,32:1 di gelap). Ambang dilaporkan sebagai ambang APP, bukan "gagal WCAG" — disiplin yang sama dgn bagian teks-200% di `audit:reflow` |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
-bukan kodenya. Sudah terjadi 7×: sampel kena border 1px, aturan dialog dikenakan ke halaman
+bukan kodenya. Sudah terjadi 9×: sampel kena border 1px, aturan dialog dikenakan ke halaman
 penuh, probe mengambil dialog di belakang sheet, `.sr-only` terbaca "terpotong", pola rute
 `supabase-*.js` meleset dari nama asli `vendor-supabase-*.js` (sapuan diam-diam menguji jalur
-ONLINE lalu "lolos"), klik ditolak karena panel collapse masih beranimasi, dan klik pembuka
-panel mendarat SEBELUM hidrasi lalu tak berbuat apa-apa. Karena itu tiap gangguan jaringan di
+ONLINE lalu "lolos"), klik ditolak karena panel collapse masih beranimasi, klik pembuka
+panel mendarat SEBELUM hidrasi lalu tak berbuat apa-apa, `audit:mati` menyapu SEMUA tombol
+(termasuk yang tak punya gaya `disabled` sama sekali) lalu melaporkan label bottom-nav sebagai
+gagal — populasi salah, ukuran benar — dan sampel `fill` di sapuan yang sama mendarat di AVATAR
+baris daftar, bukan di fill tombol, sehingga rasionya avatar-lawan-latar ("1:1"). Karena itu
+`audit:mati` kini hanya melihat tombol yang gayanya BENAR-BENAR berubah saat nonaktif, dan fill
+diambil dari MODUS kisi di dalam kotak teks. Tiap gangguan jaringan di
 `audit-masuk.mjs` menghitung berapa kali benar-benar terpasang, dan tiap prasyarat UI ditunggu
 sampai MENGAKU tercapai (`aria-expanded="true"`), bukan diasumsikan dari satu klik.
 

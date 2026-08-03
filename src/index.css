@@ -700,20 +700,46 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      Sistem warna app sudah punya jawabannya: ABU = kontrol inaktif, sinyal yang
      disengaja. Fill = fill `.inset-soft`, label = `ink-faint` → 8,9:1.
      Tiga nilai opacity berbeda utk pekerjaan sama juga ikut hilang. */
-  .btn-brand:disabled, .btn-danger:disabled {
+  /* `.btn-mati` = tombol TERISI non-brand yang ikut bahasa ini (mis. submit
+     "Masuk sebagai Bendahara": `bg-gray-900/90` + putih, di luar keluarga
+     .btn-brand sehingga aturan di bawah tak pernah menjangkaunya). */
+  .btn-brand:disabled, .btn-danger:disabled, .btn-mati:disabled {
     background-image: none;
     background-color: #E9EEF5;
     color: #334155;
     box-shadow: none;
     filter: none;
+    opacity: 1;              /* menang atas `disabled:opacity-*` sisa di call-site */
     cursor: not-allowed;
   }
   /* Press mati saat nonaktif — tombol tak boleh "menjawab" tekanan. */
-  .btn-brand:disabled:active, .btn-danger:disabled:active { transform: none; box-shadow: none; }
-  .dark .btn-brand:disabled, .dark .btn-danger:disabled {
+  .btn-brand:disabled:active, .btn-danger:disabled:active, .btn-mati:disabled:active { transform: none; box-shadow: none; }
+  .dark .btn-brand:disabled, .dark .btn-danger:disabled, .dark .btn-mati:disabled {
     background-color: rgba(255, 255, 255, 0.08);
-    color: #9CA3AF;
+    /* #9CA3AF (gray-400) diukur 4,32:1 di atas fill ini — LOLOS di terang, gagal
+       di GELAP. Perbaikan aslinya cuma dihitung untuk mode terang, dan tak ada
+       yang menangkapnya karena keadaan nonaktif tak pernah disampel sama sekali
+       sampai `npm run audit:mati` ada. Dinaikkan ke #B4BCC8. */
+    color: #B4BCC8;
   }
+
+  /* ── `.mati-teks` = keadaan nonaktif untuk tombol TEKS/hantu ──────────────
+     Tombol tanpa fill (Ekspor PDF, Batalkan, Hapus di Kas Hadiran) tak bisa
+     memakai resep abu di atas — tak ada kotak untuk diberi warna. Dulu ketiganya
+     memakai `disabled:opacity-50`, dan opacity pada teks yang memang sudah
+     bernada sedang menjatuhkannya ke 2,22–2,72:1 (diukur audit:mati; terburuk
+     "PDF Pendapatan" di mode gelap). Warga lansia tak bisa membacanya.
+
+     Ganti opacity dengan WARNA redup yang masih terbaca: nonaktifnya tetap
+     terbaca sebagai abu netral (bahasa app: abu = kontrol inaktif), tapi
+     labelnya tak lagi memudar ke latar. `opacity: 1` wajib supaya `disabled:
+     opacity-*` yang mungkin masih menempel di call-site tak menimpanya lagi. */
+  .mati-teks:disabled {
+    opacity: 1;
+    color: #64748B;          /* 4,76:1 di atas kartu putih */
+    cursor: not-allowed;
+  }
+  .dark .mati-teks:disabled { color: #94A3B8; }
 
   /* ── Secondary button (aksi netral: Batal/Tutup di footer modal) ───────
      SATU sumber untuk tombol sekunder berbingkai yang sebelumnya disalin

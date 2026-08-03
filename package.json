@@ -16,6 +16,7 @@
     "audit:publik": "CAP_URL=http://localhost:5199 node scripts/audit-publik.mjs",
     "audit:kontras": "CAP_URL=http://localhost:5199 node scripts/audit-kontras.mjs",
     "audit:kontras-nonteks": "CAP_URL=http://localhost:5199 node scripts/audit-kontras-nonteks.mjs",
+    "audit:mati": "CAP_URL=http://localhost:5199 node scripts/audit-mati.mjs",
     "audit:lebar": "CAP_URL=http://localhost:5199 node scripts/audit-lebar-nominal.mjs",
     "audit:sentuh": "CAP_URL=http://localhost:5199 node scripts/audit-sentuh.mjs",
     "audit:reflow": "CAP_URL=http://localhost:5199 node scripts/audit-reflow.mjs",

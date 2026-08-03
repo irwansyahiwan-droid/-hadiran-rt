@@ -363,7 +363,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="press w-full py-3 rounded-xl bg-gray-900/90 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="press btn-mati w-full py-3 rounded-xl bg-gray-900/90 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-semibold text-sm transition-colors"
               >
                 {loading ? 'Memproses…' : 'Masuk sebagai Bendahara'}
               </button>
