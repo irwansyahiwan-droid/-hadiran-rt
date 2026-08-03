@@ -96,13 +96,25 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
 
   return (
     <div ref={ref} className="relative">
-      {/* Indikator */}
+      {/* Indikator — digeser `transform`, BUKAN `top`.
+          Geometrinya identik (top:-46 + translateY(pull) === top:pull-46), tapi
+          `top` properti LAYOUT: ia di-set ulang tiap frame selama jari menarik
+          (onMove → setPull), jadi tiap frame memicu layout+paint, bukan cuma
+          komposit. Pembungkus konten di bawah sudah memakai transform sejak
+          awal; indikatornya saja yang tertinggal.
+
+          Transform di sini AMAN dari jebakan containing-block yang diperingatkan
+          pembungkus konten: satu-satunya keturunannya lingkaran spinner, tak ada
+          `position: fixed` di dalamnya. */}
       <div
         className="absolute left-0 right-0 flex justify-center pointer-events-none z-10"
         style={{
-          top: pull - 46,
+          top: -46,
+          transform: `translateY(${pull}px)`,
           opacity: refreshing ? 1 : progress,
-          transition: animating ? 'top 0.3s var(--ease-out-expo), opacity 0.3s' : 'none',
+          transition: animating
+            ? 'transform 0.3s var(--ease-out-expo), opacity 0.3s var(--ease-out-expo)'
+            : 'none',
         }}
       >
         {/* .float (token overlay) — bukan shadow-lg mentah; indikator melayang di atas konten. */}
