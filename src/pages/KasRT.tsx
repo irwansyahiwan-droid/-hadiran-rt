@@ -588,6 +588,41 @@ export default function KasRTPage() {
           <SmartInsight label="Kas masuk bulan ini" current={masukBulanIni} previous={masukBulanLalu} />
         )}
 
+        {/* Selama muat, dua blok di bawah (grafik & rekap) dulu bertinggi NOL lalu
+            tiba-tiba ada — mendorong seluruh isi halaman 661px sekaligus (CLS
+            terukur 0,479 di 400 kbps, "buruk" menurut ambang Google; layar lain
+            0,02–0,15). Warga membaca sambil halaman melompat satu layar penuh.
+            Hero & daftar mutasi sudah lama punya skeleton lewat CrossFade —
+            kedua blok inilah yang tertinggal.
+
+            Skeletonnya BERBENTUK isi aslinya (bukan slab abu setinggi tetap):
+            tinggi tetap akan salah begitu `sm:` mengubah grid jadi 2 kolom.
+            Dengan struktur yang sama, ia reflow persis seperti yang digantikan. */}
+        {loading && (
+          <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2" aria-hidden="true">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
+              <div className="skeleton h-4 w-24 rounded-lg mb-2" />
+              {/* 84px = tinggi default AreaTrend */}
+              <div className="skeleton rounded-xl" style={{ height: 84 }} />
+              <div className="mt-2 flex justify-between gap-2">
+                <div className="skeleton h-3 w-20 rounded-full" />
+                <div className="skeleton h-3 w-20 rounded-full" />
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="skeleton h-4 w-28 rounded-lg" />
+                <div className="flex gap-1">
+                  {[0, 1, 2].map((i) => <div key={i} className="skeleton h-11 w-14 rounded-full" />)}
+                </div>
+              </div>
+              <div className="skeleton h-3 w-32 rounded-full mb-2" />
+              {/* 96px = tinggi area bar MonthlyBars */}
+              <div className="skeleton rounded-xl" style={{ height: 96 }} />
+            </div>
+          </div>
+        )}
+
         {/* Grafik tren saldo & masuk/keluar per bulan (periode 3/6/12) */}
         {!loading && list.length > 1 && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
@@ -641,6 +676,31 @@ export default function KasRTPage() {
                 <MonthlyBars data={monthly} />
               </div>
             )}
+          </div>
+        )}
+
+        {/* Rekap per kategori — skeleton sebentuk isinya (lihat alasan di atas). */}
+        {loading && (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 mt-4" aria-hidden="true">
+            <div className="skeleton h-4 w-36 rounded-lg mb-3" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[0, 1].map((k) => (
+                <div key={k} className="inset-soft rounded-xl p-3">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="skeleton h-3 w-20 rounded-full" />
+                    <div className="skeleton h-3 w-24 rounded-full" />
+                  </div>
+                  <div className="space-y-1.5">
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} className="flex items-center justify-between gap-2">
+                        <div className="skeleton h-3 w-28 rounded-full" />
+                        <div className="skeleton h-3 w-16 rounded-full" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
