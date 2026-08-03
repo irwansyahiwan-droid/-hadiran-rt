@@ -55,8 +55,8 @@ const STATUS_UI: Record<AbsensiStatus, { label: string; text: string; ava: strin
   },
   tidak_hadir: {
     label: 'Tidak hadir → Talangan',
-    text: 'text-rose-600 dark:text-rose-400',
-    ava: 'bg-rose-50 dark:bg-rose-900/25 text-rose-600 dark:text-rose-400',
+    text: 'text-neg dark:text-rose-400',
+    ava: 'bg-rose-50 dark:bg-rose-900/25 text-neg dark:text-rose-400',
     hover: 'hover:bg-rose-50/30 dark:hover:bg-rose-900/15',
   },
 };
@@ -377,14 +377,14 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             tidak bisa di-tap (hadir/titip/tidak hadir) & di luar hitungan talangan. */}
         {sohibulWarga && (
           <div className="w-full flex items-center gap-3 p-3.5 [--di-l:3.625rem] [--di-r:0.875rem] divide-inset bg-amber-50/60 dark:bg-amber-900/15">
-            <div className="icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+            <div className="icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400">
               {sohibulWarga.nama.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{sohibulWarga.nama}</p>
-              <p className="text-xs font-medium text-amber-700 dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
+              <p className="text-xs font-medium text-warn dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 shrink-0">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400 shrink-0">
               <Lock className="w-3 h-3" /> Penerima
             </span>
           </div>
@@ -449,7 +449,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             <button
               onClick={handleBatalkanClick}
               disabled={saving || cancelling}
-              className="press w-full py-3 rounded-full font-bold text-sm shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
+              className="press w-full py-3 rounded-full font-bold text-sm shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-neg dark:text-rose-400"
             >
               {cancelling
                 ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan…</>
@@ -468,7 +468,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         </>}
         typeToConfirm={{
           value: String(tarikan.nomor),
-          hint: <>Ketik angka <span className="font-bold text-rose-600 dark:text-rose-400">{tarikan.nomor}</span> untuk konfirmasi</>,
+          hint: <>Ketik angka <span className="font-bold text-neg dark:text-rose-400">{tarikan.nomor}</span> untuk konfirmasi</>,
         }}
         confirmLabel="Batalkan"
         loadingLabel="Membatalkan…"
@@ -567,7 +567,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> {result.titipCount} Titip
             </span>
           )}
-          <span className="inline-flex items-center gap-1.5 font-semibold text-rose-600 dark:text-rose-400">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-neg dark:text-rose-400">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {result.tidakCount} Tidak hadir
           </span>
         </div>
@@ -593,7 +593,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         {hasTalangan && (
           <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-100 dark:border-amber-900/30">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <p className="text-micro text-amber-700 dark:text-amber-400 font-medium">
+            <p className="text-micro text-warn dark:text-amber-400 font-medium">
               Talangan keluar <span className="font-display tabular-nums">{formatRupiahPlain(result.talanganTotal)}</span>
             </p>
           </div>

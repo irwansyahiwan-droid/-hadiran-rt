@@ -696,7 +696,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <button
             onClick={() => onNavigate('talangan')}
-            className="press inline-flex items-center min-h-[44px] text-xs text-amber-700 dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
+            className="press inline-flex items-center min-h-[44px] text-xs text-warn dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
           >
             Lihat
           </button>

@@ -34,7 +34,7 @@ const FILTERS = [
 
 const ACCENT_CLS: Record<Accent, string> = {
   emerald: 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30',
-  rose: 'text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30',
+  rose: 'text-neg dark:text-rose-400 bg-rose-100 dark:bg-rose-900/30',
   amber: 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30',
   blue: 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30',
 };

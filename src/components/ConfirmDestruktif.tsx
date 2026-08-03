@@ -81,7 +81,7 @@ export default function ConfirmDestruktif({
       >
         <div className="flex items-start gap-3">
           <span className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
-            <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+            <AlertTriangle className="w-5 h-5 text-neg dark:text-rose-400" />
           </span>
           <div className="min-w-0">
             <h2 className="text-balance text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">

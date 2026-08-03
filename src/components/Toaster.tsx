@@ -5,7 +5,7 @@ import { haptic } from '../lib/utils';
 
 const STYLES = {
   success: { icon: Check, ring: 'ring-emerald-200 dark:ring-emerald-800/50', dot: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
-  error: { icon: AlertCircle, ring: 'ring-rose-200 dark:ring-rose-800/50', dot: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400' },
+  error: { icon: AlertCircle, ring: 'ring-rose-200 dark:ring-rose-800/50', dot: 'bg-rose-500', text: 'text-neg dark:text-rose-400' },
   info: { icon: Info, ring: 'ring-slate-200 dark:ring-slate-700', dot: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-300' },
 } as const;
 

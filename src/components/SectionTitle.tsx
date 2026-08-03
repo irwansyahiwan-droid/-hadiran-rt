@@ -30,7 +30,7 @@ export default function SectionTitle({ children, count, action, tone = 'default'
         {count != null && count > 0 && (
           <span className={`font-display text-micro font-bold tabular-nums rounded-full px-2 py-0.5 ${
             tone === 'warn'
-              ? 'text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30'
+              ? 'text-warn dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30'
               : 'text-ink-faint dark:text-gray-400 bg-gray-100 dark:bg-gray-800'
           }`}>{count}</span>
         )}

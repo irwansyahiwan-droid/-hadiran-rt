@@ -826,7 +826,7 @@ export default function KasHadiranPage() {
                           <button
                             onClick={() => { haptic(); handleBatalkanClick(t); }}
                             disabled={processingId === t.id}
-                            className="press flex items-center gap-1.5 min-h-[44px] px-1.5 rounded-lg text-caption font-semibold transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-amber-700 dark:hover:bg-gray-800/60"
+                            className="press flex items-center gap-1.5 min-h-[44px] px-1.5 rounded-lg text-caption font-semibold transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
                           >
                             <RotateCcw className={`w-4 h-4 ${processingId === t.id ? 'animate-spin' : ''}`} />
                             Batalkan
@@ -840,7 +840,7 @@ export default function KasHadiranPage() {
                             /* dark:text-gray-400, BUKAN gray-500: gray-500 di atas
                                gray-900 cuma 3,67:1 — ketangkap audit kontras deep
                                sbg satu-satunya cacat fill nyata dari 1842 sampel. */
-                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold ml-auto transition-colors mati-teks text-ink-faint dark:text-gray-400 hover:bg-gray-50 hover:text-rose-600 dark:hover:bg-gray-800/60"
+                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold ml-auto transition-colors mati-teks text-ink-faint dark:text-gray-400 hover:bg-gray-50 hover:text-neg dark:hover:bg-gray-800/60"
                           >
                             <Trash2 className="w-4 h-4" />
                             Hapus
@@ -890,7 +890,7 @@ export default function KasHadiranPage() {
         </>}
         typeToConfirm={{
           value: String(batalTarikan?.nomor ?? 0),
-          hint: <>Ketik angka <span className="font-bold text-rose-600 dark:text-rose-400">{batalTarikan?.nomor ?? 0}</span> untuk konfirmasi</>,
+          hint: <>Ketik angka <span className="font-bold text-neg dark:text-rose-400">{batalTarikan?.nomor ?? 0}</span> untuk konfirmasi</>,
         }}
         confirmLabel="Batalkan"
         loadingLabel="Membatalkan…"
@@ -911,7 +911,7 @@ export default function KasHadiranPage() {
         </>}
         typeToConfirm={{
           value: String(hapusTarget?.nomor ?? 0),
-          hint: <>Ketik angka <span className="font-bold text-rose-600 dark:text-rose-400">{hapusTarget?.nomor ?? 0}</span> untuk konfirmasi</>,
+          hint: <>Ketik angka <span className="font-bold text-neg dark:text-rose-400">{hapusTarget?.nomor ?? 0}</span> untuk konfirmasi</>,
         }}
         confirmLabel="Hapus"
         loadingLabel="Menghapus…"

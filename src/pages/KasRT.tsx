@@ -846,7 +846,7 @@ export default function KasRTPage() {
                   <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk
                       ? <ArrowDownLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      : <ArrowUpRight  className="w-4 h-4 text-rose-600 dark:text-rose-400" />}
+                      : <ArrowUpRight  className="w-4 h-4 text-neg dark:text-rose-400" />}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -929,7 +929,7 @@ export default function KasRTPage() {
               </button>
               <button
                 onClick={() => setHapusRow(selectedRow)}
-                className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900"
+                className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border bg-white dark:bg-gray-800 text-neg dark:text-rose-400 border-rose-200 dark:border-rose-900"
               >
                 <Trash2 className="w-4 h-4" /> Hapus
               </button>

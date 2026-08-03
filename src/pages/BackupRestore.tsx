@@ -112,7 +112,7 @@ export default function BackupRestore({ open, onClose }: Props) {
         {/* Restore */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-rose-200/70 dark:border-rose-900/40 lift p-5">
           <div className="flex items-center gap-2 mb-1">
-            <Upload className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            <Upload className="w-4 h-4 text-neg dark:text-rose-400" />
             <h2 className="text-balance text-sm font-bold text-gray-900 dark:text-gray-100">Pulihkan (Restore)</h2>
           </div>
           <div className="flex items-start gap-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200/60 dark:border-rose-800/40 rounded-xl p-3 mb-4">
@@ -145,7 +145,7 @@ export default function BackupRestore({ open, onClose }: Props) {
               </div>
               <div>
                 <label htmlFor="restore-konfirmasi" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
-                  Ketik <span className="font-bold text-rose-600">{KATA_KONFIRMASI}</span> untuk konfirmasi
+                  Ketik <span className="font-bold text-neg dark:text-rose-400">{KATA_KONFIRMASI}</span> untuk konfirmasi
                 </label>
                 <input
                   id="restore-konfirmasi"

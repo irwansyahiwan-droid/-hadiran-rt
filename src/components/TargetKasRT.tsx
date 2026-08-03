@@ -243,7 +243,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
                 type="button"
                 onClick={hapus}
                 disabled={saving}
-                className="press inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-semibold text-rose-600 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 disabled:opacity-60 transition-colors"
+                className="press inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-semibold text-neg dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 disabled:opacity-60 transition-colors"
               >
                 <Trash2 className="w-4 h-4" /> Hapus
               </button>

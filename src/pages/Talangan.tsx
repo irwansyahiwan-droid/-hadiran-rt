@@ -320,7 +320,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <div className={`icon-tile w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
                   t.status_lunas
                     ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                    : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                    : 'bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-300'
                 }`}>
                   #{t.tarikan?.nomor}
                 </div>
