@@ -37,7 +37,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
       // Menggantikan bar dok penuh-nempel-bawah (2 Jul, ala Google/myBCA/BYOND).
       // Safe-area kini jadi jarak DI BAWAH kapsul (bukan padding di dalam bar),
       // supaya kapsul betul-betul mengambang di atas home indicator.
-      className="fixed inset-x-0 bottom-0 z-40"
+      className="fixed inset-x-0 bottom-0 z-nav"
       style={{
         // Geser 100% + buffer 8px (sisa hairline/bayangan atas) → nav bersih
         // total keluar layar; safe-area sudah ikut karena bagian dari tinggi bar.

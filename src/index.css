@@ -127,6 +127,21 @@ input, textarea  { caret-color: #1B7249; }
   :is(button, a, summary):focus-visible { transition: outline-offset 0.12s var(--ease-out-expo); }
 }
 
+/* Kursor kontrol (4 Agu 2026). Peramban memberi `<button>` kursor PANAH, bukan
+   tangan — di HP tak kelihatan, tapi bendahara membuka app ini di laptop juga
+   dan di sana tiap tombol terasa "tidak bisa diklik". Ditulis sekali di sini,
+   bukan ditempel `cursor-pointer` satu per satu (baru 9 tempat yang punya, dari
+   ratusan kontrol). `:disabled` sengaja dikecualikan dan diberi `not-allowed`:
+   kontrol nonaktif di app ini sudah terbaca lewat kontras (lihat audit:mati),
+   kursor melengkapinya tanpa menambah warna baru. */
+:is(button, [role="button"], [role="tab"], [role="menuitem"], summary, label[for]):not(:disabled):not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+:is(button, [role="button"]):disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* ── Kanvas Login: branded exception — satu-satunya layar glass ──────
    DESIGN.md §381: Login = momen brand, BUKAN pelanggaran arah flat.
    Kanvas gradient mint brand + aurora blob mengambang + grain halus +

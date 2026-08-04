@@ -38,6 +38,13 @@ export default {
            z-tooltip = InfoTip portal — HARUS di atas toast agar tak pernah tertutup modal/toast manapun */
       zIndex: {
         fab: '30',
+        /* nav & scrim ditambahkan 4 Agu 2026. Sebelumnya keduanya sama-sama
+           `z-40` mentah, jadi yang menang cuma karena scrim di-portal ke
+           <body> = lebih akhir di DOM. Kalau urutan itu terbalik, ketukan
+           di nav saat menu terbuka akan PINDAH TAB tanpa menutup menu.
+           Urutan chrome sekarang eksplisit: nav 40 < scrim 42 < menu 45. */
+        nav: '40',
+        scrim: '42',
         menu: '45',
         banner: '55',
         modal: '60',

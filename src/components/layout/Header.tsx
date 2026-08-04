@@ -86,14 +86,14 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
 
   return (
     <header
-      // Saat menu hidup: naik ke tier z-menu (45) di atas scrim portal z-40,
+      // Saat menu hidup: naik ke tier z-menu (45) di atas scrim portal z-scrim (42),
       // tetap di bawah overlay z-50 — header ber-transform = stacking context
       // sendiri, jadi z-50 milik dropdown tak bisa menembus keluar; tanpa bump
       // ini scrim (lebih akhir di DOM) menutup menu & item tak bisa diklik.
       // `transition` utility sengaja TIDAK dipasang di sini: properti + durasi
       // sudah ditulis eksplisit di `style.transition` di bawah, dan inline style
       // menang atas class → utility-nya cuma jadi kode mati yang menyesatkan.
-      className={`sticky top-0 ${menuMounted ? 'z-menu' : 'z-40'} backdrop-blur-xl backdrop-saturate-150 ${
+      className={`sticky top-0 ${menuMounted ? 'z-menu' : 'z-nav'} backdrop-blur-xl backdrop-saturate-150 ${
         scrolled
           ? 'bg-white/80 dark:bg-gray-900/80 border-b border-line/70 dark:border-gray-800/70'
           : 'bg-white/90 dark:bg-gray-900/85 border-b border-transparent'
@@ -185,7 +185,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             {/* Scrim dismiss di-portal ke body: header kini ber-transform (fix iOS)
                 → fixed di dalamnya jadi relatif header, bukan viewport. */}
             {menuOpen && createPortal(
-              <div aria-hidden="true" className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />,
+              <div aria-hidden="true" className="fixed inset-0 z-scrim" onClick={() => setMenuOpen(false)} />,
               document.body,
             )}
             {menuMounted && (
