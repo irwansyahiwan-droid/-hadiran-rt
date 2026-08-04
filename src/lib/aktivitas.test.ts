@@ -92,6 +92,55 @@ describe('tarikan_snapshot — arsip pemulihan, jalur paling tak boleh salah', (
   });
 });
 
+/* Arsip pra-restore yang ditulis RPC pulihkan_backup(). Alasannya sama persis
+   dgn tarikan_snapshot di atas: transaksi atomik menjaga dari koneksi putus,
+   TIDAK dari file yang salah dipulihkan — di sana restore sukses dan data lama
+   tetap hilang. Kalau baris ini tak terbaca di Riwayat Aktivitas, arsipnya ada
+   tapi tak berguna bagi siapa pun. */
+describe('backup_snapshot — arsip sebelum seluruh data ditimpa', () => {
+  const snap = (extra: Record<string, unknown> = {}) => row({
+    table_name: 'backup_snapshot',
+    action: 'DELETE',
+    old_data: {
+      exportedAt: '2026-07-30T12:00:00.000Z',
+      tables: { warga: [{}, {}, {}], tarikan: [{}], absensi: [{}, {}] },
+      ...extra,
+    },
+  });
+
+  it('membaca old_data & mencacah SELURUH tabel, bukan satu tabel saja', () => {
+    const v = formatAktivitas(snap());
+    expect(v.title).toBe('Arsip Sebelum Pemulihan Backup');
+    expect(v.detail).toBe('6 baris data lama terarsip · 3 anggota');
+  });
+
+  it('tanggal file backup ikut disebut — dua arsip beruntun harus bisa dibedakan', () => {
+    expect(formatAktivitas(snap()).penjelasan).toMatch(/bertanggal 2026-07-30/);
+  });
+
+  it('tanpa exportedAt tetap berkalimat wajar, bukan "bertanggal undefined"', () => {
+    const v = formatAktivitas(snap({ exportedAt: undefined }));
+    expect(v.penjelasan).not.toMatch(/bertanggal/);
+    expect(v.penjelasan).toMatch(/^Seluruh data lama diarsipkan/);
+  });
+
+  it('dibedakan visual dari log biasa (accent biru) & dilabeli Backup', () => {
+    const v = formatAktivitas(snap());
+    expect(v.accent).toBe('blue');
+    expect(v.tableLabel).toBe('Backup');
+    expect(v.amount).toBeNull();   // ini bukan transaksi uang
+  });
+
+  it('tables hilang / bukan daftar tetap terbaca, bukan crash', () => {
+    for (const jelek of [undefined, { warga: 'bukan daftar' }]) {
+      const v = formatAktivitas(row({
+        table_name: 'backup_snapshot', action: 'DELETE', old_data: { tables: jelek },
+      }));
+      expect(v.detail).toBe('0 baris data lama terarsip · 0 anggota');
+    }
+  });
+});
+
 describe('baris DELETE — jejak tak boleh jadi kosong', () => {
   it('nominal & keterangan diambil dari old_data saat new_data null', () => {
     const v = formatAktivitas(row({

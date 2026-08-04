@@ -2,136 +2,128 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 /**
  * `restoreBackup` adalah operasi paling merusak di app ini: HAPUS TOTAL seluruh
- * data operasional, lalu tulis ulang dari file. Tak ada undo. Yang dikunci di
- * sini bukan "fungsinya jalan", tapi hal-hal yang kalau rusak menghasilkan
- * kerusakan SENYAP:
+ * data operasional, lalu tulis ulang dari file. Tak ada undo.
  *
- *  1. URUTAN. Hapus wajib anak→induk dan tulis wajib induk→anak. Kalau salah
- *     arah, foreign key menolak di tengah jalan — dan saat itu data lama SUDAH
- *     terhapus sebagian. Ini satu-satunya aturan di berkas ini yang kegagalannya
- *     tak bisa diperbaiki dengan mengulang.
- *  2. `pengaturan` dikunci kolom `key`, tabel lain `id`. Salah kolom = filter
- *     tak cocok, tabelnya tak pernah benar-benar dikosongkan, lalu insert
- *     menabrak baris lama.
- *  3. Tiap kegagalan wajib DILEMPAR dengan menyebut tabelnya. Restore yang
- *     gagal separuh dan pulang diam-diam adalah kehilangan data tanpa jejak.
- *  4. `validasiBackup` adalah satu-satunya penjaga sebelum penghapusan total.
- *     File asing yang lolos = seluruh kas RT terhapus.
- *  5. Potongan 500 baris: kalau pemotongannya salah, sebagian baris hilang tanpa
- *     error apa pun — 69 anggota tak akan menyentuhnya, tapi absensi/talangan
- *     yang menumpuk bertahun-tahun bisa.
+ * SEJAK 4 Agu 2026 jalur itu pindah ke RPC `pulihkan_backup()` (satu transaksi
+ * plpgsql). Berkas ini dulu mengunci URUTAN hapus/tulis dan potongan 500 baris —
+ * dua hal yang kini tinggal di SQL, tak bisa lagi dilihat dari sini, dan tak
+ * boleh dipalsukan dgn mock seolah masih ada di TypeScript. Uji yang dulu
+ * "hijau" untuk urutan sekarang berbahaya: ia akan tetap hijau walau atomisitas
+ * hilang. Diganti dgn invarian yang MASIH nyata di sisi klien:
+ *
+ *  1. TEPAT SATU panggilan RPC yang membawa SELURUH file. Ini definisi atomik
+ *     di sisi klien — begitu ada yang memecahnya jadi per-tabel "supaya bisa
+ *     progress bar", satu transaksi hilang tanpa suara.
+ *  2. NOL tulisan langsung ke tabel. Regresi paling mungkin adalah orang
+ *     mengembalikan loop delete/insert lama karena terlihat lebih sederhana.
+ *  3. `.rpc()` ikut jebakan `.select()`: gagal TIDAK melempar, ia mengembalikan
+ *     `{data:null, error}`. Tiap kegagalan wajib MELEDAK — restore yang pulang
+ *     diam-diam adalah kehilangan data tanpa jejak.
+ *  4. Hasil yang bukan daftar = tak ada ringkasan; melaporkannya sukses berarti
+ *     bilang "pulih" tanpa tahu apa pun.
+ *  5. `validasiBackup` tetap penjaga terakhir sebelum penghapusan total.
+ *  6. Urutan `TABEL_BACKUP` dikunci — ia wajib sama dgn `v_tables` di migrasi.
  *
  * `downloadBackup` TIDAK diuji di sini: ia murni DOM (Blob + <a download>), dan
  * suite ini berjalan di environment node. Yang berisiko bukan bagian itu.
  */
-
 type Res = { data: unknown; error: unknown };
-type Op = { tabel: string; jenis: 'select' | 'delete' | 'insert'; kunci?: string; n?: number };
+type Op = { tabel: string; jenis: 'select' | 'delete' | 'insert' };
+type Rpc = { fn: string; args: Record<string, unknown> };
 
 let ops: Op[] = [];
+let rpcs: Rpc[] = [];
 let dataPer: Record<string, unknown[]> = {};
 let errPer: Record<string, Partial<Record<'select' | 'delete' | 'insert', unknown>>> = {};
+let rpcRes: Res = { data: [], error: null };
 
 function builder(t: string): Record<string, unknown> {
   const b: Record<string, unknown> = {};
-  const balas = (jenis: 'select' | 'delete' | 'insert', extra: Partial<Op> = {}) => {
-    ops.push({ tabel: t, jenis, ...extra });
+  const balas = (jenis: 'select' | 'delete' | 'insert') => {
+    ops.push({ tabel: t, jenis });
     const error = errPer[t]?.[jenis] ?? null;
     const res: Res = { data: jenis === 'select' ? (dataPer[t] ?? []) : null, error };
     return { then: (r: (v: Res) => unknown) => Promise.resolve(res).then(r) };
   };
   b.select = () => balas('select');
-  b.delete = () => ({ not: (kunci: string) => balas('delete', { kunci }) });
-  b.insert = (rows: unknown[]) => balas('insert', { n: rows.length });
+  b.delete = () => ({ not: () => balas('delete') });
+  b.insert = () => balas('insert');
   return b;
 }
 
-vi.mock('./supabase', () => ({ supabase: { from: (t: string) => builder(t) } }));
+vi.mock('./supabase', () => ({
+  supabase: {
+    from: (t: string) => builder(t),
+    rpc: (fn: string, args: Record<string, unknown>) => {
+      rpcs.push({ fn, args });
+      return { then: (r: (v: Res) => unknown) => Promise.resolve(rpcRes).then(r) };
+    },
+  },
+}));
 
-const { fetchBackup, restoreBackup, validasiBackup, ringkasBackup } = await import('./backup');
+const { fetchBackup, restoreBackup, validasiBackup, ringkasBackup, TABEL_BACKUP } = await import('./backup');
 
 const URUT_INSERT = ['warga', 'tarikan', 'absensi', 'talangan', 'transaksi_kas', 'kas_rt', 'pengaturan'];
 const file = (tables: Record<string, Record<string, unknown>[]> = {}) =>
   ({ app: 'hadiran-rt' as const, version: 1 as const, exportedAt: '2026-08-04T00:00:00.000Z', tables });
 
-beforeEach(() => { ops = []; dataPer = {}; errPer = {}; });
+beforeEach(() => { ops = []; rpcs = []; dataPer = {}; errPer = {}; rpcRes = { data: [], error: null }; });
 
-describe('restoreBackup — urutan, satu-satunya kesalahan yang tak bisa diulang', () => {
-  it('menghapus ANAK dulu baru induk (kebalikan urutan tulis)', async () => {
-    await restoreBackup(file());
-    const urutHapus = ops.filter((o) => o.jenis === 'delete').map((o) => o.tabel);
-    expect(urutHapus).toEqual([...URUT_INSERT].reverse());
+describe('restoreBackup — atomik: satu transaksi, bukan 14 request', () => {
+  it('memanggil RPC pulihkan_backup TEPAT sekali', async () => {
+    await restoreBackup(file({ warga: [{ id: 1 }], absensi: [{ id: 2 }] }));
+    expect(rpcs).toHaveLength(1);
+    expect(rpcs[0].fn).toBe('pulihkan_backup');
   });
 
-  it('menulis INDUK dulu baru anak', async () => {
+  it('mengirim SELURUH file apa adanya — bukan per tabel', async () => {
+    const b = file({ warga: [{ id: 1 }, { id: 2 }], kas_rt: [{ id: 9 }] });
+    await restoreBackup(b);
+    expect(rpcs[0].args.p_backup).toBe(b);
+  });
+
+  it('TIDAK menghapus atau menulis tabel langsung dari klien', async () => {
     await restoreBackup(file(Object.fromEntries(URUT_INSERT.map((t) => [t, [{ id: 1 }]]))));
-    const urutTulis = ops.filter((o) => o.jenis === 'insert').map((o) => o.tabel);
-    expect(urutTulis).toEqual(URUT_INSERT);
+    expect(ops.filter((o) => o.jenis === 'delete')).toHaveLength(0);
+    expect(ops.filter((o) => o.jenis === 'insert')).toHaveLength(0);
   });
 
-  it('SEMUA penghapusan selesai sebelum penulisan pertama', async () => {
-    await restoreBackup(file({ warga: [{ id: 1 }] }));
-    const hapusTerakhir = ops.map((o) => o.jenis).lastIndexOf('delete');
-    const tulisPertama = ops.map((o) => o.jenis).indexOf('insert');
-    expect(tulisPertama).toBeGreaterThan(hapusTerakhir);
-  });
-
-  it('`pengaturan` dikunci kolom `key`, tabel lain `id`', async () => {
-    await restoreBackup(file());
-    const kunci = Object.fromEntries(ops.filter((o) => o.jenis === 'delete').map((o) => [o.tabel, o.kunci]));
-    expect(kunci.pengaturan).toBe('key');
-    expect(kunci.warga).toBe('id');
-    expect(kunci.transaksi_kas).toBe('id');
-  });
-
-  it('audit_log tidak ikut dihapus maupun ditulis — ia append-only', async () => {
+  it('audit_log tidak ikut dikirim untuk dihapus/ditulis — ia append-only', async () => {
     await restoreBackup(file({ audit_log: [{ id: 1 }] }));
     expect(ops.some((o) => o.tabel === 'audit_log')).toBe(false);
   });
+
+  it('meneruskan ringkasan per tabel dari database, bukan menghitung ulang di klien', async () => {
+    rpcRes = { data: [{ table: 'warga', count: 69 }, { table: 'kas_rt', count: 4 }], error: null };
+    const hasil = await restoreBackup(file({ warga: [{ id: 1 }] }));
+    expect(hasil).toEqual([{ table: 'warga', count: 69 }, { table: 'kas_rt', count: 4 }]);
+  });
 });
 
-describe('restoreBackup — potongan 500 baris', () => {
-  it('1200 baris jadi 3 potongan 500/500/200, bukan satu tembakan', async () => {
-    const rows = Array.from({ length: 1200 }, (_, i) => ({ id: i }));
-    await restoreBackup(file({ absensi: rows }));
-    const potongan = ops.filter((o) => o.jenis === 'insert' && o.tabel === 'absensi').map((o) => o.n);
-    expect(potongan).toEqual([500, 500, 200]);
-    expect(potongan.reduce((a, b) => a! + b!, 0)).toBe(1200);
-  });
-
-  it('tepat 500 baris = satu potongan, tidak menyisakan panggilan kosong', async () => {
-    await restoreBackup(file({ absensi: Array.from({ length: 500 }, (_, i) => ({ id: i })) }));
-    expect(ops.filter((o) => o.jenis === 'insert' && o.tabel === 'absensi').map((o) => o.n)).toEqual([500]);
-  });
-
-  it('tabel kosong tidak memanggil insert sama sekali, tapi tetap dilaporkan 0', async () => {
-    const hasil = await restoreBackup(file({ warga: [] }));
-    expect(ops.some((o) => o.jenis === 'insert')).toBe(false);
-    expect(hasil).toContainEqual({ table: 'warga', count: 0 });
-  });
-
-  it('ringkasan mengembalikan jumlah baris per tabel', async () => {
-    const hasil = await restoreBackup(file({ warga: [{ id: 1 }, { id: 2 }], tarikan: [{ id: 9 }] }));
-    expect(hasil).toContainEqual({ table: 'warga', count: 2 });
-    expect(hasil).toContainEqual({ table: 'tarikan', count: 1 });
+describe('urutan tabel = kontrak dgn migrasi SQL', () => {
+  it('TABEL_BACKUP induk→anak persis seperti v_tables di pulihkan_backup()', () => {
+    // Kalau uji ini gagal, migrasi 20260804000000_restore_atomik.sql WAJIB ikut
+    // diubah di baris `v_tables` — kalau tidak, hapus/tulis melanggar FK.
+    expect([...TABEL_BACKUP]).toEqual(URUT_INSERT);
   });
 });
 
 describe('kegagalan wajib MELEDAK, bukan pulang diam-diam', () => {
-  it('penghapusan gagal → melempar & menyebut tabelnya', async () => {
-    errPer = { talangan: { delete: { message: 'FK' } } };
-    await expect(restoreBackup(file())).rejects.toThrow(/talangan/);
+  it('RPC mengembalikan error → melempar (gagal TIDAK melempar sendiri)', async () => {
+    rpcRes = { data: null, error: { message: 'deadlock terdeteksi' } };
+    await expect(restoreBackup(file({ warga: [{ id: 1 }] }))).rejects.toThrow(/deadlock terdeteksi/);
   });
 
-  it('penghapusan gagal → penulisan TIDAK ikut dijalankan', async () => {
-    errPer = { kas_rt: { delete: { message: 'FK' } } };
-    await restoreBackup(file({ warga: [{ id: 1 }] })).catch(() => {});
-    expect(ops.some((o) => o.jenis === 'insert')).toBe(false);
+  it('pesan galat database ikut terbawa, tidak ditelan jadi kalimat umum', async () => {
+    rpcRes = { data: null, error: { message: 'Hanya bendahara yang boleh memulihkan backup' } };
+    await expect(restoreBackup(file())).rejects.toThrow(/Hanya bendahara/);
   });
 
-  it('penulisan gagal → melempar & menyebut tabelnya', async () => {
-    errPer = { warga: { insert: { message: 'duplikat' } } };
-    await expect(restoreBackup(file({ warga: [{ id: 1 }] }))).rejects.toThrow(/warga/);
+  it('hasil BUKAN daftar (null / objek) → melempar, jangan lapor "pulih"', async () => {
+    for (const jelek of [null, undefined, { ok: true }, 'sukses']) {
+      rpcRes = { data: jelek, error: null };
+      await expect(restoreBackup(file({ warga: [{ id: 1 }] }))).rejects.toThrow(/ringkasan/);
+    }
   });
 
   it('fetchBackup: satu tabel gagal dibaca → melempar, bukan backup separuh isi', async () => {

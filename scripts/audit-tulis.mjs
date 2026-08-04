@@ -112,7 +112,22 @@ async function ujiTulis(nama, buka, isi, tombol) {
     }
     const detik = ((Date.now() - mulai) / 1000).toFixed(1);
     const terkunci = await simpan.isDisabled().catch(() => false);
-    const toast = await page.locator('[role="status"]').last().innerText().catch(() => '');
+    // Pesan gagal WAJIB dicari di TIGA permukaan sekaligus. Versi pertama probe
+    // ini cuma membaca `[role="status"]` dan melaporkan kedua jalur tulis
+    // "menyerah diam-diam" — PALSU, dan false-positive alat ke-10 di repo ini.
+    // Sebabnya: Toaster memisahkan pengumuman jadi dua region live permanen
+    // (`umumkan(msg, type === 'error')`), dan toast GALAT masuk ke region
+    // ASSERTIVE `role="alert"` — bukan `role="status"` yang sopan. Wadah toast
+    // yang terlihat sendiri sengaja TANPA role (anti-baca-dobel). Jadi selektor
+    // lama justru satu-satunya tempat yang dijamin kosong saat gagal.
+    // Beri jeda kecil dulu: label tombol pulih di tick yang sama saat toast
+    // baru dipasang, jadi membaca seketika bisa menangkap DOM sebelum render.
+    await page.waitForTimeout(400);
+    const toast = (await Promise.all([
+      page.locator('[role="alert"]').last().innerText().catch(() => ''),
+      page.locator('[role="status"]').last().innerText().catch(() => ''),
+      page.locator('.z-toast, [class*="z-toast"]').last().innerText().catch(() => ''),
+    ])).map((s) => s.trim()).filter(Boolean).join(' | ');
 
     if (!tulis.n) m.push('PROBE CACAT: tak ada request tulis yang tercegat — hasil tak bermakna');
     if (!pulih) m.push(`TOMBOL TERKUNCI "${label}" setelah ${detik}s — bendahara tak tahu tersimpan atau tidak`);

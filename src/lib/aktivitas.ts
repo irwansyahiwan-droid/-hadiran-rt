@@ -129,6 +129,25 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
         penjelasan: `Tarikan #${nomor} ${modeLabel}. Sebelum data dihapus, seluruh daftar hadir & talangan diarsipkan di sini secara permanen — bila perlu pemulihan, datanya lengkap di arsip ini (bukan lagi dari catatan kertas).`,
       };
     }
+    // Arsip yang ditulis fungsi pulihkan_backup() SEBELUM seluruh data ditimpa
+    // file backup. Atomisitas menjaga dari koneksi putus; entri INI yang
+    // menjaga dari file yang SALAH dipulihkan — di situ transaksi tetap sukses
+    // dan data lama tetap hilang. Tanpa case ini arsipnya ada tapi tak terbaca
+    // siapa pun, alias sama saja tidak ada.
+    case 'backup_snapshot': {
+      const snap = old as { tables?: Record<string, unknown>; exportedAt?: string };
+      const tabel = snap.tables ?? {};
+      const cacah = (k: string) => (Array.isArray(tabel[k]) ? (tabel[k] as unknown[]).length : 0);
+      const total = Object.keys(tabel).reduce((n, k) => n + cacah(k), 0);
+      const tglFile = str(snap.exportedAt).slice(0, 10);
+      return {
+        title: 'Arsip Sebelum Pemulihan Backup',
+        detail: `${total} baris data lama terarsip · ${cacah('warga')} anggota`,
+        amount: null,
+        changes, actor, accent: 'blue', actionLabel, tableLabel: 'Backup',
+        penjelasan: `Seluruh data lama diarsipkan permanen di sini SEBELUM ditimpa isi file backup${tglFile ? ` bertanggal ${tglFile}` : ''}. Kalau ternyata file yang dipulihkan keliru, isi lama masih lengkap di entri ini — pemulihannya tidak bergantung pada catatan kertas.`,
+      };
+    }
     case 'transaksi_kas': {
       const tipeRaw = str(data.tipe);
       const tipe = TIPE_KAS[tipeRaw] ?? 'Transaksi Kas';

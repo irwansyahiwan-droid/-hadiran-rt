@@ -11,9 +11,15 @@ import { supabase } from './supabase';
  * dibaca). Restore tetap akan tercatat ringkas di Riwayat Aktivitas.
  */
 
-// Urutan AMAN untuk INSERT (induk dulu). Hapus = kebalikannya (anak dulu).
-const TABLES = ['warga', 'tarikan', 'absensi', 'talangan', 'transaksi_kas', 'kas_rt', 'pengaturan'] as const;
-type TableName = (typeof TABLES)[number];
+/** Tabel yang di-backup, urut induk → anak.
+ *
+ *  Daftar ini WAJIB sama persis (isi & urutan) dgn `v_tables` di
+ *  supabase/migrations/20260804000000_restore_atomik.sql — di sanalah urutan
+ *  hapus/tulis benar-benar dijalankan. Di sini ia dipakai untuk MEMBACA
+ *  (fetchBackup) dan mencacah (ringkasBackup) saja. Ada uji yang mengunci
+ *  urutan ini supaya menambah tabel di salah satu tempat langsung terlihat. */
+export const TABEL_BACKUP = ['warga', 'tarikan', 'absensi', 'talangan', 'transaksi_kas', 'kas_rt', 'pengaturan'] as const;
+const TABLES = TABEL_BACKUP;
 
 export interface BackupFile {
   app: 'hadiran-rt';
@@ -58,36 +64,34 @@ export function validasiBackup(raw: unknown): BackupFile {
   return b;
 }
 
-async function deleteAll(t: TableName) {
-  const key = t === 'pengaturan' ? 'key' : 'id';
-  const { error } = await supabase.from(t).delete().not(key, 'is', null);
-  if (error) throw new Error(`Gagal mengosongkan ${t}: ${error.message}`);
-}
-
-async function insertChunked(t: TableName, rows: Record<string, unknown>[]) {
-  const SIZE = 500;
-  for (let i = 0; i < rows.length; i += SIZE) {
-    const chunk = rows.slice(i, i + SIZE);
-    const { error } = await supabase.from(t).insert(chunk);
-    if (error) throw new Error(`Gagal menulis ${t}: ${error.message}`);
-  }
-}
-
 /**
- * Ganti TOTAL data dengan isi backup. Menghapus semua data lama lalu memasukkan
- * data backup. Mengembalikan ringkasan jumlah baris yang dipulihkan per tabel.
+ * Ganti TOTAL data dengan isi backup. Mengembalikan ringkasan jumlah baris yang
+ * dipulihkan per tabel.
+ *
+ * SATU panggilan RPC, dan itu memang intinya — bukan gaya penulisan. Versi lama
+ * menjalankan 7 DELETE lalu 7 INSERT sebagai request TERPISAH dari klien: tak
+ * ada transaksi yang membungkusnya, jadi koneksi putus di tengah (hal biasa buat
+ * bendahara dgn sinyal seadanya) meninggalkan database dgn **data lama sudah
+ * terhapus dan data backup baru masuk separuh** — dan restore justru satu-
+ * satunya jalan pulih saat ada insiden, jadi ia gagal tepat di saat paling
+ * dibutuhkan. Badan plpgsql `pulihkan_backup()` = satu transaksi: gagal di baris
+ * mana pun berarti batal semua, data lama utuh seperti tak pernah disentuh.
+ * Fungsi itu juga mengarsipkan keadaan SEBELUM restore ke audit_log
+ * (`backup_snapshot`) — atomik saja tak menolong kalau yang dipulihkan file
+ * yang SALAH. Lihat supabase/migrations/20260804000000_restore_atomik.sql.
+ *
+ * JANGAN kembalikan urutan hapus/tulis ke klien "supaya bisa progress bar".
+ * Urutan tabel & pemotongan baris kini tinggal di SQL; menduplikasinya di sini
+ * berarti dua sumber kebenaran yang bisa berbeda diam-diam.
  */
 export async function restoreBackup(b: BackupFile): Promise<{ table: string; count: number }[]> {
-  // 1) Hapus anak → induk (kebalikan urutan insert) agar tidak melanggar FK.
-  for (const t of [...TABLES].reverse()) {
-    await deleteAll(t);
+  const { data, error } = await supabase.rpc('pulihkan_backup', { p_backup: b });
+  if (error) throw new Error(`Gagal memulihkan data: ${error.message}`);
+  // `.rpc()` ikut jebakan yang sama dgn `.select()`: gagal TIDAK melempar. Hasil
+  // yang bukan daftar = fungsi tak mengembalikan ringkasan yang dijanjikan;
+  // melaporkannya sebagai sukses berarti bilang "pulih" tanpa tahu apa pun.
+  if (!Array.isArray(data)) {
+    throw new Error('Pemulihan tidak mengembalikan ringkasan — periksa data sebelum melanjutkan.');
   }
-  // 2) Masukkan induk → anak.
-  const hasil: { table: string; count: number }[] = [];
-  for (const t of TABLES) {
-    const rows = b.tables[t] ?? [];
-    if (rows.length) await insertChunked(t, rows);
-    hasil.push({ table: t, count: rows.length });
-  }
-  return hasil;
+  return data as { table: string; count: number }[];
 }
