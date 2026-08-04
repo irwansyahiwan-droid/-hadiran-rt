@@ -39,7 +39,7 @@ html {
      iOS/Android generik. Satu baris, konsisten di seluruh app. */
   accent-color: #1B7249;
 }
-html.dark { color-scheme: dark; accent-color: #1A9B86; } /* brand-linkDark */
+html.dark { color-scheme: dark; accent-color: #34D399; } /* brand-linkDark */
 
 body {
   /* Kanvas abu netral sejuk (Apple/Linear clean): rata & tenang agar kartu
@@ -100,7 +100,7 @@ input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
 /* ── Detail tuntas: seleksi, caret, fokus keyboard (semua on-brand) ───
    Hal kecil yang bikin app terasa "satu produk", bukan kumpulan default. */
 ::selection      { background: rgba(27, 114, 73, 0.18); }            /* brand-500 tint */
-.dark ::selection{ background: rgba(26, 155, 134, 0.30); }           /* brand-linkDark */
+.dark ::selection{ background: rgba(52, 211, 153, 0.30); }           /* brand-linkDark */
 input, textarea  { caret-color: #1B7249; }
 .dark input, .dark textarea { caret-color: #1A9B86; }
 /* Fokus keyboard terlihat (syarat a11y/store). Hanya elemen interaktif non-input
@@ -121,7 +121,9 @@ input, textarea  { caret-color: #1B7249; }
   box-shadow: 0 0 0 2px #FFFFFF;
 }
 .dark :is(button, a, summary, [role="button"], [tabindex]):focus-visible {
-  outline-color: #1A9B86;
+  /* #1A9B86 → #34D399 (pass kontras maksimal 4 Agu): sama dgn brand-linkDark
+     baru & cincin fokus `.field` gelap — SATU mint untuk seluruh aksen gelap. */
+  outline-color: #34D399;
 }
 @media (prefers-reduced-motion: no-preference) {
   :is(button, a, summary):focus-visible { transition: outline-offset 0.12s var(--ease-out-expo); }
@@ -154,11 +156,16 @@ input, textarea  { caret-color: #1B7249; }
     radial-gradient(ellipse 60% 42% at 16% 80%,  rgba(16, 185, 129, 0.28) 0%, transparent 55%),
     linear-gradient(160deg, #ecfdf5 0%, #d1fae5 40%, #a7f3d0 100%);
 }
+/* Pass KONTRAS MAKSIMAL (4 Agu): kanvas gelap Login diturunkan satu step —
+   teks mint di atasnya (emerald-200/300, sub-judul & keterangan akses warga)
+   terukur 4,92–6,94:1. Yang digelapkan KANVASNYA, bukan teksnya: menaikkan
+   mint lebih terang lagi membuatnya menyala di layar gelap, dan gradient inilah
+   satu-satunya tempat hijau-tua ini muncul (bukan token yang dipakai ulang). */
 .dark .login-bg {
   background-image:
-    radial-gradient(ellipse 72% 54% at 68% 14%,  rgba(6, 78, 49, 0.70) 0%, transparent 62%),
-    radial-gradient(ellipse 60% 42% at 16% 80%,  rgba(4, 52, 33, 0.55) 0%, transparent 55%),
-    linear-gradient(160deg, #04231A 0%, #06402E 45%, #02150E 100%);
+    radial-gradient(ellipse 72% 54% at 68% 14%,  rgba(5, 64, 40, 0.70) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 42% at 16% 80%,  rgba(3, 42, 27, 0.55) 0%, transparent 55%),
+    linear-gradient(160deg, #031B14 0%, #05351F 45%, #010F0A 100%);
 }
 
 /* Aurora blob animation (hanya .login-bg, tidak menyentuh .app-bg) */
@@ -277,8 +284,64 @@ input, textarea  { caret-color: #1B7249; }
    188×) yang cuma ≈4.8:1. Seluruh tangga teks naik SATU step lagi (lever sah:
    warna teks, bukan glass/canvas); kini tak ada teks light-mode di bawah ≈7:1.
    Ikut selaras dgn ink-sub/faint yang naik di tailwind.config.js. */
-html:not(.dark) .text-gray-400 { color: #475569; }  /* gray-400→slate-600: nyaman (≈7.4:1) */
+/* Pass KONTRAS MAKSIMAL (4 Agu): angka "≈7.4:1" di atas dihitung lawan PUTIH,
+   padahal massa caption ini duduk di kanvas #ECF1F7 yang lebih gelap — di sana
+   #475569 cuma 6,68:1, alias tetap di bawah AAA. Turun satu step lagi ke
+   #41505F: 8,28:1 di putih, 7,30:1 di kanvas. Tangga tetap utuh & terbaca
+   berjenjang: ink #0B1220 > sub #1F2937 > faint #334155 (9,14 kanvas) >
+   gray-400-remap #41505F (7,30 kanvas). */
+html:not(.dark) .text-gray-400 { color: #41505F; }  /* gray-400→slate-ink: nyaman (≈7.3:1 di kanvas) */
 html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: tegas (≈10.4:1) */
+
+/* ── Kontras teks (DARK MODE) — cermin aturan light di atas ──────────────────
+   Pass KONTRAS MAKSIMAL (4 Agu 2026). Sisi TERANG punya remap tangga teks sejak
+   8 Jul; sisi GELAP tidak pernah punya — jadi selama ini tak ada satu pun
+   pemeriksaan yang memaksa `dark:text-gray-400` (151 pemakaian, tertinggi di
+   app) melewati ambang apa pun. Diukur lawan kartu `dark:bg-gray-900` #111827:
+     gray-400 #9CA3AF = 6,99:1  → lolos AA, MELESET dari AAA sepersepuluh poin
+     rose-400  #FB7185 = 6,59:1 → sama, dan ini warna NOMINAL UANG keluar
+   (emerald-400 9,25:1 & amber-400 10,63:1 sudah aman, tak disentuh).
+   Dinaikkan dari SATU titik, persis pola light — bukan menyisir 151 call-site:
+     #AEB7C4 = 8,66:1 · #FDA4AF (rose-300) = 9,38:1
+   Jenjang tetap ada: gray-300 #D1D5DB (12,1:1) masih jelas di atas gray-400.
+   Specificity html.dark .text-* (0,2,1) menang atas `.dark .text-*` Tailwind
+   (0,2,0) tanpa !important. Placeholder pakai kelas lain → tidak ikut. */
+/* Selektor WAJIB menyebut kelas ber-prefix `dark:` juga. Tailwind memancarkan
+   `dark:text-gray-400` sebagai `.dark .dark\:text-gray-400` — nama KELASNYA
+   ikut membawa prefiksnya, jadi `html.dark .text-gray-400` saja tidak pernah
+   menyentuh 151 elemen itu (percobaan pertama pass ini persis begitu: audit
+   tetap melaporkan 213 sampel #9CA3AF setelah remap "terpasang"). Sisi terang
+   tak kena jebakan ini karena kelasnya memang telanjang. */
+html.dark .text-gray-400,
+html.dark .dark\:text-gray-400 { color: #AEB7C4; }
+html.dark .text-rose-400,
+html.dark .dark\:text-rose-400 { color: #FDA4AF; }
+
+/* ── Literal warna semantik di LIGHT MODE — satu lever, bukan 40 call-site ───
+   Pass KONTRAS MAKSIMAL (4 Agu). Kelas Tailwind mentah (emerald-700/800,
+   rose-700, amber-800, slate-600, blue-700) tersebar di puluhan tempat sebagai
+   teks status/chip, dan hampir semuanya duduk di TINT sewarna (emerald-50/100,
+   rose-50, amber-100) — permukaan yang lebih gelap dari putih, jadi rasio
+   nyatanya 4,8–6,9:1: lolos AA, gagal AAA. Digelapkan satu step dari SATU
+   titik, pola yang sama dgn remap gray di atas (menyisir call-site berarti 40
+   diff dan tetap tak menutup pemakai berikutnya).
+   Tangga emerald tetap berjenjang: 600 #065F46 > 700 #064E3B > 800 #053D2E.
+   Sisi GELAP tidak ikut — di sana pasangannya (*-300/-400) sudah ≥7:1. */
+html:not(.dark) .text-emerald-600 { color: #065F46; }  /* 7,69:1 putih */
+html:not(.dark) .text-emerald-700 { color: #064E3B; }  /* 8,57:1 di emerald-100 */
+html:not(.dark) .text-emerald-800 { color: #053D2E; }  /* 8,39:1 di kanvas mint Login */
+html:not(.dark) .text-rose-700    { color: #881337; }  /* 8,93:1 di rose-50 */
+html:not(.dark) .text-amber-800   { color: #78350F; }  /* 7,95:1 di amber-100 */
+html:not(.dark) .text-slate-600   { color: #334155; }  /* 8,49:1 di tile abu (inisial AvatarPeci) */
+html:not(.dark) .text-blue-700    { color: #1E3A8A; }  /* 8,38:1 di pil "WARGA" */
+/* Dua fill pekat yang membawa label PUTIH (pil "Akses Cepat", pil "Defisit").
+   Ini SATU-SATUNYA dua baris yang tidak digerbang `:not(.dark)`: fill-nya sama
+   di kedua tema (kelasnya dipakai tanpa pasangan `dark:`), jadi menggerbangnya
+   berarti mode gelap ditinggalkan di 5,48:1 — persis yang terjadi di putaran
+   audit pertama pass ini. Selektor `html .bg-*` (0,1,1) menang atas utility
+   Tailwind (0,1,0) tanpa !important. */
+html .bg-emerald-700   { background-color: #065F46; }  /* putih 5,48 → 7,69:1 */
+html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 */
 
 /* ── Hero card design tokens ─────────────────────────────── */
 :root {
@@ -299,8 +362,15 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      tengah = 3.43:1), bukan ujung gradient — meredupkan ramp saja tak menyembuhkan.
      Pola sama sudah dipakai di ramp dark (glow .18). Verifikasi = sampel piksel asli
      di bawah teks (Playwright 390px), bukan hitung token di atas kertas. */
-  --hero-gradient: linear-gradient(135deg, #0D5B36 0%, #137A46 50%, #157A45 100%);
-  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.20) 0%, rgba(45, 212, 150, 0) 55%);
+  /* Pass KONTRAS MAKSIMAL (4 Agu): ramp 13 Jul berhenti di #157A45 — putih
+     SOLID 5,38:1 di sana, dan titik terburuk (tumpukan glow sudut kanan-atas)
+     malah 3,4–3,9:1. Ramp turun lagi ke #0A5230 (putih 7,92:1 SETELAH sheen
+     ikut diredam, lihat .hero-sheen) DAN glow sudut diredam .20 → .05, karena peredupan ramp saja tak
+     pernah menyembuhkan titik glow — pelajaran yang sama persis dgn 13 Jul,
+     kali ini dituntaskan di dua lever sekaligus. Hijau yang lebih dalam juga
+     yang dimau: "money green" Amex/Wise, bukan hijau daun terang. */
+  --hero-gradient: linear-gradient(135deg, #063A21 0%, #094B2C 50%, #0A5230 100%);
+  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.10) 0%, rgba(45, 212, 150, 0) 55%);
   /* MATERIAL-FLAT (2 Jul): resep glass 4-lapis (inset highlight + ambient .55)
      dibuang — hero sub-page kini pakai bayangan yang SAMA dgn kartu saldo aktif
      di BannerCarousel (flat-BYOND, sudah "nyatu" duluan menurut user): dua drop
@@ -324,8 +394,10 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    sudut diredam (.34 → .18; halo terang di atas near-black = biang silau).
    Putih di atas stop paling terang (#147044) = 6.1:1 → AA aman. */
 .dark {
-  --hero-gradient: linear-gradient(135deg, #0A4429 0%, #10603A 50%, #147044 100%);
-  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.18) 0%, rgba(45, 212, 150, 0) 55%);
+  /* Pass kontras maksimal: stop terang #147044 (6,12:1) → #094B2C (8,68:1),
+     glow .18 → .05 — paritas dgn sisi terang yang juga turun dua lever. */
+  --hero-gradient: linear-gradient(135deg, #042716 0%, #073B22 50%, #094B2C 100%);
+  --hero-glow: radial-gradient(120% 90% at 100% 0%, rgba(45, 212, 150, 0.05) 0%, rgba(45, 212, 150, 0) 55%);
 }
 
 /* Grain/noise overlay — keeps the gradient from looking flat */
@@ -349,7 +421,12 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 .songket-weave {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M0 16 L16 0 L32 16 L16 32 Z' fill='none' stroke='%23E8B651' stroke-width='1.25'/%3E%3C/svg%3E");
   background-size: 32px 32px;
-  opacity: 0.8;
+  /* 0.8 → 0.45 (pass KONTRAS MAKSIMAL 4 Agu). Nilai lama disetel untuk hero
+     yang JAUH lebih terang; di atas ramp baru yang pekat, soft-light membuat
+     benang emas justru menang dan kartu terbaca seperti jaring, bukan kain
+     bermotif. Motifnya identitas (jangan dihapus) — tapi ia latar, dan nominal
+     saldo yang harus memimpin. Turun bersama peredupan ramp, bukan sendirian. */
+  opacity: 0.45;
   mix-blend-mode: soft-light;
   -webkit-mask-image: radial-gradient(150% 100% at 100% 4%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 66%);
   mask-image: radial-gradient(150% 100% at 100% 4%, #000 0%, rgba(0,0,0,0.5) 34%, transparent 66%);
@@ -492,9 +569,11 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 .hero-emerald {
   background-image:
     radial-gradient(130% 72% at 0% 0%, rgba(4, 38, 24, 0.48), transparent 55%),
-    /* Stop terang #2CC06E → #157A45 (13 Jul): sampel piksel membuktikan teks
-       white/90 di zona terang cuma 3.9:1 — selaras peredupan --hero-gradient. */
-    linear-gradient(150deg, #157A45 0%, #0F7A47 52%, #064A2C 100%);
+    /* Stop terang #2CC06E → #157A45 (13 Jul) → #0A5230 (4 Agu, pass kontras
+       maksimal): putih solid 5,38 → 7,92:1, caption emerald-100 ≈7,0:1. Glow sudut ikut
+       diredam .10 di token --hero-glow (titik terburuk ada di sana, bukan di
+       ujung gradient). Selaras peredupan --hero-gradient. */
+    linear-gradient(150deg, #0A5230 0%, #08492B 52%, #032A17 100%);
 }
 
 /* ── Permukaan brand di DARK — diredupkan (12 Jul 2026) ────────────────────
@@ -503,13 +582,15 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    dan kartu terasa seperti stiker menyala, bukan permukaan. App dark premium
    (Revolut/Linear/Mercury/iOS) selalu MENURUNKAN chroma & lightness permukaan
    brand di dark. Ramp diturunkan satu tingkat; teks putih tetap lolos AA —
-   dihitung, bukan dikira: putih di atas stop TERANG tiap ramp =
-     emerald #1B7A49 → 5.35:1 · setor #2A56B8 → 6.68:1 · slate #3A4759 → 9.4:1
-   (semua ≥4.5:1, syarat teks kecil). Scrim pojok kiri-atas tetap → eyebrow aman. */
+   dihitung, bukan dikira. Pass KONTRAS MAKSIMAL (4 Agu) menurunkannya satu
+   tingkat LAGI: putih di atas stop TERANG #1B7A49 → #094B2C = 5,35 → 8,68:1.
+   (Ramp `setor` biru & `slate` abu sudah dihapus 30 Jul — tinggal satu ramp.)
+   Scrim pojok kiri-atas tetap → eyebrow aman. */
 .dark .hero-emerald {
   background-image:
     radial-gradient(130% 72% at 0% 0%, rgba(2, 20, 12, 0.42), transparent 55%),
-    linear-gradient(150deg, #1B7A49 0%, #0C5734 52%, #05301D 100%);
+    /* #1B7A49 (5,35:1) → #094B2C (8,68:1), pass kontras maksimal 4 Agu. */
+    linear-gradient(150deg, #094B2C 0%, #073B22 52%, #021A0F 100%);
 }
 
 /* (.hero-setor biru & .hero-slate abu DIHAPUS 30 Jul — dua ramp itu memakai
@@ -518,26 +599,29 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    beradu dengan pil merah "Defisit". Status kini dibawa chip + pil kata; hero
    se-app satu warna: .hero-emerald. Jangan pasang ulang ramp per-status.) */
 
-/* (.nav-float dihapus 10 Jul. Nav sempat jadi bar DOK `.nav-dock` 2 Jul, lalu
-   kembali ke kapsul melayang 3 Agu sebagai `.nav-pill` di bawah — kelas lama
-   `.nav-float` & `.nav-dock` dua-duanya sudah tak ada, jangan dihidupkan lagi.) */
+/* (.nav-float dihapus 10 Jul; `.nav-pill` — kapsul melayang ala GitHub Mobile,
+   3 Agu — dihapus 4 Agu atas permintaan user "kembalikan seperti awal, bukan
+   kapsul, seperti di app Google". Nav kembali ke bar DOK di bawah. Ketiganya
+   tak boleh hidup bersamaan; hanya `.nav-dock` yang ada.) */
 
-/* Bar nav KAPSUL MELAYANG (3 Agu 2026, permintaan user — ala GitHub Mobile).
-   Menggantikan `.nav-dock` (bar penuh nempel tepi bawah, 2 Jul). Karena kini
-   melayang, ia butuh bayangan MENGELILINGI — bukan hairline atas seperti dok.
-   Hairline tetap ada sebagai tepi tercetak, sejalan bahasa kartu Material-flat:
-   satu contact whisper + ring tipis, bukan glow berlapis. */
-.nav-pill {
+/* Bar nav DOK bawah (kembali 4 Agu 2026 — ala Google/myBCA/BYOND BSI): nempel
+   penuh ke tepi bawah layar. Pemisah dari konten = hairline atas + bayangan
+   NAIK tipis (bar dok tak butuh drop berlapis ke bawah; itu bahasa kapsul).
+
+   Hairline atas memakai warna PADAT token `line` (#B8C4D3), bukan alpha samar
+   0.07 seperti versi 2 Jul. Alasannya sama dgn tepi kartu di pass "etched":
+   garis yang nyaris tak terbaca membuat bar dok terlihat menyatu dgn kanvas
+   dan konten seakan tersapu keluar layar tanpa batas. Satu hairline tercetak =
+   bar terbaca sebagai permukaan sendiri, tanpa menambah lapisan baru. */
+.nav-dock {
   box-shadow:
-    0 0 0 1px rgba(16, 24, 40, 0.06),
-    0 2px 4px -1px rgba(15, 23, 42, 0.09),
-    0 12px 28px -14px rgba(15, 23, 42, 0.30);
+    0 -1px 0 0 #B8C4D3,                           /* hairline atas = token `line` */
+    0 -8px 24px -12px rgba(15, 23, 42, 0.14);     /* ambient naik tipis */
 }
-.dark .nav-pill {
+.dark .nav-dock {
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.09),
-    0 2px 4px -1px rgba(0, 0, 0, 0.5),
-    0 12px 28px -14px rgba(0, 0, 0, 0.75);
+    0 -1px 0 0 rgba(255, 255, 255, 0.14),
+    0 -8px 24px -12px rgba(0, 0, 0, 0.6);
 }
 
 /* MATERIAL-FLAT (2 Jul): top-light gradient kartu (light & dark) DIHAPUS.
@@ -672,7 +756,14 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 
   .btn-brand {
     border-radius: 0.75rem;   /* = rounded-xl (token ada, bukan nilai baru) */
-    background-image: linear-gradient(180deg, #18A055 0%, #0F6B40 58%, #0C5E37 100%);
+    /* Pass KONTRAS MAKSIMAL (4 Agu): stop atas #18A055 → #0F7A45. Label putih
+       di TENGAH tombol memang aman sejak dulu (6,57:1 di atas #0F6B40 — itu
+       sebabnya audit kontras selalu lolos), tapi tepi ATAS gradient cuma
+       3,39:1; ikon/teks yang kebetulan naik sedikit ke sana jatuh di bawah AA.
+       Ramp diturunkan sepadan hero. Putaran pertama (#0F7A45) masih 6,50–6,96
+       di sampel piksel `.btn-brand` penuh-lebar — tepi glossy putih di dalamnya
+       ikut menerangkan baris teratas label. Turun satu step lagi: >=7,4:1. */
+    background-image: linear-gradient(180deg, #0C6238 0%, #0A5531 58%, #094A2B 100%);
     color: #fff;
     /* MATERIAL-FLAT (2 Jul): glow emerald besar 12/28 dibuang — di dunia kartu
        flat, CTA cukup menonjol dari warna brand + contact tipis (ala myBCA/
@@ -701,7 +792,12 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      contact whisper rose-ink — flat, bukan glow. */
   .btn-danger {
     border-radius: 0.75rem;   /* = rounded-xl */
-    background-image: linear-gradient(180deg, #F43F5E 0%, #E11D48 58%, #BE123C 100%);
+    /* Pass KONTRAS MAKSIMAL (4 Agu): ramp lama #F43F5E→#E11D48→#BE123C memberi
+       putih 3,67:1 di tepi atas & 4,70:1 di tengah — lolos AA tipis sekali,
+       padahal ini tombol HAPUS/BATALKAN yang paling tak boleh salah baca.
+       Diturunkan mengikuti token `neg` yang juga turun ke rose-800: tepi atas
+       4,70:1, tengah 6,17:1, dasar 8,78:1. Anatomi tetap kembar .btn-brand. */
+    background-image: linear-gradient(180deg, #E11D48 0%, #C01340 58%, #941136 100%);
     color: #fff;
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
@@ -756,10 +852,13 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      opacity-*` yang mungkin masih menempel di call-site tak menimpanya lagi. */
   .mati-teks:disabled {
     opacity: 1;
-    color: #64748B;          /* 4,76:1 di atas kartu putih */
+    /* Pass KONTRAS MAKSIMAL (4 Agu): #64748B (4,76:1) → #475569 (7,58:1 kartu
+       putih / 6,68:1 kanvas). Nonaktif tetap terbaca "abu netral", tapi kini
+       ikut ambang AAA app — bukan cuma "lebih baik dari opacity". */
+    color: #475569;
     cursor: not-allowed;
   }
-  .dark .mati-teks:disabled { color: #94A3B8; }
+  .dark .mati-teks:disabled { color: #AEB7C4; }  /* #94A3B8 6,92:1 → 8,66:1, sama dgn remap gray-400 gelap */
 
   /* ── Secondary button (aksi netral: Batal/Tutup di footer modal) ───────
      SATU sumber untuk tombol sekunder berbingkai yang sebelumnya disalin
@@ -811,9 +910,15 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
 /* Sheen + kedalaman untuk kartu hero gradient (Saldo). Satu sumber cahaya
    kiri-atas + bayang halus kanan-bawah → pecah gradient datar tanpa ubah
    warna brand. Selalu pointer-events-none, di bawah konten (.relative). */
+/* Pass KONTRAS MAKSIMAL (4 Agu): sapuan putih kiri-atas .18 → .06. Selama ini
+   peredupan hero SELALU digarap di ramp & glow, padahal titik paling terang di
+   kartu bukan salah satunya — ia lapisan PUTIH 18% yang dicat di atas keduanya.
+   Sampel piksel di bawah eyebrow "Saldo Bersih Kas RT" jatuh ke 6,03:1 walau
+   stop di bawahnya sudah 7,4:1. Bayang kanan-bawah TIDAK diturunkan (menambah
+   kontras, bukan mengurangi) → arah cahaya kartu tetap terbaca. */
 .hero-sheen {
   background:
-    radial-gradient(120% 80% at 14% -10%, rgba(255, 255, 255, 0.18), transparent 56%),
+    radial-gradient(120% 80% at 14% -10%, rgba(255, 255, 255, 0.06), transparent 56%),
     radial-gradient(90% 75% at 100% 115%, rgba(0, 0, 0, 0.18), transparent 60%);
 }
 
@@ -1127,7 +1232,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    warna sistem saat forced-colors, edge ring dipertegas saat prefers-contrast.
    Hanya menambah definisi tepi; tak menyentuh markup/arah near-white. */
 @media (forced-colors: active) {
-  .lift, .float, .nav-pill {
+  .lift, .float, .nav-dock {
     border: 1px solid CanvasText;
   }
 }

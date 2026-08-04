@@ -142,7 +142,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         </h1>
         <p
           className="rise mt-1.5 text-[0.8125rem] font-semibold
-                     text-emerald-800 dark:text-emerald-300/80
+                     text-emerald-800 dark:text-emerald-200
                      drop-shadow-sm"
           style={{ animationDelay: '0.14s' }}
         >
@@ -151,7 +151,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
         {/* Tagline — bikin momen brand */}
         <p
-          className="rise mt-2 text-xs text-emerald-800 dark:text-emerald-200/80 font-medium"
+          className="rise mt-2 text-xs text-emerald-800 dark:text-emerald-100 font-medium"
           style={{ animationDelay: '0.18s' }}
         >
           Transparansi kas &amp; kehadiran warga
@@ -184,7 +184,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             </span>
             <div className="min-w-0">
               <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Masuk sebagai Warga</p>
-              <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-300/80 font-medium">
+              <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-200 font-medium">
                 Lihat saldo, jadwal, absensi &amp; talangan
               </p>
             </div>
@@ -195,7 +195,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               jadi hijau sedang → teks emerald-800 cuma 3,5:1 (sampel piksel). */}
           <div className="flex items-start gap-2 mb-3 rounded-xl bg-emerald-100 dark:bg-emerald-900 border border-emerald-200/60 dark:border-emerald-700/30 px-3 py-2.5">
             <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-            <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-200 leading-snug">
+            <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-100 leading-snug">
               Tanpa daftar. Cukup ketik kata{' '}
               <button
                 type="button"
@@ -295,7 +295,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div>
-                <label htmlFor="login-email" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
+                <label htmlFor="login-email" className="block text-xs font-semibold text-ink-sub dark:text-gray-200 mb-1.5">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -322,7 +322,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
               {/* Password */}
               <div>
-                <label htmlFor="login-password" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
+                <label htmlFor="login-password" className="block text-xs font-semibold text-ink-sub dark:text-gray-200 mb-1.5">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -373,7 +373,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       </div>
 
       {/* Footer note */}
-      <p className="rise relative z-10 text-xs text-emerald-800 dark:text-emerald-200/70 mt-5 text-center" style={{ animationDelay: '0.32s' }}>
+      <p className="rise relative z-10 text-xs text-emerald-800 dark:text-emerald-100 mt-5 text-center" style={{ animationDelay: '0.32s' }}>
         Bendahara lupa password? Hubungi pengurus RT
       </p>
     </main>

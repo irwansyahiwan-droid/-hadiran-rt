@@ -69,18 +69,33 @@ export default {
       colors: {
         /* ── Brand hijau (sumber: hero gradient di index.css) ──────────
            JANGAN ganti ke navy/gold. Lihat memory design-system. */
+        /* Pass KONTRAS MAKSIMAL (4 Agu 2026, permintaan user "kontras dibuat
+           maksimal"). Ambang app naik dari AA (4,5:1) ke AAA (7:1) untuk TEKS
+           di permukaan aslinya — bukan cuma di atas putih, tapi juga di atas
+           kanvas #ECF1F7 yang selalu sedikit lebih gelap. Tiap nilai di bawah
+           dihitung terhadap KEDUANYA; yang dilaporkan = yang terburuk. */
         brand: {
-          DEFAULT: '#0F4C2E', // deep — fill chip aktif, judul kuat
+          DEFAULT: '#0F4C2E', // deep — fill chip aktif, judul kuat, ink tab aktif (8,1:1 di atas pil nav)
           600: '#145D39',
           500: '#1B7249',
-          link: '#0D6B5E',    // teal-green untuk tautan "Lihat semua"
-          linkDark: '#1A9B86', // pasangan link utk dark mode (tab aktif + tautan) — SATU sumber
+          /* #0D6B5E → #0A5B4E: teal lama 6,39:1 di putih & 5,63:1 di kanvas —
+             lolos AA, gagal AAA. Turun satu step: 8,02:1 / 7,07:1. */
+          link: '#0A5B4E',    // teal-green untuk tautan "Lihat semua"
+          /* #1A9B86 → #34D399 (emerald-400): teal lama cuma 5,13:1 di atas kartu
+             gray-900. #34D399 = 9,25:1, DAN menyatukan aksen gelap app — warna
+             ini sudah dipakai cincin fokus `.field` gelap, jadi bukan hex baru:
+             satu mint untuk tautan, tab aktif, fokus, accent-color, ::selection. */
+          linkDark: '#34D399', // pasangan link utk dark mode (tab aktif + tautan) — SATU sumber
         },
         /* ── Semantik nominal: SATU hijau, SATU merah, SATU amber ──────
            Hindari campur red/rose & green/emerald di satu layar. */
-        pos: '#047857',   // uang masuk / positif  (emerald-700, on-brand)
-        neg: '#BE123C',   // uang keluar / negatif (rose-700) — SATU merah: rose-600 gagal AA di rose-50/kanvas (4,0–4,3:1), dark tetap rose-400
-        warn: '#92400E',  // tunggakan / perhatian (amber-800) — amber-700 gagal AA di kanvas/banner (4,3–4,4:1)
+        /* Ketiganya turun satu step di pass KONTRAS MAKSIMAL (4 Agu). Riwayatnya
+           selalu ke arah yang sama — tiap pass menemukan warna sebelumnya cuma
+           "lolos" di permukaan termudah — jadi kali ini ambangnya dinaikkan
+           sekalian ke AAA, diukur di putih DAN di kanvas #ECF1F7. */
+        pos: '#05543E',   // uang masuk / positif  (emerald-800/900) — #047857 cuma 5,48:1 putih / 4,83:1 kanvas; #065F46 masih 6,59 di atas panel .inset-soft; kini 8,96 putih / 7,69 inset-soft
+        neg: '#941136',   // uang keluar / negatif (rose-800) — SATU merah: rose-600 gagal AA di rose-50/kanvas, rose-700 #BE123C lolos AA tapi 6,29/5,54; diukur 6,75 di kanvas → turun lagi ke #941136: 8,78 / 7,29
+        warn: '#78350F',  // tunggakan / perhatian (amber-900) — amber-700 gagal AA di kanvas/banner, amber-800 #92400E 7,10/6,26; kini 9,07 / 8,00
         /* ── Status SETOR (kartu hero Kas Hadiran saat sudah disetor) ──
            Biru = sinyal status, BUKAN accent kedua. Hanya dipakai di hero
            Kas Hadiran. Struktur DEFAULT/600/500 mirror brand utk pola gradient. */
@@ -92,7 +107,7 @@ export default {
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
         sunken: '#ECF1F7', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). MATERIAL-FLAT (2 Jul): #EAEFF6→#ECF1F7 (nada Gmail/Google apps) + seluruh sistem kartu pindah ke bahasa FLAT ala Google/myBCA/BYOND — kanvas rata tanpa whisper radial, kartu putih murni ber-hairline, bayangan tinggal satu contact whisper. 9 pass naik-turun L kanvas tak pernah selesai karena akar masalahnya dua bahasa visual campur (nav/pill/banner sudah flat, kartu masih floating-glass) — bukan nilai L. Jangan tuning L lagi.
-        line: '#C5CFDB',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk). Pass kontras-tercetak (8 Jul): #DAE0E8→#D3DAE3 — user minta kontras lebih premium; naikkan SATU step di dalam bahasa flat (hairline = lever sah) agar tepi kartu "tercetak", tetap whisper-class bukan bingkai. Pass "Etched Premium" (26 Jul): #D3DAE3→#C5CFDB — user minta warna/kontras lebih mahal (trend 2026); tepi kartu dinaikkan SATU step lagi (lever hairline yg sama, BUKAN glass/shadow) agar "tercetak" ala Linear/Stripe/Mercury light. Edge-family digelapkan serempak menjaga hierarki control > line > divider.
+        line: '#B8C4D3',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk). Pass kontras-tercetak (8 Jul): #DAE0E8→#D3DAE3 — user minta kontras lebih premium; naikkan SATU step di dalam bahasa flat (hairline = lever sah) agar tepi kartu "tercetak", tetap whisper-class bukan bingkai. Pass "Etched Premium" (26 Jul): #D3DAE3→#C5CFDB — user minta warna/kontras lebih mahal (trend 2026); tepi kartu dinaikkan SATU step lagi (lever hairline yg sama, BUKAN glass/shadow) agar "tercetak" ala Linear/Stripe/Mercury light. Edge-family digelapkan serempak menjaga hierarki control > line > divider. Pass KONTRAS MAKSIMAL (4 Agu): #C5CFDB→#B8C4D3 — satu step lagi di lever yang SAMA (hairline), bukan glass/shadow/kanvas. Nilainya persis `control` sebelum pass non-teks, jadi hierarki control #64748B > line #B8C4D3 > divider baris #D1DAE5 tetap utuh. Hairline ini juga jadi garis atas bar nav dok (.nav-dock) supaya tepi bar & tepi kartu satu bahasa.
         /* border kontrol (input/tombol) — lebih kuat dari line. Riwayat: #E2E8F0→#CBD5E1
            (8 Jul, dulu malah LEBIH TERANG dari line) → #B8C4D3 (26 Jul "Etched Premium",
            naik serempak dgn line menjaga hierarki control > line > divider).

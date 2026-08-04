@@ -25,6 +25,7 @@ export const labelTab = (id: TabName) => tabs.find((t) => t.id === id)?.label ??
 export default function BottomNav({ active, onChange, isWargaMode }: BottomNavProps) {
   // Warga tidak punya tab Talangan — diakses lewat tombol "Lihat" di Beranda
   const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
+  const activeIndex = visibleTabs.findIndex(t => t.id === active);
 
   // Auto-hide: scroll turun (masuk ke konten) → nav menyelinap turun keluar layar;
   // scroll naik → muncul lagi. Beri ruang baca list yg panjang. Dekat puncak (y<80)
@@ -33,10 +34,12 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
 
   return (
     <nav
-      // Kapsul MELAYANG (3 Agu 2026, permintaan user — ala GitHub Mobile).
-      // Menggantikan bar dok penuh-nempel-bawah (2 Jul, ala Google/myBCA/BYOND).
-      // Safe-area kini jadi jarak DI BAWAH kapsul (bukan padding di dalam bar),
-      // supaya kapsul betul-betul mengambang di atas home indicator.
+      // Bar DOK bawah — permintaan user (4 Agu 2026): "kembalikan seperti awal,
+      // bukan kapsul, seperti di app Google". Kapsul melayang ala GitHub Mobile
+      // (3 Agu) DIBATALKAN; ini kembali ke bentuk 2 Jul: bar penuh NEMPEL tepi
+      // bawah layar dgn indikator pil Material 3 di belakang ikon. Latar bar
+      // mengisi sampai belakang home indicator (safe-area = padding DI DALAM
+      // bar, bukan jarak di bawahnya).
       className="fixed inset-x-0 bottom-0 z-nav"
       style={{
         // Geser 100% + buffer 8px (sisa hairline/bayangan atas) → nav bersih
@@ -56,77 +59,86 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
         backfaceVisibility: 'hidden',
       }}
     >
-      {/* KAPSUL MELAYANG (3 Agu 2026, permintaan user — ala GitHub Mobile).
-          Menggantikan bar dok penuh 2 Jul.
+      {/* Permukaan SOLID putih penuh selebar layar (dark = gray-900), pemisah
+          cuma hairline atas + bayangan naik tipis via .nav-dock — bar dok datar
+          ala app Google/bank, tanpa ring/radius kapsul. Slot tombol tetap
+          max-w-lg di tengah agar sejajar kolom konten di layar lebar.
 
-          JARAK BAWAH: safe-area TIDAK ditumpuk penuh. Versi pertama memakai
-          `safe-area + 12px` — di iPhone itu 34 + 12 = 46px, dan kapsulnya
-          terbaca mengambang kelewat tinggi (keluhan user: "kurang ke bawah").
-          Bar melayang memang tak perlu menghindari seluruh zona home indicator
-          seperti bar dok yang harus mengecat sampai dasar; GitHub Mobile pun
-          duduk tepat di atas garis indikator. Jadi safe-area dipotong 16px dan
-          diberi lantai 8px: iPhone ≈ 18px, layar tanpa notch = 8px.
-
-          Tinggi TOTAL nav jadi ≤70px + safe-area — tetap AMAN terhadap `4.5rem`
-          yang dipakai ulang di empat tempat (padding-bawah <main> App, Fab,
-          tombol sticky Absensi Jadwal, prompt PWA/Install), karena nav kini
-          memakan LEBIH SEDIKIT ruang, bukan lebih banyak. Yang berbahaya cuma
-          arah sebaliknya: menaikkan tinggi tanpa menyentuh keempatnya. */}
+          Tinggi TOTAL = 70px + safe-area, PERSIS seperti sebelum kapsul. Angka
+          itu dipakai ulang sebagai `4.5rem` di empat tempat (padding-bawah
+          <main> App, Fab, tombol sticky Absensi Jadwal, prompt PWA/Install) —
+          menaikkannya tanpa menyentuh keempatnya = konten ngumpet di balik bar. */}
       <div
-        className="px-3"
+        className="nav-dock bg-white dark:bg-gray-900"
         // Tucked (scroll turun) = bar meluncur keluar layar: matikan interaksi
         // agar tak ada tap "hantu" yang tertangkap saat nav tak terlihat.
         style={{
-          paddingBottom: 'max(8px, calc(env(safe-area-inset-bottom) - 16px))',
+          paddingBottom: 'env(safe-area-inset-bottom)',
           pointerEvents: tucked ? 'none' : 'auto',
         }}
       >
-      <div className="nav-pill relative max-w-lg mx-auto flex items-stretch h-[58px] rounded-full bg-white dark:bg-gray-900 px-1.5">
+      <div className="relative max-w-lg mx-auto flex items-stretch h-[70px]">
+        {/* Indikator pil meluncur (spring) — slot selebar tombol, pil di area ikon.
+            Row TANPA padding horizontal agar slot = lebar tombol persis. */}
+        {activeIndex >= 0 && (
+          <div
+            aria-hidden
+            className="absolute inset-y-0 left-0 pointer-events-none transition-transform duration-300"
+            style={{
+              width: `${100 / visibleTabs.length}%`,
+              transform: `translateX(${activeIndex * 100}%)`,
+              transitionTimingFunction: 'var(--ease-spring)',
+            }}
+          >
+            {/* Pil aktif ala Google (Material 3): tonal DATAR — satu fill tint
+                brand, tanpa gradient/ring/glow. Bentuk stadium (rounded-full)
+                w-16 h-8 mengikuti spec indikator M3 (64×32, ikon 24). Yang
+                bergerak hanya pil-nya (slide spring antar slot).
+
+                Tint diambil dari `brand` (#0F4C2E), BUKAN `brand-link`, dan di
+                GELAP sengaja MENGGELAPKAN (brand/40 di atas gray-900), bukan
+                menerangkan. Alasannya kontras, bukan rupa: tint terang di gelap
+                menaikkan luminansi latar tepat di bawah label aktif dan
+                menjatuhkannya ke ±4,1:1 (terukur saat kapsul 3 Agu). Tonal
+                container gelap justru menaikkannya ke 7,7:1 — sejalan pula dgn
+                aturan panel di permukaan gelap app ini yang memang `bg-black/xx`. */}
+            <span className="absolute left-1/2 -translate-x-1/2 top-3 w-16 h-8 rounded-full bg-brand/[0.14] dark:bg-brand/40" />
+          </div>
+        )}
         {visibleTabs.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
             <button
               key={id}
               onClick={() => { if (!isActive) haptic(); onChange(id); }}
-              className="press relative flex items-center justify-center flex-1 min-w-0 h-full select-none"
+              className="press relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
               aria-current={isActive ? 'page' : undefined}
             >
-              {/* Kapsul aktif MEMBUNGKUS ikon + label sekaligus — itu ciri utama
-                  GitHub Mobile, beda dari M3 yang cuma memagari ikon. Lebarnya
-                  hampir sepenuh slot (bukan memeluk teks seperti GitHub) karena
-                  app ini punya 5 tab dgn label sepanjang "Talangan": di 320px
-                  satu slot cuma ~59px, jadi kapsul yang memeluk teks akan
-                  meluber. Indikator geser spring DILEPAS bersama pola lama —
-                  kapsul di sini berpindah, bukan meluncur, persis GitHub. */}
-              <span
-                /* Kapsul NETRAL, bukan bertint brand — dan itu memang cara
-                   GitHub: warna aksen tinggal di ikon & label, kapsulnya cuma
-                   abu. Bukan cuma soal rupa; kapsul bertint teal sempat dipakai
-                   dan menjatuhkan label aktif mode GELAP ke 4,09:1 (tint
-                   MENERANGKAN latar tepat di bawah teks yang sudah pas-pasan).
-                   Mode gelap sengaja CEKUNG (hitam/35%), bukan terang seperti
-                   GitHub: menerangkan latar di sini selalu memakan kontras
-                   #1A9B86, sedangkan mencekungkannya justru menaikkannya ke
-                   5,51:1 — lebih tinggi dari pil polosnya sendiri (5,13).
-                   Sejalan pula dgn aturan panel di permukaan gelap app ini yang
-                   memang `bg-black/xx`, bukan `white/xx`. */
-                className={`flex flex-col items-center justify-center gap-0.5 w-full h-[46px] rounded-full transition-colors duration-150 ${
-                  isActive ? 'bg-black/[0.06] dark:bg-black/[0.35]' : ''
-                }`}
-              >
+              {/* Ala Google/M3: ikon DIAM di tempat (tanpa scale/lift) — yang
+                  berpindah hanya pil tonal di belakangnya. Ikon 24px duduk di
+                  blok h-8 yg sejajar persis dgn pil. Aktif tetap DIISI (fill
+                  tint) → outline→solid, active terbaca "padat" bukan cuma warna. */}
+              <span className="flex items-center justify-center w-16 h-8">
+                {/* Warna 150ms (bukan 300): nav ditekan puluhan kali sehari →
+                    respons harus crisp; gerak "hidup" cukup dari pil spring. */}
                 <Icon
-                  className={`w-[22px] h-[22px] shrink-0 transition-colors duration-150 ${isActive ? 'text-brand-link dark:text-brand-linkDark' : 'text-ink-sub dark:text-gray-300'}`}
+                  className={`w-6 h-6 transition-colors duration-150 ${isActive ? 'text-brand dark:text-brand-linkDark' : 'text-ink-sub dark:text-gray-300'}`}
                   strokeWidth={isActive ? 2.2 : 2}
                   fill={isActive ? 'currentColor' : 'none'}
                   style={{ fillOpacity: isActive ? 0.2 : 0, transition: 'fill-opacity 200ms ease-out' }}
                 />
-                <span
-                  className={`text-micro leading-none whitespace-nowrap transition-colors duration-150 ${
-                    isActive ? 'font-bold text-brand-link dark:text-brand-linkDark' : 'font-semibold text-ink-sub dark:text-gray-300'
-                  }`}
-                >
-                  {label}
-                </span>
+              </span>
+              {/* Timing spring DIHAPUS dari warna: kurva overshoot (>1) meng-
+                  extrapolate interpolasi warna melewati target (kilat aneh).
+                  Spring hanya utk transform (pil); warna = ease standar.
+
+                  Tab TAK AKTIF pun bertinta pekat (ink-sub / gray-300, ≥12:1) —
+                  bukan abu pudar. Bedanya aktif-vs-tidak dibawa pil + warna
+                  brand + tebal huruf, bukan dgn meredupkan yang tak aktif. */}
+              <span
+                className={`text-micro leading-none mt-1 transition-colors duration-150 ${isActive ? 'font-bold text-brand dark:text-brand-linkDark' : 'font-semibold text-ink-sub dark:text-gray-300'}`}
+              >
+                {label}
               </span>
             </button>
           );

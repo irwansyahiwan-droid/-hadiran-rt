@@ -58,7 +58,7 @@
 
   /* Token disinkron dari app (tailwind.config.js + src/index.css):
      hero = --hero-gradient/--hero-glow, kartu saldo = .hero-emerald,
-     line #D3DAE3 / row #DCE2EA (pass kontras-tercetak 8 Jul),
+     line #B8C4D3 / row #D1DAE5 (pass KONTRAS MAKSIMAL 4 Agu),
      ink #0B1220/#1F2937/#334155 (pass kontras-terbaca 8 Jul),
      shadow kartu = satu contact whisper (MATERIAL-FLAT 2 Jul).
      Radius: kartu besar 24 / tile 16 / ikon & tombol 12 / pill full. */
@@ -67,20 +67,20 @@
        bila warga memilihnya lewat toggle di dalam app). Landing tak punya toggle,
        jadi dark mode otomatis di sini cuma bikin nada melompat saat warga masuk. */
     color-scheme: light;
-    --emerald-deep: #0D5B36;
-    --emerald: #137A46;
-    --emerald-bright: #157A45;
-    --brand: #1B7249;
-    --accent: #1B7249;
+    --emerald-deep: #063A21;
+    --emerald: #094B2C;
+    --emerald-bright: #0A5230;
+    --brand: #0F4C2E;
+    --accent: #0F4C2E;
     --canvas: #ECF1F7;
     --surface: #FFFFFF;
-    --line: #D3DAE3;
-    --row: #DCE2EA;
+    --line: #B8C4D3;
+    --row: #D1DAE5;
     --ink: #0B1220;
     --ink-sub: #1F2937;
     --ink-faint: #334155;
     --tile-bg: linear-gradient(150deg, #EAF7F0 0%, #DCF1E6 100%);
-    --tile-ink: #1B7249;
+    --tile-ink: #0F4C2E;
     --cell-tint: #EAF7F0;
     --alt-bg: linear-gradient(180deg, #FFFFFF 0%, #ECF1F7 100%);
     --shadow-card: 0 2px 4px -1px rgba(15, 23, 42, 0.09);
@@ -129,7 +129,7 @@
     position: relative;
     overflow: hidden;
     background:
-      radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.20) 0%, rgba(45,212,150,0) 55%),
+      radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.05) 0%, rgba(45,212,150,0) 55%),
       linear-gradient(135deg, var(--emerald-deep) 0%, var(--emerald) 50%, var(--emerald-bright) 100%);
     color: #fff;
     /* Bawah dilebihkan agar strip showcase HP bisa overlap premium ke tepi hero. */
@@ -244,7 +244,12 @@
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.20), inset 0 1px 0 rgba(255,255,255,.26);
     /* Scrim atas+bawah — mirror BannerCarousel app: stop terang gradient (mis.
        teal #2cb8a5) < 4.5:1 utk teks putih; scrim menarik eyebrow/judul/desc
-       ke >=4.5:1 tanpa mengubah warna brand. */
+       ke >=4.5:1 tanpa mengubah warna brand.
+       Pass KONTRAS MAKSIMAL (4 Agu): scrim saja ternyata cuma menolong bagian
+       ATAS kartu — judul h3 duduk ~55% ke bawah, tempat scrim sudah habis, dan
+       di sana putih cuma 3,87:1. Kelima stop AWAL diturunkan ke versi pekatnya
+       (hue tiap kartu tetap) → putih >=7,8:1 di SELURUH bidang, bukan cuma di
+       balik scrim. */
     background:
       linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,0) 56%),
       linear-gradient(to top, rgba(0,0,0,.28), rgba(0,0,0,0) 46%);
@@ -265,11 +270,11 @@
   }
   .bn-ic svg { width: 22px; height: 22px; }
   /* Gradient sinkron dgn slide carousel app saat ini (BannerCarousel.tsx). */
-  .bn-target   { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#2cb8a5 0%,#0a564e 100%); }
-  .bn-absensi  { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#4a7cf6 0%,#173dac 100%); }
-  .bn-tarikan  { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#9059f2 0%,#4825a8 100%); }
-  .bn-talangan { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#ef9120 0%,#9a4c07 100%); }
-  .bn-kasrt    { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#22a957 0%,#0a5e3d 100%); }
+  .bn-target   { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#0A5D51 0%,#063934 100%); }
+  .bn-absensi  { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#1E46B0 0%,#122C77 100%); }
+  .bn-tarikan  { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#5B2BA6 0%,#33176B 100%); }
+  .bn-talangan { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#7A400A 0%,#4E2905 100%); }
+  .bn-kasrt    { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#0B5F33 0%,#053B25 100%); }
 
   /* ─────────── SECTIONS ─────────── */
   section { padding: 52px 0; }
@@ -299,7 +304,7 @@
     color: #fff;
     background:
       radial-gradient(130% 72% at 0% 0%, rgba(4,38,24,.48), transparent 55%),
-      linear-gradient(150deg, #157A45 0%, #0F7A47 52%, #064A2C 100%);
+      linear-gradient(150deg, #0A5230 0%, #08492B 52%, #032A17 100%);
     box-shadow: var(--hero-shadow);
   }
   .flead::before {
@@ -448,7 +453,7 @@
   /* Final CTA */
   .final {
     background:
-      radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.28) 0%, rgba(45,212,150,0) 55%),
+      radial-gradient(120% 90% at 100% 0%, rgba(45,212,150,.07) 0%, rgba(45,212,150,0) 55%),
       linear-gradient(135deg, var(--emerald-deep) 0%, var(--emerald) 100%);
     color: #fff; text-align: center;
     border-radius: 24px; padding: 44px 26px; position: relative; overflow: hidden;
