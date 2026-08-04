@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { hitungGeometriStruk, bagikanFileGambar, STRUK, type ReceiptRow } from './shareReceipt';
+import { hitungGeometriStruk, bagikanFileGambar, warnaTone, perluChipDefisit, STRUK, type ReceiptRow } from './shareReceipt';
+import { CETAK } from './warnaCetak';
 
 /**
  * Kartu PNG struk adalah artefak yang KELUAR dari app: bendahara membagikannya
@@ -9,6 +10,9 @@ import { hitungGeometriStruk, bagikanFileGambar, STRUK, type ReceiptRow } from '
  *      yang sudah terlanjur tersebar.
  *   2. Kontrak share — WhatsApp menolak share yang mencampur file + title/text
  *      (mental balik tanpa lampiran). WAJIB files-only.
+ *   3. WARNA & penanda defisit — ditambahkan 4 Agu 2026, lihat blok ujinya di
+ *      bawah. Sampai saat itu suite ini hanya mengunci GEOMETRI, dan celah itu
+ *      persis yang membiarkan `tone` diabaikan diam-diam selama berbulan-bulan.
  */
 
 const baris = (n: number): ReceiptRow[] =>
@@ -102,5 +106,61 @@ describe('bagikanFileGambar — kontrak share WhatsApp', () => {
     // di sini: share TIDAK dipanggil dengan file yang ditolak platform.
     await bagikanFileGambar(file, 'teks', { canShare: () => false, share }).catch(() => {});
     expect(share).not.toHaveBeenCalled();
+  });
+});
+
+
+/* ── Warna nilai & penanda defisit ─────────────────────────────────────────
+ *
+ * Kenapa blok ini ada. `warnaTone` dulu fungsi LOKAL di dalam cabang berseksi
+ * `shareReceipt()`, sehingga cabang detail polos — yang dipakai kartu Kas
+ * Hadiran & Jadwal — mengecat semua nilai `ink` dan membuang `row.tone` tanpa
+ * suara. Tipe `ReceiptRow` menerima `tone`, pemanggil boleh mengisinya, dan tak
+ * terjadi apa-apa. Tak ada test yang merah, karena suite ini cuma mengukur
+ * geometri; ketahuannya lewat melihat kartunya sendiri.
+ *
+ * Uji divalidasi lewat MUTASI (disiplin uji uang repo ini): kembalikan
+ * `warnaTone` jadi `() => CETAK.ink` → kasus pos/neg/warn di bawah gagal.
+ */
+describe('warnaTone — tone baris benar-benar dipakai', () => {
+  it('memetakan tiap tone ke token uang, bukan ink', () => {
+    expect(warnaTone({ tone: 'pos' })).toBe(CETAK.pos);
+    expect(warnaTone({ tone: 'neg' })).toBe(CETAK.neg);
+    expect(warnaTone({ tone: 'warn' })).toBe(CETAK.warn);
+  });
+
+  it('tanpa tone → ink (baris netral, mis. "Setor ke Kas RT")', () => {
+    expect(warnaTone({})).toBe(CETAK.ink);
+    expect(warnaTone({ tone: undefined })).toBe(CETAK.ink);
+  });
+
+  it('tiga tone menghasilkan tiga warna BERBEDA — bukan diam-diam ink semua', () => {
+    const dipakai = new Set([
+      warnaTone({ tone: 'pos' }),
+      warnaTone({ tone: 'neg' }),
+      warnaTone({ tone: 'warn' }),
+      warnaTone({}),
+    ]);
+    expect(dipakai.size).toBe(4);
+  });
+});
+
+describe('perluChipDefisit — satu-satunya penanda saldo minus di kartu', () => {
+  /* Nominal hero TETAP putih (DESIGN.stitch §7 melarang mewarnainya salmon),
+     jadi kalau predikat ini salah, kartu yang beredar di WA kehilangan seluruh
+     tanda bahwa saldonya minus. */
+  it('nominal minus → chip', () => {
+    expect(perluChipDefisit('-Rp390.000')).toBe(true);
+    expect(perluChipDefisit('  -Rp1.250.000')).toBe(true); // spasi awal tak menipu
+  });
+
+  it('nominal positif / nol → tanpa chip', () => {
+    expect(perluChipDefisit('Rp390.000')).toBe(false);
+    expect(perluChipDefisit('+Rp390.000')).toBe(false);
+    expect(perluChipDefisit('Rp0')).toBe(false);
+  });
+
+  it('angka yang KEBETULAN memuat minus di tengah bukan defisit', () => {
+    expect(perluChipDefisit('Rp1.000-2.000')).toBe(false);
   });
 });

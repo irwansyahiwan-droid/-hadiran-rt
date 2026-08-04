@@ -90,6 +90,31 @@ export function hitungGeometriStruk(data: Pick<ReceiptData, 'rows' | 'list'>): G
   return { hasGroups, rowsCardH, listCardTop, listCardH, H: contentBottom + FOOTER };
 }
 
+/** Warna nilai baris dari `tone`. MURNI & diekspor supaya bisa diuji.
+ *
+ *  Dulu ia fungsi lokal di dalam cabang BERSEKSI `shareReceipt()`, sehingga
+ *  cabang detail polos (kartu Kas Hadiran & Jadwal) mengecat semua nilai `ink`
+ *  dan mengabaikan `row.tone` diam-diam: tipe menerima `tone`, pemanggil boleh
+ *  mengisinya, tak terjadi apa-apa. Bug yang tak kelihatan dari sisi pemanggil
+ *  DAN tak tertangkap suite — karena suite mengunci GEOMETRI struk, bukan
+ *  warnanya. Diangkat ke sini supaya kedua cabang memakai satu jalur dan
+ *  jalur itu punya uji. */
+export function warnaTone(r: Pick<ReceiptRow, 'tone'>): string {
+  return r.tone === 'pos' ? CETAK.pos
+    : r.tone === 'neg' ? CETAK.neg
+    : r.tone === 'warn' ? CETAK.warn
+    : CETAK.ink;
+}
+
+/** Apakah hero kartu perlu chip "DEFISIT"? `amount` sudah TERFORMAT ("-Rp390.000").
+ *
+ *  Dipisah supaya aturannya bisa diuji tanpa canvas: nominal hero TETAP putih
+ *  (DESIGN.stitch §7 melarang mewarnainya salmon/merah), jadi chip inilah
+ *  satu-satunya penanda defisit di kartu yang beredar di WhatsApp. */
+export function perluChipDefisit(amount: string): boolean {
+  return amount.trim().startsWith('-');
+}
+
 /** Bentuk minimal `navigator` yang dipakai saat membagikan — supaya bisa diuji. */
 export interface NavBagikan {
   canShare?: (d: { files?: File[] }) => boolean;
@@ -252,7 +277,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
      jadi "-Rp390.000" saja sudah menyisakan ruang lebih sempit dari chip.
      Penjaganya benar, penempatannya yang salah; di baris eyebrow ia selalu
      muat karena eyebrow tak pernah sepanjang itu. */
-  if (data.amount.trim().startsWith('-')) {
+  if (perluChipDefisit(data.amount)) {
     ctx.font = `700 11px ${rupiahFont}`;
     const chipW = ctx.measureText('DEFISIT').width + 18;
     const chipX = W - 40 - chipW;
@@ -266,15 +291,6 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   ctx.fillStyle = 'rgba(255,255,255,0.75)';
   ctx.font = `500 11px ${rupiahFont}`;
   ctx.fillText(data.title, 40, 195);
-
-  /* `tone` → warna nilai. Diangkat KELUAR dari cabang berseksi (4 Agu 2026):
-     sampai sekarang ia hanya hidup di sana, sedangkan cabang detail polos di
-     bawah mengecat SEMUA nilai dengan `ink` dan mengabaikan `row.tone` diam-diam.
-     Akibatnya tipe `ReceiptRow` menerima `tone`, pemanggilnya boleh mengisinya,
-     dan tak terjadi apa-apa — kartu Kas Hadiran & Jadwal selalu netral walau
-     panel in-app yang sama berwarna. Bug yang tak kelihatan dari kode pemanggil. */
-  const toneColor = (r: ReceiptRow) =>
-    r.tone === 'pos' ? CETAK.pos : r.tone === 'neg' ? CETAK.neg : r.tone === 'warn' ? CETAK.warn : CETAK.ink;
 
   // Baris detail (kartu putih FLAT ber-hairline — bahasa kartu app)
   let y = rowsCardTop;
@@ -292,7 +308,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
       ctx.font = `500 13px ${rupiahFont}`;
       ctx.textAlign = 'left';
       ctx.fillText(row.label, 40, y);
-      ctx.fillStyle = toneColor(row);
+      ctx.fillStyle = warnaTone(row);
       ctx.font = `700 13px ${rupiahFont}`;
       ctx.textAlign = 'right';
       ctx.fillText(row.value, W - 40, y);
@@ -334,7 +350,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
         ctx.fillText(row.label.toUpperCase(), 40, cy);
         try { ctx.letterSpacing = '0px'; } catch { /* noop */ }
         ctx.textAlign = 'right';
-        ctx.fillStyle = toneColor(row);
+        ctx.fillStyle = warnaTone(row);
         ctx.font = `700 14px ${rupiahFont}`;
         ctx.fillText(row.value, W - 40, cy);
       } else if (row.kind === 'total') {
@@ -356,7 +372,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
         ctx.font = `500 14px ${rupiahFont}`;
         ctx.fillText(fitText(ctx, row.label, W - 80 - 128), 52, cy);
         ctx.textAlign = 'right';
-        ctx.fillStyle = toneColor(row);
+        ctx.fillStyle = warnaTone(row);
         ctx.font = `700 14px ${rupiahFont}`;
         ctx.fillText(row.value, W - 40, cy);
       }
