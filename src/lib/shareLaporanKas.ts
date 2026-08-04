@@ -1,5 +1,6 @@
 import { LOGO_DATA_URL } from './logoBase64';
 import { bagikanFileGambar } from './shareReceipt';
+import { CETAK } from './warnaCetak';
 
 /**
  * Data satu kartu laporan kas (dipakai untuk "Tutup Buku Sekarang" maupun
@@ -82,16 +83,20 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   ctx.scale(scale, scale);
   ctx.textBaseline = 'alphabetic';
 
-  // Latar
-  ctx.fillStyle = '#EEF2F6';
+  // Latar — token `sunken` app. Dulu #EEF2F6, tone yang tak pernah ada di app.
+  ctx.fillStyle = CETAK.canvas;
   ctx.fillRect(0, 0, W, H);
 
   // ── Hero hijau ──────────────────────────────────────────────
   const hx = PAD, hy = PAD, hw = IW, hh = HERO_H;
   const grad = ctx.createLinearGradient(hx, hy, hx + hw, hy + hh);
-  grad.addColorStop(0, '#0F4C2E');
-  grad.addColorStop(0.5, '#145D39');
-  grad.addColorStop(1, '#1B7249');
+  /* Ramp `.hero-emerald` lewat CETAK. Nilai lama (#0F4C2E→#145D39→#1B7249)
+     adalah ramp brand-deep dari sebelum 13 Jul: makin ke kanan makin TERANG,
+     kebalikan arah hero app sekarang, dan hijau paling terangnya sudah dua kali
+     diturunkan sejak itu karena teks putih kecil di atasnya tak lolos. */
+  grad.addColorStop(0, CETAK.heroRamp[0]);
+  grad.addColorStop(0.5, CETAK.heroRamp[1]);
+  grad.addColorStop(1, CETAK.heroRamp[2]);
   ctx.fillStyle = grad;
   roundRect(ctx, hx, hy, hw, hh, 24);
   ctx.fill();
@@ -125,8 +130,22 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
     fs -= 1;
     ctx.font = `800 ${fs}px ${FONT}`;
   }
-  ctx.fillStyle = heroAmount < 0 ? '#FCA5A5' : '#FFFFFF';
+  /* Nominal TETAP putih walau minus — DESIGN.stitch §7 melarang mewarnai
+     nominal hero salmon/merah ("saldo minus disengaja"; sinyalnya chip KATA,
+     bukan rona, karena rona lemah bagi mata yang sulit membedakan warna).
+     Kartu ini satu-satunya permukaan yang masih melanggarnya. */
+  ctx.fillStyle = '#FFFFFF';
   ctx.fillText(amountStr, hx + 20, hy + 134);
+  if (heroAmount < 0) {
+    // Chip "DEFISIT" — paritas HeroSaldo in-app.
+    ctx.font = `700 10px ${FONT}`;
+    const cw = ctx.measureText('DEFISIT').width + 16;
+    ctx.fillStyle = CETAK.neg;
+    roundRect(ctx, hx + 20, hy + 142, cw, 18, 9);
+    ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('DEFISIT', hx + 28, hy + 155);
+  }
 
   ctx.fillStyle = 'rgba(255,255,255,0.62)';
   ctx.font = `500 11.5px ${FONT}`;
@@ -140,7 +159,9 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
 
     // Judul
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#9CA3AF';
+    // #9CA3AF = 2,50:1 di putih — judul panel praktis tak terbaca di layar HP
+    // penerima, apalagi setelah WhatsApp mengompres gambarnya.
+    ctx.fillStyle = CETAK.faint;
     ctx.font = `700 11px ${FONT}`;
     ctx.fillText(judul.toUpperCase(), IX + 16, y + PANEL_PAD_T + 12);
 
@@ -152,7 +173,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
     let ry = y + PANEL_PAD_T + PANEL_TITLE;
     rows.forEach((r) => {
       if (r.saldo) {
-        ctx.fillStyle = '#ECFDF5';
+        ctx.fillStyle = CETAK.posTint;
         roundRect(ctx, IX + 8, ry - 4, IW - 16, ROW_H - 6, 8);
         ctx.fill();
       }
@@ -160,14 +181,14 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
       // label
       ctx.textAlign = 'left';
       ctx.font = `${r.saldo ? '700' : '500'} 13px ${FONT}`;
-      ctx.fillStyle = r.saldo ? '#065F46' : '#6B7280';
+      ctx.fillStyle = r.saldo ? CETAK.pos : CETAK.faint;
       ctx.fillText(r.label, IX + 16, cy);
       // value
       ctx.textAlign = 'right';
       ctx.font = `700 13px ${FONT}`;
       ctx.fillStyle = r.saldo
-        ? (r.val < 0 ? '#DC2626' : '#065F46')
-        : r.minus ? '#DC2626' : '#047857';
+        ? (r.val < 0 ? CETAK.neg : CETAK.pos)
+        : r.minus ? CETAK.neg : CETAK.pos;
       const valStr = r.minus && r.val > 0 ? `-${rp(r.val)}` : rp(r.val);
       ctx.fillText(valStr, IX + IW - 16, cy);
       ry += ROW_H;
@@ -182,7 +203,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
 
   // ── Baris aktivitas (satu baris, terpusat) ──────────────────
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#6B7280';
+  ctx.fillStyle = CETAK.faint;
   ctx.font = `500 11.5px ${FONT}`;
   ctx.fillText(
     `${d.tarikanSelesai} tarikan · ${d.talanganLunas} talangan lunas · ${d.jumlahTransaksi} transaksi`,
@@ -193,7 +214,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
 
   // ── Footer ──────────────────────────────────────────────────
   const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  ctx.fillStyle = '#9CA3AF';
+  ctx.fillStyle = CETAK.muted;
   ctx.font = `500 11px ${FONT}`;
   ctx.fillText(`Dibuat ${tgl} · Hadiran RT`, W / 2, y + 18);
   ctx.textAlign = 'left';

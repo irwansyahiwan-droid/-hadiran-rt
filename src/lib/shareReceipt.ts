@@ -1,4 +1,5 @@
 import { LOGO_DATA_URL } from './logoBase64';
+import { CETAK } from './warnaCetak';
 
 export interface ReceiptRow {
   label: string;
@@ -179,16 +180,18 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   const ctx = canvas.getContext('2d')!;
   ctx.scale(scale, scale);
 
-  // Latar — kanvas app (sunken #ECF1F7), bukan tone drift lama #EEF2F6.
-  ctx.fillStyle = '#ECF1F7';
+  // Latar — kanvas app (token `sunken`).
+  ctx.fillStyle = CETAK.canvas;
   ctx.fillRect(0, 0, W, H);
 
-  // Kartu hero — "Refined Emerald" (SATU sumber dgn .hero-emerald di index.css:
-  // jewel money-green #157A45→#0F7A47→#064A2C), bukan gradient brand-deep lama.
+  // Kartu hero — ramp `.hero-emerald`. Sampai 4 Agu 2026 komentar di sini
+  // mengaku "SATU sumber dgn index.css" sambil menyalin nilainya tangan, jadi
+  // begitu ramp app diturunkan (13 Jul lalu 4 Agu) kartu yang dikirim ke WA
+  // tetap memakai hijau versi lama. Kini benar-benar satu sumber: CETAK.
   const grad = ctx.createLinearGradient(20, 20, W - 60, 230);
-  grad.addColorStop(0, '#157A45');
-  grad.addColorStop(0.52, '#0F7A47');
-  grad.addColorStop(1, '#064A2C');
+  grad.addColorStop(0, CETAK.heroRamp[0]);
+  grad.addColorStop(0.52, CETAK.heroRamp[1]);
+  grad.addColorStop(1, CETAK.heroRamp[2]);
   ctx.fillStyle = grad;
   roundRect(ctx, 20, 20, W - 40, 200, 24);
   ctx.fill();
@@ -242,25 +245,25 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   ctx.fillStyle = '#FFFFFF';
   roundRect(ctx, 20, y, W - 40, rowsCardH, 20);
   ctx.fill();
-  ctx.strokeStyle = '#C5CFDB'; // line — tepi kartu "tercetak"
+  ctx.strokeStyle = CETAK.line; // tepi kartu "tercetak"
   ctx.lineWidth = 1;
   roundRect(ctx, 20.5, y + 0.5, W - 41, rowsCardH - 1, 20);
   ctx.stroke();
   if (!hasGroups) {
     y += 26;
     data.rows.forEach((row, i) => {
-      ctx.fillStyle = '#334155'; // ink-faint (kontras-terbaca, bukan gray-500 lama)
+      ctx.fillStyle = CETAK.faint;
       ctx.font = `500 13px ${rupiahFont}`;
       ctx.textAlign = 'left';
       ctx.fillText(row.label, 40, y);
-      ctx.fillStyle = '#0B1220'; // ink
+      ctx.fillStyle = CETAK.ink;
       ctx.font = `700 13px ${rupiahFont}`;
       ctx.textAlign = 'right';
       ctx.fillText(row.value, W - 40, y);
       ctx.textAlign = 'left';
       // Divider inset antar-baris (lebih terang dari border kartu — pola list app)
       if (i < data.rows.length - 1) {
-        ctx.strokeStyle = '#D1DAE5';
+        ctx.strokeStyle = CETAK.divider;
         ctx.beginPath();
         ctx.moveTo(40, y + 18);
         ctx.lineTo(W - 40, y + 18);
@@ -272,10 +275,9 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     // ── Mode berseksi: PENERIMAAN/PENGELUARAN + rincian kategori + total ──
     // Tipografi sengaja SATU step lebih besar dari mode lama (detail 13→14,
     // total 17): kartu ini dibaca warga (banyak lansia) di grup WA, bukan
-    // dipindai bendahara. Warna nilai pakai tangga kontras app — pos #047857
-    // (≈4.9:1), neg #BE123C (≈6.0:1), label #334155 (≈10.4:1) → AA aman.
-    const POS = '#047857', NEG = '#BE123C';
-    const toneColor = (r: ReceiptRow) => (r.tone === 'pos' ? POS : r.tone === 'neg' ? NEG : '#0B1220');
+    // dipindai bendahara. Warna nilai = token uang app lewat CETAK.
+    const POS = CETAK.pos, NEG = CETAK.neg;
+    const toneColor = (r: ReceiptRow) => (r.tone === 'pos' ? POS : r.tone === 'neg' ? NEG : CETAK.ink);
     let ry = y + 12;
     data.rows.forEach((row, i) => {
       const h = rowH(row);
@@ -285,14 +287,14 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
         // Hairline pemisah DI ATAS kepala kelompok (bukan antar tiap baris) →
         // rincian terbaca menempel pada kelompoknya, bukan deretan seragam.
         if (i > 0) {
-          ctx.strokeStyle = '#D1DAE5';
+          ctx.strokeStyle = CETAK.divider;
           ctx.beginPath();
           ctx.moveTo(40, ry);
           ctx.lineTo(W - 40, ry);
           ctx.stroke();
         }
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#475569';
+        ctx.fillStyle = CETAK.muted;
         ctx.font = `700 12px ${rupiahFont}`;
         try { ctx.letterSpacing = '1px'; } catch { /* browser lama */ }
         ctx.fillText(row.label.toUpperCase(), 40, cy);
@@ -302,21 +304,21 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
         ctx.font = `700 14px ${rupiahFont}`;
         ctx.fillText(row.value, W - 40, cy);
       } else if (row.kind === 'total') {
-        ctx.fillStyle = '#ECFDF5';
+        ctx.fillStyle = CETAK.posTint;
         roundRect(ctx, 32, ry + 4, W - 64, h - 10, 12);
         ctx.fill();
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#065F46';
+        ctx.fillStyle = CETAK.pos;
         ctx.font = `700 15px ${rupiahFont}`;
         ctx.fillText(row.label, 44, cy);
         ctx.textAlign = 'right';
-        ctx.fillStyle = row.value.trim().startsWith('-') ? NEG : '#065F46';
+        ctx.fillStyle = row.value.trim().startsWith('-') ? NEG : CETAK.pos;
         ctx.font = `800 17px ${displayFont}`;
         ctx.fillText(row.value, W - 44, cy);
       } else {
         // Detail kategori — diindent 12px supaya jelas "milik" kelompok di atasnya.
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#334155';
+        ctx.fillStyle = CETAK.faint;
         ctx.font = `500 14px ${rupiahFont}`;
         ctx.fillText(fitText(ctx, row.label, W - 80 - 128), 52, cy);
         ctx.textAlign = 'right';
@@ -334,22 +336,22 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     ctx.fillStyle = '#FFFFFF';
     roundRect(ctx, 20, listCardTop, W - 40, listCardH, 20);
     ctx.fill();
-    ctx.strokeStyle = '#C5CFDB';
+    ctx.strokeStyle = CETAK.line;
     ctx.lineWidth = 1;
     roundRect(ctx, 20.5, listCardTop + 0.5, W - 41, listCardH - 1, 20);
     ctx.stroke();
     // Heading
-    ctx.fillStyle = '#B45309'; // warn — selaras "tidak hadir / perhatian"
+    ctx.fillStyle = CETAK.warn; // selaras "tidak hadir / perhatian"
     ctx.font = `700 11px ${rupiahFont}`;
     ctx.textAlign = 'left';
     ctx.fillText((data.list!.heading).toUpperCase(), 40, listCardTop + LIST_TOP_PAD + LIST_HEAD_H / 2);
     // Item bernomor
     let ly = listCardTop + LIST_TOP_PAD + LIST_HEAD_H + LIST_ITEM_H / 2;
     items.forEach((nama, i) => {
-      ctx.fillStyle = '#475569'; // nomor — dulu gray-400 (di bawah standar kontras)
+      ctx.fillStyle = CETAK.muted; // nomor — dulu gray-400 (di bawah standar kontras)
       ctx.font = `600 12px ${rupiahFont}`;
       ctx.fillText(`${i + 1}.`, 40, ly);
-      ctx.fillStyle = '#0B1220';
+      ctx.fillStyle = CETAK.ink;
       ctx.font = `500 13px ${rupiahFont}`;
       ctx.fillText(fitText(ctx, nama, W - 40 - 64), 64, ly);
       ly += LIST_ITEM_H;
@@ -358,7 +360,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
 
   // Footer
   const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  ctx.fillStyle = '#475569'; // tangga kontras: footer minimal setara gray-400 remap
+  ctx.fillStyle = CETAK.muted; // tangga kontras: footer minimal setara gray-400 remap
   ctx.font = `500 11px ${rupiahFont}`;
   ctx.textAlign = 'center';
   ctx.fillText(`Dibuat ${tgl} · Hadiran RT`, W / 2, H - 28);

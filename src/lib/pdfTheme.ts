@@ -1,6 +1,7 @@
 import type jsPDF from 'jspdf';
 import type { CellHookData, Styles } from 'jspdf-autotable';
 import { LOGO_DATA_URL } from './logoBase64';
+import { CETAK, rgb } from './warnaCetak';
 
 /**
  * Tema bersama semua PDF — minimalis clean "startup 2026" (Stripe/Mercury/Linear).
@@ -13,16 +14,21 @@ import { LOGO_DATA_URL } from './logoBase64';
 
 export type RGB = [number, number, number];
 
+/* Diturunkan dari `warnaCetak.ts`, tidak lagi ditulis tangan (4 Agu 2026).
+   Nilai lama di sini mengaku "token pos/neg/warn" tapi membeku di generasi
+   sebelum pass kontras maksimal — pos #047857, neg #DC2626 (dua generasi
+   tertinggal), warn #B45309, dan `line` #E5E7EB yang di kertas laser praktis
+   hilang. Sekarang PDF ikut bergerak sendiri tiap token app bergerak. */
 export const C = {
-  ink:   [11, 18, 32]    as RGB, // judul / nominal utama (token ink)
-  sub:   [55, 65, 81]    as RGB, // isi tabel
-  faint: [100, 116, 139] as RGB, // label / caption
-  muted: [148, 163, 184] as RGB, // footer
-  line:  [229, 231, 235] as RGB, // hairline
-  brand: [15, 76, 46]    as RGB, // wordmark & aksen tunggal (token brand)
-  pos:   [4, 120, 87]    as RGB, // uang masuk (token pos)
-  neg:   [220, 38, 38]   as RGB, // uang keluar (token neg)
-  warn:  [180, 83, 9]    as RGB, // perhatian (token warn)
+  ink:   rgb(CETAK.ink)   as RGB, // judul / nominal utama
+  sub:   rgb(CETAK.sub)   as RGB, // isi tabel
+  faint: rgb(CETAK.faint) as RGB, // label / caption
+  muted: rgb(CETAK.muted) as RGB, // footer
+  line:  rgb(CETAK.line)  as RGB, // hairline
+  brand: rgb(CETAK.brand) as RGB, // wordmark & aksen tunggal
+  pos:   rgb(CETAK.pos)   as RGB, // uang masuk
+  neg:   rgb(CETAK.neg)   as RGB, // uang keluar
+  warn:  rgb(CETAK.warn)  as RGB, // perhatian
 } as const;
 
 /**
