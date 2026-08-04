@@ -74,7 +74,7 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 | `audit:mati` | Keterbacaan label tombol saat `disabled` (terang+gelap, warga+bendahara) | Kedua audit kontras MELEWATI kontrol nonaktif secara eksplisit — sah, karena WCAG 1.4.3 mengecualikannya. Tapi "tak wajib" bukan "boleh tak terbaca", dan pengecualian itu berarti keadaan nonaktif **tak pernah diukur sekali pun**. Yang tersembunyi di baliknya: tombol masuk bendahara 3,79:1 saat "Memproses…", 3 tombol teks Kas Hadiran 2,2–2,7:1, dan perbaikan `.btn-brand:disabled` yang ternyata cuma dihitung untuk mode TERANG (4,32:1 di gelap). Ambang dilaporkan sebagai ambang APP, bukan "gagal WCAG" — disiplin yang sama dgn bagian teks-200% di `audit:reflow` |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
-bukan kodenya. Sudah terjadi 9×: sampel kena border 1px, aturan dialog dikenakan ke halaman
+bukan kodenya. Sudah terjadi 10×: sampel kena border 1px, aturan dialog dikenakan ke halaman
 penuh, probe mengambil dialog di belakang sheet, `.sr-only` terbaca "terpotong", pola rute
 `supabase-*.js` meleset dari nama asli `vendor-supabase-*.js` (sapuan diam-diam menguji jalur
 ONLINE lalu "lolos"), klik ditolak karena panel collapse masih beranimasi, klik pembuka
@@ -86,6 +86,20 @@ baris daftar, bukan di fill tombol, sehingga rasionya avatar-lawan-latar ("1:1")
 diambil dari MODUS kisi di dalam kotak teks. Tiap gangguan jaringan di
 `audit-masuk.mjs` menghitung berapa kali benar-benar terpasang, dan tiap prasyarat UI ditunggu
 sampai MENGAKU tercapai (`aria-expanded="true"`), bukan diasumsikan dari satu klik.
+Yang ke-10 (4 Agu): `audit:tulis` melaporkan KEDUA jalur tulis "menyerah diam-diam" padahal
+keduanya memang menampilkan toast galat — probenya cuma membaca `[role="status"]`, sedangkan
+Toaster mengirim toast GALAT ke region ASSERTIVE `role="alert"` dan wadah toast yang terlihat
+sengaja TANPA role (anti-baca-dobel). Selektor lama justru satu-satunya tempat yang dijamin
+kosong saat gagal. Kini ketiga permukaan dibaca, plus jeda 400ms karena label tombol pulih di
+tick yang sama saat toast baru dipasang.
+
+**Memeriksa hasil deploy: baca ISI bundel, jangan bandingkan HASH.** Vercel membangun ulang
+dari repo dan menghasilkan hash chunk yang BERBEDA dari `npm run build` lokal, jadi
+"hash produksi ≠ hash lokal" bukan bukti apa pun — 4 Agu sempat dibaca sebagai "deploy belum
+jalan" padahal sudah. Dua jebakan sekaligus di sini: `vercel.json` merewrite `/(.*)` ke
+`/index.html`, sehingga **path aset yang tak ada tetap balas HTTP 200** berisi HTML. Cara yang
+benar: ambil `index.html` produksi → cari nama chunk yang DIRUJUK → unduh chunk itu → grep
+simbol yang memang berubah (mis. `pulihkan_backup` ada, `insertChunked` hilang).
 
 **Sapuan wajib diarahkan ke produksi sekali sebelum dianggap benar** (`CAP_URL=https://hadiran-rt.vercel.app`):
 localhost instan menyembunyikan seluruh kelas bug balapan-hidrasi.
