@@ -151,7 +151,14 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             Hadiran RT
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        {/* gap-2 → gap-3 (4 Agu 2026). InfoTip "Apa itu Mode Warga?" melebarkan
+            area sentuhnya `before:-inset-3` (12px tiap sisi) dari kotak 20px =
+            44. Terukur cuma 40×44: gap 8px lebih SEMPIT dari pelebaran itu,
+            jadi 4px sisi kanannya jatuh di bawah tombol Menu (⋮) yang juga
+            melebar — `elementFromPoint` mengembalikan Menu, bukan InfoTip.
+            Dua target yang sama-sama dilebarkan WAJIB dijarakkan minimal
+            sejauh pelebarannya, kalau tidak yang satu memakan yang lain. */}
+        <div className="flex items-center gap-3 shrink-0">
           {/* Pil peran + penjelasannya. Banner "Mode Warga" di bawah bisa ditutup
               PERMANEN (localStorage) — sebelum ini, sekali ditutup keterangan
               "hanya bisa melihat" hilang selamanya dan tak ada tempat lain yang
@@ -248,11 +255,26 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       {!isBendahara && !bannerDismissed && (
         <div
           className="border-t border-line bg-gray-50 overflow-hidden px-5 dark:bg-gray-800/60 dark:border-gray-800 transition-[max-height,opacity] duration-300"
+          /* Padding 0.375 → 0.625rem, maxHeight 40 → 56 (4 Agu 2026).
+             Tombol "Tutup" di dalamnya sudah memakai teknik pelebaran app
+             (`w-8 h-8` + `before:-inset-1.5` = 44) tapi terukur 44×36: yang
+             kurang BUKAN tombolnya, melainkan kotak yang memuatnya — banner ini
+             `overflow-hidden` (perlu, untuk animasi lipat saat menggulir), jadi
+             pelebaran tombol terpotong di tepi banner.
+
+             Percobaan pertama cuma menaikkan `maxHeight` dan TIDAK berefek sama
+             sekali: maxHeight itu batas ATAS, sedangkan tinggi nyata banner
+             ditentukan isinya (6 + chip 24 + 6 = 36). Yang harus naik paddingnya:
+             10 + 24 + 10 = 44 pas. maxHeight ikut naik ke 56 supaya tak balik
+             jadi pemotong yang baru.
+
+             Diukur lewat hit-test `elementFromPoint`, bukan geometri CSS — di
+             CSS tombol ini selalu terlihat 44 (persis jebakan FP ke-8 repo). */
           style={{
-            maxHeight: scrolled ? '0px' : '40px',
+            maxHeight: scrolled ? '0px' : '56px',
             opacity: scrolled ? 0 : 1,
-            paddingTop: scrolled ? 0 : '0.375rem',
-            paddingBottom: scrolled ? 0 : '0.375rem',
+            paddingTop: scrolled ? 0 : '0.625rem',
+            paddingBottom: scrolled ? 0 : '0.625rem',
             transitionTimingFunction: 'var(--ease-out-expo)',
           }}
         >

@@ -739,6 +739,14 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 // BERSINGGUNGAN, tidak bertumpuk (WCAG 2.5.8 AA). Dulu lebar
                 // tombol = lebar dot (7px) → praktis tak bisa diketuk (audit
                 // 30 Jul). Dot-nya sendiri tetap 7px: yang tumbuh cuma ruang.
+                //
+                // `audit:sentuh` melaporkan 25×45 — di bawah ambang APP 44px, dan
+                // itu SENGAJA. Menaikkannya ke 44 berarti 7 × 44 = 308px: deretan
+                // ini berhenti terbaca sebagai indikator (kelompok rapat di bawah
+                // kartu) dan berubah jadi bilah navigasi selebar layar. Ia juga
+                // kontrol REDUNDAN — carousel bisa digeser jari dan berjalan
+                // sendiri; dot-nya penunjuk posisi lebih dulu, tombol belakangan.
+                // §2.5.8 AA sudah terpenuhi. Jangan dilebarkan lagi.
                 style={{ minHeight: 44, paddingTop: 16, paddingBottom: 16, paddingLeft: 9, paddingRight: 9 }}
               >
                 <span

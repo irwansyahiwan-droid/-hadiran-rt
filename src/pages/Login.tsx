@@ -197,6 +197,12 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
             <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-100 leading-snug">
               Tanpa daftar. Cukup ketik kata{' '}
+              {/* 36×16 dan SENGAJA dibiarkan (audit:sentuh melaporkannya di
+                  bawah ambang app 44px). §2.5.8 mengecualikan target yang berada
+                  DI DALAM kalimat, dan itu persis kata ini: melebarkannya berarti
+                  merusak kalimatnya. Ia juga murni jalan pintas — kolom isian
+                  tepat di bawahnya tetap bisa diketik tangan, jadi tak ada fungsi
+                  yang hilang kalau meleset. Jangan "diperbaiki" jadi tombol. */}
               <button
                 type="button"
                 onClick={isiOtomatis}
