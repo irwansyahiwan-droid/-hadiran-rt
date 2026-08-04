@@ -35,9 +35,18 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
           <>
             {Icon && <Icon className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />}
             <span className="mt-0.5 text-micro font-medium text-white/95">{s.label}</span>
-            {/* clamp: nominal kolom harus muat di 360px tanpa membungkus (3 kolom
-                = ±100px per kolom). Sora + tabular → sejajar antar kolom. */}
-            <span className="whitespace-nowrap text-[clamp(0.72rem,3.1vw,0.78rem)] font-display font-extrabold tabular-nums text-white">
+            {/* clamp: nominal kolom harus muat di 360px tanpa membungkus.
+                Angka "±100px per kolom" di komentar lama SALAH, dan itu sebab
+                batas bawahnya meleset: kaki ini juga dipakai di dalam kartu
+                carousel Beranda yang lebarnya 284px, bukan selebar layar — jadi
+                kolomnya cuma 79px (dikurangi `px-0.5` → 75px isi). Diukur di
+                360px: "Rp4.830.000" pada 0.72rem = 78px, yakni MELUBER ~3px ke
+                padding. Belum menabrak tetangga (masih di dalam kotak kolom),
+                tapi nol margin — angka sedigit lebih panjang langsung menabrak.
+                0.72 → 0.69rem (11,04px → 74,7px) mengembalikan marginnya dengan
+                ongkos setengah piksel ukuran huruf. Sora + tabular → sejajar
+                antar kolom. */}
+            <span className="whitespace-nowrap text-[clamp(0.69rem,3.1vw,0.78rem)] font-display font-extrabold tabular-nums text-white">
               {s.value}
             </span>
           </>

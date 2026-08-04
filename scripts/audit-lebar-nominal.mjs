@@ -45,6 +45,15 @@ async function measure(page, ctxName) {
       if (!/Rp\s?[\d.]/.test(txt)) continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.4) continue;
+      /* FP ke-11 (4 Agu 2026): slide carousel yang TIDAK aktif sudah ditandai
+         `aria-hidden="true"` oleh BannerCarousel — ia sengaja diparkir di luar
+         panggung. Dua penjaga di bawah (titik pusat & oklusi) tak menangkapnya:
+         kartu peek menyisakan sepotong yang pusatnya masih di dalam viewport DAN
+         masih paling atas di titik itu, jadi sapuan melaporkan "Rp20.530.000
+         meluber 30px" untuk angka yang tak seorang pun lihat. Elemen yang
+         disembunyikan dari pembaca layar juga bukan elemen yang lebarnya perlu
+         dinilai — pengecualian yang sama sudah dipakai sapuan kontras. */
+      if (el.closest('[aria-hidden="true"]')) continue;
       const r = el.getBoundingClientRect();
       if (r.width < 4 || r.height < 6) continue;
       // BannerCarousel = kartu bertumpuk 3D: slide tetangga memang duduk di luar
