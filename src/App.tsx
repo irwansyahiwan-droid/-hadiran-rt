@@ -12,7 +12,7 @@ import PwaUpdatePrompt from './components/PwaUpdatePrompt';
 import InstallPrompt from './components/InstallPrompt';
 import Toaster from './components/Toaster';
 import WelcomeSheet from './components/WelcomeSheet';
-import { labelTab, type TabName } from './components/layout/BottomNav';
+import { labelTab, urutanTab, tabTerlihat, type TabName } from './components/layout/tabs';
 import logoRT from './assets/logo-rt.svg';
 
 // Code-splitting per halaman → first load ringan di HP warga; tiap tab/overlay
@@ -61,7 +61,10 @@ export default function App() {
   const [anggotaOpen, setAnggotaOpen] = useState(false);
   const [tentangOpen, setTentangOpen] = useState(false);
 
-  const TAB_ORDER: TabName[] = ['beranda', 'jadwal', 'talangan', 'kas', 'kas-rt'];
+  // Diturunkan dari daftar tab (tabs.ts), BUKAN disalin — dulu baris ini
+  // menuliskan ulang kelima id-nya, jadi menggeser urutan tab di nav diam-diam
+  // membuat arah animasi geser di sini terbalik.
+  const TAB_ORDER = urutanTab;
   const scrollPos = useRef<Record<string, number>>({});
 
   const changeTab = (tab: TabName) => {
@@ -74,7 +77,9 @@ export default function App() {
   // Swipe kiri = tab berikutnya, kanan = tab sebelumnya (pakai urutan tab yang terlihat)
   const swipeTab = (delta: 1 | -1) => {
     const warga = wargaMode && !auth.user;
-    const order = warga ? TAB_ORDER.filter((t) => t !== 'talangan') : TAB_ORDER;
+    // Penyaring yang SAMA dgn bar nav (tabs.ts) — dulu disalin sbg
+    // `.filter(t => t !== 'talangan')` di dua tempat.
+    const order = tabTerlihat(warga).map((t) => t.id);
     const i = order.indexOf(activeTab);
     if (i === -1) return;
     const next = order[i + delta];

@@ -1,8 +1,11 @@
-import { Home, CalendarDays, ArrowLeftRight, Wallet, Building2, type LucideIcon } from 'lucide-react';
 import { haptic } from '../../lib/utils';
 import { useScrollHide } from '../../hooks/useScrollDirection';
+import { tabTerlihat, type TabName } from './tabs';
 
-export type TabName = 'beranda' | 'jadwal' | 'talangan' | 'kas' | 'kas-rt';
+/* Daftar tab & `labelTab` pindah ke `./tabs.ts` — berkas ini kini HANYA
+   mengekspor komponen, syarat Fast Refresh bekerja (react-refresh/
+   only-export-components). Jangan tambahkan ekspor non-komponen di sini;
+   letakkan di tabs.ts supaya urutan tab tetap satu sumber. */
 
 interface BottomNavProps {
   active: TabName;
@@ -10,21 +13,11 @@ interface BottomNavProps {
   isWargaMode?: boolean;
 }
 
-const tabs: { id: TabName; label: string; icon: LucideIcon }[] = [
-  { id: 'beranda',  label: 'Beranda',  icon: Home },
-  { id: 'jadwal',   label: 'Jadwal',   icon: CalendarDays },
-  { id: 'talangan', label: 'Talangan', icon: ArrowLeftRight },
-  { id: 'kas',      label: 'Hadiran',  icon: Wallet },
-  { id: 'kas-rt',   label: 'Kas RT',   icon: Building2 },
-];
-
-/** Label tab = SATU sumber, dipakai bar nav DAN judul dokumen (App.tsx).
- *  Jangan salin daftar di atas ke tempat lain. */
-export const labelTab = (id: TabName) => tabs.find((t) => t.id === id)?.label ?? '';
-
 export default function BottomNav({ active, onChange, isWargaMode }: BottomNavProps) {
-  // Warga tidak punya tab Talangan — diakses lewat tombol "Lihat" di Beranda
-  const visibleTabs = isWargaMode ? tabs.filter(t => t.id !== 'talangan') : tabs;
+  // Warga tidak punya tab Talangan — diakses lewat tombol "Lihat" di Beranda.
+  // Penyaringnya dibagi pakai dgn navigasi swipe di App.tsx (lihat tabs.ts),
+  // supaya bar nav & swipe tak pernah menampilkan urutan yang berbeda.
+  const visibleTabs = tabTerlihat(!!isWargaMode);
   const activeIndex = visibleTabs.findIndex(t => t.id === active);
 
   // Auto-hide: scroll turun (masuk ke konten) → nav menyelinap turun keluar layar;
