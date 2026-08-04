@@ -51,7 +51,16 @@
     box-shadow: 0 14px 30px -18px rgba(16,24,40,.22);
   }
   .card-title { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 800; margin-bottom: 14px; }
-  .card-title .emoji { font-size: 22px; }
+  /* Ikon garis (lucide), BUKAN emoji. DESIGN.stitch §7 melarang emoji di UI dan
+     app-nya sendiri sudah 0 emoji — halaman ini satu-satunya sisa, padahal justru
+     halaman PERTAMA yang dibuka warga baru. Emoji juga dirender beda-beda per
+     perangkat (ikon robot di Android beda dari di iOS & HP lama), jadi wajahnya tak
+     pernah sama dua kali. `currentColor` → ikon mewarisi warna teksnya. */
+  .card-title svg.i { color: #0F4C2E; flex: none; }
+  .link svg.i { vertical-align: -3px; color: #0F4C2E; }
+  .step svg.ok { vertical-align: -2px; color: #0F4C2E; }
+  .step svg.i { vertical-align: -2px; color: #334155; }
+  .warn svg.i { vertical-align: -3px; color: #78350F; flex: none; }
   .card-title .tag { margin-left: auto; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #ECFDF5; color: #0F4C2E; }
   .step { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
   .step:last-child { margin-bottom: 0; }
@@ -81,26 +90,26 @@
       </div>
     </div>
 
-    <div class="link">🔗 hadiran-rt.vercel.app</div>
+    <div class="link"><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> hadiran-rt.vercel.app</div>
 
     <div class="card">
-      <div class="card-title"><span class="emoji">🤖</span> HP Android <span class="tag">Chrome</span></div>
+      <div class="card-title"><svg class="i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg> HP Android <span class="tag">Chrome</span></div>
       <div class="step"><span class="num">1</span><span>Buka link di atas dengan <b>Chrome</b></span></div>
       <div class="step"><span class="num">2</span><span>Muncul tombol <b>Pasang</b> → ketuk</span></div>
       <div class="step"><span class="num">3</span><span>Kalau tidak muncul: menu <b>⋮</b> → <b>Instal aplikasi</b></span></div>
-      <div class="step"><span class="num">4</span><span>Ketuk <b>Instal</b> ✅ ikon muncul di layar</span></div>
+      <div class="step"><span class="num">4</span><span>Ketuk <b>Instal</b> <svg class="ok" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> ikon muncul di layar</span></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span class="emoji">🍎</span> iPhone / iPad <span class="tag">Safari</span></div>
+      <div class="card-title"><svg class="i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="10" height="14" x="3" y="8" rx="2"/><path d="M5 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-2"/><path d="M8 18h.01"/></svg> iPhone / iPad <span class="tag">Safari</span></div>
       <div class="step"><span class="num">1</span><span>Buka link di atas dengan <b>Safari</b></span></div>
-      <div class="step"><span class="num">2</span><span>Ketuk ikon <b>Bagikan</b> ⬆️ (kotak panah ke atas)</span></div>
+      <div class="step"><span class="num">2</span><span>Ketuk ikon <b>Bagikan</b> <svg class="i" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v13"/><path d="m8 6 4-4 4 4"/><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/></svg> (kotak panah ke atas)</span></div>
       <div class="step"><span class="num">3</span><span>Pilih <b>Tambahkan ke Layar Utama</b></span></div>
-      <div class="step"><span class="num">4</span><span>Ketuk <b>Tambah</b> ✅ ikon muncul di layar</span></div>
+      <div class="step"><span class="num">4</span><span>Ketuk <b>Tambah</b> <svg class="ok" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> ikon muncul di layar</span></div>
     </div>
 
     <div class="warn">
-      ⚠️ <b>Jangan buka dari dalam WhatsApp.</b> Ketuk titik tiga <b>⋮</b> di pojok kanan atas → <b>Buka di browser</b> dulu, baru ikuti langkah di atas.
+      <svg class="i" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> <b>Jangan buka dari dalam WhatsApp.</b> Ketuk titik tiga <b>⋮</b> di pojok kanan atas → <b>Buka di browser</b> dulu, baru ikuti langkah di atas.
     </div>
 
     <div class="footer">Hadiran RT 004/006 · Tanah Baru Beji, Depok</div>
