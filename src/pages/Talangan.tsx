@@ -260,7 +260,16 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
 
     return (
-      <div key={g.warga_id}>
+      /* --di-l/--di-r ditaruh di SINI, bukan di ketiga kartu `list-inset` yang
+         memakai renderGroup (Berganda / Daftar Talangan / Sudah Lunas):
+         nilainya diturunkan dari geometri baris di bawah ini (px-4 = 16 +
+         avatar w-9 = 36 + gap-2.5 = 10 → 62px = 3.875rem), jadi ia harus hidup
+         bersama baris itu — kalau tidak, mengubah padding/avatar di sini
+         diam-diam membuat tiga kartu di tempat lain jadi salah. Sebelumnya
+         ketiganya memakai default 4.75rem (rumus daftar ber-avatar 44px di
+         padding 20), jadi hairline mulai 14px setelah nama & berhenti 4px
+         sebelum tepi kanan baris. */
+      <div key={g.warga_id} className="[--di-l:3.875rem] [--di-r:1rem]">
         {/* Group header */}
         <div className="flex items-center">
           <button
@@ -485,10 +494,15 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       />
 
       <CrossFade loading={loading} skeleton={(
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
+        /* Geometri WAJIB sama dgn baris asli di renderGroup (px-4, avatar w-9,
+           gap-2.5, --di-l 3.875rem). Versi lama memakai px-5/w-11/gap-3 →
+           begitu data datang, avatar mengecil 8px dan tiap hairline bergeser
+           14px ke kiri: daftar "melompat" tepat di detik pertama warga
+           melihatnya. */
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset [--di-l:3.875rem] [--di-r:1rem]">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-5 py-4">
-              <div className="w-11 h-11 rounded-2xl skeleton shrink-0" />
+            <div key={i} className="flex items-center gap-2.5 px-4 py-4">
+              <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-2/3" />
                 <div className="h-3 skeleton rounded-lg w-1/2" />

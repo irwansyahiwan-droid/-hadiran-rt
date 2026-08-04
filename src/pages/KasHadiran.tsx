@@ -607,15 +607,21 @@ export default function KasHadiranPage() {
           <div className="space-y-2">
             {/* --di-r:0 — default 1.25rem dipakai utk baris list yg kontainernya
                 TANPA padding; di sini kartu sudah p-5, jadi inset kanan ganda
-                bikin hairline berhenti ±20px sebelum nominal (kelihatan salah). */}
-            <div className="divide-inset [--di-l:2.5rem] [--di-r:0px] flex items-center justify-between py-2">
+                bikin hairline berhenti ±20px sebelum nominal (kelihatan salah).
+                --di-l:1.25rem — rumusnya "padding + lebar ikon + gap", dan di
+                baris ini padding = 0 (kartunya yang p-5), ikon `w-3.5` = 14px,
+                `gap-1.5` = 6px → 20px. Nilai lama 2.5rem disalin dari daftar
+                ber-ikon 44px, jadi hairline-nya mulai 20px SETELAH huruf
+                pertama label — tepi kanan sudah sejajar nominal sejak dulu,
+                tepi kirinya yang tak pernah ikut diukur. */}
+            <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
               <span className="text-sm font-display font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
-            <div className="divide-inset [--di-l:2.5rem] [--di-r:0px] flex items-center justify-between py-2">
+            <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
