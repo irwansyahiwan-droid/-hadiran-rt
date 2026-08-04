@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Download, ChevronDown, type LucideIcon } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
@@ -17,17 +17,36 @@ interface ExportMenuProps {
    *  sejajar tombol → cocok saat tombol di kanan layar (Kas RT). 'left' = buka
    *  ke kanan → cocok saat tombol di kiri (Kas Hadiran), agar tak terpotong. */
   align?: 'left' | 'right';
+  /** Matikan ekspor saat data TIDAK bisa dipercaya (mis. muat gagal).
+   *
+   *  Aturan "app kas dilarang menyatakan nominal saat gagal muat" selama ini
+   *  berhenti di LAYAR: saat muat gagal halaman memang menampilkan ErrorState
+   *  tanpa satu angka pun — tapi tombol Ekspor duduk di PageHeader, di luar
+   *  cabang error itu, jadi ia tetap hidup. Menekannya saat itu menghasilkan
+   *  PDF berisi Rp0 (atau angka basi dari cache) LENGKAP dengan tanggal cetak
+   *  hari ini dan tiga kolom tanda tangan — dokumen yang tampak sah untuk
+   *  diarsipkan, padahal angkanya tak pernah termuat. Layar salah bisa
+   *  di-refresh; berkas yang sudah tersebar di grup WA tidak. */
+  disabled?: boolean;
+  /** Alasan yang dibacakan pembaca layar & muncul sebagai tooltip. */
+  disabledReason?: string;
 }
 
 /** Tombol "Ekspor" + dropdown — menyatukan aksi ekspor yang JARANG dipakai
  *  (PDF / Excel) ke satu menu, agar aksi utama (FAB) tak tersaingi di toolbar.
  *  Satu aksi primer per layar. Popover ringan (bukan sheet) selaras menu Header:
  *  tutup via Escape / klik luar. */
-export default function ExportMenu({ items, align = 'right' }: ExportMenuProps) {
+export default function ExportMenu({ items, align = 'right', disabled = false, disabledReason }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
   const mounted = useExitAnim(open);
   const ref = useRef<HTMLDivElement>(null);
+  const alasanId = useId();
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Menu yang kebetulan sedang terbuka saat muat gagal WAJIB ikut tertutup —
+  // kalau tidak, itemnya tetap bisa diketuk lewat popover yang sudah terlanjur
+  // ada di layar dan penjaga di tombolnya jadi tak berarti.
+  useEffect(() => { if (disabled) setOpen(false); }, [disabled]);
 
   useEffect(() => {
     if (!open) return;
@@ -57,14 +76,22 @@ export default function ExportMenu({ items, align = 'right' }: ExportMenuProps) 
     <div className="relative" ref={ref}>
       <button
         onClick={() => { haptic(); setOpen((o) => !o); }}
+        disabled={disabled}
+        title={disabled ? disabledReason : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-sm font-semibold min-h-[44px] px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+        aria-describedby={disabled && disabledReason ? alasanId : undefined}
+        /* `btn-mati` = keluarga tombol TERISI non-brand; resep `:disabled`-nya
+           (fill .inset-soft + label ink-faint) ada di index.css, jadi keadaan
+           nonaktif di sini terbaca 8,9:1 — bukan `opacity-50` yang dulu
+           menjatuhkan label ke 2,2:1 (lihat `npm run audit:mati`). */
+        className="btn-mati press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-sm font-semibold min-h-[44px] px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:border-transparent disabled:shadow-none"
       >
         <Download className="w-4 h-4" />
         Ekspor
         <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
       </button>
+      {disabled && disabledReason && <span id={alasanId} className="sr-only">{disabledReason}</span>}
 
       {open && <div className="fixed inset-0 z-40" aria-hidden="true" onClick={() => setOpen(false)} />}
       {mounted && (

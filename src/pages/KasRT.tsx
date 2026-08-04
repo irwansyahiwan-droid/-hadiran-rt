@@ -479,6 +479,13 @@ export default function KasRTPage() {
                 align kiri: tombol berada di kiri toolbar (HP) → dropdown buka ke
                 kanan agar tidak terpotong tepi layar. */}
             <ExportMenu
+              /* Muat gagal → ekspor dimatikan. Halaman memang sudah
+                 menampilkan ErrorState tanpa angka, tapi tombol ini duduk
+                 di PageHeader (di LUAR cabang error) sehingga tetap hidup —
+                 dan PDF-nya keluar dgn Rp0 + tanggal cetak + kolom tanda
+                 tangan, tampak sah untuk diarsipkan. */
+              disabled={error}
+              disabledReason="Data gagal dimuat — muat ulang dulu sebelum mengekspor."
               align="left"
               items={[
                 {
