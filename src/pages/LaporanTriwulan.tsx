@@ -25,13 +25,18 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-            <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-500" /> Masuk
+            {/* Ikon = token yang SAMA dgn nominal di kanannya (5 Agu 2026).
+                Sama persis dgn panel "Alur Kas Hadiran" kemarin: emerald-500 &
+                rose-500 jauh lebih terang dari `pos`/`neg` di baris yang sama,
+                jadi satu panel membawa dua hijau + dua merah — dilarang
+                DESIGN.stitch §7. Berkas ini terlewat waktu sweep kemarin. */}
+            <ArrowDownLeft className="w-3.5 h-3.5 text-pos dark:text-pos-dark" /> Masuk
           </span>
           <span className="font-display font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
         </div>
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-            <ArrowUpRight className="w-3.5 h-3.5 text-rose-500" /> Keluar
+            <ArrowUpRight className="w-3.5 h-3.5 text-neg dark:text-neg-dark" /> Keluar
           </span>
           <span className="font-display font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
         </div>
