@@ -553,7 +553,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           </div>
           <div className="px-4 py-3 min-w-0">
             <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400">Sohibul Terima</p>
-            <p className="font-display text-amount font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
+            <p className="font-display text-amount font-semibold text-pos dark:text-pos-dark tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
           </div>
         </div>
 

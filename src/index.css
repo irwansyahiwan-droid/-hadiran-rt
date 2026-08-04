@@ -441,28 +441,11 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   border-left: 1px solid var(--hero-divider);
 }
 
-/* Hero sparkline — area menyembul lembut + titik ujung berdenyut */
-.hs-area {
-  opacity: 0;
-  animation: hsAreaIn 900ms 250ms var(--ease-out-expo) forwards;
-}
-.hs-dot {
-  position: absolute;
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
-  margin-top: -3.5px;
-  border-radius: 9999px;
-  background: #ECFDF5;
-  /* Glow statis — titik ujung terbaca tanpa denyut tak henti (idle = tenang). */
-  box-shadow: 0 0 0 2px rgba(167, 243, 208, 0.35), 0 0 10px 2px rgba(110, 231, 183, 0.8);
-}
-@keyframes hsAreaIn {
-  to { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hs-area { animation: none; opacity: 1; }
-}
+/* (Hero sparkline DIHAPUS 4 Agu 2026 bersama `components/charts/HeroSparkline.tsx`.
+   Komponennya nol pemakai — sparkline di hero sudah ditolak dgn alasan konkret —
+   dan ia menyimpan hex sendiri (#6EE7B7 / #D1FAE5 / rgba emerald di .hs-dot) di
+   luar sistem token, siap salah lagi begitu ada yang memasangnya kembali. Kalau
+   suatu saat sparkline hero dihidupkan: pakai token, bukan hex baru.) */
 
 /* ════════════════════════════════════════════════════════════
    Premium motion & material system — fintech 2026 feel

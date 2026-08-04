@@ -71,7 +71,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
         <div>
           <h3 className="text-balance text-base font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h3>
           <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
-            Saldo hadiran: <span className="font-display font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">{formatRupiahPlain(saldoHadiran)}</span>
+            Saldo hadiran: <span className="font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
         </div>
         <form onSubmit={submit} className="space-y-3">
@@ -616,21 +616,36 @@ export default function KasHadiranPage() {
                 tepi kirinya yang tak pernah ikut diukur. */}
             <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
-                <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+                {/* Ikon baris = token yang SAMA dgn nominalnya (4 Agu 2026).
+                    Dulu ketiganya `-500` mentah: emerald-500/amber-500/blue-500
+                    jauh lebih terang & jenuh daripada angka di sebelah kanannya,
+                    sehingga panel uang ini terbaca sebagai deretan chip
+                    warna-warni. Tak pernah terukur sapuan mana pun — ikon yang
+                    kontrolnya sudah punya label teks dihitung dekoratif
+                    (§1.4.11 memang tak menuntutnya), persis blind-spot yang
+                    juga menyembunyikan warna grafik. Ikon + label + nominal
+                    kini satu pernyataan, bukan tiga suara. */}
+                <TrendingUp className="w-3.5 h-3.5 text-pos dark:text-pos-dark" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="text-sm font-display font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
+              <span className="text-sm font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
             <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
               <span className="text-sm font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
-                <ArrowUpRight className="w-3.5 h-3.5 text-blue-500" />
+                {/* Biru DIPERTAHANKAN sbg penanda kategori "transfer" (lihat
+                    catatan nominal di bawah — Setor Blue tak boleh menyentuh
+                    NILAI uang, tapi ikon kategori sah). Yang berubah cuma
+                    terangnya: blue-500 → blue-700 di terang (nilai yang sudah
+                    dipakai pil "WARGA") + pasangan blue-400 di gelap, supaya ia
+                    tak lagi jadi titik paling menyala di panel. */}
+                <ArrowUpRight className="w-3.5 h-3.5 text-blue-700 dark:text-blue-400" />
                 <span className="text-sm text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
               {/* Nominal NETRAL, bukan biru: DESIGN.stitch §2 mengunci Setor Blue
@@ -642,7 +657,7 @@ export default function KasHadiranPage() {
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-base font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+              <span className={`text-base font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
@@ -1063,7 +1078,12 @@ export default function KasHadiranPage() {
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
-                            <Check className="w-4 h-4 text-emerald-500 shrink-0" strokeWidth={2.5} />
+                            {/* emerald-500 di atas putih cuma 2,50:1. Ia lolos
+                                sapuan karena barisnya sudah berlabel teks
+                                ("Hadir (N)" + nama) sehingga centang ini
+                                dihitung dekoratif — tapi "tak wajib" bukan
+                                "boleh nyaris tak terlihat" buat warga lansia. */}
+                            <Check className="w-4 h-4 text-pos dark:text-pos-dark shrink-0" strokeWidth={2.5} />
                           </div>
                         ))}
                       </div>
