@@ -54,6 +54,11 @@ export const CETAK = {
   heroScrim: 'rgba(4, 38, 24, 0.48)',
 } as const;
 
+/** '#0B1220' → 'FF0B1220'. ExcelJS minta ARGB (alfa di DEPAN), bukan '#rrggbb'. */
+export function argb(hex: string): string {
+  return 'FF' + hex.replace('#', '').toUpperCase();
+}
+
 /** '#0B1220' → [11, 18, 32]. jsPDF minta komponen RGB, bukan string hex. */
 export function rgb(hex: string): [number, number, number] {
   const h = hex.replace('#', '');

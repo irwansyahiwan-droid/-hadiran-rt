@@ -1,9 +1,19 @@
 import type { Workbook, Worksheet, Borders } from 'exceljs';
+import { CETAK, argb } from './warnaCetak';
 
-export const BRAND = 'FF0F4C2E';
-export const ZEBRA = 'FFF1F5F9';
+/* Excel ikut `warnaCetak.ts` (4 Agu 2026, susulan pass cetak).
+   Pass sebelumnya menyatukan PDF & kartu PNG lalu berhenti di tiga berkas yang
+   ter-grep — Excel tak ikut, padahal ia keluaran juga. Yang tertinggal di sini
+   persis kelas nilai yang sudah dibuang dari permukaan lain:
+     ZEBRA  #F1F5F9 → kanvas app #ECF1F7
+     border #E2E8F0 → token `line` #B8C4D3 (yg lama lebih terang dari hairline app)
+     subjudul #94A3B8 → `muted` #475569 — #94A3B8 cuma 2,50:1 di atas putih,
+       dan lembar ini yang dibuka bendahara di layar laptop lalu dicetak.
+   `BRAND` sudah benar sejak dulu; kini ia pun tak lagi ditulis tangan. */
+export const BRAND = argb(CETAK.brand);
+export const ZEBRA = argb(CETAK.canvas);
 
-const thin = { style: 'thin' as const, color: { argb: 'FFE2E8F0' } };
+const thin = { style: 'thin' as const, color: { argb: argb(CETAK.line) } };
 export const border: Partial<Borders> = { top: thin, left: thin, bottom: thin, right: thin };
 
 /** Judul + subjudul (baris 1–2) yang di-merge selebar tabel. */
@@ -18,7 +28,7 @@ export function titleBlock(ws: Worksheet, title: string, subtitle: string, cols:
   ws.mergeCells(2, 1, 2, cols);
   const s = ws.getCell(2, 1);
   s.value = subtitle;
-  s.font = { size: 10, color: { argb: 'FF94A3B8' } };
+  s.font = { size: 10, color: { argb: argb(CETAK.muted) } };
   ws.getRow(2).height = 16;
 }
 
@@ -29,7 +39,7 @@ export function headerRow(ws: Worksheet, rowIndex: number, headers: string[]): v
     const c = r.getCell(i + 1);
     c.value = h;
     c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
-    c.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+    c.font = { bold: true, color: { argb: argb(CETAK.surface) }, size: 11 };
     c.alignment = { horizontal: 'center', vertical: 'middle' };
     c.border = border;
   });
