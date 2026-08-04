@@ -698,6 +698,27 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   --shadow-float: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
 }
 
+/* ── Overlay layar-penuh kebal jarak induknya (5 Agu 2026) ──────────────────
+   `position: fixed; inset: 0` artinya "penuhi layar". Tapi MARGIN tetap
+   berlaku pada elemen fixed, dan Tailwind `space-y-*` memasang `margin-top`
+   ke `> :not([hidden]) ~ :not([hidden])` — jadi overlay apa pun yang kebetulan
+   dirender sebagai anak halaman ber-`space-y-7` diam-diam turun 28px.
+
+   Terukur di ConfirmDestruktif Talangan: scrim y=28 h=816 di viewport 844,
+   sehingga strip teratas layar TIDAK ikut diredupkan — kartu hero tetap terang
+   & tajam di atas dialog "Hapus data talangan?". Dialog yang paling tak boleh
+   ambigu justru yang latarnya bocor.
+
+   Diperbaiki di SATU tempat, bukan per-pemanggil: ada 18 overlay `fixed
+   inset-0` di app dan yang berikutnya tak akan tahu jebakan ini. Margin pada
+   elemen `fixed inset-0` SELALU bug — tak ada yang boleh mengandalkannya.
+   `!important` wajib: selektor `space-y-*` Tailwind (0,3,0) menang atas
+   `.fixed.inset-0` (0,2,0).
+
+   Jangan diganti dgn menambal `m-0` di call-site: itu mengulang kelalaian yang
+   sama begitu ada sheet baru. */
+.fixed.inset-0 { margin: 0 !important; }
+
 /* Tactile press feedback — ease-out (bukan spring): feedback tekan harus
    bergerak instan saat ditekan, bukan overshoot karet. Spring disisakan untuk
    elemen yg memang "hidup" (pill nav, count-up). */
