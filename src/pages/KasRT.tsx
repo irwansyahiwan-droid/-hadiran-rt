@@ -667,11 +667,12 @@ export default function KasRTPage() {
                     ))}
                   </div>
                 </div>
-                {/* Dot legend sinkron warna bar MonthlyBars (emerald-600/rose-500,
-                    ≥3:1 di atas putih — WCAG 1.4.11 non-teks) */}
+                {/* Dot legend sinkron warna bar MonthlyBars — kini token
+                    `pos`/`neg` (+ pasangan gelapnya), sama persis dgn warna
+                    nominal uang di kartu-kartu halaman ini. */}
                 <div className="flex items-center gap-2 text-micro font-medium mb-2">
-                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-600" />Masuk</span>
-                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span className="w-2 h-2 rounded-full bg-rose-500" />Keluar</span>
+                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span data-grafik="legenda-masuk" className="w-2 h-2 rounded-full bg-pos dark:bg-pos-dark" />Masuk</span>
+                  <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span data-grafik="legenda-keluar" className="w-2 h-2 rounded-full bg-neg dark:bg-neg-dark" />Keluar</span>
                 </div>
                 <MonthlyBars data={monthly} />
               </div>

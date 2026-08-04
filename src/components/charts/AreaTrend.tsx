@@ -24,17 +24,36 @@ export default function AreaTrend({ points, height = 84 }: AreaTrendProps) {
 
   return (
     <svg viewBox={`0 0 ${W} ${height}`} preserveAspectRatio="none" className="w-full" style={{ height }} aria-hidden="true">
+      {/* Warna dari token `pos` (4 Agu 2026), bukan hex sendiri.
+          Dua hal sekaligus yang diperbaiki di sini:
+          (1) `#0F6039` bukan token app mana pun — sisa era pra-flat yang
+              tertinggal di satu berkas, jadi garis tren ini satu-satunya hijau
+              yang tak pernah ikut saat ramp brand diturunkan.
+          (2) Berkas ini TIDAK punya sisi gelap sama sekali, dan hijau tua di
+              atas kartu `dark:bg-gray-900` cuma 2,28:1 — di bawah ambang 3:1
+              untuk grafik informatif (§1.4.11): di mode gelap kartu "Tren
+              Saldo" praktis kosong. Sapuan kontras yang ada tak menangkapnya
+              karena keduanya menyampel teks, ikon, batas kontrol, & ring fokus
+              — bukan stroke SVG.
+          `currentColor` dipakai agar SATU kelas `text-*` mengatur garis DAN
+          gradiennya; `<stop>` mewarisi warna teks induknya. */}
       <defs>
-        <linearGradient id="areaTrendG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#10B981" stopOpacity="0.28" />
-          <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+        <linearGradient id="areaTrendG" x1="0" y1="0" x2="0" y2="1" className="text-pos dark:text-pos-dark">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={area} fill="url(#areaTrendG)" />
       <path
         d={line}
         fill="none"
-        stroke="#0F6039"
+        className="stroke-pos dark:stroke-pos-dark"
+        /* Penanda populasi utk `npm run audit:kontras-nonteks`. Tanda grafik
+           tak bisa ditemukan lewat selektor generik (svg-nya aria-hidden,
+           persis supaya pembaca layar tak membacanya) — itu sebabnya garis ini
+           bertahun-tahun 2,28:1 di mode gelap tanpa ada yang lapor. Tiap tanda
+           grafik BARU wajib ikut memasangnya, kalau tidak ia tak terukur. */
+        data-grafik="garis-tren"
         strokeWidth="2"
         vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"

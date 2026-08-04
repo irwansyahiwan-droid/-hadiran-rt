@@ -5,10 +5,11 @@
  * sekali pun — persis pola blind-spot yang sudah 7x kejadian di repo ini
  * ("audit jalan lawan keadaan yang tak pernah dirender").
  *
- * Tiga pemeriksaan, ambang 3:1 semua:
+ * Empat pemeriksaan, ambang 3:1 semua:
  *   A. IKON BERMAKNA  — ikon di kontrol yang TIDAK punya label teks terlihat.
  *   B. BATAS KONTROL  — input/select/textarea: batas ATAU fill harus 3:1 vs latar.
  *   C. RING FOKUS     — indikator :focus-visible asli (lewat Tab) vs latar sebelah.
+ *   D. TANDA GRAFIK   — garis tren, bar, dot legenda (opt-in `data-grafik`).
  *
  * ── ATURAN ANTI-FALSE-POSITIVE (jangan dilonggarkan tanpa bukti) ───────────
  * 1. JANGAN PERNAH menyampel piksel garis 1–2px. Itu sumber tunggal 33 FP di
@@ -58,6 +59,20 @@ const outsidePoints = (r, gap) => {
   }
   for (const f of [0.35, 0.65]) {
     pts.push([r.x - gap, r.y + r.h * f], [r.x + r.w + gap, r.y + r.h * f]);
+  }
+  return pts;
+};
+
+/* Titik sampel latar untuk TANDA GRAFIK — sengaja hanya di ATAS & BAWAH.
+   `outsidePoints` juga menyampel kiri & kanan, dan di grafik bar tetangga
+   sebelah persis ada bar LAIN berjarak ~4px: warnanya beda jauh dari tanda yang
+   diukur sehingga lolos saringan `avoid` di `modusBg`, lalu ikut jadi kandidat
+   "latar" — bar masuk akan diadu lawan bar keluar, bukan lawan kartu. Di atas
+   bar tertinggi & di bawah garis dasar selalu permukaan kartu. */
+const chartBgPoints = (r, gap) => {
+  const pts = [];
+  for (const f of [0, 0.25, 0.5, 0.75, 1]) {
+    pts.push([r.x + r.w * f, r.y - gap], [r.x + r.w * f, r.y + r.h + gap]);
   }
   return pts;
 };
@@ -143,6 +158,53 @@ async function collectIcons(page) {
         opacity: +cs.opacity || 1,
         rect: rectOf(svg),
         tag: jejak(ctrl || svg),
+      });
+    }
+    return out;
+  })()`);
+}
+
+/* D. TANDA GRAFIK — garis tren, bar, dot legenda.
+ *
+ * Ditambahkan 4 Agu 2026. Pemeriksaan A (ikon) sengaja MELEWATI svg ber-leluhur
+ * `aria-hidden` (aturan 2: grafis dekoratif tak dituntut §1.4.11), dan seluruh
+ * grafik app justru aria-hidden — ringkasannya sudah dibacakan lewat teks di
+ * `role="img"`. Akibatnya tanda grafik tak pernah terukur sekali pun, dan garis
+ * "Tren Saldo" bertahan di 2,28:1 di mode gelap (hex `#0F6039` yang disetel
+ * untuk kartu PUTIH, tanpa pasangan gelap sama sekali) sampai ditemukan lewat
+ * mata, bukan lewat alat.
+ *
+ * Populasinya OPT-IN lewat `data-grafik`, bukan tebakan selektor: bar adalah
+ * `div` biasa, garisnya `path` — keduanya tak punya ciri struktural yang bisa
+ * dibedakan dari elemen tata letak. Selektor tebakan di repo ini sudah 10x
+ * mengambil populasi yang salah; di sini penandanya eksplisit di call-site.
+ *
+ * Warna diambil dari CSS lalu di-blend ke piksel LUAR elemen (aturan 1) —
+ * garis 2px tak boleh disampel pikselnya sendiri. `nilaiIkon` dipakai ulang
+ * apa adanya: matematikanya memang identik (tanda vs latar sekitarnya). */
+async function collectGrafik(page) {
+  return page.evaluate(`(() => {
+    ${PAGE_HELPERS}
+    const out = [];
+    for (const el of document.querySelectorAll('[data-grafik]')) {
+      if (!vis(el) || mati(el)) continue;
+      const r = el.getBoundingClientRect();
+      /* Bar yang nilainya nyaris nol tetap dirender setinggi <1px. Ia tak
+         membawa informasi yang bisa dibaca siapa pun, dan rect setipis itu
+         membuat titik sampel "luar" jatuh di dalam dirinya sendiri. */
+      if (r.width < 2 || r.height < 2) continue;
+      const cs = getComputedStyle(el);
+      const isSvg = el.ownerSVGElement || el.tagName.toLowerCase() === 'path';
+      const stroke = isSvg && cs.stroke && cs.stroke !== 'none' ? cs.stroke : null;
+      const isi = cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)' ? cs.backgroundColor : null;
+      const warna = stroke || isi || (isSvg ? cs.fill : null);
+      if (!warna || warna === 'none') continue;
+      out.push({
+        nama: el.getAttribute('data-grafik'),
+        warna,
+        opacity: +cs.opacity || 1,
+        rect: rectOf(el),
+        tag: jejak(el),
       });
     }
     return out;
@@ -283,14 +345,15 @@ function nilaiFokus(st, bg) {
 
 // ── sapuan satu tampilan ──────────────────────────────────────────────────
 async function auditView(page, ctxName, { fokus = false } = {}) {
-  const [ikon, field] = await Promise.all([collectIcons(page), collectFields(page)]);
+  const [ikon, field, grafik] = await Promise.all([collectIcons(page), collectFields(page), collectGrafik(page)]);
 
-  if (ikon.length || field.length) {
+  if (ikon.length || field.length || grafik.length) {
     const shot = (await page.screenshot()).toString('base64');
     const ptsIkon = ikon.map((e) => clamp(insidePoints(e.rect, 1).concat(outsidePoints(e.rect, 3))));
     const ptsLuar = field.map((e) => clamp(outsidePoints(e.rect, 3)));
     const ptsDalam = field.map((e) => clamp(insidePoints(e.rect, 6)));
-    const flat = [...ptsIkon.flat(), ...ptsLuar.flat(), ...ptsDalam.flat()];
+    const ptsGrafik = grafik.map((e) => clamp(chartBgPoints(e.rect, 6)));
+    const flat = [...ptsIkon.flat(), ...ptsLuar.flat(), ...ptsDalam.flat(), ...ptsGrafik.flat()];
     const px = await samplePixels(page, shot, flat);
 
     /* Pemotong blok eksplisit — aritmetika offset manual sudah pernah bikin
@@ -301,9 +364,11 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
     };
     const nIkon = ptsIkon.flat().length;
     const nLuar = ptsLuar.flat().length;
+    const nDalam = ptsDalam.flat().length;
     const sIkon = potong(ptsIkon, 0);
     const sLuar = potong(ptsLuar, nIkon);
     const sDalam = potong(ptsDalam, nIkon + nLuar);
+    const sGrafik = potong(ptsGrafik, nIkon + nLuar + nDalam);
 
     ikon.forEach((e, i) => {
       const res = nilaiIkon(e, sIkon[i]);
@@ -314,6 +379,11 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
       const res = nilaiField(e, sLuar[i], sDalam[i]);
       if (!res) return;
       push({ jenis: 'batas-kontrol', ctx: ctxName, nama: e.nama, tag: e.tag, lewat: res.lewat, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
+    });
+    grafik.forEach((e, i) => {
+      const res = nilaiIkon(e, sGrafik[i]);
+      if (!res) return;
+      push({ jenis: 'grafik', ctx: ctxName, nama: e.nama, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
     });
   }
 
@@ -449,7 +519,7 @@ writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const per = (j) => results.filter((r) => r.jenis === j);
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log('\n=== KONTRAS NON-TEKS (ambang 3:1) ===');
-for (const j of ['ikon', 'batas-kontrol', 'ring-fokus']) {
+for (const j of ['ikon', 'batas-kontrol', 'ring-fokus', 'grafik']) {
   const s = per(j);
   console.log(`  ${j.padEnd(14)} ${String(s.length).padStart(4)} sampel, ${s.filter((r) => !r.pass).length} gagal`);
 }
