@@ -1,6 +1,7 @@
 import { LOGO_DATA_URL } from './logoBase64';
 import { bagikanFileGambar } from './shareReceipt';
 import { CETAK } from './warnaCetak';
+import { formatRupiahPlain } from './utils';
 
 /**
  * Data satu kartu laporan kas (dipakai untuk "Tutup Buku Sekarang" maupun
@@ -24,9 +25,23 @@ export interface LaporanKasCard {
 
 const FONT = 'Inter, system-ui, -apple-system, sans-serif';
 
-function rp(n: number) {
-  const s = `Rp${Math.abs(n).toLocaleString('id-ID')}`;
-  return n < 0 ? `-${s}` : s;
+/** Nominal BERTANDA untuk kartu ("-Rp390.000"). Dibangun di atas
+ *  `formatRupiahPlain` (yang sengaja memakai Math.abs) supaya format "Rp" cuma
+ *  punya satu sumber; berkas ini dulu menyalin rumusnya sendiri. Diekspor demi
+ *  uji: tanda minus di kartu yang beredar di WA tak boleh salah. */
+export function rpBertanda(n: number): string {
+  return (n < 0 ? '-' : '') + formatRupiahPlain(n);
+}
+
+/** Nominal yang jadi ANGKA UTAMA kartu.
+ *
+ *  Aturan bisnisnya, bukan pilihan tata letak: Kas RT adalah pool final /
+ *  akumulasi, jadi ia yang tampil besar. Saldo Kas Hadiran (yang BELUM disetor)
+ *  muncul terpisah di panel dan TIDAK boleh dijumlahkan ke sini — menjumlahkan
+ *  keduanya menghitung uang yang sama dua kali di kartu yang dibaca puluhan
+ *  warga. Diekspor supaya aturan itu punya uji, bukan cuma komentar. */
+export function nominalHeroKartu(d: Pick<LaporanKasCard, 'rtSaldoAkhir'>): number {
+  return d.rtSaldoAkhir;
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -69,7 +84,7 @@ const panelH = PANEL_PAD_T + PANEL_TITLE + 3 * ROW_H + PANEL_PAD_B;
 export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   // Kas RT = pool final/akumulasi → jadi angka utama. Saldo Kas Hadiran
   // (belum disetor) ditampilkan terpisah di panel, TIDAK dijumlah ke total.
-  const heroAmount = d.rtSaldoAkhir;
+  const heroAmount = nominalHeroKartu(d);
 
   // Tinggi total dihitung dulu → kanvas pas, isi TIDAK akan terpotong.
   const H =
@@ -123,7 +138,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   ctx.font = `700 11px ${FONT}`;
   ctx.fillText(d.title.toUpperCase(), hx + 20, hy + 96);
 
-  const amountStr = rp(heroAmount);
+  const amountStr = rpBertanda(heroAmount);
   let fs = 40;
   ctx.font = `800 ${fs}px ${FONT}`;
   while (ctx.measureText(amountStr).width > hw - 40 && fs > 22) {
@@ -189,7 +204,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
       ctx.fillStyle = r.saldo
         ? (r.val < 0 ? CETAK.neg : CETAK.pos)
         : r.minus ? CETAK.neg : CETAK.pos;
-      const valStr = r.minus && r.val > 0 ? `-${rp(r.val)}` : rp(r.val);
+      const valStr = r.minus && r.val > 0 ? `-${rpBertanda(r.val)}` : rpBertanda(r.val);
       ctx.fillText(valStr, IX + IW - 16, cy);
       ry += ROW_H;
     });
