@@ -1069,7 +1069,22 @@ export default function JadwalPage() {
                             disabled={navigatingId === t.id}
                             title="Hitung Ulang"
                             aria-label="Hitung Ulang"
-                            className="w-11 h-11 rounded-xl border border-control dark:border-control-dark text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
+                            /* Tanpa bingkai (4 Agu 2026). Daftar ini 71 baris, dan
+                               dulu tiap barisnya membawa satu–dua kotak bergaris
+                               `control` yang identik: berjejer ke bawah, ia terbaca
+                               seperti formulir, bukan daftar. Dua alasan konkret,
+                               bukan selera:
+                                 • DESIGN.md §Cards melarang "kotak abu bergaris" di
+                                   DALAM kartu — fill datar, bukan bingkai.
+                                 • Ikonnya `text-gray-400`, padahal abu di app ini
+                                   sinyal kontrol INAKTIF. Tombol aktif memakai
+                                   kostum nonaktif; itu yang bikin barisnya terasa
+                                   mati. `.btn-secondary` (resep sekunder kanonik)
+                                   pun memakai gray-600/300, bukan 400.
+                               Affordance TIDAK dikurangi: 44px tetap, lapisan
+                               tekan tetap, `title`+`aria-label` tetap. Yang hilang
+                               cuma garisnya. */
+                            className="w-11 h-11 rounded-xl text-ink-faint dark:text-gray-300 inline-flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-800 active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
                           >
                             <RefreshCw className={`w-[18px] h-[18px] ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                           </button>
@@ -1111,7 +1126,12 @@ export default function JadwalPage() {
                             onClick={() => { haptic(); setRowTarikan(t); }}
                             title="Aksi lainnya"
                             aria-label={`Aksi lainnya tarikan #${t.nomor}`}
-                            className="w-11 h-11 rounded-xl border border-control dark:border-control-dark text-gray-400 inline-flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
+                            /* Tanpa bingkai — alasan sama dgn "Hitung Ulang" di atas.
+                               Di baris terjadwal ini justru paling terasa: dulu ada
+                               DUA kotak sederajat bersebelahan (Play + ⋮) sehingga
+                               aksi utama baris tak punya penekanan. Kini hierarkinya
+                               terbaca: satu chip ber-tint (Play) + satu ikon tenang. */
+                            className="w-11 h-11 rounded-xl text-ink-faint dark:text-gray-300 inline-flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
                           >
                             <MoreVertical className="w-[18px] h-[18px]" />
                           </button>
