@@ -249,11 +249,17 @@ export default function KasHadiranPage() {
         title: 'Ringkasan Kas Hadiran RT 004 / RW 006',
         amountLabel: 'Saldo Kas Hadiran',
         amount: fmtSaldo,
+        /* `tone` mengikuti panel "Alur Kas Hadiran" di layar — empat baris yang
+           SAMA persis. Sampai 4 Agu 2026 tak satu pun baris membawa tone, jadi
+           kartu yang beredar di WA menampilkan keempatnya dalam ink polos
+           sementara layarnya berwarna: warga melihat dua versi fakta yang sama.
+           "Setor ke Kas RT" sengaja TETAP netral — di layar pun begitu (biru
+           `setor` tak boleh menyentuh nilai uang, lihat catatan di panel). */
         rows: [
-          { label: 'Kas Terkumpul', value: '+' + formatRupiahPlain(totalKasTerkumpul) },
-          { label: 'Talangan Belum Lunas', value: '-' + formatRupiahPlain(totalTalanganBelum) },
+          { label: 'Kas Terkumpul', value: '+' + formatRupiahPlain(totalKasTerkumpul), tone: 'pos' as const },
+          { label: 'Talangan Belum Lunas', value: '-' + formatRupiahPlain(totalTalanganBelum), tone: 'warn' as const },
           { label: 'Setor ke Kas RT', value: '-' + formatRupiahPlain(totalSetor) },
-          { label: 'Saldo Bersih', value: fmtSaldo },
+          { label: 'Saldo Bersih', value: fmtSaldo, tone: saldo < 0 ? ('neg' as const) : ('pos' as const) },
         ],
         shareText: `Ringkasan Kas Hadiran RT 004/006\nSaldo: ${fmtSaldo} · ${tarikanSelesai.length} tarikan\n— Hadiran RT`,
       });

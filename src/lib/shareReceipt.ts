@@ -11,8 +11,11 @@ export interface ReceiptRow {
    *   'total'   = baris kesimpulan bertekanan berpita tint (mis. Saldo Bersih)
    */
   kind?: 'section' | 'total';
-  /** Warna nilai: hijau (uang masuk) / merah (uang keluar). Default ink. */
-  tone?: 'pos' | 'neg';
+  /** Warna nilai: hijau (masuk) / merah (keluar) / amber (tunggakan). Default ink.
+   *  'warn' ditambahkan 4 Agu 2026 supaya kartu bisa memakai tangga warna yang
+   *  SAMA dgn panel in-app — di sana "Talangan Belum Lunas" memang `warn`, dan
+   *  tanpa nilai ini pemanggil terpaksa membiarkannya netral. */
+  tone?: 'pos' | 'neg' | 'warn';
 }
 
 export interface ReceiptList {
@@ -198,7 +201,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   // Scrim AA pojok kiri-atas (paritas .hero-emerald): zona start jewel terlalu
   // terang utk teks putih kecil — radial gelap tipis hanya di pojok itu.
   const scrim = ctx.createRadialGradient(20, 20, 0, 20, 20, 250);
-  scrim.addColorStop(0, 'rgba(4, 38, 24, 0.48)');
+  scrim.addColorStop(0, CETAK.heroScrim);
   scrim.addColorStop(0.55, 'rgba(4, 38, 24, 0)');
   ctx.save();
   roundRect(ctx, 20, 20, W - 40, 200, 24);
@@ -236,9 +239,42 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   ctx.font = `800 40px ${displayFont}`;
   ctx.fillText(data.amount, 40, 158);
 
+  /* Chip "DEFISIT" — paritas HeroSaldo in-app. Nominalnya TETAP putih (aturan
+     DESIGN.stitch §7: saldo minus disengaja, sinyalnya chip KATA bukan rona);
+     tanpa chip, satu-satunya penanda di kartu yang beredar di WA cuma tanda
+     minus di depan angka — dan itu yang paling dulu hilang saat WhatsApp
+     mengompres gambar.
+
+     Ditaruh RATA KANAN di baris eyebrow, bukan di samping nominal seperti di
+     app. Percobaan pertama menaruhnya di samping nominal lalu menjaga dengan
+     "gambar hanya bila muat" — dan penjaga itu menolaknya SETIAP kali:
+     nominal di kartu ini font tetap 40px (bukan fit-to-width seperti hero app),
+     jadi "-Rp390.000" saja sudah menyisakan ruang lebih sempit dari chip.
+     Penjaganya benar, penempatannya yang salah; di baris eyebrow ia selalu
+     muat karena eyebrow tak pernah sepanjang itu. */
+  if (data.amount.trim().startsWith('-')) {
+    ctx.font = `700 11px ${rupiahFont}`;
+    const chipW = ctx.measureText('DEFISIT').width + 18;
+    const chipX = W - 40 - chipW;
+    ctx.fillStyle = CETAK.neg;
+    roundRect(ctx, chipX, 110, chipW, 20, 10);
+    ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText('DEFISIT', chipX + 9, 121);
+  }
+
   ctx.fillStyle = 'rgba(255,255,255,0.75)';
   ctx.font = `500 11px ${rupiahFont}`;
   ctx.fillText(data.title, 40, 195);
+
+  /* `tone` → warna nilai. Diangkat KELUAR dari cabang berseksi (4 Agu 2026):
+     sampai sekarang ia hanya hidup di sana, sedangkan cabang detail polos di
+     bawah mengecat SEMUA nilai dengan `ink` dan mengabaikan `row.tone` diam-diam.
+     Akibatnya tipe `ReceiptRow` menerima `tone`, pemanggilnya boleh mengisinya,
+     dan tak terjadi apa-apa — kartu Kas Hadiran & Jadwal selalu netral walau
+     panel in-app yang sama berwarna. Bug yang tak kelihatan dari kode pemanggil. */
+  const toneColor = (r: ReceiptRow) =>
+    r.tone === 'pos' ? CETAK.pos : r.tone === 'neg' ? CETAK.neg : r.tone === 'warn' ? CETAK.warn : CETAK.ink;
 
   // Baris detail (kartu putih FLAT ber-hairline — bahasa kartu app)
   let y = rowsCardTop;
@@ -256,7 +292,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
       ctx.font = `500 13px ${rupiahFont}`;
       ctx.textAlign = 'left';
       ctx.fillText(row.label, 40, y);
-      ctx.fillStyle = CETAK.ink;
+      ctx.fillStyle = toneColor(row);
       ctx.font = `700 13px ${rupiahFont}`;
       ctx.textAlign = 'right';
       ctx.fillText(row.value, W - 40, y);
@@ -276,8 +312,6 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     // Tipografi sengaja SATU step lebih besar dari mode lama (detail 13→14,
     // total 17): kartu ini dibaca warga (banyak lansia) di grup WA, bukan
     // dipindai bendahara. Warna nilai = token uang app lewat CETAK.
-    const POS = CETAK.pos, NEG = CETAK.neg;
-    const toneColor = (r: ReceiptRow) => (r.tone === 'pos' ? POS : r.tone === 'neg' ? NEG : CETAK.ink);
     let ry = y + 12;
     data.rows.forEach((row, i) => {
       const h = rowH(row);
@@ -312,7 +346,7 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
         ctx.font = `700 15px ${rupiahFont}`;
         ctx.fillText(row.label, 44, cy);
         ctx.textAlign = 'right';
-        ctx.fillStyle = row.value.trim().startsWith('-') ? NEG : CETAK.pos;
+        ctx.fillStyle = row.value.trim().startsWith('-') ? CETAK.neg : CETAK.pos;
         ctx.font = `800 17px ${displayFont}`;
         ctx.fillText(row.value, W - 44, cy);
       } else {
