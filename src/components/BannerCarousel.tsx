@@ -59,7 +59,7 @@ function bannerBlockHeight(vh: number): number {
  * & statistik yang sudah berstruktur.
  */
 export function BannerSkeleton({ vh }: { vh: number }) {
-  const bar = 'rounded-full bg-line dark:bg-gray-700';
+  const bar = 'rounded-full skeleton-bar';
   return (
     <div style={{ height: bannerBlockHeight(vh) }}>
       <div
@@ -81,18 +81,21 @@ export function BannerSkeleton({ vh }: { vh: number }) {
         </div>
         {/* nominal besar + sub-teks */}
         <div className="flex flex-1 flex-col justify-center gap-3">
-          <span className="h-8 w-3/4 rounded-xl bg-line dark:bg-gray-700" />
+          <span className="h-8 w-3/4 rounded-xl skeleton-bar" />
           <span className={`h-3 w-3/5 ${bar}`} />
         </div>
         {/* footer 3 kolom (Terkumpul / Talangan / Setor Kas RT) — ikut lepas di
             layar pendek, PERSIS seperti kartu aslinya. Kalau syarat ini beda dgn
             kartu, skeleton jadi lebih tinggi dari isinya → layar meloncat saat
             data datang, cacat yang justru mau dicegah komponen ini. */}
+        {/* Pemisah kaki ikut nada skeleton, bukan `control` (#64748B) — itu token
+            BATAS KONTROL (input/tombol), dan sebagai garis di dalam placeholder
+            ia terbaca jauh lebih tegas daripada isi yang diwakilinya. */}
         {!heroRingkas(vh) && (
-          <div className="grid grid-cols-3 gap-3 border-t border-control pt-4 dark:border-control-dark">
+          <div className="grid grid-cols-3 gap-3 border-t border-[#D6DADE] pt-4 dark:border-gray-700">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex flex-col items-center gap-2">
-                <span className="h-3.5 w-3.5 rounded-md bg-line dark:bg-gray-700" />
+                <span className="h-3.5 w-3.5 rounded-md skeleton-bar" />
                 <span className={`h-2 w-11 ${bar}`} />
                 <span className={`h-2.5 w-14 ${bar}`} />
               </div>

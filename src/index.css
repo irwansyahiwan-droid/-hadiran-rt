@@ -932,6 +932,22 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   overflow: hidden;
   background: #E9ECEF;
 }
+/* Bar placeholder yang duduk DI ATAS permukaan `.skeleton` (hero Beranda).
+   Di seluruh app relasinya selalu sama: bar = SATU langkah dari permukaannya
+   (#E9ECEF di atas kartu putih; di gelap #1F2937 di atas #111827). Hero dulu
+   memakai token `line` #B8C4D3 sebagai isian — itu token GARIS TEPI, jauh
+   lebih gelap & lebih biru, sehingga layar pertama yang dilihat tiap orang
+   tiap kali membuka app berbicara dua bahasa memuat sekaligus.
+
+   Bahaya keduanya lebih halus: `line` sudah disetel ulang 4× di proyek ini
+   (#CFD5DF → #DAE0E8 → #D3DAE3 → #C5CFDB → #B8C4D3), SELALU demi tepi kartu —
+   dan tiap kali itu diam-diam mengubah skeleton hero yang tak seorang pun
+   sedang pikirkan. Sekarang ia punya nama sendiri.
+
+   Sisi GELAP tak berubah nilainya (#374151 memang sudah satu langkah di atas
+   #1F2937); ia cuma ikut pindah ke nama ini agar kedua tema satu sumber. */
+.skeleton-bar { background-color: #D6DADE; }
+.dark .skeleton-bar { background-color: #374151; }
 .dark .skeleton { background: #1F2937; }
 .skeleton::after {
   content: '';
