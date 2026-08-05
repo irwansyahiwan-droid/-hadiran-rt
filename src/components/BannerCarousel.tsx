@@ -14,25 +14,43 @@ const TARGET_NOMINAL = 25_000_000;
 const TARGET_DEADLINE = '2026-12-31';
 
 /* Geometri kartu 3D. Lebar/spacing dihitung dari lebar viewport carousel (responsif).
-   Tinggi: maksimum tetap (344) agar tumpukan kartu konsisten di HP normal, TAPI
+   Tinggi: maksimum tetap (300) agar tumpukan kartu konsisten di HP normal, TAPI
    menyusut di layar pendek (mis. iPhone SE 667px) supaya hero tak menelan >½ layar
    pertama & seksi di bawahnya tetap mengintip (lihat cardHeight()). */
-const CARD_H = 344;     // tinggi kartu maksimum (px)
+const CARD_H = 300;     // tinggi kartu maksimum (px)
 const TOP = 8;          // offset atas kartu di dalam viewport
 const CARD_GAP = 18;    // sisa tinggi viewport di luar kartu (TOP + napas bawah)
 
-/** Tinggi kartu efektif menurut tinggi viewport. ≥740px → 344 persis (HP modern,
- *  desain tak berubah). 700–739 → skala ~46.5% tinggi layar. <700 → mode ringkas:
- *  kaki stat sudah lepas (~82px), jadi lantainya boleh jauh lebih rendah tanpa
- *  bikin isi bertumpuk — 226px masih menyisakan napas di atas caption.
+/** Tinggi kartu efektif menurut tinggi viewport. ≥740px → 300 persis (HP modern).
+ *  700–739 → skala ~41% tinggi layar. <700 → mode ringkas: kaki stat sudah lepas
+ *  (~82px), jadi lantainya boleh jauh lebih rendah tanpa bikin isi bertumpuk.
  *
- *  Loncatan di ambang 700 (326 → 245) memang besar, dan itu memang MAKSUDNYA: yang
- *  hilang persis setinggi kaki stat yang ikut dilepas di titik yang sama. Satu HP
- *  punya satu tinggi layar, jadi loncatan ini tak pernah terlihat sebagai animasi. */
+ *  Loncatan di ambang 700 memang besar, dan itu memang MAKSUDNYA: yang hilang
+ *  persis setinggi kaki stat yang ikut dilepas di titik yang sama. Satu HP punya
+ *  satu tinggi layar, jadi loncatan ini tak pernah terlihat sebagai animasi.
+ *
+ *  ── Kenapa diturunkan (5 Agu 2026) ────────────────────────────────────────
+ *  Angka lama (344 / 46,5% / 35%) membuat blok carousel memakan ~51–53% layar
+ *  pertama di SEMUA ukuran. Diukur lawan build sungguhan:
+ *
+ *      360×640  blok 290px (51%)  → konten berikutnya mengintip cuma  50px
+ *      390×844  blok 408px (53%)  → mengintip 136px
+ *
+ *  50px itu KURANG DARI SATU BARIS DAFTAR (±72px): warga membuka app dan tak
+ *  dapat sinyal apa pun bahwa masih ada isi di bawah — persis masalah yang dulu
+ *  `heroRingkas` dibuat untuk mencegah, dan ternyata belum tuntas.
+ *
+ *  Sekarang (dipilih user dari tiga varian yang dirender sungguhan):
+ *      360×640  blok 269px (47%)  → mengintip  71px
+ *      390×844  blok 364px (47%)  → mengintip 180px
+ *
+ *  Kalau angka ini disetel lagi: UKUR, jangan kira-kira — dan RESTART server
+ *  `vite preview` tiap build, karena ia menahan `dist` sejak dinyalakan
+ *  sehingga tiga varian berbeda bisa terbaca identik (kejadian 5 Agu). */
 function cardHeight(vh: number): number {
   if (vh >= 740) return CARD_H;
-  if (!heroRingkas(vh)) return Math.max(300, Math.round(vh * 0.465));
-  return Math.max(226, Math.round(vh * 0.35));
+  if (!heroRingkas(vh)) return Math.max(264, Math.round(vh * 0.41));
+  return Math.max(200, Math.round(vh * 0.32));
 }
 
 /** Tinggi viewport carousel (kartu + napas bawah), TANPA baris indikator. */
