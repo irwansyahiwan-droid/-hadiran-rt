@@ -539,7 +539,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     ) : (
     <div className="space-y-7 pb-2">
       {/* Sapaan + badge status kas */}
-      <div className="flex items-end justify-between px-1">
+      {/* Tepi 16px, sama dgn kartu & judul seksi (lihat SectionTitle). */}
+      <div className="flex items-end justify-between">
         <div>
           <p className="text-caption text-ink-faint dark:text-gray-400">{greeting},</p>
           <h1 className="text-xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
@@ -791,7 +792,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         {trxItems.length > 0 && (
           <div className="space-y-2 mb-3">
           {/* Search + filter + sort */}
-          <div className="relative px-1">
+          <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -806,7 +807,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             {trxSearch && <ClearButton onClick={() => setTrxSearch('')} />}
           </div>
           <FilterChips
-            className="px-1"
             options={[
               { id: 'semua', label: 'Semua' },
               { id: 'setor', label: 'Setor' },

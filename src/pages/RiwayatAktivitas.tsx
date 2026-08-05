@@ -168,7 +168,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
         {/* Hint: tiap baris bisa diketuk untuk penjelasan alur */}
         {!loading && rows.length > 0 && (
-          <div className="flex items-center gap-2 text-micro text-ink-faint dark:text-gray-400 px-1">
+          <div className="flex items-center gap-2 text-micro text-ink-faint dark:text-gray-400">
             <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <span>Ketuk satu aktivitas untuk lihat penjelasan alur &amp; pencatatannya.</span>
           </div>
@@ -207,7 +207,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         ) : (
           grouped.map((grp) => (
             <div key={grp.hari} className="space-y-2">
-              <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400 px-1 pt-1">{grp.hari}</p>
+              <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400 pt-1">{grp.hari}</p>
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
                 {grp.items.map((row, idx) => {
                   const v = formatAktivitas(row);

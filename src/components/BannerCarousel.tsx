@@ -520,9 +520,16 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           height: viewportH, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y',
           // Fade halus di tepi kiri/kanan → kartu tetangga yang mengintip MELEBUR
           // di tepi layar, bukan terpotong garis keras (teks tak lagi "kepotong").
-          // 28px < jarak kartu aktif ke tepi (~32px) → kartu aktif tak tersentuh.
-          maskImage: 'linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%)',
+          //
+          // 16px, DIPERSEMPIT dari 28px (5 Agu). Peek tetangga cuma selebar ~22px
+          // (tepi kartu aktif 352 → 374 di layar 390); ramp 28px memakan lebih dari
+          // separuhnya, jadi bagian paling terang peek pun cuma 1,47:1 lawan kanvas.
+          // Yang dulu dijaga ramp lebar = fragmen TEKS kartu tetangga, dan itu kini
+          // nol lewat `contentOpacity` — sisa yang di-mask cuma tepi BERWARNA. Ramp
+          // menyempit hanya menggeser titik lebur ke luar, tak pernah mendekati kartu
+          // aktif: jaraknya 22px di 390px DAN di 360px (kartu ikut menyempit).
+          maskImage: 'linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%)',
         }}
         onMouseEnter={() => { hoverRef.current = true; }}
         onMouseLeave={() => { hoverRef.current = false; }}
@@ -543,12 +550,19 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
           const c1 = Math.min(ad, 1);
           const active = i === index;
           const scale = (1 - c1 * 0.12) * (pressed && active && !dragging ? 0.985 : 1);
-          // Falloff opacity kartu tetangga. 0.72 (tetangga → 0.28) sengaja lebih
-          // dalam dari 0.62 lama: mask tepi (28px) tak boleh dilebarkan (akan
-          // melarutkan TEPI kartu aktif di HP sempit), jadi legibilitas potongan
-          // teks kartu tetangga yang mengintip di kanan diredam lewat opacity —
-          // peek tetap terlihat sbg "ada lagi", tanpa fragmen kata yang terbaca.
-          const opacity = Number((1 - c1 * 0.72).toFixed(3));
+          // Falloff opacity kartu tetangga. 0.45 (tetangga → 0.55), turun dari 0.72.
+          //
+          // Nilai 0.72 dipasang untuk meredam FRAGMEN TEKS kartu tetangga (mask tepi
+          // 28px tak boleh dilebarkan — akan melarutkan tepi kartu aktif di HP sempit).
+          // Tapi pekerjaan itu kini dipikul `contentOpacity` di bawah, yang sudah
+          // menyentuh NOL tepat di posisi tetangga (c1=1 → 1-1.35 < 0). Dua rem untuk
+          // satu tujuan, dan yang lebih tua menagih ongkosnya ke peek: diukur di
+          // produksi (5 Agu) piksel tetangga rgb(229,236,242) lawan kanvas
+          // rgb(236,241,247) = 1,05:1 di terang dan 1,02:1 di gelap — tumpukan 3D-nya
+          // praktis LENYAP saat diam, dan seluruh isyarat "ada 6 kartu lagi" jatuh ke
+          // titik indikator 7×4px di bawahnya. 0.55 mengembalikan peek sbg KARTU
+          // (tepi berwarna), teks tetap dijaga contentOpacity.
+          const opacity = Number((1 - c1 * 0.45).toFixed(3));
           // Konten (eyebrow/judul/desc/nominal) memudar LEBIH CEPAT dari kartunya:
           // kartu tetangga menyisakan tepi warna bersih (peek "ada lagi") TANPA
           // fragmen kata yang terbaca — memenuhi niat asli di komentar opacity di
@@ -749,8 +763,17 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                 // §2.5.8 AA sudah terpenuhi. Jangan dilebarkan lagi.
                 style={{ minHeight: 44, paddingTop: 16, paddingBottom: 16, paddingLeft: 9, paddingRight: 9 }}
               >
+                {/* Rel indikator = token `control` (abu kontrol inaktif), BUKAN
+                    brand beralpha. `bg-brand/20` di atas kanvas mist terukur
+                    rgb(192,208,207) = 1,4:1 (5 Agu) — segmen "belum lewat" praktis
+                    tak terlihat, padahal ia yang memberi tahu ADA BERAPA kartu.
+                    Alpha tak bisa menolong: brand/70 pun cuma 2,53:1. `control`
+                    (#64748B / dark #6B7280) = 4,19:1 & 4,17:1, dan justru MENAJAMKAN
+                    beda keadaan — abu = belum dilihat, hijau = aktif/sudah lewat.
+                    Nilainya token yang sama dgn batas kolom isian, bukan hex baru.
+                    Rel abu ini juga bikin bar progress autoplay akhirnya terbaca. */}
                 <span
-                  className="block h-1 overflow-hidden rounded-full bg-brand/20 dark:bg-brand-linkDark/25"
+                  className="block h-1 overflow-hidden rounded-full bg-control dark:bg-control-dark"
                   style={{ width: isActive ? 26 : 7, transition: reduced ? 'none' : `width 0.42s ${EASE}` }}
                 >
                   {isActive && !reduced && !stopped && (

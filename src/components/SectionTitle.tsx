@@ -19,7 +19,11 @@ interface SectionTitleProps {
  */
 export default function SectionTitle({ children, count, action, tone = 'default', className = '' }: SectionTitleProps) {
   return (
-    <div className={`flex items-center justify-between gap-2 mb-3 px-1 ${className}`}>
+    /* TANPA px-1. Kartu, header, dan bar nav semuanya bertepi 16px (main px-4);
+       `px-1` menaruh judul seksi di 20px — tak sejajar tepi kartu (16) MAUPUN isi
+       kartu (36). Selisih 4px itu terbaca "hampir sejajar", cacat yang paling
+       gampang tertangkap mata. Satu tepi teks halaman = 16px. */
+    <div className={`flex items-center justify-between gap-2 mb-3 ${className}`}>
       <h2 className={`flex items-center gap-2 text-balance text-base font-bold ${tone === 'muted' ? 'text-ink-sub dark:text-gray-400' : 'text-ink dark:text-gray-100'}`}>
         <span className={`w-1 h-4 rounded-full shrink-0 ${
           tone === 'muted' ? 'bg-gray-300 dark:bg-gray-700'
