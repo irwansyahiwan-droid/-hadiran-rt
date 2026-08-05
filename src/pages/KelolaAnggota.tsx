@@ -431,7 +431,14 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                 <div className="flex items-center gap-1.5 shrink-0">
                   {w.role === 'bendahara' && <Tag tone="success">Bendahara</Tag>}
                   {!w.status_aktif && <Tag tone="neutral">Nonaktif</Tag>}
-                  <Pencil className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
+                  {/* Aturan yang sama dgn tombol baris Jadwal (4 Agu): abu di app
+                      ini SINYAL KONTROL INAKTIF, jadi ikon aksi yang aktif tak
+                      boleh memakainya. Sisi gelapnya yang paling terasa —
+                      gray-500 di atas kartu gray-900 cuma 3,70:1, ikon paling
+                      redup di seluruh daftar; gray-300 ≈12:1. Barisnya sendiri
+                      memang seluruhnya tombol (44px), pensil ini penanda
+                      "bisa diubah", bukan target terpisah. */}
+                  <Pencil className="w-3.5 h-3.5 text-ink-faint dark:text-gray-300" />
                 </div>
               </button>
             ))}
