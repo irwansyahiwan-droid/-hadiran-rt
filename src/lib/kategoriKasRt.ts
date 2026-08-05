@@ -24,6 +24,12 @@ export const KATEGORI_KELUAR: KategoriOpsi[] = [
      kolom `kas_rt.kategori` (teks bebas, tanpa CHECK constraint), jadi
      mengganti namanya membuat transaksi lama jatuh ke "Belum dikategorikan". */
   { key: 'musholah_al_jihad', label: 'Setor Kas Musholah Al Jihad',       short: 'Musholah' },
+  /* Perayaan HUT RI (5 Agu 2026). Kegiatannya SUDAH berjalan dan transaksinya
+     selama ini tercatat di 'lainnya' — pos ini dibuat supaya bisa dirapikan.
+     Pemindahan transaksi lama TIDAK dilakukan dari sini: itu keputusan
+     bendahara per transaksi (mis. "setoran panitia 17 agustusan" sekarang ada
+     di 'sosial', bukan 'lainnya'), bukan tebakan dari kata kunci. */
+  { key: 'hut_ri',            label: 'Kegiatan Perayaan HUT RI 17 Agustusan', short: 'HUT RI' },
   { key: 'lainnya',           label: 'Lain-lain',                         short: 'Lain-lain' },
 ];
 

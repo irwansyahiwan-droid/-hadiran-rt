@@ -68,9 +68,47 @@ describe('Setor Kas Musholah Al Jihad (pengeluaran rutin bulanan)', () => {
     expect(labelKategori('keluar', 'musholah')).toBe('Belum dikategorikan');
   });
 
-  it('tidak menggeser urutan kategori lama', () => {
-    const sebelum = KATEGORI_KELUAR.map((o) => o.key).filter((k) => k !== KEY);
-    expect(sebelum).toEqual(['donasi_rawat_inap', 'pemeliharaan', 'sosial', 'lainnya']);
+});
+
+describe('Kegiatan Perayaan HUT RI 17 Agustusan', () => {
+  const KEY = 'hut_ri';
+
+  it('terdaftar sebagai kategori KELUAR, bukan masuk', () => {
+    expect(KATEGORI_KELUAR.map((o) => o.key)).toContain(KEY);
+    expect(KATEGORI_MASUK.map((o) => o.key)).not.toContain(KEY);
+  });
+
+  it('labelnya utuh di rekap & PDF', () => {
+    expect(labelKategori('keluar', KEY)).toBe('Kegiatan Perayaan HUT RI 17 Agustusan');
+    expect(labelKategoriSingkat('keluar', KEY)).toBe('HUT RI');
+  });
+
+  it('key-nya terkunci — mengganti nama key membuat transaksi lama tak terkategori', () => {
+    expect(KATEGORI_KELUAR.some((o) => o.key === KEY)).toBe(true);
+    expect(labelKategori('keluar', 'hut_ri_17')).toBe('Belum dikategorikan');
+  });
+});
+
+/* Uji ini dulu menyamakan seluruh daftar dgn satu array literal, jadi ia PECAH
+   tiap kali kategori baru ditambah — padahal yang mau dijaga bukan "daftarnya
+   tak berubah" (ia memang tumbuh), melainkan "kategori LAMA tak bergeser
+   relatif satu sama lain". Kini yang diperiksa urutan RELATIF, sehingga
+   penambahan berikutnya tak perlu menyunting uji ini lagi. */
+describe('penambahan kategori tak menggeser urutan kategori lama', () => {
+  const urutanRelatif = (semua: string[], sebagian: string[]) =>
+    semua.filter((k) => sebagian.includes(k));
+
+  it('keluar: rawat inap → pemeliharaan → sosial, dan lainnya paling akhir', () => {
+    const keys = KATEGORI_KELUAR.map((o) => o.key);
+    expect(urutanRelatif(keys, ['donasi_rawat_inap', 'pemeliharaan', 'sosial']))
+      .toEqual(['donasi_rawat_inap', 'pemeliharaan', 'sosial']);
+    expect(keys[keys.length - 1]).toBe('lainnya');
+  });
+
+  it('masuk: hadiran → iuran_warga, dan lainnya paling akhir', () => {
+    const keys = KATEGORI_MASUK.map((o) => o.key);
+    expect(urutanRelatif(keys, ['hadiran', 'iuran_warga'])).toEqual(['hadiran', 'iuran_warga']);
+    expect(keys[keys.length - 1]).toBe('lainnya');
   });
 });
 
