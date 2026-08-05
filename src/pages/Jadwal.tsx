@@ -61,11 +61,11 @@ const STATUS_UI: Record<AbsensiStatus, { label: string; text: string; ava: strin
   },
 };
 
-// Intl compact id-ID → "50 rb" / "3,45 jt" (pemisah = spasi tak-putus bawaan Intl).
-const kompakFmt = new Intl.NumberFormat('id-ID', { notation: 'compact', maximumFractionDigits: 2 });
-function formatKompak(n: number): string {
-  return `Rp${kompakFmt.format(n)}`;
-}
+/* (formatKompak DIHAPUS 5 Agu 2026 — satu-satunya pemakainya adalah strip
+   statistik absensi, dan nominalnya kini tampil eksak di baris sendiri.
+   Jangan dihidupkan lagi untuk "menghemat tempat": menyingkat uang menukar
+   ketepatan dengan ruang, dan di app kas ketepatan yang menang. Kalau sempit,
+   ubah TATA LETAKNYA — jangan angkanya.) */
 
 // ── Absensi View ────────────────────────────────────────────
 
@@ -299,15 +299,38 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         </div>
       </div>
 
-      {/* Stats bar — StatRow bersama (satu kartu berkolom, sama dgn Beranda) */}
+      {/* Stats bar — HITUNGAN saja (3 kolom). Nominal talangan pindah ke baris
+          sendiri di bawah, dan itu bukan soal rapi-rapi:
+
+          Kolom keempat cuma selebar 63px @360, sedangkan "Rp3,45 jt" pada 20px
+          terukur 94px — nominalnya sudah MELUBER 31px keluar kolomnya sendiri
+          sejak dulu. Bentuk eksaknya ("Rp3.450.000") 134px, artinya butuh font
+          9,4px untuk muat: setengah ukuran tiga angka di sebelahnya, dan tak
+          terbaca warga lansia. Jadi strip 4-kolom memang tak bisa memuat uang
+          dalam bentuk APA PUN — menyingkatnya cuma menyembunyikan itu, sambil
+          menukar ketepatan (Rp3.454.000 tampil "Rp3,45 jt") di layar tempat
+          bendahara mencocokkan uang.
+
+          Dengan 3 kolom, `tight` mati → angkanya justru naik ke text-2xl. */}
       <StatRow
         items={[
           { label: 'Hadir', value: hadirCount, tone: 'pos' },
           { label: 'Titip', value: titipCount, tone: 'info' },
           { label: 'Tdk Hadir', value: tidakCount, tone: 'neg' },
-          { label: 'Talangan', value: formatKompak(talanganTotal), tone: 'warn' },
         ]}
       />
+
+      {/* Talangan — nominal EKSAK, satu baris lega (pola baris panel "Alur Kas
+          Hadiran": label kiri, nominal kanan, token `warn` sama dgn sebelumnya). */}
+      <div className="flex items-center justify-between gap-3 rounded-2xl inset-soft px-4 py-3">
+        <span className="inline-flex items-center gap-1.5 text-caption font-medium text-ink-sub dark:text-gray-300">
+          <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark shrink-0" />
+          Talangan
+        </span>
+        <span className="font-display text-amount font-semibold tabular-nums text-warn dark:text-warn-dark">
+          {formatRupiahPlain(talanganTotal)}
+        </span>
+      </div>
 
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
