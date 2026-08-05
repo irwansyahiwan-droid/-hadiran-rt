@@ -15,6 +15,15 @@ export const KATEGORI_KELUAR: KategoriOpsi[] = [
   { key: 'donasi_rawat_inap', label: 'Donasi Rawat Inap',                short: 'Rawat Inap' },
   { key: 'pemeliharaan',      label: 'Pemeliharaan Fasilitas Lingkungan', short: 'Pemeliharaan' },
   { key: 'sosial',            label: 'Sosial',                            short: 'Sosial' },
+  /* Setoran RUTIN bulanan ke kas musholah (5 Agu 2026). Disisipkan SEBELUM
+     'lainnya', bukan di puncak: urutan array ini = urutan seksi di rekap
+     in-app & PDF, jadi menaruhnya di puncak akan menggeser tiga seksi yang
+     sudah ada di tiap laporan lama tanpa alasan. 'lainnya' tetap paling
+     bawah — ia penampung, dan penampung selalu di ekor.
+     `key` tak boleh berubah setelah dipakai: ia tersimpan apa adanya di
+     kolom `kas_rt.kategori` (teks bebas, tanpa CHECK constraint), jadi
+     mengganti namanya membuat transaksi lama jatuh ke "Belum dikategorikan". */
+  { key: 'musholah_al_jihad', label: 'Setor Kas Musholah Al Jihad',       short: 'Musholah' },
   { key: 'lainnya',           label: 'Lain-lain',                         short: 'Lain-lain' },
 ];
 
