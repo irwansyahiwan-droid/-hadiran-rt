@@ -316,10 +316,18 @@ html.dark .text-gray-400,
 html.dark .dark\:text-gray-400 { color: #AEB7C4; }
 html.dark .text-rose-400,
 html.dark .dark\:text-rose-400 { color: #FDA4AF; }
+/* Biru status 'titip' — satu-satunya nada StatRow yang belum punya pasangan
+   gelap ≥7:1: blue-400 #60A5FA cuma 6,98:1 di kartu gray-900, 6,13:1 di tile
+   blue-900/30, dan 5,77:1 di sheet gray-800. Nilainya = blue-300 #93C5FD yang
+   SUDAH dipakai Tag tone `info` (`dark:text-blue-300`), jadi ini menyatukan dua
+   biru jadi satu — pola persis rose-400→rose-300 di atas, bukan hex baru.
+   9,84 / 8,65 / 8,14:1. */
+html.dark .text-blue-400,
+html.dark .dark\:text-blue-400 { color: #93C5FD; }
 
 /* ── Literal warna semantik di LIGHT MODE — satu lever, bukan 40 call-site ───
    Pass KONTRAS MAKSIMAL (4 Agu). Kelas Tailwind mentah (emerald-700/800,
-   rose-700, amber-800, slate-600, blue-700) tersebar di puluhan tempat sebagai
+   rose-700, amber-800, slate-600, blue-600/700) tersebar di puluhan tempat sebagai
    teks status/chip, dan hampir semuanya duduk di TINT sewarna (emerald-50/100,
    rose-50, amber-100) — permukaan yang lebih gelap dari putih, jadi rasio
    nyatanya 4,8–6,9:1: lolos AA, gagal AAA. Digelapkan satu step dari SATU
@@ -334,6 +342,13 @@ html:not(.dark) .text-rose-700    { color: #881337; }  /* 8,93:1 di rose-50 */
 html:not(.dark) .text-amber-800   { color: #78350F; }  /* 7,95:1 di amber-100 */
 html:not(.dark) .text-slate-600   { color: #334155; }  /* 8,49:1 di tile abu (inisial AvatarPeci) */
 html:not(.dark) .text-blue-700    { color: #1E3A8A; }  /* 8,38:1 di pil "WARGA" */
+/* blue-600 terlewat di pass 4 Agu — satu-satunya literal biru yang tak ikut,
+   dan justru yang dipakai StatRow tone `info` (angka "Titip" di Jadwal) plus
+   ikon panah transaksi setor. #2563EB cuma 5,17:1 di kartu putih, 4,55:1 di
+   kanvas, dan 4,24:1 di tile blue-100 tempat ikonnya duduk — nyaris menyentuh
+   batas AA, apalagi AAA. Tangga biru tetap berjenjang: 600 #1E40AF > 700
+   #1E3A8A. 8,72 putih / 7,68 kanvas / 7,15 tile blue-100. */
+html:not(.dark) .text-blue-600    { color: #1E40AF; }
 /* Dua fill pekat yang membawa label PUTIH (pil "Akses Cepat", pil "Defisit").
    Ini SATU-SATUNYA dua baris yang tidak digerbang `:not(.dark)`: fill-nya sama
    di kedua tema (kelasnya dipakai tanpa pasangan `dark:`), jadi menggerbangnya
