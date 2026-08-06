@@ -219,7 +219,21 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             className={`relative ${shakeWarga ? 'shake' : ''}`}
             onAnimationEnd={() => setShakeWarga(false)}
           >
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/70" />
+            {/* Gembok ini SENGAJA `text-gray-400`, sama persis dgn gembok panel
+                bendahara 60px di bawahnya. Versi lama `text-emerald-500/70`
+                mint-di-atas-mint = 1,06:1 terang / 1,54:1 gelap (sampel piksel):
+                dekoratif & `aria-hidden`, jadi sah dilewati §1.4.11 — tapi
+                praktis tak tercat, dan dua gembok kembar di satu layar tampil
+                beda. `text-gray-400` (yang sudah di-remap dua tema) = 7,79 / 8,00
+                di permukaan yang SAMA — diukur, bukan disalin.
+                `z-10 pointer-events-none`: input pakai `backdrop-blur-sm`, dan
+                backdrop-filter MEMBUAT stacking context — jadi input yang
+                `static` tercat DI ATAS ikon `absolute` yang z-index-nya auto,
+                dan gembok tenggelam di balik kaca putih/70. Mengganti warnanya
+                saja tak menolong (1,06 → 1,14): yang salah urutan cat, bukan
+                warnanya. `pointer-events-none` wajib ikut, kalau tidak ketukan
+                di area ikon berhenti di ikon dan tak lagi memfokuskan kolom. */}
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
             <input
               id="warga-password"
               type={showWargaPassword ? 'text' : 'password'}
@@ -235,7 +249,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/70 dark:bg-black/20
                          border border-emerald-600 dark:border-emerald-500
                          text-sm text-gray-900 dark:text-gray-100
-                         placeholder-gray-400 dark:placeholder-gray-500
+                         placeholder-gray-500 dark:placeholder-gray-400
                          focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
                          transition backdrop-blur-sm"
             />
@@ -303,7 +317,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               <div>
                 <label htmlFor="login-email" className="block text-xs font-semibold text-ink-sub dark:text-gray-200 mb-1.5">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
                   <input
                     id="login-email"
                     name="email"
@@ -319,7 +333,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/60 dark:bg-black/20
                                border border-control dark:border-control-dark
                                text-sm text-gray-900 dark:text-gray-100
-                               placeholder-gray-400 dark:placeholder-gray-500
+                               placeholder-gray-500 dark:placeholder-gray-400
                                focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
                                transition backdrop-blur-sm"
                   />
@@ -330,7 +344,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               <div>
                 <label htmlFor="login-password" className="block text-xs font-semibold text-ink-sub dark:text-gray-200 mb-1.5">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
                   <input
                     id="login-password"
                     name="password"
@@ -343,7 +357,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/60 dark:bg-black/20
                                border border-control dark:border-control-dark
                                text-sm text-gray-900 dark:text-gray-100
-                               placeholder-gray-400 dark:placeholder-gray-500
+                               placeholder-gray-500 dark:placeholder-gray-400
                                focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
                                transition backdrop-blur-sm"
                   />

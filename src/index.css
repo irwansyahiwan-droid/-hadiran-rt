@@ -324,6 +324,18 @@ html.dark .dark\:text-rose-400 { color: #FDA4AF; }
    9,84 / 8,65 / 8,14:1. */
 html.dark .text-blue-400,
 html.dark .dark\:text-blue-400 { color: #93C5FD; }
+/* ::placeholder — teks tanpa text node, jadi pemungut teks kedua sapuan kontras
+   BUTA terhadapnya sampai 6 Agu. gray-500 cuma 4,63:1 di `.field` terang dan
+   gray-400 5,78:1 di `.field` gelap: lolos AA, jatuh dari ambang AAA app —
+   padahal ini justru teks yang dibaca warga lansia saat mencari namanya.
+   Satu pasang menang di keenam permukaan field app (gray-50, putih, gray-800,
+   gray-900, + dua permukaan Login yang branded): terang #4B5563, gelap #AEB7C4
+   (= nilai remap `gray-400` gelap yang sudah dipakai app, bukan hex baru).
+   7,23–7,56 terang / 7,25–8,76 gelap. Kelas ber-prefix WAJIB ikut disebut —
+   jebakan yang sama dgn remap gray & blue di atas. */
+html:not(.dark) .placeholder-gray-500::placeholder { color: #4B5563; }
+html.dark .placeholder-gray-400::placeholder,
+html.dark .dark\:placeholder-gray-400::placeholder { color: #AEB7C4; }
 
 /* ── Literal warna semantik di LIGHT MODE — satu lever, bukan 40 call-site ───
    Pass KONTRAS MAKSIMAL (4 Agu). Kelas Tailwind mentah (emerald-700/800,
