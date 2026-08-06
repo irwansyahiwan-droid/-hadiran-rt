@@ -51,6 +51,7 @@ async function collectTexts(page) {
       );
       if (!hit || (!el.contains(hit) && !hit.contains(el))) return;
       const m = cs.color.match(/[\d.]+/g).map(Number);
+      el.setAttribute('data-audit-k', String(out.length)); // dipakai uji occlusion per-TITIK
       out.push({
         text: txt.slice(0, 60),
         color: m.slice(0, 3),
@@ -64,6 +65,39 @@ async function collectTexts(page) {
     walk(document.body);
     return out;
   });
+}
+
+/* Uji occlusion PER TITIK — kembar `keepVisible` di audit-kontras.mjs.
+   Uji-tengah di collectTexts hanya membuktikan PUSAT elemen tak tertutup; baris
+   sampel tepi-bawah bisa mendarat di hairline atas bar nav dok yang `fixed`,
+   lalu MODUS memilih hairline itu sebagai "latar". Lihat catatan panjang di
+   audit-kontras.mjs (FP ke-11, 6 Agu). Di sini belum pernah menghasilkan temuan
+   palsu, tapi cacatnya sama persis — jadi ditutup serempak, bukan menunggu. */
+const BLEED = 2;
+
+async function keepVisible(page, ptsPerEl) {
+  return page.evaluate(({ groups, bleed }) => {
+    const fixedEls = [...document.querySelectorAll('*')]
+      .filter((e) => getComputedStyle(e).position === 'fixed')
+      .map((e) => ({ e, r: e.getBoundingClientRect() }))
+      .filter(({ r }) => r.width > 0 && r.height > 0);
+    return groups.map((pts, i) => {
+      const el = document.querySelector(`[data-audit-k="${i}"]`);
+      if (!el) return pts.map(() => false);
+      const overlays = fixedEls.filter(({ e }) => !e.contains(el)).map(({ r }) => r);
+      return pts.map(([x, y]) => {
+        const hit = document.elementFromPoint(x, y);
+        if (!hit || (!el.contains(hit) && !hit.contains(el))) return false;
+        for (const r of overlays) {
+          const inBox = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+          const inBand = x >= r.left - bleed && x <= r.right + bleed
+            && y >= r.top - bleed && y <= r.bottom + bleed;
+          if (inBand && !inBox) return false;
+        }
+        return true;
+      });
+    });
+  }, { groups: ptsPerEl, bleed: BLEED });
 }
 
 async function samplePixels(page, shotB64, points) {
@@ -129,6 +163,7 @@ function analyse(el, samples) {
 }
 
 const results = [];
+const buta = []; // elemen yang SEMUA titik sampelnya tertutup overlay — tak terukur
 const seen = new Set();
 
 async function auditView(page, ctxName) {
@@ -137,11 +172,16 @@ async function auditView(page, ctxName) {
   const shot = (await page.screenshot()).toString('base64');
   const allPts = els.map((e) => perimeterPoints(e.rect, e.size));
   const pixels = await samplePixels(page, shot, allPts.flat());
+  const visible = await keepVisible(page, allPts);
+  await page.evaluate(() => document.querySelectorAll('[data-audit-k]').forEach((e) => e.removeAttribute('data-audit-k')));
   let off = 0;
   for (let i = 0; i < els.length; i++) {
     const el = els[i];
-    const samples = pixels.slice(off, off + allPts[i].length);
+    const samples = pixels.slice(off, off + allPts[i].length).filter((_, j) => visible[i][j]);
     off += allPts[i].length;
+    /* Lihat catatan di audit-kontras.mjs: penjaga occlusion tak boleh jadi
+       tempat temuan bersembunyi, jadi yang habis titiknya WAJIB mengaku. */
+    if (!samples.length) { buta.push(`${ctxName}|${el.text.slice(0, 40)}`); continue; }
     const res = analyse(el, samples);
     if (!res) continue;
     const large = el.size >= 24 || (el.size >= 18.66 && el.weight >= 700);
@@ -410,6 +450,8 @@ await browser.close();
 writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log(`\n=== TOTAL sampel: ${results.length}, GAGAL AA: ${fails.length} ===`);
+console.log(`tak terukur (semua titik tertutup overlay): ${buta.length}`);
+if (process.env.SHOW_BUTA) for (const b of [...new Set(buta)]) console.log('  buta:', b);
 for (const f of fails) {
   console.log(`${f.ratio} (butuh ${f.need}) [${f.ctx}] "${f.text}" fg rgb(${f.color}) a=${f.alpha} bg rgb(${f.bg}) ${f.size}px/${f.weight} <${f.tag}>`);
 }

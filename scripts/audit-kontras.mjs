@@ -41,6 +41,7 @@ async function collectTexts(page) {
       );
       if (!hit || (!el.contains(hit) && !hit.contains(el))) return;
       const m = cs.color.match(/[\d.]+/g).map(Number);
+      el.setAttribute('data-audit-k', String(out.length)); // dipakai uji occlusion per-TITIK
       out.push({
         text: txt.slice(0, 60),
         color: m.slice(0, 3),
@@ -54,6 +55,54 @@ async function collectTexts(page) {
     walk(document.body);
     return out;
   });
+}
+
+/* Uji occlusion PER TITIK, bukan cuma titik tengah elemen.
+   FP ke-11 (6 Agu): bar nav dok `fixed` menutup 70px terbawah layar (top=774 di
+   viewport 844). Teks yang tergulir masuk ke bawahnya tetap lolos uji-tengah —
+   tengahnya masih di atas bar — tapi baris sampel tepi-BAWAH mendarat di
+   hairline atas bar (`line` #B8C4D3). Karena latar dipilih lewat MODUS, 7 titik
+   hairline menang atas fill kartu putih yang tersisa, dan nominal Beranda
+   ("Rp600.000") terbaca 5,13:1 padahal latar aslinya banner amber-50 (≈9:1).
+   Ukurannya benar; LATARnya yang bukan miliknya. Sama seperti audit:sentuh,
+   jawabannya hit-test — dan hit-test itu harus mengenai TIAP titik yang
+   benar-benar disampel, bukan cuma titik tengah.
+
+   Hit-test saja TIDAK cukup, dan ini bagian yang bikin percobaan pertama cuma
+   menyembuhkan separuh: kotak bar nav mulai di y=774, tapi hairline-nya dicat di
+   y=773 — DI LUAR border-box-nya (bayangan/`::before`, bukan `border-top`).
+   `elementFromPoint(x, 773)` dengan patuh menjawab "itu paragrafnya", sementara
+   piksel di sana 184,196,211. Jadi ada penjaga kedua: buang titik yang jatuh di
+   PITA 2px tepat di luar kotak elemen `position:fixed`. Sengaja pita tepi, bukan
+   seluruh kotak — lapisan `fixed inset-0` (scrim/latar app) akan menelan semua
+   titik kalau kotak penuhnya dipakai, dan bagian dalam kotak sudah dijaga
+   hit-test. Overlay yang MEMUAT elemennya dilewati: label bar nav sendiri juga
+   ikut disapu dan titik-titiknya memang duduk di dalam bar. */
+const BLEED = 2;
+
+async function keepVisible(page, ptsPerEl) {
+  return page.evaluate(({ groups, bleed }) => {
+    const fixedEls = [...document.querySelectorAll('*')]
+      .filter((e) => getComputedStyle(e).position === 'fixed')
+      .map((e) => ({ e, r: e.getBoundingClientRect() }))
+      .filter(({ r }) => r.width > 0 && r.height > 0);
+    return groups.map((pts, i) => {
+      const el = document.querySelector(`[data-audit-k="${i}"]`);
+      if (!el) return pts.map(() => false);
+      const overlays = fixedEls.filter(({ e }) => !e.contains(el)).map(({ r }) => r);
+      return pts.map(([x, y]) => {
+        const hit = document.elementFromPoint(x, y);
+        if (!hit || (!el.contains(hit) && !hit.contains(el))) return false;
+        for (const r of overlays) {
+          const inBox = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+          const inBand = x >= r.left - bleed && x <= r.right + bleed
+            && y >= r.top - bleed && y <= r.bottom + bleed;
+          if (inBand && !inBox) return false;
+        }
+        return true;
+      });
+    });
+  }, { groups: ptsPerEl, bleed: BLEED });
 }
 
 async function samplePixels(page, shotB64, points) {
@@ -138,11 +187,18 @@ async function auditCurrentView(page, ctxName, results, seen) {
   const allPts = els.map((e) => perimeterPoints(e.rect, e.size));
   const flat = allPts.flat();
   const pixels = await samplePixels(page, shot, flat);
+  const visible = await keepVisible(page, allPts);
+  await page.evaluate(() => document.querySelectorAll('[data-audit-k]').forEach((e) => e.removeAttribute('data-audit-k')));
   let off = 0;
   for (let i = 0; i < els.length; i++) {
     const el = els[i];
-    const samples = pixels.slice(off, off + allPts[i].length);
+    const samples = pixels.slice(off, off + allPts[i].length).filter((_, j) => visible[i][j]);
     off += allPts[i].length;
+    /* Sapuan yang diam-diam menyempitkan populasinya = sapuan yang "lolos"
+       karena tak melihat, bukan karena bersih. Yang habis titiknya dihitung
+       dan dilaporkan, supaya penjaga occlusion di atas tak pernah jadi tempat
+       temuan bersembunyi. */
+    if (!samples.length) { buta.push(`${ctxName}|${el.text.slice(0, 40)}`); continue; }
     const res = analyse(el, samples);
     if (!res) continue;
     const large = el.size >= 24 || (el.size >= 18.66 && el.weight >= 700);
@@ -219,11 +275,14 @@ async function runTheme(theme, results, seen) {
 
 const results = [];
 const seen = new Set();
+const buta = []; // elemen yang SEMUA titik sampelnya tertutup overlay — tak terukur
 for (const theme of ['light', 'dark']) await runTheme(theme, results, seen);
 
 writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log(`\n=== TOTAL sampel: ${results.length}, GAGAL AA: ${fails.length} ===`);
+console.log(`tak terukur (semua titik tertutup overlay): ${buta.length}`);
+if (process.env.SHOW_BUTA) for (const b of [...new Set(buta)]) console.log('  buta:', b);
 for (const f of fails) {
   console.log(`${f.ratio} (butuh ${f.need}) [${f.ctx}] "${f.text}" fg rgb(${f.color}) a=${f.alpha} bg rgb(${f.bg}) ${f.size}px/${f.weight} <${f.tag}>`);
 }

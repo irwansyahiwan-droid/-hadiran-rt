@@ -63,7 +63,8 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 | `audit:keadaan` | Layar saat data KOSONG & saat muat GAGAL (warga + bendahara + overlay) | Semua audit lain jalan lawan DB penuh, jadi EmptyState/ErrorState tak pernah dirender. **App kas dilarang menyatakan nominal saat gagal muat.** |
 | `audit:sheet` | Geometri sheet/modal/popover di 360px | Form di dalam bottom-sheet tak pernah diukur; kontrol bisa meluber keluar panel |
 | `audit:publik` | landing / warta / nobar / panduan-install, light+dark | HTML statis di `public/` tak tersentuh audit app, padahal wajah pertama |
-| `audit:kontras` | Kontras piksel-nyata TEKS (sampel screenshot) | Token tak bisa dipercaya; warna final = hasil blend |
+| `audit:kontras` | Kontras piksel-nyata TEKS, **tab WARGA saja** (sampel screenshot) | Token tak bisa dipercaya; warna final = hasil blend |
+| `audit:kontras-deep` | Kontras TEKS di permukaan yang TAK disentuh `audit:kontras`: sheet/modal warga, SELURUH permukaan bendahara (5 tab + form FAB + overlay admin), landing /info | Populasinya justru yang TERBESAR — 2.174 dari 3.410 sampel. Sampai 6 Agu skripnya ada tapi tak terdaftar di `package.json`, jadi cuma jalan kalau seseorang ingat mengetik path-nya; sekarang bisa dipanggil dgn nama. Bendahara di-MOCK 3 lapis aman (sesi palsu di localStorage + rest/v1 dipaksa anon + method tulis DIBLOKIR Playwright) — jangan pernah pakai kredensial asli atau klik Simpan/Hapus di data produksi |
 | `audit:kontras-nonteks` | Kontras NON-teks: ikon tanpa label, batas kolom isian, ring `:focus-visible`, **tanda grafik** (§1.4.11 & §2.4.13, ambang 3:1) | `audit:kontras` cuma menyampel TEKS. Ring fokus tak pernah diukur sekali pun — ternyata ring hijau di atas hero HIJAU = 1,26:1 (praktis hilang bagi pengguna papan ketik) dan ring `.field` beralpha 30% gagal di SEMUA input. Fokus di-Tab beneran, screenshot per elemen (rect & piksel wajib sezaman). **Bagian grafik (4 Agu)** ada karena pemeriksaan ikon SENGAJA melewati svg ber-leluhur `aria-hidden` — dan semua grafik app memang aria-hidden, jadi garis "Tren Saldo" bertahan 2,33:1 di mode gelap tanpa satu pun sapuan menyentuhnya. Populasinya OPT-IN lewat `data-grafik` di call-site, bukan tebakan selektor: bar = `div`, garis = `path`, tak ada ciri struktural yang bisa dibedakan dari elemen tata letak. **Tanda grafik baru WAJIB memasang `data-grafik`** — kalau tidak, ia tak terukur |
 | `audit:lebar` | Nominal "Rp" terpotong/meluber di 360px | `<span>` inline punya clientWidth 0 → scrollWidth buta |
 | `audit:reflow` | Halaman geser samping di 320px (§1.4.10, WAJIB) + saat font dasar browser 200% (di atas AA) | Yang WAJIB cuma 320px dan itu bersih. Bagian 200% sengaja dipisah supaya tak dilaporkan sebagai "gagal WCAG" — ia ambang app sendiri untuk warga lansia. Probe WAJIB menyaring elemen ber-leluhur `position:fixed`: isi bottom-nav tak menciptakan scroll dokumen, dan melaporkannya = menyuruh orang membetulkan yang bukan penyebab |
@@ -74,7 +75,7 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 | `audit:mati` | Keterbacaan label tombol saat `disabled` (terang+gelap, warga+bendahara) | Kedua audit kontras MELEWATI kontrol nonaktif secara eksplisit — sah, karena WCAG 1.4.3 mengecualikannya. Tapi "tak wajib" bukan "boleh tak terbaca", dan pengecualian itu berarti keadaan nonaktif **tak pernah diukur sekali pun**. Yang tersembunyi di baliknya: tombol masuk bendahara 3,79:1 saat "Memproses…", 3 tombol teks Kas Hadiran 2,2–2,7:1, dan perbaikan `.btn-brand:disabled` yang ternyata cuma dihitung untuk mode TERANG (4,32:1 di gelap). Ambang dilaporkan sebagai ambang APP, bukan "gagal WCAG" — disiplin yang sama dgn bagian teks-200% di `audit:reflow` |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
-bukan kodenya. Sudah terjadi 10×: sampel kena border 1px, aturan dialog dikenakan ke halaman
+bukan kodenya. Sudah terjadi 11×: sampel kena border 1px, aturan dialog dikenakan ke halaman
 penuh, probe mengambil dialog di belakang sheet, `.sr-only` terbaca "terpotong", pola rute
 `supabase-*.js` meleset dari nama asli `vendor-supabase-*.js` (sapuan diam-diam menguji jalur
 ONLINE lalu "lolos"), klik ditolak karena panel collapse masih beranimasi, klik pembuka
@@ -92,6 +93,18 @@ Toaster mengirim toast GALAT ke region ASSERTIVE `role="alert"` dan wadah toast 
 sengaja TANPA role (anti-baca-dobel). Selektor lama justru satu-satunya tempat yang dijamin
 kosong saat gagal. Kini ketiga permukaan dibaca, plus jeda 400ms karena label tombol pulih di
 tick yang sama saat toast baru dipasang.
+Yang ke-11 (6 Agu): `audit:kontras` melaporkan dua nominal 5,13 & 5,86:1 padahal keduanya duduk
+di banner amber-50 / kartu putih (≈9:1). Latarnya bukan miliknya: uji occlusion cuma menguji
+titik TENGAH elemen, sedangkan baris sampel tepi-BAWAH elemen yang tergulir ke bawah bar nav
+dok mendarat di hairline atas bar (`line` #B8C4D3) — dan karena latar dipilih lewat MODUS,
+7 titik hairline menang atas fill aslinya. Hit-test per-titik saja **cuma menyembuhkan
+separuh**: kotak bar mulai di y=774 tapi garisnya dicat di y=773, DI LUAR border-box-nya, jadi
+`elementFromPoint` dengan patuh menjawab "itu paragrafnya". Kini ada dua penjaga — hit-test tiap
+titik, plus buang titik yang jatuh di PITA 2px tepat di luar kotak elemen `position:fixed`
+(pita tepi, bukan seluruh kotak: lapisan `fixed inset-0` akan menelan semua titik). Dan karena
+penjaga occlusion bisa jadi tempat temuan bersembunyi, elemen yang HABIS titiknya dihitung &
+dilaporkan (`tak terukur: N`, rinciannya lewat `SHOW_BUTA=1`) — sapuan tak boleh menyempitkan
+populasinya sendiri tanpa mengaku.
 
 **Memeriksa hasil deploy: baca ISI bundel, jangan bandingkan HASH.** Vercel membangun ulang
 dari repo dan menghasilkan hash chunk yang BERBEDA dari `npm run build` lokal, jadi
