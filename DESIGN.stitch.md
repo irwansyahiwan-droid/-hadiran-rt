@@ -68,6 +68,15 @@ scoped exceptions exist and must never grow into second accents.
 - **Warning / Arrears** (#92400E) — amber-800, for talangan (unpaid dues).
 - Icon tiles in lists get matching 100-level tints (soft emerald / rose / amber
   backgrounds), never flat gray.
+- **Text tier vs fill tier (dark mode).** Money text must clear the app's AAA
+  bar, which in dark mode forces pale tints — and pale tints used as FILL turn
+  charts into pastel candy. Graphic marks only owe 3:1, so they get their own
+  darker pair: `pos.dark-fill` #10B981 and `neg.dark-fill` #F43F5E (6.99:1 and
+  4.83:1 on a dark card). Bars, legend dots, and trend strokes use the fill
+  tier; text, links and rings keep `*.dark`. Light mode needs no such split —
+  there, higher contrast means DARKER, which only makes a fill richer. This
+  asymmetry is the same lesson as the rejected gray-300 chips: contrast is not
+  symmetric between themes.
 
 ### Scoped exceptions (never expand these)
 - **Setor Blue** (#1E40AF → #2563EB → #3B82F6 gradient) — a STATUS signal only:

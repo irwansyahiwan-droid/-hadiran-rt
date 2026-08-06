@@ -41,13 +41,13 @@ export default function MonthlyBars({ data }: { data: MonthBar[] }) {
                 memakai warna yang disetel untuk kartu putih.
                 Legend dot di KasRT.tsx wajib ikut pasangan ini. */}
             <div
-              className="w-1/2 max-w-[14px] origin-bottom rounded-t-md bg-pos dark:bg-pos-dark"
+              className="w-1/2 max-w-[14px] origin-bottom rounded-t-md bg-pos dark:bg-pos-dark-fill"
               data-grafik="bar-masuk"
               style={{ height: `${(d.masuk / max) * 100}%`, transform: grown ? 'scaleY(1)' : 'scaleY(0)', transition: `transform 0.55s var(--ease-out-expo) ${i * 0.04}s` }}
               title={`Masuk: ${d.masuk.toLocaleString('id-ID')}`}
             />
             <div
-              className="w-1/2 max-w-[14px] origin-bottom rounded-t-md bg-neg dark:bg-neg-dark"
+              className="w-1/2 max-w-[14px] origin-bottom rounded-t-md bg-neg dark:bg-neg-dark-fill"
               data-grafik="bar-keluar"
               style={{ height: `${(d.keluar / max) * 100}%`, transform: grown ? 'scaleY(1)' : 'scaleY(0)', transition: `transform 0.55s var(--ease-out-expo) ${i * 0.04 + 0.02}s` }}
               title={`Keluar: ${d.keluar.toLocaleString('id-ID')}`}

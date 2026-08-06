@@ -38,7 +38,7 @@ export default function AreaTrend({ points, height = 84 }: AreaTrendProps) {
           `currentColor` dipakai agar SATU kelas `text-*` mengatur garis DAN
           gradiennya; `<stop>` mewarisi warna teks induknya. */}
       <defs>
-        <linearGradient id="areaTrendG" x1="0" y1="0" x2="0" y2="1" className="text-pos dark:text-pos-dark">
+        <linearGradient id="areaTrendG" x1="0" y1="0" x2="0" y2="1" className="text-pos dark:text-pos-dark-fill">
           <stop offset="0%" stopColor="currentColor" stopOpacity="0.22" />
           <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
         </linearGradient>
@@ -47,7 +47,7 @@ export default function AreaTrend({ points, height = 84 }: AreaTrendProps) {
       <path
         d={line}
         fill="none"
-        className="stroke-pos dark:stroke-pos-dark"
+        className="stroke-pos dark:stroke-pos-dark-fill"
         /* Penanda populasi utk `npm run audit:kontras-nonteks`. Tanda grafik
            tak bisa ditemukan lewat selektor generik (svg-nya aria-hidden,
            persis supaya pembaca layar tak membacanya) — itu sebabnya garis ini
