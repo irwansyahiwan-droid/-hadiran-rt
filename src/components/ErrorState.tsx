@@ -30,10 +30,16 @@ export default function ErrorState({
         {/* Backdrop lembut — amber (beda dari emerald empty). */}
         <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-amber-100/70 to-amber-50/40 dark:from-gray-800 dark:to-gray-800/50" />
 
-        {/* Elemen dekoratif mengambang. */}
-        <span className="blob absolute -top-1 right-3 w-2.5 h-2.5 rounded-full bg-amber-300/80" />
-        <span className="blob absolute bottom-2 -left-1 w-3.5 h-3.5 rounded-md bg-orange-300/70" style={{ animationDelay: '-4s' }} />
-        <span className="blob absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-amber-400/70" style={{ animationDelay: '-8s' }} />
+        {/* Tiga bintik dekoratif DIBUANG (6 Agu) — kembar EmptyState. Kelas
+            `.blob` sudah tak ada sejak 10 Jul (jadi tak pernah mengambang), dan
+            salah satunya `orange-300`: hue yang TIDAK ADA di palet app sama
+            sekali — kanon §2 menetapkan satu amber. */}
+
+        {/* Emblem ketupat — DITAMBAHKAN agar layar gagal punya anatomi yang SAMA
+            dgn layar kosong (latar bertint + emblem + tile), cuma beda warna
+            semantik. Dulu yang kosong punya emblem identitas RT, yang gagal cuma
+            punya konfeti: dua layar sejenis, dua bahasa. */}
+        <span aria-hidden className="absolute inset-0 m-auto w-[68px] h-[68px] rotate-45 rounded-[15px] border border-amber-400/35 dark:border-amber-300/15" />
 
         {/* Tile ikon di tengah — token `lift` (bahasa kartu crisp), bukan shadow generik. */}
         <div className="empty-bob lift absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">

@@ -18,12 +18,14 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
         {/* Backdrop lembut */}
         <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-emerald-100/70 to-emerald-50/40 dark:from-gray-800 dark:to-gray-800/50" />
 
-        {/* Elemen dekoratif mengambang */}
-        <span className="blob absolute -top-1 right-3 w-2.5 h-2.5 rounded-full bg-amber-300/80" />
-        <span className="blob absolute bottom-2 -left-1 w-3.5 h-3.5 rounded-md bg-emerald-300/70" style={{ animationDelay: '-4s' }} />
-        {/* Teal brand, bukan biru — aturan config: biru = sinyal status, bukan accent dekoratif. */}
-        <span className="blob absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-teal-300/70" style={{ animationDelay: '-8s' }} />
-
+        {/* Tiga bintik dekoratif DIBUANG (6 Agu). Kelas `.blob` yang membuatnya
+            mengambang sudah dihapus 10 Jul, jadi yang tersisa cuma tiga titik
+            DIAM — komentar lama masih bilang "mengambang" padahal tak ada yang
+            bergerak. Warnanya pun tiga hue di luar aturan: amber-300 itu
+            keluarga WARN (warna semantik dipakai sebagai hiasan), teal-300 hijau
+            ketiga di app yang seharusnya punya satu aksen. Sisanya —
+            latar bertint + emblem ketupat + tile ikon — persis yang diminta
+            kanon §4: "a small illustration or tinted icon tile", bukan konfeti. */}
         {/* Emblem ketupat (anyaman) — identitas RT yang samar membingkai ikon →
             empty-state terasa "milik app ini", bukan SaaS generik. Emerald (bukan
             emas: jaga scope `--gold-songket` honor). Statik di belakang tile yang
