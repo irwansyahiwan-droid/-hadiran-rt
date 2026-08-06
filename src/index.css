@@ -749,7 +749,15 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 /* Tactile press feedback — ease-out (bukan spring): feedback tekan harus
    bergerak instan saat ditekan, bukan overshoot karet. Spring disisakan untuk
    elemen yg memang "hidup" (pill nav, count-up). */
-.press { transition: transform 0.16s var(--ease-out-expo), opacity 0.16s ease, box-shadow 0.16s ease; }
+/* SATU gestur = SATU kurva & SATU durasi. Versi lama menyetel transform pada
+   expo tapi opacity & box-shadow pada `ease` bawaan; di gestur 160ms bayangan
+   jadi telat menyusul transform. Persis jenis ketidakrapian yang terbaca
+   "belum digarap" tanpa bisa ditunjuk. */
+.press {
+  transition-property: transform, opacity, box-shadow;
+  transition-duration: 0.16s;
+  transition-timing-function: var(--ease-out-expo);
+}
 .press:active { transform: scale(0.97); }
 
 /* Press feedback TRANSFORM-SAFE untuk tombol ikon/utility yang centering-nya
@@ -802,7 +810,18 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.22),       /* glossy top edge */
       0 2px 6px -1px rgba(13, 80, 50, 0.30);
-    transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease, filter 0.2s ease;
+    /* Kurva press disamakan dgn `.press` (expo 0,16s), BUKAN spring. Dulu app
+       punya DUA rasa tekan untuk gestur yang sama: kartu/baris ber-`.press`
+       bergerak instan ala ease-out, sementara CTA `.btn-*` overshoot ala pegas
+       — padahal keduanya sama-sama `scale(0.97)`. Komentar `.press` di atas
+       sudah menetapkan alasannya (tekan tak boleh terasa karet); yang belum
+       ikut cuma tombolnya. Empat properti juga disatukan durasinya: dulu
+       transform 0,15s tapi box-shadow & filter 0,2s, jadi bayangan mendarat
+       50ms setelah tombolnya. Spring tetap hidup di tempat yang memang
+       "hidup" (toast, pop, success) — lihat pemakaian --ease-spring. */
+    transition-property: transform, box-shadow, opacity, filter;
+    transition-duration: 0.16s;
+    transition-timing-function: var(--ease-out-expo);
   }
   /* Hover CTA = filter, BUKAN font-weight. `font-weight: 800` melebarkan label
      1,75px & menggeser ikon panah 0,88px (ukur Playwright) — itu properti
@@ -833,7 +852,10 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
     box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
       0 2px 6px -1px rgba(136, 19, 55, 0.30);
-    transition: transform 0.15s var(--ease-spring), box-shadow 0.2s ease, opacity 0.15s ease, filter 0.2s ease;
+    /* Anatomi kembar .btn-brand — kurva & durasi press ikut serempak. */
+    transition-property: transform, box-shadow, opacity, filter;
+    transition-duration: 0.16s;
+    transition-timing-function: var(--ease-out-expo);
   }
   .btn-danger:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 1px 3px -1px rgba(136,19,55,0.3); }
 
@@ -902,7 +924,9 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
     @apply border border-control dark:border-control-dark
            text-sm font-semibold text-gray-600 dark:text-gray-300
            hover:bg-gray-50 dark:hover:bg-gray-800;
-    transition: background-color 0.18s ease, transform 0.15s var(--ease-spring);
+    transition-property: background-color, transform;
+    transition-duration: 0.16s;
+    transition-timing-function: var(--ease-out-expo);
   }
   .btn-secondary:active { transform: scale(0.97); }
 

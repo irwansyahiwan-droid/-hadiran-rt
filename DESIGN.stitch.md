@@ -154,11 +154,17 @@ scoped exceptions exist and must never grow into second accents.
 
 ## 6. Motion & Interaction
 
-- **Two easings only:** spring `cubic-bezier(0.34, 1.4, 0.5, 1)` for tactile
-  feedback; ease-out-expo `cubic-bezier(0.16, 1, 0.3, 1)` for entrances and
-  exits. No linear easing.
-- **Press feedback:** buttons and tappable cards scale to 0.97 in ~150ms on
-  the spring curve.
+- **Two easings only:** ease-out-expo `cubic-bezier(0.16, 1, 0.3, 1)` for press
+  feedback, entrances and exits; spring `cubic-bezier(0.34, 1.4, 0.5, 1)` only
+  for elements that should feel ALIVE on arrival (toast, pop, success overlay,
+  count-up). No linear easing.
+- **Press feedback:** buttons and tappable cards scale to 0.97 in 160ms on the
+  ease-out-expo curve — a press must move the instant it is touched, never
+  overshoot like rubber. (This supersedes the earlier "press = spring" rule:
+  the app tried both, and spring on press-down reads as wobble. Every property
+  in one press — transform, shadow, opacity, filter — shares that single
+  duration and curve; a shadow landing 50ms after the button is the classic
+  tell of an undesigned UI.)
 - **Entrances:** list/card content rises in (~0.5s ease-out-expo, translateY +
   fade) with short stagger delays — never mounts instantly, never > 3 items of
   stagger depth.
