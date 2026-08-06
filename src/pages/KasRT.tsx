@@ -640,7 +640,13 @@ export default function KasRTPage() {
                   periode, tanpa nilai, dan AreaTrend aria-hidden → pembaca layar
                   kehilangan kartunya utuh. Dua penanda ujung sudah cukup membuat
                   bentuk garis bisa dibaca sbg angka, tanpa membangun sumbu penuh. */}
-              <div className="flex items-baseline justify-between gap-2 mt-2 text-micro font-medium text-ink-faint dark:text-gray-400">
+              {/* `font-display tabular-nums` di WADAH, bukan per span: dua penanda
+                  ujung ini satu-satunya nominal rupiah di seluruh app yang masih
+                  dicetak dgn font body DAN tanpa angka tabular — dua aturan
+                  sekaligus (wajah angka 100% Sora; angka selalu tabular). Ia
+                  lolos bertahun-tahun karena bersembunyi sbg "caption grafik",
+                  padahal isinya saldo awal & akhir periode. */}
+              <div className="flex items-baseline justify-between gap-2 mt-2 font-display text-micro font-medium tabular-nums text-ink-faint dark:text-gray-400">
                 <span>{trenAwal.label} · {maskRp(trenAwal.nilai, hidden, 4)}</span>
                 <span className="text-right">{trenAkhir.label} · {maskRp(trenAkhir.nilai, hidden, 4)}</span>
               </div>
@@ -923,7 +929,12 @@ export default function KasRTPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-ink-faint dark:text-gray-400">Nominal</span>
-                <span className={`font-display text-base font-bold tabular-nums ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
+                {/* Wajah nominal KANONIK (`text-amount font-semibold`) — sama
+                    persis dgn baris "Jumlah" di sheet detail Beranda: panel
+                    `.inset-soft` yang sama, label `text-sm` yang sama, pekerjaan
+                    yang sama. Dulu di sini 16px/700, di sana 17px/600: satu
+                    pekerjaan, dua kostum. */}
+                <span className={`font-display text-amount font-semibold tabular-nums ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                   {maskRp(`${selectedRow.tipe === 'masuk' ? '+' : '-'}${formatRupiahPlain(selectedRow.nominal)}`, hidden, 4)}
                 </span>
               </div>

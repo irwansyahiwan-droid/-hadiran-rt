@@ -319,7 +319,7 @@ export default function JadwalWargaPage() {
             <div>
               <div className="flex items-center justify-between text-xs text-emerald-100 mb-1">
                 <span>Kehadiran</span>
-                <span className="font-bold">{hadirCount}/{lastTarikan.total_warga} ({pctHadir}%)</span>
+                <span className="font-bold tabular-nums">{hadirCount}/{lastTarikan.total_warga} ({pctHadir}%)</span>
               </div>
               <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
                 <div
