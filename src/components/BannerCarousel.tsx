@@ -359,9 +359,11 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
   // di HP tak ada hover/fokus utk menjeda, jadi "ambil kendali" = mekanisme stop
   // yang disyaratkan WCAG 2.2.2 (Pause, Stop, Hide). Sekali berhenti, tetap berhenti.
   const [stopped, setStopped] = useState(false);
-  // Pause shimmer loop saat carousel tergulir keluar layar (baseline: jangan
-  // biarkan animasi loop jalan off-screen). Autoplay tetap pakai document.hidden.
-  const [onScreen, setOnScreen] = useState(true);
+  /* `onScreen` + IntersectionObserver-nya DIBUANG bersama shimmer (6 Agu):
+     keduanya ada HANYA untuk menggerbang kilau kaca agar tak berputar di luar
+     layar. Begitu loop-nya hilang, penjaganya jadi observer yang mengamati
+     tanpa ada yang diamati. Autoplay punya gerbangnya sendiri (document.hidden
+     + `stopped`), jadi tak ada yang kehilangan pelindung. */
 
   // Lebar viewport → lebar & spacing kartu (responsif, mobile-first).
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -374,14 +376,6 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
-  // Amati apakah carousel terlihat → gate shimmer loop (baseline off-screen).
-  useEffect(() => {
-    const el = viewportRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return;
-    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting), { threshold: 0 });
-    io.observe(el);
-    return () => io.disconnect();
   }, []);
   const cardW = Math.min(vw - 44, 326);
   const spacing = Math.round(cardW * 0.82);
@@ -717,8 +711,13 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                 </div>
               )}
 
-              {/* Kilau kaca menyapu — hanya kartu aktif. */}
-              {active && !reduced && onScreen && <div aria-hidden className="banner-shimmer" />}
+              {/* Kilau kaca DIBUANG (6 Agu). Ia menyapu SELURUH kartu aktif —
+                  termasuk slide saldo — jadi kilau kaca putih 16% lewat di atas
+                  angka uang tiap 5,5 detik, selamanya. Dua alasan, keduanya
+                  sudah tertulis di tempat lain: permukaan carousel ini sengaja
+                  FLAT & tegas (glass/glow/noise DITOLAK), dan kanon §7 melarang
+                  loop dekoratif abadi. Kartu tetap "hidup" lewat autoplay,
+                  tumpukan 3D, drag, dan indikator — bukan lewat kilau. */}
             </div>
           );
         })}

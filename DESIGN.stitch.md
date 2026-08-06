@@ -172,8 +172,15 @@ scoped exceptions exist and must never grow into second accents.
   0.32s on spring.
 - Animate `transform` and `opacity` exclusively. Never top/left/width/height.
 - Honor `prefers-reduced-motion` (all entrances collapse to visible-static).
-- No perpetual decorative loops. The only infinite animations allowed: skeleton
-  shimmer while loading, and the Login aurora blobs.
+- No perpetual decorative loops. Idle motion that never stops is the loudest
+  signal that an interface was assembled rather than designed, and it bills the
+  battery of the low-end Androids this app actually runs on. Infinite animation
+  is allowed in exactly three places: the skeleton shimmer (it reports loading,
+  so it is feedback, not decoration), the Login aurora blobs (the one branded
+  exception), and the float on the promo banner's ILLUSTRATION — scoped to the
+  drawing itself, never to a surface carrying data. A glass shine sweeping
+  across a card is banned outright: the balance slide is one of those cards, and
+  a gloss crossing a rupiah figure every 5.5s is the opposite of expensive.
 
 ## 7. Anti-Patterns (BANNED)
 

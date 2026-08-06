@@ -1207,7 +1207,13 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    transform: pop (0.6s) selesai & ditahan (both), bob delay 0.7s ambil alih.
    Catch-all reduced-motion di paling bawah file menonaktifkan keduanya. */
 @keyframes emptyBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-.empty-bob { animation: popIn 0.6s var(--ease-spring) both, emptyBob 3.6s ease-in-out 0.7s infinite; }
+/* Mengambang abadi DIBUANG 6 Agu: ikon layar kosong/gagal naik-turun 5px
+   selamanya. Itu ornamen chrome, bukan umpan balik — dan gerak menganggur yang
+   tak pernah berhenti justru tanda paling keras bahwa sebuah app tak digarap
+   (kanon §7). Entrance `popIn` DIPERTAHANKAN, jadi layar kosong tetap datang
+   dengan hidup, lalu DIAM. Keyframe emptyBob sengaja ditinggal — kalau kelak
+   dipakai untuk gerak sekali-jalan, ia sudah ada. */
+.empty-bob { animation: popIn 0.6s var(--ease-spring) both; }
 
 /* Popover/dropdown menu entrance — CEPAT (≤300ms) & origin-aware. Menu dibuka
    sering → spring 0.6s (.pop) terasa molor; ini 170ms ease-out dari scale(0.96)
@@ -1243,21 +1249,10 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 .banner-draw-area { opacity: 0; animation: bannerFade 0.9s ease-out 0.5s forwards; }
 .banner-draw-dot  { opacity: 0; animation: bannerFade 0.4s ease-out 1s forwards; }
 
-/* Kilau kaca menyapu pelan di slide aktif → kartu terasa hidup (sekali tiap ~5.5s). */
-.banner-shimmer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 20; }
-.banner-shimmer::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 42%;
-  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.16) 50%, transparent 100%);
-  transform: translateX(-160%) skewX(-12deg);
-  animation: bannerShimmer 5.5s ease-in-out 1.2s infinite;
-}
-@keyframes bannerShimmer {
-  0%       { transform: translateX(-160%) skewX(-12deg); }
-  55%, 100%{ transform: translateX(320%)  skewX(-12deg); }
-}
+/* `.banner-shimmer` DIBUANG 6 Agu — kilau kaca putih 16% menyapu seluruh kartu
+   AKTIF tiap 5,5 detik tanpa henti, termasuk slide saldo, jadi ia lewat di atas
+   angka uang. Permukaan carousel ini sengaja flat & tegas (glass/glow/noise
+   ditolak), dan kanon §7 melarang loop dekoratif abadi. Jangan pasang lagi. */
 
 /* One-time specular sheen sweep on hero card when dashboard loads.
    Hanya saat `.hero-sheen-sweep` (kunjungan pertama sesi) — balik ke Beranda
