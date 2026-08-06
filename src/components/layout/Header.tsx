@@ -93,7 +93,18 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       // `transition` utility sengaja TIDAK dipasang di sini: properti + durasi
       // sudah ditulis eksplisit di `style.transition` di bawah, dan inline style
       // menang atas class → utility-nya cuma jadi kode mati yang menyesatkan.
-      className={`sticky top-0 ${menuMounted ? 'z-menu' : 'z-nav'} backdrop-blur-xl backdrop-saturate-150 ${
+      /* `backdrop-saturate-150` DIBUANG 6 Agu. Diukur, bukan ditaksir: screenshot
+         header saat konten tergulir di bawahnya, sekali dgn `blur+saturate` dan
+         sekali dgn `blur` saja, lalu piksel keduanya didekode dan dibandingkan →
+         NOL piksel berbeda, di terang maupun gelap. Masuk akal: fill 80–90% sudah
+         memucatkan yang tembus, dan blur meratakan warnanya ke netral dulu —
+         menaikkan saturasi warna netral tetap netral. Yang tersisa cuma satu
+         operasi filter lagi di layer GPU yang dicat ulang tiap frame gulir, di
+         HP kelas bawah yang justru dipakai warga.
+         BLUR-nya TETAP dan memang berbayar: tanpa itu, 20% latar yang tembus jadi
+         bayangan teks TAJAM yang meluncur di balik header — terbaca seperti bug,
+         bukan kedalaman (diukur: 32–38% piksel header berubah, selisih maks 45). */
+      className={`sticky top-0 ${menuMounted ? 'z-menu' : 'z-nav'} backdrop-blur-xl ${
         scrolled
           ? 'bg-white/80 dark:bg-gray-900/80 border-b border-line/70 dark:border-gray-800/70'
           : 'bg-white/90 dark:bg-gray-900/85 border-b border-transparent'

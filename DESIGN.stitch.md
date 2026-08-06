@@ -193,8 +193,15 @@ scoped exceptions exist and must never grow into second accents.
 
 ## 7. Anti-Patterns (BANNED)
 
-- No glassmorphism, blur, glow, grain, or noise anywhere in the app body —
-  Login is the single branded exception.
+- No glassmorphism, blur, glow, grain, or noise anywhere in the app body. Two
+  exceptions, both narrow: the Login card (the branded one), and the STICKY
+  HEADER's backdrop blur. The header's blur is structural, not decorative — its
+  fill is only 80–90% opaque, and without the blur that remaining 20% becomes
+  sharp ghosted text sliding underneath, which reads as a rendering bug rather
+  than depth (measured: 32–38% of header pixels change, max delta 45). Anything
+  layered ON TOP of the blur must earn itself the same way: `backdrop-saturate`
+  was removed on 6 Aug after a pixel-decoded before/after showed it changed
+  exactly ZERO pixels in either theme — a filter op per scroll frame for nothing.
 - No top-light gradients, white halos, carved inset shadows, double edge
   rings, or icon sheen on cards. Flat means flat.
 - No second accent: never promote Setor Blue or Gold Songket beyond their
