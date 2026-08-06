@@ -744,10 +744,18 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                       berikutnya" (4 ornamen pada avatar 44px). Kini chip netral
                       ber-hairline — tetap terbaca di atas avatar (fill putih,
                       bukan abu yg melebur ke avatar), tapi diam. Sejalan nomor
-                      tarikan di Kas Hadiran & Jadwal warga yang juga netral. */}
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-white dark:bg-gray-800 text-ink-sub dark:text-gray-300 ring-1 ring-line dark:ring-gray-700 text-micro font-bold rounded-full flex items-center justify-center shadow-sm">
-                    {j.nomor}
-                  </span>
+                      tarikan di Kas Hadiran & Jadwal warga yang juga netral.
+
+                      DIBUANG 6 Agu — nomornya pindah ke baris meta di bawah nama
+                      sbg "Tarikan ke-N · <tanggal>". Riwayat di atas sudah dua
+                      kali menunjuk arah yang sama: meredam ornamen keempat cuma
+                      menunda, membuangnya menyelesaikan. Dua alasan lain:
+                      (1) ini satu-satunya nomor tarikan di app yang DITUMPUK di
+                      atas elemen lain — Jadwal warga & Talangan menaruhnya di
+                      slot depan, dan kanon §5 melarang penumpukan konten;
+                      (2) kalimat "Tarikan ke-N · <tanggal>" BUKAN pola baru, itu
+                      persis yang sudah dipakai hero Jadwal warga. Avatar kini
+                      membawa satu hal saja: siapa. */}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
@@ -761,7 +769,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                       <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
                     )}
                   </div>
-                  <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(j.tanggal)}</p>
+                  <p className="text-caption font-medium tabular-nums text-ink-faint dark:text-gray-400 mt-0.5">Tarikan ke-{j.nomor} · {formatTanggal(j.tanggal)}</p>
                 </div>
               </div>
               );
