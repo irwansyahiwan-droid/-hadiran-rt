@@ -63,7 +63,7 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 | `audit:keadaan` | Layar saat data KOSONG & saat muat GAGAL (warga + bendahara + overlay) | Semua audit lain jalan lawan DB penuh, jadi EmptyState/ErrorState tak pernah dirender. **App kas dilarang menyatakan nominal saat gagal muat.** |
 | `audit:sheet` | Geometri sheet/modal/popover di 360px | Form di dalam bottom-sheet tak pernah diukur; kontrol bisa meluber keluar panel |
 | `audit:publik` | landing / warta / nobar / panduan-install, light+dark | HTML statis di `public/` tak tersentuh audit app, padahal wajah pertama |
-| `audit:kontras` | Kontras piksel-nyata TEKS, **tab WARGA saja** (sampel screenshot) | Token tak bisa dipercaya; warna final = hasil blend |
+| `audit:kontras` | Kontras piksel-nyata TEKS, **tab WARGA saja** (sampel screenshot) — termasuk `::placeholder` | Token tak bisa dipercaya; warna final = hasil blend. **Bagian placeholder (6 Agu)** ada karena pemungut teks berjalan lewat TEXT NODE, dan placeholder tak punya satu pun — 16 placeholder app tak pernah terukur sekali pun meski ia teks biasa di mata §1.4.3, dan justru itu yang dibaca warga lansia saat mencari namanya. Warna diambil dari computed `::placeholder`, BUKAN warna teks nilainya |
 | `audit:kontras-deep` | Kontras TEKS di permukaan yang TAK disentuh `audit:kontras`: sheet/modal warga, SELURUH permukaan bendahara (5 tab + form FAB + overlay admin), landing /info | Populasinya justru yang TERBESAR — 2.174 dari 3.410 sampel. Sampai 6 Agu skripnya ada tapi tak terdaftar di `package.json`, jadi cuma jalan kalau seseorang ingat mengetik path-nya; sekarang bisa dipanggil dgn nama. Bendahara di-MOCK 3 lapis aman (sesi palsu di localStorage + rest/v1 dipaksa anon + method tulis DIBLOKIR Playwright) — jangan pernah pakai kredensial asli atau klik Simpan/Hapus di data produksi |
 | `audit:kontras-nonteks` | Kontras NON-teks: ikon tanpa label, batas kolom isian, ring `:focus-visible`, **tanda grafik** (§1.4.11 & §2.4.13, ambang 3:1) | `audit:kontras` cuma menyampel TEKS. Ring fokus tak pernah diukur sekali pun — ternyata ring hijau di atas hero HIJAU = 1,26:1 (praktis hilang bagi pengguna papan ketik) dan ring `.field` beralpha 30% gagal di SEMUA input. Fokus di-Tab beneran, screenshot per elemen (rect & piksel wajib sezaman). **Bagian grafik (4 Agu)** ada karena pemeriksaan ikon SENGAJA melewati svg ber-leluhur `aria-hidden` — dan semua grafik app memang aria-hidden, jadi garis "Tren Saldo" bertahan 2,33:1 di mode gelap tanpa satu pun sapuan menyentuhnya. Populasinya OPT-IN lewat `data-grafik` di call-site, bukan tebakan selektor: bar = `div`, garis = `path`, tak ada ciri struktural yang bisa dibedakan dari elemen tata letak. **Tanda grafik baru WAJIB memasang `data-grafik`** — kalau tidak, ia tak terukur |
 | `audit:lebar` | Nominal "Rp" terpotong/meluber di 360px | `<span>` inline punya clientWidth 0 → scrollWidth buta |
@@ -105,6 +105,13 @@ titik, plus buang titik yang jatuh di PITA 2px tepat di luar kotak elemen `posit
 penjaga occlusion bisa jadi tempat temuan bersembunyi, elemen yang HABIS titiknya dihitung &
 dilaporkan (`tak terukur: N`, rinciannya lewat `SHOW_BUTA=1`) — sapuan tak boleh menyempitkan
 populasinya sendiri tanpa mengaku.
+
+**`backdrop-filter` = stacking context.** Input berkaca (`backdrop-blur-sm`) tercat DI ATAS
+ikon `absolute` yang z-index-nya auto, walau ikonnya lebih dulu di DOM. Tiga ikon dalam-kolom
+Login tenggelam di balik kaca putih/70 (gembok warga 1,06:1 terang / 1,54:1 gelap). Mengganti
+WARNA ikon tak menolong sama sekali (1,06 → 1,14) — yang salah urutan cat. Obatnya `z-10` +
+`pointer-events-none` (tanpa yang kedua, ketukan di area ikon berhenti di ikon dan tak lagi
+memfokuskan kolom). Diagnosa: `elementFromPoint` di TENGAH ikon menjawab `INPUT`, bukan `svg`.
 
 **Memeriksa hasil deploy: baca ISI bundel, jangan bandingkan HASH.** Vercel membangun ulang
 dari repo dan menghasilkan hash chunk yang BERBEDA dari `npm run build` lokal, jadi

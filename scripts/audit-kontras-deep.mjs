@@ -63,6 +63,36 @@ async function collectTexts(page) {
       });
     };
     walk(document.body);
+
+    /* ::placeholder — kembar blok di audit-kontras.mjs. Teks tanpa text node,
+       jadi walk() buta terhadapnya; di sini justru paling padat (form bendahara
+       & sheet). Lihat catatan lengkapnya di sana. */
+    for (const el of document.querySelectorAll('input[placeholder], textarea[placeholder]')) {
+      if (el.value) continue;
+      const cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.4) continue;
+      if (el.disabled || el.closest('[disabled],[aria-disabled="true"]')) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 4 || r.height < 8) continue;
+      if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) continue;
+      const hit = document.elementFromPoint(
+        Math.min(innerWidth - 1, Math.max(0, r.x + r.width / 2)),
+        Math.min(innerHeight - 1, Math.max(0, r.y + r.height / 2)),
+      );
+      if (!hit || (!el.contains(hit) && !hit.contains(el))) continue;
+      const ph = getComputedStyle(el, '::placeholder');
+      const m = (ph.color || cs.color).match(/[\d.]+/g).map(Number);
+      el.setAttribute('data-audit-k', String(out.length));
+      out.push({
+        text: el.getAttribute('placeholder').slice(0, 60),
+        color: m.slice(0, 3),
+        alpha: m.length > 3 ? m[3] : 1,
+        size: parseFloat(ph.fontSize) || parseFloat(cs.fontSize),
+        weight: +ph.fontWeight || +cs.fontWeight || 400,
+        rect: { x: r.x, y: r.y, w: r.width, h: r.height },
+        tag: el.tagName.toLowerCase() + '::placeholder',
+      });
+    }
     return out;
   });
 }
