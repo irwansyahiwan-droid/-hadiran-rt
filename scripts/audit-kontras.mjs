@@ -166,6 +166,8 @@ async function samplePixels(page, shotB64, points) {
    salah memang alatnya. Border di app ini ≤2px, jadi inset 3px sudah keluar dari
    zona border DAN dari zona `ring-inset`, tapi masih di dalam fill. */
 const INSET = 3;
+/* Viewport sapuan — dipakai membuang titik sampel yang jatuh di luar layar. */
+const VW = 390, VH = 844;
 
 function perimeterPoints(r, fontSize) {
   // Sampel di KETINGGIAN BARIS TEKS (mid-y) — fair utk gradient vertikal
@@ -185,7 +187,16 @@ function perimeterPoints(r, fontSize) {
       pts.push([x, r.y + inY], [x, r.y + r.h - inY]);
     }
   }
-  return pts.map(([x, y]) => [Math.max(0, Math.min(389, x)), Math.max(0, Math.min(843, y))]);
+  /* DIBUANG, bukan di-CLAMP. FP ke-12 (6 Agu): clamp `Math.min(843, y)`
+     memindahkan titik yang jatuh di luar layar ke TEPI BAWAH — dan untuk elemen
+     dua baris yang menggantung di bawah lipatan, SELURUH baris sampel mid-y
+     menumpuk di y=843, tepat di tengah barisan glyph. Piksel tepi-antialias
+     (138,142,150) lolos saringan "mirip warna teks" (jarak 175), jadi ia jadi
+     MODUS dan dilaporkan sebagai "latar": baris Kas RT terbaca 2,99:1 padahal
+     latarnya kartu gray-900 (≈15:1). Titik di luar viewport bukan sampel yang
+     dipindahkan — ia sampel yang TIDAK ADA. Kalau semua titik elemen jatuh ke
+     luar, ia masuk hitungan `tak terukur` dan mengaku, bukan mengarang. */
+  return pts.filter(([x, y]) => x >= 0 && x <= VW - 1 && y >= 0 && y <= VH - 1);
 }
 
 function analyse(el, samples) {
@@ -253,6 +264,14 @@ async function auditPage(page, name, results, seen) {
     await auditCurrentView(page, name, results, seen);
     if (y === 0) await page.screenshot({ path: `${OUT}/${name.replace(/[^\w-]/g, '_')}.png` });
   }
+  /* Langkah 640px tak menjamin layar TERAKHIR utuh: baris paling bawah bisa
+     selalu menggantung di bawah lipatan, dan sejak titik di luar viewport
+     dibuang (bukan di-clamp) ia jadi benar-benar tak terukur — "Donasi Rawat
+     Inap Bpk Nano" di Kas RT muncul 0× dari 1.243 sampel. Satu pas ke dasar
+     halaman menutupnya. */
+  await page.evaluate((t) => window.scrollTo(0, t), total);
+  await page.waitForTimeout(350);
+  await auditCurrentView(page, name, results, seen);
 }
 
 async function runTheme(theme, results, seen) {
@@ -314,7 +333,7 @@ for (const theme of ['light', 'dark']) await runTheme(theme, results, seen);
 writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log(`\n=== TOTAL sampel: ${results.length}, GAGAL AA: ${fails.length} ===`);
-console.log(`tak terukur (semua titik tertutup overlay): ${buta.length}`);
+console.log(`tak terukur (semua titik tertutup overlay / di luar viewport): ${buta.length}`);
 if (process.env.SHOW_BUTA) for (const b of [...new Set(buta)]) console.log('  buta:', b);
 for (const f of fails) {
   console.log(`${f.ratio} (butuh ${f.need}) [${f.ctx}] "${f.text}" fg rgb(${f.color}) a=${f.alpha} bg rgb(${f.bg}) ${f.size}px/${f.weight} <${f.tag}>`);

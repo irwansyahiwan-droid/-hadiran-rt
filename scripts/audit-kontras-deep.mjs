@@ -152,6 +152,8 @@ async function samplePixels(page, shotB64, points) {
    1–2px dari tepi membaca BORDER/RING 1px, bukan fill. Dua berkas ini WAJIB
    memakai geometri sampel yang sama, kalau tidak hasil keduanya tak sebanding. */
 const INSET = 3;
+/* Viewport sapuan — dipakai membuang titik sampel yang jatuh di luar layar. */
+const VW = 390, VH = 844;
 
 function perimeterPoints(r, fontSize) {
   const my = r.y + r.h / 2;
@@ -168,7 +170,10 @@ function perimeterPoints(r, fontSize) {
       pts.push([x, r.y + inY], [x, r.y + r.h - inY]);
     }
   }
-  return pts.map(([x, y]) => [Math.max(0, Math.min(389, x)), Math.max(0, Math.min(843, y))]);
+  /* Kembar catatan di audit-kontras.mjs (FP ke-12): titik di luar viewport
+     DIBUANG, bukan di-clamp ke tepi — clamp menumpuk seluruh baris sampel di
+     y=843 di tengah barisan glyph, lalu piksel antialias menang jadi "latar". */
+  return pts.filter(([x, y]) => x >= 0 && x <= VW - 1 && y >= 0 && y <= VH - 1);
 }
 
 function analyse(el, samples) {
@@ -233,6 +238,11 @@ async function auditPage(page, name) {
     await auditView(page, name);
     if (y === 0) await page.screenshot({ path: `${OUT}/${name.replace(/[^\w-]/g, '_')}.png` });
   }
+  /* Satu pas ke DASAR halaman — langkah 640px tak menjamin layar terakhir utuh,
+     dan baris paling bawah bisa tak pernah terukur. Lihat audit-kontras.mjs. */
+  await page.evaluate((t) => window.scrollTo(0, t), total);
+  await page.waitForTimeout(350);
+  await auditView(page, name);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(300);
 }
@@ -480,7 +490,7 @@ await browser.close();
 writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log(`\n=== TOTAL sampel: ${results.length}, GAGAL AA: ${fails.length} ===`);
-console.log(`tak terukur (semua titik tertutup overlay): ${buta.length}`);
+console.log(`tak terukur (semua titik tertutup overlay / di luar viewport): ${buta.length}`);
 if (process.env.SHOW_BUTA) for (const b of [...new Set(buta)]) console.log('  buta:', b);
 for (const f of fails) {
   console.log(`${f.ratio} (butuh ${f.need}) [${f.ctx}] "${f.text}" fg rgb(${f.color}) a=${f.alpha} bg rgb(${f.bg}) ${f.size}px/${f.weight} <${f.tag}>`);

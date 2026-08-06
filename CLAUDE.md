@@ -75,7 +75,7 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 | `audit:mati` | Keterbacaan label tombol saat `disabled` (terang+gelap, warga+bendahara) | Kedua audit kontras MELEWATI kontrol nonaktif secara eksplisit — sah, karena WCAG 1.4.3 mengecualikannya. Tapi "tak wajib" bukan "boleh tak terbaca", dan pengecualian itu berarti keadaan nonaktif **tak pernah diukur sekali pun**. Yang tersembunyi di baliknya: tombol masuk bendahara 3,79:1 saat "Memproses…", 3 tombol teks Kas Hadiran 2,2–2,7:1, dan perbaikan `.btn-brand:disabled` yang ternyata cuma dihitung untuk mode TERANG (4,32:1 di gelap). Ambang dilaporkan sebagai ambang APP, bukan "gagal WCAG" — disiplin yang sama dgn bagian teks-200% di `audit:reflow` |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
-bukan kodenya. Sudah terjadi 11×: sampel kena border 1px, aturan dialog dikenakan ke halaman
+bukan kodenya. Sudah terjadi 12×: sampel kena border 1px, aturan dialog dikenakan ke halaman
 penuh, probe mengambil dialog di belakang sheet, `.sr-only` terbaca "terpotong", pola rute
 `supabase-*.js` meleset dari nama asli `vendor-supabase-*.js` (sapuan diam-diam menguji jalur
 ONLINE lalu "lolos"), klik ditolak karena panel collapse masih beranimasi, klik pembuka
@@ -105,6 +105,16 @@ titik, plus buang titik yang jatuh di PITA 2px tepat di luar kotak elemen `posit
 penjaga occlusion bisa jadi tempat temuan bersembunyi, elemen yang HABIS titiknya dihitung &
 dilaporkan (`tak terukur: N`, rinciannya lewat `SHOW_BUTA=1`) — sapuan tak boleh menyempitkan
 populasinya sendiri tanpa mengaku.
+Yang ke-12 (6 Agu, muncul begitu judul seksi naik 16→18px dan tata letak bergeser ~6px):
+baris Kas RT dilaporkan 2,99:1 padahal latarnya kartu gray-900 (≈15:1). Penyebabnya `clamp`
+`Math.min(843, y)` di `perimeterPoints` — ia MEMINDAHKAN titik yang jatuh di luar layar ke tepi
+bawah, jadi untuk elemen dua baris yang menggantung di bawah lipatan SELURUH baris sampel mid-y
+menumpuk di y=843, tepat di tengah barisan glyph; piksel tepi-antialias lolos saringan
+"mirip warna teks" (jarak 175) lalu menang jadi MODUS. **Titik di luar viewport bukan sampel
+yang dipindahkan — ia sampel yang TIDAK ADA**, jadi kini DIBUANG (filter, bukan clamp).
+Efek sampingnya langsung ketahuan lewat penghitung `tak terukur`: baris PALING BAWAH tiap
+halaman jadi nol sampel, karena langkah gulir 640px tak menjamin layar terakhir utuh — ditutup
+dengan satu pas tambahan ke DASAR halaman. Populasi 1.243 → 1.265.
 
 **`backdrop-filter` = stacking context.** Input berkaca (`backdrop-blur-sm`) tercat DI ATAS
 ikon `absolute` yang z-index-nya auto, walau ikonnya lebih dulu di DOM. Tiga ikon dalam-kolom
