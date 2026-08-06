@@ -1,17 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Target, ClipboardCheck, HandCoins, Coins, Building2, Smartphone,
-  ChevronRight, Crown, Check, X, CalendarClock,
+  ChevronRight, Crown, Check, X,
   type LucideIcon,
 } from 'lucide-react';
-import { formatRupiahPlain, haptic } from '../lib/utils';
+import { haptic } from '../lib/utils';
 import { heroRingkas, useTinggiLayar } from '../lib/hooks';
 import rtBendahara from '../assets/rt-bendahara.jpg';
 import dashboardPhone from '../assets/dashboard-phone.jpg';
-
-/** Target Kas RT yang dipromosikan di carousel (info, terpisah dari widget editable). */
-const TARGET_NOMINAL = 25_000_000;
-const TARGET_DEADLINE = '2026-12-31';
 
 /* Geometri kartu 3D. Lebar/spacing dihitung dari lebar viewport carousel (responsif).
    Tinggi: maksimum tetap (300) agar tumpukan kartu konsisten di HP normal, TAPI
@@ -294,17 +290,9 @@ function KasrtArt() {
   );
 }
 
-/** Hitung "31 Des 2026 · N hari lagi". */
-function fmtDeadline(iso: string): string {
-  const d = new Date(iso);
-  const hari = Math.ceil((d.getTime() - Date.now()) / 86400000);
-  const tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-  return hari >= 0 ? `${tgl} · ${hari} hari lagi` : `${tgl} · lewat`;
-}
 
 interface Props {
   /** Saldo Kas RT terkini → progress Target Kas RT. */
-  kasRT?: number;
   /** Pindah tab saat CTA / kartu panduan ditekan. */
   onNavigate?: (tab: string) => void;
   /** Konten kartu SALDO (rumah) — dibangun di Beranda agar tetap memegang data
@@ -315,11 +303,14 @@ interface Props {
   heroSweep?: boolean;
 }
 
-export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroSweep }: Props) {
+export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Props) {
   const promos: PromoSlide[] = [
     {
+      /* Judul TANPA nominal. "Bersama menuju Rp25 juta" mengulang angka target
+         yang aslinya hidup di DB & bisa diubah bendahara lewat widget Target —
+         begitu diubah, kartu ini diam-diam mempromosikan angka lama. */
       id: 'target-kas-rt', kind: 'target', eyebrow: 'TARGET KAS RT',
-      judul: 'Bersama menuju Rp25 juta', icon: Target,
+      judul: 'Bersama menabung untuk warga', desc: 'Lihat progres target kas RT tahun ini.', icon: Target,
       grad: 'linear-gradient(150deg,#2cb8a5 0%,#0a564e 100%)', glow: 'rgba(45,212,191,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
@@ -356,15 +347,9 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
 
   const hasHero = heroSlide != null;
   const count = promos.length + (hasHero ? 1 : 0);
-  const heroOffset = hasHero ? 1 : 0;
-  const targetIdx = promos.findIndex((p) => p.kind === 'target') + heroOffset;
   const reduced =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-
-  const ratio = TARGET_NOMINAL > 0 ? Math.min(100, Math.max(0, (kasRT / TARGET_NOMINAL) * 100)) : 0;
-  const sisa = Math.max(0, TARGET_NOMINAL - kasRT);
-  const done = kasRT >= TARGET_NOMINAL;
 
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0);
@@ -374,8 +359,6 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
   // di HP tak ada hover/fokus utk menjeda, jadi "ambil kendali" = mekanisme stop
   // yang disyaratkan WCAG 2.2.2 (Pause, Stop, Hide). Sekali berhenti, tetap berhenti.
   const [stopped, setStopped] = useState(false);
-  // Bar progress target "ditarik" 0→ratio tiap kali kartu target jadi aktif.
-  const [targetFill, setTargetFill] = useState(0);
   // Pause shimmer loop saat carousel tergulir keluar layar (baseline: jangan
   // biarkan animasi loop jalan off-screen). Autoplay tetap pakai document.hidden.
   const [onScreen, setOnScreen] = useState(true);
@@ -431,14 +414,7 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
     idxRef.current = index;
     progRef.current = 0;
     if (progressBarRef.current) progressBarRef.current.style.transform = 'scaleX(0)';
-    // Kartu target → tarik ulang bar dari 0.
-    if (index === targetIdx) {
-      setTargetFill(0);
-      const id = window.setTimeout(() => setTargetFill(ratio), 60);
-      return () => window.clearTimeout(id);
-    }
-    setTargetFill(0);
-  }, [index, count, targetIdx, ratio]);
+  }, [index, count]);
 
   // Autoplay ping-pong + isi bar progress indikator aktif. Berhenti saat
   // reduced-motion, disentuh, atau tab tersembunyi.
@@ -710,35 +686,27 @@ export default function BannerCarousel({ kasRT = 0, onNavigate, heroSlide, heroS
                     <div className={`mt-[10px] text-pretty text-[0.9rem] font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
 
-                  {/* Progress target → kartu target Kas RT. */}
-                  {promo!.kind === 'target' && (
-                    <div className="mt-auto">
-                      <div className="relative h-[9px] overflow-hidden rounded-full bg-white/20">
-                        <div
-                          className="absolute left-0 top-0 h-full w-full origin-left rounded-full"
-                          style={{
-                            transform: `scaleX(${targetFill / 100})`,
-                            background: 'linear-gradient(90deg,#bff0d6,#ffffff)',
-                            boxShadow: '0 0 12px rgba(255,255,255,.5)',
-                            transition: reduced ? 'none' : `transform 0.95s ${EASE}`,
-                          }}
-                        />
-                      </div>
-                      <div
-                        className="mt-[12px] flex items-center justify-between text-[0.78rem] text-white"
-                        style={{ textShadow: '0 1px 4px rgba(4,28,22,.55)' }}
-                      >
-                        <span className="font-extrabold tabular-nums">
-                          {done
-                            ? <span className="inline-flex items-center gap-1"><Check className="h-3 w-3" strokeWidth={3} />Target tercapai</span>
-                            : <>{Math.round(ratio)}% · <span className="font-semibold text-white/90">kurang <span className="font-display tabular-nums">{formatRupiahPlain(sisa)}</span></span></>}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 text-white/90">
-                          <CalendarClock className="h-3 w-3" /> {fmtDeadline(TARGET_DEADLINE)}
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                  {/* Kartu target = AJAKAN, bukan laporan (5 Agu 2026).
+
+                      Dulu di sini ada bar progress + "18% · kurang Rp20.530.000".
+                      Angkanya SALAH: ia dihitung dari `total_setor_kas_rt`
+                      (setoran Kas Hadiran → Kas RT, Rp4,47jt), bukan SALDO Kas
+                      RT (Rp17,16jt). Kartu Target di halaman Kas RT membaca
+                      saldo & target yang benar dari DB dan menampilkan 69%.
+                      Jadi layar depan menyatakan 18% ke setiap warga untuk
+                      pencapaian yang sebenarnya 69% — mengecilkannya ~4×.
+
+                      Beranda memang TAK PUNYA angkanya: `summary` cuma membawa
+                      `saldo_aktif` (itu saldo Kas HADIRAN), setoran, & talangan.
+                      Saldo Kas RT maupun baris target tak pernah diambil di
+                      layar ini, dan menambah query di layar ber-FCP terjaga cuma
+                      demi mengulang angka yang sudah punya rumah = ongkos tanpa
+                      manfaat.
+
+                      Maka progresnya DIHAPUS, bukan diperbaiki: satu fakta satu
+                      suara — target hidup di halaman Kas RT, kartu ini cukup
+                      mengantar ke sana lewat CTA-nya. Jangan pasang ulang bar/
+                      persen di sini tanpa membawa saldo & target ASLI dari DB. */}
 
                   {/* Dekorasi tematik per jenis. */}
                   {promo!.kind === 'app' && <AppPhone />}

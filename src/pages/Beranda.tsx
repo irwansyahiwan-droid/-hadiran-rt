@@ -555,7 +555,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           "rumah" (ditahan lebih lama lalu balik), promo numpang lewat di
           permukaan yang sama. Container bawa --hero-shadow → semua slide naik kelas. */}
       <BannerCarousel
-        kasRT={setorKasRT}
         onNavigate={onNavigate}
         heroSweep={firstHero}
         heroSlide={
