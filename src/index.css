@@ -24,10 +24,20 @@
    dari tepi kartu, lebih berat dari batang huruf Inter 15px di sebelahnya.
    Efeknya persis lawan "mahal" — ikon berteriak lebih keras dari angkanya.
 
-   1,75 dipilih, bukan 1,5: lucide menggambar di kisi 24px, jadi ikon 14px
-   (paling kecil di app) hanya mendapat 1,75 x 14/24 = 1,02px garis nyata.
-   Di 1,5 ia turun ke 0,88px — di bawah 1 piksel CSS, dan ikon kecil mulai
-   "menguap" di HP ber-DPR rendah yang justru dipakai warga.
+   1,75 dipilih, bukan 1,5: lucide menggambar di kisi 24px, jadi garis NYATA
+   sebuah ikon = 1,75 x (ukuran / 24). Ambangnya 1 piksel CSS — di bawah itu
+   browser merender sub-piksel dan ikon mulai "menguap" di HP ber-DPR rendah
+   yang justru dipakai warga.
+
+   `:not(.w-3)` BUKAN hiasan — ia yang menjaga ambang itu benar-benar dipenuhi.
+   Versi pertama aturan ini (16 Agu) beralasan "ikon 14px = paling kecil di
+   app", padahal app punya 21 ikon `w-3` alias 12px. Untuk mereka 1,75 x 12/24
+   = 0,875px: aturan yang dibuat demi menghindari sub-piksel justru MENCIPTAKAN
+   18 di antaranya (86 ikon 12px lain selamat hanya karena call-site-nya
+   sudah menulis stroke 2,5 sendiri). Dikecualikan → mereka kembali ke 2 dan
+   mendarat pas di 1,0px. 14px tetap ikut turun: 1,021px, masih di atas ambang.
+   Diukur di browser, bukan dihitung di atas kertas — computed `strokeWidth`
+   x lebar nyata tiap svg.
 
    Selektor sengaja `[stroke-width="2"]`, BUKAN `.lucide` polos: 43 ikon di
    src/ menuliskan bobotnya SENDIRI (2,2–3,5 untuk chevron/centang kecil
@@ -38,7 +48,7 @@
    Catatan CSS: `stroke-width` presentation attribute SELALU kalah dari
    properti CSS, jadi tak perlu !important, dan tak perlu menyisir 200+
    call-site ikon satu per satu. */
-svg.lucide[stroke-width='2'] { stroke-width: 1.75; }
+svg.lucide[stroke-width='2']:not(.w-3) { stroke-width: 1.75; }
 /* Util eksplisit untuk elemen non-heading yang ingin Sora (mis. nominal hero). */
 .font-display { font-family: var(--font-display); }
 
