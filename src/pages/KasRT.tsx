@@ -8,7 +8,7 @@ import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, maskRp, pesanError } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, maskRp, pesanError } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import EmptyState from '../components/EmptyState';
@@ -27,7 +27,7 @@ import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
 import TargetKasRT from '../components/TargetKasRT';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
-import { kategoriOpsi, kategoriDefault, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
+import { kategoriOpsi, kategoriDefault, labelKategori, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
 import type { ReceiptRow } from '../lib/shareReceipt';
 import type { KasRT } from '../lib/types';
 
@@ -844,18 +844,23 @@ export default function KasRTPage() {
             {displayList.map((k, idx) => {
               const isMasuk = k.tipe === 'masuk';
               const isLast  = idx === displayList.length - 1;
-              const editable = isBendahara && k.keterangan !== 'Saldo Awal Kas RT';
-              // Baris bendahara = <button> asli (klik/Enter/Space/fokus bawaan);
-              // baris view-only warga tetap <div> non-interaktif.
-              const Row: React.ElementType = editable ? 'button' : 'div';
+              const isSaldoAwal = k.keterangan === 'Saldo Awal Kas RT';
+              const editable = isBendahara && !isSaldoAwal;
+              /* Sheet detail kini dibuka SIAPA SAJA, bukan cuma bendahara: judul
+                 baris dipotong 2 baris (lihat line-clamp di bawah), jadi warga
+                 WAJIB tetap punya jalan membaca keterangan utuh — memotong teks
+                 tanpa menyediakan jalan itu = menyembunyikan pertanggungjawaban.
+                 Yang dibatasi ke bendahara adalah tombol Edit/Hapus DI DALAM sheet. */
+              const bisaDetail = !isSaldoAwal;
+              const Row: React.ElementType = bisaDetail ? 'button' : 'div';
               return (
                 <Row
                   key={k.id}
-                  type={editable ? 'button' : undefined}
-                  onClick={editable ? () => { haptic(); setSelectedRow(k); } : undefined}
-                  aria-label={editable ? `Aksi: ${k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}` : undefined}
+                  type={bisaDetail ? 'button' : undefined}
+                  onClick={bisaDetail ? () => { haptic(); setSelectedRow(k); } : undefined}
+                  aria-label={bisaDetail ? `${editable ? 'Aksi' : 'Lihat detail'}: ${k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}` : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise w-full text-left flex items-center gap-3 px-5 py-4 [--di-l:4.25rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${editable ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
+                  className={`rise w-full text-left flex items-center gap-3 px-5 py-4 [--di-l:4.25rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 >
                   <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk
@@ -864,25 +869,36 @@ export default function KasRTPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">
+                    {/* Keterangan Kas RT = teks BEBAS yang panjangnya tak terbatas
+                        (terukur di 360px: 35 dari 36 baris membungkus >=3 baris,
+                        terburuk 10 baris / 288px — sepertiga layar untuk SATU
+                        transaksi, sementara Beranda & Jadwal duduk di 68-97px).
+                        Dipotong 2 baris supaya irama daftar Kas RT kembali ke
+                        irama app; teks utuh ada di sheet detail (ketuk baris). */}
+                    <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
-                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                      <p className="text-caption font-medium text-ink-faint dark:text-gray-400 whitespace-nowrap">{formatTanggal(k.tanggal)}</p>
-                      {k.kategori && (
-                        <span className="text-micro font-semibold px-1.5 py-0.5 rounded-md border border-line dark:border-gray-700 text-ink-sub dark:text-gray-300 whitespace-nowrap">
-                          {labelKategoriSingkat(k.tipe, k.kategori)}
-                        </span>
-                      )}
-                    </div>
+                    {/* Meta = dialek baris KANONIK Beranda: satu <p>, bagian
+                        digabung " · ", `truncate` (satu baris, tak pernah
+                        membungkus). Sebelumnya di sini chip BERBINGKAI dalam
+                        wadah flex-wrap — bingkai di dalam baris daftar adalah
+                        dialek liar (bukan komponen Tag bersama), dan karena
+                        tanggal+chip tak muat di kolom 120px ia selalu jatuh ke
+                        baris kedua, membuat chip menggantung sendirian. */}
+                    <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
+                      {[formatTanggalRingkas(k.tanggal), k.kategori && labelKategoriSingkat(k.tipe, k.kategori)].filter(Boolean).join(' · ')}
+                    </p>
                   </div>
 
+                  {/* Saldo berjalan TURUN ke sheet detail. Ia dulu duduk di sini
+                      sebagai tingkat kedua dan justru dialah yang MENENTUKAN lebar
+                      kolom kanan (terukur: "Saldo: Rp16.557.000" 129px lawan
+                      nominal 106px) — menyisakan cuma 97px untuk judul, sehingga
+                      konten utama baris kalah lebar dari angka pendampingnya.
+                      Kolom kanan kini satu tingkat, sama seperti baris Beranda. */}
                   <div className="text-right shrink-0">
                     <p className={`font-display text-amount font-semibold tabular-nums ${isMasuk ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                       {maskRp(`${isMasuk ? '+' : '-'}${formatRupiahPlain(k.nominal)}`, hidden, 4)}
-                    </p>
-                    <p className={`font-display text-xs font-medium tabular-nums mt-0.5 ${k.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-400'}`}>
-                      Saldo: {maskRp(`${k.saldo_setelah < 0 ? '-' : ''}Rp${Math.abs(k.saldo_setelah).toLocaleString('id-ID')}`, hidden, 4)}
                     </p>
                   </div>
                 </Row>
@@ -938,21 +954,47 @@ export default function KasRTPage() {
                   {maskRp(`${selectedRow.tipe === 'masuk' ? '+' : '-'}${formatRupiahPlain(selectedRow.nominal)}`, hidden, 4)}
                 </span>
               </div>
+              {/* Kategori & saldo berjalan: keduanya TURUN dari baris daftar ke
+                  sini (baris dulu memikul empat tingkat informasi sekaligus).
+                  Label kategori di sini sengaja versi PENUH; baris daftar pakai
+                  versi ringkas karena metanya di-`truncate` dalam ~120px. */}
+              {selectedRow.kategori && (
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-sm text-ink-faint dark:text-gray-400 shrink-0">Kategori</span>
+                  <span className="text-sm font-semibold text-ink dark:text-gray-100 text-right">
+                    {labelKategori(selectedRow.tipe, selectedRow.kategori)}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-ink-faint dark:text-gray-400">Saldo setelah</span>
+                <span className={`font-display text-sm font-semibold tabular-nums ${selectedRow.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink dark:text-gray-100'}`}>
+                  {maskRp(`${selectedRow.saldo_setelah < 0 ? '-' : ''}Rp${Math.abs(selectedRow.saldo_setelah).toLocaleString('id-ID')}`, hidden, 4)}
+                </span>
+              </div>
             </div>
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => { setEditing(selectedRow); setSelectedRow(null); setShowModal(true); }}
-                className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 text-sm font-bold"
-              >
-                <Pencil className="w-4 h-4" /> Edit
+            {/* Warga membuka sheet ini untuk MEMBACA (judul baris dipotong 2
+                baris), jadi ia tak boleh berakhir buntu tanpa satu tombol pun. */}
+            {isBendahara ? (
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => { setEditing(selectedRow); setSelectedRow(null); setShowModal(true); }}
+                  className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 text-sm font-bold"
+                >
+                  <Pencil className="w-4 h-4" /> Edit
+                </button>
+                <button
+                  onClick={() => setHapusRow(selectedRow)}
+                  className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border bg-white dark:bg-gray-800 text-neg dark:text-rose-400 border-rose-200 dark:border-rose-900"
+                >
+                  <Trash2 className="w-4 h-4" /> Hapus
+                </button>
+              </div>
+            ) : (
+              <button onClick={rowDrag.dismiss} className="btn-secondary w-full py-3 mt-4 text-sm font-bold">
+                Tutup
               </button>
-              <button
-                onClick={() => setHapusRow(selectedRow)}
-                className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border bg-white dark:bg-gray-800 text-neg dark:text-rose-400 border-rose-200 dark:border-rose-900"
-              >
-                <Trash2 className="w-4 h-4" /> Hapus
-              </button>
-            </div>
+            )}
           </div>
         </div>
       )}

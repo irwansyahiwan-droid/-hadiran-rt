@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   formatRupiah, formatRupiahPlain, maskRp, hitungSaldoHadiran, pesanError,
+  formatTanggalRingkas,
 } from './utils';
 
 /**
@@ -98,5 +99,38 @@ describe('pesanError — kode SQL diterjemahkan, tak pernah bocor mentah', () =>
     const spy = bisu();
     pesanError({ code: '23505' });
     expect(spy).toHaveBeenCalled();
+  });
+});
+
+/**
+ * `formatTanggalRingkas` menyembunyikan tahun saat ia sudah tersirat. Yang
+ * dikunci di sini bukan format cetaknya, melainkan SATU aturan yang gampang
+ * hilang saat orang "merapikan" fungsinya: tahun lampau WAJIB tetap dicetak.
+ * Kalau tahun ikut hilang di sana, mutasi 2025 dan 2026 tampak identik di
+ * daftar Kas RT — dua tahun buku yang berbeda terbaca sebagai satu.
+ *
+ * Tanggal "sekarang" disuntikkan lewat parameter kedua; menguji fungsi
+ * bergantung-jam dengan jam asli membuat ujinya membusuk sendiri tiap 1 Januari.
+ */
+describe('formatTanggalRingkas — tahun disembunyikan HANYA saat tersirat', () => {
+  const kini = new Date('2026-08-16T00:00:00');
+
+  it('tahun berjalan: tahun tidak dicetak', () => {
+    expect(formatTanggalRingkas('2026-08-16T00:00:00', kini)).toBe('16 Agu');
+  });
+
+  it('tahun lampau: tahun WAJIB dicetak', () => {
+    expect(formatTanggalRingkas('2025-08-16T00:00:00', kini)).toBe('16 Agu 2025');
+  });
+
+  it('tahun depan juga dicetak — bukan cuma yang lampau', () => {
+    expect(formatTanggalRingkas('2027-01-03T00:00:00', kini)).toBe('3 Jan 2027');
+  });
+
+  it('tak pernah memuat nama hari (itu tugas formatTanggal di sheet detail)', () => {
+    const hasil = formatTanggalRingkas('2026-08-16T00:00:00', kini);
+    for (const hari of ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']) {
+      expect(hasil).not.toContain(hari);
+    }
   });
 });

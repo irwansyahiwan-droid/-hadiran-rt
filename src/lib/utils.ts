@@ -99,6 +99,34 @@ export function formatTanggalShort(dateStr: string): string {
 }
 
 /**
+ * Tanggal untuk BARIS DAFTAR yang sempit: "16 Agu" untuk tahun berjalan,
+ * "16 Agu 2025" untuk tahun lain. Tanpa nama hari.
+ *
+ * Dipakai daftar mutasi Kas RT, yang tidak mengelompokkan per tanggal (jadi
+ * tiap baris memikul tanggalnya sendiri) dan hanya punya ~120px untuk tanggal
+ * DAN kategori sekaligus. Ketiga bentuk lain gagal di lebar itu, masing-masing
+ * dengan caranya: `formatTanggal` penuh terpotong tepat di TAHUN
+ * ("Min, 16 Agu 202…"); memaksa tahun selalu tampil menyisakan ruang yang
+ * memotong kategori jadi satu huruf ("16 Agu 2026 · H…"); dan
+ * `formatTanggalShort` membuang tahun SELAMANYA, yang menyesatkan begitu
+ * mutasi mencakup lebih dari satu tahun buku.
+ *
+ * Menyembunyikan tahun HANYA saat ia sudah tersirat (tahun ini) adalah pola
+ * yang sama dipakai klien surel arus utama, dan aman di sini karena tahun
+ * lampau tetap dicetak. Tanggal lengkap berikut nama harinya tetap tampil di
+ * sheet detail, jadi tak ada informasi yang benar-benar hilang.
+ */
+export function formatTanggalRingkas(dateStr: string, sekarang: Date = new Date()): string {
+  const date = new Date(dateStr);
+  const tahunLain = date.getFullYear() !== sekarang.getFullYear();
+  return date.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    ...(tahunLain ? { year: 'numeric' } : {}),
+  });
+}
+
+/**
  * SATU SUMBER rumus Saldo Kas Hadiran. Dipakai dashboard (Beranda) & halaman
  * Kas Hadiran supaya angkanya tak pernah drift bila salah satu diubah.
  *
