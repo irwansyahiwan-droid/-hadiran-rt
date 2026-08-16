@@ -33,7 +33,7 @@ Mengikuti palet induk penuh. Yang khas layar ini:
   lunas `bg-emerald-100` + `text-emerald-700`, Tag success "LUNAS".
 - **Rose Konfirmasi** (`bg-rose-600` solid + teks putih) — HANYA wujud kedua
   tombol dua-ketuk ("Yakin batal?" / "Hapus?"). Bukan warna tunggakan.
-- **Hero emerald** (`.hero-emerald`, ramp #157A45 → #0F7A47 → #064A2C) — total
+- **Hero emerald** (`.hero-emerald`, ramp #0A5230 → #08492B → #032A17) — total
   belum lunas; chip stat `bg-black/10` (ikon amber-300/emerald-300 dekoratif,
   makna dipikul label putih di sampingnya).
 - **Kartu "Semua Talangan Lunas"** — kartu putih flat + hairline (BUKAN hero

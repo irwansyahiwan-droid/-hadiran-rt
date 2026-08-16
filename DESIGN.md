@@ -79,7 +79,7 @@ spacing:
 components:
   button-primary:
     class: ".btn-brand"
-    background: "linear-gradient(180deg, #18A055, #0F6B40, #0C5E37)"
+    background: "linear-gradient(180deg, #0C6238 0%, #0A5531 58%, #094A2B 100%)"
     textColor: "{colors.surface}"
     rounded: "{rounded.control}"
     padding: "12px 16px"
@@ -322,9 +322,12 @@ kartu (`.lift/.float/.nav-dock`) mendapat `border: 1px solid CanvasText`; di
 
 ### Buttons
 - **Shape:** 12px (`rounded-xl`). Pill (9999px) hanya untuk FAB, chip, tag.
-- **Primary (`.btn-brand`):** gradient emerald `#18A055 → #0F6B40 → #0C5E37`, teks putih,
+- **Primary (`.btn-brand`):** gradient emerald `#0C6238 → #0A5531 → #094A2B`, teks putih,
   **glossy top edge + contact tipis** (glow emerald besar dibongkar — CTA cukup menonjol dari
-  warna brand). `:active` → `scale(0.97)` spring.
+  warna brand). `:active` → `scale(0.97)` ease-out-expo 0,16s.
+  Ramp itu sudah diturunkan DUA kali (13 Jul, lalu pass kontras maksimal 4 Agu): tepi ATAS
+  gradient lama cuma 3,39:1 dan glossy edge menerangkan baris teratas label. Jangan
+  diterangkan lagi.
 - **Danger (`.btn-danger`):** pasangan destruktif — gradient `neg` rose
   `#F43F5E → #E11D48 → #BE123C`, anatomi persis `.btn-brand` (glossy top + contact, flat).
   Untuk Pulihkan/Batalkan tarikan. Jangan salin manual glow rose lama.

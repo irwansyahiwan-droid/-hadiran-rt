@@ -30,7 +30,8 @@ Kalibrasi rasa (skala 1–10):
 - **Variance 3 — tenang & dapat diprediksi:** satu kolom mobile; hierarki datang
   dari ukuran/bobot tipografi dan warna status, bukan dari layout akrobatik.
 - **Motion 4 — "Fluid CSS":** count-up odometer, stagger masuk kartu, press
-  spring. Tidak ada koreografi sinematik.
+  **ease-out-expo 0,16s** (BUKAN spring — dialek gerak disatukan 6 Agu; spring
+  di tekan-turun terbaca seperti karet). Tidak ada koreografi sinematik.
 
 Kepribadian angka: **nominal rupiah adalah bintang** — Sora, tabular-nums,
 sebesar mungkin tanpa terpotong (FitAmount).
@@ -53,15 +54,20 @@ hero**, bukan accent kedua.
   gray-500 → #334155 di light, dipaksa dari `index.css`).
 - **Canvas Dark** (#030712) — bukan pure black.
 
-### Status hero (tiga varian, nilai TERKINI pasca pass kontras 13 Jul)
-- **`.hero-emerald`** (default, saldo ≥ 0 belum disetor): ramp light
-  `#157A45 → #0F7A47 → #064A2C` (150deg) + radial green-ink
-  `rgba(4,38,24,0.48)` di kiri-atas. Dark: `#1B7A49 → #0C5734 → #05301D`.
-- **`.hero-setor`** (sudah ada setoran ke Kas RT): ramp light
-  `#1E3A8A → #1D4ED8 → #2563EB` (stop terang sengaja diredupkan — putih di
-  zona terburuk 5.2:1). Dark: `#16306E → #1B3F8F → #2A56B8`.
-- **`.hero-slate`** (saldo < 0 dan belum disetor): `#1E293B → #334155 → #64748B`.
-  Dark: `#16202F → #232E42 → #3A4759`.
+### Hero — SATU varian saja (nilai terkini pasca pass kontras maksimal 4 Agu)
+- **`.hero-emerald`** — satu-satunya ramp hero se-app. Light:
+  `linear-gradient(150deg, #0A5230 0%, #08492B 52%, #032A17 100%)` + radial
+  green-ink `rgba(4,38,24,0.48)` di kiri-atas. Dark:
+  `linear-gradient(150deg, #094B2C 0%, #073B22 52%, #021A0F 100%)` + radial
+  `rgba(2,20,12,0.42)`.
+- **`.hero-setor` (biru) dan `.hero-slate` (abu) SUDAH DIHAPUS (30 Jul).**
+  Jangan pasang ulang ramp per-status. Keduanya memakai WARNA sebagai penanda
+  status, sehingga saldo yang sama tampil hijau di Beranda tapi biru/abu di
+  halamannya sendiri, dan biru "sudah setor" beradu dengan pil merah "Defisit".
+  Status kini dibawa chip + pil KATA, bukan rona hero.
+- Ramp light di atas juga bukan nilai yang boleh diterangkan lagi: ia sudah
+  ditarik turun dua kali (13 Jul, lalu 4 Agu) karena caption putih di stop lama
+  jatuh di bawah AA.
 - Semua hero: `--hero-shadow` (dua drop terkontain), radius 24px, `.hero-sheen`
   di atasnya. **Panel/chip di atas hero wajib `bg-black/xx`** (mis. chip "Sudah
   disetor" `bg-black/25` + `border-white/20`) — bukan `bg-white/xx`.
@@ -152,9 +158,16 @@ emerald). Skeleton sheet berbentuk baris nama, bukan spinner.
 
 ### FAB & tombol
 FAB "Setor" pill di zona jempol (bendahara saja). Primer `.btn-brand`
-(gradient emerald `#18A055 → #0F6B40 → #0C5E37`, active scale 0.97);
-sekunder `.btn-secondary` (border `control` #CBD5E1). Form pakai `.field`
-(bg #F9FAFB, radius 12px, fokus ring emerald `rgba(16,185,129,0.30)`).
+(gradient emerald `linear-gradient(180deg, #0C6238 0%, #0A5531 58%, #094A2B 100%)`,
+active scale 0.97); sekunder `.btn-secondary` (border `control` **#64748B**,
+dark #6B7280). Form pakai `.field` (bg #F9FAFB, radius 12px, fokus = cincin
+**PADAT** `box-shadow: 0 0 0 2px #047857` + `border-color` sewarna; dark #34D399).
+
+> Dua nilai di paragraf ini pernah salah dan keduanya adalah temuan pass
+> kontras non-teks (2 Agu), jadi jangan dikembalikan: `control` #CBD5E1 hanya
+> 1,56:1 terhadap kanvas (34 kolom isian praktis tanpa batas), dan ring fokus
+> beralpha `rgba(16,185,129,0.30)` cuma 1,29–1,71:1 — gagal di SETIAP input.
+> Ring fokus wajib padat, bukan transparan.
 
 ### State kosong / error / loading
 - **Loading:** skeleton shimmer **sesuai dimensi layout** (hero, kartu list,

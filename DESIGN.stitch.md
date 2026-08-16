@@ -21,7 +21,8 @@ gold songket weave motif reserved for the balance hero card.
 - **Density:** Daily-App Balanced (5/10) — generous list rows, one idea per card.
 - **Variance:** Predictable Symmetric (3/10) — this is a utility app for elderly
   users; layouts are calm, single-column, and repeatable. No artsy asymmetry.
-- **Motion:** Fluid CSS (5/10) — springy press feedback, bottom sheets gliding
+- **Motion:** Fluid CSS (5/10) — crisp press feedback (ease-out-expo, never
+  spring — see §6), bottom sheets gliding
   on ease-out-expo, staggered list reveals. Never cinematic, never looping
   decoration.
 - **Elevation philosophy:** FLAT. Depth comes from tonal step (white card on
