@@ -141,6 +141,48 @@ scoped exceptions exist and must never grow into second accents.
   no space after Rp is acceptable app style).
 - Body prose max 65–75ch. No serif fonts anywhere.
 
+### Where the ramp applies — and the one place it does not
+
+The ramp above governs **UI text**. Two kinds of content are deliberately
+outside it, and both live in `BannerCarousel.tsx`:
+
+- **DOM illustrations** (`TalanganArt`, `KasrtArt`, …) — drawings that happen to
+  be built from divs instead of SVG. Their `text-[9px]` / `text-[23px]` are
+  parts of a picture, not a type scale, exactly as an SVG's internal
+  coordinates would be.
+- **The promo card block** — written end-to-end in arbitrary values
+  (`h-[44px]`, `rounded-[14px]`, `mt-[16px]`, `text-[1.5rem]`,
+  `leading-[1.16]`). Measured: BannerCarousel carries **102** arbitrary values
+  against an average of **12** in every other file.
+
+**Do not "fix" these by converting one line at a time.** A single
+`text-[11px] → text-micro` inside the promo block leaves it half-tokenised,
+which is strictly worse than either end state: the block stops being internally
+consistent without becoming consistent with the app. Either migrate the whole
+block in one deliberate pass — with screenshots, since its proportions are
+hand-tuned — or leave it whole. This note exists because that one-line "fix"
+looked correct on 17 Aug (the value is *identical* to `text-micro`, and 21
+sibling eyebrows already use the token) and was only rejected after counting
+the 102 arbitrary values around it.
+
+Everything that is neither illustration nor the promo block **must** use the
+ramp tokens.
+
+### Known: the ramp has a rival, and that is a deferred decision
+
+Two scales are live side by side — the ramp tokens (11/13/15/17) used **134**
+times, and the plain Tailwind scale (12/14/16) used **227**. So the app's small
+text is effectively continuous from 11px to 17px rather than stepped. The
+sharpest case: the "faint caption" role is written **10×** as `text-caption`
+(13px) and **17×** as `text-xs` (12px) — one role, two sizes.
+
+This is recorded so it is not rediscovered as news every pass. It was measured
+on 17 Aug and deliberately **left alone**: a 1px difference is invisible, while
+raising 17 sites from 12→13px enlarges that text by 8% and can push new
+overflow at 360px — a real cost for an invisible gain. If it is ever unified,
+it is its own pass with `audit:lebar` + `audit:reflow` as the guard rails, not
+a change smuggled into an unrelated one.
+
 ## 4. Component Stylings
 
 - **Cards:** pure white, radius 16px (dense panels) or 24px (content/list
