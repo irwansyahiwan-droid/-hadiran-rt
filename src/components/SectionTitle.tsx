@@ -46,10 +46,27 @@ export default function SectionTitle({ children, count, action, tone = 'default'
       }`}>
         {children}
         {count != null && count > 0 && (
-          <span className={`font-display text-micro font-bold tabular-nums rounded-full px-2 py-0.5 ${
+          /* Penghitung "tercetak", bukan gumpalan abu.
+             Versi lama memakai FILL (`bg-gray-100`) — permukaan penuh untuk
+             memuat satu-dua digit. Karena judul seksi muncul di tiap layar,
+             gumpalan itu jadi bentuk paling sering diulang di app, dan ia
+             satu-satunya elemen yang memakai abu sebagai LATAR padahal kanon
+             warna app menaruh abu di satu tempat saja: kontrol inaktif. Angka
+             yang aktif duduk di atas fill "inaktif" = sinyal yang bertabrakan.
+
+             Ganti fill dengan hairline ring-inset — bahasa yang sama dengan
+             pil Tag & chip "Mode Warga" (pass Etched Premium): tepi tipis
+             mendefinisikan bentuk, isinya dibiarkan kanvas. Ring dekoratif
+             (angkanya sendiri yang membawa informasi), jadi tak menyentuh
+             §1.4.11 — persis alasan ring Tag tak dihitung.
+
+             `min-w` + `text-center` supaya "5" dan "103" sama-sama bulat rapi:
+             tanpa itu satu digit menghasilkan kapsul yang lebih sempit dari
+             tingginya dan terbaca gepeng. */
+          <span className={`font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-1.5 py-0.5 text-center ${
             tone === 'warn'
-              ? 'text-warn dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30'
-              : 'text-ink-faint dark:text-gray-400 bg-gray-100 dark:bg-gray-800'
+              ? 'text-warn dark:text-amber-300 ring-amber-600/30 dark:ring-amber-400/30'
+              : 'text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700'
           }`}>{count}</span>
         )}
       </h2>

@@ -94,6 +94,19 @@ scoped exceptions exist and must never grow into second accents.
   there, higher contrast means DARKER, which only makes a fill richer. This
   asymmetry is the same lesson as the rejected gray-300 chips: contrast is not
   symmetric between themes.
+- **A zero gets no color.** Semantic tint is a SIGNAL; a zero is the report that
+  there is nothing to signal. `StatRow` drops any value that renders as `0` to
+  Ink Faint regardless of its declared tone. Before this rule the Jadwal stat
+  card lit four hues across 358px (ink, emerald, blue, rose) and the loudest of
+  them was "0 Titip" — the one column carrying no news. Three hues now, and the
+  colored ones mean something.
+- **Role pills are identity, not status.** WARGA renders `neutral` (slate).
+  Being a warga is the default state of everyone who opens the app; it is
+  neither an achievement nor a warning, so it gets a name, not a hue. Only
+  BENDAHARA keeps `success` green — it is rare and it marks a session that can
+  write. This is also what keeps the Setor Blue rule below honest: a blue role
+  pill put blue in the top-right corner of EVERY screen, directly opposite the
+  emerald brandmark.
 
 ### Scoped exceptions (never expand these)
 - **Setor Blue** (#1E40AF → #2563EB → #3B82F6 gradient) — a STATUS signal only:
@@ -110,6 +123,10 @@ scoped exceptions exist and must never grow into second accents.
   from weight and ink color, not from screaming size.
 - **Body: Inter Variable** (400) — body-only, quiet partner to Sora. Inter must
   NEVER be used as the display face.
+- **The header brandmark is Sora too.** "Hadiran RT" next to the logo is the
+  most-seen text in the product and it is the app's own name — the one string
+  that must be *set*, not typed. It sat in Inter until 16 Aug, which was the
+  last standing breach of the rule directly above.
 - **Numbers always use `tabular-nums`** app-wide — rupiah amounts are the most
   important content and digits must not wobble in columns or count-ups.
 - **Hero amounts are fit-to-width**: the balance number scales as large as the
@@ -152,6 +169,23 @@ scoped exceptions exist and must never grow into second accents.
   rgba(16,185,129,0.30). No floating labels.
 - **Icon tiles in lists:** flat semantic tint (emerald-100 in / rose-100 out /
   amber-100 arrears) with matching deep icon color. Never gray, never sheen.
+- **Icon line weight is 1.75, not lucide's default 2.** This app is built on
+  hairlines — 1px card edges, 1px row dividers, 1px dock rule — and icons were
+  the one line family exempt from that discipline, which made them the HEAVIEST
+  strokes on the page: heavier than a card edge, heavier than the Inter stems
+  beside them. 1.75 (not 1.5): lucide draws on a 24px grid, so a 14px icon gets
+  1.02px of real stroke at 1.75 and only 0.88px at 1.5, where small icons start
+  evaporating on the low-DPR phones warga actually carry. Implemented as one
+  base rule on `svg.lucide[stroke-width="2"]` — call-sites that declare their
+  own weight (2.2–3.5 for small chevrons and checks, 0 for filled icons) keep
+  it. The rule replaces the DEFAULT, never a deliberate choice.
+- **Section counters are etched, not filled.** The count beside a section title
+  is a hairline ring-inset pill over bare canvas with Ink Faint digits — the
+  same "printed" language as Tag and the Mode Warga chip. It used a `bg-gray-100`
+  fill until 16 Aug, which made it the most-repeated shape in the app AND the
+  only place gray was used as a BACKGROUND — gray is reserved for inactive
+  controls, so an active count sat on an "inactive" surface. `min-w` keeps "5"
+  and "103" the same round shape.
 - **Bottom navigation:** a full-width DOCK bar glued to the screen's bottom
   edge (Google/myBCA style) — NOT a floating capsule. Active tab = flat tonal
   pill (Material 3), static 24px icons, top hairline + faint upward shadow.

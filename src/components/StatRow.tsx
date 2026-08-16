@@ -51,7 +51,21 @@ export default function StatRow({
         {items.map((s) => (
           <div key={s.label} className={`flex flex-col items-center gap-0.5 ${tight ? 'px-1.5' : 'px-3'}`}>
             <span
-              className={`font-display font-bold tabular-nums ${tight ? 'text-xl' : 'text-2xl'} ${TONE[s.tone ?? 'ink']}`}
+              /* NOL tidak berhak atas warna.
+                 Warna di app ini dipakai sebagai SINYAL (pos/neg/warn/info), dan
+                 nol adalah kabar bahwa tak ada yang perlu disinyalkan. Sebelum
+                 ini "0 Titip" tetap dicat biru pekat sekuat "12 Tidak Hadir"
+                 yang merah — jadi baris statistik Jadwal menyalakan EMPAT warna
+                 sekaligus (tinta, hijau, biru, merah) di satu kartu selebar
+                 358px, dan yang paling mencolok justru angka yang tak berisi
+                 apa-apa. Nol jatuh ke `ink-faint`: tetap terbaca (10,4:1),
+                 tapi berhenti berteriak. Baris yang sama kini menyalakan tiga.
+
+                 Perbandingan sengaja longgar (`==` lewat String) supaya nol
+                 dari mana pun ikut — number 0 maupun string '0'. */
+              className={`font-display font-bold tabular-nums ${tight ? 'text-xl' : 'text-2xl'} ${
+                String(s.value) === '0' ? 'text-ink-faint dark:text-gray-400' : TONE[s.tone ?? 'ink']
+              }`}
             >
               {s.value}
             </span>

@@ -15,6 +15,30 @@
 @layer base {
   h1, h2 { font-family: var(--font-display); letter-spacing: -0.018em; text-wrap: balance; }
 }
+
+/* ── Bobot garis IKON = 1,75, bukan 2 (default lucide) ──────────────────
+   App ini dibangun di atas hairline: tepi kartu 1px, divider baris 1px,
+   garis bar nav 1px. Satu-satunya keluarga garis yang TIDAK ikut disiplin
+   itu adalah ikon — lucide memancarkan `stroke-width="2"` di tiap svg, dan
+   di layar 3x itu membuat ikon jadi garis TERTEBAL di halaman: lebih berat
+   dari tepi kartu, lebih berat dari batang huruf Inter 15px di sebelahnya.
+   Efeknya persis lawan "mahal" — ikon berteriak lebih keras dari angkanya.
+
+   1,75 dipilih, bukan 1,5: lucide menggambar di kisi 24px, jadi ikon 14px
+   (paling kecil di app) hanya mendapat 1,75 x 14/24 = 1,02px garis nyata.
+   Di 1,5 ia turun ke 0,88px — di bawah 1 piksel CSS, dan ikon kecil mulai
+   "menguap" di HP ber-DPR rendah yang justru dipakai warga.
+
+   Selektor sengaja `[stroke-width="2"]`, BUKAN `.lucide` polos: 43 ikon di
+   src/ menuliskan bobotnya SENDIRI (2,2–3,5 untuk chevron/centang kecil
+   yang memang harus tebal, 0 untuk ikon ber-fill). Menimpa semuanya berarti
+   membuang niat yang sudah ditimbang per call-site. Aturan ini hanya
+   mengganti NILAI DEFAULT — yang eksplisit tetap menang.
+
+   Catatan CSS: `stroke-width` presentation attribute SELALU kalah dari
+   properti CSS, jadi tak perlu !important, dan tak perlu menyisir 200+
+   call-site ikon satu per satu. */
+svg.lucide[stroke-width='2'] { stroke-width: 1.75; }
 /* Util eksplisit untuk elemen non-heading yang ingin Sora (mis. nominal hero). */
 .font-display { font-family: var(--font-display); }
 

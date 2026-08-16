@@ -158,7 +158,14 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}
           />
           {/* Brandmark, bukan judul halaman — h1 milik konten tiap page (hindari h1 dobel). */}
-          <p className="text-base font-semibold tracking-tight text-gray-900 dark:text-gray-100 truncate">
+          {/* `font-display` (Sora) ditambahkan: Sora sudah jadi SUARA app — semua
+              h1/h2 dan setiap nominal memakainya — dan satu-satunya tempat yang
+              masih Inter justru namanya sendiri, elemen yang paling sering
+              dilihat & paling identitas. Wordmark ber-font body = logo yang
+              "diketik", bukan diset. Sora ~9% lebih lebar di 16px; baris ini
+              `truncate` di dalam `min-w-0` dan sisa ruangnya masih lega di
+              360px (diukur, lihat sapuan sesudah pass ini). */}
+          <p className="font-display text-base font-semibold tracking-tight text-gray-900 dark:text-gray-100 truncate">
             Hadiran RT
           </p>
         </div>
@@ -176,7 +183,17 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
               menjelaskan kenapa tak ada tombol ubah. Pil peran selalu tampak,
               jadi di sinilah keterangan itu seharusnya tinggal. */}
           <span className="inline-flex items-center gap-1">
-            <Tag tone={isBendahara ? 'success' : 'info'} className="tracking-wide">
+            {/* WARGA: tone `info` (BIRU) → `neutral`. Biru di app ini punya satu
+                pekerjaan yang sudah ditetapkan kanon warna: token `setor`, sinyal
+                status "sudah disetor" yang sengaja dikurung di hero Kas Hadiran —
+                BUKAN aksen kedua. Pil peran memakainya membuat biru muncul di
+                pojok kanan atas SETIAP layar, jadi satu-satunya warna di header
+                dan lawan langsung emerald brand di logo sebelahnya.
+                `neutral` juga lebih benar secara makna: "warga" itu keadaan
+                bawaan semua orang, bukan peringatan atau capaian — ia tak perlu
+                warna, cukup nama. BENDAHARA tetap `success`: ia jarang, dan
+                hijaunya memang menandai "sesi ini bisa menulis". */}
+            <Tag tone={isBendahara ? 'success' : 'neutral'} className="tracking-wide">
               {isBendahara ? 'BENDAHARA' : 'WARGA'}
             </Tag>
             {!isBendahara && (
