@@ -847,20 +847,32 @@ export default function KasHadiranPage() {
                           footer "Lihat semua" Beranda; aksi bendahara tetap
                           netral (hierarki) tapi ikut dapat .press + ukuran ramp
                           `text-caption` biar terbaca warga lansia. */}
+                      {/* Ketiga label WAJIB `whitespace-nowrap`. Terukur di 360px:
+                          strip ini butuh 324px sedangkan ruang isinya cuma 286px
+                          (lebar kartu 326 − padding px-5), jadi flexbox menyusutkan
+                          tombol sampai labelnya PECAH DUA BARIS ("PDF /
+                          Pendapatan"). Cacat itu tak pernah terlihat dari ukuran
+                          karena `min-h-[44px]` menahan tinggi tombol tetap 44px —
+                          hanya screenshot elemen yang sezaman dgn rect yang
+                          menunjukkannya. Label dipendekkan ke "PDF" (ikon dokumen +
+                          konteks kartu tarikan sudah membawa sisa maknanya; kalimat
+                          penuh pindah ke aria-label supaya pembaca layar tak ikut
+                          kehilangan) → butuh turun ke 245px: muat, sisa 41px. */}
                       <div className="flex items-center gap-x-3 px-5 pb-3 pt-3 border-t border-line dark:border-gray-800">
                         <button
                           onClick={() => { haptic(); handlePendapatanPDF(t); }}
                           disabled={pdfLoading === t.id}
-                          className="press flex items-center gap-1.5 min-h-[44px] -mx-1.5 px-1.5 rounded-lg text-caption font-semibold text-brand-link dark:text-brand-linkDark hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors mati-teks"
+                          aria-label={`Unduh PDF pendapatan tarikan #${t.nomor}`}
+                          className="press flex items-center gap-1.5 min-h-[44px] -mx-1.5 px-1.5 rounded-lg text-caption font-semibold whitespace-nowrap text-brand-link dark:text-brand-linkDark hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors mati-teks"
                         >
                           <FileText className={`w-4 h-4 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
-                          {pdfLoading === t.id ? 'Memuat…' : 'PDF Pendapatan'}
+                          {pdfLoading === t.id ? 'Memuat…' : 'PDF'}
                         </button>
                         {isBendahara && (
                           <button
                             onClick={() => { haptic(); handleBatalkanClick(t); }}
                             disabled={processingId === t.id}
-                            className="press flex items-center gap-1.5 min-h-[44px] px-1.5 rounded-lg text-caption font-semibold transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
+                            className="press flex items-center gap-1.5 min-h-[44px] px-1.5 rounded-lg text-caption font-semibold whitespace-nowrap transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
                           >
                             <RotateCcw className={`w-4 h-4 ${processingId === t.id ? 'animate-spin' : ''}`} />
                             Batalkan
@@ -874,7 +886,7 @@ export default function KasHadiranPage() {
                             /* dark:text-gray-400, BUKAN gray-500: gray-500 di atas
                                gray-900 cuma 3,67:1 — ketangkap audit kontras deep
                                sbg satu-satunya cacat fill nyata dari 1842 sampel. */
-                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold ml-auto transition-colors mati-teks text-ink-faint dark:text-gray-400 hover:bg-gray-50 hover:text-neg dark:hover:bg-gray-800/60"
+                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold whitespace-nowrap ml-auto transition-colors mati-teks text-ink-faint dark:text-gray-400 hover:bg-gray-50 hover:text-neg dark:hover:bg-gray-800/60"
                           >
                             <Trash2 className="w-4 h-4" />
                             Hapus
@@ -1024,7 +1036,8 @@ export default function KasHadiranPage() {
                 </>
               ) : (
                 <>
-                  {/* Rincian pendapatan real-time — angka sama dgn PDF Pendapatan */}
+                  {/* Rincian pendapatan real-time — angka sama dgn PDF pendapatan
+                      yang diunduh dari tombol "PDF" di strip aksi kartu tarikan */}
                   {(detailHadir.length > 0 || detailTitip.length > 0 || detailTidak.length > 0) && (
                     <div className="inset-soft rounded-2xl px-4 py-3.5">
                       <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>

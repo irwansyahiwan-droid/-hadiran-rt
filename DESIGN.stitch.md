@@ -39,12 +39,17 @@ scoped exceptions exist and must never grow into second accents.
   washes, no gradients. Same value everywhere (body, splash, overscroll).
 - **Pure Surface** (#FFFFFF) — card and sheet fill. Flat white, no top-light
   gradient, no tint.
-- **Hairline** (#D3DAE3) — the single card edge. 1px only.
-- **Control Border** (#CBD5E1) — input and secondary-button borders; visibly
-  stronger than Hairline. Edge hierarchy: control > hairline > row divider.
+- **Hairline** (#B8C4D3) — the single card edge. 1px only.
+- **Control Border** (#64748B, dark #6B7280) — input and secondary-button
+  borders; visibly stronger than Hairline. Edge hierarchy: control > hairline >
+  row divider. This one is far darker than a "hairline" instinct suggests, and
+  deliberately so: the non-text contrast sweep (2 Aug) measured the old #CBD5E1
+  at 1.56:1 against the canvas, so all 34 input fields had no perceivable
+  boundary at all. Do not lighten it back toward the hairline — §1.4.11 wants
+  3:1 for control boundaries, and the margin here is intentionally generous.
 - **Inset Panel** (#E9EEF5) — flat tonal fill for sub-panels inside white cards
   (detail rows, stat strips). No border, no inner shadow — fill only.
-- **Row Divider** (#DCE2EA) — hairline between list rows, inset past the icon
+- **Row Divider** (#D1DAE5) — hairline between list rows, inset past the icon
   column so it aligns with text.
 - **Ink** (#0B1220) — headings and primary amounts (near-black, never #000000).
 - **Ink Sub** (#1F2937) — secondary text (≈14.7:1 on white).
@@ -57,9 +62,20 @@ scoped exceptions exist and must never grow into second accents.
 - **Emerald Deep** (#0F4C2E, ramp #145D39 / #1B7249) — active filter chips,
   strong titles, primary buttons, the balance hero gradient. The single voice
   of the product.
-- **Hero Emerald Gradient** — `linear-gradient(135deg, #0D5B36 0%, #137A46 50%,
-  #157A45 100%)` plus a soft mint radial glow (rgba(45,212,150,0.20) fading
-  from the top-right corner). Used only on hero balance cards.
+- **Hero Emerald Gradient** — two related surfaces, both far darker than an
+  "emerald" instinct suggests. Page heroes use
+  `linear-gradient(135deg, #063A21 0%, #094B2C 50%, #0A5230 100%)` plus a mint
+  radial glow (rgba(45,212,150,0.10) from the top-right). The balance card
+  (`.hero-emerald`) uses `linear-gradient(150deg, #0A5230 0%, #08492B 52%,
+  #032A17 100%)` over a dark radial scrim at the top-left corner. Used only on
+  hero balance cards.
+  Do not brighten these ramps to look "fresher". They were measured and pulled
+  down twice (13 Jul, then the maximum-contrast pass on 4 Aug) because white
+  captions over the old lighter stops landed at 2.8–3.4:1 — below AA. The worst
+  point was never the end of the gradient but the top-RIGHT corner, where the
+  glow stacks on the mid stop, which is why the glow is 0.10 and the corner
+  carries its own scrim. If a hero needs more life, work through saturation or
+  the songket motif, never through lightness.
 - **Link Teal-Green** (#0D6B5E) — "Lihat semua" links and active text tabs.
 
 ### Money semantics (one green, one red, one amber — never mixed families)
@@ -110,7 +126,7 @@ scoped exceptions exist and must never grow into second accents.
 ## 4. Component Stylings
 
 - **Cards:** pure white, radius 16px (dense panels) or 24px (content/list
-  cards — the maximum, never rounder). Edge = 1px Hairline (#D3DAE3). Shadow =
+  cards — the maximum, never rounder). Edge = 1px Hairline (#B8C4D3). Shadow =
   ONE contact whisper: `0 2px 4px -1px rgba(15,23,42,0.09)`. Nothing else — no
   ambient float, no edge ring, no inner highlight.
 - **Hero balance card (signature):** 24px radius, emerald gradient (above) with
@@ -119,9 +135,12 @@ scoped exceptions exist and must never grow into second accents.
   (`0 6px 16px -12px rgba(0,0,0,0.28)` + `0 18px 40px -22px rgba(15,40,30,0.40)`).
   Negative balance = amount stays WHITE with a small "Defisit" word-chip beside
   it — never tint the numeral salmon/red on gradient.
-- **Primary button:** radius 12px, emerald gradient `#18A055 → #0F6B40 →
-  #0C5E37`, white text, subtle glossy top edge, tactile press `scale(0.97)` on
-  spring easing. No outer glow.
+- **Primary button:** radius 12px, emerald gradient
+  `linear-gradient(180deg, #0C6238 0%, #0A5531 58%, #094A2B 100%)`, white text,
+  subtle glossy top edge, tactile press `scale(0.97)` on ease-out-expo. No outer
+  glow. The ramp was lowered twice for the same reason as the hero: the label is
+  safe in the middle of the button, but the TOP edge of the old gradient sat at
+  3.39:1, and the glossy top edge lightens that first row of text further.
 - **Danger button:** identical anatomy, rose gradient `#F43F5E → #E11D48 →
   #BE123C`.
 - **Secondary button:** white fill, Control Border, Ink Sub text, radius 12px.

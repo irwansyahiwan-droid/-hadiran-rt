@@ -897,7 +897,9 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      memakai resep abu di atas — tak ada kotak untuk diberi warna. Dulu ketiganya
      memakai `disabled:opacity-50`, dan opacity pada teks yang memang sudah
      bernada sedang menjatuhkannya ke 2,22–2,72:1 (diukur audit:mati; terburuk
-     "PDF Pendapatan" di mode gelap). Warga lansia tak bisa membacanya.
+     tombol PDF Kas Hadiran di mode gelap — labelnya "PDF Pendapatan" waktu itu,
+     dipendekkan ke "PDF" 16 Agu agar strip aksinya muat satu baris di 360px).
+     Warga lansia tak bisa membacanya.
 
      Ganti opacity dengan WARNA redup yang masih terbaca: nonaktifnya tetap
      terbaca sebagai abu netral (bahasa app: abu = kontrol inaktif), tapi
