@@ -30,6 +30,11 @@ export const KATEGORI_KELUAR: KategoriOpsi[] = [
      bendahara per transaksi (mis. "setoran panitia 17 agustusan" sekarang ada
      di 'sosial', bukan 'lainnya'), bukan tebakan dari kata kunci. */
   { key: 'hut_ri',            label: 'Kegiatan Perayaan HUT RI 17 Agustusan', short: 'HUT RI' },
+  /* Kegiatan Keagamaan (16 Agu 2026) — pengajian, santunan, perayaan hari besar.
+     Sama seperti 'hut_ri': transaksi lama yang sebenarnya masuk sini masih duduk
+     di 'sosial'/'lainnya' dan SENGAJA tidak dipindahkan dari berkas ini —
+     reklasifikasi itu keputusan bendahara per transaksi lewat Edit. */
+  { key: 'kegiatan_keagamaan', label: 'Kegiatan Keagamaan',                short: 'Keagamaan' },
   { key: 'lainnya',           label: 'Lain-lain',                         short: 'Lain-lain' },
 ];
 
