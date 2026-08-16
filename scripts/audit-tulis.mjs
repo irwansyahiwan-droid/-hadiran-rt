@@ -53,8 +53,15 @@ function lapor(nama, keluhan) {
  * Buka app sebagai bendahara. BACA dijawab kosong; TULIS sengaja DIGANTUNG —
  * tak dijawab, tak digagalkan. `tulis.n` menghitung berapa yang benar-benar
  * tercegat: sapuan yang tak mencegat apa pun akan "lolos" tanpa menguji apa pun.
+ *
+ * @param bacaan  (url) => array | null — isi palsu untuk GET tertentu.
+ *   Dibutuhkan jalur tulis yang formnya baru ADA kalau datanya ada (editor
+ *   absensi cuma bisa dibuka dari sebuah tarikan). Dijawab `[]` seperti biasa
+ *   kalau pemetanya mengembalikan null, jadi dua jalur lama tak berubah
+ *   perilakunya. Data palsu ini hanya hidup di dalam respons yang dicegat —
+ *   tak satu pun request tulis pernah sampai ke server.
  */
-async function siapkan() {
+async function siapkan(bacaan) {
   const ctx = await browser.newContext({ viewport: { width: W, height: 780 }, serviceWorkers: 'block' });
   await ctx.addInitScript(({ ref, s }) => {
     localStorage.setItem('hadiran-welcome-v2', '1');
@@ -66,7 +73,12 @@ async function siapkan() {
   await ctx.route('**/rest/v1/**', (route) => {
     const m = route.request().method();
     if (m === 'GET' || m === 'HEAD') {
-      return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'content-range': '*/0' }, body: '[]' });
+      const isi = bacaan ? bacaan(route.request().url()) : null;
+      const body = JSON.stringify(isi ?? []);
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        headers: { 'content-range': `*/${isi?.length ?? 0}` }, body,
+      });
     }
     tulis.n++;   // digantung: sengaja tak dipanggil fulfill/abort
   });
@@ -87,19 +99,22 @@ async function tunggu(page, cek, batas = 15_000) {
 
 /**
  * @param nama    label skenario
- * @param buka    (page) => buka form-nya, kembalikan locator dialog
- * @param isi     (dialog) => isi field wajib
+ * @param buka    (page) => buka form-nya, kembalikan locator WADAH-nya. Wadah tak
+ *                harus `[role="dialog"]`: editor absensi adalah VIEW penuh, bukan
+ *                sheet, jadi yang dikembalikan cukup elemen yang memuat tombol simpan.
+ * @param isi     (wadah) => isi field wajib
  * @param tombol  regex label tombol simpan (termasuk bentuk "sedang menyimpan")
+ * @param bacaan  opsional, lihat `siapkan()`
  */
-async function ujiTulis(nama, buka, isi, tombol) {
-  const { ctx, page, tulis } = await siapkan();
+async function ujiTulis(nama, buka, isi, tombol, bacaan) {
+  const { ctx, page, tulis } = await siapkan(bacaan);
   const m = [];
   try {
-    const dialog = await buka(page);
-    if (!dialog) { lapor(nama, ['PROBE CACAT: form tak pernah terbuka — tak ada yang diuji']); await ctx.close(); return; }
-    await isi(dialog);
+    const wadah = await buka(page);
+    if (!wadah) { lapor(nama, ['PROBE CACAT: form tak pernah terbuka — tak ada yang diuji']); await ctx.close(); return; }
+    await isi(wadah);
 
-    const simpan = dialog.getByRole('button', { name: tombol });
+    const simpan = wadah.getByRole('button', { name: tombol });
     const labelAwal = (await simpan.innerText()).trim();
     await simpan.click();
 
@@ -178,6 +193,62 @@ await ujiTulis(
   },
   async (dialog) => { await dialog.locator('#anggota-nama').fill('Warga Audit'); },
   /^(Simpan Anggota|Menyimpan…)$/,
+);
+
+// ── Absensi: "Simpan & Hitung Iuran" ─────────────────────────────────────────
+// Jalur tulis TERBESAR di app dan satu-satunya yang berantai: `simpanTarikanSelesai`
+// menyentuh 4 tabel berurutan (absensi delete+insert → talangan delete+insert →
+// transaksi_kas delete+insert → tarikan update). Dua jalur di atas cuma satu insert,
+// jadi keduanya tak pernah menguji apa yang terjadi kalau server diam DI TENGAH rantai.
+// Yang digantung di sini adalah operasi tulis PERTAMA (absensi delete), yaitu keadaan
+// terburuk bagi bendahara: tak satu pun tabel berubah, tapi layar sudah bilang
+// "Menghitung…". Yang dijaga tetap sama — tombol wajib pulih dan gagalnya wajib
+// diucapkan, bukan ditelan.
+const WARGA = Array.from({ length: 4 }, (_, i) => ({
+  id: `00000000-0000-4000-8000-00000000000${i + 1}`,
+  nama: ['Pak Slamet', 'Bu Aminah', 'H. Mahmud', 'Pak Tarno'][i],
+  no_rumah: `A-${i + 1}`, no_hp: '', role: 'warga',
+  status_aktif: true, created_at: '2026-01-01T00:00:00Z',
+}));
+const TARIKAN = [{
+  id: '00000000-0000-4000-8000-0000000000a1',   // hex sah — 't' bukan digit UUID
+  nomor: 1, tanggal: '2026-08-15', jumlah_per_orang: 5000,
+  total_hadir: 0, total_warga: WARGA.length, sohibul_bait_id: WARGA[0].id,
+  status: 'dijadwalkan', total_terkumpul: 0, created_at: '2026-01-01T00:00:00Z',
+  sohibul_bait: WARGA[0],
+}];
+const bacaanAbsensi = (url) => {
+  // Cocokkan nama TABEL di path, bukan sekadar substring di seluruh URL: query
+  // `tarikan` membawa kata "warga" di dalam parameter select-nya (join
+  // `sohibul_bait:warga!sohibul_bait_id`), jadi urutan pengecekan yang ceroboh
+  // akan menjawab tabel yang salah.
+  const path = new globalThis.URL(url).pathname;
+  if (path.endsWith('/tarikan')) return TARIKAN;
+  if (path.endsWith('/warga'))   return WARGA;
+  return null;                    // sisanya tetap [] (absensi & talangan kosong)
+};
+
+await ujiTulis(
+  'tulis/Absensi Simpan & Hitung Iuran',
+  async (page) => {
+    await page.getByRole('button', { name: 'Jadwal' }).first().click();
+    /* `^Proses` — BUKAN `Proses tarikan`: Jadwal punya DUA wujud tombol ini, dan
+       yang muncul untuk tarikan BERIKUTNYA (satu-satunya yang ada di data palsu)
+       justru pil berlabel teks "Proses"; aria-label "Proses tarikan #N" hanya
+       dipakai varian ikon-saja untuk tarikan terjadwal lainnya. Jangkar `^`
+       menahan agar tak ikut mencocokkan "Memproses…" saat tombolnya sudah diklik. */
+    const PROSES = /^Proses/i;
+    if (!await tunggu(page, async () => await page.getByRole('button', { name: PROSES }).count() > 0)) return null;
+    await page.waitForTimeout(600);
+    await page.getByRole('button', { name: PROSES }).first().click();
+    // Editor absensi = VIEW penuh, bukan dialog → tunggu tombol simpannya sendiri.
+    if (!await tunggu(page, async () => await page.getByRole('button', { name: /Simpan & Hitung/i }).count() > 0)) return null;
+    await page.waitForTimeout(800);
+    return page.locator('body');
+  },
+  async () => { /* default "tidak hadir" untuk semua sudah sah — tak ada field wajib */ },
+  /^(Simpan & Hitung Iuran|Menghitung…|Menyimpan…)$/,
+  bacaanAbsensi,
 );
 
 await browser.close();

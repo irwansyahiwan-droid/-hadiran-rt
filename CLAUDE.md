@@ -71,7 +71,7 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis (51 pemeriksaan)
 | `audit:sentuh` | Luas area sentuh tiap kontrol di 360px (§2.5.8 min 24px, ambang app 44px) | Warga pakai jempol, sebagian lansia. **Diukur lewat hit-test `elementFromPoint`, BUKAN geometri CSS**: percobaan pertama membaca `cs.insetTop` (properti yang tak ada — yang benar `top/right/bottom/left`) sehingga semua pelebaran `before:-inset-*` terbaca nol dan 19 kontrol dilaporkan gagal padahal semuanya sudah 44px. Tiap kontrol WAJIB di-`scrollIntoView` dulu sebelum diukur — kalau tidak, kontrol yang kebetulan separuh di bawah Header sticky terukur separuh tinggi |
 | `audit:muat` | FCP & siap-pakai (CPU 4× lambat, 400 kbps) | Warga pakai Android kelas bawah, sinyal seadanya |
 | `audit:masuk` | Gerbang masuk & keluar saat jaringan busuk (chunk gagal, request menggantung, logout luring) | Semua audit lain menguji layar SESUDAH masuk. **Tombol "Masuk" yang terkunci tak menyisakan jalan lain sama sekali**, dan kegagalan jaringan yang dilaporkan sebagai "password salah" bikin bendahara mengganti sandi yang sudah benar |
-| `audit:tulis` | Tombol simpan saat request tulis MENGGANTUNG (Kas RT + Kelola Anggota) | `audit:keadaan` menguji BACA gagal, `audit:masuk` menguji auth — jalur TULIS, satu-satunya tempat uang benar-benar dicatat, tak tersentuh keduanya. **`try/finally` ada di semua jalur tulis tapi tak menolong: `finally` tak pernah tercapai kalau janjinya tak pernah selesai** |
+| `audit:tulis` | Tombol simpan saat request tulis MENGGANTUNG (Kas RT + Kelola Anggota + **Absensi "Simpan & Hitung Iuran"**) | `audit:keadaan` menguji BACA gagal, `audit:masuk` menguji auth — jalur TULIS, satu-satunya tempat uang benar-benar dicatat, tak tersentuh keduanya. **`try/finally` ada di semua jalur tulis tapi tak menolong: `finally` tak pernah tercapai kalau janjinya tak pernah selesai**. Jalur Absensi (16 Agu) ditambahkan karena dua jalur lama sama-sama SATU insert, jadi tak satu pun menguji rantai `simpanTarikanSelesai` — 4 tabel berurutan; yang digantung = tulis PERTAMA (absensi delete), keadaan terburuk: nol tabel berubah tapi layar sudah bilang "Menghitung…". Form-nya baru ADA kalau ada tarikan, jadi `siapkan()` kini bisa menyuntik isi GET palsu (`bacaan`); tanpa itu semua GET dijawab `[]` dan editor absensi tak pernah bisa dibuka |
 | `audit:mati` | Keterbacaan label tombol saat `disabled` (terang+gelap, warga+bendahara) | Kedua audit kontras MELEWATI kontrol nonaktif secara eksplisit — sah, karena WCAG 1.4.3 mengecualikannya. Tapi "tak wajib" bukan "boleh tak terbaca", dan pengecualian itu berarti keadaan nonaktif **tak pernah diukur sekali pun**. Yang tersembunyi di baliknya: tombol masuk bendahara 3,79:1 saat "Memproses…", 3 tombol teks Kas Hadiran 2,2–2,7:1, dan perbaikan `.btn-brand:disabled` yang ternyata cuma dihitung untuk mode TERANG (4,32:1 di gelap). Ambang dilaporkan sebagai ambang APP, bukan "gagal WCAG" — disiplin yang sama dgn bagian teks-200% di `audit:reflow` |
 
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
@@ -115,6 +115,16 @@ yang dipindahkan — ia sampel yang TIDAK ADA**, jadi kini DIBUANG (filter, buka
 Efek sampingnya langsung ketahuan lewat penghitung `tak terukur`: baris PALING BAWAH tiap
 halaman jadi nol sampel, karena langkah gulir 640px tak menjamin layar terakhir utuh — ditutup
 dengan satu pas tambahan ke DASAR halaman. Populasi 1.243 → 1.265.
+Yang ke-13 (16 Agu, saat menambah jalur Absensi ke `audit:tulis`): probe melapor "PROBE CACAT:
+form tak pernah terbuka" — bukan bug app, selektornya yang meleset. Jadwal punya DUA wujud
+tombol proses: pil BERLABEL TEKS "Proses" untuk tarikan BERIKUTNYA, dan ikon-saja ber-aria-label
+"Proses tarikan #N" untuk tarikan terjadwal lainnya. Data palsu cuma berisi satu tarikan → yang
+dirender justru wujud pertama, sehingga `name: /Proses tarikan/i` tak pernah cocok. Kini
+`/^Proses/i` (jangkar `^` supaya tak ikut menangkap "Memproses…" setelah diklik). **Pelajaran
+yang berulang: satu aksi bisa punya lebih dari satu accessible name tergantung KEADAAN DATA —
+periksa apa yang benar-benar dirender (screenshot + `innerText`), jangan percaya satu selektor.**
+Sapuan tulis baru juga divalidasi lewat MUTASI (naikkan `BATAS_REQ_MS` 20s→300s → ketiga jalur
+WAJIB melapor "TOMBOL TERKUNCI"); hijau tanpa mutasi tak membuktikan apa pun.
 
 **`backdrop-filter` = stacking context.** Input berkaca (`backdrop-blur-sm`) tercat DI ATAS
 ikon `absolute` yang z-index-nya auto, walau ikonnya lebih dulu di DOM. Tiga ikon dalam-kolom
