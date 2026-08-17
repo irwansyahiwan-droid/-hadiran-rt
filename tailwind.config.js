@@ -46,6 +46,15 @@ export default {
         nav: '40',
         scrim: '42',
         menu: '45',
+        /* `overlay` (sheet & dropdown) ditambahkan 17 Agu. Tier ini SUDAH ada
+           sejak lama dan dipakai 20x — hanya saja tanpa nama, ditulis `z-50`
+           mentah di tiap call-site. Itu bukan sekadar tak rapi: tier yang tak
+           bernama membuat tetangganya gampang ditulis mentah juga, dan dua
+           penangkap klik dropdown memang berakhir di `z-40` — nilai yang sama
+           persis dgn `nav`, sehingga ketukan di bar nav MEMINDAHKAN TAB alih-alih
+           menutup menu (diuji & diperbaiki di commit yang sama). Nilainya tidak
+           berubah; yang berubah cuma: sekarang ia punya nama. */
+        overlay: '50',
         banner: '55',
         modal: '60',
         toast: '70',

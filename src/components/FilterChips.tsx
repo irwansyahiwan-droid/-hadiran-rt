@@ -107,15 +107,18 @@ export default function FilterChips<T extends string, S extends string = string>
           </button>
 
           {sortOpen && (
-            /* Penangkap klik di luar → tutup */
-            <div className="fixed inset-0 z-40" aria-hidden="true" onClick={() => setSortOpen(false)} />
+            /* Penangkap klik di luar → tutup. `z-scrim` (42), BUKAN `z-40`:
+               z-40 sama persis dgn bar nav, jadi penangkap ini kalah dan
+               ketukan di bar nav MEMINDAHKAN TAB alih-alih menutup menu
+               (diuji, lihat catatan sama di ExportMenu). */
+            <div className="fixed inset-0 z-scrim" aria-hidden="true" onClick={() => setSortOpen(false)} />
           )}
           {sortMounted && (
             <>
               <div
                 role="listbox"
                 aria-label="Pilihan urutan"
-                className={`${sortOpen ? 'pop-menu' : 'pop-menu-out'} absolute right-0 top-full mt-2 z-50 min-w-[10rem] py-1.5 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float origin-top-right`}
+                className={`${sortOpen ? 'pop-menu' : 'pop-menu-out'} absolute right-0 top-full mt-2 z-overlay min-w-[10rem] py-1.5 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float origin-top-right`}
               >
                 {sort.options.map((o) => {
                   const selected = o.id === sort.value;

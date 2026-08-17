@@ -138,7 +138,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
+    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
       <OverlayHeader
         icon={FileText}
         title="Tutup Buku Triwulan"

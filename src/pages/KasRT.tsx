@@ -75,7 +75,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const saldoPreview = tipe === 'masuk' ? saldoSekarang + nominal : saldoSekarang - nominal;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end" onClick={drag.dismiss}>
+    <div className="fixed inset-0 z-overlay flex items-end" onClick={drag.dismiss}>
       <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div
         ref={dlg.panelRef}
@@ -935,7 +935,7 @@ export default function KasRTPage() {
 
       {/* Aksi baris: detail + Edit + Hapus (bendahara) */}
       {selectedRow && (
-        <div className="fixed inset-0 z-50 flex items-end" onClick={rowDrag.dismiss}>
+        <div className="fixed inset-0 z-overlay flex items-end" onClick={rowDrag.dismiss}>
           <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${rowDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
           <div
             ref={rowDlg.panelRef}

@@ -863,7 +863,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
 
     {/* Transaksi detail bottom sheet */}
     {selectedTrx !== null && (
-      <div className="fixed inset-0 z-50 flex items-end" onClick={trxDrag.dismiss}>
+      <div className="fixed inset-0 z-overlay flex items-end" onClick={trxDrag.dismiss}>
         <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${trxDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
         <div
           ref={trxDlg.panelRef}

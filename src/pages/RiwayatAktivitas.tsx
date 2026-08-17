@@ -135,7 +135,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   // (halaman induk ikut bergeser / pull-to-refresh terpicu). `.sheet-panel` sudah
   // punya ini; overlay full-screen tidak lewat kelas itu.
   return (
-    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-50 bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
+    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
       <OverlayHeader
         icon={History}
         title="Riwayat Aktivitas"

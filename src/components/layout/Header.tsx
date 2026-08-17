@@ -87,8 +87,8 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   return (
     <header
       // Saat menu hidup: naik ke tier z-menu (45) di atas scrim portal z-scrim (42),
-      // tetap di bawah overlay z-50 — header ber-transform = stacking context
-      // sendiri, jadi z-50 milik dropdown tak bisa menembus keluar; tanpa bump
+      // tetap di bawah overlay z-overlay — header ber-transform = stacking context
+      // sendiri, jadi z-overlay milik dropdown tak bisa menembus keluar; tanpa bump
       // ini scrim (lebih akhir di DOM) menutup menu & item tak bisa diklik.
       // `transition` utility sengaja TIDAK dipasang di sini: properti + durasi
       // sudah ditulis eksplisit di `style.transition` di bawah, dan inline style
@@ -235,7 +235,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                   role="menu"
                   aria-label="Menu aplikasi"
                   onKeyDown={onMenuKeyDown}
-                  className={`${menuOpen ? 'pop-menu' : 'pop-menu-out'} absolute right-0 top-[calc(100%+8px)] z-50 w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right`}
+                  className={`${menuOpen ? 'pop-menu' : 'pop-menu-out'} absolute right-0 top-[calc(100%+8px)] z-overlay w-56 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 origin-top-right`}
                   style={{ boxShadow: 'var(--shadow-float)' }}
                 >
                   {isBendahara && onOpenLaporan && (

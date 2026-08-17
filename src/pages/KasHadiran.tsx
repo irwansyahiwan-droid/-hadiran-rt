@@ -62,7 +62,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end" onClick={drag.dismiss}>
+    <div className="fixed inset-0 z-overlay flex items-end" onClick={drag.dismiss}>
       <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} style={drag.style}>
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
@@ -968,7 +968,7 @@ export default function KasHadiranPage() {
 
       {/* Sheet detail tarikan: hadir & tidak hadir + status bayar talangan */}
       {detailTarikan && (
-        <div className="fixed inset-0 z-50 flex items-end" onClick={detailDrag.dismiss}>
+        <div className="fixed inset-0 z-overlay flex items-end" onClick={detailDrag.dismiss}>
           <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${detailDrag.dismissing ? 'sheet-backdrop-out' : ''}`} />
           <div
             ref={detailDlg.panelRef}

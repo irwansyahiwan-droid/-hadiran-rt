@@ -17,7 +17,7 @@ interface FabProps {
  *  (Revolut/Cash App/Jago): aksi paling sering dipakai dalam jangkauan satu
  *  tangan, bukan di pojok atas. Memakai resep .btn-brand (gradient + glow) +
  *  .press (spring) → konsisten dgn CTA utama lain. z-30 → di bawah sheet/modal
- *  (z-50) sehingga tertutup backdrop saat form terbuka.
+ *  (z-overlay) sehingga tertutup backdrop saat form terbuka.
  *
  *  PINTAR (Material 3 2026): MENYINGKIR saat scroll turun, kembali dengan label
  *  saat scroll naik/berhenti. Dulu ia hanya mengkerut jadi bulat — tetap

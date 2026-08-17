@@ -93,7 +93,15 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
       </button>
       {disabled && disabledReason && <span id={alasanId} className="sr-only">{disabledReason}</span>}
 
-      {open && <div className="fixed inset-0 z-40" aria-hidden="true" onClick={() => setOpen(false)} />}
+      {/* `z-scrim` (42), BUKAN `z-40`: z-40 sama persis dgn bar nav, jadi yang
+          menang cuma urutan DOM — dan nav menang. Terbukti dgn MENGUJI, bukan
+          dibaca: saat menu ini terbuka, `elementFromPoint` di tengah tombol nav
+          menjawab ikon nav, dan ketukan di sana MEMINDAHKAN TAB alih-alih
+          menutup menu. Persis kegagalan yang sudah diperbaiki untuk menu Header
+          4 Agu (urutan chrome: nav 40 < scrim 42 < menu 45) — dua penangkap
+          klik ini tertinggal. Dropdown-nya sendiri z-overlay (50), jadi tetap
+          duduk di atas penangkap. */}
+      {open && <div className="fixed inset-0 z-scrim" aria-hidden="true" onClick={() => setOpen(false)} />}
       {mounted && (
         <>
           <div
@@ -101,7 +109,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
             role="menu"
             aria-label="Ekspor"
             onKeyDown={onMenuKeyDown}
-            className={`${open ? 'pop-menu' : 'pop-menu-out'} absolute top-[calc(100%+8px)] z-50 w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
+            className={`${open ? 'pop-menu' : 'pop-menu-out'} absolute top-[calc(100%+8px)] z-overlay w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-1.5 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             {items.map(({ label, icon: Icon, onClick, tone }) => (
