@@ -47,16 +47,16 @@ export default function ErrorState({
         </div>
       </div>
 
-      <p className="text-balance text-sm font-bold text-gray-700 dark:text-gray-200">{title}</p>
+      <p className="text-balance text-body font-bold text-gray-700 dark:text-gray-200">{title}</p>
       {subtitle && (
-        <p className="text-pretty text-xs text-ink-faint dark:text-gray-400 mt-1 max-w-[240px] leading-relaxed">{subtitle}</p>
+        <p className="text-pretty text-caption text-ink-faint dark:text-gray-400 mt-1 max-w-[240px] leading-relaxed">{subtitle}</p>
       )}
 
       {onRetry && (
         <button
           onClick={onRetry}
           disabled={retrying}
-          className="press btn-brand mt-5 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold"
+          className="press btn-brand mt-5 inline-flex items-center gap-2 px-5 py-2.5 text-body font-semibold"
         >
           <RotateCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} strokeWidth={2.2} />
           {retrying ? 'Memuat…' : 'Coba lagi'}

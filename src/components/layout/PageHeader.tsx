@@ -58,7 +58,7 @@ export default function PageHeader({
             <span className="truncate">{title}</span>
             {info}
           </h1>
-          {subtitle && <p className="mt-0.5 text-xs text-ink-faint dark:text-gray-400">{subtitle}</p>}
+          {subtitle && <p className="mt-0.5 text-caption text-ink-faint dark:text-gray-400">{subtitle}</p>}
         </div>
       </div>
       {actions && <div className="flex shrink-0 items-center gap-1.5">{actions}</div>}

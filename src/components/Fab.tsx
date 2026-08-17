@@ -64,7 +64,7 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
       /* Saat menyingkir wrapper-nya aria-hidden — jangan tinggalkan tombol yang
          masih bisa di-Tab (fokus mendarat di elemen tak terlihat). */
       tabIndex={compact ? -1 : undefined}
-      className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-sm font-bold overflow-hidden"
+      className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-body font-bold overflow-hidden"
       style={{ transition: 'box-shadow 0.2s ease, transform 0.15s var(--ease-spring)' }}
     >
       <Icon className="w-5 h-5 shrink-0" strokeWidth={2.4} />

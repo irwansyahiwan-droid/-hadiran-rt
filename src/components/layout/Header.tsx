@@ -73,7 +73,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
       role="menuitem"
       tabIndex={-1}
       onClick={() => { haptic(); setMenuOpen(false); onClick(); }}
-      className={`w-full flex items-center gap-3 min-h-[44px] px-4 py-2.5 text-sm font-medium transition-colors ${
+      className={`w-full flex items-center gap-3 min-h-[44px] px-4 py-2.5 text-body font-medium transition-colors ${
         danger
           ? 'text-neg dark:text-rose-400 hover:bg-rose-50 active:bg-rose-100 dark:hover:bg-rose-900/20 dark:active:bg-rose-900/35'
           : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-700'
@@ -309,7 +309,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           <div className="relative max-w-lg mx-auto flex items-center justify-center">
             {/* Chip read-only "tercetak" (ring-inset, bahasa Etched Premium) —
                 mata brand-emerald = percikan identitas, bukan strip abu mati. */}
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-sub dark:text-gray-200 bg-white dark:bg-gray-900/50 ring-1 ring-inset ring-line dark:ring-gray-700 rounded-full pl-2.5 pr-3 py-1">
+            <span className="inline-flex items-center gap-1.5 text-caption font-medium text-ink-sub dark:text-gray-200 bg-white dark:bg-gray-900/50 ring-1 ring-inset ring-line dark:ring-gray-700 rounded-full pl-2.5 pr-3 py-1">
               <Eye className="w-3.5 h-3.5 text-brand-link dark:text-brand-linkDark" /> Mode Warga — hanya bisa melihat data
             </span>
             <button

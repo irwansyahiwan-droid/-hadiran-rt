@@ -111,11 +111,11 @@ function ToastStack({
             <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${s.dot}`}>
               <Icon className="w-3.5 h-3.5 text-white" strokeWidth={3} />
             </span>
-            <p className="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-100">{t.message}</p>
+            <p className="flex-1 text-body font-semibold text-gray-800 dark:text-gray-100">{t.message}</p>
             {t.actionLabel && (
               <button
                 onClick={() => onAction(t)}
-                className="press shrink-0 -mr-1 px-3 py-1.5 rounded-xl text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                className="press shrink-0 -mr-1 px-3 py-1.5 rounded-xl text-body font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
               >
                 {t.actionLabel}
               </button>

@@ -47,7 +47,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           <h1 className="text-lg font-bold text-ink dark:text-gray-100 mb-1.5">
             Ups, ada gangguan
           </h1>
-          <p className="text-pretty text-sm text-ink-sub dark:text-gray-400 mb-5 leading-relaxed">
+          <p className="text-pretty text-body text-ink-sub dark:text-gray-400 mb-5 leading-relaxed">
             Terjadi kesalahan tak terduga. Coba muat ulang halaman — datamu aman,
             tidak ada yang hilang.
           </p>

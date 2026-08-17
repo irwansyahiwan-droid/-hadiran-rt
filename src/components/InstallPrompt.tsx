@@ -80,14 +80,14 @@ export default function InstallPrompt() {
         >
           <img src={logoRt} alt="" width={40} height={40} className="w-10 h-10 rounded-xl object-cover shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Pasang Hadiran RT</p>
+            <p className="text-body font-bold text-gray-900 dark:text-gray-100 leading-tight">Pasang Hadiran RT</p>
             <p className="text-micro text-gray-500 dark:text-gray-400">Akses cepat dari layar utama HP</p>
           </div>
           <button
             onClick={isIos ? () => setShowGuide(true) : install}
             /* min-h 44: aksi UTAMA banner ini sempat 32px tinggi — di bawah
                kontrak 44px yang dipatuhi seluruh app (lihat FilterChips). */
-            className="press shrink-0 inline-flex min-h-[44px] items-center gap-1.5 bg-brand text-white text-xs font-bold px-3.5 py-2 rounded-xl"
+            className="press shrink-0 inline-flex min-h-[44px] items-center gap-1.5 bg-brand text-white text-caption font-bold px-3.5 py-2 rounded-xl"
           >
             <Download className="w-3.5 h-3.5" />
             Pasang
@@ -114,7 +114,7 @@ export default function InstallPrompt() {
               <img src={logoRt} alt="" width={44} height={44} className="w-11 h-11 rounded-2xl object-cover" />
               <div>
                 <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Pasang di iPhone</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Wajib pakai browser <b>Safari</b></p>
+                <p className="text-caption text-gray-500 dark:text-gray-400">Wajib pakai browser <b>Safari</b></p>
               </div>
             </div>
             <ol className="space-y-3">
@@ -122,8 +122,8 @@ export default function InstallPrompt() {
                 const Icon = s.icon;
                 return (
                   <li key={i} className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                    <span className="flex-1 text-sm text-gray-700 dark:text-gray-200">{s.text}</span>
+                    <span className="w-7 h-7 rounded-full bg-brand text-white text-caption font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                    <span className="flex-1 text-body text-gray-700 dark:text-gray-200">{s.text}</span>
                     <Icon className="w-4 h-4 text-brand dark:text-emerald-400 shrink-0" />
                   </li>
                 );
@@ -131,7 +131,7 @@ export default function InstallPrompt() {
             </ol>
             <button
               onClick={guideDrag.dismiss}
-              className="press w-full mt-5 py-3 rounded-xl bg-brand text-white font-bold text-sm"
+              className="press w-full mt-5 py-3 rounded-xl bg-brand text-white font-bold text-body"
             >
               Mengerti
             </button>

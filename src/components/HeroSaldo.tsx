@@ -97,7 +97,7 @@ interface HeroSaldoProps {
  * Kartu hero saldo — SATU anatomi untuk Kas Hadiran, Kas RT, dan Talangan.
  *
  * Sebelum 30 Jul 2026 ketiganya menyalin bingkai yang sama lalu menyimpang:
- * label `text-xs font-semibold` di satu tempat & `text-micro font-bold` di
+ * label `text-caption font-semibold` di satu tempat & `text-micro font-bold` di
  * tempat lain, jarak tombol `-mr-2` vs `-mr-1.5 gap-0.5`, kaki kartu dua panel
  * di dua halaman dan tak ada sama sekali di halaman ketiga. Warna hero sudah
  * disatukan lebih dulu (satu `.hero-emerald`, lihat index.css); ini menyatukan
@@ -156,7 +156,7 @@ export default function HeroSaldo({
           {status}
         </div>
 
-        {caption && <p className="mt-1 text-xs text-white/90">{caption}</p>}
+        {caption && <p className="mt-1 text-caption text-white/90">{caption}</p>}
         {children}
         {stats && stats.length > 0 && <HeroStats items={stats} className="mt-4 pt-[18px]" />}
       </div>

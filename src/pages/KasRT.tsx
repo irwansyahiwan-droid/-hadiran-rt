@@ -98,7 +98,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 type="button"
                 onClick={() => pilihTipe(t)}
                 aria-pressed={tipe === t}
-                className={`press inline-flex items-center justify-center gap-1.5 min-h-[44px] py-2.5 rounded-xl text-sm font-semibold border transition ${
+                className={`press inline-flex items-center justify-center gap-1.5 min-h-[44px] py-2.5 rounded-xl text-body font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
                       ? 'bg-pos text-white border-pos'
@@ -116,7 +116,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
           {/* Kategori — untuk laporan pertanggungjawaban (opsi ikut tipe) */}
           <div>
-            <label htmlFor="kasrt-kategori" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Kategori</label>
+            <label htmlFor="kasrt-kategori" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Kategori</label>
             <select id="kasrt-kategori" name="kategori" value={kategori} onChange={(e) => setKategori(e.target.value)} required
               className="field">
               {kategoriOpsi(tipe).map((o) => (
@@ -126,7 +126,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           </div>
 
           <div>
-            <label htmlFor="kasrt-keterangan" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Keterangan</label>
+            <label htmlFor="kasrt-keterangan" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Keterangan</label>
             <input
               id="kasrt-keterangan"
               name="keterangan"
@@ -142,9 +142,9 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="kasrt-nominal" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
+              <label htmlFor="kasrt-nominal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-500 dark:text-gray-400">Rp</span>
                 <input
                   id="kasrt-nominal"
                   name="nominal"
@@ -159,7 +159,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               </div>
             </div>
             <div>
-              <label htmlFor="kasrt-tanggal" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Tanggal</label>
+              <label htmlFor="kasrt-tanggal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Tanggal</label>
               <input
                 id="kasrt-tanggal"
                 name="tanggal"
@@ -174,7 +174,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
           {nominal > 0 && (
             <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800/40'}`}>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-caption text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
                 <span className={`font-display font-bold tabular-nums ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
                   {/* formatRupiahPlain pakai Math.abs → tanda minus ditambah sendiri */}
@@ -195,7 +195,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <button
               type="submit"
               disabled={saving || !nominal}
-              className={`flex-1 py-3 text-white text-sm font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 flex items-center justify-center gap-2 ${
+              className={`flex-1 py-3 text-white text-body font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 flex items-center justify-center gap-2 ${
                 tipe === 'masuk' ? 'btn-brand' : 'btn-danger'
               }`}
             >
@@ -634,7 +634,7 @@ export default function KasRTPage() {
         {!loading && list.length > 1 && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
-              <p className="text-sm font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</p>
+              <p className="text-body font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</p>
               <AreaTrend points={saldoSeries} />
               {/* Kaki grafik — sebelumnya kartu ini cuma garis: tanpa sumbu, tanpa
                   periode, tanpa nilai, dan AreaTrend aria-hidden → pembaca layar
@@ -654,7 +654,7 @@ export default function KasRTPage() {
             {monthly.length > 0 && (
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
                 <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
-                  <p className="text-sm font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
+                  <p className="text-body font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
                   <div className="flex items-center gap-1">
                     {[3, 6, 12].map((p) => (
                       <button
@@ -663,11 +663,11 @@ export default function KasRTPage() {
                         aria-pressed={chartPeriod === p}
                         aria-label={`${p} bulan terakhir`}
                         /* Kosakata chip KANONIK (sama FilterChips): rounded-full,
-                           text-xs font-semibold, inaktif putih ber-border-control.
+                           text-caption font-semibold, inaktif putih ber-border-control.
                            Dulu kontrol ini satu-satunya "pilih 1 dari N" yang
                            beda wajah — kotak rounded-md ber-fill abu tanpa tepi,
                            padahal pekerjaannya sama: memfilter data. */
-                        className={`press shrink-0 min-h-[44px] px-3 inline-flex items-center justify-center rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+                        className={`press shrink-0 min-h-[44px] px-3 inline-flex items-center justify-center rounded-full text-caption font-semibold whitespace-nowrap transition-colors ${
                           chartPeriod === p
                             ? 'bg-brand text-white'
                             : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-control-dark'
@@ -721,7 +721,7 @@ export default function KasRTPage() {
         {/* Rekap per kategori — untuk pertanggungjawaban */}
         {!loading && list.length > 0 && (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 mt-4">
-            <p className="text-sm font-bold text-ink dark:text-gray-100 mb-3">Rekap per Kategori</p>
+            <p className="text-body font-bold text-ink dark:text-gray-100 mb-3">Rekap per Kategori</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Penerimaan */}
               <div className="inset-soft rounded-xl p-3">
@@ -935,19 +935,19 @@ export default function KasRTPage() {
               <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
             <p className="text-base font-bold text-ink dark:text-gray-100 leading-snug">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</p>
-            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
+            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
             <div className="inset-soft rounded-2xl p-4 space-y-2.5 mt-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-ink-faint dark:text-gray-400">Tipe</span>
-                <span className={`text-sm font-semibold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
+                <span className="text-body text-ink-faint dark:text-gray-400">Tipe</span>
+                <span className={`text-body font-semibold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
                   {selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-ink-faint dark:text-gray-400">Nominal</span>
+                <span className="text-body text-ink-faint dark:text-gray-400">Nominal</span>
                 {/* Wajah nominal KANONIK (`text-amount font-semibold`) — sama
                     persis dgn baris "Jumlah" di sheet detail Beranda: panel
-                    `.inset-soft` yang sama, label `text-sm` yang sama, pekerjaan
+                    `.inset-soft` yang sama, label `text-body` yang sama, pekerjaan
                     yang sama. Dulu di sini 16px/700, di sana 17px/600: satu
                     pekerjaan, dua kostum. */}
                 <span className={`font-display text-amount font-semibold tabular-nums ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
@@ -960,15 +960,15 @@ export default function KasRTPage() {
                   versi ringkas karena metanya di-`truncate` dalam ~120px. */}
               {selectedRow.kategori && (
                 <div className="flex items-start justify-between gap-3">
-                  <span className="text-sm text-ink-faint dark:text-gray-400 shrink-0">Kategori</span>
-                  <span className="text-sm font-semibold text-ink dark:text-gray-100 text-right">
+                  <span className="text-body text-ink-faint dark:text-gray-400 shrink-0">Kategori</span>
+                  <span className="text-body font-semibold text-ink dark:text-gray-100 text-right">
                     {labelKategori(selectedRow.tipe, selectedRow.kategori)}
                   </span>
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-ink-faint dark:text-gray-400">Saldo setelah</span>
-                <span className={`font-display text-sm font-semibold tabular-nums ${selectedRow.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink dark:text-gray-100'}`}>
+                <span className="text-body text-ink-faint dark:text-gray-400">Saldo setelah</span>
+                <span className={`font-display text-body font-semibold tabular-nums ${selectedRow.saldo_setelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink dark:text-gray-100'}`}>
                   {maskRp(`${selectedRow.saldo_setelah < 0 ? '-' : ''}Rp${Math.abs(selectedRow.saldo_setelah).toLocaleString('id-ID')}`, hidden, 4)}
                 </span>
               </div>
@@ -979,19 +979,19 @@ export default function KasRTPage() {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => { setEditing(selectedRow); setSelectedRow(null); setShowModal(true); }}
-                  className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 text-sm font-bold"
+                  className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 text-body font-bold"
                 >
                   <Pencil className="w-4 h-4" /> Edit
                 </button>
                 <button
                   onClick={() => setHapusRow(selectedRow)}
-                  className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border bg-white dark:bg-gray-800 text-neg dark:text-rose-400 border-rose-200 dark:border-rose-900"
+                  className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-body font-bold border bg-white dark:bg-gray-800 text-neg dark:text-rose-400 border-rose-200 dark:border-rose-900"
                 >
                   <Trash2 className="w-4 h-4" /> Hapus
                 </button>
               </div>
             ) : (
-              <button onClick={rowDrag.dismiss} className="btn-secondary w-full py-3 mt-4 text-sm font-bold">
+              <button onClick={rowDrag.dismiss} className="btn-secondary w-full py-3 mt-4 text-body font-bold">
                 Tutup
               </button>
             )}

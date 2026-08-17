@@ -39,14 +39,14 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
         </div>
       </div>
 
-      <p className="text-balance text-sm font-bold text-gray-700 dark:text-gray-200">{title}</p>
+      <p className="text-balance text-body font-bold text-gray-700 dark:text-gray-200">{title}</p>
       {subtitle && (
-        <p className="text-pretty text-xs text-ink-faint dark:text-gray-400 mt-1 max-w-[230px] leading-relaxed">{subtitle}</p>
+        <p className="text-pretty text-caption text-ink-faint dark:text-gray-400 mt-1 max-w-[230px] leading-relaxed">{subtitle}</p>
       )}
       {action && (
         <button
           onClick={action.onClick}
-          className="press mt-4 inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-xl text-sm font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200/60 dark:ring-emerald-800/40 active:bg-emerald-100 dark:active:bg-emerald-900/30 transition-colors"
+          className="press mt-4 inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-xl text-body font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200/60 dark:ring-emerald-800/40 active:bg-emerald-100 dark:active:bg-emerald-900/30 transition-colors"
         >
           {action.icon && <action.icon className="w-4 h-4" strokeWidth={2} />}
           {action.label}

@@ -86,15 +86,15 @@ export default function BackupRestore({ open, onClose }: Props) {
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
           <div className="flex items-center gap-2 mb-1">
             <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">Backup Data</h2>
+            <h2 className="text-body font-bold text-gray-900 dark:text-gray-100">Backup Data</h2>
           </div>
-          <p className="text-pretty text-xs text-gray-500 dark:text-gray-400 mb-4">
+          <p className="text-pretty text-caption text-gray-500 dark:text-gray-400 mb-4">
             Unduh seluruh data (anggota, tarikan, absensi, talangan, kas) sebagai satu file JSON. Simpan baik-baik sebagai cadangan.
           </p>
           <button
             onClick={handleBackup}
             disabled={backingUp}
-            className="btn-brand w-full min-h-[44px] py-3 font-semibold text-sm flex items-center justify-center gap-2"
+            className="btn-brand w-full min-h-[44px] py-3 font-semibold text-body flex items-center justify-center gap-2"
           >
             {backingUp ? <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan…</> : <><Download className="w-4 h-4" /> Unduh Backup Sekarang</>}
           </button>
@@ -113,11 +113,11 @@ export default function BackupRestore({ open, onClose }: Props) {
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-rose-200/70 dark:border-rose-900/40 lift p-5">
           <div className="flex items-center gap-2 mb-1">
             <Upload className="w-4 h-4 text-neg dark:text-rose-400" />
-            <h2 className="text-balance text-sm font-bold text-gray-900 dark:text-gray-100">Pulihkan (Restore)</h2>
+            <h2 className="text-balance text-body font-bold text-gray-900 dark:text-gray-100">Pulihkan (Restore)</h2>
           </div>
           <div className="flex items-start gap-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200/60 dark:border-rose-800/40 rounded-xl p-3 mb-4">
             <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-            <p className="text-pretty text-xs text-rose-700 dark:text-rose-300 leading-relaxed">
+            <p className="text-pretty text-caption text-rose-700 dark:text-rose-300 leading-relaxed">
               Memulihkan akan <b>mengganti seluruh data saat ini</b> dengan isi file backup. Tindakan ini tidak bisa dibatalkan — pastikan kamu sudah membuat backup terbaru lebih dulu.
             </p>
           </div>
@@ -133,7 +133,7 @@ export default function BackupRestore({ open, onClose }: Props) {
             </button>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
+              <div className="flex items-center gap-2 text-caption text-emerald-700 dark:text-emerald-400 font-semibold">
                 <CheckCircle2 className="w-4 h-4" /> File backup terbaca {pending.exportedAt ? `(${pending.exportedAt.slice(0, 10)})` : ''}
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -144,7 +144,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                 ))}
               </div>
               <div>
-                <label htmlFor="restore-konfirmasi" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                <label htmlFor="restore-konfirmasi" className="block text-caption font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
                   Ketik <span className="font-bold text-neg dark:text-rose-400">{KATA_KONFIRMASI}</span> untuk konfirmasi
                 </label>
                 <input
@@ -157,7 +157,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                   onChange={(e) => setKonfirmasi(e.target.value)}
                   placeholder={KATA_KONFIRMASI}
                   autoCapitalize="characters"
-                  className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-sm dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-neg dark:focus:ring-rose-400 transition"
+                  className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-body dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-neg dark:focus:ring-rose-400 transition"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                 <button
                   onClick={handleRestore}
                   disabled={restoring || konfirmasi.trim().toUpperCase() !== KATA_KONFIRMASI}
-                  className="btn-danger press flex-1 min-h-[44px] py-3 font-semibold text-sm disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="btn-danger press flex-1 min-h-[44px] py-3 font-semibold text-body disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {restoring ? <><RefreshCw className="w-4 h-4 animate-spin" /> Memulihkan…</> : 'Pulihkan Sekarang'}
                 </button>

@@ -326,7 +326,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           <div className="reveal border-t border-line dark:border-gray-800 list-inset [--di-l:3.75rem] [--di-r:1rem]">
             {(showAll ? [...belumEntries, ...lunasEntries] : belumEntries).map(t => (
               <div key={t.id} className="flex items-center gap-2 px-4 py-3">
-                <div className={`icon-tile w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
+                <div className={`icon-tile w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-caption font-bold ${
                   t.status_lunas
                     ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
                     : 'bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-300'
@@ -335,12 +335,12 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-body font-semibold text-ink dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
-                  <p className="text-xs text-ink-faint dark:text-gray-400 truncate">
+                  <p className="text-caption text-ink-faint dark:text-gray-400 truncate">
                     {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-display font-semibold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">{maskRp(formatRupiahPlain(t.nominal), hidden, 4)}</span>
+                  <span className="text-caption font-display font-semibold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">{maskRp(formatRupiahPlain(t.nominal), hidden, 4)}</span>
                   {t.status_lunas && (
                     <Tag tone="success">LUNAS</Tag>
                   )}
@@ -349,7 +349,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
-                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-white text-xs font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 shrink-0 whitespace-nowrap ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-white text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 shrink-0 whitespace-nowrap ${
                       confirmId === t.id ? 'bg-brand' : 'btn-brand'
                     }`}
                   >
@@ -362,7 +362,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBatalClick(t)}
                     disabled={processingId === t.id}
-                    className="inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-xs font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    className="inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                   >
                     {processingId === t.id ? (
                       <><RefreshCw className="w-3 h-3 animate-spin" />Memproses…</>
@@ -457,8 +457,8 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 text-center">
           <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-ink-sub dark:text-gray-300">Semua Talangan Lunas</p>
-          <p className="text-xs text-ink-faint dark:text-gray-400">{countLunas} talangan tercatat</p>
+          <p className="text-body font-semibold text-ink-sub dark:text-gray-300">Semua Talangan Lunas</p>
+          <p className="text-caption text-ink-faint dark:text-gray-400">{countLunas} talangan tercatat</p>
         </div>
       )}
       </CrossFade>

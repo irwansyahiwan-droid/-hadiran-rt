@@ -58,12 +58,12 @@ export default function PwaUpdatePrompt() {
           <Sparkles className="w-4 h-4 text-emerald-200" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold leading-tight">Versi baru tersedia</p>
+          <p className="text-body font-bold leading-tight">Versi baru tersedia</p>
           <p className="text-micro text-white/85">Muat ulang untuk pakai versi terbaru.</p>
         </div>
         <button
           onClick={() => waiting.postMessage('SKIP_WAITING')}
-          className="press shrink-0 inline-flex items-center gap-1.5 bg-white text-brand text-xs font-bold px-3 py-2 rounded-xl"
+          className="press shrink-0 inline-flex items-center gap-1.5 bg-white text-brand text-caption font-bold px-3 py-2 rounded-xl"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Muat ulang

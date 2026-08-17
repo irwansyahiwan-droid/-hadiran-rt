@@ -70,13 +70,13 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
         </div>
         <div>
           <h3 className="text-balance text-base font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h3>
-          <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
+          <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
             Saldo hadiran: <span className="font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
         </div>
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label htmlFor="kashadiran-tarikan" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Dari tarikan</label>
+            <label htmlFor="kashadiran-tarikan" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Dari tarikan</label>
             <select id="kashadiran-tarikan" name="tarikan" value={tarikanId} onChange={e => setTarikanId(e.target.value)} required
               className="field">
               {tarikanOpsi.length === 0 && <option value="">— belum ada tarikan selesai —</option>}
@@ -88,23 +88,23 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             </select>
           </div>
           <div>
-            <label htmlFor="kashadiran-keterangan" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Keterangan</label>
+            <label htmlFor="kashadiran-keterangan" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Keterangan</label>
             <input id="kashadiran-keterangan" name="keterangan" autoComplete="off" type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
               placeholder="Contoh: Setoran bulan Mei 2026…"
               className="field" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="kashadiran-nominal" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
+              <label htmlFor="kashadiran-nominal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400">Rp</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-500 dark:text-gray-400">Rp</span>
                 <input id="kashadiran-nominal" name="nominal" autoComplete="off" type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
                   onChange={e => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)} required
                   className="field pl-9 pr-3" />
               </div>
             </div>
             <div>
-              <label htmlFor="kashadiran-tanggal" className="block text-xs font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Tanggal</label>
+              <label htmlFor="kashadiran-tanggal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Tanggal</label>
               <input id="kashadiran-tanggal" name="tanggal" type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
                 className="field" />
             </div>
@@ -113,7 +113,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             <button type="button" onClick={drag.dismiss}
               className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
             <button type="submit" disabled={saving || !nominal}
-              className="btn-brand flex-1 py-3 text-sm font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2">
+              className="btn-brand flex-1 py-3 text-body font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
               {saving ? 'Menyimpan…' : 'Setor'}
             </button>
@@ -593,7 +593,7 @@ export default function KasHadiranPage() {
               ikut jadi biru). Panel di atas hero pakai bg-black/25 — aturan
               kontras 13 Jul: panel di hero gelapkan, jangan terangkan. */}
           {sudahSetor && (
-            <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-white text-xs font-semibold">
+            <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-white text-caption font-semibold">
               <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
             </span>
           )}
@@ -603,7 +603,7 @@ export default function KasHadiranPage() {
         {/* Alur Kas */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
-            <p className="inline-flex items-center gap-1 text-sm font-bold text-ink dark:text-gray-100">
+            <p className="inline-flex items-center gap-1 text-body font-bold text-ink dark:text-gray-100">
               Alur Kas Hadiran
               <InfoTip label="Iuran">
                 Tiap anggota bayar Rp50.000/tarikan: Rp45.000 untuk Sohibul Bait (penerima) + Rp5.000 masuk kas. Yang tidak hadir ditalangi dulu.
@@ -639,16 +639,16 @@ export default function KasHadiranPage() {
                     juga menyembunyikan warna grafik. Ikon + label + nominal
                     kini satu pernyataan, bukan tiga suara. */}
                 <TrendingUp className="w-3.5 h-3.5 text-pos dark:text-pos-dark" />
-                <span className="text-sm text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
+                <span className="text-body text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="text-sm font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
+              <span className="text-body font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
             <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" />
-                <span className="text-sm text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
+                <span className="text-body text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
-              <span className="text-sm font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
+              <span className="text-body font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-1.5 min-w-0">
@@ -659,17 +659,17 @@ export default function KasHadiranPage() {
                     dipakai pil "WARGA") + pasangan blue-400 di gelap, supaya ia
                     tak lagi jadi titik paling menyala di panel. */}
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-700 dark:text-blue-400" />
-                <span className="text-sm text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
+                <span className="text-body text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
               {/* Nominal NETRAL, bukan biru: DESIGN.stitch §2 mengunci Setor Blue
                   sebagai sinyal STATUS (hero Kas Hadiran) — biru tak boleh
                   menyentuh nilai uang, kalau tidak panel ini punya 4 keluarga
                   warna (hijau/amber/biru/rose) dan biru diam-diam jadi aksen
                   kedua. Ikon biru dipertahankan sbg penanda kategori "transfer". */}
-              <span className="text-sm font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
+              <span className="text-body font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
-              <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
+              <p className="text-body font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
               <span className={`text-base font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
@@ -760,7 +760,7 @@ export default function KasHadiranPage() {
                               "Lunas semua"). Satu fakta dua sandi: warna jadi
                               tebakan, dan ambernya bukan token `warn` mana pun.
                               Kini netral (abu = penanda, sesuai sistem warna). */}
-                          <div className="icon-tile w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
+                          <div className="icon-tile w-7 h-7 rounded-lg flex items-center justify-center text-caption font-bold shrink-0 bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
@@ -810,7 +810,7 @@ export default function KasHadiranPage() {
 
                       {/* ── Progress bar + kas info ───────────────────── */}
                       <div className="px-5 pb-4">
-                        <div className="flex items-center justify-between text-sm text-ink-sub dark:text-gray-400 mb-2">
+                        <div className="flex items-center justify-between text-body text-ink-sub dark:text-gray-400 mb-2">
                           <span>
                             Kas Hadiran{' '}
                             <span className="font-display font-semibold tabular-nums text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
@@ -837,7 +837,7 @@ export default function KasHadiranPage() {
                       {/* ── Actions ──────────────────────────────────
                           PDF pendapatan tersedia untuk semua (termasuk warga);
                           Absensi, Batalkan & Hapus khusus bendahara. */}
-                      {/* Aksi kartu dulu tak punya WAJAH tombol: `text-xs`
+                      {/* Aksi kartu dulu tak punya WAJAH tombol: `text-caption`
                           `text-ink-sub` `font-medium` + ikon 14px = seberat teks
                           caption, tanpa `.press`, tanpa haptic. Padahal ini
                           berulang di 13 kartu, jadi tiap kartu berakhir dgn
@@ -987,13 +987,13 @@ export default function KasHadiranPage() {
                 <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
                 <div className="min-w-0 flex-1">
                   <p className="text-base font-bold text-ink dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
-                  <p className="text-xs text-ink-faint dark:text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
+                  <p className="text-caption text-ink-faint dark:text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
                 </div>
                 {isBendahara && !detailLoading && (
                   <button
                     onClick={handleAbsensiPDF}
                     aria-label="Cetak daftar hadir PDF"
-                    className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-xs font-semibold px-3 py-2 rounded-xl shadow-sm"
+                    className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-caption font-semibold px-3 py-2 rounded-xl shadow-sm"
                   >
                     <FileText className="w-4 h-4" /> PDF Absensi
                   </button>
@@ -1041,7 +1041,7 @@ export default function KasHadiranPage() {
                   {(detailHadir.length > 0 || detailTitip.length > 0 || detailTidak.length > 0) && (
                     <div className="inset-soft rounded-2xl px-4 py-3.5">
                       <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
-                      <div className="space-y-1.5 text-sm">
+                      <div className="space-y-1.5 text-body">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × <span className="font-display tabular-nums">{formatRupiahPlain(SOHIBUL_PER)}</span></span>
                           <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
@@ -1069,7 +1069,7 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-2.5 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
-                            <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
                           </div>
                         ))}
@@ -1084,7 +1084,7 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-2.5 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
-                            <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
                               <Tag tone="success"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</Tag>
                             ) : (
@@ -1103,7 +1103,7 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-2.5 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
-                            <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {/* emerald-500 di atas putih cuma 2,50:1. Ia lolos
                                 sapuan karena barisnya sudah berlabel teks
                                 ("Hadir (N)" + nama) sehingga centang ini
@@ -1116,7 +1116,7 @@ export default function KasHadiranPage() {
                     </div>
                   )}
                   {detailHadir.length === 0 && detailTitip.length === 0 && detailTidak.length === 0 && (
-                    <p className="text-center text-sm text-ink-faint dark:text-gray-400 py-8">Belum ada data absensi untuk tarikan ini.</p>
+                    <p className="text-center text-body text-ink-faint dark:text-gray-400 py-8">Belum ada data absensi untuk tarikan ini.</p>
                   )}
                 </>
               )}

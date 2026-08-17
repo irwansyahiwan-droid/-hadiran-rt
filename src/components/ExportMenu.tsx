@@ -85,7 +85,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
            (fill .inset-soft + label ink-faint) ada di index.css, jadi keadaan
            nonaktif di sini terbaca 8,9:1 — bukan `opacity-50` yang dulu
            menjatuhkan label ke 2,2:1 (lihat `npm run audit:mati`). */
-        className="btn-mati press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-sm font-semibold min-h-[44px] px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:border-transparent disabled:shadow-none"
+        className="btn-mati press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-body font-semibold min-h-[44px] px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:border-transparent disabled:shadow-none"
       >
         <Download className="w-4 h-4" />
         Ekspor
@@ -110,7 +110,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
                 role="menuitem"
                 tabIndex={-1}
                 onClick={() => { haptic(); setOpen(false); onClick(); }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-700 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-body font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-700 transition-colors"
               >
                 <Icon className={`w-[18px] h-[18px] ${tone ?? 'text-gray-400'}`} />
                 {label}

@@ -204,7 +204,7 @@ export default function JadwalWargaPage() {
         <div className="space-y-3">
         {/* StatRow 4 kolom — cermin markup StatRow (tight: px-3 py-4) */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-3 py-4">
-          {/* h-7 = line-height text-xl (28px); h-[15px] = text-xs leading-tight
+          {/* h-7 = line-height text-xl (28px); h-[15px] = text-caption leading-tight
               → tinggi total sama persis dgn StatRow asli (79px), tanpa drift. */}
           <div className="grid grid-cols-4 divide-x divide-line dark:divide-gray-800">
             {[0, 1, 2, 3].map((i) => (
@@ -306,7 +306,7 @@ export default function JadwalWargaPage() {
               <p className="text-white text-lg font-bold leading-tight">
                 Tarikan ke-{lastTarikan.nomor} · {formatTanggal(lastTarikan.tanggal)}
               </p>
-              <p className="text-emerald-100 text-sm mt-0.5">
+              <p className="text-emerald-100 text-body mt-0.5">
                 Sohibul Bait
                 <InfoTip label="Sohibul Bait" tone="onDark" className="mx-1">
                   Anggota yang menerima seluruh hasil tarikan pada giliran ini (penerima arisan).
@@ -317,7 +317,7 @@ export default function JadwalWargaPage() {
 
             {/* Progress bar */}
             <div>
-              <div className="flex items-center justify-between text-xs text-emerald-100 mb-1">
+              <div className="flex items-center justify-between text-caption text-emerald-100 mb-1">
                 <span>Kehadiran</span>
                 <span className="font-bold tabular-nums">{hadirCount}/{lastTarikan.total_warga} ({pctHadir}%)</span>
               </div>
@@ -401,7 +401,7 @@ export default function JadwalWargaPage() {
               // Fokus ikut pindah (aktivasi otomatis — hanya 2 panel, ringan).
               document.getElementById(`subtab-${next}`)?.focus();
             }}
-            className={`press relative z-10 flex-1 min-h-[44px] py-2.5 rounded-xl text-sm font-semibold transition-colors inline-flex items-center justify-center gap-1.5 ${
+            className={`press relative z-10 flex-1 min-h-[44px] py-2.5 rounded-xl text-body font-semibold transition-colors inline-flex items-center justify-center gap-1.5 ${
               subTab === id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
             }`}
           >
@@ -500,11 +500,11 @@ export default function JadwalWargaPage() {
                       {idx + 1}
                     </span>
                     {/* Avatar */}
-                    <div className={`icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ava}`}>
+                    <div className={`icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-caption font-bold ${ava}`}>
                       {w.nama.charAt(0)}
                     </div>
                     {/* Nama */}
-                    <p className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
+                    <p className="flex-1 text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
                     {/* Badge — hadir / titip (iuran masuk) / tidak hadir */}
                     {!lastTarikan ? (
                       <Tag tone="neutral" className="shrink-0">—</Tag>
@@ -532,7 +532,7 @@ export default function JadwalWargaPage() {
               <button
                 onClick={cetakJadwal}
                 disabled={allTarikan.length === 0}
-                className="press flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                className="press flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-caption font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
               >
                 <FileText className="w-3.5 h-3.5" />
                 PDF Jadwal
@@ -570,16 +570,16 @@ export default function JadwalWargaPage() {
                         karena nomor tarikan bukan status. Redupnya nama DIPERTAHANKAN
                         (itu hierarki lampau vs mendatang, bukan status), dan pill
                         tetap satu-satunya yang menyebut status dengan kata. */}
-                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
+                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-body bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
                       {t.nomor}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-semibold truncate ${isSelesai ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                      <p className={`text-body font-semibold truncate ${isSelesai ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
                         {t.sohibul_bait?.nama ?? '—'}
                       </p>
-                      <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
+                      <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
                         {formatTanggal(t.tanggal)}
                         {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
                           <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>

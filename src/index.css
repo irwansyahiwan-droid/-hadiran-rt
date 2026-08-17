@@ -127,9 +127,22 @@ body {
 
 /* ── Guard auto-zoom iOS ──────────────────────────────────────────────
    Safari iOS men-zoom halaman saat fokus ke input ber-font <16px (dan zoom
-   tidak balik sendiri). Semua input app pakai text-sm (14px) → paksa 16px
-   dari SATU titik. Specificity (0,1,1) menang atas utility .text-sm (0,1,0). */
-input.text-sm, select.text-sm, textarea.text-sm { font-size: 16px; }
+   tidak balik sendiri). Paksa 16px dari SATU titik.
+
+   Guard ini dulu HANYA `input.text-sm` dan berdiri di atas kebetulan yang
+   tak terlihat: `.field` meng-`@apply text-sm`, dan `@apply` Tailwind ikut
+   menyalin SELEKTOR KOMPLEKS — jadi `input.text-sm{16px}` diam-diam
+   diterbitkan ulang sebagai `input.field{16px}`. Dibuktikan dgn memindahkan
+   `.field` ke `text-base` lalu build: aturan `input.field` LENYAP dari CSS
+   keluaran. Artinya siapa pun yang memindahkan `.field` ke token ramp lain
+   akan mematikan guard ini tanpa satu pun error — dan gejalanya cuma muncul
+   di iPhone asli, saat warga menekan kolom isian.
+
+   Sekarang guard tidak bergantung pada kelas apa pun. `input[class]` = (0,1,1)
+   → tetap menang atas utility `.text-*` (0,1,0); baris tanpa `[class]`
+   mengurus input yang tak membawa kelas sama sekali. */
+input, select, textarea { font-size: 16px; }
+input[class], select[class], textarea[class] { font-size: 16px; }
 
 /* ── Detail tuntas: seleksi, caret, fokus keyboard (semua on-brand) ───
    Hal kecil yang bikin app terasa "satu produk", bukan kumpulan default. */
@@ -958,7 +971,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      .btn-brand). Pasangan visual btn-brand di footer dua-tombol. */
   .btn-secondary {
     @apply border border-control dark:border-control-dark
-           text-sm font-semibold text-gray-600 dark:text-gray-300
+           text-body font-semibold text-gray-600 dark:text-gray-300
            hover:bg-gray-50 dark:hover:bg-gray-800;
     transition-property: background-color, transform;
     transition-duration: 0.16s;
@@ -974,13 +987,13 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   .field {
     @apply w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800
            border border-control dark:border-control-dark
-           text-sm text-gray-900 dark:text-gray-100
+           text-body text-gray-900 dark:text-gray-100
            placeholder-gray-500 dark:placeholder-gray-400;
   }
   .field-search {
     @apply w-full pl-9 pr-9 py-3 rounded-xl bg-white dark:bg-gray-900
            border border-control dark:border-control-dark
-           text-sm dark:text-gray-100
+           text-body dark:text-gray-100
            placeholder-gray-500 dark:placeholder-gray-400;
   }
   /* Fokus field: cincin PADAT, bukan alpha 30%. Versi lama

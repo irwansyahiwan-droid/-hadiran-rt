@@ -147,7 +147,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
-        <p className="text-pretty text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-pretty text-caption text-gray-500 dark:text-gray-400">
           Tutup buku <span className="font-semibold">sekarang</span> untuk posisi kas terkini, atau pilih per triwulan. Bagikan sebagai gambar (PNG) langsung ke grup WhatsApp, atau unduh PDF.
         </p>
 
@@ -182,7 +182,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
             <button
               onClick={() => bagikan('snap', snapToCard(snap))}
               disabled={sharingKey !== null}
-              className="press relative w-full min-h-[44px] py-3 rounded-2xl bg-white text-brand font-bold text-sm hover:bg-emerald-50 transition flex items-center justify-center gap-2 disabled:opacity-60"
+              className="press relative w-full min-h-[44px] py-3 rounded-2xl bg-white text-brand font-bold text-body hover:bg-emerald-50 transition flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {sharingKey === 'snap' ? (
                 <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan gambar…</>
@@ -227,7 +227,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
               <div className="flex items-end justify-between gap-2">
                 <div>
                   <p className="text-body font-bold text-gray-900 dark:text-gray-100">{r.label}</p>
-                  <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{r.rentang}</p>
+                  <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{r.rentang}</p>
                 </div>
                 {idx === 0 && (
                   <span className="text-micro font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
@@ -254,7 +254,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 <button
                   onClick={() => bagikan(r.key, triwulanToCard(r))}
                   disabled={sharingKey !== null}
-                  className="press btn-brand flex-1 min-h-[44px] py-3 text-white font-semibold text-sm flex items-center justify-center gap-2"
+                  className="press btn-brand flex-1 min-h-[44px] py-3 text-white font-semibold text-body flex items-center justify-center gap-2"
                 >
                   {sharingKey === r.key ? (
                     <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan…</>

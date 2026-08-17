@@ -116,7 +116,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
   const input =
     'field';
-  const label = 'block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5';
+  const label = 'block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5';
 
   return (
     <div className="fixed inset-0 z-modal flex items-end sm:items-center justify-center">
@@ -135,7 +135,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">
               {mode === 'add' ? 'Tambah Anggota' : 'Edit Anggota'}
             </p>
-            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">
+            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
               {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
             </p>
           </div>
@@ -165,7 +165,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
               key={r}
               onClick={() => { if (role !== r) haptic(); setRole(r); }}
               aria-pressed={role === r}
-              className={`press min-h-[44px] py-2.5 rounded-xl text-sm font-semibold border transition ${
+              className={`press min-h-[44px] py-2.5 rounded-xl text-body font-semibold border transition ${
                 role === r
                   ? 'bg-brand text-white border-transparent' /* fill brand DATAR (MATERIAL-FLAT) — gradient+glow pra-flat dihapus */
                   : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-control-dark'
@@ -184,8 +184,8 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             aria-checked={aktif}
             className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark mb-4"
           >
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
-            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+            <span className="text-body font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
+            <span className={`text-caption font-bold px-2.5 py-1 rounded-full ${
               aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
             }`}>
               {aktif ? 'Aktif' : 'Nonaktif'}
@@ -202,7 +202,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
               aria-checked={susulan}
               className="w-full flex items-center justify-between gap-2 px-3.5 py-3 text-left"
             >
-              <span className="flex items-center gap-2 text-sm font-semibold text-amber-800 dark:text-amber-300">
+              <span className="flex items-center gap-2 text-body font-semibold text-amber-800 dark:text-amber-300">
                 <History className="w-4 h-4 shrink-0" />
                 Anggota susulan — sudah lunas tarikan lama
               </span>
@@ -231,7 +231,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                           {on && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
                         </span>
                         <span className="flex-1 min-w-0">
-                          <span className="block text-sm font-semibold text-gray-800 dark:text-gray-100">
+                          <span className="block text-body font-semibold text-gray-800 dark:text-gray-100">
                             Tarikan #{t.nomor}
                           </span>
                           <span className="block text-micro text-ink-faint dark:text-gray-400">
@@ -253,10 +253,10 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         {/* Peringatan: masih punya jadwal tarikan ke depan */}
         {jadwalNonaktif && (
           <div className="mb-4 rounded-2xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/70 dark:bg-rose-900/15 p-3.5">
-            <p className="flex items-center gap-2 text-sm font-bold text-rose-700 dark:text-rose-300">
+            <p className="flex items-center gap-2 text-body font-bold text-rose-700 dark:text-rose-300">
               <AlertTriangle className="w-4 h-4 shrink-0" /> Masih punya jadwal ke depan
             </p>
-            <p className="text-pretty text-xs text-neg dark:text-rose-400/90 mt-1 leading-relaxed">
+            <p className="text-pretty text-caption text-neg dark:text-rose-400/90 mt-1 leading-relaxed">
               {initial?.nama} masih jadi Sohibul Bait di {jadwalNonaktif.length} tarikan:{' '}
               <b>#{jadwalNonaktif.join(', #')}</b>. Setelah dinonaktifkan, jangan lupa ganti Sohibul Bait tarikan tersebut lewat <b>Revisi jadwal</b>.
             </p>
@@ -273,7 +273,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           <button
             onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
             disabled={saving || !nama.trim()}
-            className={`flex-1 py-3 rounded-full text-white text-sm font-bold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
+            className={`flex-1 py-3 rounded-full text-white text-body font-bold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
               /* btn-danger, bukan bg-rose-600 tangan: satu sumber CTA merah →
                  ikut state nonaktif ber-fill abu (label tetap terbaca). */
               jadwalNonaktif ? 'btn-danger' : 'btn-brand'
@@ -351,7 +351,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
       />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}>
-        <p className="text-xs text-ink-faint dark:text-gray-400">{aktifCount} aktif · {list.length} total</p>
+        <p className="text-caption text-ink-faint dark:text-gray-400">{aktifCount} aktif · {list.length} total</p>
 
         {/* Search */}
         <div className="relative">
@@ -414,13 +414,13 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                   idx < filtered.length - 1 ? 'divide-inset' : ''
                 }`}
               >
-                <div className={`icon-tile w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold ${
+                <div className={`icon-tile w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-body font-bold ${
                   w.status_aktif ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
                 }`}>
                   {w.nama.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold truncate ${w.status_aktif ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <p className={`text-body font-semibold truncate ${w.status_aktif ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
                     {w.nama}
                   </p>
                   <p className="text-micro text-ink-faint dark:text-gray-400 flex items-center gap-2 mt-0.5">

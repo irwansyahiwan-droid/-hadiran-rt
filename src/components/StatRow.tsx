@@ -69,7 +69,7 @@ export default function StatRow({
             >
               {s.value}
             </span>
-            <span className="text-xs text-ink-sub dark:text-gray-400 font-medium text-center leading-tight">
+            <span className="text-caption text-ink-sub dark:text-gray-400 font-medium text-center leading-tight">
               {s.label}
             </span>
           </div>

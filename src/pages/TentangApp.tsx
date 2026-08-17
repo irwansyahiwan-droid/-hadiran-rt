@@ -47,7 +47,7 @@ function Section({ icon: Icon, title, children }: { icon: typeof BookOpen; title
         <span className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
           <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
         </span>
-        <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">{title}</h2>
+        <h2 className="text-body font-bold text-gray-900 dark:text-gray-100">{title}</h2>
       </div>
       {children}
     </div>
@@ -104,7 +104,7 @@ export default function TentangApp({ open, onClose }: Props) {
                 <AvatarPeci nama={p.nama} className="w-10 h-10 rounded-xl" />
                 <div className="min-w-0">
                   <p className="text-micro font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{p.nama}</p>
+                  <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{p.nama}</p>
                 </div>
               </div>
             ))}
@@ -153,7 +153,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         <button
           onClick={() => { haptic(); exit.requestClose(); }}
-          className="btn-brand w-full min-h-[44px] py-3 font-semibold text-sm"
+          className="btn-brand w-full min-h-[44px] py-3 font-semibold text-body"
         >
           Tutup
         </button>

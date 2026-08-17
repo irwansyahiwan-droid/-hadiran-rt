@@ -684,7 +684,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
+            <p className="text-body font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
             {/* Sub = ANGKANYA saja. "Total … belum diselesaikan" mengulang judul
                 tepat di atasnya ("Talangan Belum Lunas"), dan panjangnya itu yang
                 memecah kalimat jadi 2 baris di 360px. Bentuk label-lalu-angka juga
@@ -696,7 +696,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </div>
           <button
             onClick={() => onNavigate('talangan')}
-            className="press inline-flex items-center min-h-[44px] text-xs text-warn dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
+            className="press inline-flex items-center min-h-[44px] text-caption text-warn dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
           >
             Lihat
           </button>
@@ -708,7 +708,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={jadwalList.length}
           action={
-            <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
+            <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-medium">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
             </button>
@@ -783,7 +783,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={trxItems.length}
           action={
-            <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-sm text-brand-link dark:text-brand-linkDark font-medium">
+            <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-medium">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
             </button>
@@ -849,7 +849,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           {trxHidden > 0 && (
             <button
               onClick={() => onNavigate('kas')}
-              className="press w-full flex items-center justify-center gap-1 px-4 py-3.5 text-sm font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+              className="press w-full flex items-center justify-center gap-1 px-4 py-3.5 text-body font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
             >
               Lihat {trxHidden} transaksi lainnya
               <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
@@ -880,25 +880,25 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               : <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
           </div>
           <p className="text-body font-medium text-ink dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
-          <p className="text-xs text-ink-faint dark:text-gray-400 mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
+          <p className="text-caption text-ink-faint dark:text-gray-400 mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
           <div className="inset-soft rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-ink-faint dark:text-gray-400">Jumlah</span>
+              <span className="text-body text-ink-faint dark:text-gray-400">Jumlah</span>
               <span className={`font-display text-amount font-semibold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
                 {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
             {selectedTrx.saldoSetelah !== null && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-ink-faint dark:text-gray-400">Saldo Setelah</span>
-                <span className={`font-display text-sm font-semibold tabular-nums ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
+                <span className="text-body text-ink-faint dark:text-gray-400">Saldo Setelah</span>
+                <span className={`font-display text-body font-semibold tabular-nums ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
                   {maskRp(`${selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
                 </span>
               </div>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-ink-faint dark:text-gray-400">Tipe</span>
-              <span className="text-sm font-medium text-ink-sub dark:text-gray-300">
+              <span className="text-body text-ink-faint dark:text-gray-400">Tipe</span>
+              <span className="text-body font-medium text-ink-sub dark:text-gray-300">
                 {selectedTrx.tipe === 'setor' ? 'Setor ke Kas RT' : 'Talangan Lunas'}
               </span>
             </div>

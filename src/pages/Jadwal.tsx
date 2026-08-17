@@ -295,7 +295,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
           </h2>
-          <p className="text-xs text-ink-faint dark:text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
+          <p className="text-caption text-ink-faint dark:text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
         </div>
       </div>
 
@@ -334,8 +334,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
-        <span className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
+        <p className="text-body font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
+        <span className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-caption font-bold rounded-full">
           {pembayarList.length}
         </span>
       </div>
@@ -344,21 +344,21 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => setAll('hadir')}
-          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 active:bg-emerald-100 dark:hover:bg-emerald-900/40 dark:active:bg-emerald-900/40 transition-colors"
+          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-caption font-semibold hover:bg-emerald-100 active:bg-emerald-100 dark:hover:bg-emerald-900/40 dark:active:bg-emerald-900/40 transition-colors"
         >
           <UserCheck className="w-3.5 h-3.5" />
           Semua Hadir
         </button>
         <button
           onClick={() => setAll('titip')}
-          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-xs font-semibold hover:bg-blue-100 active:bg-blue-100 dark:hover:bg-blue-900/40 dark:active:bg-blue-900/40 transition-colors"
+          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-caption font-semibold hover:bg-blue-100 active:bg-blue-100 dark:hover:bg-blue-900/40 dark:active:bg-blue-900/40 transition-colors"
         >
           <Coins className="w-3.5 h-3.5" />
           Semua Titip
         </button>
         <button
           onClick={() => setAll('tidak_hadir')}
-          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700 transition-colors"
+          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-gray-600 dark:text-gray-300 text-caption font-semibold hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset
@@ -400,12 +400,12 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             tidak bisa di-tap (hadir/titip/tidak hadir) & di luar hitungan talangan. */}
         {sohibulWarga && (
           <div className="w-full flex items-center gap-3 p-3.5 [--di-l:3.625rem] [--di-r:0.875rem] divide-inset bg-amber-50/60 dark:bg-amber-900/15">
-            <div className="icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400">
+            <div className="icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-caption font-bold bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400">
               {sohibulWarga.nama.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{sohibulWarga.nama}</p>
-              <p className="text-xs font-medium text-warn dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
+              <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{sohibulWarga.nama}</p>
+              <p className="text-caption font-medium text-warn dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400 shrink-0">
               <Lock className="w-3 h-3" /> Penerima
@@ -425,12 +425,12 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
                 idx < filtered.length - 1 ? 'divide-inset' : ''
               } ${ui.hover}`}
             >
-              <div className={`icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${ui.ava}`}>
+              <div className={`icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-caption font-bold ${ui.ava}`}>
                 {w.nama.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
-                <p className={`text-xs ${ui.text}`}>{ui.label}</p>
+                <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
+                <p className={`text-caption ${ui.text}`}>{ui.label}</p>
               </div>
               {/* Indikator status: hadir ✓ emerald · titip koin biru · tidak hadir lingkaran kosong */}
               {st === 'hadir' ? (
@@ -460,7 +460,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || cancelling}
-            className="btn-brand w-full py-3.5 font-bold text-sm flex items-center justify-center gap-2"
+            className="btn-brand w-full py-3.5 font-bold text-body flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             {saving ? 'Menghitung…' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
@@ -472,7 +472,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             <button
               onClick={handleBatalkanClick}
               disabled={saving || cancelling}
-              className="press w-full py-3 rounded-full font-bold text-sm shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-neg dark:text-rose-400"
+              className="press w-full py-3 rounded-full font-bold text-body shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-neg dark:text-rose-400"
             >
               {cancelling
                 ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan…</>
@@ -560,7 +560,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
             <CheckCircle2 className="w-5 h-5" strokeWidth={2.5} />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{result.tarikanNomor} selesai dihitung</p>
+            <p className="text-body font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{result.tarikanNomor} selesai dihitung</p>
             <p className="text-micro text-ink-faint dark:text-gray-400">Cocokkan uang dulu sebelum ditutup</p>
           </div>
           <button onClick={dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 -mt-2 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0">
@@ -581,7 +581,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         </div>
 
         {/* Kehadiran */}
-        <div className="flex items-center gap-4 px-4 py-2.5 border-t border-line dark:border-gray-800 text-xs">
+        <div className="flex items-center gap-4 px-4 py-2.5 border-t border-line dark:border-gray-800 text-caption">
           <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {result.hadirCount} Hadir
           </span>
@@ -627,7 +627,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           <button
             onClick={share}
             disabled={sharing}
-            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-2.5 text-xs font-semibold"
+            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-2.5 text-caption font-semibold"
           >
             <Share2 className="w-3.5 h-3.5" /> {sharing ? 'Menyiapkan…' : 'Bagikan PNG'}
           </button>
@@ -696,14 +696,14 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
-            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
+            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
           </div>
           <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
-        <label htmlFor="jadwal-edit-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-edit-tanggal" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
         <input
           id="jadwal-edit-tanggal"
           name="tanggal-tarikan"
@@ -713,7 +713,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           className="field mb-4"
         />
 
-        <label htmlFor="jadwal-edit-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-edit-sohibul" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
         <select
           id="jadwal-edit-sohibul"
           name="sohibul-bait"
@@ -737,7 +737,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="btn-brand flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 text-body font-bold flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan…' : 'Simpan Revisi'}
@@ -801,14 +801,14 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
-            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
+            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
           </div>
           <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
-        <label htmlFor="jadwal-add-tanggal" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-add-tanggal" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
         <input
           id="jadwal-add-tanggal"
           name="tanggal-tarikan"
@@ -818,7 +818,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           className="field mb-4"
         />
 
-        <label htmlFor="jadwal-add-sohibul" className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-add-sohibul" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
         <select
           id="jadwal-add-sohibul"
           name="sohibul-bait"
@@ -842,7 +842,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="btn-brand flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 text-body font-bold flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan…' : 'Simpan Tarikan'}
@@ -998,7 +998,7 @@ export default function JadwalPage() {
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
               aria-label="Tambah jadwal tarikan"
-              className="press flex items-center gap-1.5 btn-brand text-sm font-semibold min-h-[44px] px-2.5 py-2 rounded-xl"
+              className="press flex items-center gap-1.5 btn-brand text-body font-semibold min-h-[44px] px-2.5 py-2 rounded-xl"
             >
               <Plus className="w-4 h-4" /> Jadwal
             </button>
@@ -1116,7 +1116,7 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className="btn-brand flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-xs font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm"
+                            className="btn-brand flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm"
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses…' : 'Proses'}
@@ -1208,7 +1208,7 @@ export default function JadwalPage() {
             <p className="text-base font-bold text-ink dark:text-gray-100 leading-snug">
               Tarikan #{rowTarikan.nomor} · {rowTarikan.sohibul_bait?.nama ?? '—'}
             </p>
-            <p className="text-xs text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(rowTarikan.tanggal)}</p>
+            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(rowTarikan.tanggal)}</p>
             <div className="space-y-2 mt-4">
               {rowTarikan.status !== 'selesai' && (
                 <button
@@ -1217,14 +1217,14 @@ export default function JadwalPage() {
                     openWa(null, pesanTarikan(rowTarikan.nomor, rowTarikan.tanggal, rowTarikan.sohibul_bait?.nama ?? '—', rowTarikan.jumlah_per_orang));
                     setRowTarikan(null);
                   }}
-                  className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-sm font-semibold"
+                  className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-body font-semibold"
                 >
                   <MessageCircle className="w-4 h-4" /> Bagikan pengingat WhatsApp
                 </button>
               )}
               <button
                 onClick={() => { setRowTarikan(null); setEditingTarikan(rowTarikan); }}
-                className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-sm font-semibold"
+                className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-body font-semibold"
               >
                 <Pencil className="w-4 h-4" /> Revisi jadwal
               </button>
