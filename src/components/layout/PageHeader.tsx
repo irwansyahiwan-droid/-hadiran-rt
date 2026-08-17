@@ -40,8 +40,13 @@ export default function PageHeader({
     /* gap-2, bukan gap-3: kepala Jadwal bendahara memuat judul + TIGA aksi
          (muat ulang, PDF, "+ Jadwal") dan di 360px sisa ruang judul pas-pasan —
          tiap 4px jarak di sini langsung memakan huruf terakhir judul. */
-    <div className="flex items-center justify-between gap-2">
-      <div className="flex min-w-0 items-center gap-1">
+    /* `flex-wrap` = katup pengaman. Judul sudah `min-w-0 truncate`, tapi grup
+       aksinya `shrink-0` — jadi saat teks dasar browser 200% grup itu sendiri
+       melebar melampaui viewport (terukur 335px di layar 360px) dan tak ada
+       yang bisa mengalah lagi. Di lebar normal keduanya muat sebaris, jadi
+       tampilan tak bergerak. */
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-1">
         {onBack && (
           <button
             onClick={() => { haptic(); onBack(); }}
@@ -61,7 +66,13 @@ export default function PageHeader({
           {subtitle && <p className="mt-0.5 text-caption text-ink-faint dark:text-gray-400">{subtitle}</p>}
         </div>
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-1.5">{actions}</div>}
+      {/* `flex-wrap` + `justify-end` di GRUP aksinya sendiri: `shrink-0` menjaga
+          aksi tak tergencet oleh judul (itu memang niatnya), tapi ia juga
+          berarti grup ini tak pernah mengalah — dan saat teks 200% grup berisi
+          dua aksi melebar ke 335px sedangkan ruang isi halaman cuma 296px.
+          Melipat ISI grup mengecilkan lebar naturalnya tanpa mengorbankan
+          prioritas judul; `justify-end` menjaga aksi tetap rata kanan. */}
+      {actions && <div className="flex max-w-full shrink-0 flex-wrap items-center justify-end gap-1.5">{actions}</div>}
     </div>
   );
 }

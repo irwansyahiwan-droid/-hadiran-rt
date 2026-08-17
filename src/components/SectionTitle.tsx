@@ -38,8 +38,18 @@ export default function SectionTitle({ children, count, action, tone = 'default'
        `px-1` menaruh judul seksi di 20px — tak sejajar tepi kartu (16) MAUPUN isi
        kartu (36). Selisih 4px itu terbaca "hampir sejajar", cacat yang paling
        gampang tertangkap mata. Satu tepi teks halaman = 16px. */
-    <div className={`flex items-center justify-between gap-2 mb-3 ${className}`}>
-      <h2 className={`flex items-center gap-2 text-balance text-lg font-bold ${
+    /* `flex-wrap` = katup pengaman, bukan perubahan tata letak: di 360px judul
+       dan aksinya muat berdampingan, jadi tampilan normal tak bergerak sama
+       sekali. Ia baru bekerja saat teks dasar browser 200%, di mana judul +
+       tombol aksi tak lagi muat — dan karena tak ada leluhur yang meng-clip,
+       tombolnya dulu meluber sampai x=458 pada viewport 360 dan menyeret
+       SELURUH halaman geser samping. Diukur di Beranda: tombol "Lihat semua"
+       adalah elemen yang menentukan `scrollWidth`, bukan carousel di
+       belakangnya (kartu promo yang tampak jauh di luar layar semuanya sudah
+       ter-clip dan tak menambah apa pun). Karena SectionTitle dipakai di tiap
+       layar, satu perbaikan di sini menutup polanya di semua tempat. */
+    <div className={`flex flex-wrap items-center justify-between gap-2 mb-3 ${className}`}>
+      <h2 className={`flex min-w-0 items-center gap-2 text-balance text-lg font-bold ${
         tone === 'muted' ? 'text-ink-sub dark:text-gray-400'
         : tone === 'warn' ? 'text-warn dark:text-warn-dark'
         : 'text-ink dark:text-gray-100'

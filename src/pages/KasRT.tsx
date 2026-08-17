@@ -646,7 +646,10 @@ export default function KasRTPage() {
                   sekaligus (wajah angka 100% Sora; angka selalu tabular). Ia
                   lolos bertahun-tahun karena bersembunyi sbg "caption grafik",
                   padahal isinya saldo awal & akhir periode. */}
-              <div className="flex items-baseline justify-between gap-2 mt-2 font-display text-micro font-medium tabular-nums text-ink-faint dark:text-gray-400">
+              {/* Caption dua-ujung grafik tren (saldo awal & akhir periode).
+                  `flex-wrap` sbg katup: di 200% kedua ujungnya butuh 162px
+                  masing-masing dan mendorong halaman geser samping. */}
+              <div className="flex flex-wrap items-baseline justify-between gap-2 mt-2 font-display text-micro font-medium tabular-nums text-ink-faint dark:text-gray-400">
                 <span>{trenAwal.label} · {maskRp(trenAwal.nilai, hidden, 4)}</span>
                 <span className="text-right">{trenAkhir.label} · {maskRp(trenAkhir.nilai, hidden, 4)}</span>
               </div>
@@ -655,7 +658,11 @@ export default function KasRTPage() {
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
                 <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
                   <p className="text-body font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
-                  <div className="flex items-center gap-1">
+                  {/* `flex-wrap` di GRUP-nya, bukan cuma di induk: ketiga chip
+                      `shrink-0`, jadi saat teks 200% grupnya sendiri melebar ke
+                      369px (> viewport 360) dan induk yang sudah wrap tak bisa
+                      menolong — yang perlu melipat adalah isi grup ini. */}
+                  <div className="flex flex-wrap items-center gap-1">
                     {[3, 6, 12].map((p) => (
                       <button
                         key={p}
@@ -725,13 +732,19 @@ export default function KasRTPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Penerimaan */}
               <div className="inset-soft rounded-xl p-3">
-                <div className="flex items-center justify-between gap-2 mb-2">
+                {/* `flex-wrap`: katup pengaman yang hanya bekerja saat ruang
+                    habis. Di 360px label + total muat berdampingan, jadi
+                    tampilan normal tak bergerak. Saat teks dasar browser 200%
+                    nominalnya (`shrink-0`) tak bisa mengalah dan meluber sampai
+                    x=477 pada viewport 360 — terukur sbg penyumbang TUNGGAL
+                    geser samping 117px halaman Kas RT. */}
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Penerimaan</span>
                   <span className="text-caption font-display font-bold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
                 </div>
                 <div className="space-y-1.5">
                   {KATEGORI_MASUK.filter((o) => (rekapKategori.masuk[o.key] ?? 0) > 0).map((o) => (
-                    <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
+                    <div key={o.key} className="flex flex-wrap items-start justify-between gap-2 text-caption">
                       <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
                     </div>
@@ -741,13 +754,13 @@ export default function KasRTPage() {
               </div>
               {/* Pengeluaran */}
               <div className="inset-soft rounded-xl p-3">
-                <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Pengeluaran</span>
                   <span className="text-caption font-display font-bold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
                 </div>
                 <div className="space-y-1.5">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
-                    <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
+                    <div key={o.key} className="flex flex-wrap items-start justify-between gap-2 text-caption">
                       <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
                     </div>
