@@ -46,7 +46,10 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
           ? 'translate3d(0, calc(100% + 8px), 0)'
           : 'translate3d(0, 0, 0)',
         opacity: tucked ? 0 : 1,
-        transition: 'transform 0.32s var(--ease-out-expo), opacity 0.26s ease',
+        /* `opacity` ikut kurva yang sama dgn `transform`. Tanpa timing function
+           ia jatuh ke `ease` bawaan browser, jadi bar ini menyingkir dengan DUA
+           kurva sekaligus — geser dan pudarnya tak sinkron (kanon §6). */
+        transition: 'transform 0.32s var(--ease-out-expo), opacity 0.26s var(--ease-out-expo)',
         willChange: 'transform',
         WebkitBackfaceVisibility: 'hidden',
         backfaceVisibility: 'hidden',

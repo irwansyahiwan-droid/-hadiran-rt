@@ -117,7 +117,12 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
         boxShadow: scrolled
           ? '0 1px 2px rgba(16,24,40,0.05), 0 4px 12px -8px rgba(16,24,40,0.12)'
           : 'none',
-        transition: 'box-shadow 0.3s var(--ease-out-expo), background-color 0.3s',
+        /* KEDUA properti memakai kurva yang sama. `background-color 0.3s` tanpa
+           timing function jatuh ke `ease` bawaan browser, jadi satu deklarasi
+           ini dulu menjalankan DUA kurva sekaligus — persis "satu gestur, dua
+           kurva" yang kanon §6 sebut sebagai tanda UI yang tak dirancang, dan
+           ia berjalan di elemen yang paling sering bergerak di app. */
+        transition: 'box-shadow 0.3s var(--ease-out-expo), background-color 0.3s var(--ease-out-expo)',
         /* Paksa layer GPU stabil — sticky ber-backdrop-filter bisa "melompat"
            di iOS Safari saat address bar muncul/sembunyi (fix sama dgn BottomNav).
            Transform ini membuat containing block utk descendant fixed → scrim

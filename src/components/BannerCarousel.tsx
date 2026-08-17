@@ -595,7 +595,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                 borderRadius: 'var(--hero-radius)', padding: 24, boxSizing: 'border-box', background: grad, color: '#fff',
                 transform: `translateX(${x}px) translateY(${ty}px) scale(${scale.toFixed(3)}) rotateY(${ry}deg)`,
                 opacity, zIndex: z, willChange: 'transform, opacity',
-                transition: dragging ? 'none' : `transform 0.62s ${EASE}, opacity 0.45s ease, box-shadow 0.45s ease`,
+                transition: dragging ? 'none' : `transform 0.62s ${EASE}, opacity 0.45s ${EASE}, box-shadow 0.45s ${EASE}`,
                 boxShadow: active
                   ? '0 18px 40px -22px rgba(15,40,30,.40), 0 6px 16px -12px rgba(0,0,0,.28)'
                   : '0 10px 24px -18px rgba(0,0,0,.32)',
@@ -644,13 +644,13 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                    selaras dgn aria-hidden kartu (tak ada focusable di dalam aria-hidden). */
                 <div
                   className="relative z-[3] flex h-full flex-col"
-                  style={{ opacity: contentOpacity, transition: dragging ? 'none' : 'opacity 0.42s ease' }}
+                  style={{ opacity: contentOpacity, transition: dragging ? 'none' : `opacity 0.42s ${EASE}` }}
                   {...(!active ? ({ inert: '' } as Record<string, string>) : {})}
                 >
                   {heroSlide}
                 </div>
               ) : (
-                <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW, opacity: contentOpacity, transition: dragging ? 'none' : 'opacity 0.42s ease' }}>
+                <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW, opacity: contentOpacity, transition: dragging ? 'none' : `opacity 0.42s ${EASE}` }}>
                   {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
                   {promo!.cta && onNavigate && (
                     <button
