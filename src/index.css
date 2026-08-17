@@ -527,6 +527,14 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 :root {
   --ease-spring:   cubic-bezier(0.34, 1.4, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Durasi PRESS — pasangan sah `--ease-out-expo`. Aturan "SATU gestur = SATU
+     kurva & SATU durasi" (lihat `.press`) selama ini cuma dijaga separuh:
+     kurvanya punya nama, durasinya ditulis ulang sebagai angka mentah `0.16s`
+     di EMPAT resep (.press, .btn-brand, .btn-danger, .btn-secondary). Sebuah
+     invarian yang tak punya nama tak bisa dilanggar secara terlihat — persis
+     bagaimana tier z-index tanpa nama berakhir jadi `z-40` yang bertabrakan
+     dgn bar nav. Kalau press perlu disetel ulang, geser SATU nilai ini. */
+  --dur-press: 0.16s;
   /* Apple clean — pemisahan kartu dari "satu step tonal + bayangan crisp
      terarah", BUKAN halo. Halo putih dihapus (biang "berkabut"), tint emerald
      dihapus (biang muddy). Semua netral abu-ink → bayangan bersih & mahal.
@@ -802,7 +810,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    "belum digarap" tanpa bisa ditunjuk. */
 .press {
   transition-property: transform, opacity, box-shadow;
-  transition-duration: 0.16s;
+  transition-duration: var(--dur-press);
   transition-timing-function: var(--ease-out-expo);
 }
 .press:active { transform: scale(0.97); }
@@ -867,7 +875,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
        50ms setelah tombolnya. Spring tetap hidup di tempat yang memang
        "hidup" (toast, pop, success) — lihat pemakaian --ease-spring. */
     transition-property: transform, box-shadow, opacity, filter;
-    transition-duration: 0.16s;
+    transition-duration: var(--dur-press);
     transition-timing-function: var(--ease-out-expo);
   }
   /* Hover CTA = filter, BUKAN font-weight. `font-weight: 800` melebarkan label
@@ -901,7 +909,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
       0 2px 6px -1px rgba(136, 19, 55, 0.30);
     /* Anatomi kembar .btn-brand — kurva & durasi press ikut serempak. */
     transition-property: transform, box-shadow, opacity, filter;
-    transition-duration: 0.16s;
+    transition-duration: var(--dur-press);
     transition-timing-function: var(--ease-out-expo);
   }
   .btn-danger:active { transform: scale(0.97); box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.18), 0 1px 3px -1px rgba(136,19,55,0.3); }
@@ -974,7 +982,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
            text-body font-semibold text-gray-600 dark:text-gray-300
            hover:bg-gray-50 dark:hover:bg-gray-800;
     transition-property: background-color, transform;
-    transition-duration: 0.16s;
+    transition-duration: var(--dur-press);
     transition-timing-function: var(--ease-out-expo);
   }
   .btn-secondary:active { transform: scale(0.97); }
