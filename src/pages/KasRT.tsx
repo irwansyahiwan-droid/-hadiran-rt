@@ -742,10 +742,17 @@ export default function KasRTPage() {
                   <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Penerimaan</span>
                   <span className="text-caption font-display font-bold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
                 </div>
+                {/* Label BOLEH membungkus (`min-w-0 flex-1`), nominalnya TIDAK ikut
+                    turun. `flex-wrap` sempat dipasang di baris ini 17 Agu untuk
+                    menutup geser samping @teks-200%, dan itu keliru: di 360px NORMAL
+                    pun label panjang ("Iuran Warga (di luar anggota hadiran)") sudah
+                    memicunya, sehingga nominalnya jatuh ke baris bawah dan berdiri
+                    rata KIRI — kolom angka berhenti sejajar. Yang perlu mengalah
+                    adalah LABEL-nya, bukan seluruh baris. */}
                 <div className="space-y-1.5">
                   {KATEGORI_MASUK.filter((o) => (rekapKategori.masuk[o.key] ?? 0) > 0).map((o) => (
-                    <div key={o.key} className="flex flex-wrap items-start justify-between gap-2 text-caption">
-                      <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                    <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
+                      <span className="min-w-0 flex-1 text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
@@ -760,8 +767,8 @@ export default function KasRTPage() {
                 </div>
                 <div className="space-y-1.5">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
-                    <div key={o.key} className="flex flex-wrap items-start justify-between gap-2 text-caption">
-                      <span className="text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                    <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
+                      <span className="min-w-0 flex-1 text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
