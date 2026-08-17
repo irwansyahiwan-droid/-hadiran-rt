@@ -401,11 +401,17 @@ export default function JadwalWargaPage() {
               // Fokus ikut pindah (aktivasi otomatis — hanya 2 panel, ringan).
               document.getElementById(`subtab-${next}`)?.focus();
             }}
-            className={`press relative z-10 flex-1 min-h-[44px] py-2.5 rounded-xl text-body font-semibold transition-colors inline-flex items-center justify-center gap-1.5 ${
+            /* `min-w-0`: `flex-1` sendiri TIDAK cukup — flex item punya
+               `min-width:auto`, jadi tombol menolak menyusut di bawah lebar
+               min-content-nya dan MELUBER keluar wadahnya sendiri (terukur saat
+               teks dasar browser 200%: wadah 296px, tombol berakhir di 366px).
+               Ikon `shrink-0` supaya yang mengalah adalah labelnya, bukan ikon
+               yang lalu gepeng. */
+            className={`press relative z-10 flex-1 min-w-0 min-h-[44px] py-2.5 rounded-xl text-body font-semibold transition-colors inline-flex items-center justify-center gap-1.5 ${
               subTab === id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
             }`}
           >
-            <Icon className="w-4 h-4" /> {label}
+            <Icon className="w-4 h-4 shrink-0" /> <span className="truncate">{label}</span>
           </button>
         ))}
       </div>
@@ -491,7 +497,14 @@ export default function JadwalWargaPage() {
                     key={w.id}
                     // ~79 baris: content-visibility lewati render baris di luar layar
                     // (sama seperti daftar absensi bendahara di Jadwal.tsx).
-                    className={`flex items-center gap-3 p-3.5 [--di-l:5.625rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] ${
+                    /* `flex-wrap` = katup pengaman, bukan perubahan tata letak:
+                       di 360px normal baris ini muat jauh di dalam satu baris.
+                       Ia baru bekerja saat teks dasar browser 200%, di mana
+                       padding+gap+nomor+avatar+chip (semuanya `shrink-0`, semuanya
+                       rem) sudah menghabiskan 361px SEBELUM nama dapat ruang —
+                       jadi tak ada yang bisa mengalah dan chip mendorong halaman
+                       geser samping. Dengan wrap, chip turun sebaris. */
+                    className={`flex flex-wrap items-center gap-3 p-3.5 [--di-l:5.625rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] ${
                       idx < filteredWarga.length - 1 ? 'divide-inset' : ''
                     }`}
                   >
