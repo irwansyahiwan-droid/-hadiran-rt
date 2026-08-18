@@ -43,10 +43,19 @@ const CARD_GAP = 18;    // sisa tinggi viewport di luar kartu (TOP + napas bawah
  *  Kalau angka ini disetel lagi: UKUR, jangan kira-kira — dan RESTART server
  *  `vite preview` tiap build, karena ia menahan `dist` sejak dinyalakan
  *  sehingga tiga varian berbeda bisa terbaca identik (kejadian 5 Agu). */
+/** Mode ringkas: tinggi yang ISINYA butuh, bukan persentase layar.
+ *  Begitu kaki stat dilepas, isi kartu tinggal eyebrow + nominal + delta —
+ *  dan itu TETAP, tak tumbuh mengikuti layar. Diukur di build sungguhan:
+ *  isi butuh 176px @640 dan 180px @667, sementara rumus 32% memberi 205 dan
+ *  213 → 29–33px ruang kosong menganga di bawah nominal, justru di HP yang
+ *  paling sempit. 184 = 180 + satu napas kecil; `Math.min` menjaga layar yang
+ *  lebih pendek lagi tetap proporsional. */
+const CARD_H_RINGKAS = 184;
+
 function cardHeight(vh: number): number {
   if (vh >= 740) return CARD_H;
   if (!heroRingkas(vh)) return Math.max(264, Math.round(vh * 0.41));
-  return Math.max(200, Math.round(vh * 0.32));
+  return Math.min(CARD_H_RINGKAS, Math.round(vh * 0.32));
 }
 
 /** Tinggi viewport carousel (kartu + napas bawah), TANPA baris indikator. */
