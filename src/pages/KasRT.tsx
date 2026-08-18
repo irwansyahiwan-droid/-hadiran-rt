@@ -880,7 +880,14 @@ export default function KasRTPage() {
                   onClick={bisaDetail ? () => { haptic(); setSelectedRow(k); } : undefined}
                   aria-label={bisaDetail ? `${editable ? 'Aksi' : 'Lihat detail'}: ${k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}` : undefined}
                   style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                  className={`rise w-full text-left flex items-center gap-3 px-5 py-4 [--di-l:4.25rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
+                  /* `items-start`, BUKAN `items-center`: judul di sini
+                     `line-clamp-2` jadi barisnya bisa dua, dan dgn perataan
+                     tengah tile ikon & nominal mengambang di antara baris 1
+                     dan 2 — tak sejajar dgn apa pun. Baris Beranda boleh tetap
+                     `items-center` karena judulnya `truncate` (selalu satu
+                     baris). Nominal & ikon kini bertumpu pada baris PERTAMA
+                     judul, sama seperti kolom angka Rekap per Kategori. */
+                  className={`rise w-full text-left flex items-start gap-3 px-5 py-4 [--di-l:4.25rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 >
                   <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk
