@@ -336,7 +336,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       key={trx.id}
       onClick={() => { haptic(); setSelectedTrx(trx); }}
       style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-      className={`press rise w-full flex items-center gap-3 px-5 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
+      className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
     >
       <div className={`icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
         {trx.tipe === 'setor'
@@ -397,7 +397,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           }}
           aria-expanded={open}
           style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-          className={`press rise w-full flex items-center gap-3 px-5 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
+          className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
         >
           <div className="icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
             <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
@@ -519,7 +519,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className={`flex items-center gap-3 px-5 py-4 ${i < 3 ? 'divide-inset' : ''}`}>
+            <div key={i} className={`flex items-center gap-2 px-4 py-4 ${i < 3 ? 'divide-inset' : ''}`}>
               <div className="w-11 h-11 rounded-2xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-3/5" />
@@ -726,7 +726,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               // emas songket (selaras motif hero), sisanya tetap baris netral.
               const next = idx === 0;
               return (
-              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-3 px-5 py-4 ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'divide-inset' : ''}`}>
+              <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-2 px-4 py-4 ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'divide-inset' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
                   <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className={`w-11 h-11 rounded-2xl ${next ? 'ring-2 ring-[var(--gold-songket)] ring-offset-2 ring-offset-white dark:ring-offset-gray-900' : ''}`} />
@@ -758,7 +758,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                       membawa satu hal saja: siapa. */}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center justify-between gap-1.5">
                     <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
                     {next ? (
                       <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/25 px-2 py-0.5 text-micro font-bold text-emerald-700 dark:text-emerald-300">

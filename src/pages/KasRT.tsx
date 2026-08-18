@@ -713,7 +713,7 @@ export default function KasRTPage() {
                   </div>
                   <div className="space-y-1.5">
                     {[0, 1, 2].map((i) => (
-                      <div key={i} className="flex items-center justify-between gap-2">
+                      <div key={i} className="flex items-center justify-between gap-1.5">
                         <div className="skeleton h-3 w-28 rounded-full" />
                         <div className="skeleton h-3 w-16 rounded-full" />
                       </div>
@@ -785,7 +785,7 @@ export default function KasRTPage() {
         <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className={`flex items-center gap-3 px-5 py-4 [--di-l:4.25rem]${i < 4 ? ' divide-inset' : ''}`}>
+              <div key={i} className={`flex items-center gap-2 px-4 py-4 [--di-l:3.75rem]${i < 4 ? ' divide-inset' : ''}`}>
                 <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/4" />
@@ -887,7 +887,7 @@ export default function KasRTPage() {
                      `items-center` karena judulnya `truncate` (selalu satu
                      baris). Nominal & ikon kini bertumpu pada baris PERTAMA
                      judul, sama seperti kolom angka Rekap per Kategori. */
-                  className={`rise w-full text-left flex items-start gap-3 px-5 py-4 [--di-l:4.25rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
+                  className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 >
                   <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk

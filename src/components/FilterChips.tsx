@@ -22,7 +22,7 @@ interface FilterChipsProps<T extends string, S extends string> {
   options: readonly ChipOption<T>[];
   value: T;
   onChange: (id: T) => void;
-  /** Tombol sort opsional di kanan (ml-auto). */
+  /** Tombol sort opsional, menempel di belakang chip. */
   sort?: SortProp<S>;
   className?: string;
 }
@@ -64,8 +64,16 @@ export default function FilterChips<T extends string, S extends string = string>
        (2) grup chip TIDAK lagi dibungkus div sendiri. Waktu grupnya terpisah,
            chip membungkus di dalam kotaknya sementara tombol sort tetap
            menggantung di kanan baris pertama → lubang menganga berbentuk L.
-       Sekarang semua ikut satu aliran: chip mengisi kiri, sort `ml-auto` menempel
-       kanan (baris pertama bila muat, baris terakhir bila membungkus). */
+       Sekarang semua ikut satu aliran: chip mengisi kiri, sort menempel di
+       belakangnya.
+
+       (18 Agu 2026) `ml-auto` pada sort DIBUANG. Saat keempat kontrol tak muat
+       satu baris (Kas Hadiran di 390px), sort turun ke baris kedua LALU didorong
+       rata kanan — berdiri sendirian di seberang ruang kosong, terbaca seperti
+       tata letak yang jebol, bukan pilihan. Tanpa `ml-auto` ia duduk tepat di
+       belakang chip terakhir, jadi barisan kedua terbaca sebagai sambungan.
+       Yang TIDAK dipakai: kembali ke geser-mendatar. Itu justru pola yang dibuang
+       30 Jul di atas, dan menghidupkannya berarti menyembunyikan chip lagi. */
     <div className={`flex flex-wrap items-center gap-x-1.5 gap-y-2 ${className}`}>
       {options.map((f) => {
           const active = value === f.id;
@@ -93,7 +101,7 @@ export default function FilterChips<T extends string, S extends string = string>
       })}
 
       {sort && 'options' in sort && (
-        <div className="relative ml-auto shrink-0">
+        <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => { haptic(); setSortOpen((o) => !o); }}
@@ -151,7 +159,7 @@ export default function FilterChips<T extends string, S extends string = string>
           type="button"
           onClick={() => { haptic(); sort.onCycle(); }}
           aria-label={`Urutkan: ${sort.label}`}
-          className="press ml-auto shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark"
+          className="press shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark"
         >
           <ArrowDownUp className="w-3.5 h-3.5" />
           {sort.label}

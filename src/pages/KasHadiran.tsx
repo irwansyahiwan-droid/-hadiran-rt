@@ -858,7 +858,18 @@ export default function KasHadiranPage() {
                           konteks kartu tarikan sudah membawa sisa maknanya; kalimat
                           penuh pindah ke aria-label supaya pembaca layar tak ikut
                           kehilangan) → butuh turun ke 245px: muat, sisa 41px. */}
-                      <div className="flex items-center gap-x-3 px-5 pb-3 pt-3 border-t border-line dark:border-gray-800">
+                      {/* Pita aksi dirapatkan pt/pb 12px→6px (18 Agu 2026). Diukur di tab WARGA:
+                          pita 341×69px hanya berisi satu tombol 59×44px — 83% kosong,
+                          dan memakan 27% tinggi kartu, sehingga daftar terbaca belum
+                          selesai. Pita ini SENGAJA TIDAK dihapus meski sempat diusulkan:
+                          kosongnya cuma terjadi pada warga. Di bendahara pita yang sama
+                          memuat TIGA tombol (PDF, Batalkan, Hapus), dan `handlePendapatanPDF`
+                          hanya punya SATU call-site — di sini. Layar detail memang punya
+                          tombol PDF, tapi itu PDF absensi, dokumen yang berbeda. Menghapus
+                          pita = menghapus PDF pendapatan sekaligus dua kontrol aksi merusak
+                          milik bendahara; itu regresi fungsi, bukan pemolesan.
+                          Tinggi tombol tetap 44px (§2.5.8) — yang menyusut hanya napasnya. */}
+                      <div className="flex items-center gap-x-3 px-5 pb-1.5 pt-1.5 border-t border-line dark:border-gray-800">
                         <button
                           onClick={() => { haptic(); handlePendapatanPDF(t); }}
                           disabled={pdfLoading === t.id}
