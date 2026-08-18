@@ -2,7 +2,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, SIGN_H, C, fmtNum, alignHeadFoot,
+  tabelSkala, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, signH, C, fmtNum,
+  alignHeadFoot, drawContinuationHeader, sectionLabel, LANSIA,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -17,12 +18,25 @@ interface Stats {
 
 function rp(n: number) { return `Rp${n.toLocaleString('id-ID')}`; }
 
-export function generateKasHadiranPDF(
+/* Dicetak pada skala LANSIA, sama seperti Laporan Pertanggungjawaban Kas RT:
+   dua-duanya dibagikan ke warga di atas KERTAS.
+   Sempat mustahil di 11pt: dengan DELAPAN kolom, kebutuhannya 186,1mm
+   sedangkan A4 potret cuma punya 182mm, dan kurang 4,1mm itu harus dibayar
+   oleh salah satu — angka patah di tengah, atau 7 dari 12 nama warga
+   membungkus dua baris. Kolom HADIR dihapus (18 Agu 2026) sehingga tinggal
+   TUJUH kolom; 11,6mm yang dibebaskannya membuat kebutuhan turun ke 174,5mm
+   dan potret muat lagi dengan sisa 7,5mm. Jadi laporan ini bisa memakai
+   skala LANSIA UTUH, setara Laporan Pertanggungjawaban Kas RT. */
+const SK = LANSIA;
+const TABEL = tabelSkala(SK);
+
+/** Bangun dokumennya saja — lihat catatan sama di `generateKasRTPDF.ts`. */
+export function buildKasHadiranPDF(
   tarikanList: Tarikan[],
   talanganMap: Record<string, TalanganInfo>,
   setorMap: Record<string, number>,
   stats: Stats,
-) {
+): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
@@ -43,19 +57,37 @@ export function generateKasHadiranPDF(
     W, M, docCode, tanggalCetak,
     title: 'Laporan Alur Kas Hadiran',
     subtitle: `Kas masuk, talangan & setoran RT 004/006 Tanah Baru, Beji, Kota Depok${periode}`,
-  });
+  }, SK);
 
   // (Strip statistik atas dihapus — angka yang sama sudah di Ringkasan tutup buku.)
   // ── Tabel per tarikan ─────────────────────────────────────
+  /* Lebar kolom pada skala LANSIA — DIUKUR lewat `doc.getTextWidth`, bukan
+     ditaksir. Yang mengikat itu DATA, bukan kepala kolom: angka rupiah tak
+     punya spasi sehingga TAK BISA membungkus, sedangkan "KAS MASUK (Rp)"
+     berspasi dan turun ke baris kedua dengan tenang. Karena itu potret tetap
+     cukup — "kurang 4,9mm" yang sempat terukur adalah total kalau tiap kepala
+     dipaksa satu baris, batas semu; mengganti orientasi halaman karenanya
+     akan jadi obat untuk penyakit yang tidak ada.
+
+     Kolom angka disizing dari baris TOTAL, BUKAN dari sampel baris biasa.
+     Percobaan pertama memakai 23mm karena mengukur `49.650.000` (10 digit),
+     lalu TOTAL 42 tarikan tembus `252.525.000` dan PATAH jadi "252.525.00"
+     lalu "0" di baris berikutnya — di dokumen bertanda tangan itu bukan
+     kurang rapi, itu angka yang bisa salah dibaca. Baris TOTAL selalu lebih
+     lebar dari baris mana pun di atasnya; ia yang menentukan.
+     Diukur @11pt bold: `-999.999.999` = 24,7mm → 25mm.
+
+     Sisanya jatuh ke SOHIBUL BAIT (±44mm), lega untuk nama terpanjang yang
+     terukur (40,3mm). Nama berspasi sehingga membungkus dengan anggun kalau
+     pun lewat; angka tidak — itu sebabnya angka yang dapat jatah pasti. */
   const KAS_COL = {
-    0: { cellWidth: 9,  halign: 'center' as const },
-    1: { cellWidth: 26 },
+    0: { cellWidth: 8,  halign: 'center' as const },
+    1: { cellWidth: 30 },
     2: { cellWidth: 'auto' as const },
-    3: { cellWidth: 13, halign: 'center' as const },
-    4: { cellWidth: 22, halign: 'right' as const },
-    5: { cellWidth: 22, halign: 'right' as const },
-    6: { cellWidth: 22, halign: 'right' as const },
-    7: { cellWidth: 22, halign: 'right' as const },
+    3: { cellWidth: 25, halign: 'right' as const },
+    4: { cellWidth: 25, halign: 'right' as const },
+    5: { cellWidth: 25, halign: 'right' as const },
+    6: { cellWidth: 25, halign: 'right' as const },
   };
   const sorted = [...tarikanList].sort((a, b) => a.nomor - b.nomor);
 
@@ -73,7 +105,6 @@ export function generateKasHadiranPDF(
       String(i + 1),
       `#${t.nomor} · ${new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}`,
       t.sohibul_bait?.nama ?? '—',
-      `${t.total_hadir}/${t.total_warga}`,
       fmtNum(kasIn),
       tal.total > 0 ? `-${fmtNum(tal.total)}` : '0',
       setor > 0 ? `-${fmtNum(setor)}` : '0',
@@ -82,12 +113,12 @@ export function generateKasHadiranPDF(
   });
 
   autoTable(doc, {
-    ...TABLE,
+    ...TABEL,
     startY: Y + 7,
-    head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'HADIR', 'KAS MASUK (Rp)', 'TALANGAN (Rp)', 'SETOR (Rp)', 'NET KAS (Rp)']],
+    head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'KAS MASUK (Rp)', 'TALANGAN (Rp)', 'SETOR KAS RT (Rp)', 'NET KAS (Rp)']],
     body: rows,
     foot: [[
-      { content: 'TOTAL', colSpan: 4, styles: { halign: 'right' } },
+      { content: 'TOTAL', colSpan: 3, styles: { halign: 'right' } },
       { content: fmtNum(totalKas), styles: { halign: 'right' } },
       { content: totalTal > 0 ? `-${fmtNum(totalTal)}` : '0', styles: { halign: 'right' } },
       { content: totalSetor > 0 ? `-${fmtNum(totalSetor)}` : '0', styles: { halign: 'right' } },
@@ -99,9 +130,9 @@ export function generateKasHadiranPDF(
     didParseCell(data) {
       alignHeadFoot(data, KAS_COL);
       if (data.section === 'foot') {
-        if (data.column.index === 5 && totalTal > 0) data.cell.styles.textColor = C.neg;
-        if (data.column.index === 6 && totalSetor > 0) data.cell.styles.textColor = C.warn;
-        if (data.column.index === 7) {
+        if (data.column.index === 4 && totalTal > 0) data.cell.styles.textColor = C.neg;
+        if (data.column.index === 5 && totalSetor > 0) data.cell.styles.textColor = C.warn;
+        if (data.column.index === 6) {
           data.cell.styles.textColor = totalNet < 0 ? C.neg : C.pos;
         }
         return;
@@ -111,15 +142,15 @@ export function generateKasHadiranPDF(
       if (!row) return;
       const tal = talanganMap[row.id] ?? { count: 0, total: 0 };
       const setor = setorMap[row.id] ?? 0;
-      if (data.column.index === 5 && tal.total > 0) {
+      if (data.column.index === 4 && tal.total > 0) {
         data.cell.styles.textColor = C.neg;
         data.cell.styles.fontStyle = 'bold';
       }
-      if (data.column.index === 6 && setor > 0) {
+      if (data.column.index === 5 && setor > 0) {
         data.cell.styles.textColor = C.warn;
         data.cell.styles.fontStyle = 'bold';
       }
-      if (data.column.index === 7) {
+      if (data.column.index === 6) {
         const net = (row.total_terkumpul ?? 0) - tal.total - setor;
         data.cell.styles.textColor = net < 0 ? C.neg : C.pos;
         data.cell.styles.fontStyle = 'bold';
@@ -131,16 +162,51 @@ export function generateKasHadiranPDF(
   const afterY: number = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY;
   const saldoText = (stats.saldoAktif < 0 ? '-' : '') + rp(Math.abs(stats.saldoAktif));
 
-  const sumY = drawSummary(doc, ensureSpace(doc, afterY + 6, 42), [
+  const ringkasan: Parameters<typeof drawSummary>[2] = [
     { label: 'Total Kas Terkumpul',        value: rp(stats.totalKasTerkumpul) },
     { label: 'Total Talangan Belum Lunas', value: `-${rp(stats.totalTalanganBelum)}`, tone: 'neg' },
     { label: 'Total Setor ke Kas RT',      value: `-${rp(stats.totalSetor)}`, tone: 'warn' },
-  ], { label: 'Saldo Bersih Kas', value: saldoText, tone: stats.saldoAktif < 0 ? 'neg' : 'ink' }, W, M);
+  ];
+  const saldoBersih = {
+    label: 'Saldo Bersih Kas', value: saldoText,
+    tone: (stats.saldoAktif < 0 ? 'neg' : 'ink') as 'neg' | 'ink',
+  };
+  const sumY = drawSummary(doc, ensureSpace(doc, afterY + 6, 52), ringkasan, saldoBersih, W, M, undefined, SK);
 
-  drawSignatures(doc, ensureSpace(doc, sumY + 14, SIGN_H), W, M, { dateline: `Depok, ${tanggalCetak}` });
+  /* Lembar tanda tangan WAJIB bisa berdiri sendiri — penjaga yang sudah ada di
+     `generateKasRTPDF` tapi belum pernah ada di sini. Sebelumnya, kalau blok
+     tanda tangan jatuh ke halaman baru, halaman itu keluar TANPA identitas
+     apa pun: tak ada judul, tak ada kode dokumen, tak ada periode. Terbukti
+     nyata di data 42 tarikan — halaman 3 berisi ringkasan + tiga tanda tangan
+     dan tak satu pun menyebut dokumen apa yang disahkan. Lembar begitu, kalau
+     terlepas dari berkasnya, tak mengesahkan apa pun dan gampang tertukar.
+     Huruf yang membesar (skala LANSIA) membuat kasus ini jauh lebih sering
+     terjadi, jadi penjaganya dipasang bersama kenaikan hurufnya. */
+  const halamanSebelum = doc.getNumberOfPages();
+  let ttdY = ensureSpace(doc, sumY + 14, signH(SK));
+  if (doc.getNumberOfPages() > halamanSebelum) {
+    const headY = drawContinuationHeader(doc, {
+      W, M,
+      title: 'Laporan Alur Kas Hadiran',
+      subtitle: `Kas masuk, talangan & setoran RT 004/006${periode} · ${docCode}`,
+    }, SK);
+    const recapY = sectionLabel(doc, headY + 8, 'Ringkasan Tutup Buku', W, M, undefined, SK);
+    ttdY = drawSummary(doc, recapY, ringkasan, saldoBersih, W, M, undefined, SK) + 18;
+  }
+  drawSignatures(doc, ttdY, W, M, { dateline: `Depok, ${tanggalCetak}`, sk: SK });
 
   const H = doc.internal.pageSize.getHeight();
-  drawFooter(doc, W, H, tanggalCetak);
+  drawFooter(doc, W, H, tanggalCetak, M, SK);
 
-  return outputPdf(doc, `Laporan-Kas-Hadiran-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf`);
+  return { doc, filename: `Laporan-Kas-Hadiran-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf` };
+}
+
+export function generateKasHadiranPDF(
+  tarikanList: Tarikan[],
+  talanganMap: Record<string, TalanganInfo>,
+  setorMap: Record<string, number>,
+  stats: Stats,
+) {
+  const { doc, filename } = buildKasHadiranPDF(tarikanList, talanganMap, setorMap, stats);
+  return outputPdf(doc, filename);
 }

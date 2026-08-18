@@ -315,9 +315,22 @@ export function drawContinuationHeader(
  */
 export const SIGN_H = 34;
 
-/** Tinggi blok tanda tangan pada skala tertentu (dateline + peran → garis + nama + napas). */
+/**
+ * Tinggi blok tanda tangan pada skala tertentu.
+ *
+ * Diturunkan dari geometri NYATA yang digambar `drawSignatures`, bukan
+ * ditaksir: dateline 6 → peran → garis di `ttdGaris` → nama di +5,5 → napas
+ * bawah 6,5. Untuk `RAPAT` rumus ini menghasilkan tepat 34, yaitu `SIGN_H`
+ * yang sudah dipakai selama ini — itu ujinya.
+ *
+ * Rumus pertamanya (`12 + ttdGaris + ttdNama × 0,55 + 4`) mengarang angkanya
+ * dan kelebihan ±4mm. Akibatnya kelihatan langsung di Laporan Alur Kas
+ * Hadiran: blok tanda tangan dilempar ke halaman baru karena dikira butuh
+ * 40,3mm padahal sisa halaman 38mm dan blok aslinya cuma ±31mm — laporan satu
+ * halaman berakhir dengan halaman kedua yang isinya cuma tanda tangan.
+ */
 export function signH(sk: SkalaTeks): number {
-  return 12 + sk.ttdGaris + sk.ttdNama * 0.55 + 4;
+  return 6 + sk.ttdGaris + 5.5 + 6.5;
 }
 
 /** Blok tanda tangan 3 kolom. `dateline` opsional ("Depok, 5 Juli 2026") di atas kolom kanan. */
