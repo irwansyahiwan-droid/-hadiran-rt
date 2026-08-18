@@ -1,47 +1,61 @@
-// Audit TEKS TERPOTONG — elemen ber-`truncate`/`line-clamp` yang isinya tak muat
-// sehingga terpenggal elipsis.
-//
-// Kenapa ada (18 Agu 2026): tak satu pun sapuan lain melihatnya. `audit:lebar`
-// mencari nominal yang MELUBER keluar kotaknya; `audit:reflow` mencari halaman
-// yang geser samping. Teks terpotong tidak melakukan keduanya — ia PATUH pada
-// kotaknya, cuma kehilangan sebagian isinya, jadi setiap sapuan geometri
-// melaporkannya sebagai sehat. Terukur pertama kali di tab warga: 19 potongan,
-// semuanya kurang 7–18px saja ("Talangan · 7 w…", "Nisan Nasrullah ( Ica…").
-//
-// AMBANG 0, BUKAN 1px. Percobaan pertama menyaring `scrollWidth > clientWidth+1`
-// untuk menghindari lapor palsu subpiksel — dan toleransi itu justru menelan
-// temuan asli: satu nama meleset TEPAT 1,0px, probe melapor "0 potongan"
-// sementara elipsisnya jelas terlihat di screenshot. Lebar teks asli kini
-// diukur lewat `Range.getBoundingClientRect()` (bukan `scrollWidth`, yang
-// dibulatkan ke integer dan menyembunyikan defisit pecahan).
-//
-// Bendahara di-MOCK 3 lapis aman, identik audit-kontras-deep.mjs: sesi palsu di
-// localStorage + rest/v1 dipaksa anon + SEMUA method tulis dibalas 403 oleh
-// Playwright. Jangan pernah pakai kredensial asli di sini.
+/**
+ * Audit TEKS TERPOTONG — elemen ber-`truncate`/`line-clamp` yang isinya tak
+ * muat sehingga terpenggal elipsis.
+ *
+ * Kenapa ada (18 Agu 2026): tak satu pun sapuan lain melihatnya. `audit:lebar`
+ * mencari nominal yang MELUBER keluar kotaknya; `audit:reflow` mencari halaman
+ * yang geser samping. Teks terpotong tidak melakukan keduanya — ia PATUH pada
+ * kotaknya dan cuma kehilangan sebagian isinya, jadi tiap sapuan geometri
+ * melaporkannya sehat. Itu sebabnya 19 potongan di tab warga bertahan tanpa
+ * satu pun sapuan menyentuhnya ("Talangan · 7 w…", "Nisan Nasrullah ( Ica…").
+ *
+ * TIGA bagian, dan ambangnya TIDAK sama:
+ *
+ *   A. 390px — acuan HP arus utama.
+ *   B. 320px — lebar terkecil yang diwajibkan §1.4.10. Temuan di sini nyata.
+ *   C. TEKS DASAR 200% @360px — `html{font-size:32px}`, warga menyetel
+ *      "ukuran font besar" di browser. Ini DI ATAS AA: ambang ketahanan yang
+ *      app pilih sendiri karena sebagian warga lansia. JANGAN laporkan temuan
+ *      C sebagai "gagal WCAG" — disiplin yang sama dgn `audit:reflow`.
+ *      Catatan cakupan: menaikkan font-size akar ikut membesarkan padding &
+ *      gap (Tailwind pakai rem), jadi tekanannya LEBIH berat daripada
+ *      penyetelan "ukuran teks" bawaan Android yang hanya menyentuh teks.
+ *
+ * AMBANG PROBE 0, BUKAN 1px. Percobaan pertama menyaring
+ * `scrollWidth > clientWidth + 1` demi menghindari lapor palsu subpiksel, dan
+ * toleransi itu justru menelan temuan asli: satu nama meleset TEPAT 1,0px
+ * sehingga probe melapor "0" sementara elipsisnya jelas terlihat di
+ * screenshot. Lebar teks asli diukur lewat `Range.getBoundingClientRect()`,
+ * BUKAN `scrollWidth` yang dibulatkan ke integer.
+ *
+ * DIVALIDASI LEWAT MUTASI. Hijau tanpa mutasi tak membuktikan apa pun —
+ * sapuan yang tak pernah sampai ke isinya juga melaporkan nol. `MUTASI=1`
+ * menyempitkan tiap kolom teks 40px; temuan WAJIB melonjak.
+ *
+ * Bendahara dijalankan lewat `newCtx(..., { bendahara: true })` dari harness
+ * bersama — mock 3 lapis (sesi palsu + rest/v1 dipaksa anon + method tulis
+ * dibalas 403). Mock-nya TIDAK disalin ke sini supaya tak melenceng diam-diam
+ * saat aslinya berubah.
+ */
 import { chromium } from 'playwright';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { newCtx, loginWarga, gotoTab, closeLayer, openMenuItem } from './lib/audit-harness.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
-const env = readFileSync(new globalThis.URL('../.env', import.meta.url), 'utf8');
-const SUPA_URL = env.match(/VITE_SUPABASE_URL=(\S+)/)[1];
-const ANON = env.match(/VITE_SUPABASE_ANON_KEY=(\S+)/)[1];
-const REF = SUPA_URL.match(/https:\/\/([^.]+)\./)[1];
+const OUT = process.env.OUT_DIR || '.audit-potong';
+mkdirSync(OUT, { recursive: true });
 
-function fakeSession() {
-  const b64u = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
-  const jwt = `${b64u({ alg: 'HS256', typ: 'JWT' })}.${b64u({ sub: '00000000-0000-4000-8000-0000000000aa', role: 'authenticated', aud: 'authenticated', exp: 4102444800, email: 'audit@lokal' })}.x`;
-  return {
-    access_token: jwt, token_type: 'bearer', expires_in: 31536000, expires_at: 4102444800,
-    refresh_token: 'audit-refresh',
-    user: { id: '00000000-0000-4000-8000-0000000000aa', aud: 'authenticated', email: 'audit@lokal',
-      app_metadata: { provider: 'email' }, user_metadata: { role: 'bendahara' } },
-  };
-}
-
-// Pemungut: hanya elemen DAUN (tanpa anak elemen) yang benar-benar memotong.
+/* Lingkup pemungutan = LAPISAN TERATAS saja. Saat overlay/sheet terbuka,
+   halaman di belakangnya TIDAK di-unmount, jadi memungut se-dokumen membuat
+   baris Kas RT yang sama terhitung ulang di tiap overlay (terlihat sbg
+   "27 Jun · Kas Hadiran" muncul identik di b-riwayat, b-anggota, b-backup,
+   dan b-tentang). Itu populasi salah, bukan temuan — kelas cacat yang sama
+   dgn "probe mengambil dialog di belakang sheet" di CLAUDE.md. */
 const PUNGUT = () => {
   const out = [];
-  document.querySelectorAll('*').forEach((el) => {
+  const dialogs = document.querySelectorAll('[role="dialog"]');
+  const akar = dialogs.length ? dialogs[dialogs.length - 1] : document;
+  akar.querySelectorAll('*').forEach((el) => {
     if (el.children.length) return;
     const t = (el.textContent || '').trim();
     if (!t) return;
@@ -56,169 +70,161 @@ const PUNGUT = () => {
   return out;
 };
 
-async function newCtx(browser, bendahara) {
-  const ctx = await browser.newContext({
-    viewport: { width: 390, height: 844 }, deviceScaleFactor: 2,
-    colorScheme: 'light', serviceWorkers: 'block',
-  });
-  await ctx.addInitScript(({ b, ref, sess }) => {
-    try {
-      localStorage.setItem('hadiran-welcome-v2', '1');
-      localStorage.setItem('hadiran-theme', 'light');
-      if (b) localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(sess));
-    } catch { /* storage diblokir */ }
-  }, { b: bendahara, ref: REF, sess: fakeSession() });
+const MUTASI_CSS = '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}';
 
-  if (bendahara) {
-    await ctx.route('**/rest/v1/**', (route) => {
-      const req = route.request(); const m = req.method();
-      const baca = m === 'GET' || m === 'HEAD' || m === 'OPTIONS' || (m === 'POST' && req.url().includes('/rpc/'));
-      if (!baca) return route.fulfill({ status: 403, contentType: 'application/json', body: '{"message":"audit: tulis diblokir"}' });
-      return route.continue({ headers: { ...req.headers(), authorization: `Bearer ${ANON}`, apikey: ANON } });
-    });
-    await ctx.route('**/auth/v1/**', (route) => {
-      const req = route.request();
-      if (req.url().includes('/logout')) return route.fulfill({ status: 204, body: '' });
-      if (req.url().includes('/user')) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fakeSession().user) });
-      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fakeSession()) });
-    });
-  }
-  const page = await ctx.newPage();
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-
-  /* MUTASI=1 — menyempitkan tiap kolom teks 40px supaya baris yang sehat
-     DIPAKSA terpotong. Hijau tanpa mutasi tak membuktikan apa pun: sapuan yang
-     tak pernah sampai ke isinya juga melaporkan nol. Jalankan `MUTASI=1` dan
-     temuannya WAJIB melonjak; kalau tetap nol, yang rusak probenya. */
-  if (process.env.MUTASI) {
-    await page.addStyleTag({ content: '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}' })
-      .catch(() => {});
-    await page.addInitScript(() => {
-      const pasang = () => {
-        const s = document.createElement('style');
-        s.textContent = '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}';
-        document.head.appendChild(s);
-      };
-      if (document.head) pasang(); else addEventListener('DOMContentLoaded', pasang);
-    });
-  }
-  return { ctx, page };
+function pasangMutasi(ctx) {
+  if (!process.env.MUTASI) return;
+  return ctx.addInitScript((css) => {
+    const pasang = () => {
+      const s = document.createElement('style');
+      s.textContent = css;
+      (document.head || document.documentElement).appendChild(s);
+    };
+    if (document.head) pasang(); else document.addEventListener('DOMContentLoaded', pasang);
+  }, MUTASI_CSS);
 }
 
-// Gulir SELURUH halaman: baris di bawah lipatan tak dirender (content-visibility),
-// jadi memungut sekali di puncak = menyempitkan populasi tanpa mengaku.
-async function pungutLayar(page, nama, hasil) {
+function pasangTeks200(ctx) {
+  /* addInitScript, BUKAN addStyleTag setelah muat: kalau disuntik belakangan,
+     sebagian layout sudah terlanjur diukur React dgn font lama. */
+  return ctx.addInitScript(() => {
+    const pasang = () => {
+      const s = document.createElement('style');
+      s.textContent = 'html{font-size:32px !important}';
+      (document.head || document.documentElement).appendChild(s);
+    };
+    if (document.head) pasang(); else document.addEventListener('DOMContentLoaded', pasang);
+  });
+}
+
+async function pungutLayar(page, bag, nama, hasil) {
+  /* Gulir sampai DASAR: baris di bawah lipatan tak dirender
+     (`content-visibility:auto`), jadi memungut sekali di puncak =
+     menyempitkan populasi tanpa mengaku. */
   const h = await page.evaluate(() => document.body.scrollHeight);
-  for (let y = 0; y < h; y += 600) {
+  for (let y = 0; y < h; y += 500) {
     await page.evaluate((yy) => window.scrollTo(0, yy), y);
-    await page.waitForTimeout(140);
+    await page.waitForTimeout(130);
   }
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await page.waitForTimeout(350);
+  await page.waitForTimeout(320);
   const found = await page.evaluate(PUNGUT);
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(180);
   const uniq = new Map();
-  for (const f of found) uniq.set(f.t + '|' + f.kurang, f);
-  const list = [...uniq.values()].sort((a, b) => b.kurang - a.kurang);
-  hasil.push({ layar: nama, n: list.length, item: list });
-  console.log(`  ${list.length ? '✗' : 'ok'}  ${nama.padEnd(22)} ${list.length}`);
-  return list;
+  for (const f of found) uniq.set(`${f.t}|${f.kurang}`, f);
+  const item = [...uniq.values()].sort((a, b) => b.kurang - a.kurang);
+  hasil.push({ bag, layar: nama, n: item.length, item });
+  console.log(`  ${item.length ? '✗' : 'ok'}  [${bag}] ${nama.padEnd(20)} ${item.length}`);
 }
 
-async function gotoTab(page, label) {
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(300);
-  await page.locator('nav button', { hasText: label }).first().click({ force: true, timeout: 8000 })
-    .catch(() => page.locator('nav button', { hasText: label }).first().evaluate((el) => el.click()));
-  await page.waitForTimeout(3200);
+async function jelajahWarga(page, bag, hasil) {
+  await loginWarga(page);
+  if (!(await page.locator('nav button').count())) {
+    console.log(`  PROBE CACAT [${bag}]: gate warga tak terlewati`);
+    process.exitCode = 2; return;
+  }
+  const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
+  for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, bag, `w-${tab}`, hasil); }
 }
 
-async function openMenuItem(page, itemLabel) {
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(300);
-  await page.getByRole('button', { name: 'Menu' }).click().catch(() => {});
-  await page.waitForTimeout(600);
-  const item = page.getByRole('menu').getByText(itemLabel, { exact: false });
-  if (!(await item.count())) { await page.keyboard.press('Escape'); await page.waitForTimeout(400); return false; }
-  await item.first().click();
-  await page.waitForTimeout(1400);
-  return true;
-}
+async function jelajahBendahara(page, bag, hasil, { dalam = true } = {}) {
+  if (!(await page.locator('nav button').count())) {
+    console.log(`  PROBE CACAT [${bag}]: mock bendahara gagal — masih di login`);
+    process.exitCode = 2; return;
+  }
+  const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
+  for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, bag, `b-${tab}`, hasil); }
+  if (!dalam) return;
 
-async function closeLayer(page) {
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(700);
-  if (await page.locator('[role="dialog"]').count()) { await page.goBack(); await page.waitForTimeout(700); }
+  for (const [tab, aria, nama] of [
+    ['Hadiran', 'Setor ke Kas RT', 'b-sheet-setor'],
+    ['Kas RT', 'Tambah transaksi Kas RT', 'b-sheet-kasrt'],
+  ]) {
+    await gotoTab(page, tab);
+    const fab = page.getByRole('button', { name: aria });
+    if (await fab.count()) {
+      await fab.click().catch(() => {});
+      await page.waitForTimeout(900);
+      if (await page.locator('[role="dialog"]').count()) { await pungutLayar(page, bag, nama, hasil); await closeLayer(page); }
+    }
+  }
+  for (const [label, nama] of [
+    ['Tutup Buku Triwulan', 'b-laporan'], ['Riwayat Aktivitas', 'b-riwayat'],
+    ['Kelola Anggota', 'b-anggota'], ['Backup & Restore', 'b-backup'],
+    ['Tentang Aplikasi', 'b-tentang'],
+  ]) {
+    if (await openMenuItem(page, label)) { await pungutLayar(page, bag, nama, hasil); await closeLayer(page); }
+  }
 }
 
 const browser = await chromium.launch();
 const hasil = [];
-const ONLY = process.env.ONLY; // 'warga' | 'bendahara'
+const ONLY = process.env.ONLY; // '390' | '320' | '200'
 
-// ── WARGA ──────────────────────────────────────────────────────────────────
-if (!ONLY || ONLY === 'warga') {
-  const { ctx, page } = await newCtx(browser, false);
-  await page.goto(URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1200);
-  await page.fill('input[type=password]', 'warga');
-  await page.evaluate(() => [...document.querySelectorAll('button')]
-    .find((b) => /Masuk Sekarang/.test(b.textContent))?.click());
-  await page.waitForTimeout(3000);
-  if (!(await page.locator('nav button').count())) {
-    console.log('PROBE CACAT: gate warga tak terlewati');
-    process.exitCode = 2;
-  } else {
-    const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
-    console.log('tab warga:', JSON.stringify(tabs));
-    for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, `w-${tab}`, hasil); }
+// ── A: 390px (acuan HP arus utama) ─────────────────────────────────────────
+if (!ONLY || ONLY === '390') {
+  for (const bendahara of [false, true]) {
+    const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    await pasangMutasi(ctx);
+    await page.goto(URL, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(bendahara ? 4000 : 1200);
+    if (bendahara) await jelajahBendahara(page, '390', hasil);
+    else await jelajahWarga(page, '390', hasil);
+    await ctx.close();
   }
-  await ctx.close();
 }
 
-// ── BENDAHARA (mock read-only) ─────────────────────────────────────────────
-if (!ONLY || ONLY === 'bendahara') {
-  const { ctx, page } = await newCtx(browser, true);
-  await page.goto(URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(4000);
-  const navN = await page.locator('nav button').count();
-  if (!navN) {
-    console.log('PROBE CACAT: mock bendahara gagal — masih di layar login');
-    process.exitCode = 2;
-  } else {
-    const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
-    console.log('tab bendahara:', JSON.stringify(tabs));
-    for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, `b-${tab}`, hasil); }
-
-    for (const [tab, aria, nama] of [
-      ['Hadiran', 'Setor ke Kas RT', 'b-sheet-setor'],
-      ['Kas RT', 'Tambah transaksi Kas RT', 'b-sheet-kasrt'],
-    ]) {
-      await gotoTab(page, tab);
-      const fab = page.getByRole('button', { name: aria });
-      if (await fab.count()) {
-        await fab.click().catch(() => {});
-        await page.waitForTimeout(900);
-        if (await page.locator('[role="dialog"]').count()) { await pungutLayar(page, nama, hasil); await closeLayer(page); }
-      }
-    }
-
-    for (const [label, nama] of [
-      ['Tutup Buku Triwulan', 'b-laporan'], ['Riwayat Aktivitas', 'b-riwayat'],
-      ['Kelola Anggota', 'b-anggota'], ['Backup & Restore', 'b-backup'],
-      ['Tentang Aplikasi', 'b-tentang'],
-    ]) {
-      if (await openMenuItem(page, label)) { await pungutLayar(page, nama, hasil); await closeLayer(page); }
-    }
+// ── B: 320px (WAJIB §1.4.10) ───────────────────────────────────────────────
+if (!ONLY || ONLY === '320') {
+  for (const bendahara of [false, true]) {
+    const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    await pasangMutasi(ctx);
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto(URL, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(bendahara ? 4000 : 1200);
+    if (bendahara) await jelajahBendahara(page, '320', hasil);
+    else await jelajahWarga(page, '320', hasil);
+    await ctx.close();
   }
-  await ctx.close();
 }
 
-const total = hasil.reduce((s, h) => s + h.n, 0);
-console.log(`\n=== TEMUAN: ${total} teks terpotong @390px, ${hasil.length} layar ===`);
-for (const h of hasil.filter((x) => x.n)) {
-  console.log(`\n  ${h.layar}`);
-  for (const it of h.item.slice(0, 8)) console.log(`    kurang ${String(it.kurang).padStart(5)}px  "${it.t}"`);
+// ── C: teks dasar 200% @360px (DI ATAS AA — ambang app) ────────────────────
+if (!ONLY || ONLY === '200') {
+  for (const bendahara of [false, true]) {
+    const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    await pasangTeks200(ctx);
+    await pasangMutasi(ctx);
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(URL, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(bendahara ? 4500 : 1800);
+    if (bendahara) await jelajahBendahara(page, '200', hasil, { dalam: false });
+    else await jelajahWarga(page, '200', hasil);
+    await ctx.close();
+  }
 }
+
 await browser.close();
-process.exitCode = total ? 1 : (process.exitCode || 0);
+writeFileSync(`${OUT}/hasil.json`, JSON.stringify(hasil, null, 1));
+
+const jml = (b) => hasil.filter((h) => h.bag === b).reduce((s, h) => s + h.n, 0);
+const layar = (b) => hasil.filter((h) => h.bag === b).length;
+console.log(`\n=== TEKS TERPOTONG ===`);
+console.log(`  A. 390px  (acuan HP)        : ${jml('390')} temuan / ${layar('390')} layar`);
+console.log(`  B. 320px  (WAJIB §1.4.10)   : ${jml('320')} temuan / ${layar('320')} layar`);
+console.log(`  C. teks 200% (ambang APP,`);
+console.log(`     DI ATAS AA — bukan WCAG) : ${jml('200')} temuan / ${layar('200')} layar`);
+
+for (const b of ['390', '320', '200']) {
+  const isi = hasil.filter((h) => h.bag === b && h.n);
+  if (!isi.length) continue;
+  console.log(`\n  ── rincian ${b} ──`);
+  for (const h of isi) {
+    console.log(`  ${h.layar}`);
+    for (const it of h.item.slice(0, 6)) console.log(`    kurang ${String(it.kurang).padStart(6)}px  "${it.t}"`);
+  }
+}
+/* Keluar 1 HANYA untuk A+B. Bagian C ambang app: temuannya dilaporkan tapi
+   tak menggagalkan rantai `npm run audit` — sama seperti bagian 200% di
+   `audit:reflow`, supaya tak terbaca sebagai pelanggaran konformansi. */
+process.exitCode = (jml('390') + jml('320')) ? 1 : (process.exitCode || 0);
