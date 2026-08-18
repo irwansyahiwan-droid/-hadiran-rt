@@ -271,11 +271,22 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
          sebelum tepi kanan baris. */
       <div key={g.warga_id} className="[--di-l:3.875rem] [--di-r:1rem]">
         {/* Group header */}
-        <div className="flex items-center">
+        {/* `items-start` juga di baris LUAR: tombol WA duduk di sini, di luar
+            tombol barisnya. Waktu isi baris dipindah ke perataan atas tapi wadah
+            ini masih `items-center`, WA tertinggal mengambang di tengah dan
+            terpisah jauh dari nominal — dua kolom kanan yang tak lagi sejajar. */}
+        <div className="flex items-start">
           <button
             onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
             aria-expanded={isExpanded}
-            className="flex-1 min-w-0 flex items-center gap-2.5 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
+            /* `items-start`, BUKAN `items-center`: nama di sini `line-clamp-2`
+               dan captionnya ikut melipat, jadi dgn perataan tengah avatar &
+               nominal mengambang di tengah blok teks — dan seberapa jauh
+               mengambangnya berubah-ubah mengikuti panjang nama (terukur: 8 /
+               17 / 19 / 28px dari baris pertama nama, tergantung barisnya satu
+               atau dua). Kini semuanya bertumpu pada baris PERTAMA nama, sama
+               seperti baris mutasi Kas RT & kolom Rekap per Kategori. */
+            className="flex-1 min-w-0 flex items-start gap-2.5 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
           >
             {/* Avatar 36 (bukan 44) & padding 16 (bukan 20): baris ini menanggung
                 5 blok shrink-0 sekaligus (avatar, nominal, chevron, tombol WA).
@@ -314,7 +325,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               onClick={() => ingatkan(g)}
               title="Ingatkan via WhatsApp"
               aria-label={`Ingatkan ${g.nama} via WhatsApp`}
-              className="press shrink-0 w-11 h-11 mr-1.5 inline-flex items-center justify-center rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+              className="press shrink-0 w-11 h-11 mt-3 mr-1.5 inline-flex items-center justify-center rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
             >
               <MessageCircle className="w-[18px] h-[18px]" />
             </button>
