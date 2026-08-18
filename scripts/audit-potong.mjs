@@ -13,8 +13,9 @@
  *
  *   A. 390px — acuan HP arus utama.
  *   B. 320px — lebar terkecil yang diwajibkan §1.4.10. Temuan di sini nyata.
- *   C. TEKS DASAR 200% @360px — `html{font-size:32px}`, warga menyetel
- *      "ukuran font besar" di browser. Ini DI ATAS AA: ambang ketahanan yang
+ *   C. TEKS DASAR 200% @360px — lewat CDP `Page.setFontSizes` (setelan font
+ *      browser yang sebenarnya, BUKAN suntikan `html{font-size:32px}` — lihat
+ *      catatan di `pasangTeks200`). Ini DI ATAS AA: ambang ketahanan yang
  *      app pilih sendiri karena sebagian warga lansia. JANGAN laporkan temuan
  *      C sebagai "gagal WCAG" — disiplin yang sama dgn `audit:reflow`.
  *      Catatan cakupan: menaikkan font-size akar ikut membesarkan padding &
@@ -84,17 +85,25 @@ function pasangMutasi(ctx) {
   }, MUTASI_CSS);
 }
 
-function pasangTeks200(ctx) {
-  /* addInitScript, BUKAN addStyleTag setelah muat: kalau disuntik belakangan,
-     sebagian layout sudah terlanjur diukur React dgn font lama. */
-  return ctx.addInitScript(() => {
-    const pasang = () => {
-      const s = document.createElement('style');
-      s.textContent = 'html{font-size:32px !important}';
-      (document.head || document.documentElement).appendChild(s);
-    };
-    if (document.head) pasang(); else document.addEventListener('DOMContentLoaded', pasang);
-  });
+/**
+ * Teks dasar 200% lewat CDP `Page.setFontSizes` — meniru setelan font browser
+ * yang SEBENARNYA, bukan menyuntik `html{font-size:32px}`.
+ *
+ * Bedanya menentukan (diuji 19 Agu): media query `em` mengacu ke font BAWAAN
+ * BROWSER, bukan ke `font-size` root yang ditulis CSS. Dengan suntikan CSS,
+ * root memang jadi 32px TAPI `(max-width: 22.4em)` tetap MATI — sehingga
+ * komponen yang beradaptasi lewat ambang em (`.potong-lentur`) dilaporkan
+ * "masih gagal" padahal di browser warga ia bekerja. Dengan CDP, ambang em
+ * ikut bergeser (22,4em = 716,8px) persis seperti pada pengguna nyata.
+ *
+ * `audit:reflow` masih memakai suntikan CSS. Itu sah untuk yang ia ukur —
+ * tekanan padding/gap berbasis rem terhadap geser-samping — tapi ia TIDAK
+ * melihat adaptasi berbasis em, jadi jangan pakai angkanya untuk menilai
+ * komponen yang beradaptasi lewat ambang em.
+ */
+async function pasangTeks200(ctx, page) {
+  const cdp = await ctx.newCDPSession(page);
+  await cdp.send('Page.setFontSizes', { fontSizes: { standard: 32, fixed: 32 } });
 }
 
 async function pungutLayar(page, bag, nama, hasil) {
@@ -193,7 +202,7 @@ if (!ONLY || ONLY === '320') {
 if (!ONLY || ONLY === '200') {
   for (const bendahara of [false, true]) {
     const { ctx, page } = await newCtx(browser, 'light', { bendahara });
-    await pasangTeks200(ctx);
+    await pasangTeks200(ctx, page);
     await pasangMutasi(ctx);
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto(URL, { waitUntil: 'networkidle' });

@@ -746,38 +746,68 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 .dark .divide-inset::after,
 .dark .list-inset > * + *::before { background: rgba(255, 255, 255, 0.08); }
 
-/* ── Teks baris: memotong di lebar normal, MENGALAH di 320px ───────────────
+/* ── Teks baris: memotong, tapi mengalah saat ruangnya benar-benar habis ───
    `.potong-lentur` = pengganti `truncate` untuk teks yang isinya BERMAKNA
-   (nama warga, keterangan transaksi, judul halaman). Di >=360px ia identik
-   `truncate`; di bawah itu ia berhenti memotong dan membiarkan teksnya
-   membungkus.
+   (nama warga, keterangan transaksi, judul halaman). Di keadaan normal ia
+   identik `truncate`; ia berhenti memotong hanya saat ruangnya memang tak
+   cukup, lalu membiarkan teksnya membungkus.
 
-   Kenapa (19 Agu 2026): di 320px — lebar terkecil yang diwajibkan §1.4.10 —
-   sapuan `audit:potong` menemukan 108 teks terpenggal, dan yang hilang bukan
-   hiasan. "Nisan Nasrullah ( Icang )" kurang 67px, "Talangan · 7 warga"
-   kurang 49px, dan JUDUL pun kena: "Jadwal Tarikan" kurang 41px jadi tinggal
-   "Jadwal Tarik…". Elipsis di nama warga pada aplikasi kas bukan sekadar
-   kurang rapi — warga tak bisa memastikan barisnya miliknya.
+   Kenapa ada (19 Agu 2026): di 320px — lebar terkecil yang diwajibkan §1.4.10 —
+   `audit:potong` menemukan 108 teks terpenggal, dan yang hilang bukan hiasan.
+   "Nisan Nasrullah ( Icang )" kurang 67px, "Talangan · 7 warga" kurang 49px,
+   dan JUDUL pun kena: "Jadwal Tarikan" kurang 41px jadi tinggal "Jadwal
+   Tarik…". Elipsis pada nama warga di aplikasi kas bukan sekadar kurang rapi —
+   warga tak bisa memastikan baris itu miliknya.
 
-   Kenapa membungkus, bukan merapatkan seperti pass 390px: defisitnya 41-67px,
-   sementara seluruh anggaran gap sebuah baris cuma ~16px. Tak ada penyetelan
-   jarak yang bisa menutup jarak sebesar itu; satu-satunya cara menahan
-   informasi adalah memberi baris kedua. Konsekuensinya diterima sadar: di
-   bawah 360px tinggi baris jadi TIDAK seragam. Keseragaman irama kalah dari
-   isi yang utuh, dan hanya di lebar yang memang sudah sempit.
+   Kenapa membungkus, bukan merapatkan jarak seperti pass 390px: defisitnya
+   41–67px sementara seluruh anggaran gap satu baris cuma ±16px. Tak ada
+   penyetelan jarak yang bisa menutup jarak sebesar itu; satu-satunya cara
+   menahan informasi adalah memberi baris kedua.
 
-   `overflow-wrap: anywhere` itu penjaga, bukan gaya: satu kata yang lebih
-   panjang dari kolomnya (mis. alamat surel tanpa spasi) takkan bisa dipatahkan
-   oleh `white-space: normal` sendirian, dan tanpa penjaga ini ia mendorong
-   halaman geser samping — menukar cacat terpotong dengan cacat yang lebih
-   berat. `text-overflow` dikembalikan ke `clip` supaya tak ada elipsis yatim
-   yang tercetak di ujung baris terakhir. */
+   AMBANGNYA `em`, DAN ITU BUKAN GAYA PENULISAN — ia satu-satunya bentuk yang
+   menjawab KEDUA sebab kehabisan ruang sekaligus:
+
+     22,4em = 358,4px saat font bawaan browser 16px  → 320px menyala,
+              360px & 390px TIDAK (tampilannya tetap seperti sebelumnya)
+     22,4em = 716,8px saat warga menyetel font browser 200% → menyala di
+              lebar berapa pun, karena yang habis bukan layarnya tapi ruang
+              yang tersisa setelah hurufnya membesar
+
+   Dua percobaan dibuang sebelum sampai ke sini, dan keduanya layak dicatat:
+
+   (1) `max-width: 359.98px`. Hanya menjawab layar sempit. Warga yang menyetel
+       font 200% di HP 360px tetap kehilangan 76 teks — ambangnya lebar
+       VIEWPORT sedangkan yang membesar adalah HURUF.
+
+   (2) Membuang media query sama sekali (selalu membungkus). Ini memang
+       menyembuhkan 320px DAN 200%, tapi harganya muncul di 360px — lebar
+       paling umum: 19 baris yang tadinya rapi jadi menyisakan kata yatim
+       ("Talangan · 7 / warga", "Talangan · Tarikan / #14"). Menukar elipsis
+       dengan widow di lebar terumum bukan kemajuan.
+
+   CATATAN UNTUK YANG MENGUKUR: media query `em` mengacu ke font BAWAAN
+   BROWSER, BUKAN ke `font-size` root yang ditulis CSS. Diuji langsung:
+   `html{font-size:32px}` menaikkan root ke 32px tapi ambang 22,4em tetap MATI,
+   sedangkan CDP `Page.setFontSizes` (yang meniru setelan browser sebenarnya)
+   membuatnya MENYALA. Karena itu emulasi 200% di `audit:potong` memakai CDP;
+   emulasi lewat suntikan CSS akan melaporkan perbaikan ini sebagai "masih
+   gagal". `audit:reflow` masih memakai suntikan CSS — sah untuk yang ia ukur
+   (tekanan padding/gap rem), tapi ia TIDAK melihat adaptasi berbasis em.
+
+   `overflow-wrap: anywhere` itu PENJAGA, bukan gaya: satu kata yang lebih
+   panjang dari kolomnya (mis. surel tanpa spasi) tak bisa dipatahkan oleh
+   pembungkusan biasa, dan tanpa penjaga ini ia mendorong halaman geser
+   samping — menukar cacat terpotong dengan cacat yang lebih berat.
+
+   NOMINAL RUPIAH JANGAN memakai kelas ini — angka yang membungkus ke baris
+   kedua lebih buruk daripada angka yang terpotong. Nominal tetap `truncate`,
+   dan kepatutan lebarnya dijaga `audit:lebar`. */
 .potong-lentur {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-@media (max-width: 359.98px) {
+@media (max-width: 22.4em) {
   .potong-lentur {
     text-overflow: clip;
     white-space: normal;
