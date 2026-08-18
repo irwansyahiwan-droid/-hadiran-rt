@@ -2,8 +2,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  TABLE, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum, alignHeadFoot,
-  drawContinuationHeader, SIGN_H,
+  tabelSkala, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum,
+  alignHeadFoot, drawContinuationHeader, signH, LANSIA,
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
@@ -35,15 +35,32 @@ function getY(doc: jsPDF): number {
 // dokumen pertanggungjawaban bertanda tangan. Rekonsiliasi sudah dipikul
 // subtotal per kategori + blok Ringkasan di akhir. Saldo berjalan yang sah
 // tetap tersedia di Ekspor Excel (sheet "Mutasi", kronologis datar).
+/* Laporan INI dicetak pada skala LANSIA (badan tabel 11pt, bukan 7,5pt).
+   Ia satu-satunya dokumen yang dibagikan ke warga di atas KERTAS dan dibaca
+   orang yang matanya sudah tak muda — enam laporan lain tetap skala RAPAT.
+   Kolom ikut melebar: pada 11pt "12 Agu 26" dan "+21.920.000" tak lagi muat
+   di 22/30mm, dan angka pertanggungjawaban yang terpotong lebih buruk
+   daripada angka yang kecil. */
+const SK = LANSIA;
+const TABEL = tabelSkala(SK);
+
 const COL = {
-  0: { cellWidth: 8,    halign: 'center' as const },
-  1: { cellWidth: 22 },
+  0: { cellWidth: 10,   halign: 'center' as const },
+  1: { cellWidth: 26 },
   2: { cellWidth: 'auto' as const },
-  3: { cellWidth: 30,   halign: 'right' as const },
+  3: { cellWidth: 34,   halign: 'right' as const },
 };
 const HEAD = ['NO', 'TANGGAL', 'KETERANGAN', 'JUMLAH (Rp)'];
 
-export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
+/**
+ * Bangun dokumennya saja, tanpa mengeluarkan berkas.
+ *
+ * Dipisah dari `generateKasRTPDF` supaya tipografi laporan ini bisa DIRENDER
+ * dan dilihat di luar browser (harness → PDF → PNG). Ukuran huruf dokumen
+ * cetak tak bisa dinilai dari angka di kode: yang menentukan lolos-tidaknya
+ * adalah apakah kolom masih muat dan barisnya masih terbaca di kertas A4.
+ */
+export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
@@ -63,7 +80,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     W, M, docCode, tanggalCetak,
     title: 'Laporan Pertanggungjawaban Kas RT',
     subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Kota Depok${periode}`,
-  });
+  }, SK);
 
   // ── Bagian per jenis transaksi ────────────────────────────────
   // (Strip statistik atas dihapus — angka total sudah di Ringkasan tutup buku.)
@@ -72,9 +89,9 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   const keluarList    = sorted.filter(k => k.tipe === 'keluar');
 
   if (saldoAwalList.length > 0) {
-    Y = sectionLabel(doc, ensureSpace(doc, Y + 7, 30), 'Saldo Awal', W, M);
+    Y = sectionLabel(doc, ensureSpace(doc, Y + 7, 38), 'Saldo Awal', W, M, undefined, SK);
     autoTable(doc, {
-      ...TABLE,
+      ...TABEL,
       startY: Y,
       head: [HEAD],
       body: saldoAwalList.map((k, i) => [
@@ -96,9 +113,9 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     if (rows.length === 0) return startY;
     const sub = rows.reduce((s, k) => s + k.nominal, 0);
     // Guard: label seksi jangan yatim di dasar halaman (butuh label + kepala tabel + ±2 baris)
-    const y = sectionLabel(doc, ensureSpace(doc, startY + 6, 30), `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone });
+    const y = sectionLabel(doc, ensureSpace(doc, startY + 6, 38), `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone }, SK);
     autoTable(doc, {
-      ...TABLE,
+      ...TABEL,
       startY: y,
       head: [HEAD],
       body: rows.map((k, i) => [
@@ -106,7 +123,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
       ]),
       /* top 26 = ruang untuk label "(lanjutan)" di halaman sambungan (hanya
          berlaku utk halaman kedua dst; halaman pertama pakai startY). */
-      margin: { left: M, right: M, top: 26 },
+      margin: { left: M, right: M, top: 30 },
       columnStyles: COL,
       didParseCell(data) {
         alignHeadFoot(data, COL);
@@ -124,7 +141,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
          baris sambungan saja. */
       didDrawPage(data) {
         if (data.pageNumber === 1) return;
-        sectionLabel(doc, 14, `${prefix} — ${label} (lanjutan)`, W, M);
+        sectionLabel(doc, 14, `${prefix} — ${label} (lanjutan)`, W, M, undefined, SK);
       },
     });
     return getY(doc);
@@ -147,7 +164,7 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
     { label: 'Total Pengeluaran', value: `-${rp(stats.totalKeluar)}`, tone: 'neg' },
   ];
   const saldoBersih = { label: 'Saldo Bersih', value: rp(stats.saldo) };
-  Y = drawSummary(doc, ensureSpace(doc, Y + 6, 42), ringkasan, saldoBersih, W, M);
+  Y = drawSummary(doc, ensureSpace(doc, Y + 6, 52), ringkasan, saldoBersih, W, M, undefined, SK);
 
   // Tanda tangan: jaga ruangnya seukuran blok NYATA (SIGN_H). Kalau tetap harus
   // pindah halaman, lembar itu dibuat BISA BERDIRI SENDIRI — kepala lanjutan
@@ -155,20 +172,25 @@ export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
   // atasnya. Tanda tangan harus duduk bersama angka yang disahkannya; lembar
   // tanda tangan kosong tak mengesahkan apa pun dan gampang tertukar.
   const halamanSebelum = doc.getNumberOfPages();
-  let ttdY = ensureSpace(doc, Y + 14, SIGN_H);
+  let ttdY = ensureSpace(doc, Y + 14, signH(SK));
   if (doc.getNumberOfPages() > halamanSebelum) {
     const headY = drawContinuationHeader(doc, {
       W, M,
       title: 'Laporan Pertanggungjawaban Kas RT',
       subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Kota Depok${periode} · ${docCode}`,
-    });
-    const recapY = sectionLabel(doc, headY + 8, 'Ringkasan Tutup Buku', W, M);
-    ttdY = drawSummary(doc, recapY, ringkasan, saldoBersih, W, M) + 18;
+    }, SK);
+    const recapY = sectionLabel(doc, headY + 8, 'Ringkasan Tutup Buku', W, M, undefined, SK);
+    ttdY = drawSummary(doc, recapY, ringkasan, saldoBersih, W, M, undefined, SK) + 18;
   }
-  drawSignatures(doc, ttdY, W, M, { dateline: `Depok, ${tanggalCetak}` });
+  drawSignatures(doc, ttdY, W, M, { dateline: `Depok, ${tanggalCetak}`, sk: SK });
 
   const H = doc.internal.pageSize.getHeight();
-  drawFooter(doc, W, H, tanggalCetak);
+  drawFooter(doc, W, H, tanggalCetak, M, SK);
 
-  return outputPdf(doc, `Laporan-Kas-RT-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf`);
+  return { doc, filename: `Laporan-Kas-RT-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf` };
+}
+
+export function generateKasRTPDF(list: KasRT[], stats: KasRTStats) {
+  const { doc, filename } = buildKasRTPDF(list, stats);
+  return outputPdf(doc, filename);
 }
