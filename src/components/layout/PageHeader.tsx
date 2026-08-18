@@ -60,7 +60,7 @@ export default function PageHeader({
           <h1 className="flex min-w-0 items-center gap-1 text-lg font-bold text-ink dark:text-gray-100">
             {/* truncate DI SPAN, bukan di h1: h1 juga wadah InfoTip — kalau
                 truncate dipasang di sana, tombol info ikut terpotong. */}
-            <span className="truncate">{title}</span>
+            <span className="potong-lentur">{title}</span>
             {info}
           </h1>
           {subtitle && <p className="mt-0.5 text-caption text-ink-faint dark:text-gray-400">{subtitle}</p>}

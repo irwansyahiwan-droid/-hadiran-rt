@@ -138,7 +138,7 @@ export default function HeroSaldo({
               tanpa clamp, kata terakhir hilang ditelan ellipsis. */}
           <p className="flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white/90">
             {Icon && <Icon className="h-4 w-4 shrink-0 text-white/80" />}
-            <span className="truncate">{label}</span>
+            <span className="potong-lentur">{label}</span>
             {info}
           </p>
           {actions && <div className="-mr-2 flex shrink-0 items-center">{actions}</div>}

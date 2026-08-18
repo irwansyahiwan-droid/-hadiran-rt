@@ -411,7 +411,7 @@ export default function JadwalWargaPage() {
               subTab === id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
             }`}
           >
-            <Icon className="w-4 h-4 shrink-0" /> <span className="truncate">{label}</span>
+            <Icon className="w-4 h-4 shrink-0" /> <span className="potong-lentur">{label}</span>
           </button>
         ))}
       </div>
@@ -517,7 +517,7 @@ export default function JadwalWargaPage() {
                       {w.nama.charAt(0)}
                     </div>
                     {/* Nama */}
-                    <p className="flex-1 text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
+                    <p className="flex-1 text-body font-semibold text-gray-900 dark:text-gray-100 potong-lentur">{w.nama}</p>
                     {/* Badge — hadir / titip (iuran masuk) / tidak hadir */}
                     {!lastTarikan ? (
                       <Tag tone="neutral" className="shrink-0">—</Tag>

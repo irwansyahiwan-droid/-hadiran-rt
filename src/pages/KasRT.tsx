@@ -912,7 +912,7 @@ export default function KasRTPage() {
                         dialek liar (bukan komponen Tag bersama), dan karena
                         tanggal+chip tak muat di kolom 120px ia selalu jatuh ke
                         baris kedua, membuat chip menggantung sendirian. */}
-                    <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
+                    <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
                       {[formatTanggalRingkas(k.tanggal), k.kategori && labelKategoriSingkat(k.tipe, k.kategori)].filter(Boolean).join(' · ')}
                     </p>
                   </div>

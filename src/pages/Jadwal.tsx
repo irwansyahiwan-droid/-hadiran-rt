@@ -605,7 +605,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
               {result.tidakHadirNama.map((nama, i) => (
                 <li key={`${i}-${nama}`} className="flex items-center gap-2 text-caption text-ink-sub dark:text-gray-300">
                   <span className="w-5 shrink-0 text-right tabular-nums text-ink-faint dark:text-gray-400">{i + 1}.</span>
-                  <span className="truncate">{nama}</span>
+                  <span className="potong-lentur">{nama}</span>
                 </li>
               ))}
             </ol>

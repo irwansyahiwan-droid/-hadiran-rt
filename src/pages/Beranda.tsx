@@ -358,7 +358,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             ("Talangan · Tarikan #12") sudah tercetak di baris induk persis di
             atasnya, jadi mengulangnya di 9 baris berturut-turut hanya derau. */}
         {!(hideSub && !showDate) && (
-          <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
+          <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
             {[trx.sub, showDate ? formatTanggal(trx.tanggal) : null].filter(Boolean).join(' · ')}
           </p>
         )}
@@ -408,8 +408,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               nomornya — bagian yang paling berguna. "Tarikan #12" pendek, muat,
               dan tetap identitas yang benar untuk sebuah lipatan. */}
           <div className="flex-1 min-w-0">
-            <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug truncate">{judul}</p>
-            <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 truncate">
+            <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug potong-lentur">{judul}</p>
+            <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
               {[jenis, `${run.items.length} ${satuan}`].filter(Boolean).join(' · ')}
             </p>
           </div>
@@ -572,7 +572,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     ditelan ellipsis. clamp menyusutkan huruf ~2px di HP tersempit
                     (dan tracking sedikit dirapatkan) supaya TIGA katanya utuh, lalu
                     kembali ke 11px begitu ada ruang. truncate = jaring pengaman. */}
-                <span className="truncate text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
+                <span className="potong-lentur text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
               </div>
               <div className="flex shrink-0 items-center gap-2.5">
                 <button
@@ -759,7 +759,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1.5">
-                    <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight truncate flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
+                    <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight potong-lentur flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
                     {next ? (
                       <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/25 px-2 py-0.5 text-micro font-bold text-emerald-700 dark:text-emerald-300">
                         <Crown className="h-3 w-3" style={{ color: 'var(--gold-songket)' }} fill="currentColor" strokeWidth={0} />

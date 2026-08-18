@@ -746,6 +746,45 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 .dark .divide-inset::after,
 .dark .list-inset > * + *::before { background: rgba(255, 255, 255, 0.08); }
 
+/* ── Teks baris: memotong di lebar normal, MENGALAH di 320px ───────────────
+   `.potong-lentur` = pengganti `truncate` untuk teks yang isinya BERMAKNA
+   (nama warga, keterangan transaksi, judul halaman). Di >=360px ia identik
+   `truncate`; di bawah itu ia berhenti memotong dan membiarkan teksnya
+   membungkus.
+
+   Kenapa (19 Agu 2026): di 320px — lebar terkecil yang diwajibkan §1.4.10 —
+   sapuan `audit:potong` menemukan 108 teks terpenggal, dan yang hilang bukan
+   hiasan. "Nisan Nasrullah ( Icang )" kurang 67px, "Talangan · 7 warga"
+   kurang 49px, dan JUDUL pun kena: "Jadwal Tarikan" kurang 41px jadi tinggal
+   "Jadwal Tarik…". Elipsis di nama warga pada aplikasi kas bukan sekadar
+   kurang rapi — warga tak bisa memastikan barisnya miliknya.
+
+   Kenapa membungkus, bukan merapatkan seperti pass 390px: defisitnya 41-67px,
+   sementara seluruh anggaran gap sebuah baris cuma ~16px. Tak ada penyetelan
+   jarak yang bisa menutup jarak sebesar itu; satu-satunya cara menahan
+   informasi adalah memberi baris kedua. Konsekuensinya diterima sadar: di
+   bawah 360px tinggi baris jadi TIDAK seragam. Keseragaman irama kalah dari
+   isi yang utuh, dan hanya di lebar yang memang sudah sempit.
+
+   `overflow-wrap: anywhere` itu penjaga, bukan gaya: satu kata yang lebih
+   panjang dari kolomnya (mis. alamat surel tanpa spasi) takkan bisa dipatahkan
+   oleh `white-space: normal` sendirian, dan tanpa penjaga ini ia mendorong
+   halaman geser samping — menukar cacat terpotong dengan cacat yang lebih
+   berat. `text-overflow` dikembalikan ke `clip` supaya tak ada elipsis yatim
+   yang tercetak di ujung baris terakhir. */
+.potong-lentur {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 359.98px) {
+  .potong-lentur {
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
 /* ── Icon tile — chip ikon tonal DATAR (Material 3) ────────────────────────
    MATERIAL-FLAT (2 Jul): sheen + ring + contact dibuang — chip ikon = tint
    bg-*-100 polos dari Tailwind di call-site, persis tonal chip Google/myBCA.
