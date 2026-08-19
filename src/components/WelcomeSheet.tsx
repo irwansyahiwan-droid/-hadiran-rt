@@ -50,12 +50,24 @@ export default function WelcomeSheet() {
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
-        className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-6 float"
+        /* `max-h-[90dvh] overflow-y-auto` = pola yang sama dgn SEMUA sheet lain.
+           Sampai 19 Agu 2026 panel ini satu-satunya yang TAK berbatas tinggi:
+           tingginya = tinggi isi. Di layar pendek ia melewati layar tanpa jalan
+           gulir — terukur 504px di viewport 390px (landscape 844x390), jadi
+           handle, logo, dan judul "Selamat datang" menggantung di ATAS lipatan
+           dan tak bisa diraih. Ini layar PERTAMA tiap warga baru. Semua sapuan
+           repo memvariasikan LEBAR (320/360/390) & skala teks — TINGGI tak
+           pernah sekali pun, jadi tak satu pun pernah melihatnya. */
+        className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-6 float max-h-[90dvh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)', ...drag.style }}
-        {...drag.handlers}
       >
-        <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-5" />
+        {/* Handle: `drag.handlers` pindah ke SINI dari panel. Di panel ber-scroll
+            keduanya berkelahi — gulir ke bawah terbaca sebagai tarik-tutup.
+            Semua sheet lain sudah memakai strip handle terpisah; ini menyusul. */}
+        <div className="-mt-2 mb-4 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
+          <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
+        </div>
         <img src={logoRt} alt="" width={56} height={56} className="w-14 h-14 rounded-2xl object-contain mx-auto mb-3 ring-1 ring-black/5 dark:ring-white/10" />
         <h2 className="text-xl font-bold text-ink dark:text-gray-100 text-center">Selamat datang</h2>
         <p className="text-pretty text-caption text-ink-sub dark:text-gray-400 text-center mt-1 mb-5">

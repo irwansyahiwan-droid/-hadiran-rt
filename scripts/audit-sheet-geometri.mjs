@@ -25,7 +25,13 @@ import { readFileSync, mkdirSync } from 'node:fs';
 
 const URL_APP = process.env.CAP_URL || 'http://localhost:5174';
 const W = Number(process.env.W || 360);
-const OUT = process.env.OUT_DIR || `.audit-sheet-${W}`;
+/* Tinggi viewport. Sampai 19 Agu 2026 nilai ini HARDCODE 844 di dua konteks —
+   akibatnya aturan `panel > layar TANPA overflow-y` di PROBE tak pernah bisa
+   menyala: 90vh dari 844 selalu muat. Semua sapuan repo memvariasikan LEBAR
+   (320/360/390) & skala teks; TINGGI tak pernah sekali pun. Landscape HP
+   (844x390) & HP pendek lawas (320x568) hidup di sisi lain tepi itu. */
+const H = Number(process.env.H || 844);
+const OUT = process.env.OUT_DIR || `.audit-sheet-${W}x${H}`;
 mkdirSync(OUT, { recursive: true });
 
 const env = readFileSync(new globalThis.URL('../.env', import.meta.url), 'utf8');
@@ -145,7 +151,13 @@ async function tutup(page) {
   await page.keyboard.press('Escape').catch(() => {});
   await page.waitForTimeout(700);
   if (await page.locator('[role="dialog"]').count()) {
-    await page.mouse.click(5, 400).catch(() => {});
+    /* Koordinat klik-luar WAJIB diturunkan dari viewport, bukan hardcode.
+       Sampai 19 Agu 2026 ini `click(5, 400)` — di landscape (H=390) titik itu
+       DI LUAR layar, kliknya tak mendarat, menu tetap terbuka, dan `keTab`
+       berikutnya time-out. Gejalanya terbaca "nav Kas RT hilang di landscape"
+       (temuan palsu); penyebabnya alat. Bug alat ke-14. */
+    const vh = await page.evaluate(() => innerHeight);
+    await page.mouse.click(5, Math.round(vh / 2)).catch(() => {});
     await page.waitForTimeout(700);
   }
 }
@@ -161,7 +173,7 @@ const browser = await chromium.launch();
 
 // ── A) MODE WARGA — WelcomeSheet & sheet detail transaksi ──────────────
 {
-  const ctx = await browser.newContext({ viewport: { width: W, height: 844 }, deviceScaleFactor: 2, serviceWorkers: 'block' });
+  const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, serviceWorkers: 'block' });
   await ctx.route('**/rest/v1/**', (r) => (r.request().method() === 'GET' ? r.continue() : r.abort()));
   const page = await ctx.newPage();
   await page.goto(URL_APP, { waitUntil: 'networkidle' });
@@ -189,7 +201,7 @@ const browser = await chromium.launch();
 // ── B) MODE BENDAHARA (mock read-only) — semua form & dialog ───────────
 {
   const sess = sesiPalsu();
-  const ctx = await browser.newContext({ viewport: { width: W, height: 844 }, deviceScaleFactor: 2, serviceWorkers: 'block' });
+  const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, serviceWorkers: 'block' });
   await ctx.addInitScript(({ ref, s }) => {
     localStorage.setItem('hadiran-welcome-v2', '1');
     localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s));
@@ -285,5 +297,5 @@ const browser = await chromium.launch();
 }
 
 await browser.close();
-console.log(`\n=== ${diukur} permukaan diukur @${W}px · ${gagal} bermasalah ===`);
+console.log(`\n=== ${diukur} permukaan diukur @${W}\u00d7${H} · ${gagal} bermasalah ===`);
 process.exit(gagal ? 1 : 0);

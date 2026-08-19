@@ -1202,6 +1202,19 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    menang atas inline style → transform drag-to-dismiss (ikut jari) & luncuran
    keluar dismiss() tak pernah render. Backwards: begitu entrance selesai,
    transform kembali ke inline → panel benar-benar mengikuti jari. */
+/* Batas tinggi sheet WAJIB `dvh`, JANGAN `vh` (19 Agu 2026 — 7 panel diganti).
+   Di browser HP `100vh` = viewport BESAR, yakni seolah URL bar sudah tersembunyi.
+   Saat URL bar masih terlihat — keadaan awal, dan tiap kali warga menggulir ke
+   atas — tinggi yang benar-benar terlihat LEBIH KECIL dari 100vh, jadi `90vh`
+   bisa melewatinya dan tepi ATAS sheet (handle + judul) terdorong keluar layar.
+   `dvh` mengikuti viewport dinamis, jadi 90% berarti 90% dari yang benar-benar
+   terlihat. Shell app (`min-h-dvh` di App/Login/ErrorBoundary) sudah memakai dvh
+   sejak awal — ini menutup split unit-nya.
+
+   CATATAN VERIFIKASI: perbedaan ini TAK BISA dibuktikan oleh sapuan mana pun.
+   Playwright headless tak punya chrome browser dinamis, jadi di sana
+   `vh === dvh === tinggi viewport` dan kedua varian terbaca identik. Jangan
+   membaca "sapuan hijau" sebagai bukti `vh` aman; buktinya ada di HP asli. */
 .sheet-panel    { animation: sheetUp 0.4s var(--ease-out-expo) backwards; overscroll-behavior: contain; }
 
 /* Toast — masuk turun dari atas, keluar NAIK ke atas (arah yg sama → konsisten

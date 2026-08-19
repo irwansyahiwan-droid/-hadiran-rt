@@ -44,11 +44,19 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Saat menu buka: fokus item pertama → pola menu WAI-ARIA (keyboard mulai di dalam).
+  /* Saat menu buka: fokus item pertama → pola menu WAI-ARIA (keyboard mulai di dalam).
+     Dependensi WAJIB ikut `menuMounted`, bukan `menuOpen` saja. `useExitAnim`
+     menunda mount satu commit (mounted dinaikkan dari dalam useEffect-nya), jadi
+     di commit tempat menuOpen baru jadi true panelnya BELUM ada di DOM:
+     `menuRef.current` masih null dan `?.focus()` diam-diam tak berbuat apa-apa.
+     Fokus lalu tertinggal di tombol pemicu selamanya — dan karena `onMenuKeyDown`
+     menempel di WADAH menu, Escape/panah/Home/End tak pernah kebagian event sama
+     sekali (19 Agu 2026: activeElement terukur tetap BUTTON "Menu" di 390x844
+     maupun 844x390). Sapuan lama lolos karena `tutup()` punya jaring klik-luar. */
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen || !menuMounted) return;
     menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
-  }, [menuOpen]);
+  }, [menuOpen, menuMounted]);
 
   function closeMenu() {
     setMenuOpen(false);
