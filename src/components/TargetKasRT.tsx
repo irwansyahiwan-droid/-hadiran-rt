@@ -27,7 +27,46 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
   }
   useEffect(() => { load(); }, []);
 
-  if (!loaded) return null;
+  /* Selama fetch-nya SENDIRI kartu ini dulu `return null` — nol ruang, lalu
+     muncul utuh 147px sekaligus. Kartunya dirender TANPA syarat oleh KasRT,
+     jadi kemunculannya mendorong semua yang di bawahnya: grafik, rekap, dan
+     seluruh daftar mutasi. Terukur 19 Agu 2026 sbg penyumbang TUNGGAL terbesar
+     geseran Kas RT (bersama SmartInsight: grafik turun ~175px; CLS halaman
+     0,107 warga / 0,118 bendahara, ambang "baik" Google 0,1).
+
+     Skeletonnya BERBENTUK anatomi aslinya, bukan slab setinggi tetap — pelajaran
+     yang sama dgn skeleton hero JadwalWarga: tinggi tetap akan salah begitu
+     judul melipat (`line-clamp-2`) atau kaki kartu membungkus di teks 200%.
+     Dengan struktur yang sama ia melipat di titik yang SAMA. Terukur 145px
+     lawan 147px kartu asli.
+
+     Tombol ubah ikut `isBendahara` persis seperti kartu asli: kalau tidak,
+     warga dapat skeleton 36px lebih lebar dari isi yang menggantikannya. */
+  if (!loaded) {
+    return (
+      <div aria-hidden="true" className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="skeleton w-8 h-8 rounded-xl shrink-0" />
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="skeleton h-[22px] w-3/5 rounded-full" />
+              <div className="skeleton h-[15px] w-2/5 rounded-full" />
+            </div>
+          </div>
+          {isBendahara && <div className="skeleton w-9 h-9 -mr-1 rounded-xl shrink-0" />}
+        </div>
+        <div className="skeleton h-3 rounded-full" />
+        <div className="flex items-center justify-between gap-2 mt-2.5">
+          <div className="skeleton h-[17px] w-28 rounded-full" />
+          <div className="skeleton h-[15px] w-32 rounded-full" />
+        </div>
+        <div className="flex items-center justify-between mt-1.5">
+          <div className="skeleton h-[15px] w-24 rounded-full" />
+          <div className="skeleton h-[15px] w-28 rounded-full" />
+        </div>
+      </div>
+    );
+  }
   if (gagal) return null; // kartu opsional — sembunyikan, jangan mengarang keadaan
   if (!target && !isBendahara) return null;
 

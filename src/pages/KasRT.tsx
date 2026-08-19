@@ -590,8 +590,24 @@ export default function KasRTPage() {
         {/* Target & progres Kas RT */}
         <TargetKasRT saldo={saldo} />
 
-        {/* Insight ringkas: kas masuk bulan ini vs bulan lalu */}
-        {(masukBulanIni > 0 || masukBulanLalu > 0) && (
+        {/* Insight ringkas: kas masuk bulan ini vs bulan lalu.
+            Syaratnya dihitung dari `list`, yang saat memuat masih kosong → dua
+            nominalnya 0 → barisnya TAK dirender sama sekali, lalu muncul utuh
+            65px begitu data datang. Bersama kartu Target (147px) inilah yang
+            mendorong grafik & rekap turun ~175px di Kas RT — dua blok yang
+            muncul dari NOL, bukan skeleton yang tingginya meleset.
+            Skeletonnya meniru markup SmartInsight (px-4 py-3, tile 36px, dua
+            baris caption) supaya tingginya ikut kalau anatominya berubah. */}
+        {loading && (
+          <div aria-hidden="true" className="flex items-center gap-3 rounded-3xl border border-line dark:border-gray-800/60 bg-white dark:bg-gray-900 lift px-4 py-3">
+            <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
+            <div className="min-w-0 flex-1 space-y-1">
+              <div className="skeleton h-[15px] w-2/5 rounded-full" />
+              <div className="skeleton h-[15px] w-3/5 rounded-full" />
+            </div>
+          </div>
+        )}
+        {!loading && (masukBulanIni > 0 || masukBulanLalu > 0) && (
           <SmartInsight label="Kas masuk bulan ini" current={masukBulanIni} previous={masukBulanLalu} />
         )}
 

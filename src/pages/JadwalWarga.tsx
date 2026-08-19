@@ -147,9 +147,37 @@ export default function JadwalWargaPage() {
     }
   }
 
+  /* Kepala halaman dipakai OLEH KEDUA cabang (memuat & termuat) — satu nilai,
+     bukan dua salinan. Sampai 19 Agu 2026 cabang `if (loading)` di bawah
+     mengembalikan pohon yang SAMA SEKALI berbeda dan tak memuat PageHeader,
+     padahal pohon termuat memuatnya. Halaman ini satu-satunya di app yang
+     early-return skeleton begitu; empat halaman lain (KasRT, Talangan,
+     KasHadiran, Jadwal) merender SATU pohon dan cuma menukar isi dalamnya,
+     jadi kepala mereka tak pernah lepas dari alur.
+     Akibatnya seluruh halaman menata ulang saat data datang: layout-shift
+     terukur 0,138 di 390px dan 0,186 di 360px (ambang "baik" Google 0,1).
+     Bahwa penyebabnya tukar-skeleton dan BUKAN CrossFade dibuktikan lewat
+     kunjungan KEDUA ke tab yang sama — data sudah di-cache, skeleton tak
+     muncul, dan skornya 0,000 tepat di kedua lebar.
+     Sengaja PageHeader ASLI, bukan skeleton tiruannya: propsnya statis
+     seluruhnya, jadi tiruan cuma menambah satu titik sinkron yang bisa
+     melenceng — dan spinner `animate-spin`-nya justru menjadikan keadaan
+     memuat terbaca, bukan sekadar tak menggeser. */
+  const kepalaHalaman = (
+    <PageHeader
+      title="Jadwal Tarikan"
+      actions={
+        <button onClick={() => load()} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+        </button>
+      }
+    />
+  );
+
   if (loading) {
     return (
       <div className="space-y-7 pb-2">
+        {kepalaHalaman}
         {/* Hero — bentuk kartu + ANATOMI asli (eyebrow, judul, sub Sohibul Bait,
             baris kehadiran, progress, chip), tinggi via HERO_MIN_H. Versi lama:
             slab abu h-44 polos = 22px lebih pendek dari hero asli, dan blok di
@@ -282,15 +310,9 @@ export default function JadwalWargaPage() {
     <div className="space-y-7 pb-2">
       {/* Kepala halaman = PageHeader bersama (30 Jul). Halaman ini dulu SATU-
           SATUNYA tab tanpa judul — langsung hero, tanpa nama & tanpa muat-ulang,
-          padahal tab-nya bernama "Jadwal" dan isinya dua tampilan berbeda. */}
-      <PageHeader
-        title="Jadwal Tarikan"
-        actions={
-          <button onClick={() => load()} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        }
-      />
+          padahal tab-nya bernama "Jadwal" dan isinya dua tampilan berbeda.
+          Nilainya sekarang `kepalaHalaman` di atas — dipakai cabang memuat juga. */}
+      {kepalaHalaman}
 
       {/* Hero Card — material/warna disamakan dengan hero Beranda (.hero-card) */}
       {lastTarikan ? (
