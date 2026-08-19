@@ -183,6 +183,65 @@ await ujiMasuk(
   await ctx.close();
 }
 
+// ── RELOAD DI TENGAH SESI ────────────────────────────────────────────────────
+// Kelas yang sampai 19 Agu 2026 TAK TERSENTUH sapuan mana pun: semuanya menguji
+// satu kali muat lalu berinteraksi — tak satu pun pernah MEMUAT ULANG halaman.
+// Di situlah cacat nyata bersembunyi: `wargaMode` cuma state React, jadi reload
+// melempar warga kembali ke Login. Dan itu bukan skenario langka —
+// `PwaUpdatePrompt` MEMANGGIL `location.reload()` saat warga menekan "Muat
+// ulang" pada toast versi baru, jadi tiap deploy = satu lemparan.
+//
+// Diuji EMPAT sifat, bukan satu: memperbaiki "bertahan" gampang diam-diam
+// membuka pintu, jadi gate-nya ikut diuji di napas yang sama.
+{
+  const ctx = await konteks(false);
+  const page = await ctx.newPage();
+  await page.goto(URL_APP, { waitUntil: 'domcontentloaded' });
+  const m = [];
+
+  const pw = page.locator('#warga-password');
+  await pw.waitFor({ timeout: 30000 });
+  await pw.focus();
+  await pw.pressSequentially('warga', { delay: 50 });
+  await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+  const masuk = await page.locator('nav button', { hasText: 'Beranda' }).first()
+    .waitFor({ timeout: 30000 }).then(() => true).catch(() => false);
+  if (!masuk) m.push('PROBE CACAT: gate warga tak pernah terlewati');
+
+  if (masuk) {
+    // pindah tab dulu → sekalian menguji tab ikut bertahan
+    const b = page.locator('nav button', { hasText: 'Kas RT' }).first();
+    await b.click({ force: true, timeout: 8000 }).catch(() => b.evaluate((el) => el.click()));
+    await page.waitForTimeout(2500);
+
+    await page.evaluate(() => window.location.reload());
+    await page.waitForTimeout(6000);
+    if (await page.locator('#warga-password').count()) m.push('RELOAD MELEMPAR WARGA KE LOGIN — mode warga tak bertahan sesi tab');
+    else if (!(await page.title()).startsWith('Kas RT')) m.push(`reload tak memulihkan tab aktif (judul: ${await page.title()})`);
+
+    // Back sesudah pemulihan tab non-Beranda WAJIB ke Beranda, bukan keluar app
+    await page.goBack().catch(() => {});
+    await page.waitForTimeout(2500);
+    if (!(await page.title()).startsWith('Beranda')) m.push(`Back sesudah pemulihan tak kembali ke Beranda (judul: ${await page.title()})`);
+  }
+  lapor('reload/mode warga di tengah sesi', m);
+  await ctx.close();
+}
+
+// Gate TIDAK boleh melemah: sesi/tab BARU wajib minta sandi lagi.
+{
+  const ctx = await konteks(false);
+  const page = await ctx.newPage();
+  await page.goto(URL_APP, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(3000);
+  const m = [];
+  if (!(await page.locator('#warga-password').count())) {
+    m.push('GATE BOCOR: sesi baru langsung masuk mode warga tanpa sandi');
+  }
+  lapor('gate/sesi baru tetap minta sandi', m);
+  await ctx.close();
+}
+
 await browser.close();
 console.log(`\n=== ${diukur} skenario auth diperiksa @${W}px · ${gagalTotal} bermasalah ===`);
 process.exit(gagalTotal ? 1 : 0);

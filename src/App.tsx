@@ -48,20 +48,42 @@ function PageFallback() {
   );
 }
 
-/** Kunci sesi gate warga. Satu tempat — dibaca saat init & ditulis di dua
- *  transisi (masuk mode warga, keluar darinya). */
+/** Keadaan yang bertahan selama SESI TAB ini. Satu tempat untuk keduanya —
+ *  kalau tersebar, gampang ada transisi yang menulis satu kunci dan lupa yang
+ *  lain, lalu sesi memulihkan setengah keadaan. */
 const KUNCI_WARGA = 'hadiran-warga-sesi';
+const KUNCI_TAB = 'hadiran-tab-sesi';
 function simpanWarga(aktif: boolean) {
   try {
     if (aktif) sessionStorage.setItem(KUNCI_WARGA, '1');
     else sessionStorage.removeItem(KUNCI_WARGA);
   } catch { /* mode privat / storage penuh → gate cuma tak bertahan reload */ }
 }
+function simpanTab(tab: TabName | null) {
+  try {
+    if (tab) sessionStorage.setItem(KUNCI_TAB, tab);
+    else sessionStorage.removeItem(KUNCI_TAB);
+  } catch { /* abaikan — reload cuma kembali ke Beranda spt sebelumnya */ }
+}
+/** Baca tab tersimpan, TERVALIDASI lawan `urutanTab` (sumber tunggal daftar
+ *  tab). Tanpa validasi, satu nilai basi/asing dari sesi lama akan lolos jadi
+ *  `activeTab` yang tak cocok satu cabang render pun → layar kosong. */
+function bacaTab(): TabName {
+  try {
+    const t = sessionStorage.getItem(KUNCI_TAB);
+    return t && (urutanTab as string[]).includes(t) ? (t as TabName) : 'beranda';
+  } catch { return 'beranda'; }
+}
 
 export default function App() {
   const auth = useAuth();
   const { isDark, toggle: toggleTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState<TabName>('beranda');
+  /* Tab aktif ikut bertahan melewati reload (19 Agu 2026). Sebelumnya ia selalu
+     kembali ke Beranda — kecil, tapi digabung dgn reload "Muat ulang" milik
+     PwaUpdatePrompt efeknya persis kebalikan yang diharapkan: warga sudah
+     berada di Kas RT, menerima toast versi baru, lalu mendarat di layar lain.
+     Sesi, bukan localStorage — sama alasannya dgn gate warga di bawah. */
+  const [activeTab, setActiveTab] = useState<TabName>(bacaTab);
   /* Gate warga bertahan selama SESI TAB ini — `sessionStorage`, bukan
      `localStorage` dan bukan state murni.
      Sampai 19 Agu 2026 ini `useState(false)` polos: setiap reload melempar
@@ -98,6 +120,7 @@ export default function App() {
     scrollPos.current[activeTab] = window.scrollY; // ingat posisi scroll tab sekarang
     setDir(TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(activeTab) ? 1 : -1);
     setActiveTab(tab);
+    simpanTab(tab);
   };
 
   // Swipe kiri = tab berikutnya, kanan = tab sebelumnya (pakai urutan tab yang terlihat)
@@ -236,7 +259,7 @@ export default function App() {
     return (
       <Login
         onLogin={auth.signIn}
-        onWargaMode={() => { simpanWarga(true); setWargaMode(true); setActiveTab('beranda'); }}
+        onWargaMode={() => { simpanWarga(true); simpanTab(null); setWargaMode(true); setActiveTab('beranda'); }}
       />
     );
   }
@@ -252,8 +275,8 @@ export default function App() {
        kunci yang tertinggal di sesi = mode warga diam-diam hidup lagi sesudah
        logout. Murah, dan menutup kelasnya sekarang daripada menunggu ada rute
        baru yang membukanya. */
-    signOut: async () => { simpanWarga(false); await auth.signOut(); },
-    exitWargaMode: () => { simpanWarga(false); setWargaMode(false); setActiveTab('beranda'); },
+    signOut: async () => { simpanWarga(false); simpanTab(null); await auth.signOut(); },
+    exitWargaMode: () => { simpanWarga(false); simpanTab(null); setWargaMode(false); setActiveTab('beranda'); },
   };
 
   return (
