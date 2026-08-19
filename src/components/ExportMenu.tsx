@@ -55,11 +55,20 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
-  // Saat menu buka: fokus item pertama → keyboard mulai di dalam (pola WAI-ARIA).
+  /* Saat menu buka: fokus item pertama → keyboard mulai di dalam (pola WAI-ARIA).
+     Dependensi WAJIB ikut `mounted`, bukan `open` saja — jebakan yang SAMA
+     PERSIS dgn menu Header (diperbaiki 19 Agu 2026 pagi; ini instans keduanya,
+     dan satu-satunya yang tersisa: dari tiga pemakai `useExitAnim`, FilterChips
+     tak menyentuh DOM anaknya). `useExitAnim` menaikkan `mounted` dari dalam
+     useEffect-nya, jadi di commit tempat `open` baru true panelnya BELUM ada di
+     DOM: `menuRef.current` null dan `?.focus()` diam-diam tak berbuat apa-apa.
+     Fokus lalu tertinggal di tombol pemicu selamanya — dan karena
+     `onMenuKeyDown` menempel di WADAH menu, panah/Home/End tak pernah kebagian
+     event. Terukur 19 Agu: fokus mendarat di button "Ekspor", bukan di menu. */
   useEffect(() => {
-    if (!open) return;
+    if (!open || !mounted) return;
     menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
-  }, [open]);
+  }, [open, mounted]);
 
   // Navigasi keyboard: panah naik/turun siklik, Home/End.
   function onMenuKeyDown(e: React.KeyboardEvent) {
@@ -70,6 +79,14 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
     else if (e.key === 'ArrowUp') { e.preventDefault(); els[(idx - 1 + els.length) % els.length].focus(); }
     else if (e.key === 'Home') { e.preventDefault(); els[0].focus(); }
     else if (e.key === 'End') { e.preventDefault(); els[els.length - 1].focus(); }
+    /* Tab MENUTUP menu (pola WAI-ARIA menu button), tanpa preventDefault supaya
+       fokus tetap melanjutkan ke elemen berikutnya. Tanpa ini Tab diam-diam
+       berjalan KELUAR sementara menunya tetap terbuka: pengguna lalu menyusuri
+       halaman di BELAKANG scrim — elemen yang tak bisa diklik karena scrim
+       menangkap pointer — dan Escape ikut mati, karena handler ini menempel di
+       wadah menu yang sudah ditinggalkan fokus. Terukur 19 Agu di menu Header:
+       Tab ke-6 mendarat di "Ke slide 1" milik carousel Beranda. */
+    else if (e.key === 'Tab') { setOpen(false); }
   }
 
   return (

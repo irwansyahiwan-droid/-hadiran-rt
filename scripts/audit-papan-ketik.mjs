@@ -15,8 +15,23 @@
 //      gulir menyalakan `useScrollHide`, dan itu dulu memasang `tabIndex={-1}`.
 //      FAB duduk di ekor DOM, jadi gilirannya selalu datang setelah ia pergi.
 //
-// **Ambang: 100%.** Bukan angka yang dinegosiasikan — kontrol yang terlihat &
-// aktif tapi tak tergapai papan ketik itu §2.1.1 gagal, titik.
+// **Ambang bagian A: 100%.** Bukan angka yang dinegosiasikan — kontrol yang
+// terlihat & aktif tapi tak tergapai papan ketik itu §2.1.1 gagal, titik.
+//
+// Bagian B memakai aturan BERBEDA PER PERAN, dan itu bukan kelonggaran:
+//   role=dialog → Tab WAJIB terperangkap di dalam panel
+//   role=menu   → Tab WAJIB MENUTUP menu lalu fokus melanjutkan (pola WAI-ARIA
+//                 menu button). Memberlakukan aturan dialog di menu = alat
+//                 berteriak palsu; percobaan pertama (19 Agu) melakukan persis
+//                 itu dan melaporkan dua menu yang justru sudah BENAR.
+// Cacat menu yang SEBENARNYA: fokus keluar sementara menunya MASIH TERBUKA —
+// pengguna lalu menyusuri halaman di BELAKANG scrim (elemen yang tak bisa
+// diklik karena scrim menangkap pointer) dan Escape ikut mati, sebab handler
+// menu menempel di wadah yang sudah ditinggalkan fokus.
+//
+// Temuan bagian B (19 Agu): ExportMenu mengulang PERSIS jebakan menu Header —
+// `useExitAnim` menunda mount satu commit, `menuRef.current` masih null saat
+// efek fokus jalan, `?.focus()` menelannya, dan panah/Home/End mati total.
 //
 // Populasi sengaja menyaring: `aria-hidden`, `disabled`, `.sr-only`, dan
 // `tabindex="-1"` DI LUAR `[role=menu]` (roving tabindex itu pola sah — di
@@ -148,7 +163,98 @@ for (const bendahara of [false, true]) {
   await ctx.close();
 }
 
+// ── B) DISIPLIN FOKUS LAPISAN (bendahara — di situ lapisannya terbanyak) ──
+const AE = () => {
+  const a = document.activeElement;
+  return {
+    tag: a?.tagName?.toLowerCase(),
+    lab: (a?.getAttribute?.('aria-label') || a?.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 30),
+    dlm: !!a?.closest?.('[role="dialog"],[role="menu"]'),
+    isBody: a === document.body || a === document.documentElement,
+  };
+};
+
+let lapisan = 0, lapisanGagal = 0;
+{
+  const { ctx, page } = await konteks(browser, true);
+  await page.goto(APP, { waitUntil: 'networkidle' });
+  await page.locator('nav button', { hasText: 'Beranda' }).first().waitFor({ timeout: 90000 });
+  await page.waitForTimeout(4000);
+
+  const keTab = async (t) => {
+    const b = page.locator('nav button', { hasText: t }).first();
+    await b.click({ force: true, timeout: 8000 }).catch(() => b.evaluate((el) => el.click()));
+    await page.waitForTimeout(3500);
+  };
+
+  async function ujiLapisan(nama, buka) {
+    const pemicu = await page.evaluate(AE);
+    if (!(await buka())) { console.log(`\n### ${nama} — TAK TERBUKA (lewati)`); return; }
+    await page.waitForTimeout(1100);
+    /* MUTASI bagian B: buang fokus keluar lapisan tepat sesudah dibuka —
+       persis wujud cacat aslinya (`?.focus()` yang menelan ref null). Sapuan
+       WAJIB merah di keenam lapisan. Berbeda dgn mutasi bagian A, yang ini tak
+       bisa dipulihkan React: fokus bukan atribut yang ia render. */
+    if (MUTASI) { await page.evaluate(() => { document.body.setAttribute('tabindex', '-1'); document.body.focus(); }); await page.waitForTimeout(200); }
+    const saatBuka = await page.evaluate(AE);
+    const jenis = await page.evaluate(() =>
+      (document.querySelector('[role="dialog"]') ? 'dialog' : (document.querySelector('[role="menu"]') ? 'menu' : '?')));
+    for (let i = 0; i < 6; i++) await page.keyboard.press('Tab');
+    await page.waitForTimeout(400);
+    const setelahTab = await page.evaluate(AE);
+    const masihBuka = await page.evaluate(() => document.querySelectorAll('[role="dialog"],[role="menu"]').length > 0);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(900);
+    const belumTutup = await page.locator('[role="dialog"],[role="menu"]').count();
+    const setelahTutup = await page.evaluate(AE);
+
+    lapisan++;
+    const m = [];
+    if (!saatBuka.dlm) m.push(`fokus TIDAK masuk lapisan saat buka (mendarat: ${saatBuka.tag} "${saatBuka.lab}")`);
+    if (jenis === 'dialog' && saatBuka.dlm && !setelahTab.dlm) m.push(`dialog TAK memerangkap Tab → ${setelahTab.tag} "${setelahTab.lab}"`);
+    if (jenis === 'menu' && !setelahTab.dlm && masihBuka) m.push(`menu MASIH TERBUKA sementara fokus sudah keluar (${setelahTab.tag} "${setelahTab.lab}")`);
+    if (belumTutup) m.push('Escape tak menutup');
+    else if (setelahTutup.isBody) m.push('fokus JATUH ke <body> sesudah tutup — pengguna terlempar ke puncak dokumen');
+    if (m.length) lapisanGagal++;
+    console.log(`\n### ${nama}${m.length ? '' : '  OK'}`);
+    console.log(`    [${jenis}] pemicu:${pemicu.tag}"${pemicu.lab}" → buka:${saatBuka.dlm ? 'dlm' : 'LUAR'} → 6xTab:${setelahTab.dlm ? 'dlm' : 'luar'}/${masihBuka ? 'panel-buka' : 'panel-tutup'} → tutup:${setelahTutup.tag}"${setelahTutup.lab}"`);
+    m.forEach((x) => console.log('  ⚠ ' + x));
+    if (belumTutup) {
+      await page.keyboard.press('Escape').catch(() => {});
+      await page.waitForTimeout(600);
+      if (await page.locator('[role="dialog"],[role="menu"]').count()) {
+        const vh = await page.evaluate(() => innerHeight);
+        await page.mouse.click(5, Math.round(vh / 2)).catch(() => {});
+        await page.waitForTimeout(600);
+      }
+    }
+  }
+
+  const klik = (loc) => async () => {
+    if (!(await loc.count())) return false;
+    const el = loc.first();
+    await el.evaluate((e) => e.scrollIntoView({ block: 'center' })).catch(() => {});
+    await page.waitForTimeout(400);
+    await el.focus().catch(() => {});
+    await el.click({ force: true }).catch(() => {});
+    return true;
+  };
+
+  await ujiLapisan('menu-Header', klik(page.getByRole('button', { name: 'Menu' })));
+  await keTab('Kas RT');
+  await ujiLapisan('sheet-tambah-KasRT', klik(page.getByRole('button', { name: /Tambah transaksi Kas RT/i })));
+  await ujiLapisan('sheet-ubah-target', klik(page.getByRole('button', { name: /Ubah target/i })));
+  await keTab('Hadiran');
+  await ujiLapisan('modal-setor', klik(page.getByRole('button', { name: /Setor ke Kas RT/i })));
+  await ujiLapisan('menu-ekspor', klik(page.getByRole('button', { name: /Ekspor/i })));
+  await keTab('Jadwal');
+  await ujiLapisan('menu-aksi-tarikan', klik(page.getByRole('button', { name: /Aksi lainnya tarikan/i })));
+  await ctx.close();
+}
+
 await browser.close();
-console.log(`\n=== ${layar} layar · ${totalKontrol} kontrol @390px · ${gagal} layar punya kontrol tak tergapai ===`);
-if (MUTASI && gagal === 0) { console.log('\nPROBE CACAT: MUTASI=1 tapi nol temuan — populasi/Tab tak bekerja.'); process.exit(2); }
+console.log(`\n=== A. jangkauan: ${layar} layar · ${totalKontrol} kontrol @390px · ${gagal} layar punya kontrol tak tergapai ===`);
+console.log(`=== B. fokus lapisan: ${lapisan} lapisan diuji · ${lapisanGagal} bermasalah ===`);
+gagal += lapisanGagal;
+if (MUTASI && gagal === 0) { console.log('\nPROBE CACAT: MUTASI=1 tapi nol temuan — populasi/Tab/fokus tak bekerja.'); process.exit(2); }
 process.exit(gagal ? 1 : 0);

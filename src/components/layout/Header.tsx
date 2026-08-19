@@ -73,6 +73,16 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
     else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
     else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
     else if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+    /* Tab MENUTUP menu (pola WAI-ARIA menu button) — TANPA `preventDefault` dan
+       TANPA mengembalikan fokus ke pemicu, supaya fokus melanjutkan ke elemen
+       berikutnya seperti yang diharapkan pengguna papan ketik. Karena itu
+       `setMenuOpen(false)` langsung, bukan `closeMenu()` yang memanggil
+       `triggerRef.focus()` — memanggilnya di sini akan melempar fokus mundur.
+       Tanpa aturan ini Tab berjalan KELUAR diam-diam sementara menunya tetap
+       terbuka: pengguna menyusuri halaman di BELAKANG scrim, dan Escape ikut
+       mati karena handler ini menempel di wadah menu yang sudah ditinggalkan.
+       Terukur 19 Agu: Tab ke-6 mendarat di "Ke slide 1" carousel Beranda. */
+    else if (e.key === 'Tab') { setMenuOpen(false); }
   }
 
   // Item menu overflow (kebab) — semua aksi dirapikan ke sini agar top bar lega.
