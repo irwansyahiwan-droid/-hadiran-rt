@@ -102,10 +102,12 @@ export function BannerSkeleton({ vh }: { vh: number }) {
           <span className={`h-2.5 w-2.5 shrink-0 ${bar}`} />
           <span className={`h-2.5 w-32 ${bar}`} />
         </div>
-        {/* nominal besar + sub-teks */}
-        <div className="flex flex-1 flex-col justify-center gap-3">
+        {/* nominal besar. Placeholder sub-teks DILEPAS bersama baris delta di
+            kartu aslinya (lihat heroSlide di Beranda) — skeleton yang lebih
+            tinggi dari isinya justru bikin layar meloncat saat data datang,
+            cacat yang komponen ini ada untuk mencegah. */}
+        <div className="flex flex-1 flex-col justify-center">
           <span className="h-8 w-3/4 rounded-xl skeleton-bar" />
-          <span className={`h-3 w-3/5 ${bar}`} />
         </div>
         {/* footer 3 kolom (Terkumpul / Talangan / Setor Kas RT) — ikut lepas di
             layar pendek, PERSIS seperti kartu aslinya. Kalau syarat ini beda dgn
@@ -675,7 +677,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   {/* Eyebrow: tile ikon + label. */}
                   <div className="flex items-center gap-[9px]">
                     <div
-                      className="grid h-[44px] w-[44px] place-items-center rounded-[14px] bg-white/15"
+                      className="grid h-[44px] w-[44px] place-items-center rounded-2xl bg-white/15"
                       style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.22)' }}
                     >
                       {Icon && <Icon className="h-[22px] w-[22px]" strokeWidth={1.8} />}

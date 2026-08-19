@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, TrendingUp, ChevronRight, ChevronDown, RotateCcw, Crown } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, ChevronRight, ChevronDown, RotateCcw, Crown } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -95,7 +95,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const [summary, setSummary] = useState<DashboardSummary | null>(cached?.summary ?? null);
   const [jadwalList, setJadwalList] = useState<Tarikan[]>(cached?.jadwalList ?? []);
   const [trxItems, setTrxItems] = useState<TrxItem[]>(cached?.trxItems ?? []);
-  const [lastDelta, setLastDelta] = useState(cached?.lastDelta ?? 0);
+  /* Nilainya tak lagi dirender (baris delta dilepas di hero, lihat catatan di
+     bawah), tapi tetap DIAMBIL & DI-CACHE apa adanya supaya jalur datanya utuh.
+     Binding pembacanya dibuang agar tak jadi variabel mati. */
+  const [, setLastDelta] = useState(cached?.lastDelta ?? 0);
   const [loading, setLoading] = useState(!cached);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(false);
@@ -484,7 +487,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             pertama di bawahnya (8px) padahal berjarak 16px dari baris sebelumnya —
             terbaca "jatuh" ke kelompok yang salah. Kini napas atas > bawah, jadi
             label jelas MILIK kelompok di bawahnya. */}
-        <div className={`flex items-baseline justify-between gap-3 px-5 pt-5 pb-3 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
+        {/* px-5 → px-4. Terukur: kepala kelompok padding-left 20px sementara
+            baris di bawahnya 16px — satu kartu, dua tepi kiri. Selisih 4px itu
+            persis jenis cacat yang paling gampang tertangkap mata ("hampir
+            sejajar"), dan alasan yang sama sudah dipakai SectionTitle untuk
+            menolak `px-1`. Satu kartu = satu tepi. */}
+        <div className={`flex items-baseline justify-between gap-3 px-4 pt-5 pb-3 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
           <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">{g.label}</span>
           <span className={`font-display text-micro font-bold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
             {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
@@ -543,7 +551,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div className="flex items-end justify-between">
         <div>
           <p className="text-caption text-ink-faint dark:text-gray-400">{greeting},</p>
-          <h1 className="text-xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
+          {/* text-xl → text-2xl. Judul halaman 20px lawan judul seksi 18px =
+              tangga 2px; pada berat & keluarga huruf yang sama (Sora 700) itu
+              terbaca sebagai dua judul SEDERAJAT, bukan induk & anak. 24 vs 18
+              memberi satu langkah yang benar-benar terlihat tanpa menambah token
+              baru — 2xl sudah dipakai angka StatRow. */}
+          <h1 className="text-2xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
         </div>
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-micro font-bold ring-1 ring-inset ${kasStatus.bg} ${kasStatus.text} ${kasStatus.ring}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${kasStatus.dot}`} />
@@ -575,22 +588,30 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <span className="potong-lentur text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
               </div>
               <div className="flex shrink-0 items-center gap-2.5">
+                {/* Ikon POLOS, tanpa chip lingkaran. Dua kapsul `bg-white/15
+                    ring-inset` dulu jadi bentuk paling menonjol kedua di kartu
+                    setelah nominalnya — dua "tombol" penuh untuk dua utilitas
+                    kecil, persis kepadatan yang dikeluhkan. Kotak sentuh TIDAK
+                    berubah: 38px + `before:-inset-[3px]` tetap 44px efektif
+                    (aturan yang sama dgn audit:sentuh), yang hilang cuma catnya.
+                    Warna dinaikkan /85 → /90 supaya tanpa fill pun ikonnya tetap
+                    lolos ambang non-teks 3:1 di atas gradient hero. */}
                 <button
                   onClick={() => { haptic(); toggleHideAmount(); }}
-                  className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
+                  className="press relative grid h-[38px] w-[38px] place-items-center rounded-full transition-colors hover:bg-white/10 before:absolute before:-inset-[3px] before:content-['']"
                   aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 >
                   {hidden
-                    ? <EyeOff className="h-[18px] w-[18px] text-white/85" />
-                    : <Eye className="h-[18px] w-[18px] text-white/85" />}
+                    ? <EyeOff className="h-[18px] w-[18px] text-white/90" />
+                    : <Eye className="h-[18px] w-[18px] text-white/90" />}
                 </button>
                 <button
                   onClick={() => load(true)}
                   disabled={refreshing}
-                  className="press relative grid h-[38px] w-[38px] place-items-center rounded-full bg-white/15 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-[''] disabled:opacity-60"
+                  className="press relative grid h-[38px] w-[38px] place-items-center rounded-full transition-colors hover:bg-white/10 before:absolute before:-inset-[3px] before:content-[''] disabled:opacity-60"
                   aria-label="Muat ulang"
                 >
-                  <RefreshCw className={`h-[18px] w-[18px] text-white/85 ${refreshing ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-[18px] w-[18px] text-white/90 ${refreshing ? 'animate-spin' : ''}`} />
                 </button>
               </div>
             </div>
@@ -624,23 +645,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   </span>
                 )}
               </div>
-              {/* Sub-teks dulu menabrak 4 fakta jadi satu kalimat yang membungkus dua
-                  baris — dan TIGA di antaranya sudah tampil di layar yang sama (Terkumpul
-                  di footer hero, tarikan & anggota di kartu statistik). Sisakan yang
-                  benar-benar baru: delta tarikan terakhir. Satu kalimat, satu maksud. */}
-              <p className="mt-2.5 flex items-center gap-1 text-caption font-medium text-white/95">
-                {lastDelta > 0 ? (
-                  <>
-                    <TrendingUp className="h-3.5 w-3.5 shrink-0 text-emerald-100" strokeWidth={2.5} />
-                    <span className="font-display font-semibold tabular-nums text-emerald-100">
-                      {maskRp(`+Rp${lastDelta.toLocaleString('id-ID')}`, hidden, 4)}
-                    </span>
-                    <span className="text-white/90">dari tarikan terakhir</span>
-                  </>
-                ) : (
-                  <span className="text-white/80">Belum ada tarikan selesai</span>
-                )}
-              </p>
+              {/* Baris delta ("↗ +RpX dari tarikan terakhir") DIBUANG.
+                  Anatomi kartu ini kini persis tiga hal: label → nominal → kaki
+                  stat. Delta adalah blok keempat, dan ia yang paling murah
+                  dilepas: ketiga stat di kaki sudah membawa uangnya, dan angka
+                  tarikan terakhir punya rumah sendiri di tab Hadiran.
+
+                  Query & cache-nya SENGAJA tidak disentuh (lihat `selesaiRes` di
+                  load()) — mengubah pengambilan data bukan pekerjaan pass visual
+                  ini, dan satu baris JSX cukup untuk mengembalikannya. */}
             </div>
 
             {/* Kaki stat — di dasar kartu (blok nominal di atas sudah flex-1).
@@ -656,7 +669,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 datang. */}
             {!ringkas && (
               <HeroStats
-                className="pt-[18px]"
+                /* 18 → 22px. Baris delta yang dulu duduk di atas garis ini ikut
+                   memberi jarak visual; begitu ia lepas, kaki stat naik terlalu
+                   dekat ke nominal. `className` ini milik Beranda saja — hero Kas
+                   RT & Talangan mengirim spasinya sendiri lewat HeroSaldo, jadi
+                   perubahan di sini tidak merembet ke sana. */
+                className="pt-[22px]"
                 items={[
                   { icon: Wallet, label: 'Terkumpul', value: maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas') },
                   { icon: ArrowLeftRight, label: 'Talangan', value: maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('talangan') },
@@ -677,9 +695,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         ]}
       />
 
-      {/* Alert Banner */}
+      {/* Alert Banner.
+          `lift` ditambahkan: terukur di DOM, kartu ini satu-satunya di Beranda
+          yang `box-shadow: none` sementara kartu di ATAS & di BAWAHnya sama-sama
+          membawa contact whisper `--shadow-card`. Ia jadi terbaca seperti
+          tempelan datar di tengah tumpukan yang menapak. Bayangannya pakai token
+          yang sama, bukan bayangan baru. */}
       {talangan > 0 && (
-        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl px-5 py-5">
+        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl lift px-5 py-5">
           <div className="icon-tile w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
@@ -729,7 +752,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-2 px-4 py-4 ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'divide-inset' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
-                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} className={`w-11 h-11 rounded-2xl ${next ? 'ring-2 ring-[var(--gold-songket)] ring-offset-2 ring-offset-white dark:ring-offset-gray-900' : ''}`} />
+                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} sorot={next} className="w-11 h-11 rounded-2xl" />
                   {next && (
                     <Crown
                       className="absolute -top-2.5 left-1/2 h-4 w-4 -translate-x-1/2 -rotate-[8deg]"
