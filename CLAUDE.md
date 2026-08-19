@@ -144,8 +144,17 @@ jalan" padahal sudah. Dua jebakan sekaligus di sini: `vercel.json` merewrite `/(
 benar: ambil `index.html` produksi → cari nama chunk yang DIRUJUK → unduh chunk itu → grep
 simbol yang memang berubah (mis. `pulihkan_backup` ada, `insertChunked` hilang).
 
-**Sapuan wajib diarahkan ke produksi sekali sebelum dianggap benar** (`CAP_URL=https://hadiran-rt.vercel.app`):
-localhost instan menyembunyikan seluruh kelas bug balapan-hidrasi.
+**Sapuan wajib diarahkan ke produksi sekali sebelum dianggap benar**
+(`CAP_URL=https://hadiran-rt.vercel.app npm run audit:xxx`): localhost instan
+menyembunyikan seluruh kelas bug balapan-hidrasi.
+
+Sampai 19 Agu 2026 baris di atas **tidak bekerja seperti yang tertulis**: tiap
+skrip audit di `package.json` menyetel `CAP_URL=http://localhost:5199` sendiri,
+dan itu MENIMPA env dari pemanggil — jadi `CAP_URL=https://… npm run audit:masuk`
+dengan patuh menguji localhost lalu melaporkan "0 bermasalah". Kepercayaan palsu,
+persis kelas yang paling dihindari repo ini: sapuan hijau yang tak menguji apa
+yang dikira penguji. Kini semua skrip memakai `${CAP_URL:-http://localhost:5199}`
+sehingga env pemanggil menang, dan default lokalnya tetap sama.
 
 **Jebakan jaringan menggantung:** `fetch` yang MENGGANTUNG tidak pernah reject sendiri, dan
 `try/finally` tak menolong — `finally` tak pernah tercapai. Dua penjaga, jangan dilepas:
