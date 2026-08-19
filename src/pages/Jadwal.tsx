@@ -1,3 +1,4 @@
+import { useSaving } from '../lib/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Coins, Lock, MoreVertical, Pencil, Plus,
@@ -92,8 +93,8 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   const [map, setMap] = useState<AbsensiMap>({});
   const [filter, setFilter] = useState<AbsensiFilter>('semua');
   const [search, setSearch] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
+  const [saving, setSaving, sedangSimpan] = useSaving();
+  const [cancelling, setCancelling, sedangBatalkan] = useSaving();
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [loadingAbsensi, setLoadingAbsensi] = useState(true);
   const [absensiError, setAbsensiError] = useState(false);
@@ -183,6 +184,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   }, [pembayarList, search, filter, map]);
 
   async function simpan() {
+    if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     setSaving(true);
     try {
       // Rantai tulis 4 tabel + aturan "status lunas tak boleh ter-reset" kini
@@ -205,6 +207,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   // talangan + nama warga) ke audit_log DULU, baru menghapus — satu transaksi,
   // koneksi putus di tengah tak meninggalkan data setengah terhapus.
   async function batalkan() {
+    /* Jalur MERUSAK — penjaga sinkronnya justru paling penting di sini: ketukan
+       ganda mengirim `batalkan_tarikan` dua kali, dan tiap panggilan menulis
+       snapshot pemulihan ke audit_log. */
+    if (sedangBatalkan()) return;
     setCancelling(true);
     try {
       const { error } = await supabase.rpc('batalkan_tarikan', {
@@ -649,7 +655,7 @@ interface EditTarikanModalProps {
 function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanModalProps) {
   const [tanggal, setTanggal] = useState((tarikan.tanggal ?? '').slice(0, 10));
   const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving, sedangSimpan] = useSaving();
   // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
   // lewat drag.dismiss. Handlers disebar HANYA di batang handle, bukan di panel:
   // panelnya form yang bisa di-scroll, dan itulah sebabnya sheet form KasRT &
@@ -669,6 +675,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   }, [wargaList, tarikan.sohibul_bait]);
 
   async function simpan() {
+    if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     setSaving(true);
     try {
       // Supabase tak melempar — tanpa cek ini modal tertutup "sukses" walau gagal.
@@ -763,10 +770,11 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
   const dlg = useDialog(true, { onClose: drag.dismiss, label: `Tambah jadwal tarikan #${nextNomor}` });
   const [tanggal, setTanggal] = useState(() => new Date().toISOString().slice(0, 10));
   const [sohibulId, setSohibulId] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving, sedangSimpan] = useSaving();
   useBackDismiss(true, drag.dismiss);
 
   async function simpan() {
+    if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     setSaving(true);
     try {
       // Supabase tak melempar — throw manual agar catch/toast gagal benar-benar jalan.

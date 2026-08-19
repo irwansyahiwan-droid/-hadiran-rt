@@ -1,3 +1,4 @@
+import { useSaving } from '../lib/hooks';
 import { useEffect, useState } from 'react';
 import { Target, Pencil, Trophy, CalendarClock, Plus, Trash2, PartyPopper } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -206,11 +207,11 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(initial?.tanggal ?? '');
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving, sedangSimpan] = useSaving();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nominal) return;
+    if (!nominal || sedangSimpan()) return;   // latch sinkron — lihat useSaving()
     setSaving(true);
     const ok = await setTargetKasRT({ nominal, keterangan: keterangan.trim(), tanggal: tanggal || null });
     setSaving(false);
@@ -219,6 +220,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
   }
 
   async function hapus() {
+    if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     setSaving(true);
     const ok = await clearTargetKasRT();
     setSaving(false);

@@ -6,7 +6,7 @@ import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
-import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving} from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -44,7 +44,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   // Default = tarikan paling baru. WAJIB diisi → setoran selalu ter-link ke tarikan
   // (kalau tidak, kolom SETOR di PDF alur kas kosong & total tak rekonsiliasi).
   const [tarikanId, setTarikanId] = useState<string>(() => tarikanOpsi[0]?.id ?? '');
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving, sedangSimpan] = useSaving();
   const drag = useDragDismiss(onClose);
   // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() → meluncur.
   useBackDismiss(true, drag.dismiss);
@@ -52,7 +52,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nominal) return;
+    if (!nominal || sedangSimpan()) return;   // latch sinkron — lihat useSaving()
     setSaving(true);
     try {
       await onSave({ nominal, keterangan, tanggal, tarikan_id: tarikanId || null });

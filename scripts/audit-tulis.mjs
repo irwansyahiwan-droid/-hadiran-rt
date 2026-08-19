@@ -69,7 +69,7 @@ async function siapkan(bacaan) {
     localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s));
   }, { ref: REF, s: sesiPalsu() });
 
-  const tulis = { n: 0 };
+  const tulis = { n: 0, metode: [] };
   await ctx.route('**/rest/v1/**', (route) => {
     const m = route.request().method();
     if (m === 'GET' || m === 'HEAD') {
@@ -80,7 +80,9 @@ async function siapkan(bacaan) {
         headers: { 'content-range': `*/${isi?.length ?? 0}` }, body,
       });
     }
-    tulis.n++;   // digantung: sengaja tak dipanggil fulfill/abort
+    tulis.n++;
+    tulis.metode.push(m); // POST = INSERT; PATCH/DELETE = turunan satu simpan
+    // digantung: sengaja tak dipanggil fulfill/abort
   });
   const page = await ctx.newPage();
   await page.goto(URL_APP, { waitUntil: 'domcontentloaded' });
@@ -148,6 +150,70 @@ async function ujiTulis(nama, buka, isi, tombol, bacaan) {
     if (!pulih) m.push(`TOMBOL TERKUNCI "${label}" setelah ${detik}s — bendahara tak tahu tersimpan atau tidak`);
     else if (terkunci) m.push('tombol pulih labelnya tapi masih disabled — tak bisa coba lagi');
     if (pulih && !toast.trim()) m.push('menyerah diam-diam: tak ada pesan apa pun setelah gagal');
+  } catch (e) {
+    m.push(`PROBE CACAT: ${e.message.split('\n')[0]}`);
+  }
+  lapor(nama, m);
+  await ctx.close();
+}
+
+/**
+ * KETUKAN GANDA — dua klik di TASK YANG SAMA pada tombol simpan.
+ *
+ * Kenapa terpisah dari `ujiTulis`: yang di atas menguji request MENGGANTUNG,
+ * yaitu apa yang dilihat bendahara saat jaringan busuk. Yang ini menguji hal
+ * yang sama sekali berbeda — apakah satu niat bisa tercatat DUA KALI.
+ * `disabled={saving}` tak menjawabnya: itu penjaga UI yang baru berlaku SETELAH
+ * React me-render, sedangkan dua ketukan di task yang sama masuk ke handler
+ * sebelum render itu terjadi. Terukur 19 Agu 2026 di Kas RT: **dua `POST`**
+ * untuk satu ketukan ganda. Di app kas itu uang.
+ *
+ * Kliknya dari DALAM halaman & SINKRON — `dispatchEvent` Playwright tak memicu
+ * submit bawaan, dan dua `click()` Playwright terpisah selalu berbeda task
+ * sehingga React sempat me-render dan celahnya tak pernah terlihat.
+ *
+ * Yang dihitung hanya **POST** (INSERT). Percobaan pertama menghitung semua
+ * method dan melaporkan "DOBEL" untuk satu simpan yang sehat — satu POST
+ * memang diikuti PATCH hitung-ulang saldo. Populasi salah, bukan temuan.
+ */
+async function ujiKetukGanda(nama, buka, isi, tombol, bacaan) {
+  const { ctx, page, tulis } = await siapkan(bacaan);
+  const m = [];
+  try {
+    const wadah = await buka(page);
+    if (!wadah) { lapor(nama, ['PROBE CACAT: form tak pernah terbuka — tak ada yang diuji']); await ctx.close(); return; }
+    await isi(wadah);
+    await page.waitForTimeout(400);
+
+    /* Tombolnya DITANDAI lewat Playwright (peran + nama), lalu diklik dari dalam
+       halaman. Versi pertama mencari `button[type="submit"]` dan langsung gagal
+       di Kelola Anggota, yang tombol simpannya `onClick` biasa — populasi
+       salah, bukan temuan. Menandai dulu membuat probe ini bekerja untuk kedua
+       bentuk tanpa menebak-nebak markup. */
+    const simpan = wadah.getByRole('button', { name: tombol });
+    if (!(await simpan.count())) { lapor(nama, ['PROBE CACAT: tombol simpan tak ketemu']); await ctx.close(); return; }
+    await simpan.first().evaluate((el) => el.setAttribute('data-ketuk-ganda', '1'));
+    const hasil = await page.evaluate(() => {
+      const b = document.querySelector('[data-ketuk-ganda="1"]');
+      if (!b) return { ok: false, alasan: 'penanda hilang sebelum diklik' };
+      if (b.disabled) return { ok: false, alasan: 'tombol simpan disabled — field wajib belum terisi?' };
+      b.click();
+      const sesudah1 = b.disabled;   // masih false = celah render memang ada
+      b.click();                     // sinkron: React belum sempat me-render
+      return { ok: true, sesudah1 };
+    });
+    if (!hasil.ok) { lapor(nama, [`PROBE CACAT: ${hasil.alasan}`]); await ctx.close(); return; }
+
+    await page.waitForTimeout(2500);
+    const post = tulis.metode.filter((x) => x === 'POST').length;
+    if (!tulis.n) m.push('PROBE CACAT: tak ada request tulis yang tercegat — hasil tak bermakna');
+    else if (post > 1) m.push(`TERCATAT ${post}x untuk SATU ketukan ganda (POST) — transaksi dobel`);
+    if (tulis.n && post === 1 && hasil.sesudah1 === false) {
+      // Bukan temuan: catatan bahwa celah render NYATA dan yang menahannya
+      // adalah latch sinkron, bukan `disabled`. Kalau suatu saat latch dilepas,
+      // baris ini yang menjelaskan kenapa sapuan ini ada.
+      console.log('    (celah render nyata: tombol belum disabled saat klik ke-2 — ditahan latch sinkron)');
+    }
   } catch (e) {
     m.push(`PROBE CACAT: ${e.message.split('\n')[0]}`);
   }
@@ -249,6 +315,44 @@ await ujiTulis(
   async () => { /* default "tidak hadir" untuk semua sudah sah — tak ada field wajib */ },
   /^(Simpan & Hitung Iuran|Menghitung…|Menyimpan…)$/,
   bacaanAbsensi,
+);
+
+// ── KETUKAN GANDA — jalur INSERT yang benar-benar mencatat uang ──────────────
+// `buka`/`isi` sengaja SAMA PERSIS dengan skenario di atas (disalin sebagai
+// pemanggilan, bukan logika baru) supaya kalau formnya berubah, kedua bagian
+// ikut berubah bersama alih-alih satu diam-diam basi.
+await ujiKetukGanda(
+  'ketuk-ganda/Kas RT tambah transaksi',
+  async (page) => {
+    await page.getByRole('button', { name: 'Kas RT' }).first().click();
+    if (!await tunggu(page, async () => await page.getByRole('button', { name: /Tambah transaksi Kas RT/i }).count() > 0)) return null;
+    await page.getByRole('button', { name: /Tambah transaksi Kas RT/i }).click();
+    if (!await tunggu(page, async () => await page.locator('[role="dialog"]').count() > 0)) return null;
+    await page.waitForTimeout(600);
+    return page.locator('[role="dialog"]').last();
+  },
+  async (dialog) => {
+    await dialog.locator('input[inputmode="numeric"]').first().fill('50000');
+    const ket = dialog.locator('input[type="text"]').first();
+    if (await ket.count()) await ket.fill('audit ketuk ganda');
+  },
+  /^(Simpan|Menyimpan…)$/,
+);
+
+await ujiKetukGanda(
+  'ketuk-ganda/Kelola Anggota tambah warga',
+  async (page) => {
+    await page.getByRole('button', { name: 'Menu' }).click();
+    if (!await tunggu(page, async () => await page.getByRole('menu').count() > 0)) return null;
+    await page.getByRole('menu').getByText('Kelola Anggota', { exact: false }).first().click();
+    if (!await tunggu(page, async () => await page.getByRole('button', { name: /Tambah [Aa]nggota/ }).count() > 0)) return null;
+    await page.getByRole('button', { name: /Tambah [Aa]nggota/ }).first().click();
+    if (!await tunggu(page, async () => await page.locator('[role="dialog"]').count() > 0)) return null;
+    await page.waitForTimeout(600);
+    return page.locator('[role="dialog"]').last();
+  },
+  async (dialog) => { await dialog.locator('#anggota-nama').fill('Warga Ketuk Ganda'); },
+  /^(Simpan Anggota|Menyimpan…)$/,
 );
 
 await browser.close();

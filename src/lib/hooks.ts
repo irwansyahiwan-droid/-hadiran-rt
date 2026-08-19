@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useReducer } from 'react';
+import { useState, useEffect, useRef, useReducer, useCallback} from 'react';
 
 /* ── Tinggi layar & hero ringkas ─────────────────────────────────
  * Dipakai BERSAMA oleh kartu saldo (Beranda), skeleton-nya, dan rumus tinggi
@@ -95,6 +95,46 @@ export function useFirstPlay(key: string): boolean {
  * Saat `open` jadi false, `mounted` tetap true selama `ms` (mainkan exit),
  * lalu false. Pemanggil: render saat `mounted`, pakai kelas exit saat `!open`.
  */
+/**
+ * `saving` + latch SINKRON. Kembarannya `useState(false)` biasa, tapi nilainya
+ * juga ditulis ke ref supaya bisa dibaca SEBELUM React sempat me-render.
+ *
+ * Kenapa ada (19 Agu 2026): semua jalur tulis app memakai pola
+ * `const [saving, setSaving] = useState(false)` + `disabled={saving || …}`.
+ * Itu penjaga UI, dan ia hanya bekerja SETELAH React me-render ulang. Dua
+ * ketukan di TASK YANG SAMA — ghost-click iOS/Android, atau warga menekan lagi
+ * karena HP-nya terasa tak merespons — masuk ke handler dua kali sebelum render
+ * itu terjadi. Terukur di Kas RT: satu ketukan ganda mengirim **dua `POST`**,
+ * yaitu dua transaksi tercatat untuk satu niat. Di app kas itu uang, bukan
+ * kosmetik.
+ *
+ * `useRef`, BUKAN state kedua: ref berubah SEKARANG JUGA, jadi ia kebal
+ * terhadap waktu render — persis sifat yang kurang pada `saving`.
+ *
+ * Pakai:
+ *   const [saving, setSaving, sedangSimpan] = useSaving();
+ *   async function submit(e) {
+ *     e.preventDefault();
+ *     if (!nominal || sedangSimpan()) return;   // ← penjaga
+ *     setSaving(true);
+ *     try { await tulis(); } finally { setSaving(false); }
+ *   }
+ *
+ * Penjaganya SATU BARIS di tiap handler dan tak mengubah satu pun jalur keluar
+ * yang sudah ada: `setSaving(false)` di mana pun ia dipanggil ikut melepas
+ * latch, jadi handler bertahap (mis. Kelola Anggota) tetap benar apa adanya.
+ */
+export function useSaving(): [boolean, (v: boolean) => void, () => boolean] {
+  const [saving, setSavingRaw] = useState(false);
+  const kunci = useRef(false);
+  const setSaving = useCallback((v: boolean) => {
+    kunci.current = v;
+    setSavingRaw(v);
+  }, []);
+  const sedangSimpan = useCallback(() => kunci.current, []);
+  return [saving, setSaving, sedangSimpan];
+}
+
 export function useExitAnim(open: boolean, ms = 120): boolean {
   const [mounted, setMounted] = useState(open);
   useEffect(() => {

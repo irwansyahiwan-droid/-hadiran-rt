@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw } from 'lucide-react';
-import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving} from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
@@ -47,7 +47,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(() => (initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
   const [kategori, setKategori] = useState<string>(initial?.kategori ?? kategoriDefault(initial?.tipe ?? 'masuk'));
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving, sedangSimpan] = useSaving();
   const drag = useDragDismiss(onClose);
   // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() →
   // sheet meluncur keluar, bukan lenyap. Back HP didaftarkan DI SINI (bukan
@@ -63,7 +63,11 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nominal) return;
+    /* `sedangSimpan()` = latch SINKRON, bukan `saving`. `disabled={saving}` baru
+       berlaku SETELAH React me-render; dua ketukan di task yang sama masuk ke
+       sini dua kali sebelum itu. Terukur 19 Agu: satu ketukan ganda mengirim
+       DUA `POST kas_rt` — dua transaksi untuk satu niat. */
+    if (!nominal || sedangSimpan()) return;
     setSaving(true);
     try {
       await onSave({ tipe, nominal, keterangan, tanggal, kategori });

@@ -1,3 +1,4 @@
+import { useSaving } from '../lib/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Users, Search, X, RefreshCw, RotateCcw, UserPlus, Pencil,
@@ -46,7 +47,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   // Anggota susulan (hanya mode add)
   const [susulan, setSusulan] = useState(false);
   const [pilih, setPilih] = useState<Set<string>>(() => new Set(selesaiTarikan.map((t) => t.id)));
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving, sedangSimpan] = useSaving();
   // Pengaman: anggota yang dinonaktifkan tapi masih punya jadwal tarikan ke depan
   const [jadwalNonaktif, setJadwalNonaktif] = useState<number[] | null>(null);
   // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
@@ -68,6 +69,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
   async function simpan(forceNonaktif = false) {
     if (!nama.trim()) { showToast('Nama anggota wajib diisi', 'error'); return; }
+    if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     // Pengaman: menonaktifkan anggota yang masih jadi Sohibul di tarikan ke depan
     if (mode === 'edit' && initial && initial.status_aktif && !aktif && !forceNonaktif) {
       setSaving(true);
