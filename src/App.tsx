@@ -48,11 +48,37 @@ function PageFallback() {
   );
 }
 
+/** Kunci sesi gate warga. Satu tempat — dibaca saat init & ditulis di dua
+ *  transisi (masuk mode warga, keluar darinya). */
+const KUNCI_WARGA = 'hadiran-warga-sesi';
+function simpanWarga(aktif: boolean) {
+  try {
+    if (aktif) sessionStorage.setItem(KUNCI_WARGA, '1');
+    else sessionStorage.removeItem(KUNCI_WARGA);
+  } catch { /* mode privat / storage penuh → gate cuma tak bertahan reload */ }
+}
+
 export default function App() {
   const auth = useAuth();
   const { isDark, toggle: toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<TabName>('beranda');
-  const [wargaMode, setWargaMode] = useState(false);
+  /* Gate warga bertahan selama SESI TAB ini — `sessionStorage`, bukan
+     `localStorage` dan bukan state murni.
+     Sampai 19 Agu 2026 ini `useState(false)` polos: setiap reload melempar
+     warga kembali ke Login. Itu bukan skenario langka — `PwaUpdatePrompt`
+     memang MEMANGGIL `window.location.reload()` saat warga menekan "Muat
+     ulang" pada toast versi baru, jadi tiap deploy = satu lemparan. Komentar
+     di berkas itu bahkan sudah mencatat gejalanya ("menendang warga yg baru
+     ketik 'warga' balik ke Login, mental ketik 2x beruntun"); yang diperbaiki
+     waktu itu baru reload pada KLAIM PERTAMA service worker, sedangkan reload
+     pada update sungguhan tetap membuang mode warga.
+     `sessionStorage`, jadi gate-nya TIDAK dilemahkan: tab baru / sesi baru
+     tetap harus mengetik 'warga'. Yang dipulihkan cuma reload yang dipicu APP
+     SENDIRI di tab yang sama. Jangan pindahkan ke `localStorage` — itu
+     mengubah soft-gate jadi permanen. */
+  const [wargaMode, setWargaMode] = useState(() => {
+    try { return sessionStorage.getItem(KUNCI_WARGA) === '1'; } catch { return false; }
+  });
   const [refreshKey, setRefreshKey] = useState(0);
   const [dir, setDir] = useState(1); // arah transisi tab: 1 = ke kanan, -1 = ke kiri
   const [riwayatOpen, setRiwayatOpen] = useState(false);
@@ -210,7 +236,7 @@ export default function App() {
     return (
       <Login
         onLogin={auth.signIn}
-        onWargaMode={() => { setWargaMode(true); setActiveTab('beranda'); }}
+        onWargaMode={() => { simpanWarga(true); setWargaMode(true); setActiveTab('beranda'); }}
       />
     );
   }
@@ -221,7 +247,13 @@ export default function App() {
     ...auth,
     isBendahara: auth.role === 'bendahara',
     isWargaMode,
-    exitWargaMode: () => { setWargaMode(false); setActiveTab('beranda'); },
+    /* Keluar dari sisi BENDAHARA juga membuang kunci sesi warga. Hari ini jalur
+       itu tak bisa dicapai (Login cuma tampil saat `!user && !wargaMode`), tapi
+       kunci yang tertinggal di sesi = mode warga diam-diam hidup lagi sesudah
+       logout. Murah, dan menutup kelasnya sekarang daripada menunggu ada rute
+       baru yang membukanya. */
+    signOut: async () => { simpanWarga(false); await auth.signOut(); },
+    exitWargaMode: () => { simpanWarga(false); setWargaMode(false); setActiveTab('beranda'); },
   };
 
   return (
