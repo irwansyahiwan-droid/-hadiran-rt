@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Plus, type LucideIcon } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useScrollHide } from '../hooks/useScrollDirection';
@@ -29,7 +30,34 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
      sengaja TIDAK dipakai: dengan ia, FAB balik 900ms setelah gulir berhenti —
      tepat pada detik warga berdiam untuk MEMBACA nominal, jadi ia menutupi
      angka itu lagi dan tujuan menyingkirnya batal. Naik = niat ke aksi. */
-  const compact = useScrollHide({ threshold: 80 });
+  const menyingkir = useScrollHide({ threshold: 80 });
+
+  /* FOKUS PAPAN KETIK MENGEMBALIKANNYA. Tanpa ini FAB tak tergapai Tab SAMA
+     SEKALI — bukan kadang-kadang (terukur 19 Agu 2026: `FAB kena Tab ke- -1`).
+     Sebabnya lingkar setan yang tak kelihatan dari satu call-site pun: Tab
+     MENGGULIR halaman, gulir turun menyalakan `menyingkir`, dan `menyingkir`
+     dulu memasang `tabIndex={-1}` — jadi FAB selalu sudah keluar dari urutan
+     Tab sebelum urutan itu sempat tiba padanya. Ia duduk di ekor DOM, jadi
+     giliranya selalu datang terlambat. Aksi-BUAT utama tiga halaman (Tambah
+     transaksi Kas RT, Setor ke Kas RT, Tambah anggota) karena itu mustahil
+     dijangkau tanpa tetikus — dan bendahara-lah yang paling mungkin memakai
+     papan ketik, karena dialah yang mengetik transaksi.
+
+     `aria-hidden` di wrapper ikut DIBUANG, bukan sekadar dilonggarkan: subtree
+     `aria-hidden` DILARANG memuat elemen yang bisa difokus, jadi "tetap bisa
+     di-Tab" dan "aria-hidden saat menyingkir" tak bisa hidup bersama. Yang
+     dilepas adalah yang memang lebih lemah alasannya: menyingkir itu keputusan
+     VISUAL demi tak menutupi nominal (lihat catatan di atas), sedangkan bagi
+     pengguna pembaca layar aksinya memang tetap tersedia — tak ada nominal yang
+     tertutup di sana.
+
+     Kekhawatiran asli komentar lama ("jangan tinggalkan tombol yang masih bisa
+     di-Tab → fokus mendarat di elemen tak terlihat") tetap dipenuhi, lewat
+     mekanisme yang lebih baik: fokus TIDAK PERNAH mendarat di elemen tak
+     terlihat, karena mendaratnya itu sendiri yang memunculkannya kembali —
+     pola yang sama dengan skip-link. */
+  const [fokus, setFokus] = useState(false);
+  const compact = menyingkir && !fokus;
 
   return (
     // Wrapper fixed TERPISAH dari tombol: translate3d + backface-hidden +
@@ -56,14 +84,12 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
         WebkitBackfaceVisibility: 'hidden',
         backfaceVisibility: 'hidden',
       }}
-      aria-hidden={compact}
+      onFocus={() => setFokus(true)}
+      onBlur={() => setFokus(false)}
     >
     <button
       onClick={() => { haptic(); onClick(); }}
       aria-label={ariaLabel ?? label}
-      /* Saat menyingkir wrapper-nya aria-hidden — jangan tinggalkan tombol yang
-         masih bisa di-Tab (fokus mendarat di elemen tak terlihat). */
-      tabIndex={compact ? -1 : undefined}
       className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-body font-bold overflow-hidden"
       style={{ transition: 'box-shadow 0.2s ease, transform 0.15s var(--ease-spring)' }}
     >
