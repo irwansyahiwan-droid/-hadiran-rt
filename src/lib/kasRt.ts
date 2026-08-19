@@ -17,7 +17,17 @@ export async function recomputeKasRTSaldo(): Promise<void> {
     .from('kas_rt')
     .select('id, tipe, nominal, saldo_setelah')
     .order('tanggal', { ascending: true })
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    /* Pemecah SERI wajib, dan `id` dipilih karena selalu ada & unik.
+       Tanpa ini urutan baris yang `tanggal` DAN `created_at`-nya sama tidak
+       ditentukan — Postgres boleh memulangkannya dalam urutan mana pun. Total
+       saldo tetap benar, tapi `saldo_setelah` PER BARIS bisa BERTUKAR antar
+       pemanggilan, jadi dua baris yang sama menampilkan saldo berjalan berbeda
+       di layar & Excel dari satu hitung-ulang ke hitung-ulang berikutnya.
+       Bukan hipotesis: data produksi (19 Agu 2026) punya satu grup seri —
+       dua baris 2026-02-08 dgn created_at identik. Rantainya konsisten, tapi
+       hanya untuk SATU dari dua urutan yang mungkin. */
+    .order('id', { ascending: true });
 
   /* Supabase TIDAK melempar saat gagal — ia memulangkan { data: null, error }.
      Tanpa cek ini, query gagal berubah jadi `?? []`, perulangan tak berjalan,
