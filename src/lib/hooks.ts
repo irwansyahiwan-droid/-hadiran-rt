@@ -266,6 +266,51 @@ export function useAksiBerat(): [boolean, (aksi: () => unknown, opts?: { mulai?:
   return [sibuk, inti.current.jalankan];
 }
 
+/* ── Kembali dari latar ──────────────────────────────────────────
+ * Halaman-halaman utama memuat datanya SEKALI di `useEffect` mount, dan tak
+ * satu pun memasang realtime (`useRealtime` cuma dipakai Riwayat Aktivitas).
+ * Selama tab-nya tak ditutup, itu berarti angka yang terbaca warga adalah angka
+ * saat ia membuka app — bisa berjam-jam lalu.
+ *
+ * Terukur 20 Agu 2026 (`npm run audit:kembali`): ditinggal 65 detik lalu dibuka
+ * lagi → **nol GET**, di kedua peran. Bukan skenario karangan; itu cara app ini
+ * dipakai: buka Hadiran RT, pindah ke WhatsApp membalas grup, kembali. Untuk
+ * app kas, saldo lama yang tampak persis seperti saldo sekarang bukan soal
+ * rasa — itu pernyataan keliru tentang uang, jenis kesalahan terburuk di sini.
+ *
+ * Ambangnya ADA supaya obatnya tak lebih buruk dari penyakitnya: warga yang
+ * menyentuh notifikasi lalu balik dalam 3 detik tak boleh memicu satu request
+ * pun (paket Supabase GRATIS, dan HP kelas bawah membayar tiap fetch dengan
+ * baterai). Yang dijaga cuma "pergi lama".
+ *
+ * `load()` tiap halaman sudah memilih mode diam-diam sendiri (`silent =
+ * list.length > 0`), jadi penyegaran ini TIDAK memunculkan skeleton lagi —
+ * layar yang berkedip balik ke abu tiap kali app dibuka terasa lebih murah
+ * daripada data basi yang diam. Dijaga sifat ke-3 di `audit:kembali`.
+ */
+export const AMBANG_BASI_MS = 60_000;
+
+export function useKembaliDariLatar(muat: () => void, ambangMs = AMBANG_BASI_MS): void {
+  /* Handler halaman lahir BARU tiap render (deklarasi fungsi di dalam
+     komponen), jadi yang dipasang ke listener harus yang TERBARU — kalau
+     ditangkap sekali di mount, ia akan memanggil `load` dgn closure state lama
+     dan menimpa cache dgn data yang dihitung dari daftar usang. */
+  const muatRef = useRef(muat);
+  useEffect(() => { muatRef.current = muat; });
+
+  const sejakSembunyi = useRef<number | null>(null);
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === 'hidden') { sejakSembunyi.current = Date.now(); return; }
+      const pergi = sejakSembunyi.current === null ? 0 : Date.now() - sejakSembunyi.current;
+      sejakSembunyi.current = null;
+      if (pergi >= ambangMs) muatRef.current();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, [ambangMs]);
+}
+
 export function useExitAnim(open: boolean, ms = 120): boolean {
   const [mounted, setMounted] = useState(open);
   useEffect(() => {

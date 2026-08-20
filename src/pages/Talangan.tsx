@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
-import { useCountUp, useHideAmount, toggleHideAmount } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useKembaliDariLatar } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
@@ -77,6 +77,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   }
 
   useEffect(() => { load(); }, []);
+
+  /* Ditinggal lama lalu dibuka lagi → ambil ulang diam-diam. Lihat
+     `useKembaliDariLatar` di lib/hooks.ts: tanpa ini halaman memuat datanya
+     SEKALI seumur tab. */
+  useKembaliDariLatar(load);
 
   async function bayar(t: Talangan) {
     setProcessingId(t.id);

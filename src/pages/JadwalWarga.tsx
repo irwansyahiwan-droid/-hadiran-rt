@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
-import { useAksiBerat } from '../lib/hooks';
+import { useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 
 interface JadwalWargaCache {
@@ -140,6 +140,11 @@ export default function JadwalWargaPage() {
     load();
     import('../lib/generateJadwalPDF').catch(() => {}); // preload: jaga gesture share di HP
   }, []);
+
+  /* Ditinggal lama lalu dibuka lagi → ambil ulang diam-diam. Lihat
+     `useKembaliDariLatar` di lib/hooks.ts: tanpa ini halaman memuat datanya
+     SEKALI seumur tab. */
+  useKembaliDariLatar(load);
 
   async function cetakJadwal() {
     haptic();

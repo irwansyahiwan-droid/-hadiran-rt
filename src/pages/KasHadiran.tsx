@@ -6,7 +6,7 @@ import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
-import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -224,6 +224,11 @@ export default function KasHadiranPage() {
     import('../lib/generateKasHadiranPDF').catch(() => {});
     import('../lib/generateAbsensiPDF').catch(() => {});
   }, []);
+
+  /* Ditinggal lama lalu dibuka lagi → ambil ulang diam-diam. Lihat
+     `useKembaliDariLatar` di lib/hooks.ts: tanpa ini halaman memuat datanya
+     SEKALI seumur tab. */
+  useKembaliDariLatar(load);
 
   const totalSetor = transaksi.filter(t => t.tipe === 'setor_kas_rt').reduce((s, t) => s + t.nominal, 0);
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);

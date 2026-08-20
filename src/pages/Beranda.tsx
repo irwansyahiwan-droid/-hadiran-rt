@@ -12,7 +12,7 @@ import { HeroStats } from '../components/HeroSaldo';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
-import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay, heroRingkas, useTinggiLayar } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay, heroRingkas, useTinggiLayar, useKembaliDariLatar } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { formatRupiahPlain, formatTanggal, haptic, labelTanggalRelatif, maskRp } from '../lib/utils';
@@ -248,6 +248,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   useEffect(() => {
     load();
   }, []);
+
+  /* Ditinggal lama lalu dibuka lagi → ambil ulang diam-diam. Lihat
+     `useKembaliDariLatar` di lib/hooks.ts: tanpa ini halaman memuat datanya
+     SEKALI seumur tab. */
+  useKembaliDariLatar(load);
 
   const kasHadiran = summary?.total_kas_terkumpul ?? 0;
   const saldo = summary?.saldo_aktif ?? 0;

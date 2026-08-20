@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2 } from 'lucide-react';
-import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
@@ -268,6 +268,11 @@ export default function KasRTPage() {
     load();
     import('../lib/generateKasRTPDF').catch(() => {}); // preload: jaga gesture share di HP
   }, []);
+
+  /* Ditinggal lama lalu dibuka lagi → ambil ulang diam-diam. Lihat
+     `useKembaliDariLatar` di lib/hooks.ts: tanpa ini halaman memuat datanya
+     SEKALI seumur tab. */
+  useKembaliDariLatar(load);
 
   // Agregat ringkasan (saldo, total masuk/keluar, insight bulanan) — satu pass
   // atas list, hanya dihitung ulang saat list berubah (bukan tiap keystroke cari/filter).

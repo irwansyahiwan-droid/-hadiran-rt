@@ -1,4 +1,4 @@
-import { useSaving, useAksiBerat } from '../lib/hooks';
+import { useSaving, useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Coins, Lock, MoreVertical, Pencil, Plus,
@@ -939,6 +939,11 @@ export default function JadwalPage() {
     load();
     import('../lib/generateJadwalPDF').catch(() => {}); // preload: jaga gesture share di HP
   }, []);
+
+  /* Ditinggal lama lalu dibuka lagi → ambil ulang diam-diam. Lihat
+     `useKembaliDariLatar` di lib/hooks.ts: tanpa ini halaman memuat datanya
+     SEKALI seumur tab. */
+  useKembaliDariLatar(load);
 
   const selesaiCount    = tarikanList.filter(t => t.status === 'selesai').length;
   const dijadwalCount   = tarikanList.filter(t => t.status === 'dijadwalkan' || t.status === 'berlangsung').length;

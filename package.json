@@ -26,9 +26,10 @@
     "audit:masuk": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-masuk.mjs",
     "audit:lompat": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-lompat.mjs",
     "audit:papan-ketik": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-papan-ketik.mjs",
+    "audit:kembali": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kembali.mjs",
     "audit:respon": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-respon.mjs",
     "audit:tulis": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-tulis.mjs",
-    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon"
+    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon && npm run audit:kembali"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
