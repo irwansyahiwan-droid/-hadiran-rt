@@ -43,6 +43,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { newCtx, loginWarga, gotoTab, closeLayer, openMenuItem } from './lib/audit-harness.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
+/* EKSTREM=1 → jawaban rest/v1 ditekan bentuknya (nama panjang, nominal 10
+   digit, keterangan panjang) lewat harness bersama. Bukan sapuan lain: probe
+   yang sama, POPULASI yang beda. Sapuan ini selama ini mengukur data hari ini
+   (69 warga, nominal 6 digit) dan melaporkan "tahan" untuk tata letak yang tak
+   pernah diberi beban yang dijanjikan (300 KK, kas berjuta). */
+const EKSTREM = process.env.EKSTREM === '1';
 const OUT = process.env.OUT_DIR || '.audit-potong';
 mkdirSync(OUT, { recursive: true });
 
@@ -174,7 +180,7 @@ const ONLY = process.env.ONLY; // '390' | '320' | '200'
 // ── A: 390px (acuan HP arus utama) ─────────────────────────────────────────
 if (!ONLY || ONLY === '390') {
   for (const bendahara of [false, true]) {
-    const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    const { ctx, page } = await newCtx(browser, 'light', { bendahara, ekstrem: EKSTREM });
     await pasangMutasi(ctx);
     await page.goto(URL, { waitUntil: 'networkidle' });
     await page.waitForTimeout(bendahara ? 4000 : 1200);
@@ -187,7 +193,7 @@ if (!ONLY || ONLY === '390') {
 // ── B: 320px (WAJIB §1.4.10) ───────────────────────────────────────────────
 if (!ONLY || ONLY === '320') {
   for (const bendahara of [false, true]) {
-    const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    const { ctx, page } = await newCtx(browser, 'light', { bendahara, ekstrem: EKSTREM });
     await pasangMutasi(ctx);
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto(URL, { waitUntil: 'networkidle' });
@@ -201,7 +207,7 @@ if (!ONLY || ONLY === '320') {
 // ── C: teks dasar 200% @360px (DI ATAS AA — ambang app) ────────────────────
 if (!ONLY || ONLY === '200') {
   for (const bendahara of [false, true]) {
-    const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    const { ctx, page } = await newCtx(browser, 'light', { bendahara, ekstrem: EKSTREM });
     await pasangTeks200(ctx, page);
     await pasangMutasi(ctx);
     await page.setViewportSize({ width: 360, height: 800 });

@@ -79,6 +79,32 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis + potong + respo
 | `audit:tulis` | Tombol simpan saat request tulis MENGGANTUNG (Kas RT + Kelola Anggota + **Absensi "Simpan & Hitung Iuran"**) + **KETUKAN GANDA** (satu niat tercatat berapa kali) | `audit:keadaan` menguji BACA gagal, `audit:masuk` menguji auth — jalur TULIS, satu-satunya tempat uang benar-benar dicatat, tak tersentuh keduanya. **`try/finally` ada di semua jalur tulis tapi tak menolong: `finally` tak pernah tercapai kalau janjinya tak pernah selesai**. Jalur Absensi (16 Agu) ditambahkan karena dua jalur lama sama-sama SATU insert, jadi tak satu pun menguji rantai `simpanTarikanSelesai` — 4 tabel berurutan; yang digantung = tulis PERTAMA (absensi delete), keadaan terburuk: nol tabel berubah tapi layar sudah bilang "Menghitung…". Form-nya baru ADA kalau ada tarikan, jadi `siapkan()` kini bisa menyuntik isi GET palsu (`bacaan`); tanpa itu semua GET dijawab `[]` dan editor absensi tak pernah bisa dibuka. **Bagian ketukan ganda (19 Agu)** menguji hal yang SAMA SEKALI BERBEDA dari bagian menggantung: bukan "apa yang dilihat bendahara saat jaringan busuk", tapi "apakah satu niat bisa tercatat DUA KALI". `disabled={saving}` tak menjawabnya — itu penjaga UI yang baru berlaku SETELAH React me-render, sedangkan dua ketukan di TASK YANG SAMA (ghost-click iOS/Android, atau warga menekan lagi karena HP terasa tak merespons) masuk ke handler sebelum render itu. Terukur: **dua `POST kas_rt` untuk satu ketukan ganda** — dua transaksi untuk satu niat, dan di app kas itu uang. Obatnya `useSaving()` di `src/lib/hooks.ts`: latch `useRef` yang berubah SEKARANG JUGA, dipasang satu baris (`if (… || sedangSimpan()) return;`) di 9 handler tulis + jalur merusak `batalkan()`. **Jalur tulis BARU wajib memakainya** — `useState(false)` polos akan lolos semua sapuan lain. Dua jebakan alat saat membangunnya: `dispatchEvent` Playwright TAK memicu submit bawaan (nol request, terbaca "aman"), dan dua `.click()` Playwright terpisah selalu beda task sehingga React sempat render & celahnya tak pernah terlihat — kliknya WAJIB dari dalam halaman & sinkron. Yang dihitung hanya **POST**: percobaan pertama menghitung semua method dan melaporkan "DOBEL" untuk satu simpan sehat (satu POST memang diikuti PATCH hitung-ulang saldo) |
 | `audit:mati` | Keterbacaan label tombol saat `disabled` (terang+gelap, warga+bendahara) | Kedua audit kontras MELEWATI kontrol nonaktif secara eksplisit — sah, karena WCAG 1.4.3 mengecualikannya. Tapi "tak wajib" bukan "boleh tak terbaca", dan pengecualian itu berarti keadaan nonaktif **tak pernah diukur sekali pun**. Yang tersembunyi di baliknya: tombol masuk bendahara 3,79:1 saat "Memproses…", 3 tombol teks Kas Hadiran 2,2–2,7:1, dan perbaikan `.btn-brand:disabled` yang ternyata cuma dihitung untuk mode TERANG (4,32:1 di gelap). Ambang dilaporkan sebagai ambang APP, bukan "gagal WCAG" — disiplin yang sama dgn bagian teks-200% di `audit:reflow` |
 
+**Populasi EKSTREM (`EKSTREM=1`).** Tiap sapuan geometri mengukur DATA HARI INI
+— 69 warga, nama pendek, nominal 6 digit — jadi "0 temuan" berarti "tak ada yang
+patah untuk data yang kebetulan ada sekarang", bukan "tata letaknya tahan".
+`EKSTREM=1 npm run audit:potong` / `audit:lebar` menekan BENTUK jawaban rest/v1
+lewat harness bersama (`jawabEkstrem`): nama 36 karakter, keterangan panjang,
+nominal ×`EKSTREM_SKALA` (default 100). Jumlah baris SENGAJA tak digandakan —
+menyalin baris berarti id kembar & agregat uang bohong, dan itu melahirkan
+"temuan" yang sebenarnya cacat alat. **Skalanya wajib dikalibrasi ke yang app
+janjikan** (300 KK): percobaan pertama memakai ×1000 → "Rp16.352.000.000", dan
+menyebut tata letak patah karena angka 16 milyar yang takkan pernah ada = temuan
+karangan. Hasil nyata 20 Agu: nama panjang yang terpotong di baris daftar BUKAN
+temuan (keputusan 360px yang sudah ada), tapi kaki stat hero — 3 kolom di kartu
+carousel 284px — SALING MENIMPA mulai 8 digit; kini `HeroStats` menyusutkan
+huruf seperlunya (`ukuranMuat`, lantai 9,6px), bukan membulatkan angkanya.
+
+Yang ke-16 (20 Agu): `audit:lebar` melaporkan hero Talangan & Laporan Triwulan
+"terpotong 52px" — palsu. `scrollWidth - clientWidth` ikut menghitung keturunan
+`position:absolute`, dan yang meluber justru SPAN PROBE milik `FitAmount`
+sendiri (visibility:hidden, sengaja dipasang di maxPx 48 untuk mengukur rasio);
+angka yang terlihat duduk di 39px dan muat. Alat yang percaya `scrollWidth` akan
+menyuruh orang membetulkan komponen yang justru sedang bekerja. Kini lebar teks
+diukur lewat RANGE atas TEXT NODE yang benar-benar terlihat (disiplin sama
+`audit:potong`), dan `bleed` IKUT DICETAK di laporan — sebuah baris bisa masuk
+daftar SEMATA karena melewati content-box leluhurnya, dan tanpa angka itu
+laporannya menyuruh orang mencari luapan yang tak kelihatan di kolom mana pun.
+
 **Aturan alat:** kalau sapuan melaporkan temuan yang ternyata palsu, **betulkan ALATNYA**,
 bukan kodenya. Sudah terjadi 12×: sampel kena border 1px, aturan dialog dikenakan ke halaman
 penuh, probe mengambil dialog di belakang sheet, `.sr-only` terbaca "terpotong", pola rute

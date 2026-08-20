@@ -99,9 +99,68 @@ export function fakeSession() {
   };
 }
 
+
+/* ── Populasi EKSTREM ──────────────────────────────────────────────────────
+ * Tiap sapuan geometri di repo ini mengukur DATA HARI INI: 69 warga, nama
+ * pendek, nominal 6 digit. Itu bukan populasi yang dijanjikan — memori proyek
+ * menyebut 300 KK dan terus tumbuh, dan Kas RT sudah punya baris berjuta.
+ * Jadi "0 temuan" pada sapuan potong/lebar berarti "tak ada yang patah UNTUK
+ * data yang kebetulan ada sekarang", bukan "tata letaknya tahan".
+ *
+ * Yang ditekan di sini SHAPE-nya, bukan jumlah barisnya: nama panjang, nominal
+ * 10 digit, keterangan panjang. Jumlah baris sengaja TIDAK digandakan — menyalin
+ * baris berarti id kembar (kunci React) dan agregat uang yang bohong, dan itu
+ * akan melahirkan "temuan" yang sebenarnya cacat alat.
+ *
+ * Dipasang di harness, bukan di satu sapuan, supaya probe yang sudah terbukti
+ * (potong, lebar, sentuh, kontras) bisa dipakai ulang apa adanya — repo ini
+ * sudah 15 kali kena cacat POPULASI, bukan cacat ukuran. */
+const NAMA_PANJANG = 'Muhammad Abdurrahman Nurhidayatullah';
+const TEKS_PANJANG = 'Pembelian material perbaikan saluran air depan rumah Bapak Sohibul Bait blok C nomor 12';
+
+const KUNCI_NAMA = /^(nama|name|nama_lengkap|nama_warga|nama_sohibul)$/i;
+const KUNCI_TEKS = /^(keterangan|catatan|deskripsi|judul|alamat|no_rumah)$/i;
+const KUNCI_UANG = /(nominal|jumlah|total|saldo|iuran|terkumpul|talangan|setor|target)/i;
+const SKALA_UANG = +(process.env.EKSTREM_SKALA || 100);
+
+function ekstremkan(v) {
+  if (Array.isArray(v)) return v.map(ekstremkan);
+  if (v && typeof v === 'object') {
+    const out = {};
+    for (const [k, x] of Object.entries(v)) {
+      if (typeof x === 'string' && KUNCI_NAMA.test(k)) out[k] = NAMA_PANJANG;
+      else if (typeof x === 'string' && KUNCI_TEKS.test(k)) out[k] = TEKS_PANJANG;
+      /* Skala DIKALIBRASI, bukan dikira-kira. Default ×100: kas hari ini
+         (6 digit) jadi 8 digit — "Rp 50.000.000" — yaitu skala RT yang app
+         memang janjikan menampung (300 KK, memori proyek). ×1000 sempat dipakai
+         dan menghasilkan "Rp 16.352.000.000"; itu 16 milyar, dan menyebut tata
+         letak "patah" karena angka yang takkan pernah ada = temuan karangan.
+         Naikkan lewat EKSTREM_SKALA kalau memang mau menguji lebih jauh. */
+      else if (typeof x === 'number' && Number.isFinite(x) && KUNCI_UANG.test(k)) out[k] = Math.round(x * SKALA_UANG);
+      else out[k] = ekstremkan(x);
+    }
+    return out;
+  }
+  return v;
+}
+
+/** Route rest/v1: ambil jawaban ASLI lalu tekan bentuknya. Gagal parse =
+ *  diteruskan apa adanya (jangan pernah menukar galat app dgn galat alat). */
+export async function jawabEkstrem(route, headers) {
+  try {
+    const res = await route.fetch(headers ? { headers } : undefined);
+    const teks = await res.text();
+    let json;
+    try { json = JSON.parse(teks); } catch { return route.fulfill({ response: res, body: teks }); }
+    return route.fulfill({ response: res, body: JSON.stringify(ekstremkan(json)) });
+  } catch {
+    return route.fallback();
+  }
+}
+
 /** Konteks 390px. `bendahara` = sesi palsu + paksa-anon + gembok anti-tulis
  *  (3 lapis identik audit-kontras-deep.mjs — jangan longgarkan salah satunya). */
-export async function newCtx(browser, theme, { bendahara = false, welcome = false } = {}) {
+export async function newCtx(browser, theme, { bendahara = false, welcome = false, ekstrem = false } = {}) {
   const ctx = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
@@ -123,7 +182,7 @@ export async function newCtx(browser, theme, { bendahara = false, welcome = fals
       const isRead = m === 'GET' || m === 'HEAD' || m === 'OPTIONS' || (m === 'POST' && req.url().includes('/rpc/'));
       if (!isRead) return route.fulfill({ status: 403, contentType: 'application/json', body: '{"message":"audit: tulis diblokir"}' });
       const headers = { ...req.headers(), authorization: `Bearer ${ANON}`, apikey: ANON };
-      return route.continue({ headers });
+      return ekstrem ? jawabEkstrem(route, headers) : route.continue({ headers });
     });
     await ctx.route('**/auth/v1/**', (route) => {
       const req = route.request();
@@ -132,6 +191,15 @@ export async function newCtx(browser, theme, { bendahara = false, welcome = fals
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fakeSession()) });
     });
   }
+  /* Warga tak punya route rest/v1 sama sekali di jalur normal — populasi
+     ekstrem harus memasangnya sendiri, kalau tidak flag-nya diam-diam cuma
+     berlaku untuk bendahara (setengah sapuan berjalan lawan data biasa dan
+     melaporkannya sebagai lulus). */
+  if (ekstrem && !bendahara) {
+    await ctx.route('**/rest/v1/**', (route) =>
+      (route.request().method() === 'GET' ? jawabEkstrem(route) : route.continue()));
+  }
+
   const page = await ctx.newPage();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   page.on('pageerror', (e) => console.log('  [pageerror]', e.message.slice(0, 150)));

@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   formatRupiah, formatRupiahPlain, maskRp, hitungSaldoHadiran, pesanError,
-  formatTanggalRingkas,
-} from './utils';
+  formatTanggalRingkas, ukuranMuat } from './utils';
 
 /**
  * Formatter uang & penerjemah error — dipakai hampir di setiap layar, dan
@@ -132,5 +131,33 @@ describe('formatTanggalRingkas — tahun disembunyikan HANYA saat tersirat', () 
     for (const hari of ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']) {
       expect(hasil).not.toContain(hari);
     }
+  });
+});
+
+describe('ukuranMuat — nominal kaki hero yang menyusut seperlunya', () => {
+  /* Angka acuan diukur di browser 360px: kolom kaki = 75px isi, dan
+     "Rp552.000.000" pada 12,48px selebar 90px. */
+  it('angka pendek tetap ukuran penuh', () => {
+    expect(ukuranMuat(75, 60, 12.48, 9.6)).toBe(12.48);
+  });
+
+  it('angka yang PAS di ambang aman tak ikut menyusut', () => {
+    expect(ukuranMuat(75, 72, 12.48, 9.6)).toBe(12.48);   // 72 <= 75*0.97
+  });
+
+  it('angka panjang menyusut seperlunya, bukan ke lantai', () => {
+    const px = ukuranMuat(75, 90, 12.48, 9.6);
+    expect(px).toBeLessThan(12.48);
+    expect(px).toBeGreaterThan(9.6);
+    expect(90 * (px / 12.48)).toBeLessThanOrEqual(75);     // hasilnya benar-benar MUAT
+  });
+
+  it('tak pernah menembus lantai keterbacaan (warga lansia)', () => {
+    expect(ukuranMuat(75, 400, 12.48, 9.6)).toBe(9.6);
+  });
+
+  it('lebar belum terukur (0) → jangan menebak, pakai ukuran penuh', () => {
+    expect(ukuranMuat(0, 90, 12.48, 9.6)).toBe(12.48);
+    expect(ukuranMuat(75, 0, 12.48, 9.6)).toBe(12.48);
   });
 });

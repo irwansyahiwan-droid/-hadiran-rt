@@ -20,6 +20,7 @@
 //   npx vite build && npx vite preview --port 5174   (terminal lain)
 //   node scripts/audit-lebar-nominal.mjs
 import { chromium } from 'playwright';
+import { jawabEkstrem } from './lib/audit-harness.mjs';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
@@ -82,7 +83,38 @@ async function measure(page, ctxName) {
         }
         par = par.parentElement;
       }
-      const clip = el.scrollWidth - el.clientWidth;
+      /* `scrollWidth - clientWidth` BOHONG kalau elemen punya keturunan
+         `position:absolute`: anak absolut ikut dihitung ke scrollWidth induknya.
+         Terukur 20 Agu 2026 — hero Talangan dilaporkan "terpotong 52px" padahal
+         yang meluber adalah SPAN PROBE milik `FitAmount` sendiri (absolute,
+         visibility:hidden, sengaja dipasang di maxPx 48 untuk mengukur rasio;
+         angka yang terlihat duduk di 39px dan muat). Alat yang percaya
+         scrollWidth akan menyuruh orang "memperbaiki" komponen yang justru
+         sedang bekerja dgn benar.
+         Diukur ulang lewat RANGE atas TEXT NODE yang benar-benar terlihat —
+         disiplin yang sama dgn `audit:potong`. */
+      const kotak = (() => {
+        const pad = { l: parseFloat(cs.paddingLeft) || 0, r: parseFloat(cs.paddingRight) || 0 };
+        const er = el.getBoundingClientRect();
+        return { kiri: er.left + pad.l, kanan: er.right - pad.r };
+      })();
+      let tepiKanan = -Infinity, tepiKiri = Infinity;
+      const jalan = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let n = jalan.nextNode(); n; n = jalan.nextNode()) {
+        const par = n.parentElement;
+        if (!par) continue;
+        const pcs2 = getComputedStyle(par);
+        if (pcs2.position === 'absolute' || pcs2.position === 'fixed') continue;
+        if (pcs2.visibility === 'hidden' || par.getAttribute('aria-hidden') === 'true') continue;
+        const rg = document.createRange();
+        rg.selectNodeContents(n);
+        const rr = rg.getBoundingClientRect();
+        if (!rr.width) continue;
+        tepiKanan = Math.max(tepiKanan, rr.right);
+        tepiKiri = Math.min(tepiKiri, rr.left);
+      }
+      const clip = tepiKanan === -Infinity ? 0
+        : Math.round(Math.max(0, tepiKanan - kotak.kanan, kotak.kiri - tepiKiri));
       const overflowRight = Math.round(r.right - innerWidth);
       const overflowLeft = Math.round(-r.left);
       if (clip > 1 || overflowRight > 0 || overflowLeft > 0 || bleed > 1) {
@@ -93,6 +125,7 @@ async function measure(page, ctxName) {
           clip,
           overflowRight,
           overflowLeft,
+          bleed,
           font: cs.fontFamily.split(',')[0].replace(/["']/g, ''),
           size: parseFloat(cs.fontSize),
         });
@@ -145,6 +178,12 @@ function fakeSession() {
   };
 }
 
+/* EKSTREM=1 → nominal ditekan ×1000 (6 digit → 10 digit, "Rp 1.234.567.000")
+   lewat harness bersama. Sapuan ini dibuat justru untuk nominal yang meluber,
+   tapi sampai 20 Agu 2026 ia tak pernah diberi nominal yang benar-benar besar:
+   ia mengukur kas hari ini. */
+const EKSTREM = process.env.EKSTREM === '1';
+
 async function newCtx(browser, { bendahara = false } = {}) {
   const ctx = await browser.newContext({
     viewport: { width: W, height: 800 },
@@ -167,7 +206,7 @@ async function newCtx(browser, { bendahara = false } = {}) {
       const isRead = m === 'GET' || m === 'HEAD' || m === 'OPTIONS' || (m === 'POST' && req.url().includes('/rpc/'));
       if (!isRead) return route.fulfill({ status: 403, contentType: 'application/json', body: '{"message":"audit: tulis diblokir"}' });
       const headers = { ...req.headers(), authorization: `Bearer ${ANON}`, apikey: ANON };
-      return route.continue({ headers });
+      return EKSTREM ? jawabEkstrem(route, headers) : route.continue({ headers });
     });
     await ctx.route('**/auth/v1/**', (route) => {
       const req = route.request();
@@ -176,6 +215,14 @@ async function newCtx(browser, { bendahara = false } = {}) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fakeSession()) });
     });
   }
+  /* Warga tak punya route rest/v1 di jalur normal — tanpa cabang ini flag
+     EKSTREM diam-diam cuma berlaku untuk bendahara, dan separuh sapuan
+     berjalan lawan data biasa lalu melaporkannya sebagai lulus. */
+  if (EKSTREM && !bendahara) {
+    await ctx.route('**/rest/v1/**', (route) =>
+      (route.request().method() === 'GET' ? jawabEkstrem(route) : route.continue()));
+  }
+
   const page = await ctx.newPage();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   page.on('pageerror', (e) => console.log('  [pageerror]', e.message.slice(0, 150)));
@@ -301,5 +348,9 @@ writeFileSync(`${OUT}/hasil-lebar.json`, JSON.stringify(findings, null, 1));
 console.log(`\n=== TEMUAN: ${findings.length} @ ${W}px ===`);
 for (const f of findings) {
   if (f.kind === 'halaman-geser') console.log(`[${f.ctx}] HALAMAN GESER — ${f.detail}`);
-  else console.log(`[${f.ctx}] "${f.text}" clip=${f.clip} kanan=${f.overflowRight} kiri=${f.overflowLeft} ${f.font} ${f.size}px <${f.tag}> .${f.cls}`);
+  /* `bleed` WAJIB ikut tercetak: sebuah baris bisa masuk daftar SEMATA karena
+     ia melewati content-box leluhurnya (clip 0, kanan/kiri negatif). Tanpa
+     angka itu laporannya menyuruh orang mencari luapan yang tak kelihatan di
+     kolom mana pun — persis jenis laporan yang bikin temuan asli dikira palsu. */
+  else console.log(`[${f.ctx}] "${f.text}" clip=${f.clip} bleed=${f.bleed ?? '?'} kanan=${f.overflowRight} kiri=${f.overflowLeft} ${f.font} ${f.size}px <${f.tag}> .${f.cls}`);
 }

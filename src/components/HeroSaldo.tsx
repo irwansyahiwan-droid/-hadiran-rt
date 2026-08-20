@@ -1,6 +1,8 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import FitAmount from './FitAmount';
+import { ukuranMuat } from '../lib/utils';
 
 /** Satu kolom statistik di kaki hero. `onClick` menjadikannya tombol navigasi. */
 export interface HeroStat {
@@ -22,12 +24,89 @@ export interface HeroStat {
  * Dipakai langsung oleh slide hero Beranda (yang bingkainya milik carousel)
  * maupun oleh `HeroSaldo` di bawah ini → satu sumber, tak bisa drift.
  */
+/* Batas atasnya MENIRU `clamp(0.69rem, 3.1vw, 0.78rem)` yang lama, persis —
+   supaya angka yang muat hari ini tampil sama sekali tak berubah (di 360px:
+   11,16px). Perbaikan ini soal angka PANJANG; menaikkan ukuran semua nominal
+   diam-diam adalah perubahan tampilan yang tak diminta siapa pun.
+   Yang baru cuma LANTAInya: 9,6px, cukup untuk 9 digit ("Rp999.999.999") di
+   kolom 75px dan masih terbaca — di bawah itu angkanya selamat tapi warga
+   lansia yang kalah. */
+const MAKS_KAKI_PX = 12.48;          // 0.78rem — pagar atas clamp lama
+const MIN_CLAMP_PX = 11.04;          // 0.69rem — pagar bawah clamp lama
+const MIN_KAKI_PX = 9.6;             // lantai BARU, hanya dipakai saat tak muat
+const maksSekarang = () =>
+  Math.min(MAKS_KAKI_PX, Math.max(MIN_CLAMP_PX, 0.031 * window.innerWidth));
+
 export function HeroStats({ items, className = '' }: { items: HeroStat[]; className?: string }) {
+  /* Nominal kaki MENYUSUT SEPERLUNYA, tidak lagi ber-`clamp()` tetap.
+   *
+   * Yang lama dikalibrasi ke satu panjang angka, dan komentarnya sendiri
+   * mencatat sisa ruangnya nol: "angka sedigit lebih panjang langsung
+   * menabrak". Sapuan populasi ekstrem (20 Agu 2026,
+   * `EKSTREM=1 npm run audit:lebar`) membuktikan digit itu sudah dalam
+   * jangkauan — pada kas 8 digit ketiga nominal SALING MENIMPA di 360px, dan
+   * itu terlihat di screenshot, bukan disimpulkan dari angka. "Terkumpul"
+   * adalah total kumulatif: ia cuma naik, tak pernah turun.
+   *
+   * SATU ukuran untuk ketiga kolom (dihitung dari nilai TERPANJANG), bukan
+   * per-kolom: tiga angka bertetangga dengan tiga ukuran huruf berbeda terbaca
+   * sebagai kesalahan, bukan sebagai penyesuaian.
+   *
+   * Yang menyusut hurufnya, BUKAN angkanya — "Rp55,2 jt" adalah pernyataan
+   * yang berbeda dari "Rp55.200.000", dan kaki ini menyebut uang. */
+  const rowRef = useRef<HTMLDivElement>(null);
+  const probeRef = useRef<HTMLSpanElement>(null);
+  const [px, setPx] = useState(MAKS_KAKI_PX);   // diganti ukuran nyata di layout-effect
+  const terpanjang = items.reduce((a, s2) => (String(s2.value).length > a.length ? String(s2.value) : a), '');
+
+  useLayoutEffect(() => {
+    const row = rowRef.current;
+    const probe = probeRef.current;
+    if (!row || !probe) return;
+    const ukur = () => {
+      /* Kolomnya dicari lewat penanda, BUKAN `firstElementChild`: probe
+         pengukur juga anak dari baris ini, dan lebarnya 0 — memakainya membuat
+         `ukuranMuat` menerima "tersedia = 0", mengembalikan ukuran penuh, dan
+         perbaikannya diam-diam tak pernah bekerja (kejadian, terlihat di
+         screenshot yang masih menimpa).
+         Padding kolom (`px-0.5`) ikut dikurangi: `clientWidth` memuatnya, dan
+         teks tak boleh memakai ruang itu. */
+      const kolom = row.querySelector<HTMLElement>('[data-kaki-kolom]');
+      if (!kolom) return;
+      const cs = getComputedStyle(kolom);
+      const isi = kolom.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+      /* Probe diukur pada MAKS_KAKI_PX; skalakan dulu ke ukuran clamp yang
+         berlaku di lebar layar ini, kalau tidak angka pendek akan ikut
+         "diperbaiki" jadi lebih besar dari sebelumnya. */
+      const maks = maksSekarang();
+      const lebarPadaMaks = probe.getBoundingClientRect().width * (maks / MAKS_KAKI_PX);
+      setPx(ukuranMuat(isi, lebarPadaMaks, maks, MIN_KAKI_PX));
+    };
+    ukur();
+    const ro = new ResizeObserver(ukur);
+    ro.observe(row);
+    // Sora swap dari fallback → lebar berubah; ukur ulang (pola sama FitAmount).
+    document.fonts?.ready.then(ukur).catch(() => {});
+    return () => ro.disconnect();
+  }, [terpanjang]);
+
   return (
     <div
-      className={`grid border-t border-white/15 ${className}`}
+      ref={rowRef}
+      className={`relative grid border-t border-white/15 ${className}`}
       style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
     >
+      {/* Probe pengukur: nilai TERPANJANG pada ukuran maksimum, di luar alur &
+          tak terlihat. `aria-hidden` + `visibility:hidden` supaya sapuan
+          geometri tak salah menghitungnya sebagai teks yang meluber. */}
+      <span
+        ref={probeRef}
+        aria-hidden="true"
+        className="font-display font-extrabold tabular-nums"
+        style={{ position: 'absolute', left: 0, top: 0, visibility: 'hidden', whiteSpace: 'nowrap', fontSize: MAKS_KAKI_PX, pointerEvents: 'none' }}
+      >
+        {terpanjang}
+      </span>
       {items.map((s, i) => {
         const Icon = s.icon;
         const sep = i < items.length - 1 ? 'border-r border-white/15' : '';
@@ -35,18 +114,10 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
           <>
             {Icon && <Icon className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />}
             <span className="mt-0.5 text-micro font-medium text-white/95">{s.label}</span>
-            {/* clamp: nominal kolom harus muat di 360px tanpa membungkus.
-                Angka "±100px per kolom" di komentar lama SALAH, dan itu sebab
-                batas bawahnya meleset: kaki ini juga dipakai di dalam kartu
-                carousel Beranda yang lebarnya 284px, bukan selebar layar — jadi
-                kolomnya cuma 79px (dikurangi `px-0.5` → 75px isi). Diukur di
-                360px: "Rp4.830.000" pada 0.72rem = 78px, yakni MELUBER ~3px ke
-                padding. Belum menabrak tetangga (masih di dalam kotak kolom),
-                tapi nol margin — angka sedigit lebih panjang langsung menabrak.
-                0.72 → 0.69rem (11,04px → 74,7px) mengembalikan marginnya dengan
-                ongkos setengah piksel ukuran huruf. Sora + tabular → sejajar
-                antar kolom. */}
-            <span className="whitespace-nowrap text-[clamp(0.69rem,3.1vw,0.78rem)] font-display font-extrabold tabular-nums text-white">
+            <span
+              className="whitespace-nowrap font-display font-extrabold tabular-nums text-white"
+              style={{ fontSize: px }}
+            >
               {s.value}
             </span>
           </>
@@ -55,13 +126,14 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
         return s.onClick ? (
           <button
             key={s.label}
+            data-kaki-kolom=""
             onClick={(e) => { e.stopPropagation(); s.onClick?.(); }}
             className={`press ${box} active:opacity-80`}
           >
             {inner}
           </button>
         ) : (
-          <div key={s.label} className={box}>{inner}</div>
+          <div key={s.label} data-kaki-kolom="" className={box}>{inner}</div>
         );
       })}
     </div>

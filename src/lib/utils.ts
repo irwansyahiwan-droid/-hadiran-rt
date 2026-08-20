@@ -145,3 +145,25 @@ export function hitungSaldoHadiran(
   return totalKasTerkumpul - totalTalanganBelumLunas - totalSetor;
 }
 
+
+/**
+ * Ukuran huruf (px) yang membuat teks selebar `lebarTeks` (diukur pada `maksPx`)
+ * muat di ruang `tersedia`. Angka pendek dapat ukuran penuh; yang panjang
+ * menyusut SEPERLUNYA, tak pernah lebih kecil dari `minPx`.
+ *
+ * Dipakai kaki stat hero (3 kolom). Kenapa perlu: sampai 20 Agu 2026 ukurannya
+ * `clamp()` TETAP yang dikalibrasi ke satu panjang angka — komentarnya sendiri
+ * mencatat "nol margin — angka sedigit lebih panjang langsung menabrak". Sapuan
+ * populasi ekstrem membuktikan digit itu sudah dalam jangkauan: pada kas
+ * 8 digit ketiga nominal SALING MENIMPA di 360px (terlihat di screenshot,
+ * bukan disimpulkan dari angka). "Terkumpul" itu total kumulatif — ia cuma naik.
+ *
+ * Menyusutkan huruf, BUKAN membulatkan angka: kaki ini menyebut UANG, dan
+ * "Rp55,2 jt" adalah pernyataan yang berbeda dari "Rp55.200.000".
+ */
+export function ukuranMuat(tersedia: number, lebarTeks: number, maksPx: number, minPx: number): number {
+  if (!(tersedia > 0) || !(lebarTeks > 0)) return maksPx;
+  const aman = tersedia * 0.97;              // sisakan ~3% agar tepi tak mepet
+  if (lebarTeks <= aman) return maksPx;
+  return Math.max(minPx, Math.floor((aman / lebarTeks) * maksPx * 10) / 10);
+}
