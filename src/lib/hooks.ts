@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useReducer, useCallback} from 'react';
+import { showToast } from './toast';
 
 /* ── Tinggi layar & hero ringkas ─────────────────────────────────
  * Dipakai BERSAMA oleh kartu saldo (Beranda), skeleton-nya, dan rumus tinggi
@@ -133,6 +134,136 @@ export function useSaving(): [boolean, (v: boolean) => void, () => boolean] {
   }, []);
   const sedangSimpan = useCallback(() => kunci.current, []);
   return [saving, setSaving, sedangSimpan];
+}
+
+/* ── Aksi BERAT: ekspor, cetak, bagikan ──────────────────────────
+ * Saudara `useSaving()` untuk jalur yang TIDAK menulis apa pun ke DB tapi tetap
+ * membuat orang menunggu lama: tiap "Cetak PDF" / "Ekspor Excel" / "Bagikan"
+ * memanggil `await import(...)` chunk yang baru diunduh SAAT DIKETUK (Excel
+ * 941 kB, PDF triwulan 399 kB, html2canvas 201 kB) lalu merender berkasnya di
+ * main thread.
+ *
+ * Terukur 20 Agu 2026 di Kas RT, 400 kbps + CPU 4× (`npm run audit:respon`):
+ * "Ekspor Excel" butuh **6.247 ms** sampai berkas turun, dan selama enam detik
+ * itu layar TIDAK BERUBAH SAMA SEKALI — nol spinner, nol tombol nonaktif, nol
+ * kata tunggu, nol toast. Tiga akibat, ketiganya terukur di hari yang sama:
+ *
+ *   1. Terasa MURAH. Ini justru satu-satunya jeda panjang yang tersisa di app:
+ *      `audit:respon` bagian A & B mengukur 34 interaksi lain dan yang
+ *      TERBURUK 56 ms. Ekspor 110× lebih lambat dari tetangganya dan
+ *      satu-satunya yang tak mengaku sedang bekerja.
+ *   2. Ketukan kedua menghasilkan **DUA berkas identik** (terukur: 2 unduhan
+ *      untuk satu ketukan ganda). `disabled={sibuk}` saja tak menolong —
+ *      penjaga UI baru berlaku sesudah React me-render, sedangkan dua ketukan
+ *      di TASK YANG SAMA masuk lebih dulu. Alasan yang sama persis melahirkan
+ *      `useSaving()`; jalur ekspor tak pernah kebagian.
+ *   3. Kalau chunk-nya gagal diunduh, layar diam SELAMANYA. Bukan hipotesis:
+ *      `vercel.json` merewrite semua path ke `index.html`, jadi sesudah deploy
+ *      chunk lama dibalas HTTP 200 berisi HTML dan `import()` menolak dgn galat
+ *      MIME. Terukur dgn menyuntik balasan itu: jalur Excel — yang tak punya
+ *      `catch` sama sekali — cuma meninggalkan satu `pageerror` di konsol yang
+ *      tak pernah dilihat siapa pun.
+ *
+ * Intinya sengaja dipisah dari hook-nya supaya bisa DIUJI di node (repo ini tak
+ * memasang testing-library, jadi apa pun yang hidup di dalam `useState` cuma
+ * bisa diuji lewat browser).
+ */
+
+/** Batas sabar aksi berat. Beda dari `BATAS_REQ_MS` (20 dtk, request Supabase)
+ *  karena yang ditunggu di sini bukan API tapi UNDUHAN CHUNK: 270 kB gzip di
+ *  400 kbps sudah 5,4 dtk sehat, dan memotongnya di 20 dtk akan menyebut
+ *  jaringan pelan sebagai "gagal". Yang dijaga cuma satu: tombol tak boleh
+ *  terkunci selamanya. `import()` tak bisa dibatalkan — kalau batas ini lewat,
+ *  yang dilepas hanya UI-nya; berkasnya tetap turun kalau akhirnya sampai. */
+export const BATAS_AKSI_MS = 30_000;
+
+/* Tiga angka di bawah ini yang membedakan "ada spinner" dari "terasa mahal".
+   Keadaan sibuk TIDAK dipasang serta-merta: chunk yang sudah ter-cache selesai
+   dalam ~180 ms (terukur di jalur PDF Kas RT), dan memasang pemintal untuk itu
+   cuma menghasilkan KEDIPAN — mata membacanya sebagai kerusakan, bukan sebagai
+   kerja. Jadi: tunggu sebentar sebelum mengaku sibuk, lalu kalau sudah terlanjur
+   mengaku, bertahanlah cukup lama untuk terbaca. */
+const TUNDA_SIBUK_MS = 250;   // di bawah ini: selesai diam-diam, tanpa kedipan
+const MIN_SIBUK_MS = 400;     // sekali tampil, jangan hilang sebelum terbaca
+const WARTA_MS = 1200;        // masih berjalan selama ini → beri KATA, bukan cuma ikon
+
+export function buatAksiBerat(setSibuk: (v: boolean) => void, batasMs = BATAS_AKSI_MS) {
+  let kunci = false;      // latch SINKRON — berubah sebelum React sempat render
+  let sesi = 0;           // penanda giliran: pelepasan telat tak boleh membuka kunci giliran baru
+  return {
+    sedangSibuk: () => kunci,
+    async jalankan(
+      aksi: () => unknown,
+      opts: { mulai?: string; gagal?: string } = {},
+    ) {
+      const {
+        mulai = 'Menyiapkan berkas…',
+        gagal = 'Gagal menyiapkan berkas. Coba muat ulang aplikasi.',
+      } = opts;
+      if (kunci) return;                       // ketukan kedua di task yang sama: mental di sini
+      kunci = true;
+      const id = ++sesi;
+      let tampilSejak = 0;
+
+      const jamTampil = setTimeout(() => {
+        if (id !== sesi || !kunci) return;
+        tampilSejak = Date.now();
+        setSibuk(true);
+      }, TUNDA_SIBUK_MS);
+      const jamWarta = setTimeout(() => {
+        if (id !== sesi || !kunci) return;
+        showToast(mulai, 'info');
+      }, WARTA_MS);
+
+      const lepas = async () => {
+        if (id !== sesi) return;
+        const sisa = tampilSejak ? MIN_SIBUK_MS - (Date.now() - tampilSejak) : 0;
+        if (sisa > 0) await new Promise((r) => setTimeout(r, sisa));
+        if (id !== sesi) return;
+        kunci = false;
+        if (tampilSejak) setSibuk(false);
+      };
+
+      const jamBatas = setTimeout(() => {
+        if (id !== sesi || !kunci) return;
+        kunci = false;
+        if (tampilSejak) setSibuk(false);
+        showToast('Jaringan lambat — berkas belum selesai disiapkan. Coba lagi.', 'error');
+      }, batasMs);
+
+      try {
+        await aksi();
+      } catch {
+        showToast(gagal, 'error');
+      } finally {
+        clearTimeout(jamTampil);
+        clearTimeout(jamWarta);
+        clearTimeout(jamBatas);
+        await lepas();
+      }
+    },
+  };
+}
+
+/** Versi React dari `buatAksiBerat`: `[sibuk, jalankan]`.
+ *
+ *  Pakai:
+ *    const [ekspor, jalankanEkspor] = useAksiBerat();
+ *    onClick={() => jalankanEkspor(async () => {
+ *      const { generateX } = await import('../lib/generateX');
+ *      generateX(data);
+ *    })}
+ *
+ *  `sibuk` dipasang ke tombolnya (`busy`/`disabled`) supaya ketukan itu MENGAKU
+ *  diterima; latch di dalamnya yang mencegah berkas ganda. Jalur ekspor/berbagi
+ *  BARU wajib memakainya — `try/catch` polos akan lolos semua sapuan lain. */
+export function useAksiBerat(): [boolean, (aksi: () => unknown, opts?: { mulai?: string; gagal?: string }) => Promise<void>] {
+  const [sibuk, setSibuk] = useState(false);
+  const hidup = useRef(true);
+  useEffect(() => () => { hidup.current = false; }, []);
+  const inti = useRef<ReturnType<typeof buatAksiBerat> | null>(null);
+  if (!inti.current) inti.current = buatAksiBerat((v) => { if (hidup.current) setSibuk(v); });
+  return [sibuk, inti.current.jalankan];
 }
 
 export function useExitAnim(open: boolean, ms = 120): boolean {

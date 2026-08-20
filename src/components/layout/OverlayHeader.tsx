@@ -79,6 +79,11 @@ export function OverlayAction({
       className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       title={label}
       aria-label={label}
+      /* `spinning` selalu berarti "sedang bekerja" — beritahukan juga ke pembaca
+         layar. Tombolnya sengaja tidak di-`disabled`: penjaga ketukan gandanya
+         ada di latch sinkron `useAksiBerat()`, dan menonaktifkan tombol yang
+         sedang difokus melempar fokus ke <body>. */
+      aria-busy={spinning || undefined}
     >
       <Icon className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${spinning ? 'animate-spin' : ''}`} aria-hidden="true" />
     </button>

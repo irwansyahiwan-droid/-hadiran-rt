@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, Share2, CalendarCheck } from 'lucide-react';
+import { FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, Share2, CalendarCheck, Loader2 } from 'lucide-react';
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -9,6 +9,7 @@ import { useClosePhase } from '../hooks/useClosePhase';
 import { fetchRekapTriwulan, fetchSnapshotKas } from '../lib/laporan';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
+import { useAksiBerat } from '../lib/hooks';
 import { shareLaporanKas } from '../lib/shareLaporanKas';
 import type { LaporanKasCard } from '../lib/shareLaporanKas';
 import type { RekapTriwulan, SnapshotKas } from '../lib/laporan';
@@ -57,6 +58,9 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [sharingKey, setSharingKey] = useState<string | null>(null);
+  const [cetakKey, setCetakKey] = useState<string | null>(null);
+  const [cetakSibuk, jalankanCetak] = useAksiBerat();
+  const [, jalankanBagi] = useAksiBerat();
 
   async function load() {
     setError(false);
@@ -85,30 +89,33 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   useBackDismiss(open, exit.requestClose);
   const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Tutup buku triwulan' });
 
+  /* Chunk PDF triwulan 399 kB — jalur terberat kedua sesudah Excel. Kuncinya
+     per-BARIS (`cetakKey`) supaya yang mengaku sibuk cuma triwulan yang diketuk;
+     latch di `useAksiBerat` yang menahan ketukan kedua sebelum React render. */
   async function cetak(r: RekapTriwulan) {
     haptic(12);
-    try {
+    setCetakKey(r.key);
+    await jalankanCetak(async () => {
       // Lazy-load: jsPDF tidak ikut ke bundle utama
       const { generateLaporanTriwulanPDF } = await import('../lib/generateLaporanTriwulanPDF');
       generateLaporanTriwulanPDF(r);
       showToast(`Laporan ${r.label} dibuat`);
-    } catch {
-      showToast('Gagal membuat laporan', 'error');
-    }
+    }, { mulai: 'Menyiapkan laporan…', gagal: 'Gagal membuat laporan' });
+    setCetakKey(null);
   }
 
   // Bagikan kartu PNG ke WhatsApp (anti-kepotong: kanvas auto-tinggi)
+  /* `if (sharingKey) return` yang dulu berdiri sendiri di sini cuma membaca
+     STATE: dua ketukan di task yang SAMA sama-sama melihat `null` dan dua-duanya
+     lolos. Latch sinkron `useAksiBerat` yang benar-benar menahannya; `sharingKey`
+     tinggal menandai baris MANA yang sedang sibuk. */
   async function bagikan(key: string, card: LaporanKasCard) {
-    if (sharingKey) return;
     haptic(12);
     setSharingKey(key);
-    try {
+    await jalankanBagi(async () => {
       await shareLaporanKas(card);
-    } catch {
-      showToast('Gagal membuat gambar', 'error');
-    } finally {
-      setSharingKey(null);
-    }
+    }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar' });
+    setSharingKey(null);
   }
 
   function triwulanToCard(r: RekapTriwulan): LaporanKasCard {
@@ -266,8 +273,9 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   onClick={() => cetak(r)}
                   className="btn-secondary press min-h-[44px] px-4 py-3 rounded-2xl flex items-center justify-center gap-1.5"
                   aria-label={`Unduh PDF ${r.label}`}
+                  aria-busy={(cetakSibuk && cetakKey === r.key) || undefined}
                 >
-                  <Download className="w-4 h-4" /> PDF
+                  {cetakSibuk && cetakKey === r.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} PDF
                 </button>
               </div>
             </div>

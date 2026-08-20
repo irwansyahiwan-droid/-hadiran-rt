@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Download, ChevronDown, type LucideIcon } from 'lucide-react';
+import { Download, ChevronDown, Loader2, type LucideIcon } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
 
@@ -30,13 +30,22 @@ interface ExportMenuProps {
   disabled?: boolean;
   /** Alasan yang dibacakan pembaca layar & muncul sebagai tooltip. */
   disabledReason?: string;
+  /** Sedang menyiapkan berkas (chunk ekspor diunduh + berkas dirender).
+   *
+   *  Ada karena jeda ini NYATA dan dulu tak terlihat sama sekali: 6,2 detik di
+   *  Kas RT pada 400 kbps + CPU 4× tanpa satu pun perubahan di layar
+   *  (`npm run audit:respon` bagian D). Ikon jadi pemintal & tombol nonaktif —
+   *  ketukan MENGAKU diterima. Penjaga berkas-gandanya sendiri bukan di sini
+   *  tapi di latch sinkron `useAksiBerat()`; `disabled` baru berlaku sesudah
+   *  React render, dan ketukan kedua yang bermasalah datang sebelum itu. */
+  busy?: boolean;
 }
 
 /** Tombol "Ekspor" + dropdown — menyatukan aksi ekspor yang JARANG dipakai
  *  (PDF / Excel) ke satu menu, agar aksi utama (FAB) tak tersaingi di toolbar.
  *  Satu aksi primer per layar. Popover ringan (bukan sheet) selaras menu Header:
  *  tutup via Escape / klik luar. */
-export default function ExportMenu({ items, align = 'right', disabled = false, disabledReason }: ExportMenuProps) {
+export default function ExportMenu({ items, align = 'right', disabled = false, disabledReason, busy = false }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
   const mounted = useExitAnim(open);
   const ref = useRef<HTMLDivElement>(null);
@@ -47,6 +56,19 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
   // kalau tidak, itemnya tetap bisa diketuk lewat popover yang sudah terlanjur
   // ada di layar dan penjaga di tombolnya jadi tak berarti.
   useEffect(() => { if (disabled) setOpen(false); }, [disabled]);
+
+  /* Tombol yang dinonaktifkan saat sibuk membuang fokusnya ke <body> — pengguna
+     papan ketik yang baru menekan Enter di sini kehilangan tempatnya selama
+     berkas disiapkan, lalu Tab berikutnya mulai lagi dari awal halaman.
+     Kembalikan begitu selesai, dan HANYA kalau fokusnya memang terbuang (jangan
+     merebut fokus yang sudah pindah ke tempat lain atas kemauan pengguna). */
+  const sibukRef = useRef(false);
+  useEffect(() => {
+    if (sibukRef.current && !busy && document.activeElement === document.body) {
+      ref.current?.querySelector('button')?.focus();
+    }
+    sibukRef.current = busy;
+  }, [busy]);
 
   useEffect(() => {
     if (!open) return;
@@ -93,7 +115,8 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
     <div className="relative" ref={ref}>
       <button
         onClick={() => { haptic(); setOpen((o) => !o); }}
-        disabled={disabled}
+        disabled={disabled || busy}
+        aria-busy={busy || undefined}
         title={disabled ? disabledReason : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
@@ -104,7 +127,12 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
            menjatuhkan label ke 2,2:1 (lihat `npm run audit:mati`). */
         className="btn-mati press flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-body font-semibold min-h-[44px] px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:border-transparent disabled:shadow-none"
       >
-        <Download className="w-4 h-4" />
+        {/* Ikon ditukar di tempat, label TETAP "Ekspor": label yang memanjang
+            jadi "Menyiapkan…" menekan judul halaman di sebelahnya dan itu
+            berakhir sbg teks terpotong di 360px (`audit:potong`). Kata tunggunya
+            disampaikan toast — yang sekaligus dibacakan pembaca layar lewat
+            region live permanen Toaster. */}
+        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
         Ekspor
         <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
       </button>

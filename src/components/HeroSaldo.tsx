@@ -180,6 +180,12 @@ export function HeroAction({
     <button
       onClick={onClick}
       aria-label={label}
+      /* `spin` di sini SELALU berarti "sedang bekerja" (muat ulang / menyiapkan
+         kartu PNG), jadi keadaan itu ikut diberitahukan ke pembaca layar.
+         Tombolnya sengaja TIDAK di-`disabled`: menonaktifkan tombol yang sedang
+         difokus melempar fokus ke <body>, dan penjaga ketukan-ganda-nya sudah
+         ada di latch sinkron `useAksiBerat()` — bukan di sini. */
+      aria-busy={spin || undefined}
       className="press flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-white/10"
     >
       <Icon className={`h-4 w-4 text-white/80 ${spin ? 'animate-spin' : ''}`} />

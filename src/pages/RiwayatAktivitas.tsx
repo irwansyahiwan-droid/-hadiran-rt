@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Search, History, Plus, Pencil, Trash2,
   CheckCircle2, RotateCcw, ArrowRight, RefreshCw, Download,
-  ChevronDown, Route, Lightbulb,
-} from 'lucide-react';
+  ChevronDown, Route, Lightbulb, Loader2 } from 'lucide-react';
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
@@ -16,6 +15,7 @@ import { useClosePhase } from '../hooks/useClosePhase';
 import { fetchAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
+import { useAksiBerat } from '../lib/hooks';
 import type { AktivitasLog } from '../lib/types';
 import type { Accent } from '../lib/aktivitas';
 
@@ -60,6 +60,8 @@ function labelHari(dateStr: string): string {
 }
 
 export default function RiwayatAktivitas({ open, onClose }: Props) {
+  /* Ekspor PDF = aksi berat (chunk diunduh saat diketuk). Lihat `useAksiBerat`. */
+  const [pdfSibuk, jalankanPdf] = useAksiBerat();
   const [rows, setRows] = useState<AktivitasLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -118,14 +120,20 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
     return out;
   }, [rows, filter, search]);
 
+  /* Sampai 20 Agu 2026 jalur ini TANPA `catch` sama sekali: chunk gagal (mis.
+     chunk basi sesudah deploy, yang dibalas HTML 200 oleh rewrite Vercel) cuma
+     meninggalkan unhandled rejection di konsol dan layar diam. `useAksiBerat`
+     yang kini menerjemahkannya jadi toast + keadaan sibuk. */
   async function exportPDF() {
     haptic(12);
     const flat = grouped.flatMap((g) => g.items);
     if (flat.length === 0) { showToast('Tidak ada aktivitas untuk diekspor', 'info'); return; }
     const label = FILTERS.find((f) => f.id === filter)?.label ?? 'Semua';
-    const { generateAktivitasPDF } = await import('../lib/generateAktivitasPDF');
-    generateAktivitasPDF(flat, label);
-    showToast('PDF riwayat dibuat');
+    await jalankanPdf(async () => {
+      const { generateAktivitasPDF } = await import('../lib/generateAktivitasPDF');
+      generateAktivitasPDF(flat, label);
+      showToast('PDF riwayat dibuat');
+    }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' });
   }
 
   if (!open) return null;
@@ -141,7 +149,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         title="Riwayat Aktivitas"
         onBack={exit.requestClose}
         actions={<>
-          <OverlayAction icon={Download} label="Ekspor PDF" onClick={exportPDF} />
+          <OverlayAction icon={pdfSibuk ? Loader2 : Download} label="Ekspor PDF" onClick={exportPDF} spinning={pdfSibuk} />
           <OverlayAction icon={RefreshCw} label="Muat ulang" onClick={() => { setLoading(true); load(); }} spinning={loading} />
         </>}
       />

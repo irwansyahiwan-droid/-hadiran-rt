@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw } from 'lucide-react';
-import { useCountUp, useHideAmount, toggleHideAmount, useSaving} from '../lib/hooks';
+import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2 } from 'lucide-react';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat } from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
@@ -296,13 +296,19 @@ export default function KasRTPage() {
   }, [list]);
   const animatedSaldo = useCountUp(saldo);
   const hidden = useHideAmount();
+  /* Ekspor & bagikan = aksi BERAT (chunk diunduh saat diketuk + berkas dirender
+     di main thread). Lihat `useAksiBerat` di lib/hooks.ts: ia yang memasang
+     keadaan sibuk, menahan ketukan ganda, dan memastikan kegagalan chunk
+     berakhir sbg toast — bukan sbg layar diam. */
+  const [eksporSibuk, jalankanEkspor] = useAksiBerat();
+  const [bagiSibuk, jalankanBagi] = useAksiBerat();
 
   // Bagikan ringkasan Kas RT sbg kartu PNG bermerek → grup WA warga.
   async function handleShareReceipt() {
     haptic(12);
     // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
     const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
-    try {
+    await jalankanBagi(async () => {
       const { shareReceipt } = await import('../lib/shareReceipt');
       // Kartu warga dulu hanya memuat TOTAL (masuk/keluar/saldo) → pertanyaan
       // paling sering di grup WA, "uang RT dipakai untuk apa?", tak terjawab;
@@ -331,9 +337,7 @@ export default function KasRTPage() {
         rows,
         shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${fmtSaldo}\n— Hadiran RT`,
       });
-    } catch {
-      showToast('Gagal membuat gambar. Coba lagi.', 'error');
-    }
+    }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
   }
 
   // Daftar tampil = list difilter (tipe) & diurutkan (sort). saldo_setelah per
@@ -490,28 +494,28 @@ export default function KasRTPage() {
                  tangan, tampak sah untuk diarsipkan. */
               disabled={error}
               disabledReason="Data gagal dimuat — muat ulang dulu sebelum mengekspor."
+              busy={eksporSibuk}
               align="left"
               items={[
                 {
                   label: 'Cetak PDF',
                   icon: FileText,
-                  onClick: async () => {
-                    try {
-                      const { generateKasRTPDF } = await import('../lib/generateKasRTPDF');
-                      generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal });
-                    } catch {
-                      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-                    }
-                  },
+                  onClick: () => jalankanEkspor(async () => {
+                    const { generateKasRTPDF } = await import('../lib/generateKasRTPDF');
+                    generateKasRTPDF(list, { saldo, totalMasuk, totalKeluar, saldoAwal });
+                  }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' }),
                 },
                 {
                   label: 'Ekspor Excel',
                   icon: Download,
                   tone: 'text-emerald-600 dark:text-emerald-400',
-                  onClick: async () => {
+                  /* Jalur TERBERAT di seluruh app: chunk-nya 941 kB (270 kB gzip)
+                     → 6,2 dtk di 400 kbps, dan sampai 20 Agu 2026 ia satu-satunya
+                     yang bahkan tak punya `catch`. */
+                  onClick: () => jalankanEkspor(async () => {
                     const { generateKasRTExcel } = await import('../lib/generateKasRTExcel');
                     await generateKasRTExcel(displayList, { saldo, totalMasuk, totalKeluar, saldoAwal });
-                  },
+                  }, { mulai: 'Menyiapkan Excel…', gagal: 'Gagal membuat file Excel. Coba muat ulang aplikasi.' }),
                 },
               ]}
             />
@@ -580,7 +584,10 @@ export default function KasRTPage() {
                 label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 onClick={() => { haptic(); toggleHideAmount(); }}
               />
-              <HeroAction icon={Share2} label="Bagikan ringkasan ke WhatsApp" onClick={handleShareReceipt} />
+              {/* Ikon ditukar jadi pemintal saat kartu PNG disiapkan (html2canvas 201 kB
+                  + render) — ikon Share2 yang BERPUTAR terbaca sbg gangguan, bukan
+                  sbg kerja. */}
+              <HeroAction icon={bagiSibuk ? Loader2 : Share2} label="Bagikan ringkasan ke WhatsApp" onClick={handleShareReceipt} spin={bagiSibuk} />
             </>
           }
           stats={[

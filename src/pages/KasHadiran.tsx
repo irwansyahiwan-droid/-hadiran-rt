@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Coins, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff } from 'lucide-react';
+import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Coins, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
-import { useCountUp, useHideAmount, toggleHideAmount, useSaving} from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat } from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -229,6 +229,13 @@ export default function KasHadiranPage() {
   const totalKasTerkumpul = tarikanSelesai.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const saldo = hitungSaldoHadiran(totalKasTerkumpul, totalTalanganBelum, totalSetor);
   const animatedSaldo = useCountUp(saldo);
+  /* Aksi BERAT (chunk diunduh saat diketuk + berkas dirender di main thread).
+     Satu instans per TOMBOL, bukan satu untuk halaman: latch-nya per instans,
+     jadi menyatukannya membuat "Bagikan" ikut terkunci saat PDF disiapkan. */
+  const [eksporSibuk, jalankanEkspor] = useAksiBerat();
+  const [bagiSibuk, jalankanBagi] = useAksiBerat();
+  const [absensiSibuk, jalankanAbsensi] = useAksiBerat();
+  const [, jalankanPendapatan] = useAksiBerat();
 
   // Muat gagal DAN tak ada apa pun yang bisa ditampilkan (tanpa cache) — satu
   // sumber untuk dua gerbang di bawah supaya ErrorState tak tampil dua kali.
@@ -243,7 +250,7 @@ export default function KasHadiranPage() {
     haptic(12);
     // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
     const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
-    try {
+    await jalankanBagi(async () => {
       const { shareReceipt } = await import('../lib/shareReceipt');
       await shareReceipt({
         title: 'Ringkasan Kas Hadiran RT 004 / RW 006',
@@ -263,9 +270,7 @@ export default function KasHadiranPage() {
         ],
         shareText: `Ringkasan Kas Hadiran RT 004/006\nSaldo: ${fmtSaldo} · ${tarikanSelesai.length} tarikan\n— Hadiran RT`,
       });
-    } catch {
-      showToast('Gagal membuat gambar. Coba lagi.', 'error');
-    }
+    }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
   }
 
   // Rekap per tarikan difilter (status talangan) & diurutkan.
@@ -288,9 +293,13 @@ export default function KasHadiranPage() {
       return acc;
     }, {}), [transaksi]);
 
+  /* Keadaan sibuknya PER BARIS (`pdfLoading`) supaya yang berputar cuma baris
+     yang diketuk; dari `useAksiBerat` yang dipinjam latch sinkron + penerjemah
+     galatnya. `jalankan` tak pernah melempar, jadi `setPdfLoading(null)` di
+     bawah selalu tercapai — tanpa `finally` bersarang. */
   async function handlePendapatanPDF(tarikan: Tarikan) {
     setPdfLoading(tarikan.id);
-    try {
+    await jalankanPendapatan(async () => {
       const [absensiRes, talanganRes] = await Promise.all([
         supabase.from('absensi').select('warga_id, status').eq('tarikan_id', tarikan.id),
         supabase.from('talangan').select('warga_id').eq('tarikan_id', tarikan.id).eq('status_lunas', true),
@@ -303,23 +312,18 @@ export default function KasHadiranPage() {
       );
       const { generatePendapatanPDF } = await import('../lib/generatePendapatanPDF');
       generatePendapatanPDF(tarikan, wargaList, absensiMap, lunasSet);
-    } catch {
-      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-    } finally {
-      setPdfLoading(null);
-    }
+    }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' });
+    setPdfLoading(null);
   }
 
   // Cetak daftar hadir (absensi) tarikan yang sedang dibuka → PDF.
   async function handleAbsensiPDF() {
     if (!detailTarikan) return;
     haptic(12);
-    try {
+    await jalankanAbsensi(async () => {
       const { generateAbsensiPDF } = await import('../lib/generateAbsensiPDF');
       generateAbsensiPDF(detailTarikan, detailHadir, detailTidak, detailTitip);
-    } catch {
-      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-    }
+    }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' });
   }
 
   // Buka sheet detail tarikan: daftar hadir & tidak hadir (+ status bayar talangan).
@@ -495,28 +499,25 @@ export default function KasHadiranPage() {
                  tangan, tampak sah untuk diarsipkan. */
               disabled={error}
               disabledReason="Data gagal dimuat — muat ulang dulu sebelum mengekspor."
+              busy={eksporSibuk}
               align="left"
               items={[
                 {
                   label: 'Cetak PDF',
                   icon: FileText,
-                  onClick: async () => {
-                    try {
-                      const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
-                      generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
-                    } catch {
-                      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-                    }
-                  },
+                  onClick: () => jalankanEkspor(async () => {
+                    const { generateKasHadiranPDF } = await import('../lib/generateKasHadiranPDF');
+                    generateKasHadiranPDF(tarikanSelesai, talanganMap, setorMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldoAktif: saldo });
+                  }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' }),
                 },
                 {
                   label: 'Ekspor Excel',
                   icon: Download,
                   tone: 'text-emerald-600 dark:text-emerald-400',
-                  onClick: async () => {
+                  onClick: () => jalankanEkspor(async () => {
                     const { generateKasHadiranExcel } = await import('../lib/generateKasHadiranExcel');
                     await generateKasHadiranExcel(displayTarikan, talanganMap, { totalKasTerkumpul, totalTalanganBelum, totalSetor, saldo });
-                  },
+                  }, { mulai: 'Menyiapkan Excel…', gagal: 'Gagal membuat file Excel. Coba muat ulang aplikasi.' }),
                 },
               ]}
             />
@@ -585,7 +586,7 @@ export default function KasHadiranPage() {
                 label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 onClick={() => { haptic(); toggleHideAmount(); }}
               />
-              <HeroAction icon={Share2} label="Bagikan ringkasan ke WhatsApp" onClick={handleShareReceipt} />
+              <HeroAction icon={bagiSibuk ? Loader2 : Share2} label="Bagikan ringkasan ke WhatsApp" onClick={handleShareReceipt} spin={bagiSibuk} />
             </>
           }
         >
@@ -1004,9 +1005,12 @@ export default function KasHadiranPage() {
                   <button
                     onClick={handleAbsensiPDF}
                     aria-label="Cetak daftar hadir PDF"
+                    /* Ikon → pemintal saat berkas disiapkan; LABELNYA tetap supaya
+                       lebar tombol tak berubah di tengah sheet (`audit:potong`). */
+                    aria-busy={absensiSibuk || undefined}
                     className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-caption font-semibold px-3 py-2 rounded-xl shadow-sm"
                   >
-                    <FileText className="w-4 h-4" /> PDF Absensi
+                    {absensiSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Absensi
                   </button>
                 )}
               </div>

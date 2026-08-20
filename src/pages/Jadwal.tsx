@@ -1,9 +1,8 @@
-import { useSaving } from '../lib/hooks';
+import { useSaving, useAksiBerat } from '../lib/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Coins, Lock, MoreVertical, Pencil, Plus,
-  Play, RefreshCw, RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2,
-} from 'lucide-react';
+  Play, RefreshCw, RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2, Loader2 } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -514,7 +513,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
 function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: () => void }) {
   const [visible, setVisible] = useState(false);
-  const [sharing, setSharing] = useState(false);
+  /* `useState` polos + `disabled={sharing}` dulu tak menahan ketukan ganda:
+     penjaganya baru berlaku sesudah React render. Latch sinkron `useAksiBerat`
+     menahan ketukan kedua di task yang SAMA, dan sekaligus memberi keadaan
+     sibuk yang tak berkedip untuk chunk yang kebetulan sudah ter-cache. */
+  const [sharing, jalankanBagi] = useAksiBerat();
   const hasTalangan = result.talanganTotal > 0;
 
   // Tampil tetap sampai bendahara menutup sendiri (untuk cocokkan uang real).
@@ -531,8 +534,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
   // Bagikan rincian tarikan sbg kartu PNG bermerek → grup WA warga.
   async function share() {
     haptic(12);
-    setSharing(true);
-    try {
+    await jalankanBagi(async () => {
       const { shareReceipt } = await import('../lib/shareReceipt');
       await shareReceipt({
         title: `Hasil Tarikan #${result.tarikanNomor} — RT 004 / RW 006`,
@@ -550,11 +552,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           : undefined,
         shareText: `Hasil Tarikan #${result.tarikanNomor} RT 004/006\nKas terkumpul: ${formatRupiahPlain(result.kasTotal)} · Sohibul terima: ${formatRupiahPlain(result.sohibulBaitTerima)}\n— Hadiran RT`,
       });
-    } catch {
-      showToast('Gagal membuat gambar. Coba lagi.', 'error');
-    } finally {
-      setSharing(false);
-    }
+    }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
   }
 
   return (
@@ -865,6 +863,9 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
 
 export default function JadwalPage() {
   const { isBendahara } = useAuthContext();
+  /* Cetak jadwal = aksi berat (chunk PDF diunduh saat diketuk). Lihat
+     `useAksiBerat` di lib/hooks.ts. */
+  const [pdfSibuk, jalankanPdf] = useAksiBerat();
   // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
   const [cached] = useState(() => getPageCache<{ tarikanList: Tarikan[]; wargaList: Warga[] }>('jadwal'));
   const [tarikanList, setTarikanList] = useState<Tarikan[]>(cached?.tarikanList ?? []);
@@ -986,20 +987,19 @@ export default function JadwalPage() {
               bikin judul patah baris di 390px. */}
           {isBendahara && tarikanList.length > 0 && (
             <button
-              onClick={async () => {
+              onClick={() => {
                 haptic();
-                try {
+                jalankanPdf(async () => {
                   const { generateJadwalPDF } = await import('../lib/generateJadwalPDF');
                   generateJadwalPDF(tarikanList);
-                } catch {
-                  showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-                }
+                }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' });
               }}
               title="Unduh PDF"
               aria-label="Unduh PDF jadwal"
+              aria-busy={pdfSibuk || undefined}
               className="press relative w-10 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 before:absolute before:-inset-1 before:content-['']"
             >
-              <FileText className="w-4 h-4" />
+              {pdfSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
             </button>
           )}
           {isBendahara && (

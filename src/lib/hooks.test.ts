@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { heroRingkas, toggleHideAmount } from './hooks';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { heroRingkas, toggleHideAmount, buatAksiBerat } from './hooks';
+import { subscribeToast } from './toast';
 
 /**
  * `hooks.ts` sebelumnya tanpa uji sama sekali. Yang diuji di sini SENGAJA hanya
@@ -80,5 +81,107 @@ describe('toggleHideAmount — sembunyikan nominal bertahan di localStorage', ()
     toggleHideAmount();
     toggleHideAmount();
     expect(localStorage.getItem(kunci)).toBe(tengah);
+  });
+});
+
+/* ── Aksi berat (ekspor / cetak / bagikan) ────────────────────────
+ * Yang diuji di sini INTINYA (`buatAksiBerat`), bukan hook React-nya — sengaja,
+ * karena repo ini tak memasang testing-library dan menaruh logika ini di dalam
+ * `useState` berarti ia cuma bisa diuji lewat browser. Semua sifat yang benar-
+ * benar dipegang oleh warga ada di inti ini:
+ *   - satu ketukan = satu berkas (bahkan saat ketukan kedua datang di TASK yang
+ *     sama, sebelum React sempat me-render `disabled`);
+ *   - keadaan sibuk tak berkedip untuk jalur cepat;
+ *   - kegagalan chunk berakhir sebagai toast, bukan layar diam;
+ *   - tombol tak pernah terkunci selamanya.
+ */
+describe('buatAksiBerat — penjaga aksi berat', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  const rekamToast = () => {
+    const keluar: string[] = [];
+    const stop = subscribeToast((t) => keluar.push(`${t.type}:${t.message}`));
+    return { keluar, stop };
+  };
+
+  it('dua ketukan di TASK yang sama cuma menjalankan aksi SEKALI', async () => {
+    let jalan = 0;
+    const inti = buatAksiBerat(() => {});
+    // Persis bentuk ghost-click: dua panggilan berurutan tanpa await di antaranya.
+    const a = inti.jalankan(async () => { jalan++; await new Promise((r) => setTimeout(r, 100)); });
+    const b = inti.jalankan(async () => { jalan++; });
+    await vi.advanceTimersByTimeAsync(1000);
+    await Promise.all([a, b]);
+    expect(jalan).toBe(1);
+  });
+
+  it('sesudah selesai, ketukan berikutnya diterima lagi', async () => {
+    let jalan = 0;
+    const inti = buatAksiBerat(() => {});
+    await inti.jalankan(() => { jalan++; });
+    await inti.jalankan(() => { jalan++; });
+    expect(jalan).toBe(2);
+    expect(inti.sedangSibuk()).toBe(false);
+  });
+
+  it('jalur CEPAT (~180ms, chunk sudah ter-cache) tak menyalakan sibuk sama sekali', async () => {
+    /* 180ms bukan angka karangan: itu yang terukur untuk "Cetak PDF" Kas RT saat
+       chunk-nya sudah ada (`audit:respon` bagian D). Pemintal yang menyala
+       selama 180ms terbaca sebagai KEDIPAN, bukan sebagai kerja — dan kedipan
+       itulah yang bikin app terasa murah, bukan menunggunya. */
+    const jejak: boolean[] = [];
+    const inti = buatAksiBerat((v) => jejak.push(v));
+    const p = inti.jalankan(async () => { await new Promise((r) => setTimeout(r, 180)); });
+    await vi.advanceTimersByTimeAsync(400);
+    await p;
+    expect(jejak).toEqual([]);
+  });
+
+  it('jalur LAMBAT menyalakan sibuk, dan menahannya cukup lama untuk terbaca', async () => {
+    const jejak: boolean[] = [];
+    const inti = buatAksiBerat((v) => jejak.push(v));
+    const p = inti.jalankan(async () => { await new Promise((r) => setTimeout(r, 300)); });
+    await vi.advanceTimersByTimeAsync(260);
+    expect(jejak).toEqual([true]);          // 250ms: baru mengaku sibuk
+    await vi.advanceTimersByTimeAsync(60);  // aksi selesai di 300ms…
+    expect(jejak).toEqual([true]);          // …tapi sibuk BELUM dilepas (min 400ms)
+    await vi.advanceTimersByTimeAsync(400);
+    await p;
+    expect(jejak).toEqual([true, false]);
+  });
+
+  it('aksi yang GAGAL (chunk basi → galat MIME) jadi toast, bukan layar diam', async () => {
+    const { keluar, stop } = rekamToast();
+    const inti = buatAksiBerat(() => {});
+    await inti.jalankan(() => { throw new Error('Failed to fetch dynamically imported module'); },
+      { gagal: 'Gagal membuat PDF.' });
+    stop();
+    expect(keluar).toEqual(['error:Gagal membuat PDF.']);
+    expect(inti.sedangSibuk()).toBe(false);   // gagal pun tak boleh mengunci tombol
+  });
+
+  it('memberi KATA (toast) hanya kalau tunggunya panjang', async () => {
+    const { keluar, stop } = rekamToast();
+    const inti = buatAksiBerat(() => {});
+    const p = inti.jalankan(async () => { await new Promise((r) => setTimeout(r, 2000)); },
+      { mulai: 'Menyiapkan Excel…' });
+    await vi.advanceTimersByTimeAsync(900);
+    expect(keluar).toEqual([]);               // 900ms: cukup ikon, jangan berisik
+    await vi.advanceTimersByTimeAsync(400);
+    expect(keluar).toEqual(['info:Menyiapkan Excel…']);
+    await vi.advanceTimersByTimeAsync(2000);
+    await p;
+    stop();
+  });
+
+  it('janji yang TAK PERNAH selesai tetap melepas tombolnya', async () => {
+    const { keluar, stop } = rekamToast();
+    const inti = buatAksiBerat(() => {}, 1000);
+    inti.jalankan(() => new Promise(() => { /* menggantung selamanya */ }));
+    await vi.advanceTimersByTimeAsync(1100);
+    stop();
+    expect(inti.sedangSibuk()).toBe(false);
+    expect(keluar.some((t) => t.startsWith('error:Jaringan lambat'))).toBe(true);
   });
 });

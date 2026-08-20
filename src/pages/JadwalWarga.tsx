@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { FileText, Search, X, Check, Coins, HandCoins, Users, CalendarDays, RotateCcw, RefreshCw } from 'lucide-react';
+import { FileText, Search, X, Check, Coins, HandCoins, Users, CalendarDays, RotateCcw, RefreshCw, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
+import { useAksiBerat } from '../lib/hooks';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
 
 interface JadwalWargaCache {
@@ -38,6 +39,9 @@ const SUB_TABS = [
 const HERO_MIN_H = 198;
 
 export default function JadwalWargaPage() {
+  /* Cetak jadwal = aksi berat (chunk PDF + render di main thread). Lihat
+     `useAksiBerat` di lib/hooks.ts. */
+  const [pdfSibuk, jalankanPdf] = useAksiBerat();
   // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
   const [cached] = useState(() => getPageCache<JadwalWargaCache>('jadwal-warga'));
   const [loading, setLoading] = useState(!cached);
@@ -139,12 +143,10 @@ export default function JadwalWargaPage() {
 
   async function cetakJadwal() {
     haptic();
-    try {
+    await jalankanPdf(async () => {
       const { generateJadwalPDF } = await import('../lib/generateJadwalPDF');
       generateJadwalPDF(allTarikan);
-    } catch {
-      showToast('Gagal membuat PDF. Coba muat ulang aplikasi.', 'error');
-    }
+    }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' });
   }
 
   /* Kepala halaman dipakai OLEH KEDUA cabang (memuat & termuat) — satu nilai,
@@ -567,9 +569,10 @@ export default function JadwalWargaPage() {
               <button
                 onClick={cetakJadwal}
                 disabled={allTarikan.length === 0}
+                aria-busy={pdfSibuk || undefined}
                 className="press flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-caption font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
               >
-                <FileText className="w-3.5 h-3.5" />
+                {pdfSibuk ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
                 PDF Jadwal
               </button>
             }
