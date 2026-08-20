@@ -90,12 +90,35 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       const today = new Date().toISOString().split('T')[0];
       // Supabase TIDAK melempar saat gagal — tanpa cek error, koneksi putus
       // tetap toast "Ditandai lunas" padahal data tak berubah (toast bohong).
-      const { error: eUpd } = await supabase
+      /* `.eq('status_lunas', false)` bukan hiasan — ITU penjaganya.
+         Sampai 19 Agu 2026 UPDATE ini hanya menyaring `id`, dan baris kas di
+         bawah SELALU disisipkan. Akibatnya memanggil `bayar()` pada talangan
+         yang SUDAH lunas menambah satu lagi `talangan_masuk` — pembayaran yang
+         sama tercatat dua kali di buku kas. Bukan hipotesis: data produksi
+         tarikan #5 punya 24 baris `talangan_masuk` untuk 12 utang (12 baris
+         berlebih, Rp600.000), lahir berhari-hari terpisah — jadi bukan ketukan
+         ganda, melainkan jalur ini dipanggil ulang pada utang yang sudah lunas.
+
+         Penjaganya ditaruh di TULIS, bukan di UI: layar bisa saja basi (data
+         impor yang status_lunas-nya belum ikut, atau bendahara lain sudah
+         menandai lunas dari HP berbeda), dan tombol yang tak seharusnya muncul
+         tetap bisa muncul. Dengan syarat ini operasinya IDEMPOTEN — dipanggil
+         berapa kali pun, uang hanya tercatat sekali. */
+      const { data: terubah, error: eUpd } = await supabase
         .from('talangan')
         .update({ status_lunas: true, tanggal_lunas: today })
-        .eq('id', t.id);
+        .eq('id', t.id)
+        .eq('status_lunas', false)
+        .select('id');
       if (eUpd) {
         showToast(pesanError(eUpd, 'Gagal menandai lunas. Cek koneksi lalu coba lagi.'), 'error');
+        return;
+      }
+      if (!terubah || terubah.length === 0) {
+        // Nol baris berubah = talangan ini memang SUDAH lunas. Jangan sisipkan
+        // catatan kas kedua, dan jangan diam — muat ulang supaya layar jujur.
+        showToast('Talangan ini sudah lunas.', 'info');
+        load();
         return;
       }
       const { error: eTx } = await supabase.from('transaksi_kas').insert({
