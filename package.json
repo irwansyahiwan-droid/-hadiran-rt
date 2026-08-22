@@ -24,6 +24,7 @@
     "audit:reflow": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-reflow.mjs",
     "audit:muat": "APP_URL=${APP_URL:-http://localhost:5199} node scripts/audit-muat.mjs",
     "audit:masuk": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-masuk.mjs",
+    "audit:luring": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-luring.mjs",
     "audit:lompat": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-lompat.mjs",
     "audit:papan-ketik": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-papan-ketik.mjs",
     "audit:kembali": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kembali.mjs",
