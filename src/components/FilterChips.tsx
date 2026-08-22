@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowDownUp, Check } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 
 interface ChipOption<T extends string> {
   id: T;
@@ -41,6 +42,9 @@ export default function FilterChips<T extends string, S extends string = string>
 }: FilterChipsProps<T, S>) {
   const [sortOpen, setSortOpen] = useState(false);
   const sortMounted = useExitAnim(sortOpen);
+
+  /* Back HP menutup popover urutan (paritas dgn Escape di bawah). */
+  useBackDismiss(sortOpen, () => setSortOpen(false));
 
   // Escape menutup popover urutan (keyboard).
   useEffect(() => {

@@ -27,10 +27,11 @@
     "audit:luring": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-luring.mjs",
     "audit:lompat": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-lompat.mjs",
     "audit:papan-ketik": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-papan-ketik.mjs",
+    "audit:mundur": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-mundur.mjs",
     "audit:kembali": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kembali.mjs",
     "audit:respon": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-respon.mjs",
     "audit:tulis": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-tulis.mjs",
-    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon && npm run audit:kembali"
+    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon && npm run audit:kembali && npm run audit:mundur"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

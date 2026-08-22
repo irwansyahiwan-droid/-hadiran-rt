@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { Download, ChevronDown, Loader2, type LucideIcon } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 
 export interface ExportItem {
   label: string;
@@ -47,6 +48,10 @@ interface ExportMenuProps {
  *  tutup via Escape / klik luar. */
 export default function ExportMenu({ items, align = 'right', disabled = false, disabledReason, busy = false }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
+  /* Tombol Back HP menutup menu ini — bukan meninggalkan app. Warga app ini
+     tak punya tombol Escape; `audit:papan-ketik` menguji Escape dan melaporkan
+     menu ini sehat, dan justru itu titik butanya. Lihat `npm run audit:mundur`. */
+  useBackDismiss(open, () => setOpen(false));
   const mounted = useExitAnim(open);
   const ref = useRef<HTMLDivElement>(null);
   const alasanId = useId();

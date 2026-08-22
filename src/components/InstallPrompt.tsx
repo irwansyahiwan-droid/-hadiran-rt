@@ -3,6 +3,7 @@ import { X, Download, Share, Plus } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 import { useDialog } from '../hooks/useDialog';
 import { useDragDismiss } from '../hooks/useDragDismiss';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -18,6 +19,8 @@ export default function InstallPrompt() {
   // Exit meluncur + drag beneran (konten pendek, aman handlers di panel penuh).
   const guideDrag = useDragDismiss(() => setShowGuide(false));
   const guideDlg = useDialog(showGuide, { onClose: guideDrag.dismiss, label: 'Panduan pasang aplikasi di iPhone' });
+  /* Panduan ini menutupi layar penuh; tanpa ini Back membuang seluruh app. */
+  useBackDismiss(showGuide, guideDrag.dismiss);
 
   const isStandalone =
     typeof window !== 'undefined' &&

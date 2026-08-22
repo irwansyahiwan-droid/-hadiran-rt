@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Info } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useClosePhase } from '../hooks/useClosePhase';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 
 interface InfoTipProps {
   /** Istilah yang dijelaskan (jadi judul popover + label a11y). */
@@ -40,6 +41,11 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
   // Exit pop-menu-out (0.12s) baru unmount — paritas dgn menu Header/Ekspor
   // yang sudah punya fase keluar; popover lenyap instan terasa "rusak".
   const exit = useClosePhase(() => setOpen(false), 120);
+
+  /* Back HP menutup popover — bukan meninggalkan app. Popover ini yang paling
+     sering diketuk warga lansia (ia yang menjelaskan istilah), jadi ia juga yang
+     paling sering jadi lapisan terbuka saat jempol refleks menggeser dari tepi. */
+  useBackDismiss(open, exit.requestClose);
 
   // Escape menutup popover (keyboard).
   useEffect(() => {

@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, type LucideIcon } from 'lucide-react';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
+import { useBackDismiss } from '../hooks/useBackDismiss';
 import { haptic } from '../lib/utils';
 
 interface Props {
@@ -58,6 +59,18 @@ export default function ConfirmDestruktif({
   // bukan meluncur turun (itu bahasa bottom sheet).
   const { closing, requestClose } = useClosePhase(onClose, 150);
   const dlg = useDialog(open, { onClose: requestClose, label: title });
+
+  /* Back HP membatalkan konfirmasi ini. WAJIB, dan bukan sekadar kenyamanan:
+     dialog ini dibuka DI ATAS sheet aksi yang tetap hidup (call-site memanggil
+     `setHapusRow(row)` tanpa mengosongkan `selectedRow`). Tanpa pendaftaran di
+     sini, Back memanggil close milik SHEET — sheet lenyap, dialog merah bertahan
+     sendirian, dan gerakan yang di seluruh Android berarti "batal" justru tak
+     membatalkan apa pun. Terukur 22 Agu lewat `npm run audit:mundur`:
+     [Aksi transaksi + Hapus transaksi ini?] → Back → [Hapus transaksi ini?].
+     Sengaja SEJAJAR dgn Escape (`useDialog` di atas) — termasuk saat `loading`:
+     dua jalan keluar yang berperilaku beda di keadaan yang sama itu justru
+     jebakan berikutnya. */
+  useBackDismiss(open, requestClose);
 
   // Reset isian tiap kali dibuka + fokus ke input.
   useEffect(() => {

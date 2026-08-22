@@ -4,6 +4,7 @@ import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
+import { useBackDismiss } from '../../hooks/useBackDismiss';
 import { useScrolledPast } from '../../hooks/useScrollDirection';
 import { useOnline } from '../../hooks/useOnline';
 import Tag from '../Tag';
@@ -41,6 +42,10 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
     try { localStorage.setItem('hadiran-warga-banner', '1'); } catch { /* abaikan */ }
   }
   const menuMounted = useExitAnim(menuOpen);
+  /* Tombol Back HP menutup menu ini — bukan meninggalkan app. Warga app ini
+     tak punya tombol Escape; `audit:papan-ketik` menguji Escape dan melaporkan
+     menu ini sehat, dan justru itu titik butanya. Lihat `npm run audit:mundur`. */
+  useBackDismiss(menuOpen, () => setMenuOpen(false));
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
