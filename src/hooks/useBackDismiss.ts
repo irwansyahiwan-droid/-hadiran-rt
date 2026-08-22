@@ -29,19 +29,65 @@ let inited = false;
 let pendingBack = 0;
 const opQueue: Array<() => void> = [];
 
+/* ── Entri YATIM dari page life sebelumnya ────────────────────────────────
+   Entri history SELAMAT dari reload; `stack` di atas lahir KOSONG. Jadi app
+   yang dimuat ulang saat sebuah lapisan terbuka duduk di atas entri yang tak
+   lagi dimiliki siapa pun, dan ketukan Back PERTAMA warga terbakar percuma:
+   traversal-nya mendarat, `stack` kosong, tak ada yang ditutup — tab tetap,
+   app tak keluar, NOL yang bisa dilihat. Baru ketukan kedua bekerja.
+
+   Bukan skenario karangan: `PwaUpdatePrompt` memanggil `location.reload()`
+   saat warga menekan "Muat ulang" pada toast versi baru, jadi tiap deploy
+   satu putaran — dan lapisan yang kebetulan terbuka saat itu (menu, popover
+   istilah) meninggalkan entrinya.
+
+   Obatnya menyapu entri itu SAAT BOOT, bukan saat Back ditekan: memundurkan
+   satu entri lagi dari dalam handler popstate tetap menyisakan ketukan yang
+   tak terlihat efeknya — yang harus hilang entrinya, bukan gejalanya.
+   Menonton `history.state` saja MENIPU: state memang berubah tiap entri yatim
+   dikonsumsi, dan itu membuat ketukan mati terbaca seperti ketukan yang
+   bekerja (lihat bagian D `npm run audit:mundur`). */
+let menyapuYatim = false;
+let jaringSapu: number | undefined;
+
+const sibuk = () => pendingBack > 0 || menyapuYatim;
+
 function runOrQueue(op: () => void) {
-  if (pendingBack > 0) opQueue.push(op);
+  if (sibuk()) opQueue.push(op);
   else op();
 }
 
 function flushQueue() {
-  while (pendingBack === 0 && opQueue.length > 0) opQueue.shift()!();
+  while (!sibuk() && opQueue.length > 0) opQueue.shift()!();
+}
+
+function selesaiSapu() {
+  menyapuYatim = false;
+  window.clearTimeout(jaringSapu);
+  flushQueue();
+}
+
+/** Satu langkah mundur + jaring pengaman. */
+function mundurSapu() {
+  window.clearTimeout(jaringSapu);
+  /* WAJIB ada: `history.back()` di entri PERTAMA tab tak menghasilkan traversal
+     dan popstate tak pernah datang. Tanpa jaring ini `menyapuYatim` menyala
+     selamanya dan SELURUH pendaftaran lapisan sesudahnya ikut terantri — obat
+     yang justru mematikan back-stack yang mau diperbaiki. */
+  jaringSapu = window.setTimeout(selesaiSapu, 1000);
+  window.history.back();
 }
 
 function init() {
   if (inited || typeof window === 'undefined') return;
   inited = true;
   window.addEventListener('popstate', () => {
+    if (menyapuYatim) {
+      // Rantai entri yatim bisa lebih dari satu (lapisan bertumpuk saat reload).
+      if ((window.history.state as { backId?: number } | null)?.backId != null) { mundurSapu(); return; }
+      selesaiSapu();
+      return;
+    }
     if (pendingBack > 0) { pendingBack -= 1; flushQueue(); return; } // pop kiriman kita sendiri
     const top = stack.pop();
     if (top) top.close();
@@ -74,3 +120,17 @@ export function useBackDismiss(active: boolean, onClose: () => void): void {
     return registerBack(() => ref.current());
   }, [active]);
 }
+
+/* Dijalankan sekali saat modul diimpor — SENGAJA bukan dari `registerBack`.
+   `init()` selama ini lazy, dan di Beranda tak satu lapisan pun mendaftar,
+   jadi penyapu yang menumpang di sana takkan pernah jalan justru di layar
+   tempat warga paling sering menekan Back. */
+export function sapuEntriYatim(): void {
+  if (typeof window === 'undefined') return;
+  init();
+  if ((window.history.state as { backId?: number } | null)?.backId == null) return;
+  menyapuYatim = true;
+  mundurSapu();
+}
+
+sapuEntriYatim();

@@ -232,6 +232,59 @@ async function ujiBertingkat(page, layar, bukaBawah, bukaAtas, pulih) {
   if (!(await bersihkan(page, n0))) await pulih();
 }
 
+// ── D: entri yatim yang selamat dari RELOAD ───────────────────────────────
+/* Bagian A–C semuanya berjalan di SATU page life. Itu batas yang diwarisi dari
+   18 sapuan lain: cuma `audit:masuk` yang pernah memuat ULANG, dan itu di layar
+   tanpa lapisan terbuka. Padahal entri history SELAMAT dari reload sementara
+   `stack` lapisan lahir KOSONG — jadi sesudah reload app duduk di atas entri
+   yang tak lagi dimiliki siapa pun, dan ketukan Back pertama warga terbakar
+   percuma: tak ada lapisan yang tertutup, tab tak pindah, app tak keluar.
+   NOL perubahan yang bisa dilihat.
+
+   Bukan skenario karangan: `PwaUpdatePrompt` memanggil `location.reload()` saat
+   warga menekan "Muat ulang" pada toast versi baru — tiap deploy satu putaran,
+   dan lapisan yang kebetulan terbuka saat itu meninggalkan entrinya.
+
+   Yang diuji: sesudah reload-dengan-lapisan-terbuka, Back PERTAMA wajib
+   menghasilkan perubahan yang TERLIHAT (lapisan tertutup, tab pindah, atau app
+   keluar). Membandingkan `history.state` saja tak cukup — state BERUBAH tiap
+   entri yatim dikonsumsi, dan justru itu jebakannya: sapuan yang menonton state
+   akan melaporkan "Back bekerja" untuk ketukan yang di mata warga tak
+   melakukan apa pun. */
+async function ujiYatim(page, layar, buka, pulih) {
+  const n0 = await lapisan(page);
+  if (!(await buka())) { dilewat.push(`${layar}/yatim`); return; }
+  await page.waitForTimeout(900);
+  if ((await lapisan(page)) <= n0) { probeCacat.push(`${layar}/yatim: lapisan tak terbuka`); return; }
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(3000);
+  diuji++;
+
+  const sebelum = {
+    url: page.url(), tab: await tabAktif(page), n: await lapisan(page), state: await histState(page),
+  };
+  if (sebelum.n > 0) { probeCacat.push(`${layar}/yatim: lapisan bertahan melewati reload — skenario lain`); await pulih(); return; }
+
+  await page.goBack({ timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(1200);
+
+  const keluar = !(await diApp(page));
+  const sesudah = keluar
+    ? { url: page.url(), tab: '', n: 0, state: '' }
+    : { url: page.url(), tab: await tabAktif(page), n: await lapisan(page), state: await histState(page) };
+
+  const terlihat = keluar || sesudah.tab !== sebelum.tab || sesudah.n !== sebelum.n || sesudah.url !== sebelum.url;
+  if (!terlihat) {
+    catat(layar, 'yatim',
+      `BACK MATI sesudah reload — entri yatim dari page life sebelumnya masih di history ` +
+      `(state ${sebelum.state} → ${sesudah.state}), tapi di mata warga NOL yang berubah: ` +
+      'tab tetap, nol lapisan tertutup, app tak keluar. Ketukan Back pertamanya terbakar percuma.');
+  }
+  if (!keluar && !(await appHidup(page))) catat(layar, 'yatim', 'APP KOSONG sesudah Back pasca-reload');
+  await pulih();
+}
+
 // ── pemicu ────────────────────────────────────────────────────────────────
 const klik = (page, loc) => async () => {
   const l = typeof loc === 'function' ? loc() : loc;
@@ -274,6 +327,10 @@ for (const peran of ['warga', 'bendahara']) {
   await uji(`${peran}/Beranda`, 'menu-Header', klik(page, () => page.getByRole('button', { name: 'Menu' })));
   await uji(`${peran}/Beranda`, 'popover-InfoTip', klik(page, () => page.getByRole('button', { name: /^Apa itu/i })));
   await uji(`${peran}/Beranda`, 'popover-urutan', klik(page, () => page.getByRole('button', { name: /^Urutkan/i })));
+
+  // D — entri yatim yang selamat dari reload
+  if (tabSekarang && (await tabAktif(page)) !== tabSekarang) await keTab(page, tabSekarang);
+  await ujiYatim(page, `${peran}/Beranda`, klik(page, () => page.getByRole('button', { name: 'Menu' })), pulih);
 
   // Kas RT — sheet aksi baris + konfirmasi merusak di atasnya
   await pindah('Kas RT');
