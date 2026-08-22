@@ -285,6 +285,105 @@ async function ujiYatim(page, layar, buka, pulih) {
   await pulih();
 }
 
+// ── E: Back BERUNTUN & Back di tengah animasi keluar ──────────────────────
+/* Bagian A–D menekan Back SEKALI, di lapisan yang sedang DIAM. Dua keadaan yang
+   tersisa justru yang paling sering terjadi di jempol warga:
+
+   E1 beruntun — jempol menekan Back 2–3× cepat (HP terasa tak merespons, atau
+      memang mau keluar dari tumpukan). Ini kelas balapan yang SAMA yang pernah
+      membuat app BLANK TOTAL (lihat catatan `pendingBack`/`opQueue` di
+      `useBackDismiss.ts`): `history.back()` cuma MENJADWALKAN traversal
+      (asinkron) sedangkan `pushState` sinkron.
+
+   E2 di tengah animasi keluar — user menutup lapisan lewat tombol UI (fase
+      keluar 120–150 ms berjalan, lapisannya MASIH terdaftar di `stack`) lalu
+      menekan Back sebelum animasi selesai. Bahayanya bukan "dua lapisan
+      tertutup" (Back memang niat kedua) tapi HISTORY DESYNC: `back()` tertunda
+      milik fase keluar menyusul dan memakan SATU entri lagi — sesudah itu
+      ketukan Back berikutnya jadi mati, persis penyakit bagian D.
+
+   Karena itu vonis E2 bukan "berapa lapisan tertutup" melainkan: app masih
+   hidup & di layar, DAN ketukan Back BERIKUTNYA masih menghasilkan perubahan
+   yang TERLIHAT. Itu invariant yang menangkap entri nyangkut tanpa memaksakan
+   satu tafsir tentang berapa lapisan yang "seharusnya" tertutup.
+
+   Ketukannya WAJIB dari DALAM halaman & sinkron. `page.goBack()` Playwright
+   ditunggu sampai traversalnya mendarat, jadi dua panggilan selalu jatuh di
+   task BERBEDA dan celah balapannya tak pernah terlihat — pelajaran yang sama
+   sudah dibayar di `audit:tulis` (dua `.click()` terpisah bikin React sempat
+   render & ketukan ganda tak pernah tertangkap). */
+
+/** Back n× sinkron dalam SATU task, dari dalam halaman. */
+const backBeruntun = (page, n) => page.evaluate((k) => { for (let i = 0; i < k; i++) window.history.back(); }, n);
+
+/** Ketukan Back masih menghasilkan perubahan yang TERLIHAT? (invariant bagian D) */
+async function backTerlihat(page) {
+  const a = { url: page.url(), tab: await tabAktif(page), n: await lapisan(page) };
+  await page.goBack({ timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(1100);
+  if (!(await diApp(page))) return { terlihat: true, keluar: true };
+  const b = { url: page.url(), tab: await tabAktif(page), n: await lapisan(page) };
+  return { terlihat: b.tab !== a.tab || b.n !== a.n || b.url !== a.url, keluar: false, a, b };
+}
+
+async function ujiBeruntun(page, layar, bukaBawah, bukaAtas, pulih) {
+  const n0 = await lapisan(page);
+  if (!(await bukaBawah())) { dilewat.push(`${layar}/beruntun`); return; }
+  await page.waitForTimeout(900);
+  if (!(await bukaAtas())) { await bersihkan(page, n0); dilewat.push(`${layar}/beruntun`); return; }
+  await page.waitForTimeout(900);
+  const nAtas = await lapisan(page);
+  if (nAtas < 2) { probeCacat.push(`${layar}/beruntun: tumpukan tak terbentuk (${nAtas})`); await bersihkan(page, n0); return; }
+  diuji++;
+
+  await backBeruntun(page, 3);            // 3 ketukan sinkron, satu task
+  await page.waitForTimeout(2000);
+
+  if (!(await diApp(page))) {
+    catat(layar, 'beruntun', '3 ketukan Back cepat MELEMPAR KELUAR APP — tumpukannya cuma 3 dalam (tab + sheet + konfirmasi), jadi ketukan ketiga seharusnya mendarat di Beranda');
+    await pulih(); return;
+  }
+  if (!(await appHidup(page))) {
+    catat(layar, 'beruntun', '3 ketukan Back cepat → APP KOSONG (#root tak mencetak apa pun) — kelas balapan back()/pushState yang sama yang pernah bikin blank total');
+    await pulih(); return;
+  }
+  const sisa = await lapisan(page);
+  if (sisa > n0) catat(layar, 'beruntun', `lapisan NYANGKUT sesudah 3 ketukan Back cepat (${nAtas} → ${sisa}, garis dasar ${n0})`);
+  const st = await histState(page);
+  if (sisa <= n0 && st !== 'null') catat(layar, 'beruntun', `ENTRI NYANGKUT sesudah 3 ketukan Back cepat (state ${st}, nol lapisan terbuka)`);
+  await bersihkan(page, n0);
+  await pulih();
+}
+
+async function ujiSaatKeluar(page, layar, bukaBawah, bukaAtas, tutupUI, pulih) {
+  const n0 = await lapisan(page);
+  if (!(await bukaBawah())) { dilewat.push(`${layar}/saat-keluar`); return; }
+  await page.waitForTimeout(900);
+  if (!(await bukaAtas())) { await bersihkan(page, n0); dilewat.push(`${layar}/saat-keluar`); return; }
+  await page.waitForTimeout(900);
+  if ((await lapisan(page)) < 2) { probeCacat.push(`${layar}/saat-keluar: tumpukan tak terbentuk`); await bersihkan(page, n0); return; }
+  diuji++;
+
+  /* Tutup lewat UI lalu Back 60 ms kemudian — di TENGAH fase keluar 120–150 ms,
+     saat lapisannya masih terdaftar di `stack`. Keduanya dari dalam halaman. */
+  const adaTombol = await tutupUI();
+  if (!adaTombol) { probeCacat.push(`${layar}/saat-keluar: tombol tutup tak ada`); await bersihkan(page, n0); return; }
+  await page.evaluate(() => new Promise((r) => setTimeout(() => { window.history.back(); r(); }, 60)));
+  await page.waitForTimeout(2000);
+
+  if (!(await diApp(page))) { catat(layar, 'saat-keluar', 'Back di TENGAH animasi keluar MELEMPAR KELUAR APP'); await pulih(); return; }
+  if (!(await appHidup(page))) { catat(layar, 'saat-keluar', 'Back di TENGAH animasi keluar → APP KOSONG'); await pulih(); return; }
+
+  const cek = await backTerlihat(page);
+  if (!cek.terlihat) {
+    catat(layar, 'saat-keluar',
+      'HISTORY DESYNC — sesudah Back di tengah animasi keluar, ketukan Back BERIKUTNYA mati: ' +
+      `${JSON.stringify(cek.a)} → ${JSON.stringify(cek.b)}. Entri yatim dimakan `+
+      '`back()` tertunda milik fase keluar (penyakit yang sama dgn bagian D, sumber berbeda).');
+  }
+  await pulih();
+}
+
 // ── pemicu ────────────────────────────────────────────────────────────────
 const klik = (page, loc) => async () => {
   const l = typeof loc === 'function' ? loc() : loc;
@@ -341,10 +440,16 @@ for (const peran of ['warga', 'bendahara']) {
     await uji(`${peran}/KasRT`, 'sheet-tambah', klik(page, () => page.getByRole('button', { name: /Tambah transaksi Kas RT/i })));
     await uji(`${peran}/KasRT`, 'sheet-target', klik(page, () => page.getByRole('button', { name: /^Ubah target|^Tetapkan target/i })));
     if (tabSekarang && (await tabAktif(page)) !== tabSekarang) await keTab(page, tabSekarang);
-    await ujiBertingkat(page, `${peran}/KasRT`,
-      klik(page, () => page.getByRole('button', { name: /^Aksi:/i })),
-      klik(page, () => page.getByRole('button', { name: /^Hapus$/ })),
-      pulih);
+    const bukaSheetBaris = klik(page, () => page.getByRole('button', { name: /^Aksi:/i }));
+    const bukaKonfirmasi = klik(page, () => page.getByRole('button', { name: /^Hapus$/ }));
+    await ujiBertingkat(page, `${peran}/KasRT`, bukaSheetBaris, bukaKonfirmasi, pulih);
+
+    // E — Back beruntun & Back di tengah animasi keluar
+    if (tabSekarang && (await tabAktif(page)) !== tabSekarang) await keTab(page, tabSekarang);
+    await ujiBeruntun(page, `${peran}/KasRT`, bukaSheetBaris, bukaKonfirmasi, pulih);
+    if (tabSekarang && (await tabAktif(page)) !== tabSekarang) await keTab(page, tabSekarang);
+    await ujiSaatKeluar(page, `${peran}/KasRT`, bukaSheetBaris, bukaKonfirmasi,
+      klik(page, () => page.getByRole('button', { name: /^Batal$/i })), pulih);
   }
 
   // Hadiran
