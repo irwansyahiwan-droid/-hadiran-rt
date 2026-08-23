@@ -117,13 +117,35 @@ body {
   -moz-osx-font-smoothing: grayscale;
   /* Tabular figures app-wide: tiap digit selebar sama → angka rupiah tidak
      "goyang/loncat" saat count-up atau saat disusun kolom (terasa seperti
-     running text bank). Kelas tabular-nums per-span jadi redundan tapi aman. */
+     running text bank).
+
+     Catatan lama di sini berbunyi "kelas tabular-nums per-span jadi redundan
+     tapi aman" — itu TERBALIK, dan biayanya kelihatan. Angka tabular bekerja
+     dgn memaksa TIAP glyph selebar digit, termasuk yang bukan digit: di Inter
+     13px tanda hubung melebar 6,02 → 8,42px dan angka `1` melebar 5,40 →
+     8,42px. Di kolom nominal itu justru gunanya. Di KALIMAT ia tak meratakan
+     apa pun dan cuma menyisakan celah yang terbaca: "Tarikan ke - 19" alih-alih
+     "Tarikan ke-19" (terukur +7,2px per baris di Beranda).
+
+     Jadi default app tetap tabular (kolom uang mayoritas & paling penting),
+     tapi baris PROSA memakai `.angka-prosa` di bawah. Aturannya satu kalimat:
+     TABULAR UNTUK KOLOM, PROPORSIONAL UNTUK KALIMAT. */
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
   /* App punya PullToRefresh sendiri — matikan pull-to-refresh native Chrome
      Android agar tidak dobel/rebutan gesture di posisi scroll 0. */
   overscroll-behavior-y: contain;
 }
+/* Angka PROPORSIONAL untuk baris prosa — pasangan aturan tabular di `body`.
+   Dipakai di kalimat yang kebetulan memuat angka: "Tarikan ke-19 · Sab, 5 Sep
+   2026", "53/69 hadir", "16 belum bayar", "65% terkumpul", header tanggal.
+   JANGAN dipakai di kolom nominal atau daftar bernomor yang bertumpuk — di
+   sana perataan digitlah yang justru jadi gunanya. */
+.angka-prosa {
+  font-variant-numeric: normal;
+  font-feature-settings: normal;
+}
+
 
 /* ── Guard auto-zoom iOS ──────────────────────────────────────────────
    Safari iOS men-zoom halaman saat fokus ke input ber-font <16px (dan zoom

@@ -773,7 +773,7 @@ export default function KasHadiranPage() {
                           <span className="text-micro text-ink-faint dark:text-gray-400">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
-                          <Tag tone="danger">{talanganInfo.count} belum bayar</Tag>
+                          <Tag tone="danger" className="angka-prosa">{talanganInfo.count} belum bayar</Tag>
                         ) : (
                           <Tag tone="success"><Check className="w-3 h-3" strokeWidth={2.5} /> Lunas semua</Tag>
                         )}
@@ -821,7 +821,7 @@ export default function KasHadiranPage() {
                             Kas Hadiran{' '}
                             <span className="font-display font-semibold tabular-nums text-gray-800 dark:text-gray-200">{formatRupiahPlain(kasHadiran)}</span>
                           </span>
-                          <span className="font-semibold">{t.total_hadir}/{t.total_warga} hadir</span>
+                          <span className="font-semibold angka-prosa">{t.total_hadir}/{t.total_warga} hadir</span>
                         </div>
                         <div
                           className="w-full h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden"

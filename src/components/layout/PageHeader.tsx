@@ -63,7 +63,7 @@ export default function PageHeader({
             <span className="potong-lentur">{title}</span>
             {info}
           </h1>
-          {subtitle && <p className="mt-0.5 text-caption text-ink-faint dark:text-gray-400">{subtitle}</p>}
+          {subtitle && <p className="mt-0.5 text-caption angka-prosa text-ink-faint dark:text-gray-400">{subtitle}</p>}
         </div>
       </div>
       {/* `flex-wrap` + `justify-end` di GRUP aksinya sendiri: `shrink-0` menjaga

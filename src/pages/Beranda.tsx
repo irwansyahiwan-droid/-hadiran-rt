@@ -498,7 +498,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             sejajar"), dan alasan yang sama sudah dipakai SectionTitle untuk
             menolak `px-1`. Satu kartu = satu tepi. */}
         <div className={`flex items-baseline justify-between gap-3 px-4 pt-5 pb-3 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
-          <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">{g.label}</span>
+          <span className="text-micro font-bold uppercase tracking-wide angka-prosa text-ink-faint dark:text-gray-400">{g.label}</span>
           <span className={`font-display text-micro font-bold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
             {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
           </span>
@@ -797,7 +797,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                       <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
                     )}
                   </div>
-                  <p className="text-caption font-medium tabular-nums text-ink-faint dark:text-gray-400 mt-0.5">Tarikan ke-{j.nomor} · {formatTanggal(j.tanggal)}</p>
+                  <p className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-0.5">Tarikan ke-{j.nomor} · {formatTanggal(j.tanggal)}</p>
                 </div>
               </div>
               );
