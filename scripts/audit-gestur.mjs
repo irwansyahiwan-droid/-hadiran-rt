@@ -56,6 +56,7 @@ const temuan = [];
 const probeCacat = [];
 const dilewat = [];
 let diuji = 0;
+let diujiTarik = 0;
 const catat = (nama, pesan) => { temuan.push({ nama, pesan }); console.log(`  ✗ ${nama}: ${pesan}`); };
 
 /* `swipeTab` di App.tsx DIJEPIT di kedua ujung (`if (next) changeTab(next)`),
@@ -127,6 +128,64 @@ async function tungguIsiNyata(page, batasMs = 25000) {
   return false;
 }
 
+/** Tarik ke BAWAH sungguhan, lalu laporkan apakah indikator pull-to-refresh
+ *  sempat bergerak selama tarikan.
+ *
+ *  `sel` null = tarik di halaman biasa (uji KONTROL). Kalau ada lapisan, titik
+ *  mulainya sengaja 60px DI BAWAH tepi atas panel: strip gagang duduk di sana
+ *  dan ia memang pemilik sah gestur tarik-tutup (`useDragDismiss`). Yang diuji
+ *  di sini BADAN sheet — bagian yang tak dimiliki siapa pun, dan karena itu
+ *  tarikannya menggelembung terus ke pembungkus tingkat-App.
+ *
+ *  Percobaan pertama (23 Agu) menarik di sheet Beranda dan gagal mengukur:
+ *  sheet itu salah satu dari DUA yang memasang handler di SELURUH panel, jadi
+ *  tarikannya keburu dimakan panel itu sendiri. Populasi yang benar = sheet
+ *  ber-gagang (11 dari 13 call-site). */
+async function tarikBawah(page, sel) {
+  return page.evaluate(async ({ s }) => {
+    const ind = document.querySelector('[data-ptr="indikator"]');
+    if (!ind) return { ok: false, alasan: 'indikator PTR tak ada di DOM' };
+    let x, y0;
+    if (s) {
+      const el = document.querySelector(s);
+      if (!el) return { ok: false, alasan: 'lapisan tak ada' };
+      const r = el.getBoundingClientRect();
+      x = Math.round(r.left + r.width / 2);
+      y0 = Math.round(r.top + 60);
+    } else {
+      x = Math.round(innerWidth / 2);
+      y0 = Math.round(innerHeight * 0.35);
+    }
+    const target = document.elementFromPoint(x, y0) || document.body;
+    const mk = (y) => new Touch({ identifier: 1, target, clientX: x, clientY: y, pageX: x, pageY: y });
+    const fire = (tipe, y, lepas) => {
+      const t = mk(y);
+      target.dispatchEvent(new TouchEvent(tipe, { bubbles: true, cancelable: true,
+        touches: lepas ? [] : [t], targetTouches: lepas ? [] : [t], changedTouches: [t] }));
+    };
+    const geser = (tr) => { const m = /matrix\(([^)]+)\)/.exec(tr); return m ? Math.abs(parseFloat(m[1].split(',')[5])) : 0; };
+    /* Tiap touchmove WAJIB dipisah satu frame. `PullToRefresh.onMove` memanggil
+       `setPull` — state React — jadi 14 gerakan dalam SATU task tak pernah
+       memberi React kesempatan me-render, dan transform yang dibaca selalu
+       nilai SEBELUM tarikan (puncak 0px, terbaca seperti "PTR tak menyala").
+       Ini kebalikan disiplin `audit:tulis`, dan bedanya disengaja: di sana yang
+       diuji dua ketukan dalam SATU task (celah sebelum render), di sini yang
+       ditiru satu jari yang menarik SELAMA BANYAK FRAME — memisahkannya justru
+       lebih setia pada gerakan aslinya. */
+    const frame = () => new Promise((r) => requestAnimationFrame(() => r()));
+    fire('touchstart', y0, false);
+    let puncak = 0;
+    for (let i = 1; i <= 14; i++) {
+      fire('touchmove', y0 + i * 22, false);
+      await frame();
+      puncak = Math.max(puncak, geser(getComputedStyle(ind).transform));
+    }
+    fire('touchend', y0 + 14 * 22, true);
+    return { ok: true, scrollY: Math.round(scrollY), puncakPx: Math.round(puncak),
+             sasaran: target.tagName + '.' + String(target.className).slice(0, 40) };
+  }, { s: sel });
+}
+
 async function muat(page) {
   await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: NAV_MS });
   await page.waitForTimeout(1500);
@@ -183,6 +242,48 @@ async function ujiKontrol(page, peran) {
   return false;
 }
 
+/** G3-KONTROL. Tarik bawah di halaman TANPA lapisan (scrollY 0) WAJIB
+ *  menggerakkan indikator PTR. Tanpa ini, "aman" di G3 bisa berarti tarikannya
+ *  tak pernah sampai. Ambang gerak 4px: di bawah itu subpiksel/anti-alias. */
+async function ujiKontrolTarik(page, peran) {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(700);
+  const g = await tarikBawah(page, null);
+  await page.waitForTimeout(1200);
+  if (!g.ok || g.puncakPx <= 4) {
+    probeCacat.push(`${peran}/G3 KONTROL GAGAL: tarik bawah di halaman tanpa lapisan TAK menggerakkan ` +
+      `indikator PTR (puncak ${g.puncakPx ?? '-'}px, scrollY ${g.scrollY ?? '-'}, ${g.alasan || g.sasaran}) — ` +
+      'vonis "aman" di G3 palsu. Perbaiki ALATNYA dulu.');
+    return false;
+  }
+  console.log(`  ✓ G3 kontrol: tarik bawah menggerakkan indikator PTR ${g.puncakPx}px (tarikan sampai)`);
+  return true;
+}
+
+/** G3 — tarik bawah di BADAN lapisan tak boleh menyalakan pull-to-refresh
+ *  halaman di belakangnya. */
+async function ujiTarik(page, peran, nama, buka) {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(500);
+  if (!(await buka())) { dilewat.push(`${peran}/${nama}(tarik)`); return; }
+  await page.waitForTimeout(900);
+  const nm = await lapisanNama(page);
+  if (!nm.length) { probeCacat.push(`${peran}/${nama}(tarik): lapisan tak terbuka`); return; }
+  diujiTarik++;
+
+  const g = await tarikBawah(page, LAPISAN);
+  await page.waitForTimeout(1200);
+  if (!g.ok) { probeCacat.push(`${peran}/${nama}(tarik): ${g.alasan}`); return; }
+  if (g.scrollY === 0 && g.puncakPx > 4) {
+    catat(`${peran}/${nama}`,
+      `TARIKAN TEMBUS — menarik ke bawah di BADAN lapisan [${nm.join(' + ')}] menyalakan pull-to-refresh ` +
+      `halaman di BELAKANGNYA (indikator bergerak ${g.puncakPx}px, scrollY 0). Warga menarik isi sheet; ` +
+      'yang muncul justru pemintal muat-ulang milik halaman di baliknya.');
+  }
+  await page.keyboard.press('Escape').catch(() => {});
+  await page.waitForTimeout(700);
+}
+
 /** G2 — geser mendatar di ATAS lapisan tak boleh menyentuh halaman di belakangnya. */
 async function ujiLapisan(page, peran, nama, buka, pulih) {
   if (!(await buka())) { dilewat.push(`${peran}/${nama}`); return; }
@@ -228,6 +329,13 @@ for (const peran of ['warga', 'bendahara']) {
   };
 
   if (!(await ujiKontrol(page, peran))) { await ctx.close(); continue; }
+  /* Kontrol KEDUA, di tab NON-Beranda. Bukan pengulangan: App mendaftarkan
+     entri TAB ke back-stack yang sama, jadi penjaga gestur yang menghitung
+     stack mentah-mentah akan mematikan swipe & PTR di SEMUA tab selain
+     Beranda — dan kontrol yang cuma jalan di Beranda tak akan melihatnya.
+     Persis itu yang lolos 23 Agu dan terlanjur ter-deploy. */
+  await keTab(page, 'Jadwal');
+  if (!(await ujiKontrol(page, `${peran}@Jadwal`))) { await ctx.close(); continue; }
   const diujiAwal = diuji;
   await keTab(page, 'Beranda'); tabSekarang = 'Beranda';
 
@@ -243,6 +351,21 @@ for (const peran of ['warga', 'bendahara']) {
     await uji('sheet-tambah', klik(page, () => page.getByRole('button', { name: /Tambah transaksi Kas RT/i })));
     await uji('sheet-target', klik(page, () => page.getByRole('button', { name: /^Ubah target|^Tetapkan target/i })));
   }
+
+  /* G3 — populasi = sheet ber-GAGANG (11 dari 13 call-site `useDragDismiss`).
+     Sheet yang handler-nya di SELURUH panel (Beranda detail-transaksi &
+     panduan InstallPrompt) SENGAJA di luar populasi: tarikan di sana memang
+     dimiliki panelnya sendiri, jadi mengujinya = mengukur `useDragDismiss`,
+     bukan kebocoran PTR. */
+  if (await ujiKontrolTarik(page, peran)) {
+    if (bendahara) {
+      await keTab(page, 'Kas RT');
+      await ujiTarik(page, peran, 'sheet-tambah', klik(page, () => page.getByRole('button', { name: /Tambah transaksi Kas RT/i })));
+      await ujiTarik(page, peran, 'sheet-target', klik(page, () => page.getByRole('button', { name: /^Ubah target|^Tetapkan target/i })));
+    }
+    await keTab(page, 'Hadiran');
+    await ujiTarik(page, peran, 'sheet-detail-tarikan', klik(page, () => page.getByRole('button', { name: /Lihat detail/i })));
+  }
   /* Satu peran yang menyumbang NOL lapisan tak boleh terbaca sebagai "aman".
      Laporan hijau dari populasi kosong itu kepercayaan palsu — kelas yang paling
      dihindari repo ini. */
@@ -253,7 +376,7 @@ for (const peran of ['warga', 'bendahara']) {
 }
 await browser.close();
 
-console.log(`\n=== ${diuji} lapisan digeser @390px · ${temuan.length} bermasalah ===`);
+console.log(`\n=== G2 ${diuji} lapisan digeser · G3 ${diujiTarik} lapisan ditarik @390px · ${temuan.length} bermasalah ===`);
 if (dilewat.length) console.log(`    dilewat: ${dilewat.join(', ')}`);
 if (probeCacat.length) { console.log('\nPROBE CACAT:'); probeCacat.forEach((p) => console.log('  ! ' + p)); }
 if (temuan.length) { console.log('\nRINCIAN'); temuan.forEach((t) => console.log(`  [${t.nama}]\n      ${t.pesan}`)); }

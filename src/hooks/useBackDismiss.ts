@@ -11,7 +11,7 @@ import { useEffect, useRef } from 'react';
  * UI memanggil `history.back()` sendiri agar history tetap sinkron.
  */
 
-interface Layer { id: number; close: () => void }
+interface Layer { id: number; close: () => void; lapisan: boolean }
 
 const stack: Layer[] = [];
 let seq = 0;
@@ -94,11 +94,11 @@ function init() {
   });
 }
 
-function registerBack(close: () => void): () => void {
+function registerBack(close: () => void, lapisan: boolean): () => void {
   if (typeof window === 'undefined') return () => {};
   init();
   const id = ++seq;
-  stack.push({ id, close });
+  stack.push({ id, close, lapisan });
   runOrQueue(() => window.history.pushState({ backId: id }, ''));
   return () => {
     const i = stack.findIndex((e) => e.id === id);
@@ -109,30 +109,41 @@ function registerBack(close: () => void): () => void {
 }
 
 /**
- * Ada lapisan (sheet / modal / menu / popover) yang sedang terbuka?
+ * Ada LAPISAN (sheet / modal / menu / popover) yang sedang terbuka?
  *
  * Dipakai gestur tingkat-App untuk menolak menembus lapisan. `stack` di berkas
- * ini kebetulan sumber kebenaran yang PALING tepercaya untuk itu: tiap lapisan
- * WAJIB mendaftar di sini (dijaga `npm run audit:mundur`), jadi lapisan baru
- * ikut terlindungi tanpa call-site-nya perlu ingat apa-apa — beda dgn menghitung
+ * ini sumber kebenaran yang paling tepercaya untuk itu: tiap lapisan WAJIB
+ * mendaftar di sini (dijaga `npm run audit:mundur`), jadi lapisan baru ikut
+ * terlindungi tanpa call-site-nya perlu ingat apa-apa — beda dgn menghitung
  * `[role=dialog]` di DOM, yang meleset untuk popover ber-role lain dan untuk
  * lapisan yang sedang beranimasi keluar.
+ *
+ * TAPI stack ini juga memuat entri TAB (App mendaftarkan `activeTab !==
+ * 'beranda'` supaya Back kembali ke Beranda), dan entri itu BUKAN lapisan —
+ * tak ada yang menutupi layar. Menghitungnya ikut membuat gestur mati di SEMUA
+ * tab selain Beranda: swipe ganti-tab dan pull-to-refresh berhenti bekerja
+ * justru di halaman tempat warga paling sering memakainya. Terjadi 23 Agu
+ * (tertangkap uji kontrol G3 `audit:gestur`), jadi pendaftar wajib menyatakan
+ * dirinya lapisan atau bukan.
  */
 export function adaLapisanTerbuka(): boolean {
-  return stack.length > 0;
+  return stack.some((e) => e.lapisan);
 }
 
 /**
  * @param active true saat lapisan terbuka.
  * @param onClose dipanggil saat user menekan Back (atau saat ditutup programatik).
+ * @param opts.lapisan default true. Setel FALSE untuk pendaftar yang bukan
+ *   permukaan menutupi layar (mis. entri tab di App) — lihat `adaLapisanTerbuka`.
  */
-export function useBackDismiss(active: boolean, onClose: () => void): void {
+export function useBackDismiss(active: boolean, onClose: () => void, opts?: { lapisan?: boolean }): void {
   const ref = useRef(onClose);
   ref.current = onClose;
+  const lapisan = opts?.lapisan !== false;
   useEffect(() => {
     if (!active) return;
-    return registerBack(() => ref.current());
-  }, [active]);
+    return registerBack(() => ref.current(), lapisan);
+  }, [active, lapisan]);
 }
 
 /* Dijalankan sekali saat modul diimpor — SENGAJA bukan dari `registerBack`.

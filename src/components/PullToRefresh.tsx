@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, type ReactNode } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { haptic } from '../lib/utils';
+import { adaLapisanTerbuka } from '../hooks/useBackDismiss';
 
 const THRESHOLD = 70; // jarak tarik (px) untuk memicu refresh
 const MAX = 110;       // jarak tarik maksimum
@@ -31,6 +32,16 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
 
     function onStart(e: TouchEvent) {
       if (refreshing) return;
+      /* Tarikan ini tak boleh MENEMBUS lapisan. Pembungkus PTR duduk di App,
+         sedangkan sheet/overlay dirender INLINE di JSX halamannya — dan
+         `position: fixed` cuma memindahkan tempat elemen DICAT, bukan
+         leluhurnya di DOM, jadi tarikan di BADAN sheet menggelembung sampai ke
+         sini. Sheet ber-gagang tak memakannya sendiri (handler `useDragDismiss`
+         cuma di strip gagang), jadi yang kena justru sheet yang paling lama
+         dipandangi: terukur 23 Agu di form "Tambah transaksi Kas RT" —
+         indikator muat-ulang bergerak 110px sementara bendahara menarik isi
+         formulirnya. Dijaga `npm run audit:gestur` bagian G3. */
+      if (adaLapisanTerbuka()) return;
       if (window.scrollY > 0) return;
       startY.current = e.touches[0].clientY;
       pulling.current = true;
@@ -107,6 +118,11 @@ export default function PullToRefresh({ onRefresh, children }: PullToRefreshProp
           pembungkus konten: satu-satunya keturunannya lingkaran spinner, tak ada
           `position: fixed` di dalamnya. */}
       <div
+        /* Penanda OPT-IN untuk `npm run audit:gestur` bagian G3. Sapuan itu
+           perlu tahu apakah pull-to-refresh MENYALA saat jari menarik di atas
+           lapisan modal, dan tak ada ciri struktural yang membedakan pembungkus
+           ini dari div tata letak mana pun — persis alasan `data-grafik` ada. */
+        data-ptr="indikator"
         className="absolute left-0 right-0 flex justify-center pointer-events-none z-10"
         style={{
           top: -46,

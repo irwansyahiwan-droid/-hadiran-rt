@@ -144,7 +144,10 @@ export default function App() {
     });
 
   // Tombol Back HP di tab non-Beranda → kembali ke Beranda (bukan keluar app).
-  useBackDismiss(activeTab !== 'beranda', () => changeTab('beranda'));
+  /* `lapisan: false` — entri ini cuma membuat Back kembali ke Beranda; ia tak
+     menutupi layar. Menghitungnya sebagai lapisan mematikan swipe ganti-tab &
+     pull-to-refresh di SEMUA tab selain Beranda (lihat `adaLapisanTerbuka`). */
+  useBackDismiss(activeTab !== 'beranda', () => changeTab('beranda'), { lapisan: false });
 
   /* Judul dokumen ikut tab aktif. App satu-halaman tak pernah mengganti judul
      sendiri: sebelumnya kelima layar sama-sama "Hadiran RT 004/006", padahal
