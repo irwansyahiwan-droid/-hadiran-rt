@@ -29,3 +29,13 @@ dist-ssr
 
 # Keluaran sapuan audit (screenshot) — lokal saja
 .audit-*/
+
+# Berkas berat yang nyasar di akar — bukan aset app.
+# Aset app yang SAH duduk di public/ (dan tak satu pun berupa video/installer
+# sampai 23 Agu 2026). Kalau nanti video benar-benar jadi aset, taruh di
+# public/ lalu kecualikan di sini — jangan longgarkan aturan akarnya.
+/*.mp4
+/*.mov
+/*.webm
+/*.dmg
+/*.pkg
