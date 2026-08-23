@@ -190,6 +190,21 @@ LULUS. Kini NAMA lapisan bawah direkam sebelum yang atas dibuka, lalu dibanding.
 **Pola yang berulang: penghitung yang benar bisa menyembunyikan peristiwa yang
 salah — sapuan wajib menyebut nama apa yang ia lihat, bukan berapa.**
 
+Yang ke-20 (23 Agu): `audit:mundur` MATI dua kali berturut-turut saat diarahkan
+ke PRODUKSI — `page.goto` timeout 30 dtk (ambang bawaan Playwright). Bukan
+temuan palsu melainkan CRASH, dan itu lebih buruk: matinya sesudah bagian warga
+selesai bersih, jadi bendahara tak pernah diuji sama sekali dan laporannya
+berhenti di tengah tanpa mengaku populasinya tinggal separuh. Sapuan ini yang
+paling banyak bernavigasi dari semua sapuan repo — tiap `pulih()` memuat app
+dari nol, dan bagian D memuat ULANG di tengah — sementara tiap navigasi
+produksi menempuh cold start + Supabase nyata. Kini `NAV_MS` 90 dtk saat sasaran
+JAUH (30 dtk lokal) + `pergi()` yang mengulang navigasi SEKALI: gagal tunggal
+tak boleh membunuh sisa populasi, gagal dua kali tetap menyerah keras karena itu
+memang bukan cegukan lagi. **Pelajaran yang menyambung cacat ke-13 & ke-18:
+sapuan yang berhenti di tengah dan sapuan yang menyempitkan populasinya sendiri
+adalah penyakit yang sama — laporan hijau/pendek yang tak mengaku apa yang tak
+sempat diperiksa.**
+
 **`backdrop-filter` = stacking context.** Input berkaca (`backdrop-blur-sm`) tercat DI ATAS
 ikon `absolute` yang z-index-nya auto, walau ikonnya lebih dulu di DOM. Tiga ikon dalam-kolom
 Login tenggelam di balik kaca putih/70 (gembok warga 1,06:1 terang / 1,54:1 gelap). Mengganti

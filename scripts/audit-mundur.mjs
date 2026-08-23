@@ -52,6 +52,16 @@ import { newCtx, loginWarga } from './lib/audit-harness.mjs';
 const APP = process.env.CAP_URL || 'http://localhost:5199';
 const SENTINEL = `${APP.replace(/\/$/, '')}/landing.html`;
 const MUTASI = process.env.MUTASI === '1';
+/* Sasaran JAUH (produksi) bukan sekadar "localhost yang lebih lambat": tiap
+   navigasi menempuh cold start + Supabase nyata, dan sapuan ini yang paling
+   banyak bernavigasi dari semua sapuan repo (tiap `pulih()` memuat app dari
+   nol, dan bagian D memuat ULANG di tengah). Dgn ambang bawaan Playwright 30s,
+   dua run produksi berturut-turut MATI di tengah — dan matinya sesudah bagian
+   warga selesai bersih, jadi bendahara tak pernah diuji sama sekali. Sapuan
+   yang crash lebih buruk daripada sapuan yang merah: ia menyusutkan populasi
+   tanpa mengaku. */
+const JAUH = !/localhost|127\.0\.0\.1/.test(APP);
+const NAV_MS = JAUH ? 90000 : 30000;
 
 const LAPISAN = '[role="dialog"],[role="menu"],[role="tooltip"],[role="listbox"]';
 
@@ -102,10 +112,23 @@ async function bersihkan(page, n0) {
 }
 
 // ── penyiapan & pemulihan ─────────────────────────────────────────────────
+/** goto dgn satu kali ulang. Kegagalan navigasi TUNGGAL di tengah sapuan tak
+ *  boleh membunuh sisa populasi; kalau ulangannya juga gagal, barulah menyerah
+ *  keras — itu memang bukan lagi cegukan. */
+async function pergi(page, url) {
+  try {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: NAV_MS });
+  } catch (e) {
+    console.log(`  … navigasi ke ${url} gagal (${e.name}), diulang sekali`);
+    await page.waitForTimeout(2000);
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: NAV_MS });
+  }
+}
+
 async function muat(page, bendahara) {
-  await page.goto(SENTINEL, { waitUntil: 'domcontentloaded' });
+  await pergi(page, SENTINEL);
   await page.waitForTimeout(400);
-  await page.goto(APP, { waitUntil: 'domcontentloaded' });
+  await pergi(page, APP);
   await page.waitForTimeout(1800);
   /* Gate warga hidup di sessionStorage (`hadiran-warga-sesi`, lihat memory
      warga-gate-sesi-tab), jadi pemulihan SESUDAH terlempar keluar mendarat di
@@ -257,7 +280,7 @@ async function ujiYatim(page, layar, buka, pulih) {
   await page.waitForTimeout(900);
   if ((await lapisan(page)) <= n0) { probeCacat.push(`${layar}/yatim: lapisan tak terbuka`); return; }
 
-  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: NAV_MS });
   await page.waitForTimeout(3000);
   diuji++;
 
@@ -407,6 +430,7 @@ for (const peran of ['warga', 'bendahara']) {
       history.back = () => {};
     });
   }
+  page.setDefaultNavigationTimeout(NAV_MS);
   console.log(`\n── ${peran} ─────────────────────────────────`);
   await muat(page, bendahara);
 
