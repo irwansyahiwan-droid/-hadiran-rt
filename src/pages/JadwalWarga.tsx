@@ -332,7 +332,7 @@ export default function JadwalWargaPage() {
               </InfoTip>
             </p>
             <div>
-              <p className="text-white text-lg font-bold leading-tight">
+              <p className="text-white text-lg font-bold leading-tight angka-prosa">
                 Tarikan ke-{lastTarikan.nomor} · {formatTanggal(lastTarikan.tanggal)}
               </p>
               <p className="text-emerald-100 text-body mt-0.5">

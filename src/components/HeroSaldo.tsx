@@ -228,7 +228,7 @@ export default function HeroSaldo({
           {status}
         </div>
 
-        {caption && <p className="mt-1 text-caption text-white/90">{caption}</p>}
+        {caption && <p className="mt-1 text-caption angka-prosa text-white/90">{caption}</p>}
         {children}
         {stats && stats.length > 0 && <HeroStats items={stats} className="mt-4 pt-[18px]" />}
       </div>

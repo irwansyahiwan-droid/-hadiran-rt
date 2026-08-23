@@ -681,7 +681,7 @@ export default function KasRTPage() {
               {/* Caption dua-ujung grafik tren (saldo awal & akhir periode).
                   `flex-wrap` sbg katup: di 200% kedua ujungnya butuh 162px
                   masing-masing dan mendorong halaman geser samping. */}
-              <div className="flex flex-wrap items-baseline justify-between gap-2 mt-2 font-display text-micro font-medium tabular-nums text-ink-faint dark:text-gray-400">
+              <div className="flex flex-wrap items-baseline justify-between gap-2 mt-2 font-display text-micro font-medium angka-prosa text-ink-faint dark:text-gray-400">
                 <span>{trenAwal.label} · {maskRp(trenAwal.nilai, hidden, 4)}</span>
                 <span className="text-right">{trenAkhir.label} · {maskRp(trenAkhir.nilai, hidden, 4)}</span>
               </div>
@@ -784,7 +784,7 @@ export default function KasRTPage() {
                 <div className="space-y-1.5">
                   {KATEGORI_MASUK.filter((o) => (rekapKategori.masuk[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
-                      <span className="min-w-0 flex-1 text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                      <span className="min-w-0 flex-1 angka-prosa text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
@@ -800,7 +800,7 @@ export default function KasRTPage() {
                 <div className="space-y-1.5">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
-                      <span className="min-w-0 flex-1 text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                      <span className="min-w-0 flex-1 angka-prosa text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
@@ -944,7 +944,7 @@ export default function KasRTPage() {
                         dialek liar (bukan komponen Tag bersama), dan karena
                         tanggal+chip tak muat di kolom 120px ia selalu jatuh ke
                         baris kedua, membuat chip menggantung sendirian. */}
-                    <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
+                    <p className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
                       {[formatTanggalRingkas(k.tanggal), k.kategori && labelKategoriSingkat(k.tipe, k.kategori)].filter(Boolean).join(' · ')}
                     </p>
                   </div>

@@ -770,7 +770,7 @@ export default function KasHadiranPage() {
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
-                          <span className="text-micro text-ink-faint dark:text-gray-400">{formatTanggal(t.tanggal)}</span>
+                          <span className="text-micro angka-prosa text-ink-faint dark:text-gray-400">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
                           <Tag tone="danger" className="angka-prosa">{talanganInfo.count} belum bayar</Tag>

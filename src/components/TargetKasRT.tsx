@@ -166,7 +166,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
             kehilangan satu-satunya jalan melipatnya → geser samping Kas RT
             melonjak 117px menjadi 258px. Membungkus adalah katup pengamannya. */}
         <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5">
-          <span className="inline-flex items-center gap-1 text-caption font-bold text-emerald-700 dark:text-emerald-400">
+          <span className="inline-flex items-center gap-1 text-caption font-bold angka-prosa text-emerald-700 dark:text-emerald-400">
             {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
           </span>
           <span className="font-display text-micro text-gray-500 dark:text-gray-400 tabular-nums">
