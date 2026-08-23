@@ -5,6 +5,7 @@ import {
   tabelSkala, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, signH, C, fmtNum,
   alignHeadFoot, drawContinuationHeader, sectionLabel, LANSIA,
 } from './pdfTheme';
+import { hitungSaldoHadiran } from './utils';
 import type { Tarikan } from './types';
 
 interface TalanganInfo { count: number; total: number; }
@@ -91,10 +92,34 @@ export function buildKasHadiranPDF(
   };
   const sorted = [...tarikanList].sort((a, b) => a.nomor - b.nomor);
 
+  /* Dokumen ini mencetak angka yang SAMA dari dua tempat: baris TOTAL tabel
+     (dihitung dari kolomnya sendiri, di bawah) dan blok Ringkasan (memakai
+     `stats` kiriman halaman). Keduanya wajib tak pernah saling membantah —
+     ini berkas pertanggungjawaban ke 69 warga, dan dua angka berbeda dalam
+     satu dokumen membuat SELURUHNYA tak bisa dipercaya.
+
+     Diperiksa 23 Agu 2026, dan alasan sepakatnya BERBEDA-BEDA:
+       · totalKas  — struktural: `sorted` ini persis daftar yang dipakai
+                     halaman untuk `totalKasTerkumpul`.
+       · totalTal  — struktural: `talanganMap` & `totalTalanganBelum` lahir
+                     dari SATU pass atas `talData` yang sama.
+       · totalSetor— TIDAK struktural. Halaman menjumlahkan semua transaksi
+                     bertipe `setor_kas_rt`; `setorMap` di sini dikunci
+                     `tarikan_id`. Keduanya cuma sama selama tiap setoran
+                     benar-benar tertaut tarikan (aturan lama repo ini).
+                     Terukur hari ini: 3 baris, selisih Rp0. Kalau suatu saat
+                     ada setoran tanpa `tarikan_id`, baris TOTAL tabel akan
+                     lebih KECIL dari Ringkasan — dan itu bukan salah tabel,
+                     melainkan setoran yang memang tak bisa ditempatkan di
+                     kolom tarikan mana pun.
+
+     Rumus bersihnya WAJIB lewat `hitungSaldoHadiran` — satu sumber rumus
+     saldo (lihat utils.ts). Sebelum ini pengurangannya ditulis ulang inline
+     di sini, persis kelas drift yang membuat helper itu diadakan. */
   const totalKas  = sorted.reduce((s, t) => s + (t.total_terkumpul ?? 0), 0);
   const totalTal  = Object.values(talanganMap).reduce((s, v) => s + v.total, 0);
   const totalSetor = Object.values(setorMap).reduce((s, v) => s + v, 0);
-  const totalNet  = totalKas - totalTal - totalSetor;
+  const totalNet  = hitungSaldoHadiran(totalKas, totalTal, totalSetor);
 
   const rows = sorted.map((t, i) => {
     const tal = talanganMap[t.id] ?? { count: 0, total: 0 };
