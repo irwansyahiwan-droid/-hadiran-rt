@@ -160,12 +160,16 @@ export async function jawabEkstrem(route, headers) {
 
 /** Konteks 390px. `bendahara` = sesi palsu + paksa-anon + gembok anti-tulis
  *  (3 lapis identik audit-kontras-deep.mjs — jangan longgarkan salah satunya). */
-export async function newCtx(browser, theme, { bendahara = false, welcome = false, ekstrem = false } = {}) {
+export async function newCtx(browser, theme, { bendahara = false, welcome = false, ekstrem = false, sentuh = false } = {}) {
   const ctx = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
     colorScheme: 'light',
     serviceWorkers: 'block',
+    /* `sentuh` menyalakan hasTouch — WAJIB untuk sapuan gestur: tanpa itu
+       konstruktor `Touch` tak ada di halaman dan sapuan diam-diam tak pernah
+       mengirim satu sentuhan pun (lalu melaporkan semuanya "aman"). */
+    hasTouch: sentuh || undefined,
   });
   await ctx.addInitScript(({ t, w, b, ref, sess }) => {
     try {

@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { adaLapisanTerbuka } from './useBackDismiss';
 
 /**
  * Deteksi swipe horizontal pada area konten → ganti tab.
@@ -13,6 +14,21 @@ export function useSwipeNavigate(onLeft: () => void, onRight: () => void) {
 
   return {
     onTouchStart: (e: React.TouchEvent) => {
+      /* Gestur ini tak boleh MENEMBUS lapisan. `PullToRefresh` & hook ini
+         membungkus KONTEN HALAMAN di App.tsx, sedangkan sheet/overlay/konfirmasi
+         dirender INLINE di dalam JSX halamannya — dan `position: fixed` cuma
+         memindahkan tempat elemen DICAT, bukan leluhurnya di DOM. Jadi sentuhan
+         di atas sheet modal tetap menggelembung sampai ke sini.
+         Terukur 23 Agu (`npm run audit:gestur`): 10 dari 10 lapisan tembus —
+         geser mendatar di atas sheet memindahkan tab di BELAKANGNYA dan
+         lapisannya ikut lenyap karena halamannya di-unmount. Yang terparah
+         `sheet-tambah`: satu geser membuang formulir transaksi yang sedang
+         diketik bendahara.
+         BannerCarousel sudah lama memasang `stopPropagation` untuk alasan yang
+         sama persis; yang kurang cuma penjaga untuk LAPISAN. Dijaga di sini
+         (satu titik) dan bukan per call-site, supaya lapisan berikutnya ikut
+         aman tanpa perlu ingat apa-apa. */
+      if (adaLapisanTerbuka()) { start.current = null; return; }
       if (e.touches.length !== 1) { start.current = null; return; }
       const t = e.touches[0];
       start.current = { x: t.clientX, y: t.clientY, t: Date.now() };

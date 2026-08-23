@@ -28,6 +28,7 @@
     "audit:lompat": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-lompat.mjs",
     "audit:papan-ketik": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-papan-ketik.mjs",
     "audit:mundur": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-mundur.mjs",
+    "audit:gestur": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-gestur.mjs",
     "audit:kembali": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kembali.mjs",
     "audit:respon": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-respon.mjs",
     "audit:tulis": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-tulis.mjs",

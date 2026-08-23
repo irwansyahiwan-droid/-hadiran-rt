@@ -109,6 +109,20 @@ function registerBack(close: () => void): () => void {
 }
 
 /**
+ * Ada lapisan (sheet / modal / menu / popover) yang sedang terbuka?
+ *
+ * Dipakai gestur tingkat-App untuk menolak menembus lapisan. `stack` di berkas
+ * ini kebetulan sumber kebenaran yang PALING tepercaya untuk itu: tiap lapisan
+ * WAJIB mendaftar di sini (dijaga `npm run audit:mundur`), jadi lapisan baru
+ * ikut terlindungi tanpa call-site-nya perlu ingat apa-apa — beda dgn menghitung
+ * `[role=dialog]` di DOM, yang meleset untuk popover ber-role lain dan untuk
+ * lapisan yang sedang beranimasi keluar.
+ */
+export function adaLapisanTerbuka(): boolean {
+  return stack.length > 0;
+}
+
+/**
  * @param active true saat lapisan terbuka.
  * @param onClose dipanggil saat user menekan Back (atau saat ditutup programatik).
  */
