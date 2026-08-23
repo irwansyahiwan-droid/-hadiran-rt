@@ -21,13 +21,27 @@ const ambil = (): Res => antrean.shift() ?? { data: [], error: null };
 
 function builder(tabel: string) {
   const b: Record<string, unknown> = {};
+  /* `aksiTerakhir` dilacak supaya balasan bawaan bisa SETIA: tulis yang
+     memakai `.select()` mengembalikan baris terdampak, bukan array kosong.
+     Tanpa ini `wajibBerubah` di langkah 5 mengira tiap tulis mengubah nol
+     baris — mock yang tak setia bikin uji merah untuk kode yang benar. */
+  let aksiTerakhir = '';
   for (const m of ['select', 'eq', 'order', 'in']) b[m] = () => b;
+  /* `.is()` DIREKAM, bukan sekadar diteruskan: penyaring `warga_id IS NULL`
+     itulah yang menjaga 57 baris kas per-warga milik data lama tak ikut
+     terhapus, jadi ia harus bisa di-assert. */
+  b.is = (kolom: string, nilai: unknown) => { jejak.push({ tabel, aksi: 'is', muatan: [kolom, nilai] }); return b; };
   for (const m of ['insert', 'update', 'delete', 'upsert']) {
-    b[m] = (muatan?: unknown) => { jejak.push({ tabel, aksi: m, muatan }); return b; };
+    b[m] = (muatan?: unknown) => { aksiTerakhir = m; jejak.push({ tabel, aksi: m, muatan }); return b; };
   }
   b.single = () => Promise.resolve(ambil());
   b.maybeSingle = () => Promise.resolve(ambil());
-  b.then = (resolve: (v: Res) => unknown) => Promise.resolve(ambil()).then(resolve);
+  b.then = (resolve: (v: Res) => unknown) => {
+    const bawaan: Res = ['insert', 'update', 'delete', 'upsert'].includes(aksiTerakhir)
+      ? { data: [{ id: 'ok' }], error: null }
+      : { data: [], error: null };
+    return Promise.resolve(antrean.shift() ?? bawaan).then(resolve);
+  };
   return b;
 }
 
@@ -105,6 +119,34 @@ describe('simpanTarikanSelesai — aturan uang & data', () => {
       const iTulis = jejak.findIndex((j) => j.tabel === t && j.aksi === 'insert');
       if (iTulis >= 0) expect(iHapus).toBeLessThan(iTulis);
     }
+  });
+
+  /* Data lama memakai pola LAIN untuk kas masuk: satu baris Rp5.000 PER WARGA
+     (warga_id terisi), bukan satu agregat per tarikan. Tarikan #5 di produksi
+     punya 57 di antaranya. Tanpa penyaring `warga_id IS NULL`, satu ketukan
+     "Hitung Ulang" menghapus ke-57 catatan itu — riwayat yang tak bisa
+     dipulihkan dari layar mana pun. Diverifikasi langsung ke produksi 23 Agu. */
+  it('hapus kas masuk DIBATASI baris agregat — catatan per-warga data lama selamat', async () => {
+    await simpanTarikanSelesai(TARIKAN, WARGA, MAP, SOHIBUL);
+    const penyaring = jejak.filter((j) => j.tabel === 'transaksi_kas' && j.aksi === 'is');
+    expect(penyaring).toHaveLength(1);
+    expect(penyaring[0].muatan).toEqual(['warga_id', null]);
+  });
+
+  /* Satu-satunya langkah rantai ini yang nol-barisnya berarti GAGAL. Ketiga
+     DELETE di atas boleh kena nol baris (belum pernah disimpan); tarikan yang
+     sedang ditutup tidak boleh. */
+  it('melempar bila menutup tarikan mengubah NOL baris', async () => {
+    /* Antrean: [1] baca status lunas, [2] del absensi, [3] insert absensi,
+       [4] del talangan, [5] insert talangan, [6] del kas, [7] insert kas,
+       [8] update tarikan ← yang dipaksa nol baris. */
+    antrean = [
+      { data: [], error: null },
+      ...Array.from({ length: 6 }, () => ({ data: [{ id: 'ok' }], error: null })),
+      { data: [], error: null },
+    ];
+    await expect(simpanTarikanSelesai(TARIKAN, WARGA, MAP, SOHIBUL))
+      .rejects.toThrow(/tak ada baris yang berubah/i);
   });
 
   it('tanpa pembayar sama sekali → tak ada baris kas masuk yang dibuat', async () => {

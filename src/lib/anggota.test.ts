@@ -13,12 +13,18 @@ type Res = { data: unknown; error: unknown };
 
 /** Antrean jawaban per-langkah; tiap panggilan mengambil satu. */
 let antrean: Res[] = [];
+/** Tiap `.is(kolom, nilai)` yang dipasang — utk meng-assert penyaring. */
+let penyaringIs: [string, unknown][] = [];
 const ambil = (): Res => antrean.shift() ?? { data: [], error: null };
 
 // Query builder palsu: semua method mengembalikan `this`, dan hasilnya diambil
 // saat di-`await` (thenable) — meniru bentuk PostgrestFilterBuilder.
 function builder(): Record<string, unknown> {
   const b: Record<string, unknown> = {};
+  /* `.is()` DIREKAM, bukan sekadar diteruskan: penyaring `warga_id IS NULL`
+     itulah yang membuat `.maybeSingle()` tak lagi melihat 58 baris sekaligus
+     (406 PGRST116) pada tarikan yang datanya memakai pola kas per-warga lama. */
+  b.is = (kolom: string, nilai: unknown) => { penyaringIs.push([kolom, nilai]); return b; };
   for (const m of ['select', 'insert', 'update', 'delete', 'upsert', 'eq', 'neq', 'in', 'order']) {
     b[m] = () => b;
   }
@@ -43,9 +49,22 @@ const KAS_ROW = { data: null, error: null };
    `.select('id')` agar "0 baris" bisa dibedakan dari "1 baris". */
 const OK = { data: [{ id: 'ok' }], error: null };
 
-beforeEach(() => { antrean = []; });
+beforeEach(() => { antrean = []; penyaringIs = []; });
 
 describe('recomputeTarikan — kegagalan tulis tidak boleh diam', () => {
+  /* Cacat NYATA di produksi (23 Agu 2026): tarikan #5 punya 58 baris kas_masuk —
+     57 di antaranya pola LAMA, satu baris Rp5.000 per warga dgn `warga_id`
+     terisi, plus satu baris agregat milik kode ini. `.maybeSingle()` menolak
+     keras: HTTP 406 PGRST116 "Cannot coerce the result to a single JSON object".
+     Akibatnya `backfillAnggotaSusulan` melempar DI TENGAH loop — sebagian
+     tarikan sudah di-upsert & dihitung ulang, sisanya tidak.
+     Penyaring `warga_id IS NULL` yang membuatnya kembali tunggal. */
+  it('membaca kas masuk HANYA baris agregat (warga_id null) — data kas per-warga lama tak bikin 406', async () => {
+    antrean = [TARIKAN, WARGA, ABSENSI, TALANGAN_ADA, KAS_ROW, OK, OK];
+    await recomputeTarikan('t1').catch(() => {});
+    expect(penyaringIs).toContainEqual(['warga_id', null]);
+  });
+
   it('melempar saat INSERT talangan gagal', async () => {
     antrean = [
       TARIKAN, WARGA, ABSENSI, TALANGAN_ADA,

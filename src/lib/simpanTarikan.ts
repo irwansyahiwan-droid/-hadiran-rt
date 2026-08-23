@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { wajibBerubah } from './tulisAman';
 import { ringkasAbsensi } from './absensiHitung';
 import { TALANGAN_PER_ORANG } from './absensiHitung';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
@@ -94,7 +95,18 @@ export async function simpanTarikanSelesai(
   }
 
   // 4) Kas masuk — dihapus dulu supaya Hitung Ulang tak menggandakan.
-  const eDelTx = (await supabase.from('transaksi_kas').delete().eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk')).error;
+  /* `.is('warga_id', null)` WAJIB — dan ini mencegah HILANGNYA data, bukan
+     sekadar kerapian. Kode ini hanya pernah menulis SATU baris agregat per
+     tarikan (tanpa warga_id), tapi data lama memakai pola lain: satu baris
+     Rp5.000 PER WARGA dengan warga_id terisi. Tarikan #5 punya 57 di antaranya.
+     Tanpa penyaring ini, satu ketukan "Hitung Ulang" pada tarikan itu MENGHAPUS
+     ke-57 catatan per-warga — riwayat yang tak bisa dipulihkan dari layar mana
+     pun. Totalnya memang tak berubah (laporan mengambil pendapatan dari
+     `total_terkumpul`, lihat catatan di laporan.ts), tapi app ini berkas
+     pertanggungjawaban: rinciannya bagian dari nilainya.
+     Diverifikasi langsung ke produksi 23 Agu 2026. */
+  const eDelTx = (await supabase.from('transaksi_kas').delete()
+    .eq('tarikan_id', tarikanId).eq('tipe', 'kas_masuk').is('warga_id', null)).error;
   if (eDelTx) throw eDelTx;
   if (pembayarCount) {
     const { error } = await supabase.from('transaksi_kas').insert({
@@ -109,12 +121,16 @@ export async function simpanTarikanSelesai(
   }
 
   // 5) Ringkasan tarikan.
-  const eUpd = (await supabase.from('tarikan').update({
+  /* Satu-satunya langkah rantai ini yang nol-barisnya berarti GAGAL. Ketiga
+     DELETE di atas boleh kena nol baris (belum pernah disimpan), tapi tarikan
+     yang sedang ditutup WAJIB ada — nol baris di sini berarti barisnya hilang
+     dari perangkat lain atau izin tulis mati, dan tanpa `.select()` balasannya
+     204 kosong yang identik dgn sukses. Lihat lib/tulisAman.ts. */
+  wajibBerubah(await supabase.from('tarikan').update({
     status: 'selesai',
     total_hadir: hadirIds.length,
     total_terkumpul: kasTerkumpul,
-  }).eq('id', tarikanId)).error;
-  if (eUpd) throw eUpd;
+  }).eq('id', tarikanId).select('id'), 'menutup tarikan');
 
   return {
     tarikanNomor: tarikan.nomor,

@@ -153,11 +153,20 @@ export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResu
 
   // 5) Kas Hadiran masuk — UPDATE bila ada (audit lebih bersih: nominal lama → baru)
   const keterangan = `Kas hadiran tarikan #${tarikan.nomor} (${pembayarCount} pembayar × Rp5.000)`;
+  /* `.is('warga_id', null)` WAJIB. Baris kas_masuk yang DITULIS kode ini selalu
+     agregat satu-tarikan (tanpa warga_id). Tapi data lama memakai pola lain:
+     satu baris Rp5.000 PER WARGA, warga_id terisi — tarikan #5 punya 57 di
+     antaranya. Tanpa penyaring ini `.maybeSingle()` melihat 58 baris dan
+     PostgREST menolak keras (406 PGRST116 "Cannot coerce the result to a single
+     JSON object"), sehingga `backfillAnggotaSusulan` melempar DI TENGAH loop:
+     sebagian tarikan sudah di-upsert & dihitung ulang, sisanya tidak.
+     Diverifikasi langsung ke produksi 23 Agu 2026. */
   const kasRowRes = wajibSukses(await supabase
     .from('transaksi_kas')
     .select('id')
     .eq('tarikan_id', tarikanId)
     .eq('tipe', 'kas_masuk')
+    .is('warga_id', null)
     .maybeSingle(), 'membaca kas masuk');
   const kasRow = kasRowRes.data;
   if (kasRow) {
