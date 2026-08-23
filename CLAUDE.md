@@ -49,7 +49,7 @@ Aplikasi manajemen arisan & kas RT (RT 004/006).
 Sebelum commit — cepat, tanpa browser:
 
 ```
-npm run periksa      # typecheck + lint + 185 test
+npm run periksa      # typecheck + lint + 265 test
 ```
 
 Sapuan browser (butuh build produksi hidup: `npm run build && npx vite preview --port 5199`):
