@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { wajibSukses, wajibBerubah } from './tulisAman';
 import { ringkasAbsensi, KAS_PER_PEMBAYAR, TALANGAN_PER_ORANG } from './absensiHitung';
 import type { AbsensiStatus, Warga } from './types';
 
@@ -59,8 +60,10 @@ export async function updateAnggota(
   if (patch.no_hp !== undefined) clean.no_hp = patch.no_hp.trim();
   if (patch.role !== undefined) clean.role = patch.role;
   if (patch.status_aktif !== undefined) clean.status_aktif = patch.status_aktif;
-  const { error } = await supabase.from('warga').update(clean).eq('id', id);
-  if (error) throw error;
+  /* `.select('id')` bukan hiasan: tanpa itu UPDATE yang mengubah NOL baris
+     dibalas 204 kosong — identik dgn yang berhasil — dan app menoast "Data
+     anggota diperbarui" untuk sesuatu yang tak pernah tersimpan. */
+  wajibBerubah(await supabase.from('warga').update(clean).eq('id', id).select('id'), 'menyimpan data anggota');
 }
 
 export interface RecomputeResult {
@@ -80,10 +83,6 @@ export interface RecomputeResult {
  *  sendiri: tanpa ini, tulisan yang gagal (koneksi putus, RLS menolak, constraint)
  *  lewat begitu saja dan pemanggilnya tetap melapor "berhasil". Di jalur ini
  *  akibatnya buku kas bergerak di layar tapi tidak di database. */
-function wajibSukses<T extends { error: unknown }>(res: T, langkah: string): T {
-  if (res.error) throw res.error instanceof Error ? res.error : new Error(`Gagal ${langkah}`);
-  return res;
-}
 
 export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResult> {
   // 1) Data tarikan (untuk Sohibul Bait, nomor, tanggal)
@@ -162,10 +161,11 @@ export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResu
     .maybeSingle(), 'membaca kas masuk');
   const kasRow = kasRowRes.data;
   if (kasRow) {
-    wajibSukses(await supabase
+    wajibBerubah(await supabase
       .from('transaksi_kas')
       .update({ nominal: kasTerkumpul, keterangan })
-      .eq('id', kasRow.id), 'memperbarui kas masuk');
+      .eq('id', kasRow.id)
+      .select('id'), 'memperbarui kas masuk');
   } else if (pembayarCount) {
     wajibSukses(await supabase.from('transaksi_kas').insert({
       tipe: 'kas_masuk',
@@ -178,10 +178,11 @@ export async function recomputeTarikan(tarikanId: string): Promise<RecomputeResu
   }
 
   // 6) Update ringkasan tarikan
-  wajibSukses(await supabase
+  wajibBerubah(await supabase
     .from('tarikan')
     .update({ status: 'selesai', total_hadir: hadirCount, total_terkumpul: kasTerkumpul })
-    .eq('id', tarikanId), 'memperbarui ringkasan tarikan');
+    .eq('id', tarikanId)
+    .select('id'), 'memperbarui ringkasan tarikan');
 
   return {
     nomor: tarikan.nomor as number,

@@ -61,7 +61,7 @@ function lapor(nama, keluhan) {
  *   perilakunya. Data palsu ini hanya hidup di dalam respons yang dicegat —
  *   tak satu pun request tulis pernah sampai ke server.
  */
-async function siapkan(bacaan) {
+async function siapkan(bacaan, balasTulis) {
   const ctx = await browser.newContext({ viewport: { width: W, height: 780 }, serviceWorkers: 'block' });
   await ctx.addInitScript(({ ref, s }) => {
     localStorage.setItem('hadiran-welcome-v2', '1');
@@ -82,6 +82,7 @@ async function siapkan(bacaan) {
     }
     tulis.n++;
     tulis.metode.push(m); // POST = INSERT; PATCH/DELETE = turunan satu simpan
+    if (balasTulis) return balasTulis(route, m);
     // digantung: sengaja tak dipanggil fulfill/abort
   });
   const page = await ctx.newPage();
@@ -222,6 +223,60 @@ async function ujiKetukGanda(nama, buka, isi, tombol, bacaan) {
 }
 
 // ── Kas RT: tambah transaksi ─────────────────────────────────────────────────
+/* ── Bagian NOL BARIS ──────────────────────────────────────────────────────
+ * Bagian menggantung di atas menguji "server DIAM". Bagian ketuk-ganda menguji
+ * "satu niat tercatat dua kali". Yang tak tersentuh keduanya: **server menjawab
+ * SUKSES untuk tulis yang mengubah NOL BARIS.**
+ *
+ * Itu jawaban asli PostgREST saat tak ada baris cocok — `PATCH`/`DELETE` tanpa
+ * `Prefer: return=representation` dibalas **204 kosong**, byte per byte identik
+ * dgn balasan saat satu baris benar-benar berubah. Tanpa `.select()`, klien
+ * secara STRUKTURAL tak bisa membedakannya, jadi ia menoast "tersimpan" untuk
+ * sesuatu yang tak pernah tersimpan.
+ *
+ * Terukur 23 Agu 2026 di Kelola Anggota: PATCH dibalas 204 → app tetap menoast
+ * "Data anggota diperbarui". Dua pemicunya bukan karangan — RT ini punya DUA
+ * admin aktif (baris bisa sudah diubah/dihapus dari HP lain), dan policy RLS
+ * yang hilang membuat UPDATE kena nol baris tanpa error sama sekali.
+ *
+ * Vonisnya: app boleh gagal, TAPI TIDAK BOLEH MENGAKU BERHASIL. Ketiga permukaan
+ * toast dibaca (role=status, role=alert, dan wadah toast tanpa role) — pelajaran
+ * cacat alat ke-10 di CLAUDE.md: galat dikirim ke region ASSERTIVE, dan selektor
+ * `[role="status"]` saja justru satu-satunya tempat yang dijamin kosong.
+ */
+const KATA_SUKSES = /tersimpan|diperbarui|berhasil|ditambahkan|disimpan|dihapus|diubah/i;
+const KATA_GAGAL  = /gagal|tidak|tak |error|belum|coba lagi|muat ulang/i;
+
+async function ujiNolBaris(nama, buka, isi, tombol, bacaan) {
+  diukur++;
+  const { ctx, page, tulis } = await siapkan(bacaan, (route) =>
+    route.fulfill({ status: 204, body: '' }));   // 204 kosong = "berhasil, 0 baris"
+  try {
+    const wadah = await buka(page);
+    if (!wadah) { lapor(nama, ['PROBE CACAT: form tak pernah terbuka']); return; }
+    await isi(wadah);
+    const btn = wadah.getByRole('button', { name: tombol }).first();
+    if (!(await btn.count())) { lapor(nama, ['PROBE CACAT: tombol simpan tak ada']); return; }
+    await btn.click({ force: true });
+    await page.waitForTimeout(2600);   // toast sempat terpasang (lihat cacat ke-10)
+
+    const teks = await page.evaluate(() => {
+      const ambil = (sel) => [...document.querySelectorAll(sel)].map((e) => e.innerText.trim()).filter(Boolean);
+      return [...ambil('[role="status"]'), ...ambil('[role="alert"]'), ...ambil('[class*="toast"]')].join(' | ');
+    });
+    const keluhan = [];
+    if (!tulis.n) keluhan.push('PROBE CACAT: tak ada request tulis sama sekali');
+    else if (KATA_SUKSES.test(teks) && !KATA_GAGAL.test(teks)) {
+      keluhan.push(`MENGAKU BERHASIL untuk tulis yang mengubah NOL baris → "${teks}"`);
+    } else if (!teks) {
+      keluhan.push('DIAM TOTAL — tak mengaku berhasil, tapi juga tak memberi tahu bahwa tak ada yang berubah');
+    }
+    lapor(nama, keluhan);
+  } finally {
+    await ctx.close();
+  }
+}
+
 await ujiTulis(
   'tulis/Kas RT tambah transaksi',
   async (page) => {
@@ -353,6 +408,41 @@ await ujiKetukGanda(
   },
   async (dialog) => { await dialog.locator('#anggota-nama').fill('Warga Ketuk Ganda'); },
   /^(Simpan Anggota|Menyimpan…)$/,
+);
+
+// ── NOL BARIS: jalur uang yang bisa dijangkau sapuan ─────────────────────────
+await ujiNolBaris(
+  'nol-baris/Kelola Anggota ubah warga',
+  async (page) => {
+    await page.getByRole('button', { name: 'Menu' }).click();
+    if (!await tunggu(page, async () => await page.getByRole('menu').count() > 0)) return null;
+    const item = page.getByRole('menu').getByText('Kelola', { exact: false });
+    if (!await item.count()) return null;
+    await item.first().click();
+    if (!await tunggu(page, async () => await page.getByRole('button', { name: /Tambah anggota/i }).count() > 0)) return null;
+    await page.waitForTimeout(600);
+    /* Baris anggota TAK berlabel "Edit" — pembukanya baris itu sendiri, dan nama
+       aksesibelnya = nama warga. Pelajaran cacat ke-13: satu aksi bisa punya nama
+       yang sama sekali berbeda dari kata di tombolnya. */
+    /* `hasText: /\S/` WAJIB ikut. `hasNotText` saja MELOLOSKAN tombol ikon yang
+       teksnya kosong (tutup & muat-ulang di kepala overlay), dan `.first()` lalu
+       mendarat di sana alih-alih di baris warga — form tak pernah terbuka dan
+       sapuan melaporkannya sbg "PROBE CACAT" tanpa menyebut sebabnya. */
+    const baris = page.locator('[role="dialog"] button')
+      .filter({ hasText: /\S/ })
+      .filter({ hasNotText: /Tambah|Cari|Tutup|Muat|Simpan/i });
+    if (!(await baris.count())) return null;
+    await baris.first().click({ force: true });
+    if (!await tunggu(page, async () => await page.locator('#anggota-nama').count() > 0)) return null;
+    await page.waitForTimeout(600);
+    return page.locator('[role="dialog"]').last();
+  },
+  async (dialog) => { await dialog.locator('#anggota-nama').fill('Warga Audit Nol Baris'); },
+  /* Mode EDIT memakai label BERBEDA dari mode tambah ("Simpan Perubahan" vs
+     "Simpan Anggota"). Cacat ke-13 di CLAUDE.md persis bentuk ini: satu aksi,
+     nama aksesibel yang berubah menurut keadaan data. */
+  /^(Simpan Perubahan|Menyimpan…)$/,
+  (url) => (url.includes('/warga') ? WARGA : null),
 );
 
 await browser.close();

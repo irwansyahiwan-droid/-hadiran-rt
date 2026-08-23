@@ -39,7 +39,9 @@ const WARGA = { data: [{ id: 'w1' }, { id: 'w2' }, { id: 'w3' }], error: null };
 const ABSENSI = { data: [{ warga_id: 'w2', status: 'hadir' }, { warga_id: 'w3', status: 'tidak_hadir' }], error: null };
 const TALANGAN_ADA = { data: [], error: null };
 const KAS_ROW = { data: null, error: null };
-const OK = { data: null, error: null };
+/* Tulis yang berhasil mengembalikan BARIS-nya — jalur tulis memakai
+   `.select('id')` agar "0 baris" bisa dibedakan dari "1 baris". */
+const OK = { data: [{ id: 'ok' }], error: null };
 
 beforeEach(() => { antrean = []; });
 

@@ -20,7 +20,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 type Res = { data: unknown; error: unknown };
 
 let baris: Res = { data: [], error: null };
-let updateRes: Res = { data: null, error: null };
+/* UPDATE yang berhasil kini mengembalikan BARIS-nya: jalur tulis memakai
+   `.select('id')` supaya "berhasil, 0 baris" bisa dibedakan dari "berhasil,
+   1 baris" — tanpa itu keduanya sama-sama 204 kosong (lihat lib/tulisAman.ts). */
+let updateRes: Res = { data: [{ id: 'ok' }], error: null };
 /** Rekam tiap UPDATE: [id, saldo_setelah] — untuk membuktikan baris mana saja yang ditulis. */
 let ditulis: [string, number][] = [];
 
@@ -52,7 +55,7 @@ const row = (id: string, tipe: 'masuk' | 'keluar', nominal: number, saldo_setela
 
 beforeEach(() => {
   baris = { data: [], error: null };
-  updateRes = { data: null, error: null };
+  updateRes = { data: [{ id: 'ok' }], error: null };
   ditulis = [];
 });
 
@@ -100,6 +103,18 @@ describe('recomputeKasRTSaldo — kegagalan tidak boleh diam', () => {
     baris = { data: [row('a', 'masuk', 1_000_000, 0)], error: null };
     updateRes = { data: null, error: { message: 'update kas_rt ditolak' } };
     await expect(recomputeKasRTSaldo()).rejects.toBeTruthy();
+  });
+
+  /* Kegagalan yang PALING diam: server menjawab SUKSES tapi tak ada baris yang
+     cocok. Itu jawaban asli PostgREST saat barisnya sudah dihapus/diubah admin
+     lain, atau saat policy RLS hilang — dan tanpa `.select()` balasannya 204
+     kosong, byte per byte identik dgn tulis yang berhasil. Di loop saldo
+     akibatnya paling jahat: sebagian baris tersimpan, sisanya tidak, dan saldo
+     berjalan jadi tak konsisten tanpa satu pun galat muncul. */
+  it('melempar saat UPDATE SUKSES tapi mengubah NOL baris', async () => {
+    baris = { data: [row('a', 'masuk', 1_000_000, 0)], error: null };
+    updateRes = { data: [], error: null };
+    await expect(recomputeKasRTSaldo()).rejects.toThrow(/tak ada baris yang berubah/i);
   });
 
   it('berhenti di kegagalan pertama — tak melanjutkan menulis baris berikutnya', async () => {

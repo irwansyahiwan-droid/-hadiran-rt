@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { wajibBerubah } from './tulisAman';
 
 interface Row {
   id: string;
@@ -45,11 +46,15 @@ export async function recomputeKasRTSaldo(): Promise<void> {
       // Alasan sama untuk jalur TULIS: UPDATE yang ditolak (mis. policy RLS
       // belum aktif) dulu lewat diam-diam → sebagian baris tersimpan, sisanya
       // tidak, dan saldo berjalan jadi tak konsisten tanpa ada yang tahu.
-      const { error: errUpd } = await supabase
+      /* `.select('id')` + wajibBerubah: UPDATE yang kena NOL baris dibalas 204
+         kosong, identik dgn yang berhasil. Di loop ini akibatnya paling jahat —
+         sebagian baris tersimpan, sisanya tidak, dan saldo berjalan jadi tak
+         konsisten tanpa satu pun galat muncul. */
+      wajibBerubah(await supabase
         .from('kas_rt')
         .update({ saldo_setelah: running })
-        .eq('id', row.id);
-      if (errUpd) throw errUpd;
+        .eq('id', row.id)
+        .select('id'), 'memperbarui saldo berjalan Kas RT');
     }
   }
 }

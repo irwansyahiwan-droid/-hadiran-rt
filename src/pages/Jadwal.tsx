@@ -677,12 +677,21 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
     setSaving(true);
     try {
       // Supabase tak melempar — tanpa cek ini modal tertutup "sukses" walau gagal.
-      const { error } = await supabase
+      const { data: terubah, error } = await supabase
         .from('tarikan')
         .update({ tanggal, sohibul_bait_id: sohibulId || null })
-        .eq('id', tarikan.id);
+        .eq('id', tarikan.id)
+        .select('id');
       if (error) {
         showToast('Gagal menyimpan revisi. Cek koneksi lalu coba lagi.', 'error');
+        return;
+      }
+      /* Cek `error` saja tak cukup — komentar di atas benar tapi setengah:
+         UPDATE yang mengubah NOL baris TIDAK ber-error, ia dibalas 204 kosong
+         persis seperti yang berhasil. Tanpa `.select()` modal tetap tertutup
+         "sukses" walau jadwalnya tak bergeser sedikit pun. */
+      if (!terubah || terubah.length === 0) {
+        showToast('Gagal menyimpan revisi — jadwalnya sudah diubah di perangkat lain. Muat ulang lalu coba lagi.', 'error');
         return;
       }
       onSaved();

@@ -159,12 +159,22 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     setBatalRow(null);
     try {
       // Cek error tiap langkah (Supabase tak melempar) — jangan toast sukses palsu.
-      const { error: eUpd } = await supabase
+      /* `.select('id')` WAJIB: tanpa itu UPDATE yang kena NOL baris dibalas 204
+         kosong — identik dgn yang berhasil — dan warga diberi tahu pelunasannya
+         batal padahal statusnya tak berubah sedikit pun. Nol baris di sini nyata:
+         barisnya bisa sudah diubah admin lain dari HP berbeda. */
+      const { data: batal, error: eUpd } = await supabase
         .from('talangan')
         .update({ status_lunas: false, tanggal_lunas: null })
-        .eq('id', t.id);
+        .eq('id', t.id)
+        .select('id');
       if (eUpd) {
         showToast(pesanError(eUpd, 'Gagal membatalkan pelunasan. Cek koneksi lalu coba lagi.'), 'error');
+        return;
+      }
+      if (!batal || batal.length === 0) {
+        showToast('Gagal membatalkan pelunasan — datanya sudah berubah di perangkat lain. Muat ulang lalu coba lagi.', 'error');
+        await load();
         return;
       }
       const { error: eDel } = await supabase
