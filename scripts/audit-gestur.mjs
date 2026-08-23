@@ -112,11 +112,27 @@ async function geserMendatar(page, rectDari, frac = 0.5, arah = 1) {
   }, { sel: rectDari, f: frac, a: arah });
 }
 
+/* Tunggu SKELETON habis, bukan jeda tetap. Run produksi pertama (23 Agu) masih
+   mencetak skeleton saat sapuan mulai berburu pemicu — barisan transaksi belum
+   ada, `klik()` menjawab false, dan EMPAT lapisan warga masuk daftar "dilewat".
+   Nol temuan dari populasi separuh bukan hasil; itu sapuan yang menyusutkan
+   dirinya sendiri (cacat ke-20 punya bentuk yang sama). */
+async function tungguIsiNyata(page, batasMs = 25000) {
+  const habis = Date.now() + batasMs;
+  while (Date.now() < habis) {
+    const n = await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0);
+    if (n === 0) { await page.waitForTimeout(600); return true; }
+    await page.waitForTimeout(500);
+  }
+  return false;
+}
+
 async function muat(page) {
   await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: NAV_MS });
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1500);
   if (await page.locator('#warga-password').count()) await loginWarga(page);
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(1200);
+  await tungguIsiNyata(page);
 }
 
 async function keTab(page, label) {
@@ -124,7 +140,8 @@ async function keTab(page, label) {
   await page.waitForTimeout(300);
   await page.locator('nav button', { hasText: label }).first().click({ force: true, timeout: 8000 })
     .catch(() => page.locator('nav button', { hasText: label }).first().evaluate((el) => el.click()));
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(1200);
+  await tungguIsiNyata(page);
 }
 
 const klik = (page, loc) => async () => {
@@ -211,6 +228,7 @@ for (const peran of ['warga', 'bendahara']) {
   };
 
   if (!(await ujiKontrol(page, peran))) { await ctx.close(); continue; }
+  const diujiAwal = diuji;
   await keTab(page, 'Beranda'); tabSekarang = 'Beranda';
 
   await page.evaluate(() => window.scrollTo(0, 1500));
@@ -224,6 +242,12 @@ for (const peran of ['warga', 'bendahara']) {
   if (bendahara) {
     await uji('sheet-tambah', klik(page, () => page.getByRole('button', { name: /Tambah transaksi Kas RT/i })));
     await uji('sheet-target', klik(page, () => page.getByRole('button', { name: /^Ubah target|^Tetapkan target/i })));
+  }
+  /* Satu peran yang menyumbang NOL lapisan tak boleh terbaca sebagai "aman".
+     Laporan hijau dari populasi kosong itu kepercayaan palsu — kelas yang paling
+     dihindari repo ini. */
+  if (diuji === diujiAwal) {
+    probeCacat.push(`${peran}: NOL lapisan teruji — semua pemicu meleset. Vonis peran ini TIDAK ADA, bukan "aman".`);
   }
   await ctx.close();
 }

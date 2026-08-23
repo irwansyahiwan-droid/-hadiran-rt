@@ -224,6 +224,19 @@ tembus. Kini arahnya dipilih dari posisi tab: yang PUNYA tujuan. Temuan 6 → 10
 kontrol tak bisa membedakan "app aman" dari "alatku tak pernah menyentuh
 apa-apa" — dan keduanya mencetak nol.
 
+Yang ke-23 (23 Agu, run PRODUKSI pertama `audit:gestur`): sapuan mencetak
+"0 bermasalah" dari **6 dari 10 lapisan** — keempat yang terlewat semuanya
+warga, jadi peran itu sebenarnya TAK PUNYA VONIS sama sekali. Sebabnya jeda
+TETAP di `muat()`/`keTab()`: cukup untuk localhost, tidak untuk produksi, jadi
+sapuan mulai berburu pemicu saat halaman MASIH mencetak skeleton (terbaca
+telanjang di G1: sasaran hit-test-nya `DIV.skeleton`). Dua perbaikan, dan yang
+kedua yang penting: `tungguIsiNyata()` menunggu skeleton habis alih-alih jeda
+tetap, DAN satu peran yang menyumbang NOL lapisan kini jadi `PROBE CACAT` yang
+membuat sapuan keluar MERAH. Sebelumnya daftar `dilewat` memang tercetak — itu
+yang menyelamatkan pembacanya — tapi exit code-nya tetap 0. **Sapuan tak boleh
+LULUS dari populasi kosong: laporan hijau tanpa populasi itu kepercayaan palsu,
+bukan hasil.**
+
 **`backdrop-filter` = stacking context.** Input berkaca (`backdrop-blur-sm`) tercat DI ATAS
 ikon `absolute` yang z-index-nya auto, walau ikonnya lebih dulu di DOM. Tiga ikon dalam-kolom
 Login tenggelam di balik kaca putih/70 (gembok warga 1,06:1 terang / 1,54:1 gelap). Mengganti
