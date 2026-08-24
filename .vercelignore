@@ -1,0 +1,33 @@
+# Apa yang TIDAK ikut terunggah saat `vercel --prod`.
+#
+# Berkas ini ada karena `.gitignore` TIDAK cukup: Vercel CLI mengunggah ISI
+# DIREKTORI KERJA, bukan pohon git, dan ia sama sekali tak membaca `.gitignore`.
+# Jadi berkas yang sudah benar diabaikan git tetap ikut naik ke Vercel.
+#
+# Terbukti 24 Agu 2026: deploy GAGAL di `File size limit exceeded (100 MB)`
+# sesudah mengunggah 381,6 MB. Penyebabnya `Claude (2).dmg` (334 MB) yang
+# nyasar di akar repo — persis berkas yang commit 97a6e78 sudah tambahkan ke
+# `.gitignore`. Aturannya ada, cuma di berkas yang salah.
+#
+# Daftar di bawah SENGAJA cermin dari blok "berkas berat yang nyasar" di
+# `.gitignore`, plus keluaran sapuan audit & aset kerja yang tak dibutuhkan
+# build. Kalau menambah aturan berat di `.gitignore`, tambahkan di SINI juga —
+# dua berkas, satu maksud.
+
+# Installer / video yang nyasar di akar. Aset app yang SAH duduk di public/.
+/*.dmg
+/*.pkg
+/*.mp4
+/*.mov
+/*.webm
+
+# Keluaran sapuan audit (screenshot) — lokal saja, ~25 MB.
+.audit-*/
+
+# Bahan kerja desain & referensi — tak disentuh `vite build`.
+design
+reference
+
+# Hasil build lokal. Vercel membangun ulang dari sumber; mengunggah dist lama
+# cuma menambah berat DAN bikin bingung saat memverifikasi rilis.
+dist
