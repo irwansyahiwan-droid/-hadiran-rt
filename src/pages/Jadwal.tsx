@@ -1081,11 +1081,26 @@ export default function JadwalPage() {
                    terakhir yang belum kebagian. */
                 style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
                 /* Edge kiri = sinyal "giliran berikutnya" SAJA (token brand);
-                   tarikan selesai sudah cukup de-emphasized lewat teks abu. */
-                className={`rise flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l-[3px] border-l-brand-500 dark:border-l-emerald-500' : ''}`}
+                   tarikan selesai sudah cukup de-emphasized lewat teks abu.
+                   1px, bukan 3px (24 Agu 2026): DESIGN.md §6 melarang
+                   "border-left/right > 1px sebagai stripe aksen", dan stripe
+                   tebal di sini memang berlebih — baris ini SUDAH satu-satunya
+                   yang tombolnya berlabel kata ("Proses"), jadi sinyalnya
+                   sudah dibawa KATA (kanon yang sama dgn chip "Defisit").
+                   Di 1px ia jatuh persis di jalur border kartu dan terbaca
+                   sebagai ruas berwarna pada tepi kartu itu sendiri — penanda
+                   baris aktif ala Linear, bukan pita aksen. */
+                className={`rise flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l border-l-brand-500 dark:border-l-emerald-500' : ''}`}
               >
-                {/* Nomor kecil */}
-                <span className="text-base font-bold text-ink-faint dark:text-gray-400 w-7 shrink-0 text-right tabular-nums">
+                {/* Nomor tarikan — INDEKS, bukan judul (24 Agu 2026).
+                    Dulu `text-base font-bold`: ukuran & bobot yang persis sama
+                    dgn nama Sohibul Bait di sebelahnya, jadi di 71 baris mata
+                    membaca dua kolom yang sama-sama berteriak dan yang menang
+                    justru angkanya — padahal yang dicari warga adalah NAMA.
+                    Turun ke tangga caption (13px, semibold): tetap terbaca
+                    (#334155 ≈ 10,4:1), tetap `tabular-nums` supaya kolomnya
+                    lurus, tapi kembali jadi penomoran. */}
+                <span className="text-caption font-semibold text-ink-faint dark:text-gray-400 w-7 shrink-0 text-right tabular-nums">
                   {String(t.nomor).padStart(2, '0')}.
                 </span>
 
