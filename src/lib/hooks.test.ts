@@ -27,9 +27,40 @@ describe('heroRingkas — ambang hero ringkas', () => {
   });
 
   it('HP normal & tablet tetap hero penuh', () => {
-    expect(heroRingkas(740)).toBe(false);
-    expect(heroRingkas(844)).toBe(false);
-    expect(heroRingkas(1024)).toBe(false);
+    expect(heroRingkas(740, 390)).toBe(false);
+    expect(heroRingkas(844, 390)).toBe(false);
+    expect(heroRingkas(1024, 768)).toBe(false);
+  });
+
+  /* ── Sumbu LEBAR (24 Agu 2026) ────────────────────────────────────────
+     Ditambahkan sesudah `audit:lebar` diperluas ke 320px dan menemukan kaki
+     stat 3 kolom saling bersentuhan di sana. Kekurangan ruang bisa datang
+     dari sumbu mana pun; ambang tinggi saja membiarkan layar SEMPIT-tapi-
+     TINGGI lolos, dan justru itu skenario reflow 400% zoom §1.4.10. */
+  it('layar < 360px = ringkas walau TINGGInya cukup', () => {
+    expect(heroRingkas(800, 359)).toBe(true);
+    expect(heroRingkas(800, 320)).toBe(true);
+    expect(heroRingkas(800, 360)).toBe(false);
+  });
+
+  it('360px — acuan terkecil app — tetap dapat kaki stat', () => {
+    expect(heroRingkas(844, 360)).toBe(false);
+    expect(heroRingkas(740, 390)).toBe(false);
+  });
+
+  it('dua sumbu independen: cukup SATU yang kurang', () => {
+    expect(heroRingkas(640, 390)).toBe(true);   // pendek saja
+    expect(heroRingkas(800, 320)).toBe(true);   // sempit saja
+    expect(heroRingkas(640, 320)).toBe(true);   // dua-duanya
+    expect(heroRingkas(800, 390)).toBe(false);  // dua-duanya cukup
+  });
+
+  /* `vw` opsional supaya pemanggil lama tetap sah — TAPI defaultnya wajib
+     Infinity (bukan 0), kalau tidak setiap panggilan satu-argumen jadi
+     "ringkas" dan kaki stat lenyap di SEMUA layar. */
+  it('tanpa argumen lebar, hanya sumbu tinggi yang menentukan', () => {
+    expect(heroRingkas(800)).toBe(false);
+    expect(heroRingkas(640)).toBe(true);
   });
 });
 

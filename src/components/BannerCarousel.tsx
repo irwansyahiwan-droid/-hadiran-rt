@@ -5,7 +5,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { haptic } from '../lib/utils';
-import { heroRingkas, useTinggiLayar } from '../lib/hooks';
+import { heroRingkas, useUkuranLayar } from '../lib/hooks';
 import rtBendahara from '../assets/rt-bendahara.jpg';
 import dashboardPhone from '../assets/dashboard-phone.jpg';
 
@@ -52,15 +52,20 @@ const CARD_GAP = 18;    // sisa tinggi viewport di luar kartu (TOP + napas bawah
  *  lebih pendek lagi tetap proporsional. */
 const CARD_H_RINGKAS = 184;
 
-function cardHeight(vh: number): number {
+/* `vw` ikut ditimbang sejak 24 Agu 2026 — ringkas bisa dipicu sumbu LEBAR
+   juga (lihat `heroRingkas`). Urutan cabangnya sengaja tak berubah kecuali
+   satu hal: cek `vh >= 740` TIDAK boleh lagi memintas lebih dulu, karena
+   layar 320x800 memenuhi syarat itu sementara kaki statnya justru dilepas —
+   memberi kartu 300px penuh untuk isi yang tinggal ~180px akan menganga. */
+function cardHeight(vh: number, vw: number): number {
+  if (heroRingkas(vh, vw)) return Math.min(CARD_H_RINGKAS, Math.round(vh * 0.32));
   if (vh >= 740) return CARD_H;
-  if (!heroRingkas(vh)) return Math.max(264, Math.round(vh * 0.41));
-  return Math.min(CARD_H_RINGKAS, Math.round(vh * 0.32));
+  return Math.max(264, Math.round(vh * 0.41));
 }
 
 /** Tinggi viewport carousel (kartu + napas bawah), TANPA baris indikator. */
-function bannerViewportHeight(vh: number): number {
-  return cardHeight(vh) + CARD_GAP;
+function bannerViewportHeight(vh: number, vw: number): number {
+  return cardHeight(vh, vw) + CARD_GAP;
 }
 
 /** Tinggi baris indikator story: tombol minHeight 44 + pt-0.5 (2). */
@@ -69,8 +74,8 @@ const INDICATOR_H = 46;
 /** Tinggi TOTAL blok (viewport kartu + baris indikator). `bannerViewportHeight`
  *  saja TIDAK cukup untuk skeleton — indikator ada di luar viewport, jadi memakai
  *  viewport-height bikin lompatan 46px saat skeleton → konten (terukur 18 Jul). */
-function bannerBlockHeight(vh: number): number {
-  return bannerViewportHeight(vh) + INDICATOR_H;
+function bannerBlockHeight(vh: number, vw: number): number {
+  return bannerViewportHeight(vh, vw) + INDICATOR_H;
 }
 
 /**
@@ -81,7 +86,7 @@ function bannerBlockHeight(vh: number): number {
  * seukuran layar adalah dialek skeleton "malas" yang tak sejalan dgn skeleton daftar
  * & statistik yang sudah berstruktur.
  */
-export function BannerSkeleton({ vh }: { vh: number }) {
+export function BannerSkeleton({ vh, vw }: { vh: number; vw: number }) {
   /* Bar isian di atas permukaan HERO: putih beralpha + kilau, bukan abu
      `.skeleton-bar` (#D6DADE) yang nadanya lahir untuk permukaan putih.
      Kilau pindah dari PERMUKAAN ke BAR — sekarang permukaannya gradient
@@ -94,7 +99,7 @@ export function BannerSkeleton({ vh }: { vh: number }) {
      praktis tak terlihat; nadanya tetap `.skeleton-bar` seperti semula. */
   const barKanvas = 'rounded-full skeleton-bar';
   return (
-    <div style={{ height: bannerBlockHeight(vh) }}>
+    <div style={{ height: bannerBlockHeight(vh, vw) }}>
       <div
         /* Permukaannya = permukaan kartu saldo yang sedang dimuat, bukan slab
            abu. Komponen ini sudah menyamakan SEGALANYA dgn kartu asli —
@@ -106,7 +111,7 @@ export function BannerSkeleton({ vh }: { vh: number }) {
         style={{
           // Rumus lebar IDENTIK dgn cardW: min(viewport - 44, 326).
           width: 'min(calc(100% - 44px), 326px)',
-          height: cardHeight(vh),
+          height: cardHeight(vh, vw),
           marginTop: TOP,
           borderRadius: 'var(--hero-radius)',
           padding: 24,
@@ -134,7 +139,7 @@ export function BannerSkeleton({ vh }: { vh: number }) {
             — bukan `control` (#64748B, token BATAS KONTROL yang terbaca jauh
             lebih tegas dari isi yang diwakilinya) dan bukan lagi nada skeleton
             abu, yang lahir untuk permukaan putih. */}
-        {!heroRingkas(vh) && (
+        {!heroRingkas(vh, vw) && (
           <div className="grid grid-cols-3 gap-3 border-t border-white/15 pt-4">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex flex-col items-center gap-2">
@@ -409,9 +414,17 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
   const cardW = Math.min(vw - 44, 326);
   const spacing = Math.round(cardW * 0.82);
 
-  // Tinggi layar → tinggi kartu (shrink di HP pendek). Lacak resize/rotasi.
-  const vh = useTinggiLayar();
-  const cardH = cardHeight(vh);
+  /* Ukuran LAYAR → tinggi kartu (menyusut di HP pendek/sempit). Lacak
+     resize/rotasi.
+
+     NAMANYA `lebarLayar`, bukan `vw`, dan itu bukan selera: `vw` di atas
+     sudah dipakai untuk lebar ELEMEN viewport carousel (clientWidth lewat
+     ResizeObserver), yang nilainya lebar layar DIKURANGI padding halaman
+     (~32px). Memakai yang keliru menggeser ambang `heroRingkas` sejauh
+     padding itu — persis 320 vs 352, cukup untuk membuat penjaga menyala di
+     layar yang salah tanpa satu pun error. */
+  const { vh, vw: lebarLayar } = useUkuranLayar();
+  const cardH = cardHeight(vh, lebarLayar);
   const viewportH = cardH + CARD_GAP;
 
   // Refs untuk loop autoplay tanpa stale closure.

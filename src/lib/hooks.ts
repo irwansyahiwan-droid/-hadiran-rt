@@ -27,20 +27,54 @@ const VH_RINGKAS = 700;
  *  Tiga tempat WAJIB membaca fungsi ini — kartu asli, skeleton, dan cardHeight.
  *  Kalau salah satu memakai ambang sendiri, skeleton & kartu beda tinggi → layar
  *  meloncat saat data datang. */
-export function heroRingkas(vh: number): boolean {
-  return vh < VH_RINGKAS;
+/** Lebar layar tersempit yang masih sanggup memuat kaki stat TIGA kolom.
+ *  Ditambahkan 24 Agu 2026: ambang lama hanya menimbang TINGGI, padahal
+ *  kekurangan ruangnya bisa datang dari sumbu mana pun. Terukur di 320px
+ *  (lebar WAJIB §1.4.10) oleh `audit:lebar` yang baru diperluas: tiga kolom
+ *  masing-masing tinggal 65,3px, nominal 64,6px pada huruf yang SUDAH di
+ *  lantai 9,6px — "Rp5.865.000" dan "Rp1.500.000" bersentuhan menyeberangi
+ *  divider, dan label "Setor Kas RT" pecah dua baris sehingga nominal kolom
+ *  ketiga turun & tak lagi sebaris.
+ *
+ *  Alasan melepasnya PERSIS sama dgn alasan sumbu tinggi yang sudah tertulis
+ *  di atas — ketiga angka itu tak hilang, masing-masing punya halamannya
+ *  sendiri — jadi ini memperluas keputusan yang ada, bukan membuat yang baru.
+ *
+ *  CATATAN: di HP 320px NYATA (mis. iPhone SE 320x568) kaki stat memang sudah
+ *  lepas lewat sumbu tinggi. Yang ditutup di sini justru kombinasi 320px LEBAR
+ *  dgn layar TINGGI — yaitu skenario reflow 400% zoom yang §1.4.10 maksudkan. */
+const VW_RINGKAS = 360;
+
+/** `vw` opsional supaya pemanggil lama (dan uji sumbu tinggi) tetap sah;
+ *  SEMUA pembaca runtime wajib mengirimnya. */
+export function heroRingkas(vh: number, vw = Number.POSITIVE_INFINITY): boolean {
+  return vh < VH_RINGKAS || vw < VW_RINGKAS;
 }
 
-/** Tinggi layar yang ikut resize/rotasi. Satu implementasi untuk semua pembaca:
- *  dua listener terpisah pernah jadi sumber drift geometri hero. */
-export function useTinggiLayar(): number {
-  const [vh, setVh] = useState(typeof window !== 'undefined' ? window.innerHeight : 800);
+/** Ukuran layar yang ikut resize/rotasi. Satu implementasi untuk semua pembaca:
+ *  dua listener terpisah pernah jadi sumber drift geometri hero — itu sebabnya
+ *  LEBAR ikut dititipkan ke hook ini alih-alih diberi hook & listener sendiri.
+ *
+ *  Objeknya dijaga identitasnya saat nilainya tak berubah: `resize` menyala
+ *  jauh lebih sering daripada ukuran benar-benar bergeser (bar URL mobile
+ *  muncul/hilang), dan mengembalikan objek baru tiap kali akan me-render ulang
+ *  seluruh carousel tanpa satu piksel pun berubah. Versi lama mengembalikan
+ *  number, jadi React membatalkannya sendiri; begitu jadi objek, penjaga ini
+ *  yang menggantikan peran itu. */
+export function useUkuranLayar(): { vh: number; vw: number } {
+  const [uk, setUk] = useState(() => ({
+    vh: typeof window !== 'undefined' ? window.innerHeight : 800,
+    vw: typeof window !== 'undefined' ? window.innerWidth : 390,
+  }));
   useEffect(() => {
-    const onResize = () => setVh(window.innerHeight);
+    const onResize = () =>
+      setUk((p) => (p.vh === window.innerHeight && p.vw === window.innerWidth
+        ? p
+        : { vh: window.innerHeight, vw: window.innerWidth }));
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
-  return vh;
+  return uk;
 }
 
 /* ── Sembunyikan nominal (privasi, ala bank app) ─────────────────
