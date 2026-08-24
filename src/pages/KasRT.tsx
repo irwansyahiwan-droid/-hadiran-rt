@@ -564,20 +564,25 @@ export default function KasRTPage() {
           loading={loading}
           skeleton={
             /* Skeleton BERBENTUK hero (eyebrow + dua aksi + nominal + dua chip
-               stat), pola KasHadiran — bukan blok abu polos. */
-            <div style={{ height: HERO_MIN_H }} className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-6">
+               stat), pola KasHadiran — bukan blok abu polos. Permukaannya ikut
+               permukaan hero (`hero-emerald`), bukan kartu putih: anatominya
+               sudah cermin, warnanya yang dulu tidak, jadi CrossFade memudarkan
+               putih → hijau tua di elemen terbesar layar. */
+            <div style={{ height: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }} className="relative overflow-hidden rounded-3xl hero-emerald p-6">
               <div className="flex items-center justify-between">
-                <div className="skeleton h-3 w-36 rounded-full" />
+                <div className="skeleton skeleton-hero h-3 w-36 rounded-full" />
                 <div className="flex gap-2">
-                  <div className="skeleton h-9 w-9 rounded-full" />
-                  <div className="skeleton h-9 w-9 rounded-full" />
+                  <div className="skeleton skeleton-hero h-9 w-9 rounded-full" />
+                  <div className="skeleton skeleton-hero h-9 w-9 rounded-full" />
                 </div>
               </div>
-              <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
-              {/* Kaki kolom bergaris (bukan lagi 2 kotak) — cermin HeroStats. */}
-              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-line dark:border-gray-700 pt-[18px]">
-                <div className="skeleton h-8 rounded-xl" />
-                <div className="skeleton h-8 rounded-xl" />
+              <div className="skeleton skeleton-hero mt-3 h-8 w-1/2 rounded-xl" />
+              {/* Kaki kolom bergaris (bukan lagi 2 kotak) — cermin HeroStats.
+                  Garisnya ikut hero (`border-white/15`, sama dgn HeroSaldo),
+                  bukan token `line` yang lahir untuk tepi kartu putih. */}
+              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-[18px]">
+                <div className="skeleton skeleton-hero h-8 rounded-xl" />
+                <div className="skeleton skeleton-hero h-8 rounded-xl" />
               </div>
             </div>
           }

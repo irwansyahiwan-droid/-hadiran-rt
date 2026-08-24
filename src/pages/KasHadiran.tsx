@@ -545,22 +545,28 @@ export default function KasHadiranPage() {
         {/* Skeleton BERBENTUK hero (eyebrow + ikon aksi + nominal + chip) — bukan
             blok gray polos. Saat load, sisa halaman (Alur, Rekap) render duluan
             dgn nilai Rp0; blok kosong di posisi hero terbaca "rusak/nyangkut".
-            Bentuk kartu-loading (bg putih + hairline + .lift, seragam dgn skeleton
-            list di bawah) → jelas "kartu saldo sedang dimuat". Tinggi & radius
-            sinkron via HERO_MIN_H → tak ada layout jump saat CrossFade. */}
+            Permukaannya = permukaan hero yang SEDANG dimuat (`hero-emerald` +
+            --hero-shadow), bukan kartu putih. Anatominya sudah dicermin persis
+            sejak lama — eyebrow, dua aksi, nominal, dan HERO_MIN_H yang menahan
+            layout jump — yang tak ikut cuma WARNANYA, jadi CrossFade memudarkan
+            kartu PUTIH menjadi hijau tua: satu-satunya kedipan ganti-permukaan
+            yang tersisa di app, tepat di elemen terbesar & terpenting layar.
+            Bar isian pakai `.skeleton-hero` (putih beralpha) — `.skeleton` abu
+            lahir untuk kartu putih. Tinggi & radius tetap sinkron via
+            HERO_MIN_H → tak ada layout jump saat CrossFade. */}
         <CrossFade
           loading={loading}
           skeleton={
-            <div style={{ height: HERO_MIN_H }} className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-6">
+            <div style={{ height: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }} className="relative overflow-hidden rounded-3xl hero-emerald p-6">
               <div className="flex items-center justify-between">
-                <div className="skeleton h-3 w-28 rounded-full" />
+                <div className="skeleton skeleton-hero h-3 w-28 rounded-full" />
                 <div className="flex gap-2">
-                  <div className="skeleton h-9 w-9 rounded-full" />
-                  <div className="skeleton h-9 w-9 rounded-full" />
+                  <div className="skeleton skeleton-hero h-9 w-9 rounded-full" />
+                  <div className="skeleton skeleton-hero h-9 w-9 rounded-full" />
                 </div>
               </div>
-              <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
-              <div className="skeleton mt-3 h-6 w-40 rounded-full" />
+              <div className="skeleton skeleton-hero mt-3 h-8 w-1/2 rounded-xl" />
+              <div className="skeleton skeleton-hero mt-3 h-6 w-40 rounded-full" />
             </div>
           }
         >

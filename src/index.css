@@ -1166,6 +1166,27 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 }
 @keyframes shimmer { to { transform: translateX(100%); } }
 
+/* ── Skeleton DI ATAS permukaan hero emerald ──────────────────────────────
+   `.skeleton` (#E9ECEF) & `.skeleton-bar` (#D6DADE) lahir untuk kartu PUTIH:
+   nadanya "satu langkah dari permukaannya". Di atas hero emerald relasi itu
+   putus — abu terang di atas hijau tua bukan satu langkah, ia lompatan, dan
+   terbaca gumpalan putih menempel, bukan isi yang belum datang.
+
+   Nadanya karena itu diambil dari bahasa yang sudah dipakai hero sendiri:
+   putih beralpha, sekeluarga `--hero-divider` (rgba(255,255,255,.16)) dan
+   `text-white/…` yang dipakai seluruh isi HeroSaldo. Satu nilai untuk dua
+   tema — `.dark` menurunkan gradient hero-nya, bukan tinta putihnya, jadi
+   pasangan gelap terpisah justru akan memecah yang sedang disatukan.
+
+   Kilaunya ikut diredam .55 → .20: .55 disetel untuk melintas di atas abu
+   terang; di atas emerald ia jadi sapuan putih menyala. */
+.skeleton.skeleton-hero,
+.dark .skeleton.skeleton-hero { background: rgba(255, 255, 255, 0.16); }
+.skeleton.skeleton-hero::after,
+.dark .skeleton.skeleton-hero::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.20) 50%, transparent 100%);
+}
+
 /* Staggered list entrance — set animation-delay inline per item */
 @keyframes riseIn {
   from { opacity: 0; transform: translateY(10px); }

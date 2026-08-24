@@ -476,17 +476,19 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         loading={loading}
         skeleton={
           /* Skeleton BERBENTUK hero (eyebrow + mata + nominal + dua chip stat),
-             seragam pola KasHadiran — bukan blok abu polos. Tinggi via HERO_MIN_H. */
-          <div style={{ height: HERO_MIN_H }} className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5">
+             seragam pola KasHadiran — bukan blok abu polos. Permukaan & padding
+             ikut hero yang sedang dimuat (`hero-emerald`, p-6 spt HeroSaldo),
+             bukan kartu putih p-5. Tinggi tetap via HERO_MIN_H. */
+          <div style={{ height: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }} className="relative overflow-hidden rounded-3xl hero-emerald p-6">
             <div className="flex items-center justify-between">
-              <div className="skeleton h-3 w-44 rounded-full" />
-              <div className="skeleton h-9 w-9 rounded-full" />
+              <div className="skeleton skeleton-hero h-3 w-44 rounded-full" />
+              <div className="skeleton skeleton-hero h-9 w-9 rounded-full" />
             </div>
-            <div className="skeleton mt-3 h-8 w-1/2 rounded-xl" />
-            {/* Kaki kolom bergaris (bukan lagi 2 kotak) — cermin HeroStats. */}
-            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-line dark:border-gray-700 pt-[18px]">
-              <div className="skeleton h-8 rounded-xl" />
-              <div className="skeleton h-8 rounded-xl" />
+            <div className="skeleton skeleton-hero mt-3 h-8 w-1/2 rounded-xl" />
+            {/* Kaki kolom bergaris — cermin HeroStats; garis ikut hero. */}
+            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-[18px]">
+              <div className="skeleton skeleton-hero h-8 rounded-xl" />
+              <div className="skeleton skeleton-hero h-8 rounded-xl" />
             </div>
           </div>
         }

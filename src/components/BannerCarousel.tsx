@@ -82,11 +82,27 @@ function bannerBlockHeight(vh: number): number {
  * & statistik yang sudah berstruktur.
  */
 export function BannerSkeleton({ vh }: { vh: number }) {
-  const bar = 'rounded-full skeleton-bar';
+  /* Bar isian di atas permukaan HERO: putih beralpha + kilau, bukan abu
+     `.skeleton-bar` (#D6DADE) yang nadanya lahir untuk permukaan putih.
+     Kilau pindah dari PERMUKAAN ke BAR — sekarang permukaannya gradient
+     hero yang sesungguhnya, dan menyapukan shimmer di atasnya akan
+     terbaca kilatan di kartu saldo, bukan tanda memuat. Pola ini sama
+     persis dgn skeleton hero KasRT/KasHadiran/Talangan. */
+  const bar = 'rounded-full skeleton skeleton-hero';
+  /* Indikator story duduk DI LUAR kartu, di atas kanvas app — jadi ia
+     TIDAK boleh ikut nada hero. Putih beralpha .16 di atas #ECF1F7
+     praktis tak terlihat; nadanya tetap `.skeleton-bar` seperti semula. */
+  const barKanvas = 'rounded-full skeleton-bar';
   return (
     <div style={{ height: bannerBlockHeight(vh) }}>
       <div
-        className="mx-auto skeleton flex flex-col"
+        /* Permukaannya = permukaan kartu saldo yang sedang dimuat, bukan slab
+           abu. Komponen ini sudah menyamakan SEGALANYA dgn kartu asli —
+           lebar, tinggi, radius (--hero-radius), padding, offset, anatomi —
+           justru karena drift geometri bikin layar meloncat; satu-satunya
+           yang tak ikut adalah WARNA, sehingga layar pertama tiap warga
+           memudar dari abu ke hijau tua. */
+        className="mx-auto hero-emerald relative overflow-hidden flex flex-col"
         style={{
           // Rumus lebar IDENTIK dgn cardW: min(viewport - 44, 326).
           width: 'min(calc(100% - 44px), 326px)',
@@ -95,6 +111,7 @@ export function BannerSkeleton({ vh }: { vh: number }) {
           borderRadius: 'var(--hero-radius)',
           padding: 24,
           boxSizing: 'border-box',
+          boxShadow: 'var(--hero-shadow)',
         }}
       >
         {/* eyebrow: titik status + label */}
@@ -107,20 +124,21 @@ export function BannerSkeleton({ vh }: { vh: number }) {
             tinggi dari isinya justru bikin layar meloncat saat data datang,
             cacat yang komponen ini ada untuk mencegah. */}
         <div className="flex flex-1 flex-col justify-center">
-          <span className="h-8 w-3/4 rounded-xl skeleton-bar" />
+          <span className="h-8 w-3/4 rounded-xl skeleton skeleton-hero" />
         </div>
         {/* footer 3 kolom (Terkumpul / Talangan / Setor Kas RT) — ikut lepas di
             layar pendek, PERSIS seperti kartu aslinya. Kalau syarat ini beda dgn
             kartu, skeleton jadi lebih tinggi dari isinya → layar meloncat saat
             data datang, cacat yang justru mau dicegah komponen ini. */}
-        {/* Pemisah kaki ikut nada skeleton, bukan `control` (#64748B) — itu token
-            BATAS KONTROL (input/tombol), dan sebagai garis di dalam placeholder
-            ia terbaca jauh lebih tegas daripada isi yang diwakilinya. */}
+        {/* Pemisah kaki ikut garis HERO (`border-white/15`, sama dgn HeroSaldo)
+            — bukan `control` (#64748B, token BATAS KONTROL yang terbaca jauh
+            lebih tegas dari isi yang diwakilinya) dan bukan lagi nada skeleton
+            abu, yang lahir untuk permukaan putih. */}
         {!heroRingkas(vh) && (
-          <div className="grid grid-cols-3 gap-3 border-t border-[#D6DADE] pt-4 dark:border-gray-700">
+          <div className="grid grid-cols-3 gap-3 border-t border-white/15 pt-4">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex flex-col items-center gap-2">
-                <span className="h-3.5 w-3.5 rounded-md skeleton-bar" />
+                <span className="h-3.5 w-3.5 rounded-md skeleton skeleton-hero" />
                 <span className={`h-2 w-11 ${bar}`} />
                 <span className={`h-2.5 w-14 ${bar}`} />
               </div>
@@ -131,9 +149,9 @@ export function BannerSkeleton({ vh }: { vh: number }) {
       {/* baris indikator story: satu pill aktif + dot sisanya */}
       {/* mx-[9px] + gap 0 = geometri PERSIS indikator asli (kotak sentuh 24px). */}
       <div className="flex items-center justify-center" style={{ height: INDICATOR_H }}>
-        <span className={`h-1 w-[26px] mx-[9px] ${bar}`} />
+        <span className={`h-1 w-[26px] mx-[9px] ${barKanvas}`} />
         {[0, 1, 2, 3, 4, 5].map((i) => (
-          <span key={i} className={`h-1 w-[7px] mx-[9px] ${bar}`} />
+          <span key={i} className={`h-1 w-[7px] mx-[9px] ${barKanvas}`} />
         ))}
       </div>
     </div>
