@@ -479,6 +479,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
         icon={UserPlus}
         ariaLabel="Tambah anggota"
         overNav={false}
+        disabled={error}
         onClick={() => setForm({ mode: 'add', warga: null })}
       />
 

@@ -11,6 +11,18 @@ interface FabProps {
   /** Halaman overlay (Kelola Anggota dll.) tak punya bottom-nav → FAB duduk
    *  lebih rendah. Default true = ada nav yang harus dilewati. */
   overNav?: boolean;
+  /** Matikan aksi-BUAT saat halamannya GAGAL memuat (24 Agu 2026).
+   *
+   *  Ketiga halaman ber-FAB sudah menonaktifkan `ExportMenu` saat gagal — jalan
+   *  KELUAR diputus — tapi aksi MASUK dibiarkan hidup penuh, dan itu arah yang
+   *  justru lebih berbahaya. Terukur di Kas RT: dgn data gagal dimuat, form yang
+   *  dibuka FAB ini menyatakan "Saldo setelah transaksi: Rp500.000" padahal kas
+   *  sebenarnya Rp16.352.000 — meleset Rp15,85 juta, di layar yang detik itu
+   *  juga berbunyi "Gagal memuat data". Halamannya sudah benar menyembunyikan
+   *  hero; form-nya membawa kembali angka yang app tak punya.
+   *
+   *  `title` diisi supaya bendahara tahu ini sementara, bukan tombol rusak. */
+  disabled?: boolean;
 }
 
 /** Floating Action Button — aksi-buat utama di ZONA JEMPOL (kanan-bawah),
@@ -25,7 +37,7 @@ interface FabProps {
  *  melayang di jalur nominal rata-kanan, dan di "Rekap per Kategori" Kas RT ia
  *  memotong angka "+Rp17.566.000" (terlihat di screenshot 390px). Di app kas,
  *  tak boleh ada elemen yang menutupi nominal: itu angka yang dicari warga. */
-export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, overNav = true }: FabProps) {
+export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, overNav = true, disabled = false }: FabProps) {
   /* Menyingkir saat scroll turun, kembali saat scroll NAIK. `idleExpandMs`
      sengaja TIDAK dipakai: dengan ia, FAB balik 900ms setelah gulir berhenti —
      tepat pada detik warga berdiam untuk MEMBACA nominal, jadi ia menutupi
@@ -90,6 +102,8 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
     <button
       onClick={() => { haptic(); onClick(); }}
       aria-label={ariaLabel ?? label}
+      disabled={disabled}
+      title={disabled ? 'Data belum termuat — tekan "Coba lagi" dulu' : undefined}
       className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-body font-bold overflow-hidden"
       style={{ transition: 'box-shadow 0.2s ease, transform 0.15s var(--ease-spring)' }}
     >

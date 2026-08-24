@@ -34,7 +34,9 @@ import type { KasRT } from '../lib/types';
 type Tipe = 'masuk' | 'keluar';
 
 interface ModalProps {
-  saldoSekarang: number;
+  /** `null` = saldo TIDAK DIKETAHUI (pemuatan gagal) — bukan nol.
+   *  Lihat catatan di pratinjau saldo di bawah. */
+  saldoSekarang: number | null;
   initial?: KasRT | null;
   onSave: (data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string; kategori: string }) => Promise<void>;
   onClose: () => void;
@@ -76,7 +78,12 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
     }
   }
 
-  const saldoPreview = tipe === 'masuk' ? saldoSekarang + nominal : saldoSekarang - nominal;
+  /* `null` menular: saldo yang tak diketahui + nominal apa pun tetap TAK
+     DIKETAHUI. Menghitungnya dari 0 akan menghasilkan angka yang terlihat sah
+     dan salah jutaan (lihat catatan di pratinjaunya). */
+  const saldoPreview = saldoSekarang === null
+    ? null
+    : tipe === 'masuk' ? saldoSekarang + nominal : saldoSekarang - nominal;
 
   return (
     <div className="fixed inset-0 z-overlay flex items-end" onClick={drag.dismiss}>
@@ -178,12 +185,33 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
           {nominal > 0 && (
             <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800/40'}`}>
+              {/* Pratinjau saldo BERHENTI menyebut angka saat saldonya tak
+                  diketahui (24 Agu 2026). Sebelumnya `saldoSekarang` selalu
+                  `number`, dan saat pemuatan halaman GAGAL nilainya jatuh ke 0
+                  (agregat dihitung dari `list` yang kosong) — jadi form ini
+                  dengan tenang menyatakan "Saldo setelah transaksi: Rp500.000"
+                  padahal kas sebenarnya Rp16.352.000. Terukur: meleset
+                  Rp15,85 juta, di layar yang detik itu juga berbunyi "Gagal
+                  memuat data", dan tepat saat bendahara memutuskan mencatat uang.
+
+                  Halaman sudah benar menyembunyikan heronya saat gagal; form ini
+                  membawa kembali angka yang app tak punya. Itu kanon yang sama —
+                  "app kas DILARANG menyatakan nominal saat muat gagal" — dan
+                  penjaganya sengaja ditaruh DI SINI, bukan cuma di FAB: FAB-nya
+                  memang kini `disabled={error}`, tapi penjaga di satu titik
+                  bertahan walau nanti ada jalan lain yang membuka form ini. */}
               <p className="text-caption text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
-                <span className={`font-display font-bold tabular-nums ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
-                  {/* formatRupiahPlain pakai Math.abs → tanda minus ditambah sendiri */}
-                  {(saldoPreview < 0 ? '-' : '') + formatRupiahPlain(saldoPreview)}
-                </span>
+                {saldoPreview === null ? (
+                  <span className="font-display font-bold text-ink-sub dark:text-gray-300">
+                    — <span className="font-sans font-normal">(data belum termuat)</span>
+                  </span>
+                ) : (
+                  <span className={`font-display font-bold tabular-nums ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
+                    {/* formatRupiahPlain pakai Math.abs → tanda minus ditambah sendiri */}
+                    {(saldoPreview < 0 ? '-' : '') + formatRupiahPlain(saldoPreview)}
+                  </span>
+                )}
               </p>
             </div>
           )}
@@ -970,9 +998,12 @@ export default function KasRTPage() {
         </CrossFade>
       </div>
 
+      {/* `saldoSekarang` = `null`, BUKAN 0, saat pemuatan gagal: `saldo`
+          diturunkan dari `list` yang kosong, jadi nol di sini berarti "tak
+          tahu", bukan "kas kosong". */}
       {showModal && (
         <TambahModal
-          saldoSekarang={saldo}
+          saldoSekarang={error ? null : saldo}
           initial={editing}
           onSave={handleSave}
           onClose={() => { setShowModal(false); setEditing(null); }}
@@ -1078,7 +1109,7 @@ export default function KasRTPage() {
 
       {/* Aksi utama di zona jempol */}
       {isBendahara && (
-        <Fab label="Tambah" ariaLabel="Tambah transaksi Kas RT" onClick={() => { setEditing(null); setShowModal(true); }} />
+        <Fab label="Tambah" ariaLabel="Tambah transaksi Kas RT" disabled={error} onClick={() => { setEditing(null); setShowModal(true); }} />
       )}
     </>
   );

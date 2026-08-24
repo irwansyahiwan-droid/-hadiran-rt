@@ -1155,7 +1155,7 @@ export default function KasHadiranPage() {
 
       {/* Aksi utama di zona jempol */}
       {isBendahara && (
-        <Fab label="Setor" icon={ArrowUpRight} ariaLabel="Setor ke Kas RT" onClick={() => setShowModal(true)} />
+        <Fab label="Setor" icon={ArrowUpRight} ariaLabel="Setor ke Kas RT" disabled={error} onClick={() => setShowModal(true)} />
       )}
     </>
   );
