@@ -1044,12 +1044,31 @@ export default function JadwalPage() {
         </>}
       />
 
-      {/* Stats — StatRow bersama (dialek "N kartu terpisah" yang tersisa di sini) */}
+      {/* Stats — StatRow bersama (dialek "N kartu terpisah" yang tersisa di sini)
+
+          Penjaga `|| error` ditambahkan 24 Agu 2026. Sampai saat itu barisnya
+          hanya menjaga `loading`, jadi begitu pemuatan SELESAI DENGAN GAGAL
+          ketiga hitungan jatuh ke `0` (daftarnya memang kosong) dan dirender
+          sebagai FAKTA: layar menampilkan "0 Selesai · 0 Terjadwal · 0 Total"
+          tepat di atas ErrorState yang berbunyi "Gagal memuat data". Dua
+          pernyataan yang saling bertentangan di satu layar, dan yang dipercaya
+          bendahara adalah angkanya — terbaca "RT ini belum punya jadwal sama
+          sekali", padahal app justru sedang tak tahu apa-apa.
+
+          Ini kanon yang sama dgn "app kas DILARANG menyatakan nominal saat muat
+          gagal"; `audit:keadaan` tak menangkapnya karena ia memburu nominal
+          ber-"Rp", sedangkan angka telanjang lewat begitu saja. Diukur di 9
+          layar × 2 peran: hanya SATU yang merender StatRow berdampingan dgn
+          ErrorState — layar ini. Delapan sisanya sudah benar menyembunyikan.
+
+          Tetap "—" (bukan disembunyikan) karena itu konvensi baris ini sendiri
+          saat `loading`, dan menyembunyikannya membuat barisnya muncul kembali
+          saat "Coba lagi" berhasil → tata letak melompat (lihat audit:lompat). */}
       <StatRow
         items={[
-          { label: 'Selesai', value: loading ? '—' : selesaiCount },
-          { label: 'Terjadwal', value: loading ? '—' : dijadwalCount, tone: 'pos' },
-          { label: 'Total', value: loading ? '—' : tarikanList.length },
+          { label: 'Selesai', value: loading || error ? '—' : selesaiCount },
+          { label: 'Terjadwal', value: loading || error ? '—' : dijadwalCount, tone: 'pos' },
+          { label: 'Total', value: loading || error ? '—' : tarikanList.length },
         ]}
       />
 
