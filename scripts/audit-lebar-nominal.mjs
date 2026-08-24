@@ -25,7 +25,14 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
 const OUT = process.env.OUT_DIR || '.audit-lebar';
-const W = +(process.env.W || 360);
+/* DUA lebar, bukan satu. 360px = acuan terkecil app; 320px = WAJIB §1.4.10.
+   Sampai 24 Agu 2026 sapuan ini hanya berjalan di 360, dan cacat nyata yang
+   ditutup ca6cea8 lahir TEPAT satu langkah di bawahnya — nominal hero meluber
+   7,7px di 320px lalu tercat pil "Defisit", sementara di 360px ia sisa 9,1px
+   dan sapuan melaporkan bersih. Satu lebar = satu titik sampel; kelas cacat
+   yang bergantung lebar butuh keduanya. */
+const LEBAR = (process.env.W || '360,320').split(',').map(Number).filter(Boolean);
+let W = LEBAR[0];
 mkdirSync(OUT, { recursive: true });
 
 const env = readFileSync(new globalThis.URL('../.env', import.meta.url), 'utf8');
@@ -43,6 +50,20 @@ async function measure(page, ctxName) {
       let txt = '';
       for (const n of el.childNodes) if (n.nodeType === 3) txt += n.textContent;
       txt = txt.trim();
+      /* Nominal yang dirender `Odometer` TIDAK punya satu pun TEXT NODE
+         langsung: ia menumpuk kolom digit 0-9 di dalam anak `aria-hidden`, dan
+         nilai aslinya cuma hidup di `aria-label` induknya. Sampai 24 Agu 2026
+         populasi sapuan ini hanya membaca text node langsung — jadi HERO SALDO,
+         nominal terbesar & terpenting di app, TAK PERNAH TERUKUR SEKALI PUN, di
+         lebar mana pun. Itu sebabnya pil "Defisit" bisa mengecat digit terakhir
+         saldo di 320px tanpa satu pun sapuan merah (lihat ca6cea8): bukan cuma
+         lebarnya yang kurang, POPULASINYA yang bolong.
+         Persis cacat (c) yang sudah dibayar `audit:kembali`. Label dipakai saat
+         text node kosong. */
+      if (!txt) {
+        const lab = el.getAttribute('aria-label');
+        if (lab && /Rp\s?[\d.]/.test(lab)) txt = lab.trim();
+      }
       if (!/Rp\s?[\d.]/.test(txt)) continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.4) continue;
@@ -135,9 +156,9 @@ async function measure(page, ctxName) {
   }, ctxName);
 
   if (res.pageW > res.viewW + 1) {
-    findings.push({ ctx: ctxName, kind: 'halaman-geser', detail: `scrollWidth ${res.pageW} > ${res.viewW}` });
+    findings.push({ ctx: ctxName, w: W, kind: 'halaman-geser', detail: `scrollWidth ${res.pageW} > ${res.viewW}` });
   }
-  for (const it of res.items) findings.push({ ctx: ctxName, kind: 'nominal', ...it });
+  for (const it of res.items) findings.push({ ctx: ctxName, w: W, kind: 'nominal', ...it });
   const n = res.items.length + (res.pageW > res.viewW + 1 ? 1 : 0);
   console.log(`  ${n === 0 ? 'ok' : `⚠ ${n} temuan`}  ${ctxName}`);
 }
@@ -292,6 +313,14 @@ async function openMenuItem(page, itemLabel) {
 const browser = await chromium.launch();
 const ONLY = process.env.ONLY;
 
+/* Populasi diulang PER LEBAR. Sengaja konteks baru tiap lebar, bukan
+   `setViewportSize` di halaman yang sama: sebagian ukuran hero dihitung sekali
+   saat mount (FitAmount mengukur lewat ResizeObserver, tapi `heroRingkas`
+   & tinggi kartu carousel dibaca dari tinggi layar saat render), jadi
+   mengubah viewport di tengah jalan mengukur layar yang separuh menyesuaikan. */
+for (const lebar of LEBAR) {
+  W = lebar;
+
 // ── WARGA ────────────────────────────────────────────────────────────────
 if (!ONLY || ONLY === 'warga') {
   console.log(`\n[warga @ ${W}px]`);
@@ -343,14 +372,25 @@ if (!ONLY || ONLY === 'bendahara') {
   await ctx.close();
 }
 
+} // ← selesai satu lebar
+
 await browser.close();
 writeFileSync(`${OUT}/hasil-lebar.json`, JSON.stringify(findings, null, 1));
-console.log(`\n=== TEMUAN: ${findings.length} @ ${W}px ===`);
+/* Ringkasan DIPISAH per lebar & ambangnya disebut namanya. 320px itu WAJIB
+   §1.4.10; 360px acuan app sendiri. Menjumlahkannya jadi satu angka
+   menyembunyikan lebar mana yang patah — persis yang bikin kelas ini lolos. */
+console.log('\n=== NOMINAL MELUBER / TERPOTONG ===');
+for (const lebar of LEBAR) {
+  const n = findings.filter((f) => f.w === lebar).length;
+  const label = lebar === 320 ? 'WAJIB §1.4.10' : lebar === 360 ? 'acuan terkecil app' : '';
+  console.log(`  ${String(lebar).padStart(4)}px ${label.padEnd(20)}: ${n} temuan`);
+}
+console.log(`\n=== TEMUAN: ${findings.length} (${LEBAR.join(' + ')}px) ===`);
 for (const f of findings) {
-  if (f.kind === 'halaman-geser') console.log(`[${f.ctx}] HALAMAN GESER — ${f.detail}`);
+  if (f.kind === 'halaman-geser') console.log(`[${f.w}px ${f.ctx}] HALAMAN GESER — ${f.detail}`);
   /* `bleed` WAJIB ikut tercetak: sebuah baris bisa masuk daftar SEMATA karena
      ia melewati content-box leluhurnya (clip 0, kanan/kiri negatif). Tanpa
      angka itu laporannya menyuruh orang mencari luapan yang tak kelihatan di
      kolom mana pun — persis jenis laporan yang bikin temuan asli dikira palsu. */
-  else console.log(`[${f.ctx}] "${f.text}" clip=${f.clip} bleed=${f.bleed ?? '?'} kanan=${f.overflowRight} kiri=${f.overflowLeft} ${f.font} ${f.size}px <${f.tag}> .${f.cls}`);
+  else console.log(`[${f.w}px ${f.ctx}] "${f.text}" clip=${f.clip} bleed=${f.bleed ?? '?'} kanan=${f.overflowRight} kiri=${f.overflowLeft} ${f.font} ${f.size}px <${f.tag}> .${f.cls}`);
 }
