@@ -46,10 +46,50 @@ const sesiPalsu = () => ({
   user: { id: '00000000-0000-4000-8000-0000000000aa', aud: 'authenticated', email: 'audit@lokal', app_metadata: { provider: 'email' }, user_metadata: { role: 'bendahara' }, created_at: '2026-01-01T00:00:00Z' },
 });
 
+/* ── Kenapa ada bagian "angka telanjang" (24 Agu 2026) ─────────────────────
+ * Sapuan ini pernah mencetak "24 layar · 0 bermasalah" sementara TIGA cacat
+ * kelas ini hidup di dalamnya:
+ *   · Jadwal      "0 Selesai · 0 Terjadwal · 0 Total"  di atas "Gagal memuat data"
+ *   · Kelola Angg "0 aktif · 0 total"                  di atas "Gagal memuat data"
+ *   · Kas RT      form FAB: "Saldo setelah transaksi: Rp500.000" (kas asli 16,3 jt)
+ * Sebabnya populasi: probe hanya memburu `Rp\d`, sedangkan HITUNGAN tak
+ * berprefiks lewat begitu saja. Padahal "0 tarikan" sama menyesatkannya dgn
+ * "Rp0" — bendahara membacanya sebagai "RT ini belum punya jadwal", bukan
+ * "app sedang tak tahu".
+ *
+ * Yang DIKECUALIKAN, dan alasannya (kalau tidak, sapuan berteriak palsu):
+ *   · tanggal — "Per 24 Agustus 2026" itu hari ini, benar terlepas dari muat.
+ *     Nama bulan ditulis PENUH maupun singkat; percobaan pertama cuma menyaring
+ *     singkatan ("Agu") sehingga "Agustus" lolos & terbaca sebagai klaim data.
+ *   · isi ErrorState/EmptyState sendiri.
+ *   · chrome tetap: nav, header, versi app.
+ *   · "—" dan sekitarnya — itu justru BENTUK yang benar untuk "tak tahu".
+ * Ambangnya "ada digit", bukan "ada 0": angka basi dari cache juga klaim palsu. */
 const PROBE = () => {
   const t = document.body.innerText;
+  const BULAN = 'Jan(uari)?|Feb(ruari)?|Mar(et)?|Apr(il)?|Mei|Jun(i)?|Jul(i)?|Agu(stus)?|Sep(tember)?|Okt(ober)?|Nov(ember)?|Des(ember)?';
+  const reTanggal = new RegExp(`\\b(${BULAN})\\b`, 'i');
+  const angkaTelanjang = [];
+  const nav = document.querySelector('nav');
+  const header = document.querySelector('header');
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let n;
+  while ((n = w.nextNode())) {
+    const s = (n.textContent || '').trim();
+    if (!s || !/\d/.test(s)) continue;
+    const el = n.parentElement;
+    if (!el || !el.offsetParent) continue;                 // tak terlihat
+    if (nav?.contains(el) || header?.contains(el)) continue; // chrome tetap
+    if (el.closest('[data-keadaan]')) continue;             // isi Error/EmptyState
+    const baris = (el.closest('p, div, span, li, h1, h2, h3')?.innerText || s).trim();
+    if (reTanggal.test(baris)) continue;                    // tanggal, bukan klaim
+    if (/^\d{1,2}:\d{2}/.test(s)) continue;                 // jam
+    if (/v?\d+\.\d+\.\d+/.test(s)) continue;                // versi
+    angkaTelanjang.push(baris.replace(/\s+/g, ' ').slice(0, 48));
+  }
   return {
     nominal: [...new Set(t.match(/[-+]?Rp[\d.]+/g) ?? [])].slice(0, 8),
+    angkaTelanjang: [...new Set(angkaTelanjang)].slice(0, 6),
     adaError: /Gagal memuat|Gagal memperbarui/i.test(t),
     klaimKosong: (t.match(/Belum ada [^\n·]{0,34}/g) ?? []).slice(0, 3),
     skeleton: document.querySelectorAll('.skeleton').length,
@@ -66,6 +106,7 @@ async function periksa(page, label, mode) {
   if (mode === 'gagal') {
     // Aturan inti: gagal muat → NOL nominal & harus mengaku gagal.
     if (r.nominal.length) m.push(`MENYATAKAN NOMINAL saat gagal: ${JSON.stringify(r.nominal)}`);
+    if (r.angkaTelanjang.length) m.push(`MENYATAKAN ANGKA saat gagal: ${JSON.stringify(r.angkaTelanjang)}`);
     if (r.klaimKosong.length) m.push(`mengaku "belum ada data" padahal GAGAL: ${JSON.stringify(r.klaimKosong)}`);
     if (!r.adaError && !r.nominal.length && !r.klaimKosong.length) m.push('tak ada nominal, tapi juga tak ada ErrorState — layar bisu');
   }

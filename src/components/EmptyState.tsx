@@ -13,7 +13,11 @@ interface EmptyStateProps {
  *  dekoratif mengambang + tile ikon mengambang di tengah. */
 export default function EmptyState({ icon: Icon, title, subtitle, className = '', action }: EmptyStateProps) {
   return (
-    <div className={`flex flex-col items-center justify-center text-center px-6 py-12 ${className}`}>
+    /* `data-keadaan` = penanda OPT-IN untuk `audit:keadaan` (preseden `data-grafik`
+       & `data-ptr`): sapuan itu kini menandai tiap teks berangka di layar gagal
+       sebagai klaim palsu, dan isi Empty/ErrorState harus dikecualikan — tak ada
+       ciri struktural yang membedakannya dari teks halaman biasa. */
+    <div data-keadaan="kosong" className={`flex flex-col items-center justify-center text-center px-6 py-12 ${className}`}>
       <div className="relative w-28 h-24 mb-4">
         {/* Backdrop lembut */}
         <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-emerald-100/70 to-emerald-50/40 dark:from-gray-800 dark:to-gray-800/50" />

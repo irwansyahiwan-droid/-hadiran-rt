@@ -354,7 +354,23 @@ export default function KelolaAnggota({ open, onClose }: Props) {
       />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}>
-        <p className="text-caption text-ink-faint dark:text-gray-400">{aktifCount} aktif · {list.length} total</p>
+        {/* Penjaga `loading || error` (24 Agu 2026). Baris ini sebelumnya TANPA
+            penjaga sama sekali — bahkan `loading` pun tidak — sehingga saat
+            pemuatan gagal ia menulis "0 aktif · 0 total" tepat di atas
+            ErrorState "Gagal memuat data", dan selama pemuatan normal ia
+            sempat berkedip "0 aktif · 0 total" sebelum data datang.
+
+            Nol di sini berarti "belum tahu", bukan "RT tak punya anggota" —
+            kanon yang sama dgn "app kas DILARANG menyatakan nominal saat muat
+            gagal", cuma untuk angka TELANJANG. Saudara dari cacat StatRow
+            Jadwal (93f606c); ditemukan dgn menyapu SETIAP klaim berangka di
+            seluruh layar dlm keadaan gagal, bukan dgn menebak.
+
+            Tetap "—" dan bukan disembunyikan: barisnya di atas kolom cari, jadi
+            menghilangkannya menggeser form naik lalu turun lagi saat berhasil. */}
+        <p className="text-caption text-ink-faint dark:text-gray-400">
+          {loading || error ? '—' : aktifCount} aktif · {loading || error ? '—' : list.length} total
+        </p>
 
         {/* Search */}
         <div className="relative">

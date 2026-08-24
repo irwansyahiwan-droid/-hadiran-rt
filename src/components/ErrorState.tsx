@@ -25,7 +25,9 @@ export default function ErrorState({
   className = '',
 }: ErrorStateProps) {
   return (
-    <div className={`flex flex-col items-center justify-center text-center px-6 py-12 ${className}`}>
+    /* `data-keadaan` = penanda OPT-IN untuk `audit:keadaan` (preseden `data-grafik`
+       & `data-ptr`) — lihat catatan kembarnya di EmptyState.tsx. */
+    <div data-keadaan="gagal" className={`flex flex-col items-center justify-center text-center px-6 py-12 ${className}`}>
       <div className="relative w-28 h-24 mb-4">
         {/* Backdrop lembut — amber (beda dari emerald empty). */}
         <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-amber-100/70 to-amber-50/40 dark:from-gray-800 dark:to-gray-800/50" />
