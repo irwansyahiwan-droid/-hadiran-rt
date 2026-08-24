@@ -789,10 +789,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   <div className="flex items-center justify-between gap-1.5">
                     <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight potong-lentur flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
                     {next ? (
-                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/25 px-2 py-0.5 text-micro font-bold text-emerald-700 dark:text-emerald-300">
+                      <Tag tone="success" className="shrink-0">
                         <Crown className="h-3 w-3" style={{ color: 'var(--gold-songket)' }} fill="currentColor" strokeWidth={0} />
                         Giliran berikutnya
-                      </span>
+                      </Tag>
                     ) : (
                       <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
                     )}

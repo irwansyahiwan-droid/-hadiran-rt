@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, Share2, CalendarCheck, Loader2 } from 'lucide-react';
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import EmptyState from '../components/EmptyState';
+import Tag from '../components/Tag';
 import ErrorState from '../components/ErrorState';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
@@ -237,9 +238,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{r.rentang}</p>
                 </div>
                 {idx === 0 && (
-                  <span className="text-micro font-bold px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                    Terbaru
-                  </span>
+                  <Tag tone="success">Terbaru</Tag>
                 )}
               </div>
 

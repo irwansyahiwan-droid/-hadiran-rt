@@ -340,7 +340,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
         <p className="text-body font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
-        <span className="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-caption font-bold rounded-full">
+        <span className="font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-1.5 py-0.5 text-center text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700">
           {pembayarList.length}
         </span>
       </div>
@@ -412,9 +412,9 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               <p className="text-body font-semibold text-gray-900 dark:text-gray-100 potong-lentur">{sohibulWarga.nama}</p>
               <p className="text-caption font-medium text-warn dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400 shrink-0">
+            <Tag tone="warning" className="shrink-0">
               <Lock className="w-3 h-3" /> Penerima
-            </span>
+            </Tag>
           </div>
         )}
         {filtered.map((w, idx) => {
