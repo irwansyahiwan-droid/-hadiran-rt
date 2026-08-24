@@ -1,32 +1,44 @@
 import { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff, Users, Sparkles, ArrowRight, ChevronDown, Info } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, ArrowRight, ChevronDown } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 import { haptic } from '../lib/utils';
-
-// Pagar ringan untuk Mode Warga — BUKAN kredensial rahasia, hanya agar warga
-// sadar sedang masuk ke mode lihat-saja. Ganti nilainya di sini bila perlu.
-const WARGA_PASSWORD = 'warga';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
   onWargaMode: () => void;
 }
 
+/**
+ * Login = hero TERBESAR di app ini, bukan kartu putih yang mengambang di atas
+ * latar pastel.
+ *
+ * Kenapa digambar ulang (24 Agu 2026): layar ini satu-satunya permukaan yang
+ * memakai bahasa visualnya SENDIRI — `login-bg` mint, tiga aurora blob, dan
+ * `login-card` kaca putih. Hasilnya beda terang antara kartu dan latar tipis
+ * sekali, jadi tak ada satu pun titik jangkar mata, dan kesan pertama app
+ * terbaca lembut/pastel padahal SELURUH isi app (hero saldo, hero Jadwal,
+ * halaman /info) berbicara hijau tua yang tegas.
+ *
+ * Tak ada token baru yang dilahirkan di sini. Semuanya milik app yang sudah
+ * ada: `--hero-glow` + `--hero-gradient` (otomatis bertukar di `.dark`),
+ * `.hero-noise`, `.songket-weave`, `--gold-songket`.
+ *
+ * Gerbang "ketik: warga" DIBUANG. Ia mengumumkan sandinya sendiri di layar
+ * yang sama, lengkap dengan tombol isi-otomatis — friksi tanpa perlindungan.
+ * Mode warga tetap lihat-saja; yang menjaganya RLS di database, bukan kata
+ * yang tercetak di layarnya.
+ *
+ * Cincin fokus SENGAJA emas, bukan emerald: `--hero-*` itu hijau, dan cincin
+ * hijau di atas hijau = 1,26:1 (cacat yang sudah dibayar `audit:kontras-nonteks`).
+ * Emas #E8B651 di atas #0A5230 jauh di atas ambang 3:1 §1.4.11.
+ */
 export default function Login({ onLogin, onWargaMode }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Warga = pintu utama (selalu tampil). Bendahara = sekunder (collapse).
-  const [wargaPassword, setWargaPassword] = useState('');
-  const [showWargaPassword, setShowWargaPassword] = useState(false);
-  const [wargaError, setWargaError] = useState('');
   const [bendaharaOpen, setBendaharaOpen] = useState(false);
-
-  // Micro-interactions Premium 2026
-  const [shakeWarga, setShakeWarga] = useState(false);
   const [shakeAdmin, setShakeAdmin] = useState(false);
 
   // Lepas dulu, pasang lagi di frame berikutnya — kalau kelas `shake` masih
@@ -34,34 +46,6 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   function goyang(set: (v: boolean) => void) {
     set(false);
     requestAnimationFrame(() => set(true));
-  }
-
-  // Posisi spotlight ditulis LANGSUNG sebagai CSS var di node-nya. Lewat
-  // useState, tiap gerakan mouse me-render ulang seluruh Login (~60×/detik)
-  // padahal yang berubah cuma satu variabel gradient.
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-  }
-
-  function handleWargaSubmit() {
-    haptic(12);
-    if (wargaPassword.trim().toLowerCase() === WARGA_PASSWORD) {
-      setWargaError('');
-      onWargaMode();
-    } else {
-      // Jangan reset field, biarkan warga memperbaiki ketikannya
-      setWargaError('Password warga salah. Silakan ketik: warga');
-      goyang(setShakeWarga);
-    }
-  }
-
-  // Bantu warga yang bingung: satu ketukan mengisi kata kunci otomatis.
-  function isiOtomatis() {
-    haptic(8);
-    setWargaPassword(WARGA_PASSWORD);
-    setWargaError('');
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -87,222 +71,156 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
     }
   }
 
+  /* Kolom isian bendahara: satu resep, dipakai dua kali. Kaca gelap di atas
+     hijau — bukan `bg-white/60` warisan kartu terang, yang di atas hero pekat
+     berubah jadi bidang keruh. */
+  const field =
+    'w-full pl-11 pr-4 py-3.5 rounded-xl bg-black/25 backdrop-blur-sm ' +
+    'border border-white/25 text-body text-white placeholder-white/55 ' +
+    'focus:outline-none focus:ring-2 focus:ring-[var(--gold-songket)] ' +
+    'focus:border-[var(--gold-songket)] transition';
+
   return (
-    <main className="login-bg login-grain relative min-h-dvh flex flex-col items-center justify-center px-6 py-10 overflow-hidden">
-
-      {/* ── Aurora blobs — animasi mengambang halus (branded exception per DESIGN.md §381) ── */}
+    <main
+      /* `min-h-dvh` + `overflow-x-hidden`, BUKAN `h-dvh overflow-hidden`: begitu
+         panel bendahara terbuka, isinya lebih tinggi dari layar HP pendek — dgn
+         tinggi terkunci, tombol "Masuk" berada di luar kotak dan tak pernah bisa
+         diketuk. Tinggi minimum membuat halaman tumbuh & menggulir seperlunya. */
+      className="hero-noise relative min-h-dvh overflow-x-hidden flex flex-col"
+      style={{ background: 'var(--hero-glow), var(--hero-gradient)' }}
+    >
+      {/* Motif anyaman ketupat — identitas RT.
+          Mask & opacity bawaan `.songket-weave` disetel untuk KARTU saldo ~180px;
+          dipasang polos di layar penuh 844px ia melebar ke dua pertiga layar dan
+          terbaca seperti JARING, bukan kain — persis kegagalan yang sama sudah
+          dibayar sekali saat opacity diturunkan 0,8 → 0,45. Di sini dipersempit
+          lagi ke sudut kanan-atas saja: motifnya latar, wordmark yang memimpin. */}
       <div
         aria-hidden="true"
-        className="login-blob-a pointer-events-none absolute -top-24 -right-20 w-[360px] h-[360px] rounded-full
-                   bg-emerald-300/40 dark:bg-emerald-800/40 blur-[80px]"
+        className="songket-weave pointer-events-none absolute inset-0"
+        style={{
+          opacity: 0.26,
+          WebkitMaskImage:
+            'radial-gradient(88% 52% at 100% 0%, #000 0%, rgba(0,0,0,0.4) 38%, transparent 72%)',
+          maskImage:
+            'radial-gradient(88% 52% at 100% 0%, #000 0%, rgba(0,0,0,0.4) 38%, transparent 72%)',
+        }}
       />
+
+      {/* Vignette bawah — memberi kedalaman ketiga & mendudukkan tombol di
+          permukaan, bukan mengambang di bidang hijau rata. */}
       <div
         aria-hidden="true"
-        className="login-blob-b pointer-events-none absolute -bottom-28 -left-20 w-[300px] h-[300px] rounded-full
-                   bg-teal-300/35 dark:bg-teal-900/50 blur-[70px]"
-      />
-      {/* Accent blob tengah — memberi depth ketiga */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 w-[200px] h-[200px] rounded-full
-                   bg-emerald-200/30 dark:bg-emerald-900/30 blur-[60px]"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(125% 72% at 50% 118%, rgba(0,0,0,0.42) 0%, transparent 62%)',
+        }}
       />
 
-      {/* ── Hero area ── */}
-      <div className="relative mb-7 text-center z-10">
-        {/* Logo dengan pop spring entrance */}
-        <div className="pop relative mx-auto mb-5 w-[5.5rem] h-[5.5rem]">
-          {/* Halo cincin di belakang logo */}
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 -m-2 rounded-[28px]
-                       bg-white/50 dark:bg-white/10 blur-sm"
-          />
-          <img
-            src={logoRt}
-            alt="Logo RT 004/006"
-            width={88}
-            height={88}
-            /* Aset paling atas-lipatan di layar pertama app — naikkan di antrean
-               fetch, jangan biarkan bersaing dgn request lain. */
-            fetchPriority="high"
-            className="relative w-[5.5rem] h-[5.5rem] rounded-3xl object-cover
-                       ring-2 ring-white/80 dark:ring-white/20
-                       shadow-[0_4px_20px_-4px_rgba(11,80,50,0.35)]"
-          />
-        </div>
-
-        {/* Wordmark */}
-        <h1
-          className="rise font-display text-[1.85rem] font-bold tracking-tight
-                     text-gray-900 dark:text-gray-50 drop-shadow-sm"
-          style={{ animationDelay: '0.08s' }}
-        >
-          Hadiran RT
-        </h1>
-        <p
-          className="rise mt-1.5 text-[0.8125rem] font-semibold
-                     text-emerald-800 dark:text-emerald-200
-                     drop-shadow-sm"
-          style={{ animationDelay: '0.14s' }}
-        >
-          RT&nbsp;004/006 · Tanah Baru Beji · Depok
-        </p>
-
-        {/* Tagline — bikin momen brand */}
-        <p
-          className="rise mt-2 text-caption text-emerald-800 dark:text-emerald-100 font-medium"
-          style={{ animationDelay: '0.18s' }}
-        >
-          Transparansi kas &amp; kehadiran warga
-        </p>
-      </div>
-
-      {/* ── Glassmorphism Card — branded exception DESIGN.md §381 ── */}
       <div
-        className="rise login-card login-spotlight relative w-full max-w-sm rounded-3xl p-6 z-10"
-        style={{ animationDelay: '0.22s' }}
-        onMouseMove={handleMouseMove}
+        className="relative z-10 flex-1 flex flex-col justify-center w-full max-w-sm mx-auto
+                   px-6 pt-[calc(env(safe-area-inset-top)+2rem)]
+                   pb-[calc(env(safe-area-inset-bottom)+2rem)]"
       >
-        <h2 className="font-display text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-0.5">
-          Selamat Datang
-        </h2>
-        <p className="text-[0.8125rem] text-gray-500 dark:text-gray-400 mb-5">
-          Warga RT&nbsp;004/006 — silakan masuk
-        </p>
-
-        {/* ── WARGA — pintu utama (istimewa) ──────────────────────── */}
-        <div className="login-warga-tint relative rounded-2xl p-4">
-          {/* badge sudut */}
-          <span className="absolute -top-2.5 right-3 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-700 text-white text-[0.6875rem] font-bold uppercase tracking-wide shadow-sm">
-            <Sparkles className="w-2.5 h-2.5" /> Akses Cepat
+        {/* ── Identitas ────────────────────────────────────────────── */}
+        <div className="rise text-center">
+          <span
+            className="inline-flex items-center px-3.5 py-1.5 rounded-full
+                       bg-black/25 border border-[var(--gold-songket)]/40
+                       text-[0.75rem] font-semibold tracking-wide text-[#F1E3C0]"
+          >
+            RT&nbsp;004/006 · Tanah Baru, Beji
           </span>
 
-          <div className="flex items-center gap-3 mb-3">
-            <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-emerald-500 text-white shrink-0 shadow-sm">
-              <Users className="w-5 h-5" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-body font-bold text-gray-900 dark:text-gray-100 leading-tight">Masuk sebagai Warga</p>
-              <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-200 font-medium">
-                Lihat saldo, jadwal, absensi &amp; talangan
-              </p>
-            </div>
-          </div>
-
-          {/* Petunjuk */}
-          {/* Panel SOLID (bukan /70): di atas blob aurora, tint transparan blend
-              jadi hijau sedang → teks emerald-800 cuma 3,5:1 (sampel piksel). */}
-          <div className="flex items-start gap-2 mb-3 rounded-xl bg-emerald-100 dark:bg-emerald-900 border border-emerald-200/60 dark:border-emerald-700/30 px-3 py-2.5">
-            <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-            <p className="text-[0.75rem] text-emerald-800 dark:text-emerald-100 leading-snug">
-              Tanpa daftar. Cukup ketik kata{' '}
-              {/* 36×16 dan SENGAJA dibiarkan (audit:sentuh melaporkannya di
-                  bawah ambang app 44px). §2.5.8 mengecualikan target yang berada
-                  DI DALAM kalimat, dan itu persis kata ini: melebarkannya berarti
-                  merusak kalimatnya. Ia juga murni jalan pintas — kolom isian
-                  tepat di bawahnya tetap bisa diketik tangan, jadi tak ada fungsi
-                  yang hilang kalau meleset. Jangan "diperbaiki" jadi tombol. */}
-              <button
-                type="button"
-                onClick={isiOtomatis}
-                className="font-bold underline decoration-emerald-400 underline-offset-2 active:opacity-70"
-              >
-                warga
-              </button>
-              {' '}di kolom bawah, lalu tekan <span className="font-semibold">Masuk Sekarang</span>.
-            </p>
-          </div>
-
-          <label htmlFor="warga-password" className="sr-only">Password Warga</label>
-          <div
-            className={`relative ${shakeWarga ? 'shake' : ''}`}
-            onAnimationEnd={() => setShakeWarga(false)}
-          >
-            {/* Gembok ini SENGAJA `text-gray-400`, sama persis dgn gembok panel
-                bendahara 60px di bawahnya. Versi lama `text-emerald-500/70`
-                mint-di-atas-mint = 1,06:1 terang / 1,54:1 gelap (sampel piksel):
-                dekoratif & `aria-hidden`, jadi sah dilewati §1.4.11 — tapi
-                praktis tak tercat, dan dua gembok kembar di satu layar tampil
-                beda. `text-gray-400` (yang sudah di-remap dua tema) = 7,79 / 8,00
-                di permukaan yang SAMA — diukur, bukan disalin.
-                `z-10 pointer-events-none`: input pakai `backdrop-blur-sm`, dan
-                backdrop-filter MEMBUAT stacking context — jadi input yang
-                `static` tercat DI ATAS ikon `absolute` yang z-index-nya auto,
-                dan gembok tenggelam di balik kaca putih/70. Mengganti warnanya
-                saja tak menolong (1,06 → 1,14): yang salah urutan cat, bukan
-                warnanya. `pointer-events-none` wajib ikut, kalau tidak ketukan
-                di area ikon berhenti di ikon dan tak lagi memfokuskan kolom. */}
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
-            <input
-              id="warga-password"
-              type={showWargaPassword ? 'text' : 'password'}
-              value={wargaPassword}
-              onChange={(e) => setWargaPassword(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleWargaSubmit();
-                }
-              }}
-              placeholder="Ketik: warga"
-              className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/70 dark:bg-black/20
-                         border border-emerald-600 dark:border-emerald-500
-                         text-body text-gray-900 dark:text-gray-100
-                         placeholder-gray-500 dark:placeholder-gray-400
-                         focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
-                         transition backdrop-blur-sm"
+          <div className="pop relative mx-auto mt-7 w-[5.5rem] h-[5.5rem]">
+            <img
+              src={logoRt}
+              alt="Logo RT 004/006"
+              width={88}
+              height={88}
+              /* Aset paling atas-lipatan di layar pertama app — naikkan di antrean
+                 fetch, jangan biarkan bersaing dgn request lain. */
+              fetchPriority="high"
+              className="w-[5.5rem] h-[5.5rem] rounded-[22px] object-cover
+                         ring-1 ring-[var(--gold-songket)]/50
+                         shadow-[0_16px_38px_-12px_rgba(0,0,0,0.6)]"
             />
-            <button
-              type="button"
-              onClick={() => setShowWargaPassword((p) => !p)}
-              aria-label={showWargaPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-              className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-            >
-              {showWargaPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
           </div>
 
-          {wargaError && (
-            <div role="alert" className="reveal bg-rose-50/80 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-xl px-4 py-2.5 mt-2">
-              <p className="text-body text-neg dark:text-rose-400 font-medium">{wargaError}</p>
-            </div>
-          )}
+          <h1 className="font-display mt-6 text-[2.35rem] leading-[1.05] font-extrabold tracking-[-0.03em] text-white">
+            Hadiran RT
+          </h1>
+          <p className="mt-2.5 text-body font-medium text-[#A7F3D0]">
+            Transparansi kas &amp; kehadiran warga
+          </p>
 
+          {/* Benang emas + satu belah-ketupat — motif songket yang sama dgn latar,
+              dikecilkan jadi satu detail. Justru detail sekecil ini yang terbaca
+              "dikerjakan orang", bukan "keluaran generator". */}
+          <span aria-hidden="true" className="mt-7 flex items-center justify-center gap-2.5">
+            <span
+              className="h-px w-14"
+              style={{ background: 'linear-gradient(90deg, transparent, var(--gold-songket))' }}
+            />
+            <span
+              className="w-[7px] h-[7px] rotate-45 border"
+              style={{ borderColor: 'var(--gold-songket)' }}
+            />
+            <span
+              className="h-px w-14"
+              style={{ background: 'linear-gradient(90deg, var(--gold-songket), transparent)' }}
+            />
+          </span>
+        </div>
+
+        {/* ── Aksi utama — SATU ketukan, tanpa gerbang ─────────────── */}
+        <div className="rise mt-8">
           <button
             type="button"
-            onClick={handleWargaSubmit}
-            className="btn-brand w-full mt-3 min-h-[48px] py-3 rounded-xl font-bold text-body flex items-center justify-center gap-2"
+            onClick={() => { haptic(12); onWargaMode(); }}
+            className="press w-full min-h-[56px] px-6 rounded-2xl bg-white text-[#063A21]
+                       font-bold text-[1.0625rem] flex items-center justify-center gap-2.5
+                       shadow-[0_12px_32px_-12px_rgba(0,0,0,0.65)]"
           >
-            Masuk Sekarang <ArrowRight className="w-4 h-4" />
+            Masuk sebagai Warga
+            <ArrowRight className="w-[1.125rem] h-[1.125rem]" />
           </button>
+          <p className="mt-3 text-center text-caption text-white/70">
+            Lihat saldo, jadwal, absensi &amp; talangan
+          </p>
         </div>
 
-        {/* Pemisah */}
-        <div className="flex items-center gap-3 my-5">
-          <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
-          <span className="text-[0.6875rem] font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wide">atau</span>
-          <div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
+        {/* ── Pemisah ──────────────────────────────────────────────── */}
+        <div className="flex items-center gap-3 my-7">
+          <span className="h-px flex-1 bg-white/20" />
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white/55">
+            atau
+          </span>
+          <span className="h-px flex-1 bg-white/20" />
         </div>
 
-        {/* ── BENDAHARA — sekunder (collapse) ─────────────────────── */}
+        {/* ── Bendahara — sekunder, tetap di permukaan yang sama ───── */}
         <button
           type="button"
           onClick={() => { haptic(); setBendaharaOpen((o) => !o); }}
           aria-expanded={bendaharaOpen}
-          className="press w-full flex items-center justify-between min-h-[44px] px-1 py-1.5 text-body font-semibold text-gray-600 dark:text-gray-300"
+          className="press w-full min-h-[52px] px-5 rounded-xl bg-black/20 border border-white/20
+                     flex items-center justify-between text-body font-semibold text-white"
         >
-          <span className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-gray-400" /> Masuk sebagai Bendahara
+          <span className="flex items-center gap-2.5">
+            <Lock className="w-4 h-4 text-[var(--gold-songket)]" />
+            Masuk sebagai Bendahara
           </span>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${bendaharaOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`w-4 h-4 text-white/70 transition-transform duration-300 ${bendaharaOpen ? 'rotate-180' : ''}`}
+          />
         </button>
 
         <div
           // Shake dipasang di panel, BUKAN di tiap field: field-nya `w-full` di
           // dalam wrapper `overflow-hidden` (mesin collapse), jadi geseran 4px
-          // terpotong di tepi. Panel duduk di dalam padding kartu → aman, dan
-          // satu goyangan utuh lebih terbaca daripada dua elemen bergerak.
+          // terpotong di tepi. Satu goyangan utuh lebih terbaca.
           className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'} ${shakeAdmin ? 'shake' : ''}`}
           onAnimationEnd={() => setShakeAdmin(false)}
           // Collapse = tinggi 0, tapi email/password/submit di dalam TETAP fokusabel
@@ -312,90 +230,91 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           {...(!bendaharaOpen ? ({ inert: '' } as Record<string, string>) : {})}
         >
           <div className="overflow-hidden">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email */}
-              <div>
-                <label htmlFor="login-email" className="label-field">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
-                  <input
-                    id="login-email"
-                    name="email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    autoCapitalize="off"
-                    spellCheck={false}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="contoh@email.com"
-                    required={bendaharaOpen}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/60 dark:bg-black/20
-                               border border-control dark:border-control-dark
-                               text-body text-gray-900 dark:text-gray-100
-                               placeholder-gray-500 dark:placeholder-gray-400
-                               focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
-                               transition backdrop-blur-sm"
-                  />
+            <div className="rounded-2xl bg-black/25 backdrop-blur-sm border border-white/12 p-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="login-email" className="block mb-1.5 text-caption font-semibold text-white/75">
+                    Email
+                  </label>
+                  <div className="relative">
+                    {/* `z-10 pointer-events-none`: input pakai `backdrop-blur`, dan
+                        backdrop-filter MEMBUAT stacking context — tanpa z-10 ikon
+                        `absolute` tenggelam di balik kacanya sendiri. */}
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-white/60" />
+                    <input
+                      id="login-email"
+                      name="email"
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="contoh@email.com"
+                      required={bendaharaOpen}
+                      className={field}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Password */}
-              <div>
-                <label htmlFor="login-password" className="label-field">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
-                  <input
-                    id="login-password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required={bendaharaOpen}
-                    className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/60 dark:bg-black/20
-                               border border-control dark:border-control-dark
-                               text-body text-gray-900 dark:text-gray-100
-                               placeholder-gray-500 dark:placeholder-gray-400
-                               focus:outline-none focus:ring-2 focus:ring-pos dark:focus:ring-emerald-400 focus:border-pos dark:focus:border-emerald-400
-                               transition backdrop-blur-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((p) => !p)}
-                    aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                    className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+                <div>
+                  <label htmlFor="login-password" className="block mb-1.5 text-caption font-semibold text-white/75">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-white/60" />
+                    <input
+                      id="login-password"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required={bendaharaOpen}
+                      className={`${field} pr-12`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((p) => !p)}
+                      aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                      className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-white/65 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Error */}
-              {error && (
-                <div role="alert" className="reveal bg-rose-50/80 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-xl px-4 py-2.5">
-                  <p className="text-body text-neg dark:text-rose-400 font-medium">{error}</p>
-                </div>
-              )}
+                {error && (
+                  <div role="alert" className="reveal rounded-xl bg-rose-950/70 border border-rose-400/40 px-4 py-2.5">
+                    <p className="text-body font-medium text-rose-100">{error}</p>
+                  </div>
+                )}
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="press btn-mati w-full py-3 rounded-xl bg-gray-900/90 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-semibold text-body transition-colors"
-              >
-                {loading ? 'Memproses…' : 'Masuk sebagai Bendahara'}
-              </button>
-            </form>
+                {/* Emas sbg aksi ADMIN: memisahkannya dari putih milik warga tanpa
+                    melahirkan warna baru, dan #063A21 di atas #E8B651 = 9,6:1.
+                    Keadaan nonaktif dicat SOLID (bukan opacity) supaya labelnya
+                    tetap terbaca — ambang `audit:mati`. */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="press w-full min-h-[50px] rounded-xl font-bold text-body
+                             bg-[var(--gold-songket)] text-[#063A21]
+                             disabled:bg-[#C2A052] disabled:text-[#0A3520]
+                             transition-colors"
+                >
+                  {loading ? 'Memproses…' : 'Masuk'}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Footer note */}
-      <p className="rise relative z-10 text-caption text-emerald-800 dark:text-emerald-100 mt-5 text-center" style={{ animationDelay: '0.32s' }}>
-        Bendahara lupa password? Hubungi pengurus RT
-      </p>
+        <p className="mt-7 text-center text-caption text-white/60">
+          Bendahara lupa password? Hubungi pengurus RT
+        </p>
+      </div>
     </main>
   );
 }
