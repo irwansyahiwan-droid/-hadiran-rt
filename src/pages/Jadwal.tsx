@@ -409,7 +409,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               {sohibulWarga.nama.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{sohibulWarga.nama}</p>
+              <p className="text-body font-semibold text-gray-900 dark:text-gray-100 potong-lentur">{sohibulWarga.nama}</p>
               <p className="text-caption font-medium text-warn dark:text-amber-400">Sohibul Bait · penerima (tidak bayar)</p>
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 text-micro font-bold rounded-full bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400 shrink-0">
@@ -434,7 +434,23 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
                 {w.nama.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{w.nama}</p>
+                {/* `.potong-lentur`, BUKAN `truncate` (24 Agu 2026). Padanannya di
+                    sisi warga (JadwalWarga.tsx) sudah pindah 19 Agu; editor
+                    bendahara — satu-satunya tempat absensi benar-benar DIISI —
+                    tertinggal.
+
+                    Terukur di 320px (lebar WAJIB §1.4.10): "Nisan Nasrullah
+                    ( Icang )" perlu 178px, dapat 119px → nickname-nya hilang,
+                    padahal justru itu yang dikenal warga. Dan ini bukan daftar
+                    baca: bendahara sedang mencentang KEHADIRAN melawan nama itu,
+                    jadi nama yang tak lengkap di sini bisa berarti orang yang
+                    salah kena talangan Rp50.000.
+
+                    Ambang 22,4em berarti di 360px & 390px ia IDENTIK `truncate` —
+                    keputusan "di 360px elipsis menang atas kata yatim" tidak
+                    tersentuh. Yang diselamatkan cuma 320px dan saat warga
+                    menyetel teks browser 200%. */}
+                <p className="text-body font-semibold text-gray-900 dark:text-gray-100 potong-lentur">{w.nama}</p>
                 <p className={`text-caption ${ui.text}`}>{ui.label}</p>
               </div>
               {/* Indikator status: hadir ✓ emerald · titip koin biru · tidak hadir lingkaran kosong */}
