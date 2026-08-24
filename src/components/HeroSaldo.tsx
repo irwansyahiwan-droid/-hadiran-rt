@@ -216,7 +216,59 @@ export default function HeroSaldo({
           {actions && <div className="-mr-2 flex shrink-0 items-center">{actions}</div>}
         </div>
 
-        <div className="mt-1 flex items-end gap-x-2.5">
+        {/* Baris nominal + pil status. DITUMPUK di bawah 360px, dan itu bukan
+            kosmetik — di bawah ambang itu ketiga syaratnya tak bisa dipenuhi
+            sekaligus di SATU baris:
+
+              nominal utuh (angka uang tak boleh terpotong)
+            + `minPx` 30px (lantai keterbacaan lansia — FitAmount berhenti
+              menyusut di sini, sengaja)
+            + pil "Defisit" `shrink-0` selebar 64px
+
+            Terukur di 320px (lebar WAJIB §1.4.10) pada saldo NYATA RT ini
+            (-Rp105.000): FitAmount mentok di lantai 30px, kotak nominal 166px
+            sementara teksnya 173,7px — meluber 7,7px ke KANAN, tepat ke tempat
+            pil duduk. Pil ber-`bg-rose-700` PEKAT, jadi ia mengecat digit
+            terakhir: warga membaca "-Rp105.00" dgn angka nol tertutup badge.
+            Kartunya `overflow-hidden`, jadi luberannya tak pernah menggeser
+            halaman & tak pernah menyentuh `truncate` — itulah kenapa ia lolos
+            `audit:reflow` (mengukur geser samping) MAUPUN `audit:potong`
+            (mengukur `truncate`/`line-clamp`), dan `audit:lebar` yang memang
+            memburu nominal meluber cuma berjalan di 360px, satu langkah di atas
+            ambang tempat cacatnya lahir.
+
+            Menumpuk memulihkan ketiganya tanpa mengorbankan satu pun: nominal
+            dapat lebar kartu PENUH (FitAmount justru menaikkan hurufnya lagi),
+            pil turun ke barisnya sendiri. Perilaku ini sudah jadi kanon di hero
+            Beranda — `flex-wrap` di sana melakukan hal yang sama; HeroSaldo
+            satu-satunya yang tak punya katupnya.
+
+            AMBANGNYA 360px, dan BATASNYA diakui di sini alih-alih disembunyikan.
+            Ambang 390 sempat dipasang & diukur supaya tahan pertumbuhan digit
+            (di sana sisa ruang tetap ~10px di ketiga skala: hari ini -10,1 ·
+            x10 -10,1 · x100 -10,7). Ia DIBATALKAN karena ongkosnya di 360px
+            lebih besar dari cacat yang ditutupnya: kartu tumbuh 192,7 -> 240,8px
+            (+48) dan nominal melonjak ke 47px — LEBIH BESAR daripada di 390px,
+            karena baris tumpuk memberi lebar penuh. Padahal 360px justru lebar
+            acuan terkecil app, dan tinggi hero di layar kecil sudah dua kali
+            sengaja DIPANGKAS (lihat `heroRingkas` & catatan tinggi kartu
+            carousel). Menukar satu cacat terukur dgn regresi tinggi di lebar
+            acuan bukan perbaikan.
+
+            Jadi: 320px ditumpuk (di sanalah cacatnya nyata & terlihat), 360px ke
+            atas TAK disentuh sama sekali — byte-identik dgn kode ter-ship
+            (font 34/39px, sisa -9,1/-10,1). Batas yang diketahui: pada nominal
+            ~x100 (belasan milyar — skala yang CLAUDE.md sendiri sebut takkan
+            pernah ada di RT ini) 360px akan meluber lagi 12px. Kalau saldo RT
+            benar-benar tumbuh sampai baris 360px sesak, NAIKKAN ambangnya satu
+            langkah — jangan turunkan `minPx`, karena 30px itu lantai
+            keterbacaan warga lansia, bukan angka yang bisa ditawar.
+
+            `items-stretch` WAJIB saat menumpuk: dgn `items-start` lebar <p>
+            menyusut jadi max-content, dan FitAmount membaca `clientWidth`
+            untuk menghitung skalanya — ia akan mengukur kotak yang sudah
+            terlanjur mengecil. */}
+        <div className="mt-1 flex items-end gap-x-2.5 max-[359px]:flex-col max-[359px]:items-stretch max-[359px]:gap-y-1.5">
           <FitAmount
             measure={measure}
             maxPx={48}
@@ -225,7 +277,9 @@ export default function HeroSaldo({
           >
             {amount}
           </FitAmount>
-          {status}
+          {/* Pembungkus supaya pil tak ikut melar saat `items-stretch`; di >=360px
+              ia flex-item biasa sehingga tampilan lama tak bergerak sama sekali. */}
+          {status && <div className="flex shrink-0 items-end max-[359px]:self-start">{status}</div>}
         </div>
 
         {caption && <p className="mt-1 text-caption angka-prosa text-white/90">{caption}</p>}
