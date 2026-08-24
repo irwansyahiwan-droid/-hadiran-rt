@@ -150,10 +150,9 @@ for (const mode of MODES) {
     await page.goto(URL_APP, { waitUntil: 'networkidle' });
 
     if (!bendahara) {
-      const pw = page.locator('#warga-password');
+      const pw = page.locator('#masuk-warga');
       await pw.waitFor({ timeout: 15000 }).catch(() => {});
-      await pw.click(); await pw.pressSequentially('warga', { delay: 50 });
-      await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+      await pw.click();
     }
     for (let i = 0; i < 30; i++) { await page.waitForTimeout(600); if (await page.locator('nav button').count()) break; }
     await page.waitForTimeout(3800);

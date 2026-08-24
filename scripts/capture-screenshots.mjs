@@ -24,24 +24,21 @@ await page.goto(URL, { waitUntil: 'networkidle' });
 
 // Masuk mode Warga — ketik per-karakter (onChange per huruf) lalu Enter
 // (input punya handler Enter → handleWargaSubmit). Paling andal utk controlled input.
-const pw = page.locator('#warga-password');
+const pw = page.locator('#masuk-warga');
 await pw.waitFor({ timeout: 15000 });
 await pw.click();
-await pw.pressSequentially('warga', { delay: 80 }); // keystroke nyata → React onChange fire
-console.log('  nilai field:', JSON.stringify(await pw.inputValue()));
-await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
 
 // Tunggu betul-betul masuk: bottom nav muncul (poll, toleran animasi)
 let entered = false;
 for (let i = 0; i < 30; i++) {
   await page.waitForTimeout(700);
   const hasNav = await page.locator('nav button', { hasText: 'Beranda' }).count();
-  const onLogin = await page.locator('#warga-password').count();
+  const onLogin = await page.locator('#masuk-warga').count();
   if (hasNav > 0 && onLogin === 0) { entered = true; break; }
 }
 if (!entered) {
   await page.screenshot({ path: `${OUT}/_debug.png` });
-  console.log('GAGAL masuk warga — lihat _debug.png; login masih:', await page.locator('#warga-password').count());
+  console.log('GAGAL masuk warga — lihat _debug.png; login masih:', await page.locator('#masuk-warga').count());
   await browser.close();
   process.exit(1);
 }

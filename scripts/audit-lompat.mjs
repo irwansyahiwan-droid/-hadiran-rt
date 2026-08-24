@@ -165,11 +165,9 @@ for (const bendahara of [false, true]) {
   await page.goto(APP, { waitUntil: 'domcontentloaded' });
 
   if (!bendahara) {
-    const pw = page.locator('#warga-password');
+    const pw = page.locator('#masuk-warga');
     await pw.waitFor({ timeout: 60000 });
-    await pw.focus();
-    await pw.pressSequentially('warga', { delay: 60 });
-    await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+    await pw.click();
   }
   // Tunggu bottom-nav MENGAKU ada; jangan pakai jeda tetap — di CPU 4x lambat
   // jeda tetap kadang memotret layar yang belum hidrasi lalu "lolos" palsu.

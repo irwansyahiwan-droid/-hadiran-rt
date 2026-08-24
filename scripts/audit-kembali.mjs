@@ -320,11 +320,9 @@ for (const bendahara of [false, true]) {
   await page.goto(APP, { waitUntil: 'domcontentloaded' });
 
   if (!bendahara) {
-    const pw = page.locator('#warga-password');
+    const pw = page.locator('#masuk-warga');
     await pw.waitFor({ timeout: 60000 });
-    await pw.focus();
-    await pw.pressSequentially('warga', { delay: 60 });
-    await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+    await pw.click();
   }
   await page.locator('nav button', { hasText: 'Beranda' }).first().waitFor({ timeout: 90000 });
   await page.waitForTimeout(4000);

@@ -63,11 +63,9 @@ page.on('response', (r) => {
 });
 
 await page.goto(APP, { waitUntil: 'networkidle' });
-const pw = page.locator('#warga-password');
+const pw = page.locator('#masuk-warga');
 await pw.waitFor({ timeout: 60000 });
-await pw.focus();
-await pw.pressSequentially('warga', { delay: 50 });
-await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+await pw.click();
 await page.locator('nav button', { hasText: 'Beranda' }).first().waitFor({ timeout: 60000 });
 await page.waitForTimeout(4500);
 
@@ -101,7 +99,7 @@ const A = await page.evaluate(() => {
   const b = (document.body.innerText || '').replace(/\s+/g, ' ');
   return {
     kosong: b.trim().length < 20,
-    login: !!document.querySelector('#warga-password'),
+    login: !!document.querySelector('#masuk-warga'),
     /* Odometer merender PITA digit "0 1 2 3 4 5 6 7 8 9" — menandainya sbg
        "app menyatakan Rp0" itu temuan palsu, jadi pola ini mengecualikannya. */
     rp0: /Rp\s?0(?!\s*1\s*2\s*3)\b/.test(b),

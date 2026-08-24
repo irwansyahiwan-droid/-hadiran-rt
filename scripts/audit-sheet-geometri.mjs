@@ -177,9 +177,8 @@ const browser = await chromium.launch();
   await ctx.route('**/rest/v1/**', (r) => (r.request().method() === 'GET' ? r.continue() : r.abort()));
   const page = await ctx.newPage();
   await page.goto(URL_APP, { waitUntil: 'networkidle' });
-  const pw = page.locator('#warga-password');
-  await pw.click(); await pw.pressSequentially('warga', { delay: 50 });
-  await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+  const pw = page.locator('#masuk-warga');
+  await pw.click();
   for (let i = 0; i < 30; i++) { await page.waitForTimeout(600); if (await page.locator('[role="dialog"]').count()) break; }
   await page.waitForTimeout(1200);
   await ukur(page, 'w1-welcome-sheet');   // WelcomeSheet sekali-lihat

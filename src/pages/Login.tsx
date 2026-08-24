@@ -178,6 +178,12 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         <div className="rise mt-8">
           <button
             type="button"
+            /* `id` ini KONTRAK, bukan hiasan: seluruh sapuan audit masuk lewat
+               sini. Sebelumnya kaitnya `#warga-password` — kolom sandi yang
+               ikut terbuang saat gerbangnya dihapus, dan itu mematikan 20
+               sapuan sekaligus. Jangan ganti/lepas tanpa mengubah
+               `loginWarga()` di scripts/lib/audit-harness.mjs. */
+            id="masuk-warga"
             onClick={() => { haptic(12); onWargaMode(); }}
             className="press w-full min-h-[56px] px-6 rounded-2xl bg-white text-[#063A21]
                        font-bold text-[1.0625rem] flex items-center justify-center gap-2.5

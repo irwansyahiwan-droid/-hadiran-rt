@@ -199,11 +199,9 @@ await ujiMasuk(
   await page.goto(URL_APP, { waitUntil: 'domcontentloaded' });
   const m = [];
 
-  const pw = page.locator('#warga-password');
+  const pw = page.locator('#masuk-warga');
   await pw.waitFor({ timeout: 30000 });
-  await pw.focus();
-  await pw.pressSequentially('warga', { delay: 50 });
-  await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+  await pw.click();
   const masuk = await page.locator('nav button', { hasText: 'Beranda' }).first()
     .waitFor({ timeout: 30000 }).then(() => true).catch(() => false);
   if (!masuk) m.push('PROBE CACAT: gate warga tak pernah terlewati');
@@ -216,7 +214,7 @@ await ujiMasuk(
 
     await page.evaluate(() => window.location.reload());
     await page.waitForTimeout(6000);
-    if (await page.locator('#warga-password').count()) m.push('RELOAD MELEMPAR WARGA KE LOGIN — mode warga tak bertahan sesi tab');
+    if (await page.locator('#masuk-warga').count()) m.push('RELOAD MELEMPAR WARGA KE LOGIN — mode warga tak bertahan sesi tab');
     else if (!(await page.title()).startsWith('Kas RT')) m.push(`reload tak memulihkan tab aktif (judul: ${await page.title()})`);
 
     // Back sesudah pemulihan tab non-Beranda WAJIB ke Beranda, bukan keluar app
@@ -235,7 +233,7 @@ await ujiMasuk(
   await page.goto(URL_APP, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(3000);
   const m = [];
-  if (!(await page.locator('#warga-password').count())) {
+  if (!(await page.locator('#masuk-warga').count())) {
     m.push('GATE BOCOR: sesi baru langsung masuk mode warga tanpa sandi');
   }
   lapor('gate/sesi baru tetap minta sandi', m);

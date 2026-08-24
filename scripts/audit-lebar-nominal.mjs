@@ -251,11 +251,9 @@ async function newCtx(browser, { bendahara = false } = {}) {
 }
 
 async function loginWarga(page) {
-  const pw = page.locator('#warga-password');
+  const pw = page.locator('#masuk-warga');
   await pw.waitFor({ timeout: 15000 });
   await pw.click();
-  await pw.pressSequentially('warga', { delay: 60 });
-  await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
   for (let i = 0; i < 30; i++) {
     await page.waitForTimeout(700);
     if ((await page.locator('nav button', { hasText: 'Beranda' }).count()) > 0) return true;

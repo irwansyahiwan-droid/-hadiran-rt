@@ -133,8 +133,8 @@ async function muat(page, bendahara) {
   /* Gate warga hidup di sessionStorage (`hadiran-warga-sesi`, lihat memory
      warga-gate-sesi-tab), jadi pemulihan SESUDAH terlempar keluar mendarat di
      app yang MASIH masuk — memanggil loginWarga tanpa syarat bikin sapuan
-     menunggu #warga-password yang takkan pernah datang lalu mati. */
-  if (!bendahara && (await page.locator('#warga-password').count())) await loginWarga(page);
+     menunggu #masuk-warga yang takkan pernah datang lalu mati. */
+  if (!bendahara && (await page.locator('#masuk-warga').count())) await loginWarga(page);
   await page.waitForTimeout(2500);
 }
 

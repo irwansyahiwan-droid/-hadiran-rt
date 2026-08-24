@@ -53,7 +53,7 @@ for (let run = 0; run < RUNS; run++) {
   p.on('response', (r) => { if (/supabase\.co/.test(r.url()) && tSupa === null) tSupa = Date.now() - t0; });
 
   await p.goto(APP, { waitUntil: 'domcontentloaded' });
-  await p.locator('#warga-password').waitFor({ timeout: 60000 });
+  await p.locator('#masuk-warga').waitFor({ timeout: 60000 });
   const tSiap = Date.now() - t0;
 
   const fcp = await p.evaluate(() => {

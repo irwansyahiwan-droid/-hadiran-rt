@@ -189,7 +189,7 @@ async function tarikBawah(page, sel) {
 async function muat(page) {
   await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: NAV_MS });
   await page.waitForTimeout(1500);
-  if (await page.locator('#warga-password').count()) await loginWarga(page);
+  if (await page.locator('#masuk-warga').count()) await loginWarga(page);
   await page.waitForTimeout(1200);
   await tungguIsiNyata(page);
 }
@@ -342,9 +342,17 @@ for (const peran of ['warga', 'bendahara']) {
   await page.evaluate(() => window.scrollTo(0, 1500));
   await page.waitForTimeout(700);
   await uji('sheet-detail-transaksi', klik(page, () => page.locator('button').filter({ hasText: /[+-]Rp/ })));
-  await uji('popover-urutan', klik(page, () => page.getByRole('button', { name: /^Urutkan/i })));
 
   tabSekarang = 'Kas RT'; await keTab(page, 'Kas RT');
+  /* `popover-urutan` PINDAH dari Beranda ke sini (24 Agu 2026). Cari + filter +
+     urut dibuang dari Beranda — ketiganya cuma bekerja atas jendela fetch
+     Beranda, bukan riwayat penuh. Lapisannya sendiri MASIH ADA di app (Kas RT,
+     Kas Hadiran, Talangan); yang hilang cuma pintunya di Beranda.
+     Dibiarkan di tempat lama, sapuan mencetak "dilewat: popover-urutan" di dua
+     peran dan populasinya menyusut diam-diam — kelas cacat ke-17/18/19 & ke-23
+     yang persis dilarang repo ini. Kalau nanti Kas RT kehilangan pengurutnya,
+     PINDAHKAN lagi; jangan hapus barisnya. */
+  await uji('popover-urutan', klik(page, () => page.getByRole('button', { name: /^Urutkan/i })));
   await uji('menu-ekspor', klik(page, () => page.getByRole('button', { name: /^Ekspor/i })));
   await uji('sheet-aksi-baris', klik(page, () => page.getByRole('button', { name: /^(Aksi|Lihat detail):/i })));
   if (bendahara) {

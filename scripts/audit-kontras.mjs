@@ -297,15 +297,13 @@ async function runTheme(theme, results, seen) {
   // halaman login dulu
   if (!process.env.SKIP_LOGIN_AUDIT) await auditPage(page, `${theme}/login`, results, seen);
 
-  const pw = page.locator('#warga-password');
+  const pw = page.locator('#masuk-warga');
   await pw.waitFor({ timeout: 15000 });
   await pw.click();
-  await pw.pressSequentially('warga', { delay: 60 });
-  await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
   let entered = false;
   for (let i = 0; i < 30; i++) {
     await page.waitForTimeout(700);
-    if ((await page.locator('nav button', { hasText: 'Beranda' }).count()) > 0 && (await page.locator('#warga-password').count()) === 0) { entered = true; break; }
+    if ((await page.locator('nav button', { hasText: 'Beranda' }).count()) > 0 && (await page.locator('#masuk-warga').count()) === 0) { entered = true; break; }
   }
   if (!entered) { console.log(`GAGAL masuk warga (${theme})`); await browser.close(); return; }
   await page.waitForLoadState('networkidle').catch(() => {});

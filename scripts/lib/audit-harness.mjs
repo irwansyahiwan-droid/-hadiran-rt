@@ -211,16 +211,14 @@ export async function newCtx(browser, theme, { bendahara = false, welcome = fals
 }
 
 export async function loginWarga(page) {
-  const pw = page.locator('#warga-password');
-  await pw.waitFor({ timeout: 15000 });
-  /* focus(), BUKAN click(): di viewport sempit (320px) & saat teks diperbesar,
-     pemeriksaan aktionabilitas Playwright menolak klik karena tombol mata
-     `w-11 h-11` dianggap menghalangi — padahal elementFromPoint di tengah kolom
-     benar-benar mengenai INPUT. focus() tak butuh hit-test dan TETAP menyisakan
-     sifat penting sapuan ini: 'warga' diketik betulan, tombol per tombol. */
-  await pw.focus();
-  await pw.pressSequentially('warga', { delay: 60 });
-  await page.getByRole('button', { name: 'Masuk Sekarang' }).click();
+  /* Gerbang "ketik: warga" dibuang 24 Agu 2026 — layarnya mengumumkan sandinya
+     sendiri, jadi ia friksi tanpa perlindungan. Mode warga kini SATU ketukan.
+     Kaitnya `#masuk-warga` (id di Login.tsx), bukan teks tombol: teks bisa
+     diubah pass penyuntingan kata dan mematikan seluruh sapuan diam-diam —
+     persis yang baru saja terjadi pada `#warga-password`. */
+  const btn = page.locator('#masuk-warga');
+  await btn.waitFor({ timeout: 15000 });
+  await btn.click();
   for (let i = 0; i < 30; i++) {
     await page.waitForTimeout(700);
     if ((await page.locator('nav button', { hasText: 'Beranda' }).count()) > 0) return true;
