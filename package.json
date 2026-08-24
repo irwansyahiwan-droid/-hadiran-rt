@@ -26,6 +26,7 @@
     "audit:masuk": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-masuk.mjs",
     "audit:luring": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-luring.mjs",
     "audit:lompat": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-lompat.mjs",
+    "audit:gerak": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-gerak.mjs",
     "audit:papan-ketik": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-papan-ketik.mjs",
     "audit:mundur": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-mundur.mjs",
     "audit:gestur": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-gestur.mjs",
