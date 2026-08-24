@@ -10,6 +10,29 @@
  *   B. BATAS KONTROL  — input/select/textarea: batas ATAU fill harus 3:1 vs latar.
  *   C. RING FOKUS     — indikator :focus-visible asli (lewat Tab) vs latar sebelah.
  *   D. TANDA GRAFIK   — garis tren, bar, dot legenda (opt-in `data-grafik`).
+ *   E. GLYPH NATIVE   — ikon yang digambar BROWSER di dalam kontrol native
+ *                       (panah `select`, tombol picker `input[type=date]`).
+ *
+ * ── Kenapa E ada (24 Agu 2026) ────────────────────────────────────────────
+ * A–D semuanya memungut populasinya lewat `querySelectorAll`. Glyph kontrol
+ * native BUKAN simpul DOM — ia pseudo-element shadow UA
+ * (`::-webkit-calendar-picker-indicator`) atau digambar langsung oleh mesin
+ * render. Jadi 9 glyph (5 kolom tanggal + 4 select) tak pernah terukur sekali
+ * pun, di sapuan mana pun, sepanjang umur repo ini. Kelas titik-buta yang SAMA
+ * dgn Odometer di `audit:lebar` dan `::placeholder` di `audit:kontras`: apa pun
+ * yang tak punya simpul DOM hilang dari populasi berbasis selektor.
+ *
+ * Karena tak ada elemen untuk dibaca `getComputedStyle`-nya, E menilai lewat
+ * PIKSEL: band di tepi KANAN kontrol, latar = modus, tinta = piksel terjauh
+ * dari latar. Bandnya tidak ditebak — dipetakan lebih dulu di build sungguhan:
+ *   input[type=date]  teks berhenti 56px dari kanan · glyph 12..38px
+ *   select            teks berhenti 53px dari kanan · glyph  7..13px
+ * Band 6..40px dari tepi kanan karena itu memuat glyph KEDUANYA & tak pernah
+ * menyentuh teks (yang akan menang jadi "piksel terjauh" lalu MENYEMBUNYIKAN
+ * panah abu yang gagal). Inset 6px juga menjauhkannya dari garis batas —
+ * aturan anti-FP no.1 di atas.
+ *
+ * Band yang TIDAK menemukan tinta dihitung `tak terukur`, BUKAN lulus.
  *
  * ── ATURAN ANTI-FALSE-POSITIVE (jangan dilonggarkan tanpa bukti) ───────────
  * 1. JANGAN PERNAH menyampel piksel garis 1–2px. Itu sumber tunggal 33 FP di
@@ -42,6 +65,9 @@ mkdirSync(OUT, { recursive: true });
 const NEED = 3;                // §1.4.11 & §2.4.13 sama-sama 3:1
 const results = [];
 const seen = new Set();
+/* Band glyph yang tak menemukan tinta. Dicetak terpisah — sapuan tak boleh
+   menyempitkan populasinya sendiri tanpa mengaku (pelajaran cacat ke-17/18). */
+const glyphButa = [];
 
 const push = (row) => {
   const key = `${row.jenis}|${row.ctx}|${row.nama}|${row.fg}|${row.bg}`;
@@ -78,6 +104,20 @@ const chartBgPoints = (r, gap) => {
 };
 
 /* Titik sampel di DALAM kotak, jauh dari tepi (tak kena garis) — untuk fill. */
+/* Band glyph: tepi KANAN kontrol, 6..40px dari tepi, inset 6px vertikal.
+   Langkah 1px mendatar — panah `select` cuma selebar ~6px & bergaris tipis;
+   langkah 2px bisa mendarat di antara goresan lalu cuma memungut piksel
+   antialias, dan itu melahirkan kegagalan palsu (pelajaran 33 FP audit teks). */
+const glyphPoints = (r) => {
+  const pts = [];
+  const x1 = r.x + r.w - 6;
+  const x0 = Math.max(r.x + 2, r.x + r.w - 40);
+  const y0 = r.y + 6, y1 = r.y + r.h - 6;
+  if (x1 <= x0 || y1 <= y0) return pts;
+  for (let x = x0; x <= x1; x += 1) for (let y = y0; y <= y1; y += 2) pts.push([x, y]);
+  return pts;
+};
+
 const insidePoints = (r, inset) => {
   const pts = [];
   const ix = Math.min(inset, Math.max(1, r.w / 2 - 1));
@@ -237,6 +277,27 @@ async function collectFields(page) {
   })()`);
 }
 
+/** Kontrol yang glyph-nya digambar BROWSER, bukan oleh app. */
+async function collectGlyphNative(page) {
+  return page.evaluate(`(() => {
+    ${PAGE_HELPERS}
+    const out = [];
+    for (const el of document.querySelectorAll('select,input[type="date"],input[type="time"]')) {
+      if (!vis(el) || mati(el)) continue;   // nonaktif = pengecualian eksplisit §1.4.11
+      if (!takTerhalang(el)) continue;
+      const r = rectOf(el);
+      if (r.w < 48 || r.h < 20) continue;   // terlalu sempit utk punya band glyph
+      out.push({
+        nama: el.id || el.name || el.getAttribute('aria-label') || jejak(el),
+        jenisKontrol: el.tagName.toLowerCase() + (el.type ? '[' + el.type + ']' : ''),
+        rect: r,
+        tag: jejak(el),
+      });
+    }
+    return out;
+  })()`);
+}
+
 /** Kandidat fokus + gaya SEBELUM difokus (pembanding "tak ada indikator"). */
 async function stampFocusables(page) {
   return page.evaluate(`(() => {
@@ -303,6 +364,29 @@ function nilaiIkon(el, samples) {
   return { ratio: worst, bg: worstBg, fg: cand.rgb };
 }
 
+/* Glyph native dinilai MURNI dari piksel — tak ada elemen yang bisa dibaca
+   `getComputedStyle`-nya. Latar = modus band; tinta = piksel TERJAUH dari
+   latar (inti goresan, bukan tepi antialias-nya).
+
+   `null` = tak ada tinta di band → dilaporkan `tak terukur`, BUKAN lulus.
+   Sapuan yang menghitung band kosong sebagai lulus akan mencetak angka yang
+   sama untuk "glyph-nya bagus" dan "aku tak menemukan glyph apa pun". */
+const AMBANG_TINTA = 30;   // jarak RGB minimum agar dianggap tinta, bukan noise
+
+function nilaiGlyph(samples) {
+  if (!samples || samples.length < 20) return null;
+  const cnt = new Map();
+  for (const c of samples) { const k = c.join(','); cnt.set(k, (cnt.get(k) || 0) + 1); }
+  const bg = [...cnt.entries()].sort((a, b) => b[1] - a[1])[0][0].split(',').map(Number);
+  let ink = null, dmax = -1;
+  for (const c of samples) {
+    const d = Math.hypot(c[0] - bg[0], c[1] - bg[1], c[2] - bg[2]);
+    if (d > dmax) { dmax = d; ink = c; }
+  }
+  if (dmax < AMBANG_TINTA) return null;
+  return { ratio: ratio(ink, bg), fg: ink, bg };
+}
+
 function nilaiField(el, luar, dalam) {
   const bgs = modusBg(luar, null);
   if (!bgs) return null;
@@ -345,15 +429,16 @@ function nilaiFokus(st, bg) {
 
 // ── sapuan satu tampilan ──────────────────────────────────────────────────
 async function auditView(page, ctxName, { fokus = false } = {}) {
-  const [ikon, field, grafik] = await Promise.all([collectIcons(page), collectFields(page), collectGrafik(page)]);
+  const [ikon, field, grafik, glyph] = await Promise.all([collectIcons(page), collectFields(page), collectGrafik(page), collectGlyphNative(page)]);
 
-  if (ikon.length || field.length || grafik.length) {
+  if (ikon.length || field.length || grafik.length || glyph.length) {
     const shot = (await page.screenshot()).toString('base64');
     const ptsIkon = ikon.map((e) => clamp(insidePoints(e.rect, 1).concat(outsidePoints(e.rect, 3))));
     const ptsLuar = field.map((e) => clamp(outsidePoints(e.rect, 3)));
     const ptsDalam = field.map((e) => clamp(insidePoints(e.rect, 6)));
     const ptsGrafik = grafik.map((e) => clamp(chartBgPoints(e.rect, 6)));
-    const flat = [...ptsIkon.flat(), ...ptsLuar.flat(), ...ptsDalam.flat(), ...ptsGrafik.flat()];
+    const ptsGlyph = glyph.map((e) => clamp(glyphPoints(e.rect)));
+    const flat = [...ptsIkon.flat(), ...ptsLuar.flat(), ...ptsDalam.flat(), ...ptsGrafik.flat(), ...ptsGlyph.flat()];
     const px = await samplePixels(page, shot, flat);
 
     /* Pemotong blok eksplisit — aritmetika offset manual sudah pernah bikin
@@ -369,6 +454,7 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
     const sLuar = potong(ptsLuar, nIkon);
     const sDalam = potong(ptsDalam, nIkon + nLuar);
     const sGrafik = potong(ptsGrafik, nIkon + nLuar + nDalam);
+    const sGlyph = potong(ptsGlyph, nIkon + nLuar + nDalam + ptsGrafik.flat().length);
 
     ikon.forEach((e, i) => {
       const res = nilaiIkon(e, sIkon[i]);
@@ -384,6 +470,11 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
       const res = nilaiIkon(e, sGrafik[i]);
       if (!res) return;
       push({ jenis: 'grafik', ctx: ctxName, nama: e.nama, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
+    });
+    glyph.forEach((e, i) => {
+      const res = nilaiGlyph(sGlyph[i]);
+      if (!res) { glyphButa.push(`[${ctxName}] ${e.jenisKontrol} "${e.nama}"`); return; }
+      push({ jenis: 'glyph-native', ctx: ctxName, nama: `${e.nama} (${e.jenisKontrol})`, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
     });
   }
 
@@ -519,11 +610,16 @@ writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const per = (j) => results.filter((r) => r.jenis === j);
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log('\n=== KONTRAS NON-TEKS (ambang 3:1) ===');
-for (const j of ['ikon', 'batas-kontrol', 'ring-fokus', 'grafik']) {
+for (const j of ['ikon', 'batas-kontrol', 'ring-fokus', 'grafik', 'glyph-native']) {
   const s = per(j);
   console.log(`  ${j.padEnd(14)} ${String(s.length).padStart(4)} sampel, ${s.filter((r) => !r.pass).length} gagal`);
 }
-console.log(`  TOTAL          ${String(results.length).padStart(4)} sampel, ${fails.length} gagal\n`);
+console.log(`  TOTAL          ${String(results.length).padStart(4)} sampel, ${fails.length} gagal`);
+if (glyphButa.length) {
+  console.log(`  glyph tak terukur (band tanpa tinta): ${glyphButa.length}`);
+  if (process.env.SHOW_BUTA) glyphButa.forEach((g) => console.log(`    · ${g}`));
+}
+console.log('');
 for (const f of fails) {
   console.log(`${String(f.ratio).padStart(5)} [${f.jenis}] [${f.ctx}] "${f.nama}" ${f.asal || f.lewat || ''} fg(${f.fg}) bg(${f.bg}) <${f.tag}>`);
 }
