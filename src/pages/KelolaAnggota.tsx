@@ -119,7 +119,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
   const input =
     'field';
-  const label = 'block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5';
+  const label = 'label-field';
 
   return (
     <div className="fixed inset-0 z-modal flex items-end sm:items-center justify-center">

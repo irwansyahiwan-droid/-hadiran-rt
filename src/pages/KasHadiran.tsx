@@ -76,7 +76,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
         </div>
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label htmlFor="kashadiran-tarikan" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Dari tarikan</label>
+            <label htmlFor="kashadiran-tarikan" className="label-field">Dari tarikan</label>
             <select id="kashadiran-tarikan" name="tarikan" value={tarikanId} onChange={e => setTarikanId(e.target.value)} required
               className="field">
               {tarikanOpsi.length === 0 && <option value="">— belum ada tarikan selesai —</option>}
@@ -88,14 +88,14 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             </select>
           </div>
           <div>
-            <label htmlFor="kashadiran-keterangan" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Keterangan</label>
+            <label htmlFor="kashadiran-keterangan" className="label-field">Keterangan</label>
             <input id="kashadiran-keterangan" name="keterangan" autoComplete="off" type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
               placeholder="Contoh: Setoran bulan Mei 2026…"
               className="field" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="kashadiran-nominal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
+              <label htmlFor="kashadiran-nominal" className="label-field">Nominal</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-500 dark:text-gray-400">Rp</span>
                 <input id="kashadiran-nominal" name="nominal" autoComplete="off" type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
@@ -104,7 +104,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
               </div>
             </div>
             <div>
-              <label htmlFor="kashadiran-tanggal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Tanggal</label>
+              <label htmlFor="kashadiran-tanggal" className="label-field">Tanggal</label>
               <input id="kashadiran-tanggal" name="tanggal" type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
                 className="field" />
             </div>

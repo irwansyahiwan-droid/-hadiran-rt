@@ -144,7 +144,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                 ))}
               </div>
               <div>
-                <label htmlFor="restore-konfirmasi" className="block text-caption font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                <label htmlFor="restore-konfirmasi" className="label-field">
                   Ketik <span className="font-bold text-neg dark:text-rose-400">{KATA_KONFIRMASI}</span> untuk konfirmasi
                 </label>
                 <input

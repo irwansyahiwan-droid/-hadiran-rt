@@ -1094,6 +1094,32 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
            text-body text-gray-900 dark:text-gray-100
            placeholder-gray-500 dark:placeholder-gray-400;
   }
+  /* ── Label kolom isian — SATU resep ────────────────────────────────────
+     Sampai 24 Agu 2026 peran ini ditulis ulang di tiap call-site, dan 20 label
+     app memakai TIGA tinta terang berbeda untuk pekerjaan yang sama:
+
+         text-ink-sub  x10  -> #1F2937  (~14,7:1)   KasHadiran, KasRT, Login
+         text-gray-600  x5  -> #4B5563  (~9:1)      ConfirmDestruktif,
+                                                    TargetKasRT, BackupRestore
+         text-gray-500  x5  -> #334155  (~10,4:1)   Jadwal, KelolaAnggota
+
+     Dua di antaranya token Tailwind MENTAH, dan `text-gray-500` bahkan
+     mendarat tepat di nilai `ink-faint` (#334155) — yaitu tinta TANGGAL/CAPTION,
+     satu tingkat di bawah tempat label semestinya duduk. Jadi bukan sekadar tak
+     seragam: sebagian label form diam-diam turun kelas di tangga tipografi
+     app sendiri (ink > sub > faint).
+
+     Sisi GELAP juga pecah dua (`gray-400` x18 vs `gray-200` x2 di Login).
+     Diukur, bukan dikira: label Login ternyata duduk di `#030712` yang SAMA
+     dgn form lain — bukan di gradient emerald Login — jadi tak ada alasan
+     kanvas untuk membedakannya. Pasangan gelap tunggal `gray-400` (#AEB7C4)
+     = 9,95:1 di sana, masih di atas ambang AAA app.
+
+     `mb-1.5` ikut masuk resep (19 dari 20 call-site sudah memakainya); yang
+     butuh jarak atas tinggal menambah `mt-*` di sampingnya. */
+  .label-field {
+    @apply block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5;
+  }
   .field-search {
     @apply w-full pl-9 pr-9 py-3 rounded-xl bg-white dark:bg-gray-900
            border border-control dark:border-control-dark

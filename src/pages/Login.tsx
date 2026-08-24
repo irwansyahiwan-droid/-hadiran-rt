@@ -315,7 +315,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div>
-                <label htmlFor="login-email" className="block text-caption font-semibold text-ink-sub dark:text-gray-200 mb-1.5">Email</label>
+                <label htmlFor="login-email" className="label-field">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
                   <input
@@ -342,7 +342,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
               {/* Password */}
               <div>
-                <label htmlFor="login-password" className="block text-caption font-semibold text-ink-sub dark:text-gray-200 mb-1.5">Password</label>
+                <label htmlFor="login-password" className="label-field">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none w-4 h-4 text-gray-400" />
                   <input

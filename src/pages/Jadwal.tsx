@@ -733,7 +733,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           </button>
         </div>
 
-        <label htmlFor="jadwal-edit-tanggal" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-edit-tanggal" className="label-field">Tanggal Tarikan</label>
         <input
           id="jadwal-edit-tanggal"
           name="tanggal-tarikan"
@@ -743,7 +743,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           className="field mb-4"
         />
 
-        <label htmlFor="jadwal-edit-sohibul" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-edit-sohibul" className="label-field">Sohibul Bait</label>
         <select
           id="jadwal-edit-sohibul"
           name="sohibul-bait"
@@ -839,7 +839,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           </button>
         </div>
 
-        <label htmlFor="jadwal-add-tanggal" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Tanggal Tarikan</label>
+        <label htmlFor="jadwal-add-tanggal" className="label-field">Tanggal Tarikan</label>
         <input
           id="jadwal-add-tanggal"
           name="tanggal-tarikan"
@@ -849,7 +849,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           className="field mb-4"
         />
 
-        <label htmlFor="jadwal-add-sohibul" className="block text-caption font-semibold text-gray-500 dark:text-gray-400 mb-1.5">Sohibul Bait</label>
+        <label htmlFor="jadwal-add-sohibul" className="label-field">Sohibul Bait</label>
         <select
           id="jadwal-add-sohibul"
           name="sohibul-bait"

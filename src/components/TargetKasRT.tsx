@@ -269,7 +269,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
 
         <form onSubmit={submit} className="space-y-3">
           <div>
-            <label htmlFor="target-nama" className="block text-caption font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nama Target</label>
+            <label htmlFor="target-nama" className="label-field">Nama Target</label>
             <input
               id="target-nama"
               name="nama-target"
@@ -283,7 +283,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="target-nominal" className="block text-caption font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Nominal Target</label>
+              <label htmlFor="target-nominal" className="label-field">Nominal Target</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-500 dark:text-gray-400">Rp</span>
                 <input
@@ -300,7 +300,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
               </div>
             </div>
             <div>
-              <label htmlFor="target-tanggal" className="block text-caption font-semibold text-gray-600 dark:text-gray-400 mb-1.5">Batas Waktu</label>
+              <label htmlFor="target-tanggal" className="label-field">Batas Waktu</label>
               <input
                 id="target-tanggal"
                 name="batas-waktu-target"

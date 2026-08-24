@@ -108,7 +108,7 @@ export default function ConfirmDestruktif({
 
         {typeToConfirm && (
           <>
-            <label htmlFor={inputId} className="block text-caption font-semibold text-gray-600 dark:text-gray-400 mt-4 mb-1.5">
+            <label htmlFor={inputId} className="label-field mt-4">
               {typeToConfirm.hint}
             </label>
             <input

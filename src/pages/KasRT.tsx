@@ -127,7 +127,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
           {/* Kategori — untuk laporan pertanggungjawaban (opsi ikut tipe) */}
           <div>
-            <label htmlFor="kasrt-kategori" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Kategori</label>
+            <label htmlFor="kasrt-kategori" className="label-field">Kategori</label>
             <select id="kasrt-kategori" name="kategori" value={kategori} onChange={(e) => setKategori(e.target.value)} required
               className="field">
               {kategoriOpsi(tipe).map((o) => (
@@ -137,7 +137,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           </div>
 
           <div>
-            <label htmlFor="kasrt-keterangan" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Keterangan</label>
+            <label htmlFor="kasrt-keterangan" className="label-field">Keterangan</label>
             <input
               id="kasrt-keterangan"
               name="keterangan"
@@ -153,7 +153,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="kasrt-nominal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Nominal</label>
+              <label htmlFor="kasrt-nominal" className="label-field">Nominal</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-500 dark:text-gray-400">Rp</span>
                 <input
@@ -170,7 +170,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               </div>
             </div>
             <div>
-              <label htmlFor="kasrt-tanggal" className="block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5">Tanggal</label>
+              <label htmlFor="kasrt-tanggal" className="label-field">Tanggal</label>
               <input
                 id="kasrt-tanggal"
                 name="tanggal"
