@@ -412,7 +412,12 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                 onClick={() => { haptic(); setForm({ mode: 'edit', warga: w }); }}
                 // ~79+ baris (aktif + nonaktif): content-visibility lewati render
                 // baris di luar layar — pola sama dgn Jadwal.tsx & KasRT.tsx.
-                className={`w-full flex items-center gap-3 px-4 py-3.5 text-left [--di-l:4.25rem] [--di-r:1rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px] active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
+                /* Stagger masuk — dialek gerak bersama (lihat Jadwal.tsx). `.rise`
+                   duduk di elemen yang SAMA dgn `content-visibility:auto`, persis
+                   pola KasRT.tsx: animasi elemen itu sendiri tetap jalan, yang
+                   dilewati cuma render ISI baris di luar layar. */
+                style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
+                className={`rise w-full flex items-center gap-3 px-4 py-3.5 text-left [--di-l:4.25rem] [--di-r:1rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px] active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
                   idx < filtered.length - 1 ? 'divide-inset' : ''
                 }`}
               >

@@ -1493,5 +1493,17 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    /* `animation-delay` WAJIB ikut dinolkan (24 Agu 2026). Tanpa baris ini
+       blok di atas cuma memampatkan DURASI, sedangkan JEDA-nya utuh — dan
+       `.rise` memakai fill-mode `both`, artinya elemen bertahan di keyframe
+       `from` (opacity 0, translateY 10px) selama jeda itu. Daftar ber-stagger
+       memakai delay inline sampai 10 × 0.05s, jadi pengguna yang minta
+       "kurangi gerak" justru mendapat daftar yang KOSONG setengah detik lalu
+       meletus muncul — persis kebalikan dari yang ia minta, dan lebih buruk
+       daripada animasi aslinya. Sudah berlaku sejak stagger pertama dipasang
+       (KasRT, Kas Hadiran, Riwayat, Login); ketahuan saat empat daftar lain
+       menyusul. Menolkan delay aman untuk SEMUA pemakai: dgn durasi ~0 tiap
+       animasi langsung mendarat di keadaan akhirnya. */
+    animation-delay: 0.001ms !important;
   }
 }

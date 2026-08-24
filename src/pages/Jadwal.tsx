@@ -1075,9 +1075,14 @@ export default function JadwalPage() {
             return (
               <div
                 key={t.id}
+                /* Stagger masuk — dialek gerak yang sama dgn Kas RT / Kas Hadiran /
+                   Riwayat (`.rise` + delay inline, dipuncak di idx 10 supaya baris
+                   ke-71 tak menunggu 2,5 detik). Daftar ini termasuk empat daftar
+                   terakhir yang belum kebagian. */
+                style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
                 /* Edge kiri = sinyal "giliran berikutnya" SAJA (token brand);
                    tarikan selesai sudah cukup de-emphasized lewat teks abu. */
-                className={`flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l-[3px] border-l-brand-500 dark:border-l-emerald-500' : ''}`}
+                className={`rise flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l-[3px] border-l-brand-500 dark:border-l-emerald-500' : ''}`}
               >
                 {/* Nomor kecil */}
                 <span className="text-base font-bold text-ink-faint dark:text-gray-400 w-7 shrink-0 text-right tabular-nums">

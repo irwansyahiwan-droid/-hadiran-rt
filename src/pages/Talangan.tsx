@@ -292,7 +292,12 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     if (!ok) showToast('Nomor HP belum tersimpan — pilih kontak manual di WhatsApp', 'info');
   }
 
-  function renderGroup(g: WargaGroup, showAll = false) {
+  /* `idx` HANYA untuk jeda stagger, bukan data. Sengaja dioper dari pemanggil
+     alih-alih dihitung di sini: renderGroup dipakai TIGA kartu berbeda
+     (Berganda / Daftar Talangan / Sudah Lunas), masing-masing dgn urutannya
+     sendiri — kalau indeksnya diambil dari satu daftar gabungan, kartu kedua &
+     ketiga mulai dari jeda yang sudah dipuncak dan seluruh isinya masuk serempak. */
+  function renderGroup(g: WargaGroup, showAll = false, idx = 0) {
     const isExpanded = expandedId === g.warga_id;
     const belumEntries = g.entries.filter(e => !e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
     const lunasEntries = g.entries.filter(e => e.status_lunas).sort((a, b) => (a.tarikan?.nomor ?? 0) - (b.tarikan?.nomor ?? 0));
@@ -307,7 +312,12 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
          ketiganya memakai default 4.75rem (rumus daftar ber-avatar 44px di
          padding 20), jadi hairline mulai 14px setelah nama & berhenti 4px
          sebelum tepi kanan baris. */
-      <div key={g.warga_id} className="[--di-l:3.875rem] [--di-r:1rem]">
+      <div
+        key={g.warga_id}
+        /* Stagger masuk — dialek gerak bersama (lihat Jadwal.tsx). */
+        style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
+        className="rise [--di-l:3.875rem] [--di-r:1rem]"
+      >
         {/* Group header */}
         {/* `items-start` juga di baris LUAR: tombol WA duduk di sini, di luar
             tombol barisnya. Waktu isi baris dipindah ke perataan atas tapi wadah
@@ -573,7 +583,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 Tunggakan Berganda
               </SectionTitle>
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
-                {berganda.map(g => renderGroup(g))}
+                {berganda.map((g, i) => renderGroup(g, false, i))}
               </div>
             </div>
           )}
@@ -583,7 +593,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             <div>
               <SectionTitle className="mt-6" count={single.length}>Daftar Talangan</SectionTitle>
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
-                {single.map(g => renderGroup(g))}
+                {single.map((g, i) => renderGroup(g, false, i))}
               </div>
             </div>
           )}
@@ -593,7 +603,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             <div>
               <SectionTitle className="mt-6" tone="muted" count={lunas.length}>Sudah Lunas</SectionTitle>
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
-                {lunas.map(g => renderGroup(g, true))}
+                {lunas.map((g, i) => renderGroup(g, true, i))}
               </div>
             </div>
           )}

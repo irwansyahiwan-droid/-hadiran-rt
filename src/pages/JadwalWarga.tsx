@@ -533,7 +533,9 @@ export default function JadwalWargaPage() {
                        rem) sudah menghabiskan 361px SEBELUM nama dapat ruang —
                        jadi tak ada yang bisa mengalah dan chip mendorong halaman
                        geser samping. Dengan wrap, chip turun sebaris. */
-                    className={`flex flex-wrap items-center gap-2.5 p-3.5 [--di-l:5.375rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] ${
+                    /* Stagger masuk — dialek gerak bersama (lihat Jadwal.tsx). */
+                    style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
+                    className={`rise flex flex-wrap items-center gap-2.5 p-3.5 [--di-l:5.375rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] ${
                       idx < filteredWarga.length - 1 ? 'divide-inset' : ''
                     }`}
                   >
@@ -605,7 +607,9 @@ export default function JadwalWargaPage() {
                 return (
                   <div
                     key={t.id}
-                    className={`flex items-center gap-2 px-4 py-4 [--di-l:4rem] ${!isLast ? 'divide-inset' : ''}`}
+                    /* Stagger masuk — dialek gerak bersama (lihat Jadwal.tsx). */
+                    style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
+                    className={`rise flex items-center gap-2 px-4 py-4 [--di-l:4rem] ${!isLast ? 'divide-inset' : ''}`}
                   >
                     {/* Badge nomor = IDENTITAS, netral. Statusnya dulu ter-encode
                         tiga kali di baris ini: fill badge (brand vs abu), redupnya
