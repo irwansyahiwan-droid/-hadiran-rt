@@ -13,8 +13,8 @@
 // Untuk app kas, "saldo lama yang tampak seperti saldo sekarang" bukan soal
 // rasa; itu pernyataan keliru tentang uang.
 //
-// TIGA sifat diuji sekaligus, karena memperbaiki yang pertama gampang merusak
-// dua sisanya:
+// EMPAT sifat diuji sekaligus, karena memperbaiki yang pertama gampang merusak
+// sisanya:
 //   1. KEMBALI LAMA  → data diambil ulang (≥1 GET rest/v1).
 //   2. KEMBALI SEBENTAR → TIDAK diambil ulang. Warga menyentuh notifikasi lalu
 //      balik dalam 3 detik; menyegarkan tiap kali itu = badai request di paket
@@ -22,6 +22,9 @@
 //   3. DIAM-DIAM → penyegarannya tak boleh memunculkan skeleton lagi. Layar
 //      yang berkedip balik ke abu tiap kali app dibuka terasa lebih murah
 //      daripada data basi yang diam.
+//   4. PENYEGARANNYA GAGAL → app wajib MENGAKU (4a) dan angka lamanya wajib
+//      BERTAHAN (4b). Sifat 1-3 semuanya mengandaikan penyegaran BERHASIL;
+//      rinciannya di atas `putaranGagal`.
 //
 // BATAS SAPUAN — diakui, bukan disembunyikan: Chromium di harness ini TIDAK
 // BISA benar-benar disembunyikan. `Emulation.setPageVisibilityOverride` sudah
@@ -70,9 +73,57 @@ const PASANG_VIS = () => {
   window.__tampil = () => set('visible');
 };
 
+/* Pemungut nominal & pengakuan, dipasang DI HALAMAN supaya observer bisa
+   memakainya SELAMA jendela kegagalan, bukan cuma memotret sesudahnya. */
+const PASANG_PUNGUT = () => {
+  const POLA_AKU = /Gagal mem|tanpa sinyal|salinan terakhir|Coba lagi/i;
+  /* Hero saldo dirender Odometer: tiap digit adalah kolom 0-9 yang bertumpuk,
+     jadi `innerText` di sana berbunyi "Rp\n0\n1\n2…" dan pola `Rp\d` TIDAK
+     cocok — angka PALING penting di layar justru yang tak terlihat probe.
+     Nilai aslinya hidup di `aria-label` (`role="text"`), jadi itu ikut
+     dipungut; tanpa ini sapuan menyempitkan populasinya sendiri tanpa mengaku
+     (cacat alat ke-17/18/19 repo ini). */
+  const heroTeks = () => [...document.querySelectorAll('[role="text"][aria-label]')]
+    .map((x) => x.getAttribute('aria-label')).join('\n');
+  window.__teks = () => `${heroTeks()}\n${document.body.innerText}`;
+  /* HERO DULU, lalu badan. Bukan kosmetik: nominal hero datang dari
+     `aria-label`, dan menaruhnya di EKOR lalu memotong daftar membuang justru
+     angka yang paling penting — Beranda punya lebih dari 6 nominal di badan,
+     jadi saldo hero selalu jatuh di luar jendela. Batasnya ada supaya laporan
+     tak jadi dinding teks, bukan supaya populasinya menyempit. */
+  window.__nominal = () => {
+    const ambil = (t) => t.match(/[-+]?Rp[\d.]+/g) ?? [];
+    return [...ambil(heroTeks()), ...ambil(document.body.innerText)].slice(0, 12);
+  };
+  /* Toast galat pergi ke region ASSERTIVE `role="alert"`; wadah toast yang
+     TERLIHAT sengaja TANPA role (anti-baca-dobel) — cacat alat ke-10 repo ini.
+     Ketiga permukaan dibaca. */
+  window.__aku = () => POLA_AKU.test(
+    window.__teks() + [...document.querySelectorAll('[role="alert"],[role="status"]')].map((x) => x.innerText).join(' '));
+
+  /* Tanda yang MASIH TERLIHAT sesudah toast mati (~2,6 dtk + 200 ms keluar),
+     sementara basinya PERMANEN. Dilaporkan TERPISAH & tak dihitung "gagal" —
+     disiplin sama dgn bagian teks-200% `audit:reflow` dan ambang app
+     `audit:mati`: ia ambang APP, bukan invariant yang dilanggar.
+     `.sr-only` SENGAJA dibuang di sini (dan hanya di sini): itu teks pembaca
+     layar, bukan tanda yang dilihat warga — dan Toaster menahan isi region live
+     itu SELAMANYA (sengaja, anti-pembacaan-dobel), jadi membacanya di sini akan
+     selalu menjawab "ada tanda" untuk layar yang sebenarnya sudah bersih. */
+  window.__tandaTampak = () => {
+    const jalan = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let t = '';
+    for (let n = jalan.nextNode(); n; n = jalan.nextNode()) {
+      if (n.parentElement?.closest('.sr-only')) continue;
+      t += `${n.nodeValue} `;
+    }
+    return POLA_AKU.test(t);
+  };
+};
+
 async function siapkan(browser, { bendahara }) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
   await ctx.addInitScript(PASANG_VIS);
+  await ctx.addInitScript(PASANG_PUNGUT);
   await ctx.addInitScript(({ ref, s, b }) => {
     try {
       localStorage.setItem('hadiran-welcome-v2', '1');
@@ -136,6 +187,131 @@ async function putaran(page, tabel, { jeda, wajibAmbil }) {
   return ambil;
 }
 
+/* ── Sifat 4: kembali dari latar tapi PENYEGARANNYA GAGAL ────────────────────
+ * Tepi yang diakui sifat 1–3: ketiganya mengasumsikan penyegarannya BERHASIL.
+ * Yang belum pernah diuji siapa pun adalah keadaan di ANTARA dua sapuan yang
+ * sudah ada: `audit:keadaan` menguji muat PERTAMA yang gagal (layar belum punya
+ * angka sama sekali), `audit:luring` menguji tanpa sinyal (app mengaku &
+ * melabeli "salinan terakhir"). Di antaranya: warga kembali dari WhatsApp,
+ * sinyal ADA, tapi server membalas galat. Penyegarannya SENGAJA senyap (sifat 3
+ * melarang skeleton), jadi tanpa penjaga tak ada satu pun tanda bahwa angka di
+ * layar sudah tidak dipercaya app-nya sendiri.
+ *
+ * DUA SISI, dan sisi kedua yang gampang dirusak sambil "memperbaiki" yang
+ * pertama:
+ *   4a. app WAJIB MENGAKU gagal menyegarkan (toast/banner).
+ *   4b. angka lama WAJIB BERTAHAN — jangan dinolkan/dikosongkan. Menukar
+ *       "saldo terakhir yang diketahui" dgn "Rp0" bukan kejujuran, itu
+ *       pernyataan baru yang salah, dan justru kelas yang ditutup 93f606c. */
+/* MUTASI sifat 4 — dua, satu per sisi, karena satu mutasi tak bisa menguji
+   keduanya sekaligus:
+     MUTASI=1  bungkam pengakuan → 4a WAJIB merah "DIAM".
+               Node-nya DIBUANG, bukan disembunyikan, dan itu bukan detail:
+               percobaan pertama menyuntik `display:none !important` dan mutasi
+               itu TIDAK MENGGIGIT — `innerText` pada elemen yang TIDAK DIRENDER
+               jatuh kembali ke `textContent` (spec), jadi probe yang membaca
+               `[role=alert]` LANGSUNG tetap melihat teksnya. Menyembunyikan
+               membutakan `document.body.innerText` saja, bukan pembacaan
+               per-elemen — dan probe ini sengaja membaca keduanya (cacat alat
+               ke-10 repo: toast galat pergi ke region assertive, wadah toast
+               yang terlihat sengaja tanpa role).
+     MUTASI=2  server membalas 200 `[]` alih-alih 500. Ini BUKAN sekadar varian:
+               ia meniru kegagalan yang paling menipu — app mengira BERHASIL,
+               menimpa cache dgn daftar kosong, nominal lenyap, dan tak ada
+               yang perlu diakui. 4b WAJIB merah. */
+const MUT = Number(process.env.MUTASI || 0);
+
+async function putaranGagal(ctx, page, label) {
+  const sebelum = await page.evaluate(() => window.__nominal());
+  /* Pengakuan yang SUDAH ada sebelum diuji membuat vonis 4a tak bisa dibaca:
+     region live `role="alert"` menahan teksnya selamanya (Toaster sengaja tak
+     mengosongkannya), jadi sisa toast dari putaran lain akan terbaca sbg
+     "app mengaku". Itu PROBE CACAT, bukan hijau. */
+  const akuAwal = await page.evaluate(() => window.__aku());
+
+  await page.evaluate(() => window.__sembunyi());
+  await page.waitForTimeout(LAMA);
+  if (MUT === 1) {
+    await page.evaluate(() => {
+      const sapu = () => {
+        document.querySelectorAll('[role="alert"],[role="status"]').forEach((el) => { el.textContent = ''; });
+        document.querySelectorAll('.toast-in,.toast-out').forEach((el) => el.remove());
+      };
+      sapu();
+      window.__bisu?.disconnect?.();
+      window.__bisu = new MutationObserver(sapu);
+      window.__bisu.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+
+  /* Rute kegagalan dipasang dgn handler BERNAMA supaya `unroute` melepas
+     PUNYA DIA SAJA: `ctx.unroute(pola)` tanpa handler membuang SEMUA handler
+     pola itu — termasuk mock bendahara (anon paksa + tulis diblokir) yang
+     dipasang `siapkan()`. Hari ini putaran ini yang terakhir sebelum
+     `ctx.close()`, jadi kebocorannya tak terlihat; menaruh putaran lain
+     sesudahnya akan menjalankannya dgn kredensial & izin tulis yang salah. */
+  const rusak = (r) => {
+    const m = r.request().method();
+    if (m !== 'GET' && m !== 'HEAD') return r.fulfill({ status: 403, contentType: 'application/json', body: '{}' });
+    if (MUT === 2) return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'content-range': '*/0' }, body: '[]' });
+    return r.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"audit: gagal segarkan"}' });
+  };
+  await ctx.route('**/rest/v1/**', rusak);
+
+  /* Pengakuan dipantau SELAMA jendela, bukan sesudahnya — toast hidup ~2,6 dtk
+     lalu dicabut dari DOM, sedangkan probe ini menunggu 9 dtk. Memotret
+     belakangan berarti menilai app dari SISA di region live, dan sapuan akan
+     berubah merah begitu region itu dibersihkan — padahal app tetap mengaku.
+     Disiplin yang sama sudah dipakai penghitung skeleton di sifat 3. */
+  await page.evaluate(() => {
+    window.__lihatAku = false;
+    window.__mata?.disconnect?.();
+    window.__mata = new MutationObserver(() => { if (window.__aku()) window.__lihatAku = true; });
+    window.__mata.observe(document.body, { childList: true, subtree: true, characterData: true });
+  });
+
+  const get = [];
+  const dengar = (r) => { if (r.url().includes('/rest/v1/') && r.method() === 'GET') get.push(r.url().split('/rest/v1/')[1].split('?')[0]); };
+  page.on('request', dengar);
+  await page.evaluate(() => window.__tampil());
+  await page.waitForTimeout(TUNGGU_GET + 3000);
+  page.off('request', dengar);
+
+  const r = await page.evaluate(() => {
+    window.__mata?.disconnect?.();
+    window.__bisu?.disconnect?.();
+    return { rp: window.__nominal(), aku: window.__lihatAku || window.__aku(), tanda: window.__tandaTampak() };
+  });
+  await ctx.unroute('**/rest/v1/**', rusak);
+
+  /* Uji KONTROL: kalau penyegarannya tak pernah terjadi, tak ada kegagalan yang
+     bisa diakui — dan "app patuh" akan mencetak angka yang sama dgn "alatku tak
+     pernah menyentuh apa-apa" (pelajaran G1 `audit:gestur`). */
+  const cacatProbe = [];
+  if (!sebelum.length) cacatProbe.push('nol nominal SEBELUM ditinggal — tak ada yang bisa dibandingkan');
+  if (akuAwal) cacatProbe.push('pengakuan galat SUDAH ada sebelum jendela dibuka — vonis 4a tak terbaca');
+  if (!get.length) cacatProbe.push('nol GET sesudah kembali — penyegaran tak pernah terjadi, jadi tak ada kegagalan yang diuji');
+
+  const m = [];
+  if (!cacatProbe.length) {
+    if (!r.aku) m.push('DIAM: penyegaran gagal tapi app tak mengaku — angka lama terbaca sbg angka sekarang');
+    if (!r.rp.length) m.push(`NOMINAL LENYAP: ${sebelum.length} nominal → 0. Menghapus angka terakhir yang diketahui bukan kejujuran, itu pernyataan baru yang salah`);
+    else if (r.rp.join('|') !== sebelum.join('|')) m.push(`NOMINAL BERUBAH padahal penyegaran GAGAL: ${JSON.stringify(sebelum.slice(0, 3))} → ${JSON.stringify(r.rp.slice(0, 3))}`);
+  }
+  const vonis = cacatProbe.length ? `PROBE CACAT: ${cacatProbe[0]}` : m.length ? `⚠ ${m[0]}` : 'OK';
+  console.log(`  ${label.padEnd(30)} GET ${String(get.length).padStart(2)} · nominal ${sebelum.length} → ${r.rp.length} · mengaku=${r.aku} · tanda bertahan=${r.tanda}  ${vonis}`);
+  /* Bukan vonis. Kalau pengakuannya ADA tapi sudah lenyap dari layar sementara
+     angka basinya masih terpampang, itu dicatat sbg CATATAN ambang app —
+     presedennya strip LURING di Header ("salinan terakhir", tak bisa ditutup),
+     yang lahir dari pengukuran 31 Jul atas kelas yang sama. */
+  if (!cacatProbe.length && r.aku && !r.tanda) {
+    console.log(`  ${' '.repeat(30)} · catatan (ambang app, BUKAN gagal): pengakuannya SEMENTARA (toast ~2,6 dtk) sementara basinya permanen`);
+  }
+  [...cacatProbe.slice(1), ...m.slice(1)].forEach((x) => console.log(`  ${' '.repeat(30)} ⚠ ${x}`));
+  if (cacatProbe.length) cacat++;
+  else if (m.length) gagal++;
+}
+
 for (const bendahara of [false, true]) {
   const peran = bendahara ? 'BENDAHARA' : 'WARGA';
   const tab = bendahara ? 'Kas RT' : 'Beranda';
@@ -162,10 +338,14 @@ for (const bendahara of [false, true]) {
   await putaran(page, '1. ditinggal LAMA', { jeda: LAMA, wajibAmbil: true });
   await page.waitForTimeout(1500);
   await putaran(page, '2. ditinggal SEBENTAR', { jeda: SEBENTAR, wajibAmbil: false });
+  await page.waitForTimeout(1500);
+  await putaranGagal(ctx, page, '4. kembali, SEGARKAN GAGAL');
   await ctx.close();
 }
 
 await browser.close();
 console.log(`\n=== ditinggal ${LAMA / 1000} dtk (lama) & ${SEBENTAR / 1000} dtk (sebentar) · 2 peran · ${gagal} bermasalah ===`);
 if (cacat) console.log(`${cacat} probe cacat (bukan vonis app) — betulkan ALATNYA.`);
-process.exit(gagal ? 1 : 0);
+/* Probe cacat IKUT memerahkan: sapuan tak boleh LULUS dari populasi kosong
+   — laporan hijau tanpa populasi itu kepercayaan palsu (pelajaran ke-23). */
+process.exit(gagal || cacat ? 1 : 0);
