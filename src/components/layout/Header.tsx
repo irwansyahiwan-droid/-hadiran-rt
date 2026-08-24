@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { LogOut, Sun, Moon, Eye, History, FileText, MoreVertical, DatabaseBackup, Info, Users, X, WifiOff, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
@@ -31,16 +31,6 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   const scrolled = useScrolledPast(6);
   const online = useOnline();
   const [menuOpen, setMenuOpen] = useState(false);
-  // Banner "Mode Warga" bisa ditutup permanen — pendatang baru tetap lihat,
-  // pengguna lama bebas hilangkan agar konten dapat ruang. Disimpan di localStorage.
-  const [bannerDismissed, setBannerDismissed] = useState(() => {
-    try { return localStorage.getItem('hadiran-warga-banner') === '1'; } catch { return false; }
-  });
-  function dismissBanner() {
-    haptic(8);
-    setBannerDismissed(true);
-    try { localStorage.setItem('hadiran-warga-banner', '1'); } catch { /* abaikan */ }
-  }
   const menuMounted = useExitAnim(menuOpen);
   /* Tombol Back HP menutup menu ini — bukan meninggalkan app. Warga app ini
      tak punya tombol Escape; `audit:papan-ketik` menguji Escape dan melaporkan
@@ -308,52 +298,20 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
         </div>
       )}
 
-      {!isBendahara && !bannerDismissed && (
-        <div
-          className="border-t border-line bg-gray-50 overflow-hidden px-5 dark:bg-gray-800/60 dark:border-gray-800 transition-[max-height,opacity] duration-300"
-          /* Padding 0.375 → 0.625rem, maxHeight 40 → 56 (4 Agu 2026).
-             Tombol "Tutup" di dalamnya sudah memakai teknik pelebaran app
-             (`w-8 h-8` + `before:-inset-1.5` = 44) tapi terukur 44×36: yang
-             kurang BUKAN tombolnya, melainkan kotak yang memuatnya — banner ini
-             `overflow-hidden` (perlu, untuk animasi lipat saat menggulir), jadi
-             pelebaran tombol terpotong di tepi banner.
+      {/* ── Banner "Mode Warga — hanya bisa melihat data" DIBUANG (24 Agu 2026) ──
+          Ia mengatakan persis apa yang sudah dikatakan pil `WARGA` di baris tepat
+          DI ATASNYA, yang bahkan membawa InfoTip "Apa itu Mode Warga?" untuk
+          warga yang ingin penjelasan lengkap. Dua pengumuman untuk satu fakta.
 
-             Percobaan pertama cuma menaikkan `maxHeight` dan TIDAK berefek sama
-             sekali: maxHeight itu batas ATAS, sedangkan tinggi nyata banner
-             ditentukan isinya (6 + chip 24 + 6 = 36). Yang harus naik paddingnya:
-             10 + 24 + 10 = 44 pas. maxHeight ikut naik ke 56 supaya tak balik
-             jadi pemotong yang baru.
+          Ongkosnya bukan di Beranda saja: 56px ini duduk di SETIAP halaman,
+          setiap kali warga membuka app, selamanya — sementara ia kabar yang
+          sudah selesai dibaca pada kunjungan pertama. Strip LURING di atas
+          tetap ada dan memang tak bisa ditutup: ia keadaan yang berubah-ubah
+          dan menyangkut kebenaran angka. Ini tidak.
 
-             Diukur lewat hit-test `elementFromPoint`, bukan geometri CSS — di
-             CSS tombol ini selalu terlihat 44 (persis jebakan FP ke-8 repo). */
-          style={{
-            maxHeight: scrolled ? '0px' : '56px',
-            opacity: scrolled ? 0 : 1,
-            paddingTop: scrolled ? 0 : '0.625rem',
-            paddingBottom: scrolled ? 0 : '0.625rem',
-            transitionTimingFunction: 'var(--ease-out-expo)',
-          }}
-        >
-          <div className="relative max-w-lg mx-auto flex items-center justify-center">
-            {/* Chip read-only "tercetak" (ring-inset, bahasa Etched Premium) —
-                mata brand-emerald = percikan identitas, bukan strip abu mati. */}
-            <span className="inline-flex items-center gap-1.5 text-caption font-medium text-ink-sub dark:text-gray-200 bg-white dark:bg-gray-900/50 ring-1 ring-inset ring-line dark:ring-gray-700 rounded-full pl-2.5 pr-3 py-1">
-              <Eye className="w-3.5 h-3.5 text-brand-link dark:text-brand-linkDark" /> Mode Warga — hanya bisa melihat data
-            </span>
-            <button
-              type="button"
-              onClick={dismissBanner}
-              aria-label="Tutup info Mode Warga"
-              /* dark:text-gray-400 (bukan gray-500): ikon kontrol wajib ≥3:1
-                 (WCAG 1.4.11). gray-500 di atas fill banner gelap (gray-800/60
-                 di atas gray-900 ≈ #192231) cuma 2,8:1 — di bawah ambang. */
-              className="press absolute right-0 -mr-2 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-ink-sub dark:text-gray-400 dark:hover:text-gray-200 active:opacity-70 before:absolute before:-inset-1.5 before:content-['']"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
+          `bannerDismissed` / `dismissBanner` & kunci localStorage
+          `hadiran-warga-banner` ikut dilepas — penyimpanan untuk keadaan yang
+          tak lagi punya wujud. */}
     </header>
   );
 }

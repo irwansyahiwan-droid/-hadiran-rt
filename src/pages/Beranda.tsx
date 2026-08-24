@@ -1,12 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Search, Eye, EyeOff, ChevronRight, ChevronDown, RotateCcw, Crown } from 'lucide-react';
-import ClearButton from '../components/ClearButton';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Eye, EyeOff, ChevronRight, ChevronDown, Crown } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import { showToast } from '../lib/toast';
-import FilterChips from '../components/FilterChips';
 import Odometer from '../components/Odometer';
-import StatRow from '../components/StatRow';
 import CrossFade from '../components/CrossFade';
 import { HeroStats } from '../components/HeroSaldo';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -108,9 +105,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   // sheet selalu MELUNCUR keluar, bukan lenyap seketika (unmount ditunda hook).
   useBackDismiss(selectedTrx !== null, trxDrag.dismiss);
   const trxDlg = useDialog(selectedTrx !== null, { onClose: trxDrag.dismiss, label: 'Detail transaksi' });
-  const [trxFilter, setTrxFilter] = useState<'semua' | 'setor' | 'talangan_lunas'>('semua');
-  const [trxSort, setTrxSort] = useState<'terbaru' | 'terlama' | 'nominal'>('terbaru');
-  const [trxSearch, setTrxSearch] = useState('');
   /** Lipatan baris sejenis yang sedang dibuka (kunci: tanggal|sub|indeks). */
   const [openFold, setOpenFold] = useState<Set<string>>(() => new Set());
 
@@ -270,12 +264,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   // sendiri (ring-inset) → terbaca "chip tercetak", bukan fill datar. Varian netral
   // "Kas Aktif" dulu paling pudar (gray-100 + dot gray-400 + teks gray-600 = blob abu)
   // → dipindah ke SLATE sejuk yang sadar-kanvas: teks & dot dinaikkan agar tegas.
-  const kasStatus =
-    saldo < 0
-      ? { label: 'Perlu Perhatian', dot: 'bg-rose-500', text: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20', ring: 'ring-rose-600/20 dark:ring-rose-400/20' }
-      : talangan > 0
-        ? { label: 'Kas Aktif', dot: 'bg-slate-500 dark:bg-slate-400', text: 'text-slate-700 dark:text-slate-200', bg: 'bg-slate-100 dark:bg-slate-800', ring: 'ring-slate-500/25 dark:ring-slate-400/25' }
-        : { label: 'Kas Sehat', dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20', ring: 'ring-emerald-600/20 dark:ring-emerald-400/20' };
   // Entrance hero (count-up, sheen sweep, draw-on sparkline) hanya pada
   // kunjungan pertama sesi — balik ke Beranda via tab/back tak mengulanginya.
   const firstHero = useFirstPlay('beranda-hero');
@@ -283,40 +271,25 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const animatedSaldo = useCountUp(saldo, 1000, firstHero);
   const animatedTalangan = useCountUp(talangan, 1000, firstHero);
   const animatedSetor = useCountUp(setorKasRT, 1000, firstHero);
-  // Baris statistik (Anggota/Tarikan/Terjadwal) ikut count-up spt nominal hero →
-  // angka "berputar naik" konsisten, bukan diam saat hero beranimasi.
-  const animAnggota = useCountUp(summary?.jumlah_anggota ?? 0, 900, firstHero);
-  const animTarikan = useCountUp(summary?.jumlah_tarikan ?? 0, 900, firstHero);
-  const animTerjadwal = useCountUp(summary?.jumlah_dijadwalkan ?? 0, 900, firstHero);
   const hidden = useHideAmount();
 
-  // Transaksi terakhir difilter (tipe) & diurutkan. trxItems sudah urut terbaru→lama.
-  const displayTrx = useMemo(() => {
-    const q = trxSearch.trim().toLowerCase();
-    let arr = [...trxItems];
-    if (trxSort === 'terlama') arr.reverse();
-    else if (trxSort === 'nominal') arr.sort((a, b) => Math.abs(b.nominal) - Math.abs(a.nominal));
-    if (trxFilter !== 'semua') arr = arr.filter((t) => t.tipe === trxFilter);
-    if (q) arr = arr.filter((t) => t.keterangan.toLowerCase().includes(q));
-    return arr;
-  }, [trxItems, trxFilter, trxSort, trxSearch]);
-
-  // Beranda = ringkasan, bukan ledger penuh. Batasi render ke 20 teratas →
-  // dashboard tetap ringan; sisanya lewat "Lihat semua" ke tab Kas.
-  // Pencarian/filter bekerja atas JENDELA yang diambil (TRX_FETCH terbaru per
-  // sumber) — riwayat & pencarian penuh ada di tab Hadiran.
-  const TRX_LIMIT = 20;
-  const visibleTrx = displayTrx.slice(0, TRX_LIMIT);
-  const trxHidden = displayTrx.length - visibleTrx.length;
+  /* Cari + filter + urutkan DIBUANG dari Beranda (24 Agu 2026).
+     Tiga baris kontrol berdiri di antara judul seksi dan baris data pertama,
+     dan ketiganya cuma bekerja atas JENDELA yang kebetulan diambil Beranda —
+     bukan riwayat penuh. Jadi ia mesin pencari yang tak bisa menemukan
+     sebagian besar yang dicari. Tab Hadiran sudah punya cari + filter yang
+     sama persis DI ATAS data lengkap; "Lihat semua" mengantar ke sana.
+     Beranda kembali jadi ringkasan: enam baris terakhir, titik. */
+  const TRX_LIMIT = 6;
+  const visibleTrx = trxItems.slice(0, TRX_LIMIT);
 
   // Kelompokkan per tanggal → tanggal ditulis SEKALI sebagai kepala kelompok,
   // bukan diulang di tiap baris. Tanpa ini daftar jadi tembok baris kembar
   // ("Talangan lunas oleh … — Tarikan #N", +Rp50.000, tanggal sama) yang mustahil
   // dipindai. Kepala kelompok juga membawa NET hari itu (pola buku besar bank).
-  // Hanya saat urutan kronologis — pada sort 'nominal' baris tak berurut tanggal,
-  // jadi kelompok tanggal akan menyesatkan; di situ tanggal balik ke per-baris.
+  // Daftar SELALU kronologis sekarang (sort 'nominal' ikut terbuang bersama
+  // kontrolnya), jadi kelompok tanggal tak pernah lagi bisa menyesatkan.
   const trxGroups = useMemo(() => {
-    if (trxSort === 'nominal') return null;
     const out: { key: string; label: string; net: number; items: TrxItem[] }[] = [];
     for (const t of visibleTrx) {
       const key = t.tanggal.slice(0, 10);
@@ -329,7 +302,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       }
     }
     return out;
-  }, [visibleTrx, trxSort]);
+  }, [visibleTrx]);
 
 
   /**
@@ -437,14 +410,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
    * dilipat bila anggotanya ≥ FOLD_MIN, karena melipat 2 baris jadi 1 baris +
    * penunjuk buka bukan penghematan.
    *
-   * TIDAK dilipat saat ada kata pencarian: di situ warga sedang mencari SATU
-   * nama, dan nama justru yang tersembunyi di balik lipatan.
+   * (Jalan pintas "jangan lipat saat ada kata pencarian" ikut lepas bersama
+   * kolom carinya — Beranda tak lagi punya pencarian.)
    */
   const FOLD_MIN = 3;
   const buildRuns = (items: TrxItem[], groupKey: string) => {
     type Run = { kind: 'run'; key: string; sub: string; items: TrxItem[]; total: number };
     const out: ({ kind: 'one'; item: TrxItem } | Run)[] = [];
-    if (trxSearch.trim()) return items.map((item) => ({ kind: 'one' as const, item }));
 
     /* Dikumpulkan per-KUNCI di seluruh kelompok tanggal, BUKAN per deret
        beruntun. Di satu tanggal, talangan Tarikan #11 & #12 saling menyela
@@ -551,9 +523,16 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     <ErrorState className="pt-10" onRetry={() => load()} retrying={loading} />
     ) : (
     <div className="space-y-7 pb-2">
-      {/* Sapaan + badge status kas */}
-      {/* Tepi 16px, sama dgn kartu & judul seksi (lihat SectionTitle). */}
-      <div className="flex items-end justify-between">
+      {/* Sapaan.
+          Pil status kas ("Perlu Perhatian" / "Sehat") DIBUANG 24 Agu 2026.
+          Bukan karena salah, tapi karena ia peringatan KETIGA di satu layar:
+          chip "Defisit" di hero menamai keadaan angkanya, banner Talangan di
+          bawahnya menamai sebabnya DAN membawa tindakan. Pil ini merangkum
+          keduanya tanpa menambah satu fakta pun dan tanpa bisa diketuk —
+          alarm yang tak menunjuk ke mana-mana. Tiga bahasa warna sekaligus
+          (rose / crimson / amber) juga membuat warga tak tahu mana yang
+          harus dibaca duluan. App yang mahal bicara sekali. */}
+      <div>
         <div>
           <p className="text-caption text-ink-faint dark:text-gray-400">{greeting},</p>
           {/* text-xl → text-2xl. Judul halaman 20px lawan judul seksi 18px =
@@ -563,10 +542,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               baru — 2xl sudah dipakai angka StatRow. */}
           <h1 className="text-2xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
         </div>
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-micro font-bold ring-1 ring-inset ${kasStatus.bg} ${kasStatus.text} ${kasStatus.ring}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${kasStatus.dot}`} />
-          {kasStatus.label}
-        </span>
       </div>
 
       {/* Hero saldo + promo digabung jadi SATU carousel mewah: saldo = slide
@@ -695,14 +670,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         }
       />
 
-      {/* Stats Row */}
-      <StatRow
-        items={[
-          { label: 'Anggota', value: animAnggota },
-          { label: 'Tarikan', value: animTarikan },
-          { label: 'Terjadwal', value: animTerjadwal },
-        ]}
-      />
+      {/* StatRow (Anggota / Tarikan / Terjadwal) DIBUANG 24 Agu 2026.
+          Ketiganya indeks, bukan kabar: jumlahnya nyaris tak pernah berubah,
+          tak satu pun bisa ditindaklanjuti, dan ketiganya sudah punya rumah
+          (Anggota → Kelola Anggota, Tarikan & Terjadwal → tab Jadwal, yang
+          bahkan menampilkan angka yang sama persis di baris statnya). Ia
+          menempati 96px tepat di antara saldo dan giliran berikutnya — dua
+          hal yang benar-benar dicari warga saat membuka app. */}
 
       {/* Alert Banner.
           `lift` ditambahkan: terukur di DOM, kartu ini satu-satunya di Beranda
@@ -710,13 +684,22 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           membawa contact whisper `--shadow-card`. Ia jadi terbaca seperti
           tempelan datar di tengah tumpukan yang menapak. Bayangannya pakai token
           yang sama, bukan bayangan baru. */}
+      {/* Satu-satunya peringatan yang tersisa di Beranda — dan karena ia
+          sendirian, ia tak perlu berteriak. Blok 5-baris (ubin ikon + judul +
+          nominal + tombol "Lihat" terpisah) dipadatkan jadi SATU baris yang
+          seluruhnya bisa diketuk: judul, angka, panah. Tombol terpisah di
+          dalam kartu yang toh cuma punya satu tujuan itu perabot; barisnya
+          sendiri sudah 56px, jauh di atas ambang sentuh 44px. */}
       {talangan > 0 && (
-        <div className="flex items-start gap-3 bg-amber-50/90 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40 rounded-3xl lift px-5 py-5">
-          <div className="icon-tile w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-body font-semibold text-amber-800 dark:text-amber-300">Talangan Belum Lunas</p>
+        <button
+          onClick={() => onNavigate('talangan')}
+          className="press w-full flex items-center gap-3 min-h-[56px] px-4 py-3 rounded-2xl
+                     bg-amber-50/90 dark:bg-amber-900/20
+                     border border-amber-200/60 dark:border-amber-800/40"
+        >
+          <AlertTriangle className="w-[1.125rem] h-[1.125rem] shrink-0 text-amber-600 dark:text-amber-400" />
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-body font-semibold text-amber-800 dark:text-amber-300">Talangan belum lunas</p>
             {/* Sub = ANGKANYA saja. "Total … belum diselesaikan" mengulang judul
                 tepat di atasnya ("Talangan Belum Lunas"), dan panjangnya itu yang
                 memecah kalimat jadi 2 baris di 360px. Bentuk label-lalu-angka juga
@@ -726,13 +709,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               {maskRp(formatRupiahPlain(talangan), hidden, 4)}
             </p>
           </div>
-          <button
-            onClick={() => onNavigate('talangan')}
-            className="press inline-flex items-center min-h-[44px] text-caption text-warn dark:text-amber-300 font-semibold bg-amber-100 dark:bg-amber-900/40 px-3.5 rounded-xl hover:bg-amber-200 dark:hover:bg-amber-900/60 transition-colors whitespace-nowrap"
-          >
-            Lihat
-          </button>
-        </div>
+          <ChevronRight className="w-4 h-4 shrink-0 text-amber-700 dark:text-amber-400" strokeWidth={2.25} />
+        </button>
       )}
 
       {/* Jadwal Berikutnya */}
@@ -828,62 +806,22 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               tepat di bawahnya dan oleh tombol "Lihat semua" di sampingnya. */}
           Transaksi
         </SectionTitle>
-        {trxItems.length > 0 && (
-          <div className="space-y-2 mb-3">
-          {/* Search + filter + sort */}
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={trxSearch}
-              onChange={(e) => setTrxSearch(e.target.value)}
-              placeholder="Cari keterangan / nama…"
-              aria-label="Cari transaksi"
-              inputMode="search"
-              enterKeyHint="search"
-              className="field-search pr-11"
-            />
-            {trxSearch && <ClearButton onClick={() => setTrxSearch('')} />}
-          </div>
-          <FilterChips
-            options={[
-              { id: 'semua', label: 'Semua' },
-              { id: 'setor', label: 'Setor' },
-              { id: 'talangan_lunas', label: 'Talangan' },
-            ] as const}
-            value={trxFilter}
-            onChange={setTrxFilter}
-            sort={{
-              value: trxSort,
-              options: [
-                { id: 'terbaru', label: 'Terbaru' },
-                { id: 'terlama', label: 'Terlama' },
-                { id: 'nominal', label: 'Nominal' },
-              ] as const,
-              onChange: setTrxSort,
-            }}
-          />
-          </div>
-        )}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {trxItems.length === 0 ? (
             <EmptyState icon={Receipt} title="Belum ada transaksi" subtitle="Setoran & pelunasan talangan akan muncul di sini." />
-          ) : displayTrx.length === 0 ? (
-            <EmptyState
-              icon={Receipt}
-              title="Tidak ada hasil"
-              subtitle="Tidak ada di transaksi terkini. Riwayat lengkap ada di tab Hadiran."
-              action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setTrxFilter('semua'); setTrxSearch(''); } }}
-            />
           ) : (
             renderTrxRows()
           )}
-          {trxHidden > 0 && (
+          {/* Tanpa ANGKA. Jumlah "lainnya" dulu dihitung dari jendela yang
+              kebetulan diambil Beranda, bukan dari riwayat sebenarnya — angka
+              yang terdengar pasti padahal tidak. App kas tak boleh menyebut
+              hitungan yang tak ia ketahui. */}
+          {trxItems.length > TRX_LIMIT && (
             <button
               onClick={() => onNavigate('kas')}
               className="press w-full flex items-center justify-center gap-1 px-4 py-3.5 text-body font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
             >
-              Lihat {trxHidden} transaksi lainnya
+              Lihat semua transaksi
               <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
             </button>
           )}

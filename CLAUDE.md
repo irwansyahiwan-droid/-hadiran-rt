@@ -238,6 +238,41 @@ yang menyelamatkan pembacanya — tapi exit code-nya tetap 0. **Sapuan tak boleh
 LULUS dari populasi kosong: laporan hijau tanpa populasi itu kepercayaan palsu,
 bukan hasil.**
 
+Yang ke-24 (24 Agu 2026, sesudah Login digambar ulang): gerbang "ketik: warga"
+dibuang, dan bersamanya kolom `#warga-password` — **kait yang dipakai SELURUH
+sapuan untuk masuk sebagai warga.** Dua puluh sapuan mati serentak, dan bukan
+sebagai temuan melainkan `TimeoutError` di `loginWarga`, sesudah perubahannya
+TER-DEPLOY. Kerusakannya jauh melebihi satu selektor: harness sudah punya
+`loginWarga()` justru supaya ada SATU pintu, tapi **13 sapuan menyalin sendiri
+lima baris alur login itu** ke dalam berkasnya masing-masing. Duplikasi yang
+hari ditulisnya tak berbiaya apa pun, dan yang justru membuat satu perubahan UI
+mustahil diperbaiki di satu tempat.
+
+Obatnya dua lapis. (1) Kaitnya kini `id="masuk-warga"` yang DIDEKLARASIKAN di
+`Login.tsx` sebagai kontrak, dengan komentar yang menyebut siapa yang
+bergantung padanya — sebelumnya kontraknya tak tertulis di mana pun, jadi tak
+ada yang bisa melanggarnya secara terlihat (kelas yang sama dgn tier z-index
+tanpa nama). (2) Ketiga belas salinan inline diganti panggilan `loginWarga()`.
+**Kaitnya WAJIB `id`, BUKAN teks tombol** — teks berubah di pass penyuntingan
+kata, dan `getByRole('button', { name: 'Masuk Sekarang' })` akan membunuh
+seluruh sapuan lagi tanpa satu pun tanda.
+
+Satu hal yang menyelamatkan keadaan ini justru kegagalannya yang KERAS: sapuan
+mati dengan jejak tumpukan, bukan melaporkan "0 bermasalah" dari populasi nol
+— persis cacat ke-23. Kalau `loginWarga` dulu ditulis "toleran" (mis.
+`.catch(() => {})` lalu lanjut), hari ini kita akan punya dua puluh laporan
+hijau yang tak pernah menyentuh app. **Kait yang hilang harus MELEDAK, jangan
+dilewati.**
+
+Efek sampingnya satu perbaikan gratis: pemangkasan slide promo 6 → 1 melarutkan
+pengecualian §2.5.8 pada indikator carousel yang selama ini disengaja
+("7 × 44 = 308px, jadi bilah navigasi selebar layar"). Dgn 2 slide, 2 × 45 =
+90px. Ruang sampingnya kini digerbang `count <= 3`, sehingga kompromi lamanya
+kembali sendiri kalau carousel tumbuh lagi. **Pengecualian yang lahir dari
+sebuah ANGKA wajib digerbang oleh angka itu, bukan dipaku jadi tetap** — kalau
+tidak, ia hidup terus lama sesudah alasannya mati.
+
+
 **Stack back-dismiss memuat entri TAB, dan itu BUKAN lapisan.** App
 mendaftarkan `activeTab !== 'beranda'` ke `useBackDismiss` supaya Back kembali
 ke Beranda — entri sah, tapi tak ada yang menutupi layar. Penjaga gestur yang

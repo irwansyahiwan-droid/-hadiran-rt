@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  Target, ClipboardCheck, HandCoins, Coins, Building2, Smartphone,
+  Target, Coins,
   ChevronRight, Crown, Check, X,
   type LucideIcon,
 } from 'lucide-react';
@@ -348,35 +348,15 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
       grad: 'linear-gradient(150deg,#2cb8a5 0%,#0a564e 100%)', glow: 'rgba(45,212,191,0.55)',
       cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
     },
-    {
-      id: 'app-hp', kind: 'app', eyebrow: 'APLIKASI',
-      judul: 'Pantau kas RT dari HP', desc: 'Saldo, jadwal & talangan dalam satu genggaman.',
-      icon: Smartphone, grad: 'linear-gradient(160deg,#33503f 0%,#0e1c15 100%)', glow: 'rgba(45,212,150,0.5)',
-    },
-    {
-      id: 'panduan-absensi', kind: 'absensi', eyebrow: 'PANDUAN · ABSENSI',
-      judul: 'Hadir dicatat setiap tarikan', desc: 'Bendahara menandai daftar hadir per tarikan. Yang tidak hadir otomatis kena talangan.',
-      icon: ClipboardCheck, grad: 'linear-gradient(150deg,#4a7cf6 0%,#173dac 100%)', glow: 'rgba(96,165,250,0.55)',
-      cta: { label: 'Buka Jadwal', tab: 'jadwal' },
-    },
-    {
-      id: 'panduan-tarikan', kind: 'tarikan', eyebrow: 'PANDUAN · TARIKAN',
-      judul: 'Satu Sohibul Bait per tarikan', desc: 'Setiap tarikan ada satu penerima. Iuran semua anggota yang hadir terkumpul untuknya.',
-      icon: Coins, grad: 'linear-gradient(150deg,#9059f2 0%,#4825a8 100%)', glow: 'rgba(167,139,250,0.55)',
-      cta: { label: 'Buka Jadwal', tab: 'jadwal' },
-    },
-    {
-      id: 'panduan-talangan', kind: 'talangan', eyebrow: 'PANDUAN · TALANGAN',
-      judul: 'Tidak hadir kena talangan', desc: 'Talangan wajib dilunasi sebelum tarikan berikutnya agar kas tetap sehat.',
-      icon: HandCoins, grad: 'linear-gradient(150deg,#ef9120 0%,#9a4c07 100%)', glow: 'rgba(251,191,36,0.5)',
-      cta: { label: 'Lihat Talangan', tab: 'talangan' },
-    },
-    {
-      id: 'panduan-kas-rt', kind: 'kasrt', eyebrow: 'PANDUAN · KAS RT',
-      judul: 'Kas besar RT yang terpisah', desc: 'Sebagian setoran masuk ke Kas RT — terpisah dari Kas Hadiran, untuk kebutuhan warga.',
-      icon: Building2, grad: 'linear-gradient(150deg,#22a957 0%,#0a5e3d 100%)', glow: 'rgba(16,185,129,0.55)',
-      cta: { label: 'Lihat Kas RT', tab: 'kas-rt' },
-    },
+    /* LIMA slide promo DIBUANG (24 Agu 2026) — 7 titik jadi 2.
+       Empat "PANDUAN" (absensi / tarikan / talangan / kas-rt) mengulang isi
+       TentangApp kata per kata, dan WelcomeSheet sudah menyambut pendatang
+       baru. Ia materi ONBOARDING yang duduk permanen di hero: warga yang
+       sudah 6 bulan memakai app tetap menggeserinya tiap hari. Slide kelima
+       ('app-hp' — "Pantau kas RT dari HP") mengiklankan app kepada orang
+       yang SEDANG membuka app itu.
+       Yang tersisa satu, dan ia satu-satunya yang membawa keadaan HIDUP
+       (progres target kas RT), bukan penjelasan yang tak pernah berubah. */
   ];
 
   const hasHero = heroSlide != null;
@@ -769,7 +749,11 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
           yang sudah lewat terisi penuh. */}
       {count > 1 && (
         <div className="flex items-center justify-center pt-0.5">
+          {/* Dot inaktif 7px + 2×19 = 45px (lolos ambang app 44). Di atas 3
+              slide, deretannya jadi terlalu lebar → balik ke 9px & pengecualian
+              §2.5.8-nya yang lama (lihat catatan panjang di bawah). */}
           {Array.from({ length: count }).map((_, i) => {
+            const padX = count <= 3 ? 19 : 9;
             const isActive = i === index;
             const past = i < index;
             return (
@@ -784,14 +768,24 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                 // tombol = lebar dot (7px) → praktis tak bisa diketuk (audit
                 // 30 Jul). Dot-nya sendiri tetap 7px: yang tumbuh cuma ruang.
                 //
-                // `audit:sentuh` melaporkan 25×45 — di bawah ambang APP 44px, dan
-                // itu SENGAJA. Menaikkannya ke 44 berarti 7 × 44 = 308px: deretan
-                // ini berhenti terbaca sebagai indikator (kelompok rapat di bawah
-                // kartu) dan berubah jadi bilah navigasi selebar layar. Ia juga
-                // kontrol REDUNDAN — carousel bisa digeser jari dan berjalan
-                // sendiri; dot-nya penunjuk posisi lebih dulu, tombol belakangan.
-                // §2.5.8 AA sudah terpenuhi. Jangan dilebarkan lagi.
-                style={{ minHeight: 44, paddingTop: 16, paddingBottom: 16, paddingLeft: 9, paddingRight: 9 }}
+                // Ruang samping IKUT jumlah slide (24 Agu 2026). Sampai hari ini
+                // nilainya tetap 9px, dan `audit:sentuh` melaporkan 25×45 — di
+                // bawah ambang APP 44px — sebagai pengecualian yang disengaja.
+                // Alasannya tertulis apa adanya: "menaikkannya ke 44 berarti
+                // 7 × 44 = 308px, deretan ini berubah jadi bilah navigasi
+                // selebar layar".
+                //
+                // Alasan itu SUDAH TIDAK BERLAKU. Slide promo dipangkas 6 → 1,
+                // jadi count = 2 dan 2 × 45 = 90px: masih terbaca sebagai
+                // kelompok rapat di bawah kartu 326px. Pengecualiannya lahir
+                // dari jumlah slide, bukan dari sifat indikatornya — maka
+                // gerbangnya sekarang jumlah slide juga, dan kompromi lamanya
+                // kembali sendiri kalau carousel tumbuh lagi. Jangan dijadikan
+                // 19 tetap: pada 7 slide ia mengulang persis masalah yang dulu.
+                style={{
+                  minHeight: 44, paddingTop: 16, paddingBottom: 16,
+                  paddingLeft: padX, paddingRight: padX,
+                }}
               >
                 {/* Rel indikator = token `control` (abu kontrol inaktif), BUKAN
                     brand beralpha. `bg-brand/20` di atas kanvas mist terukur
