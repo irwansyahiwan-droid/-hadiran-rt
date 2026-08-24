@@ -131,7 +131,31 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
             <button
               onClick={() => { haptic(); setEditing(true); }}
               aria-label="Ubah target"
-              className="press relative w-9 h-9 -mr-1 inline-flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors before:absolute before:-inset-1 before:content-['']"
+              /* Dua hal, keduanya menyusul aturan yang SUDAH ditegakkan di tempat
+                 lain — call-site ini yang tertinggal.
+
+                 1. Warna. `text-gray-400` dicabut: abu di app ini SINYAL KONTROL
+                    INAKTIF, jadi ikon AKSI yang aktif tak boleh memakainya.
+                    Persis alasan yang tertulis di tombol baris Jadwal.tsx dan
+                    pensil baris KelolaAnggota.tsx (keduanya dibetulkan 4 Agu);
+                    pensil ini peer sejatinya dan luput. Tombol "Tutup" app SENGAJA
+                    tetap gray-400 — dismiss memang low-emphasis, dan keenamnya
+                    seragam; yang salah cuma ikon aksi yang menyamar nonaktif.
+                    Ini BUKAN cacat kontras: `text-gray-400` di-remap #475569 di
+                    terang, dan lolos 3:1 di gelap — `audit:kontras-nonteks` 688
+                    sampel 0 gagal. Yang salah maknanya, dan tak ada sapuan yang
+                    bisa melihat itu.
+
+                 2. Area sentuh. `-inset-1` (4px) menghasilkan 44px TEPAT di 390px,
+                    tapi cuma 42px di 360px — lebar acuan app: di sana pelebarannya
+                    mentok tepi kartu dan `elementFromPoint` menjawab KARTU, bukan
+                    tombol. Niatnya jelas 44 (§ambang app), mendaratnya 42, dan tak
+                    ada komentar yang menyatakan 42 disengaja → kelewatan, bukan
+                    keputusan. `-inset-1.5` (6px) menyisakan margin supaya 2px yang
+                    termakan tepi tak menjatuhkannya lagi. Tetangganya blok teks,
+                    bukan target lain, jadi aturan "dua target yang dilebarkan wajib
+                    dijarakkan ≥ pelebarannya" tetap aman. */
+              className="press relative w-9 h-9 -mr-1 inline-flex items-center justify-center rounded-xl text-ink-faint dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors before:absolute before:-inset-1.5 before:content-['']"
             >
               <Pencil className="w-4 h-4" />
             </button>
