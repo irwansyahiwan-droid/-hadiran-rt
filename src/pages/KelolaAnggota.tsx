@@ -10,6 +10,7 @@ import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import Tag from '../components/Tag';
+import AvatarPeci from '../components/AvatarPeci';
 import { supabase } from '../lib/supabase';
 import {
   fetchAnggota, tambahAnggota, updateAnggota, backfillAnggotaSusulan,
@@ -421,11 +422,27 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                   idx < filtered.length - 1 ? 'divide-inset' : ''
                 }`}
               >
-                <div className={`icon-tile w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-body font-bold ${
-                  w.status_aktif ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
-                }`}>
-                  {w.nama.charAt(0).toUpperCase()}
-                </div>
+                {/* `AvatarPeci`, bukan tile bertint sendiri (24 Agu 2026).
+                    Dua alasan, keduanya soal SATU SUARA:
+
+                    1. Dialek. App punya satu avatar inisial — slate netral,
+                       ring hairline — dipakai Beranda, Talangan, Kas Hadiran,
+                       Tentang App. Halaman ini satu-satunya yang menggambar
+                       versinya sendiri, padahal ia menampilkan ORANG YANG SAMA:
+                       Ustad Saiful Hadi berkeping abu di Talangan lalu berkeping
+                       hijau di sini.
+
+                    2. Sinyal yang tak pernah berubah bukan sinyal. Tint hijau
+                       dulu menandai `status_aktif` — dan 70 dari 71 anggota
+                       aktif, jadi warna TERKUAT di palet dipakai di hampir tiap
+                       baris tanpa membedakan apa pun; yang terbaca cuma dinding
+                       hijau. Statusnya toh sudah ter-encode DUA kali lagi di
+                       baris yang sama, keduanya lebih jujur: nama meredup jadi
+                       gray-500, dan Tag "Nonaktif" menyebutnya dengan KATA
+                       (kanon yang sama dgn chip "Defisit" — status dibawa kata,
+                       bukan dgn mewarnai). Yang hilang cuma sandi ketiga yang
+                       paling mahal dan paling tak informatif. */}
+                <AvatarPeci nama={w.nama} className="w-10 h-10 rounded-xl" />
                 <div className="flex-1 min-w-0">
                   <p className={`text-body font-semibold potong-lentur ${w.status_aktif ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
                     {w.nama}
