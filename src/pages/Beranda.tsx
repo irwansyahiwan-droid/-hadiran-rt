@@ -535,7 +535,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       <div>
         <div>
           <p className="text-caption text-ink-faint dark:text-gray-400">{greeting},</p>
-          {/* text-xl → text-2xl. Judul halaman 20px lawan judul seksi 18px =
+          {/* Kini peran `title` (22px). Riwayat: 20px lawan judul seksi 18px =
               tangga 2px; pada berat & keluarga huruf yang sama (Sora 700) itu
               terbaca sebagai dua judul SEDERAJAT, bukan induk & anak. 24 vs 18
               memberi satu langkah yang benar-benar terlihat tanpa menambah token

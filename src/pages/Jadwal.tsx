@@ -316,7 +316,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           menukar ketepatan (Rp3.454.000 tampil "Rp3,45 jt") di layar tempat
           bendahara mencocokkan uang.
 
-          Dengan 3 kolom, `tight` mati → angkanya justru naik ke text-2xl. */}
+          Dengan 3 kolom, `tight` mati → angkanya justru naik ke ukuran penuh. */}
       <StatRow
         items={[
           { label: 'Hadir', value: hadirCount, tone: 'pos' },

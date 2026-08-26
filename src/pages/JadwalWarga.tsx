@@ -239,7 +239,7 @@ export default function JadwalWargaPage() {
         <div className="space-y-3">
         {/* StatRow 4 kolom — cermin markup StatRow (tight: px-3 py-4) */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-3 py-4">
-          {/* h-7 = line-height text-xl (28px); h-[15px] = text-caption leading-tight
+          {/* h-7 = 28px, setara tinggi baris judul; h-[15px] = text-caption leading-tight
               → tinggi total sama persis dgn StatRow asli (79px), tanpa drift. */}
           <div className="grid grid-cols-4 divide-x divide-line dark:divide-gray-800">
             {[0, 1, 2, 3].map((i) => (

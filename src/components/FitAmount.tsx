@@ -4,7 +4,7 @@ interface FitAmountProps {
   /** String FINAL angka untuk mengukur lebar (mis. "-Rp12.500.000"). Pakai nilai
    *  akhir, BUKAN nilai animasi count-up → ukuran font stabil saat digit berputar. */
   measure: string;
-  /** Ukuran maksimum (px) saat angka pendek & muat penuh. Default 48 (≈ text-5xl). */
+  /** Ukuran maksimum (px) saat angka pendek & muat penuh. Default 48px — sengaja DI ATAS peran tertinggi (`display` 38px), sebab komponen ini memang menyusutkan sendiri. */
   maxPx?: number;
   /** Lantai keterbacaan (px) — tak pernah lebih kecil dari ini. Default 30. */
   minPx?: number;
