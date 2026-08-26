@@ -337,6 +337,34 @@ diubah dari kesamaan persis menjadi ARAH (garis cetak tak boleh lebih terang
 dari garis layar). **Mazhab adalah properti MEDIA, bukan properti app.**
 
 
+Yang ke-27 (26 Agu 2026) — **DEPLOY TIDAK OTOMATIS. `git push` TIDAK men-deploy
+apa pun.** Catatan lama (termasuk di skill rt-dev) menulis "auto-deploy via
+GitHub push ke main". Itu TIDAK BENAR untuk proyek ini: integrasi Git Vercel
+tak tersambung, dan `vercel ls` menunjukkan SELURUH deployment dibuat manual
+lewat CLI. Produksi tertinggal DUA HARI sementara tiga perubahan besar (Login,
+Beranda, palet) sudah dilaporkan "live" berdasarkan push yang sukses.
+
+Deploy yang benar: `vercel --prod --yes` dari akar repo.
+
+Pelajaran yang lebih besar dari satu perintah: **"push berhasil" bukan bukti
+"live".** Bukti live cuma satu — MENGAMBIL produksi lalu memeriksa isinya:
+
+    curl -s "https://hadiran-rt.vercel.app/?v=$(date +%s)" | grep -oE '#E4ECE7|assets/index-[A-Za-z0-9_-]+\.js'
+
+Bandingkan hash aset & nilai kanvasnya dengan `dist/index.html` lokal. Kelas
+yang sama dengan cacat ke-23 & ke-25: melaporkan hijau dari langkah yang tak
+pernah benar-benar diperiksa. Vonis WAJIB dari keadaan produksi yang TERLIHAT,
+bukan dari exit code perintah sebelumnya.
+
+Verifikasi itu juga yang menemukan tiga nilai kanvas yang tak ikut pindah saat
+palet berganti — `theme-color` statis (#FAFBFC, bahkan tak pernah sama dengan
+kanvas mana pun), `theme-color` mode gelap (#030712), dan PNG splash iOS yang
+DI-BAKE pada tone lama. **Daftar "kanvas WAJIB sama di sini" belum lengkap
+kalau berhenti di CSS**: ia mencakup dua meta theme-color dan aset yang
+di-bake. Regen splash lewat `node scripts/gen-splash.mjs`, lalu verifikasi
+PIKSEL-nya — jangan percaya baris "ok →" milik generatornya sendiri.
+
+
 **Stack back-dismiss memuat entri TAB, dan itu BUKAN lapisan.** App
 mendaftarkan `activeTab !== 'beranda'` ke `useBackDismiss` supaya Back kembali
 ke Beranda — entri sah, tapi tak ada yang menutupi layar. Penjaga gestur yang

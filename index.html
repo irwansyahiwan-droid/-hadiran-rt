@@ -19,7 +19,7 @@
     <meta name="robots" content="noindex, nofollow" />
     <!-- Status bar mengikuti tema PILIHAN warga, bukan OS (di-override dinamis
          oleh useTheme saat toggle, dan oleh inline script di bawah saat load). -->
-    <meta name="theme-color" content="#FAFBFC" />
+    <meta name="theme-color" content="#E4ECE7" />
     <!-- Pasang tema SEBELUM paint pertama: tanpa ini pengguna yang memilih gelap
          melihat kilatan putih tiap buka app (class .dark baru dipasang React
          setelah bundle). Logika harus sama dgn useTheme: TERANG kecuali warga
@@ -30,7 +30,7 @@
           document.documentElement.classList.add('dark');
           document
             .querySelectorAll('meta[name="theme-color"]')
-            .forEach(function (m) { m.setAttribute('content', '#030712'); });
+            .forEach(function (m) { m.setAttribute('content', '#07170E'); });
         }
       } catch (e) { /* abaikan (mis. storage diblokir) */ }
     </script>
@@ -93,7 +93,7 @@
          kini default terang, splash terang = tebakan yang benar untuk hampir semua
          warga (yang memilih gelap sendiri lihat splash terang sesaat — trade-off
          sadar, lebih baik daripada splash gelap untuk semua pengguna HP dark).
-         PNG di-bake pada tone kanvas AKTIF #ECF1F7 (diverifikasi pixel 10 Jul) —
+         PNG di-bake pada tone kanvas AKTIF #E4ECE7 (palet Hutan, 24 Agu 2026) —
          sinkron body/sunken/manifest. Bila kanvas berubah: regen via
          scripts/gen-splash.mjs. Tanpa ini iOS standalone = blank putih. -->
     <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-640x1136.png" />
