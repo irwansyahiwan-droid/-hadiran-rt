@@ -74,9 +74,13 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   /* Kolom isian bendahara: satu resep, dipakai dua kali. Kaca gelap di atas
      hijau — bukan `bg-white/60` warisan kartu terang, yang di atas hero pekat
      berubah jadi bidang keruh. */
+  /* placeholder /55 → /75 (24 Agu 2026): `audit:kontras` mengukur 4,32:1 di
+     atas kaca gelap-di-atas-hijau — LOLOS di kartu putih tempat nilai ini
+     lahir, GAGAL di permukaan hero. Permukaan berubah, angkanya wajib diukur
+     ulang; jangan salin alpha antar permukaan. */
   const field =
     'w-full pl-11 pr-4 py-3.5 rounded-xl bg-black/25 backdrop-blur-sm ' +
-    'border border-white/25 text-body text-white placeholder-white/55 ' +
+    'border border-white/25 text-body text-white placeholder-white/75 ' +
     'focus:outline-none focus:ring-2 focus:ring-[var(--gold-songket)] ' +
     'focus:border-[var(--gold-songket)] transition';
 
@@ -200,7 +204,10 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         {/* ── Pemisah ──────────────────────────────────────────────── */}
         <div className="flex items-center gap-3 my-7">
           <span className="h-px flex-1 bg-white/20" />
-          <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white/55">
+          {/* /55 → /75: `audit:kontras` mengukur 4,13:1 di atas hijau hero —
+              di bawah AA 4,5 untuk teks 11px/600. Nilai /55 warisan pass
+              pertama layar ini, tak pernah diukur di permukaan HIJAU. */}
+          <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white/75">
             atau
           </span>
           <span className="h-px flex-1 bg-white/20" />

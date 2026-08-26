@@ -273,6 +273,32 @@ sebuah ANGKA wajib digerbang oleh angka itu, bukan dipaku jadi tetap** — kalau
 tidak, ia hidup terus lama sesudah alasannya mati.
 
 
+Yang ke-25 (24 Agu 2026, sesudah palet app pindah ke rona Hutan): sapuan
+kontras dijalankan untuk menjaga PALET, dan yang tertangkap justru dua cacat
+dari redesign LOGIN yang sudah ter-deploy sehari sebelumnya — `text-white/55`
+pada label "atau" (4,13:1) dan `placeholder-white/55` (4,32:1), dua-duanya di
+bawah AA 4,5. Palet barunya sendiri: 2.165 sampel `kontras-deep`, NOL gagal.
+
+Pelajarannya bukan "alpha 55 terlalu rendah". Kedua nilai itu LOLOS di tempat
+mereka lahir — kartu putih — dan gagal begitu dipindahkan ke permukaan HIJAU
+tanpa diukur ulang. **Alpha bukan warna; ia baru jadi warna setelah bertemu
+permukaannya. Menyalin `/55` antar permukaan sama saja menyalin angka kontras
+yang tak pernah dihitung.** Setiap kali sebuah elemen pindah ke latar baru,
+nilai alpha-nya WAJIB diukur ulang, bukan dibawa serta.
+
+Catatan kedua, tentang palet: yang digeser cuma RONA (hue 264 → 158), dengan
+L tiap langkah dikunci di nilai Tailwind aslinya lewat OKLCH. Itu sebabnya
+1.255 pemakaian kelas abu berubah wajah tanpa satu pun rasio kontras bergerak.
+**Kalau palet digeser lagi: geser hue, jangan sentuh L.** Chroma-nya di-taper
+di ujung terang (`min(1, (1-L)*4.5)`) — tanpa itu `gray-50` keluar #EBFFF3,
+mint terang yang terbaca hijau muda di atas kartu putih, bukan abu.
+
+Dan penjaga yang bekerja diam-diam: `warnaCetak.test.ts` langsung merah karena
+`warnaCetak.ts` masih memegang kanvas lama. Tanpa uji itu, seluruh PDF & Excel
+laporan akan tetap dicetak dengan kanvas palet lama tanpa ada yang sadar —
+**cermin token wajib punya uji yang menguncinya ke tokennya.**
+
+
 **Stack back-dismiss memuat entri TAB, dan itu BUKAN lapisan.** App
 mendaftarkan `activeTab !== 'beranda'` ke `useBackDismiss` supaya Back kembali
 ke Beranda — entri sah, tapi tak ada yang menutupi layar. Penjaga gestur yang
