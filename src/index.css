@@ -825,7 +825,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   left: var(--di-l, 4.25rem);
   right: var(--di-r, 1rem);
   height: 1px;
-  background: #D1DAE5;          /* lebih terang dari line #C5CFDB (pass Etched Premium 26 Jul: #DCE2EA→#D1DAE5, ikut naik serempak edge-family) — hierarki boundary-kartu-memimpin tetap terjaga */
+  background: #D2DCD5;          /* rona Hutan (24 Agu 2026). Lebih terang dari line #C5CFDB (pass Etched Premium 26 Jul: #DCE2EA→#D1DAE5, ikut naik serempak edge-family) — hierarki boundary-kartu-memimpin tetap terjaga */
 }
 .divide-inset::after { bottom: 0; }
 .list-inset > * + *::before { top: 0; }
@@ -1125,7 +1125,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
     /* Pass KONTRAS MAKSIMAL (4 Agu): #66786D (4,76:1) → #475569 (7,58:1 kartu
        putih / 6,68:1 kanvas). Nonaktif tetap terbaca "abu netral", tapi kini
        ikut ambang AAA app — bukan cuma "lebih baik dari opacity". */
-    color: #475569;
+    color: #47594E;  /* rona Hutan — L dikunci, rasio 7,58:1 tak bergerak */
     cursor: not-allowed;
   }
   .dark .mati-teks:disabled { color: #A8BCAF; }  /* #94A3B8 6,92:1 → 8,66:1, sama dgn remap gray-400 gelap */

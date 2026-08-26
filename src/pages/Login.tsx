@@ -313,15 +313,23 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 )}
 
                 {/* Emas sbg aksi ADMIN: memisahkannya dari putih milik warga tanpa
-                    melahirkan warna baru, dan #063A21 di atas #E8B651 = 9,6:1.
-                    Keadaan nonaktif dicat SOLID (bukan opacity) supaya labelnya
-                    tetap terbaca — ambang `audit:mati`. */}
+                    melahirkan warna baru. Keadaan nonaktif dicat SOLID (bukan
+                    opacity) supaya labelnya tetap terbaca — ambang `audit:mati`.
+
+                    Label nonaktif #0A3520 → #04180E (26 Agu 2026). `audit:mati`
+                    mengukur 3,45:1 (ambang 4,5) sementara rumus WCAG di atas
+                    pasangan warna TERUKUR (#0A3520 pada #C2A052) memberi 5,47:1.
+                    Selisih itu belum dijelaskan — dan justru karena itu yang
+                    dipakai VONIS ALATNYA, bukan hitungan di atas kertas: alat
+                    membaca piksel yang benar-benar tercat, hitungan membaca
+                    angka yang kita KIRA tercat. Diberi margin lebar (rumus
+                    ~7,4:1) lalu diverifikasi ulang dgn alat yang sama. */}
                 <button
                   type="submit"
                   disabled={loading}
                   className="press w-full min-h-[50px] rounded-xl font-bold text-body
                              bg-[var(--gold-songket)] text-[#063A21]
-                             disabled:bg-[#C2A052] disabled:text-[#0A3520]
+                             disabled:bg-[#C2A052] disabled:text-[#04180E]
                              transition-colors"
                 >
                   {loading ? 'Memproses…' : 'Masuk'}
