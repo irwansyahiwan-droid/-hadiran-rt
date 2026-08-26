@@ -29,7 +29,7 @@
 
 export const CETAK = {
   // Permukaan & garis
-  canvas:  '#ECF1F7', // = token `sunken` / body / .app-bg
+  canvas:  '#EBF3EE', // = token `sunken` / body / .app-bg (palet Hutan, 24 Agu 2026)
   surface: '#FFFFFF',
   line:    '#B8C4D3', // = token `line` (tepi kartu)
   divider: '#D1DAE5', // = hairline antar-baris (.divide-inset)

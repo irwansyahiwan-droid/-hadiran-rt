@@ -76,6 +76,39 @@ export default {
         amount:  '1.0625rem', // 17px — nominal menonjol
       },
       colors: {
+        /* ── Skala abu: rona HUTAN, terang DIKUNCI (24 Agu 2026) ──────────
+           App ini punya ~1.255 pemakaian kelas abu Tailwind bawaan
+           (`bg-gray-900`, `text-gray-400`, …) yang tak pernah tersambung ke
+           token brand. Akibatnya seluruh perabot app berbahasa abu-KEBIRUAN
+           (hue 264) sementara hero, tombol & identitasnya hijau tua — dua
+           bahan berbeda dalam satu layar, dan itu yang terbaca "biasa saja".
+
+           Yang digeser di sini RONA-nya (hue 264 → 158, chroma 0.028), bukan
+           TERANG-nya: L tiap langkah dikunci persis di nilai Tailwind aslinya
+           lewat OKLCH, supaya seluruh kerja kontras AAA yang sudah dibayar
+           berkali-kali di repo ini tidak hangus dalam satu commit.
+
+           DUA langkah teratas sengaja DIANGKAT (900 +0.055 L, 800 +0.0385):
+           bukan penyeragaman, tapi memperlebar jarak kartu↔kanvas. Kanvas
+           gelap lama #030712 praktis hitam pekat — hitam pekat terbaca murah
+           karena ia bukan bahan, ia ketiadaan; kartu di atasnya jadi
+           mengambang di ruang hampa alih-alih menapak di permukaan.
+
+           Kalau rona ini diubah lagi: geser hue-nya, JANGAN sentuh L. Dan
+           jalankan audit:kontras + kontras-deep + kontras-nonteks sesudahnya. */
+        gray: {
+          50: '#F9FAF9',
+          100: '#F2F5F3',
+          200: '#E2E9E5',
+          300: '#CCD8D1',
+          400: '#95A89C',
+          500: '#65776C',
+          600: '#48594E',
+          700: '#34453B',
+          800: '#26362D',
+          900: '#192920',
+          950: '#010A04',
+        },
         /* ── Brand hijau (sumber: hero gradient di index.css) ──────────
            JANGAN ganti ke navy/gold. Lihat memory design-system. */
         /* Pass KONTRAS MAKSIMAL (4 Agu 2026, permintaan user "kontras dibuat
@@ -149,7 +182,7 @@ export default {
         },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#ECF1F7', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). MATERIAL-FLAT (2 Jul): #EAEFF6→#ECF1F7 (nada Gmail/Google apps) + seluruh sistem kartu pindah ke bahasa FLAT ala Google/myBCA/BYOND — kanvas rata tanpa whisper radial, kartu putih murni ber-hairline, bayangan tinggal satu contact whisper. 9 pass naik-turun L kanvas tak pernah selesai karena akar masalahnya dua bahasa visual campur (nav/pill/banner sudah flat, kartu masih floating-glass) — bukan nilai L. Jangan tuning L lagi.
+        sunken: '#EBF3EE', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). MATERIAL-FLAT (2 Jul): #EAEFF6→#ECF1F7 (nada Gmail/Google apps) + seluruh sistem kartu pindah ke bahasa FLAT ala Google/myBCA/BYOND — kanvas rata tanpa whisper radial, kartu putih murni ber-hairline, bayangan tinggal satu contact whisper. 9 pass naik-turun L kanvas tak pernah selesai karena akar masalahnya dua bahasa visual campur (nav/pill/banner sudah flat, kartu masih floating-glass) — bukan nilai L. Jangan tuning L lagi.
         line: '#B8C4D3',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk). Pass kontras-tercetak (8 Jul): #DAE0E8→#D3DAE3 — user minta kontras lebih premium; naikkan SATU step di dalam bahasa flat (hairline = lever sah) agar tepi kartu "tercetak", tetap whisper-class bukan bingkai. Pass "Etched Premium" (26 Jul): #D3DAE3→#C5CFDB — user minta warna/kontras lebih mahal (trend 2026); tepi kartu dinaikkan SATU step lagi (lever hairline yg sama, BUKAN glass/shadow) agar "tercetak" ala Linear/Stripe/Mercury light. Edge-family digelapkan serempak menjaga hierarki control > line > divider. Pass KONTRAS MAKSIMAL (4 Agu): #C5CFDB→#B8C4D3 — satu step lagi di lever yang SAMA (hairline), bukan glass/shadow/kanvas. Nilainya persis `control` sebelum pass non-teks, jadi hierarki control #64748B > line #B8C4D3 > divider baris #D1DAE5 tetap utuh. Hairline ini juga jadi garis atas bar nav dok (.nav-dock) supaya tepi bar & tepi kartu satu bahasa.
         /* border kontrol (input/tombol) — lebih kuat dari line. Riwayat: #E2E8F0→#CBD5E1
            (8 Jul, dulu malah LEBIH TERANG dari line) → #B8C4D3 (26 Jul "Etched Premium",

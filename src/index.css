@@ -1,3 +1,10 @@
+/* CATATAN PALET (24 Agu 2026): skala abu app pindah dari abu-kebiruan
+   Tailwind ke rona HUTAN (lihat tailwind.config.js). Hex abu/kanvas yang
+   masih tertulis di KOMENTAR berkas ini (#ECF1F7, #030712, #1F2937, …)
+   adalah catatan pengukuran terhadap palet LAMA — sengaja tidak ditulis
+   ulang, karena rasio yang tercatat di sana diukur terhadap nilai itu.
+   Nilai yang BERLAKU selalu yang ada di deklarasi, bukan di komentar. */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -110,7 +117,7 @@ body {
      (nada Gmail/Google apps) RATA tanpa radial whisper; kartu putih MURNI flat
      ber-hairline; bayangan tinggal satu contact whisper. Separasi = step tonal
      + hairline + geometri, titik. Jangan tambah lapisan lagi. */
-  background-color: #ECF1F7;
+  background-color: #EBF3EE;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -356,7 +363,7 @@ input, textarea  { caret-color: #1B7249; }
 }
 
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
-.dark body { background-color: #030712; }
+.dark body { background-color: #0B1B12; }
 
 /* (Konsolidasi 10 Jul) Blok `*:focus-visible` kedua dihapus — dobel dgn aturan
    :is(button,a,...) di atas memakai DUA hijau berbeda (#0F6039 vs #1B7249) dan
@@ -384,7 +391,7 @@ input, textarea  { caret-color: #1B7249; }
      transisi muddy, biang rasa "kurang bersih"). Ala Gmail/myBCA/BYOND:
      kanvas polos, kartu putih flat, atmosfer datang dari konten & warna
      hero — bukan dari aura di latar. Samakan dgn body/sunken/manifest/landing. */
-  background-color: #ECF1F7;
+  background-color: #EBF3EE;
 }
 /* MATERIAL-FLAT DARK (12 Jul 2026) — menuntaskan keputusan 2 Jul ke sisi gelap.
    Aura radial (emerald .30 + teal .22 + sky .15) DIHAPUS. Kanvas light sudah
@@ -395,7 +402,7 @@ input, textarea  { caret-color: #1B7249; }
    Kini kanvas gelap RATA (#030712), separasi datang dari step tonal (kartu
    gray-900) + ring cahaya + geometri — sama persis dgn logika sisi light. */
 .dark .app-bg {
-  background-color: #030712;
+  background-color: #0B1B12;
 }
 
 /* ── Kontras teks (LIGHT MODE saja) ──────────────────────────────────
@@ -458,7 +465,7 @@ html.dark .dark\:text-blue-400 { color: #93C5FD; }
    (= nilai remap `gray-400` gelap yang sudah dipakai app, bukan hex baru).
    7,23–7,56 terang / 7,25–8,76 gelap. Kelas ber-prefix WAJIB ikut disebut —
    jebakan yang sama dgn remap gray & blue di atas. */
-html:not(.dark) .placeholder-gray-500::placeholder { color: #4B5563; }
+html:not(.dark) .placeholder-gray-500::placeholder { color: #48594E; }
 html.dark .placeholder-gray-400::placeholder,
 html.dark .dark\:placeholder-gray-400::placeholder { color: #AEB7C4; }
 
@@ -1233,8 +1240,8 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    Sisi GELAP tak berubah nilainya (#374151 memang sudah satu langkah di atas
    #1F2937); ia cuma ikut pindah ke nama ini agar kedua tema satu sumber. */
 .skeleton-bar { background-color: #D6DADE; }
-.dark .skeleton-bar { background-color: #374151; }
-.dark .skeleton { background: #1F2937; }
+.dark .skeleton-bar { background-color: #34453B; }
+.dark .skeleton { background: #26362D; }
 .skeleton::after {
   content: '';
   position: absolute;
@@ -1556,7 +1563,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
     -webkit-backdrop-filter: none !important;
   }
   .backdrop-blur-xl, .backdrop-blur-md { background-color: #FFFFFF !important; }
-  .dark .backdrop-blur-xl, .dark .backdrop-blur-md { background-color: #111827 !important; }
+  .dark .backdrop-blur-xl, .dark .backdrop-blur-md { background-color: #192920 !important; }
 }
 
 /* ── A11y: separasi kartu saat high-contrast / forced-colors ─────────────────
