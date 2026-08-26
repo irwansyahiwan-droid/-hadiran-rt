@@ -53,7 +53,7 @@ export default function OverlayHeader({
         </button>
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" aria-hidden="true" />
-          <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 potong-lentur">{title}</h1>
+          <h1 className="text-subtitle font-bold text-gray-900 dark:text-gray-100 potong-lentur">{title}</h1>
         </div>
         {actions && <div className="flex items-center -mr-2 shrink-0">{actions}</div>}
       </div>

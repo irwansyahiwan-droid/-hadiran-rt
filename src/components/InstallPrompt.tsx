@@ -116,7 +116,7 @@ export default function InstallPrompt() {
             <div className="flex items-center gap-3 mb-4">
               <img src={logoRt} alt="" width={44} height={44} className="w-11 h-11 rounded-2xl object-cover" />
               <div>
-                <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">Pasang di iPhone</h3>
+                <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Pasang di iPhone</h3>
                 <p className="text-caption text-gray-500 dark:text-gray-400">Wajib pakai browser <b>Safari</b></p>
               </div>
             </div>

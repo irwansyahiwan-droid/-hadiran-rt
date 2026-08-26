@@ -44,7 +44,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           <span className="w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-7 h-7 text-warn dark:text-amber-400" />
           </span>
-          <h1 className="text-lg font-bold text-ink dark:text-gray-100 mb-1.5">
+          <h1 className="text-title font-bold text-ink dark:text-gray-100 mb-1.5">
             Ups, ada gangguan
           </h1>
           <p className="text-pretty text-body text-ink-sub dark:text-gray-400 mb-5 leading-relaxed">

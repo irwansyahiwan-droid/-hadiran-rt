@@ -57,7 +57,20 @@ export default function PageHeader({
           </button>
         )}
         <div className="min-w-0">
-          <h1 className="flex min-w-0 items-center gap-1 text-lg font-bold text-ink dark:text-gray-100">
+          {/* Judul halaman MENGALIR antara dua anak tangga nyata: lantai `subtitle`
+              (18px), langit-langit `title` (22px). Bukan nilai karangan — keduanya
+              peran yang ada di tangga.
+
+              Kenapa tak dipaku 22px: header Jadwal membawa TIGA aksi (muat ulang,
+              PDF, + Jadwal). Terukur `audit:potong` @390px, judul 22px kurang
+              2,4px dan berakhir "Jadwal Tarika…". Komentar di berkas ini sudah
+              pernah memperingatkannya untuk 18px; menaikkan ukurannya begitu saja
+              mengulang cacat yang sama.
+
+              Jadi tabrakan judul-halaman vs judul-seksi diselesaikan DI MANA ADA
+              RUANG, dan mengalah dengan anggun di mana tidak. Yang membatasi
+              bukan tipografinya — melainkan tiga tombol itu. */}
+          <h1 className="flex min-w-0 items-center gap-1 text-[clamp(1.125rem,4.9vw,1.375rem)] leading-[1.25] tracking-[-0.015em] font-bold text-ink dark:text-gray-100">
             {/* truncate DI SPAN, bukan di h1: h1 juga wadah InfoTip — kalau
                 truncate dipasang di sana, tombol info ikut terpotong. */}
             <span className="potong-lentur">{title}</span>

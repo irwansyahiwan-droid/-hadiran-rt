@@ -540,7 +540,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               terbaca sebagai dua judul SEDERAJAT, bukan induk & anak. 24 vs 18
               memberi satu langkah yang benar-benar terlihat tanpa menambah token
               baru — 2xl sudah dipakai angka StatRow. */}
-          <h1 className="text-2xl font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
+          <h1 className="text-title font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
         </div>
       </div>
 

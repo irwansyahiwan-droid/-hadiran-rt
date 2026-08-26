@@ -243,7 +243,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           >
             <ArrowLeft className="w-[18px] h-[18px] text-gray-600 dark:text-gray-300" />
           </button>
-          <h2 className="text-base font-display font-bold text-ink dark:text-gray-100">
+          <h2 className="text-subtitle font-display font-bold text-ink dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
           </h2>
         </div>
@@ -297,7 +297,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
         <div>
-          <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
           </h2>
           <p className="text-caption text-ink-faint dark:text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
@@ -725,7 +725,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-base font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
+            <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
           </div>
           <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -831,7 +831,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-base font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
+            <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
           </div>
           <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -1128,7 +1128,7 @@ export default function JadwalPage() {
                 className={`rise flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l border-l-brand-500 dark:border-l-emerald-500' : ''}`}
               >
                 {/* Nomor tarikan — INDEKS, bukan judul (24 Agu 2026).
-                    Dulu `text-base font-bold`: ukuran & bobot yang persis sama
+                    Dulu `text-subtitle font-bold`: ukuran & bobot yang persis sama
                     dgn nama Sohibul Bait di sebelahnya, jadi di 71 baris mata
                     membaca dua kolom yang sama-sama berteriak dan yang menang
                     justru angkanya — padahal yang dicari warga adalah NAMA.
@@ -1149,7 +1149,7 @@ export default function JadwalPage() {
                       nama ber-nickname ("Nisan Nasrullah ( Icang )") butuh ~200px.
                       Nickname justru bagian yang dikenal warga — lebih baik baris
                       tumbuh 1 baris daripada nama dipotong elipsis. */}
-                  <p className={`text-base font-semibold line-clamp-2 leading-snug break-words ${isSelesai ? 'text-ink-sub dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                  <p className={`text-body font-semibold line-clamp-2 leading-snug break-words ${isSelesai ? 'text-ink-sub dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
                     {t.sohibul_bait?.nama ?? '—'}
                   </p>
                   <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">
@@ -1282,7 +1282,7 @@ export default function JadwalPage() {
             <div className="-mt-2 mb-3 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...rowDrag.handlers}>
               <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
-            <p className="text-base font-bold text-ink dark:text-gray-100 leading-snug">
+            <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">
               Tarikan #{rowTarikan.nomor} · {rowTarikan.sohibul_bait?.nama ?? '—'}
             </p>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(rowTarikan.tanggal)}</p>

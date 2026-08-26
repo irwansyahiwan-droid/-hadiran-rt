@@ -137,7 +137,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <span
             className="inline-flex items-center px-3.5 py-1.5 rounded-full
                        bg-black/25 border border-[var(--gold-songket)]/40
-                       text-[0.75rem] font-semibold tracking-wide text-[#F1E3C0]"
+                       text-caption font-semibold text-[#F1E3C0]"
           >
             RT&nbsp;004/006 · Tanah Baru, Beji
           </span>
@@ -157,7 +157,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             />
           </div>
 
-          <h1 className="font-display mt-6 text-[2.35rem] leading-[1.05] font-extrabold tracking-[-0.03em] text-white">
+          <h1 className="font-display mt-6 text-display font-extrabold text-white">
             Hadiran RT
           </h1>
           <p className="mt-2.5 text-body font-medium text-[#A7F3D0]">
@@ -195,7 +195,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             id="masuk-warga"
             onClick={() => { haptic(12); onWargaMode(); }}
             className="press w-full min-h-[56px] px-6 rounded-2xl bg-white text-[#063A21]
-                       font-bold text-[1.0625rem] flex items-center justify-center gap-2.5
+                       font-bold text-subtitle flex items-center justify-center gap-2.5
                        shadow-[0_12px_32px_-12px_rgba(0,0,0,0.65)]"
           >
             Masuk sebagai Warga
@@ -212,7 +212,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           {/* /55 → /75: `audit:kontras` mengukur 4,13:1 di atas hijau hero —
               di bawah AA 4,5 untuk teks 11px/600. Nilai /55 warisan pass
               pertama layar ini, tak pernah diukur di permukaan HIJAU. */}
-          <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white/75">
+          <span className="text-overline font-semibold uppercase text-white/75">
             atau
           </span>
           <span className="h-px flex-1 bg-white/20" />

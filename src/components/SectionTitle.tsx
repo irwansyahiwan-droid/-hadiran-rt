@@ -49,7 +49,7 @@ export default function SectionTitle({ children, count, action, tone = 'default'
        ter-clip dan tak menambah apa pun). Karena SectionTitle dipakai di tiap
        layar, satu perbaikan di sini menutup polanya di semua tempat. */
     <div className={`flex flex-wrap items-center justify-between gap-2 mb-3 ${className}`}>
-      <h2 className={`flex min-w-0 items-center gap-2 text-balance text-lg font-bold ${
+      <h2 className={`flex min-w-0 items-center gap-2 text-balance text-subtitle font-bold ${
         tone === 'muted' ? 'text-ink-sub dark:text-gray-400'
         : tone === 'warn' ? 'text-warn dark:text-warn-dark'
         : 'text-ink dark:text-gray-100'

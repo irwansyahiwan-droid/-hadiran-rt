@@ -250,7 +250,7 @@ export default function App() {
           className="pop h-16 w-16 rounded-2xl object-contain ring-1 ring-black/[0.06] dark:ring-white/10 shadow-sm"
         />
         <div className="flex flex-col items-center gap-4">
-          <p className="text-base font-semibold tracking-tight text-ink dark:text-gray-100">Hadiran RT</p>
+          <p className="text-subtitle font-semibold tracking-tight text-ink dark:text-gray-100">Hadiran RT</p>
           {/* Shimmer bar (bahasa .skeleton), bukan spinner — sinkron dgn #app-splash. */}
           <div className="as-bar" aria-hidden="true" />
         </div>

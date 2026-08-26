@@ -265,7 +265,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
-        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">{initial ? 'Ubah Target Kas RT' : 'Tetapkan Target Kas RT'}</h3>
+        <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">{initial ? 'Ubah Target Kas RT' : 'Tetapkan Target Kas RT'}</h3>
 
         <form onSubmit={submit} className="space-y-3">
           <div>

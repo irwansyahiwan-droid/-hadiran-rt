@@ -693,13 +693,13 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                     >
                       {Icon && <Icon className="h-[22px] w-[22px]" strokeWidth={1.8} />}
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white">{promo!.eyebrow}</span>
+                    <span className="text-overline font-bold uppercase text-white">{promo!.eyebrow}</span>
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
-                  <div className={`mt-[16px] text-balance text-[1.5rem] font-extrabold leading-[1.16] tracking-[-.02em] ${tw}`}>{promo!.judul}</div>
+                  <div className={`mt-[16px] text-balance text-title font-extrabold ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
-                    <div className={`mt-[10px] text-pretty text-[0.9rem] font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
+                    <div className={`mt-[10px] text-pretty text-body font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
 
                   {/* Kartu target = AJAKAN, bukan laporan (5 Agu 2026).

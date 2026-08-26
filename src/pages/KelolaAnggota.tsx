@@ -135,7 +135,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-base font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
               {mode === 'add' ? 'Tambah Anggota' : 'Edit Anggota'}
             </p>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">

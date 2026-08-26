@@ -39,8 +39,8 @@ export default function AvatarPeci({ nama, className = 'w-12 h-12 rounded-xl', s
   // MATERIAL-FLAT: inset top-light dihapus (sheen icon-tile sudah dipensiunkan
   // app-wide 2 Jul — tile ini sempat luput). Tint + ring hairline saja.
   return (
-    <div className={`bg-slate-100 dark:bg-slate-800 ${ring} ${className} flex items-center justify-center shrink-0`}>
-      <span className="text-base font-bold tracking-wide text-slate-600 dark:text-slate-300">{initial}</span>
+    <div className={`bg-gray-100 dark:bg-gray-800 ${ring} ${className} flex items-center justify-center shrink-0`}>
+      <span className="text-subtitle font-bold text-gray-600 dark:text-gray-300">{initial}</span>
     </div>
   );
 }

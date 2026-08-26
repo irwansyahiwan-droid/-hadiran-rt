@@ -69,7 +69,7 @@ export default function TentangApp({ open, onClose }: Props) {
         {/* Hero */}
         <div className="text-center pt-2 pb-1">
           <img src={logoRt} alt="Logo RT 004/006" width={80} height={80} className="w-20 h-20 rounded-3xl object-cover mx-auto mb-3 lift ring-1 ring-black/[0.08] dark:ring-white/10" />
-          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Hadiran RT</h2>
+          <h2 className="text-title font-bold text-gray-900 dark:text-gray-100">Hadiran RT</h2>
           <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5">RT&nbsp;004/006 · Tanah Baru Beji · Depok</p>
         </div>
 

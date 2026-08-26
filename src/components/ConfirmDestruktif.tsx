@@ -97,7 +97,7 @@ export default function ConfirmDestruktif({
             <AlertTriangle className="w-5 h-5 text-neg dark:text-rose-400" />
           </span>
           <div className="min-w-0">
-            <h2 className="text-balance text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
+            <h2 className="text-balance text-subtitle font-bold text-gray-900 dark:text-gray-100 leading-tight">
               {title}
             </h2>
             <p className="text-pretty text-caption text-ink-sub dark:text-gray-400 mt-1 leading-relaxed">

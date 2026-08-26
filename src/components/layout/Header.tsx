@@ -183,7 +183,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
               "diketik", bukan diset. Sora ~9% lebih lebar di 16px; baris ini
               `truncate` di dalam `min-w-0` dan sisa ruangnya masih lega di
               360px (diukur, lihat sapuan sesudah pass ini). */}
-          <p className="font-display text-base font-semibold tracking-tight text-gray-900 dark:text-gray-100 truncate">
+          <p className="font-display text-subtitle font-semibold tracking-tight text-gray-900 dark:text-gray-100 truncate">
             Hadiran RT
           </p>
         </div>

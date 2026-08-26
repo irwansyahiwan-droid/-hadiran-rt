@@ -69,7 +69,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
         <div>
-          <h3 className="text-balance text-base font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h3>
+          <h3 className="text-balance text-subtitle font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h3>
           <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
             Saldo hadiran: <span className="font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
@@ -682,7 +682,7 @@ export default function KasHadiranPage() {
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-body font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-base font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
+              <span className={`text-amount font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
@@ -801,7 +801,7 @@ export default function KasHadiranPage() {
                               pecah per-token panjang di kolom ~115px sehingga butuh
                               3 baris lalu kena clamp — nickname-nya hilang padahal
                               itu yang dikenal warga. */}
-                          <p className="text-base font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
+                          <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">
@@ -1009,7 +1009,7 @@ export default function KasHadiranPage() {
               <div className="flex items-center gap-3">
                 <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-base font-bold text-ink dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
+                  <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
                   <p className="text-caption text-ink-faint dark:text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
                 </div>
                 {isBendahara && !detailLoading && (

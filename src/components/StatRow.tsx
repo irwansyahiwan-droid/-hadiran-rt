@@ -63,7 +63,7 @@ export default function StatRow({
 
                  Perbandingan sengaja longgar (`==` lewat String) supaya nol
                  dari mana pun ikut — number 0 maupun string '0'. */
-              className={`font-display font-bold tabular-nums ${tight ? 'text-xl' : 'text-2xl'} ${
+              className={`font-display font-bold tabular-nums ${tight ? 'text-subtitle' : 'text-title'} ${
                 String(s.value) === '0' ? 'text-ink-faint dark:text-gray-400' : TONE[s.tone ?? 'ink']
               }`}
             >

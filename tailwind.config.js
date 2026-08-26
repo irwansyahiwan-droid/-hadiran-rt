@@ -69,11 +69,44 @@ export default {
          bermakna. Nilai = font-size SAJA (tanpa line-height) → utility leading-*
          yang sudah ada tetap menang, tidak ada drift baris. Heading tetap pakai
          skala Tailwind (lg/xl/2xl/5xl). Migrasi bertahap per layar. */
+      /* ── TANGGA TIPOGRAFI: PERAN, bukan ukuran (26 Agu 2026) ────────────
+         Sampai hari ini tangga ini cuma mengatur ujung KECIL (micro/caption/
+         body). Di atas `body` tak ada apa-apa, jadi judul memakai bawaan
+         Tailwind mentah — dan `text-base` (16px) berjarak SATU PIKSEL dari
+         `body` (15px) sambil dipakai 22 kali. Satu piksel bukan tangga; ia
+         terbaca sederajat. Cacat yang sama sudah pernah dibetulkan LOKAL di
+         Beranda ("tangga 2px … terbaca sebagai dua judul SEDERAJAT") tapi
+         penyakitnya sistemik: di SEMUA halaman selain Beranda, judul halaman
+         (`text-lg` 18) sama persis dengan judul seksi (`text-lg` 18).
+
+         Pola yang diikuti: sistem kelas dunia tak punya "ukuran judul", mereka
+         punya PERAN TERTUTUP yang tiap anak tangganya mengunci empat nilai
+         sekaligus — size, line-height, weight, tracking (Material 3: Display /
+         Headline / Title / Body / Label, tiap peran membawa token trackingnya
+         sendiri). Angka M3 sengaja TIDAK disalin: itu skala Android ber-body
+         16sp, sedangkan body app ini 15px dan sudah lolos verifikasi kontras
+         berkali-kali. Yang dipinjam strukturnya, bukan angkanya — tangga ini
+         dibangun dari jangkar yang SUDAH ada di app (11/13/15) lalu naik.
+
+         Aturan tracking (ini yang paling terasa "mahal"): NEGATIF saat huruf
+         membesar, POSITIF saat mengecil. Judul besar ber-tracking normal
+         terbaca renggang; label 11px kapital tanpa tracking terbaca sesak.
+         App ini sudah melakukannya di beberapa tempat — tapi per tempat,
+         bukan per aturan. Sekarang per aturan.
+
+         SENGAJA TAK ADA 16px. Ke-22 pemakaian `text-base` harus memilih:
+         turun ke `body` (isi) atau naik ke `subtitle` (judul). Memaksa pilihan
+         itulah yang membuat hierarkinya akhirnya terlihat. */
       fontSize: {
-        micro:   '0.6875rem', // 11px — badge kecil, nomor, label uppercase mungil (serap 9/10/11)
-        caption: '0.8125rem', // 13px — tanggal, caption, teks sekunder (serap 12/13)
-        body:    '0.9375rem', // 15px — body utama list/baris (serap 14/15)
-        amount:  '1.0625rem', // 17px — nominal menonjol
+        display:  ['2.375rem', { lineHeight: '1.05', letterSpacing: '-0.03em'  }], // 38px — nominal hero, wordmark
+        headline: ['1.75rem',  { lineHeight: '1.15', letterSpacing: '-0.022em' }], // 28px — judul besar / angka menonjol
+        title:    ['1.375rem', { lineHeight: '1.25', letterSpacing: '-0.015em' }], // 22px — JUDUL HALAMAN
+        subtitle: ['1.125rem', { lineHeight: '1.35', letterSpacing: '-0.008em' }], // 18px — judul kartu / seksi / sheet
+        amount:   ['1.0625rem',{ lineHeight: '1.3',  letterSpacing: '-0.005em' }], // 17px — nominal menonjol
+        body:     ['0.9375rem',{ lineHeight: '1.55', letterSpacing: '0'        }], // 15px — isi list/baris
+        caption:  ['0.8125rem',{ lineHeight: '1.45', letterSpacing: '0.005em'  }], // 13px — tanggal, teks sekunder
+        micro:    ['0.6875rem',{ lineHeight: '1.35', letterSpacing: '0.06em'   }], // 11px — badge, nomor
+        overline: ['0.6875rem',{ lineHeight: '1.2',  letterSpacing: '0.14em'   }], // 11px kapital — label eyebrow
       },
       colors: {
         /* ── Skala abu: rona HUTAN, terang DIKUNCI (24 Agu 2026) ──────────
