@@ -15,10 +15,15 @@ export function useTheme() {
     localStorage.setItem('hadiran-theme', isDark ? 'dark' : 'light');
 
     // Status bar HP ikut tema aktif (override meta theme-color statis).
-    // Light: near-putih agar SEAMLESS dgn Header (bg-white/95 ≈ #FDFDFE) —
-    // hilangkan seam abu di pucuk layar. Header selalu sticky di atas, jadi
-    // tak ada momen hero hijau menyentuh status bar.
-    const color = isDark ? '#030712' : '#FAFBFC';
+    // Light: senada permukaan Header — sejak palet Hutan `.bg-white` bukan lagi
+    // putih murni melainkan #F8FCF9, jadi near-putih SEJUK (#FAFBFC) yang lama
+    // justru MELAHIRKAN seam yang nilai ini ada untuk mencegah.
+    //
+    // Ini kembaran skrip pra-React di index.html. Keduanya menyetel meta yang
+    // SAMA dan WAJIB dijaga sepasang: memperbaiki satu saja berarti bar status
+    // balik ke palet lama begitu warga menekan toggle tema (persis yang terjadi
+    // 26 Agu 2026 — index.html diperbaiki, hook ini terlewat).
+    const color = isDark ? '#07170E' : '#F8FCF9';
     document
       .querySelectorAll('meta[name="theme-color"]')
       .forEach((m) => m.setAttribute('content', color));
