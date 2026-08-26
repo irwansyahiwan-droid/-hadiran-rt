@@ -74,13 +74,18 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   /* Kolom isian bendahara: satu resep, dipakai dua kali. Kaca gelap di atas
      hijau — bukan `bg-white/60` warisan kartu terang, yang di atas hero pekat
      berubah jadi bidang keruh. */
-  /* placeholder /55 → /75 (24 Agu 2026): `audit:kontras` mengukur 4,32:1 di
+  /* Batas kolom /25 → /45 (24 Agu 2026): `audit:kontras-nonteks` mengukur
+     2,04–2,17:1 di atas hijau hero — jauh di bawah ambang 3:1 §1.4.11 untuk
+     BATAS KONTROL. /45 = 3,45:1, bermargin. Sama seperti placeholder di bawah:
+     nilai kaca ini lahir di atas kartu putih dan tak pernah diukur ulang
+     setelah pindah ke permukaan hijau.
+     placeholder /55 → /75 (24 Agu 2026): `audit:kontras` mengukur 4,32:1 di
      atas kaca gelap-di-atas-hijau — LOLOS di kartu putih tempat nilai ini
      lahir, GAGAL di permukaan hero. Permukaan berubah, angkanya wajib diukur
      ulang; jangan salin alpha antar permukaan. */
   const field =
     'w-full pl-11 pr-4 py-3.5 rounded-xl bg-black/25 backdrop-blur-sm ' +
-    'border border-white/25 text-body text-white placeholder-white/75 ' +
+    'border border-white/45 text-body text-white placeholder-white/75 ' +
     'focus:outline-none focus:ring-2 focus:ring-[var(--gold-songket)] ' +
     'focus:border-[var(--gold-songket)] transition';
 
@@ -218,7 +223,9 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           type="button"
           onClick={() => { haptic(); setBendaharaOpen((o) => !o); }}
           aria-expanded={bendaharaOpen}
-          className="press w-full min-h-[52px] px-5 rounded-xl bg-black/20 border border-white/20
+          /* /20 → /45, satu bahasa dgn batas kolom isian di bawahnya — ia
+             batas KONTROL juga, dan tunduk pada ambang 3:1 yang sama. */
+          className="press w-full min-h-[52px] px-5 rounded-xl bg-black/20 border border-white/45
                      flex items-center justify-between text-body font-semibold text-white"
         >
           <span className="flex items-center gap-2.5">
