@@ -31,14 +31,21 @@ export const CETAK = {
   // Permukaan & garis
   canvas:  '#EBF3EE', // = token `sunken` / body / .app-bg (palet Hutan, 24 Agu 2026)
   surface: '#FFFFFF',
-  line:    '#B8C4D3', // = token `line` (tepi kartu)
-  divider: '#D1DAE5', // = hairline antar-baris (.divide-inset)
+  /* SENGAJA TIDAK sama dgn token `line` sejak app pindah ke mazhab tonal
+     (24 Agu 2026). Di LAYAR kartu dipisahkan langkah nada + bayangan bertinta,
+     jadi hairline-nya boleh mundur ke whisper (#D3E0D8). Di KERTAS tak ada
+     langkah nada (kertasnya putih) dan tak ada bayangan — garis itu SATU-
+     SATUNYA pemisah yang tersisa, dan whisper akan hilang di cetakan tinta
+     hemat / fotokopi. Nilainya = hairline app SEBELUM mundur, dipindah ke rona
+     hutan: satu keluarga warna, kekuatan sesuai medianya. */
+  line:    '#B7C8BD', // tepi kartu di kertas — lebih tegas dari `line` layar
+  divider: '#D2DCD5', // = hairline antar-baris (.divide-inset), rona hutan
 
   // Tangga teks — `muted` adalah yang PALING terang yang boleh dipakai
-  ink:   '#0B1220', // judul & nominal utama
-  sub:   '#1F2937', // = token `ink.sub`, isi tabel
-  faint: '#334155', // = token `ink.faint`, label & caption
-  muted: '#475569', // footer / nomor urut (7,58:1 di putih) — batas bawah
+  ink:   '#07160D', // judul & nominal utama
+  sub:   '#1D2D23', // = token `ink.sub`, isi tabel
+  faint: '#34453B', // = token `ink.faint`, label & caption
+  muted: '#47594E', // footer / nomor urut (7,58:1 di putih) — batas bawah
 
   // Brand & uang (satu hijau, satu merah, satu amber)
   brand: '#0F4C2E', // = token `brand.DEFAULT`, wordmark & aksen tunggal

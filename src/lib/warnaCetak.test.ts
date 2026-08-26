@@ -28,6 +28,8 @@ import tw from '../../tailwind.config.js';
  */
 const c = tw.theme.extend.colors;
 
+const terangHex = (hex: string) => rgb(hex).reduce((s, v) => s + v, 0);
+
 describe('warnaCetak = cermin token app', () => {
   it('warna uang persis token pos/neg/warn', () => {
     expect(CETAK.pos).toBe(c.pos.DEFAULT);
@@ -38,7 +40,12 @@ describe('warnaCetak = cermin token app', () => {
   it('brand, kanvas, garis, dan tangga teks ikut token', () => {
     expect(CETAK.brand).toBe(c.brand.DEFAULT);
     expect(CETAK.canvas).toBe(c.sunken);
-    expect(CETAK.line).toBe(c.line);
+    /* `line` cetak SENGAJA tak lagi sama dgn `c.line`: sejak app bermazhab
+       tonal, hairline LAYAR mundur ke whisper karena pemisahan pindah ke
+       langkah nada + bayangan. Kertas tak punya keduanya, jadi garisnya wajib
+       lebih tegas. Yang dikunci di sini ARAHNYA — garis cetak tak boleh lebih
+       TERANG dari garis layar — supaya ia tak pernah diam-diam ikut memudar. */
+    expect(terangHex(CETAK.line)).toBeLessThanOrEqual(terangHex(c.line));
     expect(CETAK.ink).toBe(c.ink.DEFAULT);
     expect(CETAK.sub).toBe(c.ink.sub);
     expect(CETAK.faint).toBe(c.ink.faint);

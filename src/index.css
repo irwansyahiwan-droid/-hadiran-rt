@@ -1,6 +1,6 @@
 /* CATATAN PALET (24 Agu 2026): skala abu app pindah dari abu-kebiruan
    Tailwind ke rona HUTAN (lihat tailwind.config.js). Hex abu/kanvas yang
-   masih tertulis di KOMENTAR berkas ini (#ECF1F7, #030712, #1F2937, …)
+   masih tertulis di KOMENTAR berkas ini (#ECF1F7, #030712, #1D2D23, …)
    adalah catatan pengukuran terhadap palet LAMA — sengaja tidak ditulis
    ulang, karena rasio yang tercatat di sana diukur terhadap nilai itu.
    Nilai yang BERLAKU selalu yang ada di deklarasi, bukan di komentar. */
@@ -182,7 +182,7 @@ input[class], select[class], textarea[class] { font-size: 16px; }
    `<input type="date">` menggambar sendiri tombol pemanggil pickernya, dan
    glyph itu milik SISTEM: bidang PADAT dgn pita atas terisi, near-black di
    terang & putih pekat di gelap. Di app yang setiap ikonnya lucide OUTLINE
-   stroke 1,75 (#41505F terang / #AEB7C4 gelap — sama dgn ikon di
+   stroke 1,75 (#41505F terang / #A8BCAF gelap — sama dgn ikon di
    `.field-search`), ia satu-satunya ikon yang berasal dari keluarga lain, dan
    ia duduk di form yang paling sering dipakai bendahara.
 
@@ -228,7 +228,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   -webkit-mask-repeat: no-repeat;
           mask-repeat: no-repeat;
 }
-.dark input[type="date"]::-webkit-calendar-picker-indicator { background-color: #AEB7C4; }
+.dark input[type="date"]::-webkit-calendar-picker-indicator { background-color: #A8BCAF; }
 :root {
   /* lucide `calendar`, stroke 1,75 — sama dgn ikon lucide lain di app. */
   --ikon-kalender: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
@@ -420,10 +420,10 @@ input, textarea  { caret-color: #1B7249; }
    padahal massa caption ini duduk di kanvas #ECF1F7 yang lebih gelap — di sana
    #475569 cuma 6,68:1, alias tetap di bawah AAA. Turun satu step lagi ke
    #41505F: 8,28:1 di putih, 7,30:1 di kanvas. Tangga tetap utuh & terbaca
-   berjenjang: ink #0B1220 > sub #1F2937 > faint #334155 (9,14 kanvas) >
+   berjenjang: ink #07160D > sub #1D2D23 > faint #34453B (9,14 kanvas) >
    gray-400-remap #41505F (7,30 kanvas). */
 html:not(.dark) .text-gray-400 { color: #41505F; }  /* gray-400→slate-ink: nyaman (≈7.3:1 di kanvas) */
-html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: tegas (≈10.4:1) */
+html:not(.dark) .text-gray-500 { color: #34453B; }  /* gray-500→slate-700: tegas (≈10.4:1) */
 
 /* ── Kontras teks (DARK MODE) — cermin aturan light di atas ──────────────────
    Pass KONTRAS MAKSIMAL (4 Agu 2026). Sisi TERANG punya remap tangga teks sejak
@@ -434,7 +434,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
      rose-400  #FB7185 = 6,59:1 → sama, dan ini warna NOMINAL UANG keluar
    (emerald-400 9,25:1 & amber-400 10,63:1 sudah aman, tak disentuh).
    Dinaikkan dari SATU titik, persis pola light — bukan menyisir 151 call-site:
-     #AEB7C4 = 8,66:1 · #FDA4AF (rose-300) = 9,38:1
+     #A8BCAF = 8,66:1 · #FDA4AF (rose-300) = 9,38:1
    Jenjang tetap ada: gray-300 #D1D5DB (12,1:1) masih jelas di atas gray-400.
    Specificity html.dark .text-* (0,2,1) menang atas `.dark .text-*` Tailwind
    (0,2,0) tanpa !important. Placeholder pakai kelas lain → tidak ikut. */
@@ -445,7 +445,7 @@ html:not(.dark) .text-gray-500 { color: #334155; }  /* gray-500→slate-700: teg
    tetap melaporkan 213 sampel #9CA3AF setelah remap "terpasang"). Sisi terang
    tak kena jebakan ini karena kelasnya memang telanjang. */
 html.dark .text-gray-400,
-html.dark .dark\:text-gray-400 { color: #AEB7C4; }
+html.dark .dark\:text-gray-400 { color: #A8BCAF; }
 html.dark .text-rose-400,
 html.dark .dark\:text-rose-400 { color: #FDA4AF; }
 /* Biru status 'titip' — satu-satunya nada StatRow yang belum punya pasangan
@@ -461,13 +461,13 @@ html.dark .dark\:text-blue-400 { color: #93C5FD; }
    gray-400 5,78:1 di `.field` gelap: lolos AA, jatuh dari ambang AAA app —
    padahal ini justru teks yang dibaca warga lansia saat mencari namanya.
    Satu pasang menang di keenam permukaan field app (gray-50, putih, gray-800,
-   gray-900, + dua permukaan Login yang branded): terang #4B5563, gelap #AEB7C4
+   gray-900, + dua permukaan Login yang branded): terang #4B5563, gelap #A8BCAF
    (= nilai remap `gray-400` gelap yang sudah dipakai app, bukan hex baru).
    7,23–7,56 terang / 7,25–8,76 gelap. Kelas ber-prefix WAJIB ikut disebut —
    jebakan yang sama dgn remap gray & blue di atas. */
 html:not(.dark) .placeholder-gray-500::placeholder { color: #48594E; }
 html.dark .placeholder-gray-400::placeholder,
-html.dark .dark\:placeholder-gray-400::placeholder { color: #AEB7C4; }
+html.dark .dark\:placeholder-gray-400::placeholder { color: #A8BCAF; }
 
 /* ── Literal warna semantik di LIGHT MODE — satu lever, bukan 40 call-site ───
    Pass KONTRAS MAKSIMAL (4 Agu). Kelas Tailwind mentah (emerald-700/800,
@@ -484,7 +484,7 @@ html:not(.dark) .text-emerald-700 { color: #064E3B; }  /* 8,57:1 di emerald-100 
 html:not(.dark) .text-emerald-800 { color: #053D2E; }  /* 8,39:1 di kanvas mint Login */
 html:not(.dark) .text-rose-700    { color: #881337; }  /* 8,93:1 di rose-50 */
 html:not(.dark) .text-amber-800   { color: #78350F; }  /* 7,95:1 di amber-100 */
-html:not(.dark) .text-slate-600   { color: #334155; }  /* 8,49:1 di tile abu (inisial AvatarPeci) */
+html:not(.dark) .text-slate-600   { color: #34453B; }  /* 8,49:1 di tile abu (inisial AvatarPeci) */
 html:not(.dark) .text-blue-700    { color: #1E3A8A; }  /* 8,38:1 di pil "WARGA" */
 /* blue-600 terlewat di pass 4 Agu — satu-satunya literal biru yang tak ikut,
    dan justru yang dipakai StatRow tone `info` (angka "Titip" di Jadwal) plus
@@ -536,7 +536,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      terkontain nada netral+green-ink. Hero se-app = satu keluarga bayangan. */
   --hero-shadow:
     0 6px 16px -12px rgba(0, 0, 0, 0.28),
-    0 18px 40px -22px rgba(15, 40, 30, 0.40);
+    0 18px 40px -22px rgba(6, 34, 21, 0.42);
   --hero-divider: rgba(255, 255, 255, 0.16);
 }
 
@@ -692,7 +692,8 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      tanpa top-light/edge-ring/sheen. Kanvas L & border TIDAK disentuh (lever itu
      sengaja ditutup sejak Material-flat — lihat riwayat 9 pass di atas). */
   --shadow-card:
-    0 2px 4px -1px rgba(15, 23, 42, 0.09);                   /* contact whisper — satu-satunya bayangan kartu */
+    0 1px 2px -1px rgba(8, 30, 19, 0.10),
+    0 5px 14px -6px rgba(8, 30, 19, 0.13);                   /* contact whisper — satu-satunya bayangan kartu */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
@@ -758,14 +759,14 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    penuh ke tepi bawah layar. Pemisah dari konten = hairline atas + bayangan
    NAIK tipis (bar dok tak butuh drop berlapis ke bawah; itu bahasa kapsul).
 
-   Hairline atas memakai warna PADAT token `line` (#B8C4D3), bukan alpha samar
+   Hairline atas memakai warna PADAT token `line` (#B7C8BD), bukan alpha samar
    0.07 seperti versi 2 Jul. Alasannya sama dgn tepi kartu di pass "etched":
    garis yang nyaris tak terbaca membuat bar dok terlihat menyatu dgn kanvas
    dan konten seakan tersapu keluar layar tanpa batas. Satu hairline tercetak =
    bar terbaca sebagai permukaan sendiri, tanpa menambah lapisan baru. */
 .nav-dock {
   box-shadow:
-    0 -1px 0 0 #B8C4D3,                           /* hairline atas = token `line` */
+    0 -1px 0 0 #B7C8BD,                           /* hairline atas = token `line` */
     0 -8px 24px -12px rgba(15, 23, 42, 0.14);     /* ambient naik tipis */
 }
 .dark .nav-dock {
@@ -1089,7 +1090,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   .btn-brand:disabled, .btn-danger:disabled, .btn-mati:disabled {
     background-image: none;
     background-color: #E9EEF5;
-    color: #334155;
+    color: #34453B;
     box-shadow: none;
     filter: none;
     opacity: 1;              /* menang atas `disabled:opacity-*` sisa di call-site */
@@ -1121,13 +1122,13 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      opacity-*` yang mungkin masih menempel di call-site tak menimpanya lagi. */
   .mati-teks:disabled {
     opacity: 1;
-    /* Pass KONTRAS MAKSIMAL (4 Agu): #64748B (4,76:1) → #475569 (7,58:1 kartu
+    /* Pass KONTRAS MAKSIMAL (4 Agu): #66786D (4,76:1) → #475569 (7,58:1 kartu
        putih / 6,68:1 kanvas). Nonaktif tetap terbaca "abu netral", tapi kini
        ikut ambang AAA app — bukan cuma "lebih baik dari opacity". */
     color: #475569;
     cursor: not-allowed;
   }
-  .dark .mati-teks:disabled { color: #AEB7C4; }  /* #94A3B8 6,92:1 → 8,66:1, sama dgn remap gray-400 gelap */
+  .dark .mati-teks:disabled { color: #A8BCAF; }  /* #94A3B8 6,92:1 → 8,66:1, sama dgn remap gray-400 gelap */
 
   /* ── Secondary button (aksi netral: Batal/Tutup di footer modal) ───────
      SATU sumber untuk tombol sekunder berbingkai yang sebelumnya disalin
@@ -1161,13 +1162,13 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      Sampai 24 Agu 2026 peran ini ditulis ulang di tiap call-site, dan 20 label
      app memakai TIGA tinta terang berbeda untuk pekerjaan yang sama:
 
-         text-ink-sub  x10  -> #1F2937  (~14,7:1)   KasHadiran, KasRT, Login
+         text-ink-sub  x10  -> #1D2D23  (~14,7:1)   KasHadiran, KasRT, Login
          text-gray-600  x5  -> #4B5563  (~9:1)      ConfirmDestruktif,
                                                     TargetKasRT, BackupRestore
-         text-gray-500  x5  -> #334155  (~10,4:1)   Jadwal, KelolaAnggota
+         text-gray-500  x5  -> #34453B  (~10,4:1)   Jadwal, KelolaAnggota
 
      Dua di antaranya token Tailwind MENTAH, dan `text-gray-500` bahkan
-     mendarat tepat di nilai `ink-faint` (#334155) — yaitu tinta TANGGAL/CAPTION,
+     mendarat tepat di nilai `ink-faint` (#34453B) — yaitu tinta TANGGAL/CAPTION,
      satu tingkat di bawah tempat label semestinya duduk. Jadi bukan sekadar tak
      seragam: sebagian label form diam-diam turun kelas di tangga tipografi
      app sendiri (ink > sub > faint).
@@ -1175,7 +1176,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      Sisi GELAP juga pecah dua (`gray-400` x18 vs `gray-200` x2 di Login).
      Diukur, bukan dikira: label Login ternyata duduk di `#030712` yang SAMA
      dgn form lain — bukan di gradient emerald Login — jadi tak ada alasan
-     kanvas untuk membedakannya. Pasangan gelap tunggal `gray-400` (#AEB7C4)
+     kanvas untuk membedakannya. Pasangan gelap tunggal `gray-400` (#A8BCAF)
      = 9,95:1 di sana, masih di atas ambang AAA app.
 
      `mb-1.5` ikut masuk resep (19 dari 20 call-site sudah memakainya); yang
@@ -1227,18 +1228,18 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 }
 /* Bar placeholder yang duduk DI ATAS permukaan `.skeleton` (hero Beranda).
    Di seluruh app relasinya selalu sama: bar = SATU langkah dari permukaannya
-   (#E9ECEF di atas kartu putih; di gelap #1F2937 di atas #111827). Hero dulu
-   memakai token `line` #B8C4D3 sebagai isian — itu token GARIS TEPI, jauh
+   (#E9ECEF di atas kartu putih; di gelap #1D2D23 di atas #111827). Hero dulu
+   memakai token `line` #B7C8BD sebagai isian — itu token GARIS TEPI, jauh
    lebih gelap & lebih biru, sehingga layar pertama yang dilihat tiap orang
    tiap kali membuka app berbicara dua bahasa memuat sekaligus.
 
    Bahaya keduanya lebih halus: `line` sudah disetel ulang 4× di proyek ini
-   (#CFD5DF → #DAE0E8 → #D3DAE3 → #C5CFDB → #B8C4D3), SELALU demi tepi kartu —
+   (#CFD5DF → #DAE0E8 → #D3DAE3 → #C5CFDB → #B7C8BD), SELALU demi tepi kartu —
    dan tiap kali itu diam-diam mengubah skeleton hero yang tak seorang pun
    sedang pikirkan. Sekarang ia punya nama sendiri.
 
    Sisi GELAP tak berubah nilainya (#374151 memang sudah satu langkah di atas
-   #1F2937); ia cuma ikut pindah ke nama ini agar kedua tema satu sumber. */
+   #1D2D23); ia cuma ikut pindah ke nama ini agar kedua tema satu sumber. */
 .skeleton-bar { background-color: #D6DADE; }
 .dark .skeleton-bar { background-color: #34453B; }
 .dark .skeleton { background: #26362D; }
@@ -1617,3 +1618,25 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
     animation-delay: 0.001ms !important;
   }
 }
+
+
+/* ── MAZHAB TONAL (24 Agu 2026) ──────────────────────────────────────────
+   Kanvas ber-rona + kartu PUTIH MURNI adalah kombinasi paling tidak koheren:
+   kanvas polos menuntut kartu putih, kanvas ber-rona menuntut kartu senada.
+   Sampai hari ini app memakai separuh dari masing-masing.
+
+   Kartu kini membawa jejak rona kanvasnya (#F7FBF8) dan pemisahannya datang
+   dari LANGKAH NADA + bayangan bertinta hijau — bukan lagi dari hairline.
+   Hairline mundur ke whisper (#D3E0D8) justru karena itu.
+
+   Catatan sejarah: sembilan pass naik-turun L kanvas di berkas ini tak pernah
+   selesai. Sebabnya bukan nilai L-nya belum ketemu, tapi karena hasil bermazhab
+   TONAL dikejar memakai sistem FLAT. Kalau nanti terasa kurang "nendang":
+   geser LANGKAH NADA-nya (kanvas vs kartu) atau bayangannya — JANGAN
+   menggelapkan hairline lagi, itu jalan yang sudah terbukti buntu. */
+html:not(.dark) .bg-white { background-color: #F7FBF8; }
+
+/* Gelap: tangga elevasi dipertegas satu langkah — kartu naik lepas dari
+   kanvas, tepi diringankan sepadan sisi terang. */
+.dark .bg-gray-900 { background-color: #1C2F25; }
+.dark .border-gray-800\/60 { border-color: rgba(48, 66, 55, 0.6); }

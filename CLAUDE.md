@@ -299,6 +299,38 @@ laporan akan tetap dicetak dengan kanvas palet lama tanpa ada yang sadar —
 **cermin token wajib punya uji yang menguncinya ke tokennya.**
 
 
+Yang ke-26 (24 Agu 2026): komentar `sunken` di tailwind.config.js mencatat
+"**9 pass naik-turun L kanvas tak pernah selesai**", dan menyimpulkan sebabnya
+"dua bahasa visual campur — bukan nilai L". Kesimpulan itu benar arahnya tapi
+berhenti terlalu awal. Sebab sesungguhnya: app ini memakai sistem pemisahan
+**FLAT** (kanvas polos + kartu putih murni + hairline sebagai SATU-SATUNYA
+pemisah) untuk mengejar hasil bermazhab **TONAL** (Revolut/Mercury/Linear —
+kartu membawa jejak rona kanvas, dipisahkan LANGKAH NADA + bayangan bertinta).
+Dua mazhab itu tak pernah bertemu di nilai L berapa pun. Sembilan pass itu
+mencari angka untuk soal yang bukan soal angka.
+
+Bukti bahwa arahnya memang tonal datang dari sistem yang justru dikutip komentar
+itu sendiri: **Material 3 sudah pindah ke tone-based surfaces** — tujuh peran
+(`surfaceContainerLowest` … `surfaceContainerHighest`), `surfaceVariant`
+dihapus, dan model overlay-berbasis-elevasi (`surfaceTintColor`) dimatikan;
+defaultnya kini `null` dan pemisahan datang dari langkah nada. Jadi "MATERIAL-
+FLAT ala Google" menggambarkan generasi Material yang LAMA; Google sendiri
+sudah meninggalkannya.
+
+Sesudah app pindah ke mazhab tonal, **hairline WAJIB mundur** (#B7C8BD →
+#D3E0D8). Kalau tidak, ada dua sistem pemisahan berebut satu tepi dan hasilnya
+justru lebih berisik daripada sebelum diperbaiki. **Kalau nanti terasa kurang
+"nendang": geser LANGKAH NADA (kanvas vs kartu) atau bayangannya — JANGAN
+menggelapkan hairline lagi. Itu jalan yang sudah dicoba sembilan kali.**
+
+Satu batas mazhab yang penting: `warnaCetak.line` SENGAJA dilepas dari token
+`line`. Di layar kartu dipisahkan nada + bayangan, jadi hairline boleh whisper.
+Di KERTAS tak ada langkah nada (kertasnya putih) dan tak ada bayangan — garis
+itu satu-satunya pemisah yang tersisa, dan whisper hilang di fotokopi. Ujinya
+diubah dari kesamaan persis menjadi ARAH (garis cetak tak boleh lebih terang
+dari garis layar). **Mazhab adalah properti MEDIA, bukan properti app.**
+
+
 **Stack back-dismiss memuat entri TAB, dan itu BUKAN lapisan.** App
 mendaftarkan `activeTab !== 'beranda'` ke `useBackDismiss` supaya Back kembali
 ke Beranda — entri sah, tapi tak ada yang menutupi layar. Penjaga gestur yang
