@@ -323,6 +323,12 @@ justru lebih berisik daripada sebelum diperbaiki. **Kalau nanti terasa kurang
 "nendang": geser LANGKAH NADA (kanvas vs kartu) atau bayangannya — JANGAN
 menggelapkan hairline lagi. Itu jalan yang sudah dicoba sembilan kali.**
 
+Aturan itu langsung diuji di hari yang sama: user menilai versi pertama "kurang
+tegas". Yang digeser LANGKAH NADA-nya (terang 2,75% → 6,3% L; gelap 8,1% →
+12,0% L) + bayangan (.10/.13 → .14/.17), dan hairline TIDAK disentuh sama
+sekali. Sekali geser, selesai — bandingkan dengan sembilan pass sebelumnya
+yang menggeser tuas yang salah.
+
 Satu batas mazhab yang penting: `warnaCetak.line` SENGAJA dilepas dari token
 `line`. Di layar kartu dipisahkan nada + bayangan, jadi hairline boleh whisper.
 Di KERTAS tak ada langkah nada (kertasnya putih) dan tak ada bayangan — garis

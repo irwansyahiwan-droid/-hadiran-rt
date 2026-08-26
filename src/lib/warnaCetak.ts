@@ -29,7 +29,7 @@
 
 export const CETAK = {
   // Permukaan & garis
-  canvas:  '#EBF3EE', // = token `sunken` / body / .app-bg (palet Hutan, 24 Agu 2026)
+  canvas:  '#E4ECE7', // = token `sunken` / body / .app-bg (palet Hutan, 24 Agu 2026)
   surface: '#FFFFFF',
   /* SENGAJA TIDAK sama dgn token `line` sejak app pindah ke mazhab tonal
      (24 Agu 2026). Di LAYAR kartu dipisahkan langkah nada + bayangan bertinta,

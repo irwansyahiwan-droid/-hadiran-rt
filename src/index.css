@@ -117,7 +117,7 @@ body {
      (nada Gmail/Google apps) RATA tanpa radial whisper; kartu putih MURNI flat
      ber-hairline; bayangan tinggal satu contact whisper. Separasi = step tonal
      + hairline + geometri, titik. Jangan tambah lapisan lagi. */
-  background-color: #EBF3EE;
+  background-color: #E4ECE7;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -363,7 +363,7 @@ input, textarea  { caret-color: #1B7249; }
 }
 
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
-.dark body { background-color: #0B1B12; }
+.dark body { background-color: #07170E; }
 
 /* (Konsolidasi 10 Jul) Blok `*:focus-visible` kedua dihapus — dobel dgn aturan
    :is(button,a,...) di atas memakai DUA hijau berbeda (#0F6039 vs #1B7249) dan
@@ -391,7 +391,7 @@ input, textarea  { caret-color: #1B7249; }
      transisi muddy, biang rasa "kurang bersih"). Ala Gmail/myBCA/BYOND:
      kanvas polos, kartu putih flat, atmosfer datang dari konten & warna
      hero — bukan dari aura di latar. Samakan dgn body/sunken/manifest/landing. */
-  background-color: #EBF3EE;
+  background-color: #E4ECE7;
 }
 /* MATERIAL-FLAT DARK (12 Jul 2026) — menuntaskan keputusan 2 Jul ke sisi gelap.
    Aura radial (emerald .30 + teal .22 + sky .15) DIHAPUS. Kanvas light sudah
@@ -402,7 +402,7 @@ input, textarea  { caret-color: #1B7249; }
    Kini kanvas gelap RATA (#030712), separasi datang dari step tonal (kartu
    gray-900) + ring cahaya + geometri — sama persis dgn logika sisi light. */
 .dark .app-bg {
-  background-color: #0B1B12;
+  background-color: #07170E;
 }
 
 /* ── Kontras teks (LIGHT MODE saja) ──────────────────────────────────
@@ -692,8 +692,8 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      tanpa top-light/edge-ring/sheen. Kanvas L & border TIDAK disentuh (lever itu
      sengaja ditutup sejak Material-flat — lihat riwayat 9 pass di atas). */
   --shadow-card:
-    0 1px 2px -1px rgba(8, 30, 19, 0.10),
-    0 5px 14px -6px rgba(8, 30, 19, 0.13);                   /* contact whisper — satu-satunya bayangan kartu */
+    0 1px 2px -1px rgba(8, 30, 19, 0.14),
+    0 6px 18px -6px rgba(8, 30, 19, 0.17);                   /* contact whisper — satu-satunya bayangan kartu */
   /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
      spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
      drop datar → glass top + edge crisp + key + ambient lega. */
@@ -1625,7 +1625,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    kanvas polos menuntut kartu putih, kanvas ber-rona menuntut kartu senada.
    Sampai hari ini app memakai separuh dari masing-masing.
 
-   Kartu kini membawa jejak rona kanvasnya (#F7FBF8) dan pemisahannya datang
+   Kartu kini membawa jejak rona kanvasnya (#F8FCF9) dan pemisahannya datang
    dari LANGKAH NADA + bayangan bertinta hijau — bukan lagi dari hairline.
    Hairline mundur ke whisper (#D3E0D8) justru karena itu.
 
@@ -1634,9 +1634,9 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    TONAL dikejar memakai sistem FLAT. Kalau nanti terasa kurang "nendang":
    geser LANGKAH NADA-nya (kanvas vs kartu) atau bayangannya — JANGAN
    menggelapkan hairline lagi, itu jalan yang sudah terbukti buntu. */
-html:not(.dark) .bg-white { background-color: #F7FBF8; }
+html:not(.dark) .bg-white { background-color: #F8FCF9; }
 
 /* Gelap: tangga elevasi dipertegas satu langkah — kartu naik lepas dari
    kanvas, tepi diringankan sepadan sisi terang. */
-.dark .bg-gray-900 { background-color: #1C2F25; }
+.dark .bg-gray-900 { background-color: #22342A; }
 .dark .border-gray-800\/60 { border-color: rgba(48, 66, 55, 0.6); }
