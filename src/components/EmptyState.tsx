@@ -20,7 +20,7 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
     <div data-keadaan="kosong" className={`flex flex-col items-center justify-center text-center px-6 py-12 ${className}`}>
       <div className="relative w-28 h-24 mb-4">
         {/* Backdrop lembut */}
-        <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-emerald-100/70 to-emerald-50/40 dark:from-gray-800 dark:to-gray-800/50" />
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-100/70 to-emerald-50/40 dark:from-gray-800 dark:to-gray-800/50" />
 
         {/* Tiga bintik dekoratif DIBUANG (6 Agu). Kelas `.blob` yang membuatnya
             mengambang sudah dihapus 10 Jul, jadi yang tersisa cuma tiga titik

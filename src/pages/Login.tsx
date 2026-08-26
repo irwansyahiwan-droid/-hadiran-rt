@@ -151,7 +151,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               /* Aset paling atas-lipatan di layar pertama app — naikkan di antrean
                  fetch, jangan biarkan bersaing dgn request lain. */
               fetchPriority="high"
-              className="w-[5.5rem] h-[5.5rem] rounded-[22px] object-cover
+              className="w-[5.5rem] h-[5.5rem] rounded-3xl object-cover
                          ring-1 ring-[var(--gold-songket)]/50
                          shadow-[0_16px_38px_-12px_rgba(0,0,0,0.6)]"
             />
@@ -233,7 +233,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             Masuk sebagai Bendahara
           </span>
           <ChevronDown
-            className={`w-4 h-4 text-white/70 transition-transform duration-300 ${bendaharaOpen ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-white/70 transition-transform duration-ketuk ${bendaharaOpen ? 'rotate-180' : ''}`}
           />
         </button>
 
@@ -241,7 +241,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           // Shake dipasang di panel, BUKAN di tiap field: field-nya `w-full` di
           // dalam wrapper `overflow-hidden` (mesin collapse), jadi geseran 4px
           // terpotong di tepi. Satu goyangan utuh lebih terbaca.
-          className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'} ${shakeAdmin ? 'shake' : ''}`}
+          className={`grid transition-[grid-template-rows,opacity,margin-top] duration-masuk ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0'} ${shakeAdmin ? 'shake' : ''}`}
           onAnimationEnd={() => setShakeAdmin(false)}
           // Collapse = tinggi 0, tapi email/password/submit di dalam TETAP fokusabel
           // via Tab & terbaca screen reader. `inert` mengeluarkannya dari tab-order

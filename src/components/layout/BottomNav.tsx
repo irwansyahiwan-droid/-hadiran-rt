@@ -79,7 +79,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
         {activeIndex >= 0 && (
           <div
             aria-hidden
-            className="absolute inset-y-0 left-0 pointer-events-none transition-transform duration-300"
+            className="absolute inset-y-0 left-0 pointer-events-none transition-transform duration-masuk"
             style={{
               width: `${100 / visibleTabs.length}%`,
               transform: `translateX(${activeIndex * 100}%)`,
@@ -118,7 +118,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
                 {/* Warna 150ms (bukan 300): nav ditekan puluhan kali sehari →
                     respons harus crisp; gerak "hidup" cukup dari pil spring. */}
                 <Icon
-                  className={`w-6 h-6 transition-colors duration-150 ${isActive ? 'text-brand dark:text-brand-linkDark' : 'text-ink-sub dark:text-gray-300'}`}
+                  className={`w-6 h-6 transition-colors duration-ketuk ${isActive ? 'text-brand dark:text-brand-linkDark' : 'text-ink-sub dark:text-gray-300'}`}
                   strokeWidth={isActive ? 2.2 : 2}
                   fill={isActive ? 'currentColor' : 'none'}
                   style={{ fillOpacity: isActive ? 0.2 : 0, transition: 'fill-opacity 200ms ease-out' }}
@@ -132,7 +132,7 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
                   bukan abu pudar. Bedanya aktif-vs-tidak dibawa pil + warna
                   brand + tebal huruf, bukan dgn meredupkan yang tak aktif. */}
               <span
-                className={`text-micro leading-none mt-1 transition-colors duration-150 ${isActive ? 'font-bold text-brand dark:text-brand-linkDark' : 'font-semibold text-ink-sub dark:text-gray-300'}`}
+                className={`text-micro leading-none mt-1 transition-colors duration-ketuk ${isActive ? 'font-bold text-brand dark:text-brand-linkDark' : 'font-semibold text-ink-sub dark:text-gray-300'}`}
               >
                 {label}
               </span>

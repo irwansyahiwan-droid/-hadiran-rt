@@ -174,7 +174,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           {/* Mulai dari emerald-600: fill informatif (role=progressbar) wajib ≥3:1
               vs track gray-100 (WCAG 1.4.11) — ujung from-emerald-400 lama 1,8:1 */}
           <div
-            className={`h-full w-full origin-left rounded-full transition-transform duration-700 ease-out ${tercapai ? 'bg-gradient-to-r from-emerald-600 to-brand' : 'bg-gradient-to-r from-emerald-600 to-emerald-700'}`}
+            className={`h-full w-full origin-left rounded-full transition-transform duration-rayakan ease-out ${tercapai ? 'bg-gradient-to-r from-emerald-600 to-brand' : 'bg-gradient-to-r from-emerald-600 to-emerald-700'}`}
             style={{ transform: `scaleX(${Math.min(pct, 100) / 100})` }}
           />
         </div>

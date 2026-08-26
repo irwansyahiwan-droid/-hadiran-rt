@@ -77,7 +77,7 @@ export default function WelcomeSheet() {
         <div className="space-y-3 mb-4">
           {ITEMS.map(({ icon: Icon, title, desc }) => (
             <div key={title} className="flex items-start gap-3">
-              <span className="icon-tile w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+              <span className="icon-tile w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
                 <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" strokeWidth={2} />
               </span>
               <div className="min-w-0">

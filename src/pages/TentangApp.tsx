@@ -101,7 +101,7 @@ export default function TentangApp({ open, onClose }: Props) {
           <div className="space-y-2">
             {PENGURUS.map((p) => (
               <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl inset-soft p-3">
-                <AvatarPeci nama={p.nama} className="w-10 h-10 rounded-xl" />
+                <AvatarPeci nama={p.nama} ukuran={10} />
                 <div className="min-w-0">
                   <p className="text-micro font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>
                   <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{p.nama}</p>

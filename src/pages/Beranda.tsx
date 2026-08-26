@@ -319,7 +319,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
       className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
     >
-      <div className={`icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+      <div className={`icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
         {trx.tipe === 'setor'
           ? <ArrowUpRight className="w-[18px] h-[18px] text-blue-600 dark:text-blue-400" />
           : <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
@@ -380,7 +380,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
           className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
         >
-          <div className="icon-tile w-11 h-11 rounded-2xl inline-flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
+          <div className="icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
             <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
           </div>
           {/* Hierarki dibalik dari `sub` aslinya: NOMOR TARIKAN jadi judul, jenis
@@ -397,7 +397,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <span className="font-display text-amount font-semibold shrink-0 tabular-nums text-pos dark:text-emerald-400">
             {maskRp(`+Rp${run.total.toLocaleString('id-ID')}`, hidden, 4)}
           </span>
-          <ChevronDown className={`w-4 h-4 -ml-1 -mr-1 shrink-0 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
+          <ChevronDown className={`w-4 h-4 -ml-1 -mr-1 shrink-0 text-gray-400 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
         </button>
         {open && run.items.map((trx, ii) => trxRow(trx, idx, lastInGroup && ii === run.items.length - 1, false, true))}
       </div>
@@ -505,7 +505,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[...Array(4)].map((_, i) => (
             <div key={i} className={`flex items-center gap-2 px-4 py-4 ${i < 3 ? 'divide-inset' : ''}`}>
-              <div className="w-11 h-11 rounded-2xl skeleton shrink-0" />
+              <div className="w-11 h-11 rounded-xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-3/5" />
                 <div className="h-3 skeleton rounded-lg w-2/5" />
@@ -720,7 +720,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           action={
             <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-medium">
               Lihat semua
-              <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
+              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" strokeWidth={2.25} />
             </button>
           }
         >
@@ -739,7 +739,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-2 px-4 py-4 ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'divide-inset' : ''}`}>
                 {/* Avatar + badge nomor */}
                 <div className="relative shrink-0">
-                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} sorot={next} className="w-11 h-11 rounded-2xl" />
+                  <AvatarPeci nama={j.sohibul_bait?.nama ?? '?'} sorot={next} ukuran={11} />
                   {next && (
                     <Crown
                       className="absolute -top-2.5 left-1/2 h-4 w-4 -translate-x-1/2 -rotate-[8deg]"
@@ -795,7 +795,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           action={
             <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-medium">
               Lihat semua
-              <ChevronRight className="w-4 h-4 transition-transform duration-200 group-active:translate-x-0.5" strokeWidth={2.25} />
+              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" strokeWidth={2.25} />
             </button>
           }
         >
@@ -844,7 +844,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           {...trxDrag.handlers}
         >
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
-          <div className={`icon-tile w-11 h-11 rounded-2xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+          <div className={`icon-tile w-11 h-11 rounded-xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
             {selectedTrx.tipe === 'setor'
               ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               : <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}

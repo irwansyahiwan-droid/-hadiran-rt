@@ -228,7 +228,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                         onClick={() => togglePilih(t.id)}
                         className="w-full flex items-center gap-3 px-3 py-3 text-left"
                       >
-                        <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
+                        <span className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center shrink-0 ${
                           on ? 'bg-brand-500 border-brand-500' : 'border-gray-300 dark:border-gray-600'
                         }`}>
                           {on && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
@@ -458,7 +458,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                        (kanon yang sama dgn chip "Defisit" — status dibawa kata,
                        bukan dgn mewarnai). Yang hilang cuma sandi ketiga yang
                        paling mahal dan paling tak informatif. */}
-                <AvatarPeci nama={w.nama} className="w-10 h-10 rounded-xl" />
+                <AvatarPeci nama={w.nama} ukuran={10} />
                 <div className="flex-1 min-w-0">
                   <p className={`text-body font-semibold potong-lentur ${w.status_aktif ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}>
                     {w.nama}

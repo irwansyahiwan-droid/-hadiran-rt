@@ -279,7 +279,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                           </span>
                         )}
                         {hasDetail && (
-                          <ChevronDown className={`w-4 h-4 text-gray-300 dark:text-gray-600 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                          <ChevronDown className={`w-4 h-4 text-gray-300 dark:text-gray-600 transition-transform duration-ketuk ${isOpen ? 'rotate-180' : ''}`} />
                         )}
                       </div>
                     </button>

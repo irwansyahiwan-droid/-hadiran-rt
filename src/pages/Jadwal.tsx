@@ -572,7 +572,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
   }
 
   return (
-    <div className={`transition duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
+    <div className={`transition duration-masuk ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
       <div className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift overflow-hidden">
         {/* Header — badge sukses + judul + tutup */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
@@ -1082,7 +1082,7 @@ export default function JadwalPage() {
                 <div className="h-4 skeleton rounded-lg w-3/5" />
                 <div className="h-3 skeleton rounded-lg w-2/5" />
               </div>
-              <div className="h-6 w-16 skeleton rounded-md shrink-0" />
+              <div className="h-6 w-16 skeleton rounded-lg shrink-0" />
             </div>
           ))}
         </div>
@@ -1125,7 +1125,7 @@ export default function JadwalPage() {
                    Di 1px ia jatuh persis di jalur border kartu dan terbaca
                    sebagai ruas berwarna pada tepi kartu itu sendiri — penanda
                    baris aktif ala Linear, bukan pita aksen. */
-                className={`rise flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l border-l-brand-500 dark:border-l-emerald-500' : ''}`}
+                className={`rise flex items-center gap-3 px-4 py-3 [--di-l:3.5rem] [--di-r:1rem] transition-colors duration-ketuk ${!isLast ? 'divide-inset' : ''}${isNext ? ' border-l border-l-brand-500 dark:border-l-emerald-500' : ''}`}
               >
                 {/* Nomor tarikan — INDEKS, bukan judul (24 Agu 2026).
                     Dulu `text-subtitle font-bold`: ukuran & bobot yang persis sama
@@ -1193,7 +1193,7 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm"
+                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-ketuk shadow-sm"
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses…' : 'Proses'}

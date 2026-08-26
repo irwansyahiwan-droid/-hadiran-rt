@@ -227,7 +227,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <button
               type="submit"
               disabled={saving || !nominal}
-              className={`flex-1 py-3 text-white text-body font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 flex items-center justify-center gap-2 ${
+              className={`flex-1 py-3 text-white text-body font-semibold active:scale-[0.97] active:opacity-90 transition duration-ketuk flex items-center justify-center gap-2 ${
                 tipe === 'masuk' ? 'btn-brand' : 'btn-danger'
               }`}
             >
@@ -737,7 +737,7 @@ export default function KasRTPage() {
                         /* Kosakata chip KANONIK (sama FilterChips): rounded-full,
                            text-caption font-semibold, inaktif putih ber-border-control.
                            Dulu kontrol ini satu-satunya "pilih 1 dari N" yang
-                           beda wajah — kotak rounded-md ber-fill abu tanpa tepi,
+                           beda wajah — kotak rounded-lg ber-fill abu tanpa tepi,
                            padahal pekerjaannya sama: memfilter data. */
                         className={`press shrink-0 min-h-[44px] px-3 inline-flex items-center justify-center rounded-full text-caption font-semibold whitespace-nowrap transition-colors ${
                           chartPeriod === p
@@ -952,7 +952,7 @@ export default function KasRTPage() {
                      `items-center` karena judulnya `truncate` (selalu satu
                      baris). Nominal & ikon kini bertumpu pada baris PERTAMA
                      judul, sama seperti kolom angka Rekap per Kategori. */
-                  className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_76px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
+                  className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_76px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-ketuk ${!isLast ? 'divide-inset' : ''}`}
                 >
                   <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk

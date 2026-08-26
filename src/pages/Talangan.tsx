@@ -340,7 +340,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 5 blok shrink-0 sekaligus (avatar, nominal, chevron, tombol WA).
                 Audit 29 Jul: kolom nama tersisa 76px @390 / 46px @360 → nama DAN
                 caption "N belum lunas" dua-duanya terpotong di semua lebar. */}
-            <AvatarPeci nama={g.nama} className="w-9 h-9 rounded-xl" />
+            <AvatarPeci nama={g.nama} ukuran={9} />
             <div className="flex-1 min-w-0">
               {/* line-clamp-2 (bukan truncate): nama warga panjang melipat ke baris 2. */}
               <p className="text-body font-semibold text-ink dark:text-gray-100 line-clamp-2 leading-snug break-words">{g.nama}</p>
@@ -365,7 +365,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                 </span>
               )}
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} strokeWidth={2.25} />
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isExpanded ? 'rotate-180' : ''}`} strokeWidth={2.25} />
             </div>
           </button>
           {isBendahara && g.countBelum > 0 && (
@@ -408,7 +408,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
-                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-white text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 shrink-0 whitespace-nowrap ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-white text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-ketuk shrink-0 whitespace-nowrap ${
                       confirmId === t.id ? 'bg-brand' : 'btn-brand'
                     }`}
                   >
@@ -421,7 +421,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBatalClick(t)}
                     disabled={processingId === t.id}
-                    className="inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    className="inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-ketuk disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                   >
                     {processingId === t.id ? (
                       <><RefreshCw className="w-3 h-3 animate-spin" />Memproses…</>
@@ -568,7 +568,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <div className="h-4 skeleton rounded-lg w-2/3" />
                 <div className="h-3 skeleton rounded-lg w-1/2" />
               </div>
-              <div className="h-5 w-20 skeleton rounded-md shrink-0" />
+              <div className="h-5 w-20 skeleton rounded-lg shrink-0" />
             </div>
           ))}
         </div>

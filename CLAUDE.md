@@ -337,6 +337,44 @@ diubah dari kesamaan persis menjadi ARAH (garis cetak tak boleh lebih terang
 dari garis layar). **Mazhab adalah properti MEDIA, bukan properti app.**
 
 
+Yang ke-29 (26 Agu 2026, sesudah tangga spasi) — **`AvatarPeci` tampil dengan
+EMPAT bentuk sudut berbeda di app yang sama**, karena ukuran & radius dikirim
+lewat `className` oleh pemanggil: `w-8 rounded-lg`, `w-9 rounded-xl`,
+`w-10 rounded-xl`, `w-11 rounded-2xl` — dan inisialnya SELALU `text-subtitle`
+(18px), jadi avatar 32px sesak dan avatar 48px kosong. Tak satu pun pemanggil
+salah. **Yang salah adalah keputusan itu boleh diambil di tempat pemanggil.**
+
+Ini persis alasan yang sudah tertulis di komponen itu sendiri untuk prop
+`sorot` (dua utility `ring-*` beradu, warna emas diam-diam kalah). Alasannya
+sudah ada, cuma belum diterapkan ke sumbu kedua. **Kalau sebuah komponen
+sudah pernah mengajari "ini WAJIB lewat prop", periksa properti lain yang
+masih dititipkan lewat `className`.** Sekarang `ukuran` satu angka; bentuk &
+ukuran inisial diturunkan darinya.
+
+Tangga bentuk: `lg(8) · xl(12) · 2xl(16) · 3xl(24) · full`. Tak ada `md`(6) —
+selisih 2px dari lg bukan bentuk, cuma kebisingan. Untuk tile PERSEGI radius
+DITURUNKAN dari sisinya (±30%): 28–44px → xl · 48–72px → 2xl · >=76px → 3xl.
+`rounded-full` selalu lolos: itu keputusan "benda ini bulat" (avatar, titik,
+pil), bukan keputusan radius. Waktu aturan ini pertama dijalankan, tile 44px
+di app ternyata punya TIGA radius berbeda. Dijaga `npm run audit:bentuk`.
+
+Tangga gerak: `0.12 · 0.16 · 0.24 · 0.40 · 0.60s` — dari 24 durasi, ENAM di
+antaranya di dalam rentang 60ms (0.12/0.14/0.15/0.16/0.17/0.18). Mata tak bisa
+membedakannya; yang hilang bukan ketelitian tapi TEMPO. Aturan: **KELUAR
+selalu satu anak tangga di bawah MASUK.** >= 0.9s (shimmer, sheen, blob,
+konfeti) sengaja BEBAS — itu suasana, bukan umpan balik atas perbuatan warga,
+jadi bukan tempo.
+
+Dua tuas, dan keduanya MENIMPA bukan menambah: `--dur-*` di `:root` untuk
+animasi CSS, dan `theme.transitionDuration` (DI LUAR `extend`) untuk utility
+Tailwind. Selama `duration-150/200/300/700` masih ada, tak ada yang mencegah
+durasi ke-25 lahir minggu depan — persis cara 24 yang pertama lahir.
+
+Perubahan yang PALING terasa dari sesi ini bukan radius: `.rise` (animasi
+baris daftar) turun 0.5s → 0.24s. Dengan stagger 10 × 0.035s, baris terakhir
+dulu selesai di 0.85s. Itu bukan "halus", itu lambat.
+
+
 Yang ke-28 (26 Agu 2026, sesudah tangga tipografi) — **spasi yang "hampir sama"
 lebih merusak daripada spasi yang salah.** App ini punya 29 nilai jarak berbeda:
 `gap-1.5` di satu baris, `gap-2` di baris sebelahnya, `p-3.5`/`p-4`/`p-5` untuk

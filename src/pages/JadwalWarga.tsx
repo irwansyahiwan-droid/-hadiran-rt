@@ -352,7 +352,7 @@ export default function JadwalWargaPage() {
               </div>
               <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
                 <div
-                  className="h-full w-full origin-left bg-white rounded-full transition-transform duration-700 ease-out"
+                  className="h-full w-full origin-left bg-white rounded-full transition-transform duration-rayakan ease-out"
                   style={{ transform: `scaleX(${Math.min(pctHadir, 100) / 100})` }}
                 />
               </div>
@@ -400,7 +400,7 @@ export default function JadwalWargaPage() {
         {/* Pil aktif meluncur — 2 segmen, jadi 0% / 100% dari setengah lebar. */}
         <span
           aria-hidden
-          className="absolute inset-y-1 left-1 rounded-xl bg-brand transition-transform duration-300"
+          className="absolute inset-y-1 left-1 rounded-xl bg-brand transition-transform duration-masuk"
           style={{
             width: 'calc(50% - 0.25rem)',
             transform: subTab === 'anggota' ? 'translateX(0)' : 'translateX(100%)',
@@ -621,7 +621,7 @@ export default function JadwalWargaPage() {
                         karena nomor tarikan bukan status. Redupnya nama DIPERTAHANKAN
                         (itu hierarki lampau vs mendatang, bukan status), dan pill
                         tetap satu-satunya yang menyebut status dengan kata. */}
-                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 font-bold text-body bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 font-bold text-body bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
                       {t.nomor}
                     </div>
 

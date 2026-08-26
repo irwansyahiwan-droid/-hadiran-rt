@@ -30,7 +30,7 @@ export default function ErrorState({
     <div data-keadaan="gagal" className={`flex flex-col items-center justify-center text-center px-6 py-12 ${className}`}>
       <div className="relative w-28 h-24 mb-4">
         {/* Backdrop lembut — amber (beda dari emerald empty). */}
-        <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-amber-100/70 to-amber-50/40 dark:from-gray-800 dark:to-gray-800/50" />
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-amber-100/70 to-amber-50/40 dark:from-gray-800 dark:to-gray-800/50" />
 
         {/* Tiga bintik dekoratif DIBUANG (6 Agu) — kembar EmptyState. Kelas
             `.blob` sudah tak ada sejak 10 Jul (jadi tak pernah mengambang), dan

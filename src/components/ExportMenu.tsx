@@ -139,7 +139,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
             region live permanen Toaster. */}
         {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
         Ekspor
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
       </button>
       {disabled && disabledReason && <span id={alasanId} className="sr-only">{disabledReason}</span>}
 

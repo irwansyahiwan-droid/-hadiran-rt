@@ -143,7 +143,7 @@ export function BannerSkeleton({ vh, vw }: { vh: number; vw: number }) {
           <div className="grid grid-cols-3 gap-3 border-t border-white/15 pt-4">
             {[0, 1, 2].map((i) => (
               <div key={i} className="flex flex-col items-center gap-2">
-                <span className="h-3.5 w-3.5 rounded-md skeleton skeleton-hero" />
+                <span className="h-3.5 w-3.5 rounded-lg skeleton skeleton-hero" />
                 <span className={`h-2 w-11 ${bar}`} />
                 <span className={`h-2.5 w-14 ${bar}`} />
               </div>

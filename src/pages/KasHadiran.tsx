@@ -772,7 +772,7 @@ export default function KasHadiranPage() {
                               "Lunas semua"). Satu fakta dua sandi: warna jadi
                               tebakan, dan ambernya bukan token `warn` mana pun.
                               Kini netral (abu = penanda, sesuai sistem warna). */}
-                          <div className="icon-tile w-7 h-7 rounded-lg flex items-center justify-center text-caption font-bold shrink-0 bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
+                          <div className="icon-tile w-7 h-7 rounded-xl flex items-center justify-center text-caption font-bold shrink-0 bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
@@ -790,7 +790,7 @@ export default function KasHadiranPage() {
                         onClick={() => openDetail(t)}
                         className="w-full flex items-start gap-3 px-4 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
                       >
-                        <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl shrink-0" />
+                        <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} ukuran={11} />
                         <div className="flex-1 min-w-0">
                           {/* items-start + clamp 2 baris: nama panjang ("Saman Suryadi
                               (Mono)") dulu membungkus 2 baris sementara blok nominal
@@ -840,7 +840,7 @@ export default function KasHadiranPage() {
                           {/* emerald-600: fill informatif (role=progressbar) wajib ≥3:1
                               vs track gray-100 (WCAG 1.4.11) — emerald-400 cuma 1,8:1 */}
                           <div
-                            className="h-full w-full origin-left bg-emerald-600 dark:bg-emerald-500 rounded-full transition-transform duration-700 ease-out"
+                            className="h-full w-full origin-left bg-emerald-600 dark:bg-emerald-500 rounded-full transition-transform duration-rayakan ease-out"
                             style={{ transform: `scaleX(${Math.min(pctHadir, 100) / 100})` }}
                           />
                         </div>
@@ -1007,7 +1007,7 @@ export default function KasHadiranPage() {
             {/* Header */}
             <div className="px-5 pb-3 shrink-0 border-b border-line dark:border-gray-800">
               <div className="flex items-center gap-3">
-                <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl" />
+                <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} ukuran={11} />
                 <div className="min-w-0 flex-1">
                   <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
                   <p className="text-caption text-ink-faint dark:text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
@@ -1053,7 +1053,7 @@ export default function KasHadiranPage() {
                     {[0, 1, 2, 3, 4].map((i) => (
                       <div key={i} className="flex items-center gap-3 py-2">
                         <div className="skeleton h-3 w-5 rounded-full shrink-0" />
-                        <div className="skeleton w-8 h-8 rounded-lg shrink-0" />
+                        <div className="skeleton w-8 h-8 rounded-xl shrink-0" />
                         <div className="skeleton h-3.5 flex-1 rounded-full" />
                         <div className="skeleton h-5 w-16 rounded-full shrink-0" />
                       </div>
@@ -1094,7 +1094,7 @@ export default function KasHadiranPage() {
                         {detailTitip.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
-                            <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
+                            <AvatarPeci nama={p.nama} ukuran={8} />
                             <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
                           </div>
@@ -1109,7 +1109,7 @@ export default function KasHadiranPage() {
                         {detailTidak.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
-                            <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
+                            <AvatarPeci nama={p.nama} ukuran={8} />
                             <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
                               <Tag tone="success"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</Tag>
@@ -1128,7 +1128,7 @@ export default function KasHadiranPage() {
                         {detailHadir.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
-                            <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
+                            <AvatarPeci nama={p.nama} ukuran={8} />
                             <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {/* emerald-500 di atas putih cuma 2,50:1. Ia lolos
                                 sapuan karena barisnya sudah berlabel teks

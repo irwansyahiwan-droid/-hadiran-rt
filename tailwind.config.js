@@ -21,6 +21,24 @@ export default {
      HP — satu-satunya perangkat yang dipakai warga. */
   future: { hoverOnlyWhenSupported: true },
   theme: {
+    /* ── TANGGA GERAK, di luar `extend` supaya menimpa skala bawaan ────────
+       Menimpa, bukan menambah: itu intinya. Selama `duration-150/200/300/700`
+       masih ada, tak ada yang menghalangi durasi ke-25 lahir minggu depan —
+       persis cara 24 durasi pertama lahir. Sekarang nilai di luar tangga
+       BUKAN kelas yang ada: ia tak menerbitkan CSS apa pun, dan itu terlihat
+       seketika. Pola yang sama dengan tangga tipografi & spasi.
+
+       Nilainya sengaja var(--dur-*) — SATU sumber dengan animasi CSS di
+       index.css. Kalau tempo app perlu disetel, geser di satu tempat. */
+    transitionDuration: {
+      DEFAULT: 'var(--dur-ketuk)',
+      0: '0s',
+      kilat: 'var(--dur-kilat)',      /* 120ms — keluar kecil, umpan balik ikon   */
+      ketuk: 'var(--dur-ketuk)',      /* 160ms — tekan, warna, rotasi chevron     */
+      masuk: 'var(--dur-masuk)',      /* 240ms — elemen masuk, buka-tutup panel   */
+      lapisan: 'var(--dur-lapisan)',  /* 400ms — lapisan besar                    */
+      rayakan: 'var(--dur-rayakan)',  /* 600ms — perayaan, isi bar progres        */
+    },
     extend: {
       /* ── Tangga z-index app (SATU sumber, anti-tabrak) ─────────────
          Tier overlay global dari bawah ke atas. Dua tier terbawah pakai
