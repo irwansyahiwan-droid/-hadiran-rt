@@ -170,7 +170,7 @@ interface HeroSaldoProps {
  *
  * Sebelum 30 Jul 2026 ketiganya menyalin bingkai yang sama lalu menyimpang:
  * label `text-caption font-semibold` di satu tempat & `text-micro font-bold` di
- * tempat lain, jarak tombol `-mr-2` vs `-mr-1.5 gap-0.5`, kaki kartu dua panel
+ * tempat lain, jarak tombol `-mr-2` vs `-mr-2 gap-0.5`, kaki kartu dua panel
  * di dua halaman dan tak ada sama sekali di halaman ketiga. Warna hero sudah
  * disatukan lebih dulu (satu `.hero-emerald`, lihat index.css); ini menyatukan
  * strukturnya.
@@ -268,7 +268,7 @@ export default function HeroSaldo({
             menyusut jadi max-content, dan FitAmount membaca `clientWidth`
             untuk menghitung skalanya — ia akan mengukur kotak yang sudah
             terlanjur mengecil. */}
-        <div className="mt-1 flex items-end gap-x-2.5 max-[359px]:flex-col max-[359px]:items-stretch max-[359px]:gap-y-1.5">
+        <div className="mt-1 flex items-end gap-x-3 max-[359px]:flex-col max-[359px]:items-stretch max-[359px]:gap-y-2">
           <FitAmount
             measure={measure}
             maxPx={48}
@@ -284,7 +284,7 @@ export default function HeroSaldo({
 
         {caption && <p className="mt-1 text-caption angka-prosa text-white/90">{caption}</p>}
         {children}
-        {stats && stats.length > 0 && <HeroStats items={stats} className="mt-4 pt-[18px]" />}
+        {stats && stats.length > 0 && <HeroStats items={stats} className="mt-4 pt-5" />}
       </div>
     </div>
   );

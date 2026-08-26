@@ -109,7 +109,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 type="button"
                 onClick={() => pilihTipe(t)}
                 aria-pressed={tipe === t}
-                className={`press inline-flex items-center justify-center gap-1.5 min-h-[44px] py-2.5 rounded-xl text-body font-semibold border transition ${
+                className={`press inline-flex items-center justify-center gap-2 min-h-[44px] py-3 rounded-xl text-body font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
                       ? 'bg-pos text-white border-pos'
@@ -184,7 +184,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           </div>
 
           {nominal > 0 && (
-            <div className={`rounded-xl px-4 py-2.5 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800/40'}`}>
+            <div className={`rounded-xl px-4 py-3 border ${tipe === 'masuk' ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40' : 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800/40'}`}>
               {/* Pratinjau saldo BERHENTI menyebut angka saat saldonya tak
                   diketahui (24 Agu 2026). Sebelumnya `saldoSekarang` selalu
                   `number`, dan saat pemuatan halaman GAGAL nilainya jatuh ke 0
@@ -500,7 +500,7 @@ export default function KasRTPage() {
 
   return (
     <>
-      <div className="space-y-7 pb-2 page-enter">
+      <div className="space-y-8 pb-2 page-enter">
         {/* Kepala halaman = PageHeader bersama (30 Jul). Tetap SATU baris di HP;
             tumpukan dua baris dulu menambah ±56px chrome sebelum hero. */}
         <PageHeader
@@ -580,7 +580,7 @@ export default function KasRTPage() {
               {/* Kaki kolom bergaris (bukan lagi 2 kotak) — cermin HeroStats.
                   Garisnya ikut hero (`border-white/15`, sama dgn HeroSaldo),
                   bukan token `line` yang lahir untuk tepi kartu putih. */}
-              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-[18px]">
+              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-5">
                 <div className="skeleton skeleton-hero h-8 rounded-xl" />
                 <div className="skeleton skeleton-hero h-8 rounded-xl" />
               </div>
@@ -601,7 +601,7 @@ export default function KasRTPage() {
           /* The Saldo-Defisit Rule (selaras Beranda & KasHadiran): nominal TETAP
              putih premium; negatif ditandai chip KATA "Defisit". */
           status={saldo < 0 ? (
-            <span className="mb-[6px] shrink-0 rounded-full bg-rose-700 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
               Defisit
             </span>
           ) : undefined}
@@ -776,9 +776,9 @@ export default function KasRTPage() {
                     <div className="skeleton h-3 w-20 rounded-full" />
                     <div className="skeleton h-3 w-24 rounded-full" />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {[0, 1, 2].map((i) => (
-                      <div key={i} className="flex items-center justify-between gap-1.5">
+                      <div key={i} className="flex items-center justify-between gap-2">
                         <div className="skeleton h-3 w-28 rounded-full" />
                         <div className="skeleton h-3 w-16 rounded-full" />
                       </div>
@@ -814,7 +814,7 @@ export default function KasRTPage() {
                     memicunya, sehingga nominalnya jatuh ke baris bawah dan berdiri
                     rata KIRI — kolom angka berhenti sejajar. Yang perlu mengalah
                     adalah LABEL-nya, bukan seluruh baris. */}
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {KATEGORI_MASUK.filter((o) => (rekapKategori.masuk[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
                       <span className="min-w-0 flex-1 angka-prosa text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
@@ -830,7 +830,7 @@ export default function KasRTPage() {
                   <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Pengeluaran</span>
                   <span className="text-caption font-display font-bold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
                       <span className="min-w-0 flex-1 angka-prosa text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
@@ -856,7 +856,7 @@ export default function KasRTPage() {
                   <div className="h-4 skeleton rounded-lg w-3/4" />
                   <div className="h-3 skeleton rounded-lg w-1/3" />
                 </div>
-                <div className="text-right space-y-1.5">
+                <div className="text-right space-y-2">
                   <div className="h-4 w-20 skeleton rounded-lg" />
                   <div className="h-3 w-16 skeleton rounded-lg" />
                 </div>
@@ -952,7 +952,7 @@ export default function KasRTPage() {
                      `items-center` karena judulnya `truncate` (selalu satu
                      baris). Nominal & ikon kini bertumpu pada baris PERTAMA
                      judul, sama seperti kolom angka Rekap per Kategori. */
-                  className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
+                  className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_76px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-200 ${!isLast ? 'divide-inset' : ''}`}
                 >
                   <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
                     {isMasuk
@@ -1031,7 +1031,7 @@ export default function KasRTPage() {
             </div>
             <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</p>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
-            <div className="inset-soft rounded-2xl p-4 space-y-2.5 mt-3">
+            <div className="inset-soft rounded-2xl p-4 space-y-3 mt-3">
               <div className="flex items-center justify-between">
                 <span className="text-body text-ink-faint dark:text-gray-400">Tipe</span>
                 <span className={`text-body font-semibold ${selectedRow.tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>

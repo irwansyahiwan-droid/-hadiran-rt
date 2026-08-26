@@ -486,7 +486,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   };
 
   const skeleton = (
-      <div className="space-y-7 pb-2">
+      <div className="space-y-8 pb-2">
         {/* Geometri + anatomi kartu asli, satu sumber di BannerCarousel → tanpa
             layout jump saat skeleton → konten. (Versi lama: slab polos setinggi
             bannerViewportHeight saja — kurang 46px krn indikator tak dihitung,
@@ -522,7 +522,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     {error ? (
     <ErrorState className="pt-10" onRetry={() => load()} retrying={loading} />
     ) : (
-    <div className="space-y-7 pb-2">
+    <div className="space-y-8 pb-2">
       {/* Sapaan.
           Pil status kas ("Perlu Perhatian" / "Sehat") DIBUANG 24 Agu 2026.
           Bukan karena salah, tapi karena ia peringatan KETIGA di satu layar:
@@ -558,7 +558,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 audit 30 Jul). Kini satu baris flex: eyebrow `min-w-0` mengalah,
                 tombol `shrink-0` — lebar layar apa pun, tak bisa saling timpa. */}
             <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-[9px]">
+              <div className="flex min-w-0 items-center gap-2">
                 <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-300 shadow-[0_0_8px_2px_rgba(110,231,183,0.55)]" />
                 {/* Label ikut lebar layar: di 360px ruang sisa cuma 121px sedang
                     label butuh 148px pada 11px/0.16em → kata "SALDO" akan hilang
@@ -567,7 +567,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     kembali ke 11px begitu ada ruang. truncate = jaring pengaman. */}
                 <span className="potong-lentur text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
               </div>
-              <div className="flex shrink-0 items-center gap-2.5">
+              <div className="flex shrink-0 items-center gap-3">
                 {/* Ikon POLOS, tanpa chip lingkaran. Dua kapsul `bg-white/15
                     ring-inset` dulu jadi bentuk paling menonjol kedua di kartu
                     setelah nominalnya — dua "tombol" penuh untuk dua utilitas
@@ -613,14 +613,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   terbaca utk lansia/mata yg sulit bedakan warna) + tanda minus + badge
                   "Perlu Perhatian" di header. Chip di baris nominal (bukan eyebrow) supaya
                   tak menabrak tombol mata/refresh yg absolute di kanan-atas. */}
-              <div className="flex flex-wrap items-end gap-x-2.5 gap-y-1">
+              <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
                 <span className="font-display text-[clamp(1.9rem,9vw,2.6rem)] font-extrabold leading-none tracking-tighter tabular-nums text-white">
                   {hidden
                     ? maskRp(`${animatedSaldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)
                     : <Odometer value={animatedSaldo} />}
                 </span>
                 {saldo < 0 && (
-                  <span className="mb-[3px] rounded-full bg-rose-700 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                  <span className="mb-1 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
                     Defisit
                   </span>
                 )}
@@ -658,7 +658,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                    dekat ke nominal. `className` ini milik Beranda saja — hero Kas
                    RT & Talangan mengirim spasinya sendiri lewat HeroSaldo, jadi
                    perubahan di sini tidak merembet ke sana. */
-                className="pt-[22px]"
+                className="pt-5"
                 items={[
                   { icon: Wallet, label: 'Terkumpul', value: maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas') },
                   { icon: ArrowLeftRight, label: 'Talangan', value: maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('talangan') },
@@ -768,7 +768,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                       membawa satu hal saja: siapa. */}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1.5">
+                  <div className="flex items-center justify-between gap-2">
                     <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight potong-lentur flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
                     {next ? (
                       <Tag tone="success" className="shrink-0">
@@ -819,7 +819,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           {trxItems.length > TRX_LIMIT && (
             <button
               onClick={() => onNavigate('kas')}
-              className="press w-full flex items-center justify-center gap-1 px-4 py-3.5 text-body font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+              className="press w-full flex items-center justify-center gap-1 px-4 py-4 text-body font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
             >
               Lihat semua transaksi
               <ChevronRight className="w-4 h-4" strokeWidth={2.25} />

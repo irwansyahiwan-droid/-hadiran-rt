@@ -85,7 +85,7 @@ export default function PageHeader({
           dua aksi melebar ke 335px sedangkan ruang isi halaman cuma 296px.
           Melipat ISI grup mengecilkan lebar naturalnya tanpa mengorbankan
           prioritas judul; `justify-end` menjaga aksi tetap rata kanan. */}
-      {actions && <div className="flex max-w-full shrink-0 flex-wrap items-center justify-end gap-1.5">{actions}</div>}
+      {actions && <div className="flex max-w-full shrink-0 flex-wrap items-center justify-end gap-2">{actions}</div>}
     </div>
   );
 }

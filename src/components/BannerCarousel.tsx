@@ -120,7 +120,7 @@ export function BannerSkeleton({ vh, vw }: { vh: number; vw: number }) {
         }}
       >
         {/* eyebrow: titik status + label */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <span className={`h-2.5 w-2.5 shrink-0 ${bar}`} />
           <span className={`h-2.5 w-32 ${bar}`} />
         </div>
@@ -686,7 +686,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   )}
 
                   {/* Eyebrow: tile ikon + label. */}
-                  <div className="flex items-center gap-[9px]">
+                  <div className="flex items-center gap-2">
                     <div
                       className="grid h-[44px] w-[44px] place-items-center rounded-2xl bg-white/15"
                       style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.22)' }}
@@ -697,9 +697,9 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
-                  <div className={`mt-[16px] text-balance text-title font-extrabold ${tw}`}>{promo!.judul}</div>
+                  <div className={`mt-4 text-balance text-title font-extrabold ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
-                    <div className={`mt-[10px] text-pretty text-body font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
+                    <div className={`mt-3 text-pretty text-body font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
 
                   {/* Kartu target = AJAKAN, bukan laporan (5 Agu 2026).

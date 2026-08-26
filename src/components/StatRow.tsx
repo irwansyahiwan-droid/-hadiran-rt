@@ -49,7 +49,7 @@ export default function StatRow({
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {items.map((s) => (
-          <div key={s.label} className={`flex flex-col items-center gap-0.5 ${tight ? 'px-1.5' : 'px-3'}`}>
+          <div key={s.label} className={`flex flex-col items-center gap-0.5 ${tight ? 'px-2' : 'px-3'}`}>
             <span
               /* NOL tidak berhak atas warna.
                  Warna di app ini dipakai sebagai SINYAL (pos/neg/warn/info), dan

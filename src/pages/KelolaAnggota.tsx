@@ -168,7 +168,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
               key={r}
               onClick={() => { if (role !== r) haptic(); setRole(r); }}
               aria-pressed={role === r}
-              className={`press min-h-[44px] py-2.5 rounded-xl text-body font-semibold border transition ${
+              className={`press min-h-[44px] py-3 rounded-xl text-body font-semibold border transition ${
                 role === r
                   ? 'bg-brand text-white border-transparent' /* fill brand DATAR (MATERIAL-FLAT) — gradient+glow pra-flat dihapus */
                   : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-control dark:border-control-dark'
@@ -185,10 +185,10 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             onClick={() => setAktif((a) => !a)}
             role="switch"
             aria-checked={aktif}
-            className="w-full flex items-center justify-between px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark mb-4"
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark mb-4"
           >
             <span className="text-body font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
-            <span className={`text-caption font-bold px-2.5 py-1 rounded-full ${
+            <span className={`text-caption font-bold px-3 py-1 rounded-full ${
               aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
             }`}>
               {aktif ? 'Aktif' : 'Nonaktif'}
@@ -203,7 +203,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
               onClick={() => setSusulan((s) => !s)}
               role="switch"
               aria-checked={susulan}
-              className="w-full flex items-center justify-between gap-2 px-3.5 py-3 text-left"
+              className="w-full flex items-center justify-between gap-2 px-4 py-3 text-left"
             >
               <span className="flex items-center gap-2 text-body font-semibold text-amber-800 dark:text-amber-300">
                 <History className="w-4 h-4 shrink-0" />
@@ -215,7 +215,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             </button>
 
             {susulan && (
-              <div className="px-3.5 pb-3.5 space-y-2">
+              <div className="px-4 pb-4 space-y-2">
                 <p className="text-pretty text-micro text-warn dark:text-amber-400 leading-relaxed">
                   Ditandai <b>hadir</b> di tarikan terpilih lalu kas dihitung ulang. Talangan warga lain tidak terpengaruh.
                 </p>
@@ -226,7 +226,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                       <button
                         key={t.id}
                         onClick={() => togglePilih(t.id)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left"
+                        className="w-full flex items-center gap-3 px-3 py-3 text-left"
                       >
                         <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
                           on ? 'bg-brand-500 border-brand-500' : 'border-gray-300 dark:border-gray-600'
@@ -255,7 +255,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
         {/* Peringatan: masih punya jadwal tarikan ke depan */}
         {jadwalNonaktif && (
-          <div className="mb-4 rounded-2xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/70 dark:bg-rose-900/15 p-3.5">
+          <div className="mb-4 rounded-2xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/70 dark:bg-rose-900/15 p-4">
             <p className="flex items-center gap-2 text-body font-bold text-rose-700 dark:text-rose-300">
               <AlertTriangle className="w-4 h-4 shrink-0" /> Masih punya jadwal ke depan
             </p>
@@ -266,7 +266,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           </div>
         )}
 
-        <div className="flex gap-2.5">
+        <div className="flex gap-3">
           <button
             onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : drag.dismiss}
             className="btn-secondary flex-1 py-3 rounded-full"
@@ -391,13 +391,13 @@ export default function KelolaAnggota({ open, onClose }: Props) {
         {/* List */}
         {loading ? (
           // Skeleton MENCERMINKAN geometri list asli (satu kartu rounded-3xl +
-          // baris divide-inset, px-4 py-3.5, --di-l/--di-r sama) → tak ada "lompat"
+          // baris divide-inset, px-4 py-4, --di-l/--di-r sama) → tak ada "lompat"
           // saat skeleton → konten. Sebelumnya: 6 kartu rounded-2xl terpisah
           // (space-y-2) yang menyatu jadi satu kartu saat data datang — melanggar
           // standar anti-jump app (lihat BannerSkeleton di Beranda).
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className={`flex items-center gap-3 px-4 py-3.5 [--di-l:4.25rem] [--di-r:1rem] ${i < 7 ? 'divide-inset' : ''}`}>
+              <div key={i} className={`flex items-center gap-3 px-4 py-4 [--di-l:4.25rem] [--di-r:1rem] ${i < 7 ? 'divide-inset' : ''}`}>
                 <div className="w-10 h-10 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/5" />
@@ -434,7 +434,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                    pola KasRT.tsx: animasi elemen itu sendiri tetap jalan, yang
                    dilewati cuma render ISI baris di luar layar. */
                 style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                className={`rise w-full flex items-center gap-3 px-4 py-3.5 text-left [--di-l:4.25rem] [--di-r:1rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_72px] active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
+                className={`rise w-full flex items-center gap-3 px-4 py-4 text-left [--di-l:4.25rem] [--di-r:1rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_76px] active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
                   idx < filtered.length - 1 ? 'divide-inset' : ''
                 }`}
               >
@@ -468,7 +468,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                     {w.no_hp && <span className="inline-flex items-center gap-0.5"><Phone className="w-3 h-3" />{w.no_hp}</span>}
                   </p>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   {w.role === 'bendahara' && <Tag tone="success">Bendahara</Tag>}
                   {!w.status_aktif && <Tag tone="neutral">Nonaktif</Tag>}
                   {/* Aturan yang sama dgn tombol baris Jadwal (4 Agu): abu di app

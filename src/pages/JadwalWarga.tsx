@@ -183,7 +183,7 @@ export default function JadwalWargaPage() {
 
   if (loading) {
     return (
-      <div className="space-y-7 pb-2">
+      <div className="space-y-8 pb-2">
         {kepalaHalaman}
         {/* Hero — bentuk kartu + ANATOMI asli (eyebrow, judul, sub Sohibul Bait,
             baris kehadiran, progress, chip), tinggi via HERO_MIN_H. Versi lama:
@@ -211,11 +211,11 @@ export default function JadwalWargaPage() {
               bukan tebakan: 390 persis titik chip berhenti melipat juga, dan
               tinggi hero terukur 253 vs 198 di dua sisi ambang itu. */}
           <div className="skeleton h-5 w-32 rounded-full" />
-          <div className="h-[46px] max-[389px]:h-[68px] space-y-1.5">
+          <div className="h-[46px] max-[389px]:h-[68px] space-y-2">
             <div className="skeleton h-4 w-3/4 rounded-full" />
             <div className="skeleton h-3 w-2/3 rounded-full" />
           </div>
-          <div className="h-7 space-y-1.5">
+          <div className="h-7 space-y-2">
             <div className="flex items-center justify-between">
               <div className="skeleton h-2.5 w-20 rounded-full" />
               <div className="skeleton h-2.5 w-24 rounded-full" />
@@ -243,7 +243,7 @@ export default function JadwalWargaPage() {
               → tinggi total sama persis dgn StatRow asli (79px), tanpa drift. */}
           <div className="grid grid-cols-4 divide-x divide-line dark:divide-gray-800">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="flex flex-col items-center gap-0.5 px-1.5">
+              <div key={i} className="flex flex-col items-center gap-0.5 px-2">
                 <div className="skeleton h-7 w-8 rounded-lg" />
                 <div className="skeleton h-[15px] w-10 rounded-lg" />
               </div>
@@ -253,15 +253,15 @@ export default function JadwalWargaPage() {
         {/* Search (.field-search = 46px) */}
         <div className="skeleton h-[46px] rounded-xl" />
         {/* Filter chips */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton min-h-[44px] w-[4.5rem] rounded-full" />)}
         </div>
         {/* List */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className={`flex items-center gap-3 p-3.5 [--di-l:3.875rem] [--di-r:0.875rem] ${i < 4 ? 'divide-inset' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 p-3 [--di-l:3.75rem] [--di-r:0.75rem] ${i < 4 ? 'divide-inset' : ''}`}>
               <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
-              <div className="flex-1 space-y-1.5">
+              <div className="flex-1 space-y-2">
                 <div className="skeleton h-3.5 w-1/2 rounded-full" />
                 <div className="skeleton h-2.5 w-1/3 rounded-full" />
               </div>
@@ -314,7 +314,7 @@ export default function JadwalWargaPage() {
   });
 
   return (
-    <div className="space-y-7 pb-2">
+    <div className="space-y-8 pb-2">
       {/* Kepala halaman = PageHeader bersama (30 Jul). Halaman ini dulu SATU-
           SATUNYA tab tanpa judul — langsung hero, tanpa nama & tanpa muat-ulang,
           padahal tab-nya bernama "Jadwal" dan isinya dua tampilan berbeda.
@@ -360,18 +360,18 @@ export default function JadwalWargaPage() {
 
             {/* Badges */}
             <div className="flex gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                 <Check className="w-3 h-3" strokeWidth={2.5} /> {hadirCount} Hadir
               </span>
               {titipCount > 0 && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                   <HandCoins className="w-3 h-3" /> {titipCount} Titip
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                 <X className="w-3 h-3" strokeWidth={2.5} /> {tidakHadirCount} Tidak Hadir
               </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                 <Coins className="w-3 h-3" /> <span className="font-display tabular-nums">{formatRupiahPlain(iuranTerkumpul)}</span>
               </span>
             </div>
@@ -436,7 +436,7 @@ export default function JadwalWargaPage() {
                teks dasar browser 200%: wadah 296px, tombol berakhir di 366px).
                Ikon `shrink-0` supaya yang mengalah adalah labelnya, bukan ikon
                yang lalu gepeng. */
-            className={`press relative z-10 flex-1 min-w-0 min-h-[44px] py-2.5 rounded-xl text-body font-semibold transition-colors inline-flex items-center justify-center gap-1.5 ${
+            className={`press relative z-10 flex-1 min-w-0 min-h-[44px] py-3 rounded-xl text-body font-semibold transition-colors inline-flex items-center justify-center gap-2 ${
               subTab === id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
             }`}
           >
@@ -535,7 +535,11 @@ export default function JadwalWargaPage() {
                        geser samping. Dengan wrap, chip turun sebaris. */
                     /* Stagger masuk — dialek gerak bersama (lihat Jadwal.tsx). */
                     style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                    className={`rise flex flex-wrap items-center gap-2.5 p-3.5 [--di-l:5.375rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] ${
+                    /* gap-2, bukan gap-3: baris ini punya EMPAT kolom (nomor ·
+                       avatar · nama · chip), bukan dua seperti baris Jadwal.
+                       Tiga celah × 4px selisih = 12px yang diambil dari nama —
+                       persis yang bikin "Nisan Nasrullah ( Icang )" terpotong. */
+                    className={`rise flex flex-wrap items-center gap-2 p-3 [--di-l:5rem] [--di-r:0.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_60px] ${
                       idx < filteredWarga.length - 1 ? 'divide-inset' : ''
                     }`}
                   >
@@ -577,7 +581,7 @@ export default function JadwalWargaPage() {
                 onClick={cetakJadwal}
                 disabled={allTarikan.length === 0}
                 aria-busy={pdfSibuk || undefined}
-                className="press flex items-center gap-1.5 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-caption font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                className="press flex items-center gap-2 min-h-[44px] px-3 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-caption font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
               >
                 {pdfSibuk ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
                 PDF Jadwal

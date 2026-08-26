@@ -306,7 +306,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       /* --di-l/--di-r ditaruh di SINI, bukan di ketiga kartu `list-inset` yang
          memakai renderGroup (Berganda / Daftar Talangan / Sudah Lunas):
          nilainya diturunkan dari geometri baris di bawah ini (px-4 = 16 +
-         avatar w-9 = 36 + gap-2.5 = 10 → 62px = 3.875rem), jadi ia harus hidup
+         avatar w-9 = 36 + gap-3 = 10 → 62px = 3.875rem), jadi ia harus hidup
          bersama baris itu — kalau tidak, mengubah padding/avatar di sini
          diam-diam membuat tiga kartu di tempat lain jadi salah. Sebelumnya
          ketiganya memakai default 4.75rem (rumus daftar ber-avatar 44px di
@@ -316,7 +316,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         key={g.warga_id}
         /* Stagger masuk — dialek gerak bersama (lihat Jadwal.tsx). */
         style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-        className="rise [--di-l:3.875rem] [--di-r:1rem]"
+        className="rise [--di-l:4rem] [--di-r:1rem]"
       >
         {/* Group header */}
         {/* `items-start` juga di baris LUAR: tombol WA duduk di sini, di luar
@@ -334,7 +334,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                17 / 19 / 28px dari baris pertama nama, tergantung barisnya satu
                atau dua). Kini semuanya bertumpu pada baris PERTAMA nama, sama
                seperti baris mutasi Kas RT & kolom Rekap per Kategori. */
-            className="flex-1 min-w-0 flex items-start gap-2.5 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
+            className="flex-1 min-w-0 flex items-start gap-3 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
           >
             {/* Avatar 36 (bukan 44) & padding 16 (bukan 20): baris ini menanggung
                 5 blok shrink-0 sekaligus (avatar, nominal, chevron, tombol WA).
@@ -357,7 +357,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <p className="text-caption text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
               )}
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               {g.countBelum > 0 && (
                 /* text-body, bukan text-amount: ini total kelompok (ringkasan),
                    nominal per talangan tetap tampil di baris detail saat dibuka. */
@@ -373,7 +373,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               onClick={() => ingatkan(g)}
               title="Ingatkan via WhatsApp"
               aria-label={`Ingatkan ${g.nama} via WhatsApp`}
-              className="press shrink-0 w-11 h-11 mt-3 mr-1.5 inline-flex items-center justify-center rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+              className="press shrink-0 w-11 h-11 mt-3 mr-2 inline-flex items-center justify-center rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
             >
               <MessageCircle className="w-[18px] h-[18px]" />
             </button>
@@ -408,7 +408,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
-                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-white text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 shrink-0 whitespace-nowrap ${
+                    className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-white text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 shrink-0 whitespace-nowrap ${
                       confirmId === t.id ? 'bg-brand' : 'btn-brand'
                     }`}
                   >
@@ -421,7 +421,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBatalClick(t)}
                     disabled={processingId === t.id}
-                    className="inline-flex items-center justify-center gap-1 min-h-[44px] px-3.5 rounded-xl text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    className="inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-150 disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                   >
                     {processingId === t.id ? (
                       <><RefreshCw className="w-3 h-3 animate-spin" />Memproses…</>
@@ -434,7 +434,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     disabled={processingId === t.id}
                     title="Hapus data talangan"
                     aria-label="Hapus data talangan"
-                    className="press inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-2.5 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 active:bg-rose-50 dark:hover:bg-rose-900/20 dark:active:bg-rose-900/20"
+                    className="press inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-3 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 active:bg-rose-50 dark:hover:bg-rose-900/20 dark:active:bg-rose-900/20"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -448,7 +448,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   }
 
   return (
-    <div className="space-y-7 pb-2 page-enter">
+    <div className="space-y-8 pb-2 page-enter">
       {/* Kepala halaman = PageHeader bersama (30 Jul). Dulu halaman ini cuma
           menampilkan baris "← Kembali" TANPA nama halaman — warga yang masuk
           lewat pintasan Beranda mendarat di layar tanpa identitas. Panah kembali
@@ -486,7 +486,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             </div>
             <div className="skeleton skeleton-hero mt-3 h-8 w-1/2 rounded-xl" />
             {/* Kaki kolom bergaris — cermin HeroStats; garis ikut hero. */}
-            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-[18px]">
+            <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/15 pt-5">
               <div className="skeleton skeleton-hero h-8 rounded-xl" />
               <div className="skeleton skeleton-hero h-8 rounded-xl" />
             </div>
@@ -556,13 +556,13 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
       <CrossFade loading={loading} skeleton={(
         /* Geometri WAJIB sama dgn baris asli di renderGroup (px-4, avatar w-9,
-           gap-2.5, --di-l 3.875rem). Versi lama memakai px-5/w-11/gap-3 →
+           gap-3, --di-l 3.875rem). Versi lama memakai px-5/w-11/gap-3 →
            begitu data datang, avatar mengecil 8px dan tiap hairline bergeser
            14px ke kiri: daftar "melompat" tepat di detik pertama warga
            melihatnya. */
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset [--di-l:3.875rem] [--di-r:1rem]">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset [--di-l:4rem] [--di-r:1rem]">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-2.5 px-4 py-4">
+            <div key={i} className="flex items-center gap-3 px-4 py-4">
               <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-4 skeleton rounded-lg w-2/3" />

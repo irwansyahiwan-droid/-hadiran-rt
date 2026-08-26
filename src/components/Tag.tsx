@@ -32,7 +32,7 @@ interface TagProps {
 export default function Tag({ tone = 'neutral', children, className = '' }: TagProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-micro font-semibold leading-tight whitespace-nowrap ring-1 ring-inset ${TONES[tone]} ${className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-semibold leading-tight whitespace-nowrap ring-1 ring-inset ${TONES[tone]} ${className}`}
     >
       {children}
     </span>

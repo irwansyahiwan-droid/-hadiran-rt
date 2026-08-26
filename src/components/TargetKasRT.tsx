@@ -57,11 +57,11 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           {isBendahara && <div className="skeleton w-9 h-9 -mr-1 rounded-xl shrink-0" />}
         </div>
         <div className="skeleton h-3 rounded-full" />
-        <div className="flex items-center justify-between gap-2 mt-2.5">
+        <div className="flex items-center justify-between gap-2 mt-3">
           <div className="skeleton h-[17px] w-28 rounded-full" />
           <div className="skeleton h-[15px] w-32 rounded-full" />
         </div>
-        <div className="flex items-center justify-between mt-1.5">
+        <div className="flex items-center justify-between mt-2">
           <div className="skeleton h-[15px] w-24 rounded-full" />
           <div className="skeleton h-[15px] w-28 rounded-full" />
         </div>
@@ -77,7 +77,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
       <>
         <button
           onClick={() => { haptic(); setEditing(true); }}
-          className="press w-full flex items-center gap-3 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 px-4 py-3.5 text-left hover:border-emerald-400 hover:bg-emerald-50/40 dark:hover:bg-emerald-900/10 transition-colors"
+          className="press w-full flex items-center gap-3 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 px-4 py-4 text-left hover:border-emerald-400 hover:bg-emerald-50/40 dark:hover:bg-emerald-900/10 transition-colors"
         >
           <span className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
             <Target className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
@@ -189,7 +189,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
             memang merapikan 360px, tapi saat teks dasar browser 200% baris ini
             kehilangan satu-satunya jalan melipatnya → geser samping Kas RT
             melonjak 117px menjadi 258px. Membungkus adalah katup pengamannya. */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
           <span className="inline-flex items-center gap-1 text-caption font-bold angka-prosa text-emerald-700 dark:text-emerald-400">
             {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
           </span>
@@ -198,7 +198,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           </span>
         </div>
 
-        <div className="flex items-center justify-between mt-1.5 text-micro text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between mt-2 text-micro text-gray-500 dark:text-gray-400">
           <span>
             {tercapai ? 'Lebih ' : 'Kurang '}
             <span className="font-display tabular-nums">
@@ -318,7 +318,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
                 type="button"
                 onClick={hapus}
                 disabled={saving}
-                className="press inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-body font-semibold text-neg dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 disabled:opacity-60 transition-colors"
+                className="press inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-body font-semibold text-neg dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 disabled:opacity-60 transition-colors"
               >
                 <Trash2 className="w-4 h-4" /> Hapus
               </button>

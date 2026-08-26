@@ -105,7 +105,7 @@ function ToastStack({
         return (
           <div
             key={t.id}
-            className={`${leaving.has(t.id) ? 'toast-out' : 'toast-in'} pointer-events-auto flex items-center gap-2.5 w-full px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ${s.ring}`}
+            className={`${leaving.has(t.id) ? 'toast-out' : 'toast-in'} pointer-events-auto flex items-center gap-3 w-full px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ${s.ring}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${s.dot}`}>
@@ -115,7 +115,7 @@ function ToastStack({
             {t.actionLabel && (
               <button
                 onClick={() => onAction(t)}
-                className="press shrink-0 -mr-1 px-3 py-1.5 rounded-xl text-body font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                className="press shrink-0 -mr-1 px-3 py-2 rounded-xl text-body font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
               >
                 {t.actionLabel}
               </button>

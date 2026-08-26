@@ -88,7 +88,7 @@ export default function WelcomeSheet() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2.5 mb-5 rounded-xl inset-soft px-3.5 py-2.5">
+        <div className="flex items-center gap-3 mb-5 rounded-xl inset-soft px-4 py-3">
           <Eye className="w-4 h-4 text-ink-faint dark:text-gray-400 shrink-0" />
           <p className="text-pretty text-caption text-ink-sub dark:text-gray-400 leading-snug">
             Ketuk ikon mata di kartu saldo untuk menyembunyikan nominal.

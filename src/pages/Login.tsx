@@ -84,7 +84,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
      lahir, GAGAL di permukaan hero. Permukaan berubah, angkanya wajib diukur
      ulang; jangan salin alpha antar permukaan. */
   const field =
-    'w-full pl-11 pr-4 py-3.5 rounded-xl bg-black/25 backdrop-blur-sm ' +
+    'w-full pl-11 pr-4 py-4 rounded-xl bg-black/25 backdrop-blur-sm ' +
     'border border-white/45 text-body text-white placeholder-white/75 ' +
     'focus:outline-none focus:ring-2 focus:ring-[var(--gold-songket)] ' +
     'focus:border-[var(--gold-songket)] transition';
@@ -135,14 +135,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         {/* ── Identitas ────────────────────────────────────────────── */}
         <div className="rise text-center">
           <span
-            className="inline-flex items-center px-3.5 py-1.5 rounded-full
+            className="inline-flex items-center px-4 py-2 rounded-full
                        bg-black/25 border border-[var(--gold-songket)]/40
                        text-caption font-semibold text-[#F1E3C0]"
           >
             RT&nbsp;004/006 · Tanah Baru, Beji
           </span>
 
-          <div className="pop relative mx-auto mt-7 w-[5.5rem] h-[5.5rem]">
+          <div className="pop relative mx-auto mt-8 w-[5.5rem] h-[5.5rem]">
             <img
               src={logoRt}
               alt="Logo RT 004/006"
@@ -160,14 +160,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           <h1 className="font-display mt-6 text-display font-extrabold text-white">
             Hadiran RT
           </h1>
-          <p className="mt-2.5 text-body font-medium text-[#A7F3D0]">
+          <p className="mt-3 text-body font-medium text-[#A7F3D0]">
             Transparansi kas &amp; kehadiran warga
           </p>
 
           {/* Benang emas + satu belah-ketupat — motif songket yang sama dgn latar,
               dikecilkan jadi satu detail. Justru detail sekecil ini yang terbaca
               "dikerjakan orang", bukan "keluaran generator". */}
-          <span aria-hidden="true" className="mt-7 flex items-center justify-center gap-2.5">
+          <span aria-hidden="true" className="mt-8 flex items-center justify-center gap-3">
             <span
               className="h-px w-14"
               style={{ background: 'linear-gradient(90deg, transparent, var(--gold-songket))' }}
@@ -195,7 +195,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             id="masuk-warga"
             onClick={() => { haptic(12); onWargaMode(); }}
             className="press w-full min-h-[56px] px-6 rounded-2xl bg-white text-[#063A21]
-                       font-bold text-subtitle flex items-center justify-center gap-2.5
+                       font-bold text-subtitle flex items-center justify-center gap-3
                        shadow-[0_12px_32px_-12px_rgba(0,0,0,0.65)]"
           >
             Masuk sebagai Warga
@@ -207,7 +207,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         </div>
 
         {/* ── Pemisah ──────────────────────────────────────────────── */}
-        <div className="flex items-center gap-3 my-7">
+        <div className="flex items-center gap-3 my-8">
           <span className="h-px flex-1 bg-white/20" />
           {/* /55 → /75: `audit:kontras` mengukur 4,13:1 di atas hijau hero —
               di bawah AA 4,5 untuk teks 11px/600. Nilai /55 warisan pass
@@ -228,7 +228,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           className="press w-full min-h-[52px] px-5 rounded-xl bg-black/20 border border-white/45
                      flex items-center justify-between text-body font-semibold text-white"
         >
-          <span className="flex items-center gap-2.5">
+          <span className="flex items-center gap-3">
             <Lock className="w-4 h-4 text-[var(--gold-songket)]" />
             Masuk sebagai Bendahara
           </span>
@@ -253,7 +253,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             <div className="rounded-2xl bg-black/25 backdrop-blur-sm border border-white/12 p-4">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="login-email" className="block mb-1.5 text-caption font-semibold text-white/75">
+                  <label htmlFor="login-email" className="block mb-2 text-caption font-semibold text-white/75">
                     Email
                   </label>
                   <div className="relative">
@@ -279,7 +279,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 </div>
 
                 <div>
-                  <label htmlFor="login-password" className="block mb-1.5 text-caption font-semibold text-white/75">
+                  <label htmlFor="login-password" className="block mb-2 text-caption font-semibold text-white/75">
                     Password
                   </label>
                   <div className="relative">
@@ -307,7 +307,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 </div>
 
                 {error && (
-                  <div role="alert" className="reveal rounded-xl bg-rose-950/70 border border-rose-400/40 px-4 py-2.5">
+                  <div role="alert" className="reveal rounded-xl bg-rose-950/70 border border-rose-400/40 px-4 py-3">
                     <p className="text-body font-medium text-rose-100">{error}</p>
                   </div>
                 )}
@@ -339,7 +339,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           </div>
         </div>
 
-        <p className="mt-7 text-center text-caption text-white/60">
+        <p className="mt-8 text-center text-caption text-white/60">
           Bendahara lupa password? Hubungi pengurus RT
         </p>
       </div>

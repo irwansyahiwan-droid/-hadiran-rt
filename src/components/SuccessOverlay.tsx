@@ -99,9 +99,9 @@ export default function SuccessOverlay({ show, message = 'Berhasil!', submessage
             </svg>
           </div>
         </div>
-        <p className="success-pop mt-4 text-white font-bold text-body bg-black/45 px-4 py-1.5 rounded-full backdrop-blur">{message}</p>
+        <p className="success-pop mt-4 text-white font-bold text-body bg-black/45 px-4 py-2 rounded-full backdrop-blur">{message}</p>
         {submessage && (
-          <p className="success-pop mt-1.5 text-white/95 font-medium text-caption bg-black/35 px-3 py-1 rounded-full backdrop-blur tabular-nums">{submessage}</p>
+          <p className="success-pop mt-2 text-white/95 font-medium text-caption bg-black/35 px-3 py-1 rounded-full backdrop-blur tabular-nums">{submessage}</p>
         )}
       </div>
     </div>

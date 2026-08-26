@@ -78,7 +78,7 @@ export default function InstallPrompt() {
         style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
       >
         <div
-          className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800"
+          className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800"
           style={{ boxShadow: 'var(--shadow-float)' }}
         >
           <img src={logoRt} alt="" width={40} height={40} className="w-10 h-10 rounded-xl object-cover shrink-0" />
@@ -90,7 +90,7 @@ export default function InstallPrompt() {
             onClick={isIos ? () => setShowGuide(true) : install}
             /* min-h 44: aksi UTAMA banner ini sempat 32px tinggi — di bawah
                kontrak 44px yang dipatuhi seluruh app (lihat FilterChips). */
-            className="press shrink-0 inline-flex min-h-[44px] items-center gap-1.5 bg-brand text-white text-caption font-bold px-3.5 py-2 rounded-xl"
+            className="press shrink-0 inline-flex min-h-[44px] items-center gap-2 bg-brand text-white text-caption font-bold px-4 py-2 rounded-xl"
           >
             <Download className="w-3.5 h-3.5" />
             Pasang

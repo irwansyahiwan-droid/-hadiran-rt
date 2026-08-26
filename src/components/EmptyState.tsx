@@ -50,7 +50,7 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
       {action && (
         <button
           onClick={action.onClick}
-          className="press mt-4 inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-xl text-body font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200/60 dark:ring-emerald-800/40 active:bg-emerald-100 dark:active:bg-emerald-900/30 transition-colors"
+          className="press mt-4 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-xl text-body font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200/60 dark:ring-emerald-800/40 active:bg-emerald-100 dark:active:bg-emerald-900/30 transition-colors"
         >
           {action.icon && <action.icon className="w-4 h-4" strokeWidth={2} />}
           {action.label}

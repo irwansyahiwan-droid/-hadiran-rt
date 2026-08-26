@@ -24,9 +24,9 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
   return (
     <div className="rounded-2xl inset-soft p-3">
       <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">{judul}</p>
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <div className="flex items-center justify-between text-caption">
-          <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+          <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
             {/* Ikon = token yang SAMA dgn nominal di kanannya (5 Agu 2026).
                 Sama persis dgn panel "Alur Kas Hadiran" kemarin: emerald-500 &
                 rose-500 jauh lebih terang dari `pos`/`neg` di baris yang sama,
@@ -37,12 +37,12 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
           <span className="font-display font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
         </div>
         <div className="flex items-center justify-between text-caption">
-          <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+          <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
             <ArrowUpRight className="w-3.5 h-3.5 text-neg dark:text-neg-dark" /> Keluar
           </span>
           <span className="font-display font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
         </div>
-        <div className="flex items-center justify-between text-caption pt-1.5 border-t border-control dark:border-control-dark">
+        <div className="flex items-center justify-between text-caption pt-2 border-t border-control dark:border-control-dark">
           <span className="font-semibold text-gray-700 dark:text-gray-300">Saldo akhir</span>
           <span className={`font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}
@@ -162,7 +162,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
         {/* Tutup Buku Sekarang — snapshot posisi kas s/d hari ini */}
         {!loading && snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
           <div className="rise hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
-            <div className="relative flex items-center gap-2 mb-2.5">
+            <div className="relative flex items-center gap-2 mb-3">
               <CalendarCheck className="w-4 h-4 text-emerald-200" strokeWidth={2.2} />
               <p className="text-micro font-bold uppercase text-white" style={{ letterSpacing: '0.14em' }}>
                 Tutup Buku Sekarang
@@ -173,7 +173,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
               {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
 
-            <div className="relative grid grid-cols-2 gap-2 mb-3.5">
+            <div className="relative grid grid-cols-2 gap-2 mb-4">
               {/* Panel di ATAS gradient harus RECESSED (black/10), bukan diterangkan
                   (white/10): white/10 menaikkan latar ke #2C8758 → putih SOLID pun cuma
                   4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1. */}
@@ -270,7 +270,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 </button>
                 <button
                   onClick={() => cetak(r)}
-                  className="btn-secondary press min-h-[44px] px-4 py-3 rounded-2xl flex items-center justify-center gap-1.5"
+                  className="btn-secondary press min-h-[44px] px-4 py-3 rounded-2xl flex items-center justify-center gap-2"
                   aria-label={`Unduh PDF ${r.label}`}
                   aria-busy={(cetakSibuk && cetakKey === r.key) || undefined}
                 >

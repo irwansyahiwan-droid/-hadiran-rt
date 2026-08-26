@@ -73,7 +73,7 @@ export default function SectionTitle({ children, count, action, tone = 'default'
              `min-w` + `text-center` supaya "5" dan "103" sama-sama bulat rapi:
              tanpa itu satu digit menghasilkan kapsul yang lebih sempit dari
              tingginya dan terbaca gepeng. */
-          <span className={`font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-1.5 py-0.5 text-center ${
+          <span className={`font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center ${
             tone === 'warn'
               ? 'text-warn dark:text-amber-300 ring-amber-600/30 dark:ring-amber-400/30'
               : 'text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700'

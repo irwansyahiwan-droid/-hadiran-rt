@@ -944,7 +944,9 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    `position: fixed; inset: 0` artinya "penuhi layar". Tapi MARGIN tetap
    berlaku pada elemen fixed, dan Tailwind `space-y-*` memasang `margin-top`
    ke `> :not([hidden]) ~ :not([hidden])` — jadi overlay apa pun yang kebetulan
-   dirender sebagai anak halaman ber-`space-y-7` diam-diam turun 28px.
+   dirender sebagai anak halaman ber-`space-y-8` diam-diam turun setinggi
+   irama seksi (dulu 28px; sejak tangga spasi 32px — cacatnya sama, cuma
+   makin besar).
 
    Terukur di ConfirmDestruktif Talangan: scrim y=28 h=816 di viewport 844,
    sehingga strip teratas layar TIDAK ikut diredupkan — kartu hero tetap terang
@@ -1149,11 +1151,11 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 
   /* ── Field recipes ───────────────────────────────────────────────────
      SATU sumber tinggi/warna/fokus field. `.field` = input form (bg-gray-50,
-     py-3); `.field-search` = bilah cari di halaman list (bg-white, py-2.5).
+     py-3); `.field-search` = bilah cari di halaman list (bg-white, py-3).
      Padding horizontal default ada di sini; input ber-ikon meng-override
      padding kiri/kanan di call-site (utilities layer menang). */
   .field {
-    @apply w-full px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-gray-800
+    @apply w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800
            border border-control dark:border-control-dark
            text-body text-gray-900 dark:text-gray-100
            placeholder-gray-500 dark:placeholder-gray-400;
@@ -1179,10 +1181,10 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      kanvas untuk membedakannya. Pasangan gelap tunggal `gray-400` (#A8BCAF)
      = 9,95:1 di sana, masih di atas ambang AAA app.
 
-     `mb-1.5` ikut masuk resep (19 dari 20 call-site sudah memakainya); yang
+     `mb-2` ikut masuk resep (19 dari 20 call-site sudah memakainya); yang
      butuh jarak atas tinggal menambah `mt-*` di sampingnya. */
   .label-field {
-    @apply block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-1.5;
+    @apply block text-caption font-semibold text-ink-sub dark:text-gray-400 mb-2;
   }
   .field-search {
     @apply w-full pl-9 pr-9 py-3 rounded-xl bg-white dark:bg-gray-900

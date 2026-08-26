@@ -337,6 +337,48 @@ diubah dari kesamaan persis menjadi ARAH (garis cetak tak boleh lebih terang
 dari garis layar). **Mazhab adalah properti MEDIA, bukan properti app.**
 
 
+Yang ke-28 (26 Agu 2026, sesudah tangga tipografi) — **spasi yang "hampir sama"
+lebih merusak daripada spasi yang salah.** App ini punya 29 nilai jarak berbeda:
+`gap-1.5` di satu baris, `gap-2` di baris sebelahnya, `p-3.5`/`p-4`/`p-5` untuk
+tiga kartu yang perannya identik. Tak satu pun sapuan lama peduli — semuanya
+muat, semuanya bisa disentuh, `audit:potong` hijau. Yang rusak justru yang
+dilihat mata: selisih 2px TIDAK terbaca sebagai hierarki, ia terbaca sebagai
+kebisingan. Itu sebagian besar dari "kok masih terasa biasa saja".
+
+Tangga spasi: `0.5 · 1 · 2 · 3 · 4 · 5 · 6 · 8` (2/4/8/12/16/20/24/32px).
+Sengaja tak ada 1.5 / 2.5 / 3.5 / 7. Yang di antara dua anak tangga DINAIKKAN,
+bukan diturunkan — app premium lebih lapang, bukan lebih rapat.
+
+TIGA GOLONGAN, dan cuma yang pertama diatur — ini bagian yang paling mudah
+salah: **memaksa golongan dua & tiga ke tangga irama itu perusakan, bukan
+kerapian.** (1) IRAMA: jarak antar-isi nyata, wajib di tangga. (2) FUNGSIONAL:
+angka yang lahir dari ukuran komponen lain — ruang bebas bottom-nav, inset ikon
+di dalam input, safe-area. (3) GAMBAR: geometri ilustrasi dekoratif
+(`AbsensiArt`, `TarikanArt`, kerangka indikator) — membulatkan itu sama saja
+dengan membulatkan titik path SVG. Dari 28 "nilai arbitrer" yang terlihat di
+grep pertama, 15 ternyata golongan tiga. **Hitung dulu, baru vonis.**
+
+Dijaga `npm run audit:spasi` (statis, ikut `periksa`). Pola yang sama dengan
+tangga tipografi: nilai di luar tangga dibikin MUSTAHIL, bukan dijanjikan
+tidak dipakai.
+
+NILAI TERIKAT yang wajib ikut bergeser saat bantalan baris berubah —
+ketiganya tak dijaga sapuan mana pun, jadi harus diingat: `[--di-l:*]` /
+`[--di-r:*]` (inset garis pemisah; meleset = garis tak sejajar isi),
+`[contain-intrinsic-block-size:auto_*px]` (tinggi cadangan), dan bantalan
+KERANGKA yang harus mencerminkan baris aslinya (beda = `audit:lompat`).
+
+Baris daftar padat memakai anak tangga RINGKAS (`p-3`), bukan anak tangga
+kartu (`p-5`). Waktu p-3.5 dinaikkan ke p-4 di Jadwal, dua nama warga
+terpotong 10–14px @390px — bukti bahwa "lebih lapang" bukan aturan buta:
+kartu lega, baris padat.
+
+Satu temuan `audit:potong` yang TIDAK berasal dari sesi ini: 6 label bulan di
+Kas RT terpotong pada teks 200%. Diverifikasi dengan `git stash` + build
+ulang — jumlahnya identik sebelum & sesudah. **Ambang itu di ATAS AA (bukan
+syarat WCAG); dibiarkan terbuka, bukan diam-diam dianggap milik sesi ini.**
+
+
 Yang ke-27 (26 Agu 2026) — **DEPLOY TIDAK OTOMATIS. `git push` TIDAK men-deploy
 apa pun.** Catatan lama (termasuk di skill rt-dev) menulis "auto-deploy via
 GitHub push ke main". Itu TIDAK BENAR untuk proyek ini: integrasi Git Vercel

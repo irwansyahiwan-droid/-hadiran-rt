@@ -485,7 +485,7 @@ export default function KasHadiranPage() {
 
   return (
     <>
-      <div className="space-y-7 pb-2 overflow-x-hidden">
+      <div className="space-y-8 pb-2 overflow-x-hidden">
         {/* Kepala halaman = PageHeader bersama (30 Jul). Tetap SATU baris di HP:
             judul + toolbar (ikon 44px + Ekspor ±130px) muat di 358px; tumpukan
             dua baris dulu menambah ±56px chrome di atas hero. */}
@@ -585,7 +585,7 @@ export default function KasHadiranPage() {
              putih premium; negatif ditandai chip KATA "Defisit" — rona salmon
              (text-rose-200) dulu = sinyal lemah utk mata yg sulit bedakan warna. */
           status={saldo < 0 ? (
-            <span className="mb-[6px] shrink-0 rounded-full bg-rose-700 px-2 py-[3px] text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
               Defisit
             </span>
           ) : undefined}
@@ -605,7 +605,7 @@ export default function KasHadiranPage() {
               ikut jadi biru). Panel di atas hero pakai bg-black/25 — aturan
               kontras 13 Jul: panel di hero gelapkan, jangan terangkan. */}
           {sudahSetor && (
-            <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 bg-black/25 border border-white/20 rounded-full text-white text-caption font-semibold">
+            <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-black/25 border border-white/20 rounded-full text-white text-caption font-semibold">
               <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
             </span>
           )}
@@ -622,7 +622,7 @@ export default function KasHadiranPage() {
               </InfoTip>
             </p>
             <span
-              className="flex items-center gap-1 px-2.5 py-1 bg-emerald-700 rounded-full text-white text-micro font-bold"
+              className="flex items-center gap-1 px-3 py-1 bg-emerald-700 rounded-full text-white text-micro font-bold"
               aria-label={`${tarikanSelesai.length} tarikan selesai`}
             >
               {tarikanSelesai.length}
@@ -635,12 +635,12 @@ export default function KasHadiranPage() {
                 bikin hairline berhenti ±20px sebelum nominal (kelihatan salah).
                 --di-l:1.25rem — rumusnya "padding + lebar ikon + gap", dan di
                 baris ini padding = 0 (kartunya yang p-5), ikon `w-3.5` = 14px,
-                `gap-1.5` = 6px → 20px. Nilai lama 2.5rem disalin dari daftar
+                `gap-2` = 6px → 20px. Nilai lama 2.5rem disalin dari daftar
                 ber-ikon 44px, jadi hairline-nya mulai 20px SETELAH huruf
                 pertama label — tepi kanan sudah sejajar nominal sejak dulu,
                 tepi kirinya yang tak pernah ikut diukur. */}
             <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
-              <div className="flex items-center gap-1.5 min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
                 {/* Ikon baris = token yang SAMA dgn nominalnya (4 Agu 2026).
                     Dulu ketiganya `-500` mentah: emerald-500/amber-500/blue-500
                     jauh lebih terang & jenuh daripada angka di sebelah kanannya,
@@ -656,14 +656,14 @@ export default function KasHadiranPage() {
               <span className="text-body font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
             <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
-              <div className="flex items-center gap-1.5 min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" />
                 <span className="text-body text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
               <span className="text-body font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-1.5 min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
                 {/* Biru DIPERTAHANKAN sbg penanda kategori "transfer" (lihat
                     catatan nominal di bawah — Setor Blue tak boleh menyentuh
                     NILAI uang, tapi ikon kategori sah). Yang berubah cuma
@@ -788,7 +788,7 @@ export default function KasHadiranPage() {
                       {/* ── Focal row: penerima + amount (ketuk → detail) ─ */}
                       <button
                         onClick={() => openDetail(t)}
-                        className="w-full flex items-start gap-2.5 px-4 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
+                        className="w-full flex items-start gap-3 px-4 pb-4 text-left cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors"
                       >
                         <AvatarPeci nama={t.sohibul_bait?.nama ?? '?'} className="w-11 h-11 rounded-2xl shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -881,12 +881,12 @@ export default function KasHadiranPage() {
                           pita = menghapus PDF pendapatan sekaligus dua kontrol aksi merusak
                           milik bendahara; itu regresi fungsi, bukan pemolesan.
                           Tinggi tombol tetap 44px (§2.5.8) — yang menyusut hanya napasnya. */}
-                      <div className="flex items-center gap-x-3 px-5 pb-1.5 pt-1.5 border-t border-line dark:border-gray-800">
+                      <div className="flex items-center gap-x-3 px-5 pb-2 pt-2 border-t border-line dark:border-gray-800">
                         <button
                           onClick={() => { haptic(); handlePendapatanPDF(t); }}
                           disabled={pdfLoading === t.id}
                           aria-label={`Unduh PDF pendapatan tarikan #${t.nomor}`}
-                          className="press flex items-center gap-1.5 min-h-[44px] -mx-1.5 px-1.5 rounded-lg text-caption font-semibold whitespace-nowrap text-brand-link dark:text-brand-linkDark hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors mati-teks"
+                          className="press flex items-center gap-2 min-h-[44px] -mx-2 px-2 rounded-lg text-caption font-semibold whitespace-nowrap text-brand-link dark:text-brand-linkDark hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors mati-teks"
                         >
                           <FileText className={`w-4 h-4 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
                           {pdfLoading === t.id ? 'Memuat…' : 'PDF'}
@@ -895,7 +895,7 @@ export default function KasHadiranPage() {
                           <button
                             onClick={() => { haptic(); handleBatalkanClick(t); }}
                             disabled={processingId === t.id}
-                            className="press flex items-center gap-1.5 min-h-[44px] px-1.5 rounded-lg text-caption font-semibold whitespace-nowrap transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
+                            className="press flex items-center gap-2 min-h-[44px] px-2 rounded-lg text-caption font-semibold whitespace-nowrap transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
                           >
                             <RotateCcw className={`w-4 h-4 ${processingId === t.id ? 'animate-spin' : ''}`} />
                             Batalkan
@@ -909,7 +909,7 @@ export default function KasHadiranPage() {
                             /* dark:text-gray-400, BUKAN gray-500: gray-500 di atas
                                gray-900 cuma 3,67:1 — ketangkap audit kontras deep
                                sbg satu-satunya cacat fill nyata dari 1842 sampel. */
-                            className="press flex items-center gap-1.5 min-h-[44px] -mr-1.5 px-1.5 rounded-lg text-caption font-semibold whitespace-nowrap ml-auto transition-colors mati-teks text-ink-faint dark:text-gray-400 hover:bg-gray-50 hover:text-neg dark:hover:bg-gray-800/60"
+                            className="press flex items-center gap-2 min-h-[44px] -mr-2 px-2 rounded-lg text-caption font-semibold whitespace-nowrap ml-auto transition-colors mati-teks text-ink-faint dark:text-gray-400 hover:bg-gray-50 hover:text-neg dark:hover:bg-gray-800/60"
                           >
                             <Trash2 className="w-4 h-4" />
                             Hapus
@@ -1019,7 +1019,7 @@ export default function KasHadiranPage() {
                     /* Ikon → pemintal saat berkas disiapkan; LABELNYA tetap supaya
                        lebar tombol tak berubah di tengah sheet (`audit:potong`). */
                     aria-busy={absensiSibuk || undefined}
-                    className="press shrink-0 inline-flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-caption font-semibold px-3 py-2 rounded-xl shadow-sm"
+                    className="press shrink-0 inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-caption font-semibold px-3 py-2 rounded-xl shadow-sm"
                   >
                     {absensiSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Absensi
                   </button>
@@ -1038,7 +1038,7 @@ export default function KasHadiranPage() {
               {detailLoading ? (
                 <>
                   {/* Skeleton kartu rincian pendapatan */}
-                  <div className="inset-soft rounded-2xl px-4 py-3.5 space-y-2.5">
+                  <div className="inset-soft rounded-2xl px-4 py-4 space-y-3">
                     <div className="skeleton h-2.5 w-40 rounded-full" />
                     {[0, 1, 2, 3].map((i) => (
                       <div key={i} className="flex items-center justify-between">
@@ -1049,9 +1049,9 @@ export default function KasHadiranPage() {
                   </div>
                   {/* Skeleton baris nama */}
                   <div className="space-y-1">
-                    <div className="skeleton h-2.5 w-32 rounded-full mb-2.5" />
+                    <div className="skeleton h-2.5 w-32 rounded-full mb-3" />
                     {[0, 1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex items-center gap-2.5 py-2">
+                      <div key={i} className="flex items-center gap-3 py-2">
                         <div className="skeleton h-3 w-5 rounded-full shrink-0" />
                         <div className="skeleton w-8 h-8 rounded-lg shrink-0" />
                         <div className="skeleton h-3.5 flex-1 rounded-full" />
@@ -1065,9 +1065,9 @@ export default function KasHadiranPage() {
                   {/* Rincian pendapatan real-time — angka sama dgn PDF pendapatan
                       yang diunduh dari tombol "PDF" di strip aksi kartu tarikan */}
                   {(detailHadir.length > 0 || detailTitip.length > 0 || detailTidak.length > 0) && (
-                    <div className="inset-soft rounded-2xl px-4 py-3.5">
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2.5">Pendapatan Sohibul Bait</p>
-                      <div className="space-y-1.5 text-body">
+                    <div className="inset-soft rounded-2xl px-4 py-4">
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-3">Pendapatan Sohibul Bait</p>
+                      <div className="space-y-2 text-body">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × <span className="font-display tabular-nums">{formatRupiahPlain(SOHIBUL_PER)}</span></span>
                           <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
@@ -1076,7 +1076,7 @@ export default function KasHadiranPage() {
                           <span className="text-ink-sub dark:text-gray-400">Potongan admin</span>
                           <span className="font-display font-semibold tabular-nums text-neg dark:text-rose-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
                         </div>
-                        <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-line dark:border-gray-800">
+                        <div className="flex items-center justify-between gap-3 pt-2 border-t border-line dark:border-gray-800">
                           <span className="font-bold text-ink dark:text-gray-100">Bersih diterima SB</span>
                           <span className="font-display font-bold tabular-nums text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
                         </div>
@@ -1089,10 +1089,10 @@ export default function KasHadiranPage() {
                   )}
                   {detailTitip.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-1.5">Titip · iuran masuk ({detailTitip.length})</p>
+                      <p className="text-micro font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">Titip · iuran masuk ({detailTitip.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailTitip.map((p, i) => (
-                          <div key={p.id} className="flex items-center gap-2.5 py-2">
+                          <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
@@ -1104,10 +1104,10 @@ export default function KasHadiranPage() {
                   )}
                   {detailTidak.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-1.5">Tidak Hadir / Talangan ({detailTidak.length})</p>
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Tidak Hadir / Talangan ({detailTidak.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailTidak.map((p, i) => (
-                          <div key={p.id} className="flex items-center gap-2.5 py-2">
+                          <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
@@ -1123,10 +1123,10 @@ export default function KasHadiranPage() {
                   )}
                   {detailHadir.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-1.5">Hadir ({detailHadir.length})</p>
+                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Hadir ({detailHadir.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailHadir.map((p, i) => (
-                          <div key={p.id} className="flex items-center gap-2.5 py-2">
+                          <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} className="w-8 h-8 rounded-lg" />
                             <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>

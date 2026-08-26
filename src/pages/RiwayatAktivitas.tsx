@@ -186,7 +186,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         {loading ? (
           <div className="space-y-2">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-4 py-3.5 flex items-center gap-3">
+              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-4 py-4 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-3/5" />
@@ -228,7 +228,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                       key={row.id}
                       onClick={() => { if (hasDetail) { haptic(); setExpanded(isOpen ? null : row.id); } }}
                       style={{ animationDelay: `${Math.min(idx, 8) * 0.03}s` }}
-                      className={`rise w-full flex items-start gap-3 px-4 py-3.5 text-left [--di-l:4.25rem] [--di-r:1rem] ${hasDetail ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'divide-inset' : ''}`}
+                      className={`rise w-full flex items-start gap-3 px-4 py-4 text-left [--di-l:4.25rem] [--di-r:1rem] ${hasDetail ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'divide-inset' : ''}`}
                     >
                       <div className={`icon-tile w-10 h-10 rounded-xl inline-flex items-center justify-center shrink-0 mt-0.5 ${ACCENT_CLS[v.accent]}`}>
                         <Icon className="w-4 h-4" />
@@ -246,7 +246,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                         {isOpen && hasDetail && (
                           <div className="reveal mt-2 space-y-2">
                             {v.penjelasan && (
-                              <div className="flex items-start gap-2 bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 rounded-xl p-2.5">
+                              <div className="flex items-start gap-2 bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 rounded-xl p-3">
                                 <Route className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                 <div className="min-w-0">
                                   <p className="text-micro font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-0.5">Alur &amp; pencatatan</p>
@@ -255,9 +255,9 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               </div>
                             )}
                             {hasMore && (
-                              <div className="space-y-1.5 inset-soft rounded-xl p-2.5">
+                              <div className="space-y-2 inset-soft rounded-xl p-3">
                                 {v.changes.map((c, i) => (
-                                  <div key={i} className="flex items-center gap-1.5 text-micro flex-wrap">
+                                  <div key={i} className="flex items-center gap-2 text-micro flex-wrap">
                                     <span className="text-ink-faint dark:text-gray-400 font-medium">{c.label}:</span>
                                     <span className="text-neg dark:text-rose-400 line-through">{c.from}</span>
                                     <ArrowRight className="w-3 h-3 text-gray-400" />
@@ -270,7 +270,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <div className="flex flex-col items-end gap-2 shrink-0">
                         {v.amount != null && v.amount !== 0 && (
                           <span className={`font-display text-amount font-semibold tabular-nums ${
                             v.accent === 'rose' ? 'text-neg dark:text-rose-400' : v.accent === 'emerald' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'

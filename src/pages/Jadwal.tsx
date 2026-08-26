@@ -234,7 +234,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   // di layar ini terlihat sah ("semua tidak hadir") dan bisa disimpan.
   if (absensiError) {
     return (
-      <div className="space-y-7 pb-2">
+      <div className="space-y-8 pb-2">
         <div className="flex items-center gap-3">
           <button
             onClick={() => { haptic(); onBack(); }}
@@ -254,11 +254,11 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
 
   if (loadingAbsensi) {
     return (
-      <div className="space-y-7 pb-2">
+      <div className="space-y-8 pb-2">
         {/* Back header */}
         <div className="flex items-center gap-3">
           <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 space-y-2">
             <div className="skeleton h-4 w-44 rounded-full" />
             <div className="skeleton h-2.5 w-28 rounded-full" />
           </div>
@@ -268,15 +268,15 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton h-16 rounded-2xl" />)}
         </div>
         {/* Filter tabs */}
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-3 gap-2">
           {[0, 1, 2].map((i) => <div key={i} className="skeleton h-9 rounded-xl" />)}
         </div>
         {/* Warga list */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className={`flex items-center gap-3 p-3.5 [--di-l:3.625rem] [--di-r:0.875rem] ${i < 5 ? 'divide-inset' : ''}`}>
+            <div key={i} className={`flex items-center gap-3 p-3 [--di-l:3.5rem] [--di-r:0.75rem] ${i < 5 ? 'divide-inset' : ''}`}>
               <div className="skeleton w-8 h-8 rounded-xl shrink-0" />
-              <div className="flex-1 space-y-1.5">
+              <div className="flex-1 space-y-2">
                 <div className="skeleton h-3.5 w-2/5 rounded-full" />
                 <div className="skeleton h-2.5 w-1/4 rounded-full" />
               </div>
@@ -290,7 +290,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   return (
     /* pb menyisakan ruang utk tumpukan tombol fixed di bawah (Simpan ± Batalkan)
        — tanpa ini baris warga terakhir tertutup & tak bisa di-tap. */
-    <div className={`space-y-7 ${tarikan.status === 'selesai' ? 'pb-28' : 'pb-14'}`}>
+    <div className={`space-y-8 ${tarikan.status === 'selesai' ? 'pb-28' : 'pb-14'}`}>
       {/* Back header */}
       <div className="flex items-center gap-3">
         <button onClick={onBack} aria-label="Kembali" className="press w-11 h-11 -ml-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -328,7 +328,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Talangan — nominal EKSAK, satu baris lega (pola baris panel "Alur Kas
           Hadiran": label kiri, nominal kanan, token `warn` sama dgn sebelumnya). */}
       <div className="flex items-center justify-between gap-3 rounded-2xl inset-soft px-4 py-3">
-        <span className="inline-flex items-center gap-1.5 text-caption font-medium text-ink-sub dark:text-gray-300">
+        <span className="inline-flex items-center gap-2 text-caption font-medium text-ink-sub dark:text-gray-300">
           <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark shrink-0" />
           Talangan
         </span>
@@ -340,7 +340,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
         <p className="text-body font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
-        <span className="font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-1.5 py-0.5 text-center text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700">
+        <span className="font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700">
           {pembayarList.length}
         </span>
       </div>
@@ -349,21 +349,21 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={() => setAll('hadir')}
-          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-caption font-semibold hover:bg-emerald-100 active:bg-emerald-100 dark:hover:bg-emerald-900/40 dark:active:bg-emerald-900/40 transition-colors"
+          className="press flex items-center justify-center gap-2 min-h-[44px] py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-caption font-semibold hover:bg-emerald-100 active:bg-emerald-100 dark:hover:bg-emerald-900/40 dark:active:bg-emerald-900/40 transition-colors"
         >
           <UserCheck className="w-3.5 h-3.5" />
           Semua Hadir
         </button>
         <button
           onClick={() => setAll('titip')}
-          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-caption font-semibold hover:bg-blue-100 active:bg-blue-100 dark:hover:bg-blue-900/40 dark:active:bg-blue-900/40 transition-colors"
+          className="press flex items-center justify-center gap-2 min-h-[44px] py-2 rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-caption font-semibold hover:bg-blue-100 active:bg-blue-100 dark:hover:bg-blue-900/40 dark:active:bg-blue-900/40 transition-colors"
         >
           <Coins className="w-3.5 h-3.5" />
           Semua Titip
         </button>
         <button
           onClick={() => setAll('tidak_hadir')}
-          className="press flex items-center justify-center gap-1.5 min-h-[44px] py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-gray-600 dark:text-gray-300 text-caption font-semibold hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700 transition-colors"
+          className="press flex items-center justify-center gap-2 min-h-[44px] py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-gray-600 dark:text-gray-300 text-caption font-semibold hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset
@@ -404,7 +404,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         {/* Sohibul Bait — baris TERKUNCI di paling atas: penerima, tidak bayar,
             tidak bisa di-tap (hadir/titip/tidak hadir) & di luar hitungan talangan. */}
         {sohibulWarga && (
-          <div className="w-full flex items-center gap-3 p-3.5 [--di-l:3.625rem] [--di-r:0.875rem] divide-inset bg-amber-50/60 dark:bg-amber-900/15">
+          <div className="w-full flex items-center gap-3 p-3 [--di-l:3.5rem] [--di-r:0.75rem] divide-inset bg-amber-50/60 dark:bg-amber-900/15">
             <div className="icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-caption font-bold bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-400">
               {sohibulWarga.nama.charAt(0)}
             </div>
@@ -426,7 +426,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               onClick={() => toggle(w.id)}
               aria-label={`${w.nama} — ${ui.label}. Ketuk untuk ganti status`}
               // ~79 baris: content-visibility lewati render baris di luar layar
-              className={`w-full flex items-center gap-3 p-3.5 text-left [--di-l:3.625rem] [--di-r:0.875rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] transition-colors ${
+              className={`w-full flex items-center gap-3 p-3 text-left [--di-l:3.5rem] [--di-r:0.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_60px] transition-colors ${
                 idx < filtered.length - 1 ? 'divide-inset' : ''
               } ${ui.hover}`}
             >
@@ -481,7 +481,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || cancelling}
-            className="btn-brand w-full py-3.5 font-bold text-body flex items-center justify-center gap-2"
+            className="btn-brand w-full py-4 font-bold text-body flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             {saving ? 'Menghitung…' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
@@ -575,7 +575,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
     <div className={`transition duration-300 ${visible ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'}`}>
       <div className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift overflow-hidden">
         {/* Header — badge sukses + judul + tutup */}
-        <div className="flex items-center gap-2.5 px-4 pt-4 pb-3">
+        <div className="flex items-center gap-3 px-4 pt-4 pb-3">
           <span className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-5 h-5" strokeWidth={2.5} />
           </span>
@@ -601,16 +601,16 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         </div>
 
         {/* Kehadiran */}
-        <div className="flex items-center gap-4 px-4 py-2.5 border-t border-line dark:border-gray-800 text-caption">
-          <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
+        <div className="flex items-center gap-4 px-4 py-3 border-t border-line dark:border-gray-800 text-caption">
+          <span className="inline-flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {result.hadirCount} Hadir
           </span>
           {result.titipCount > 0 && (
-            <span className="inline-flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
+            <span className="inline-flex items-center gap-2 font-semibold text-blue-600 dark:text-blue-400">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> {result.titipCount} Titip
             </span>
           )}
-          <span className="inline-flex items-center gap-1.5 font-semibold text-neg dark:text-rose-400">
+          <span className="inline-flex items-center gap-2 font-semibold text-neg dark:text-rose-400">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {result.tidakCount} Tidak hadir
           </span>
         </div>
@@ -634,7 +634,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
 
         {/* Talangan keluar */}
         {hasTalangan && (
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-100 dark:border-amber-900/30">
+          <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-100 dark:border-amber-900/30">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
             <p className="text-micro text-warn dark:text-amber-400 font-medium">
               Talangan keluar <span className="font-display tabular-nums">{formatRupiahPlain(result.talanganTotal)}</span>
@@ -647,7 +647,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           <button
             onClick={share}
             disabled={sharing}
-            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-2.5 text-caption font-semibold"
+            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-3 text-caption font-semibold"
           >
             <Share2 className="w-3.5 h-3.5" /> {sharing ? 'Menyiapkan…' : 'Bagikan PNG'}
           </button>
@@ -757,7 +757,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           ))}
         </select>
 
-        <div className="flex gap-2.5">
+        <div className="flex gap-3">
           <button
             onClick={drag.dismiss}
             className="btn-secondary flex-1 py-3 rounded-xl"
@@ -863,7 +863,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           ))}
         </select>
 
-        <div className="flex gap-2.5">
+        <div className="flex gap-3">
           <button
             onClick={drag.dismiss}
             className="btn-secondary flex-1 py-3 rounded-xl"
@@ -988,7 +988,7 @@ export default function JadwalPage() {
   }
 
   return (
-    <div className="space-y-7 pb-2 page-enter">
+    <div className="space-y-8 pb-2 page-enter">
       <SuccessOverlay
         show={showSuccess}
         variant="honor"
@@ -1036,7 +1036,7 @@ export default function JadwalPage() {
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
               aria-label="Tambah jadwal tarikan"
-              className="press flex items-center gap-1.5 btn-brand text-body font-semibold min-h-[44px] px-2.5 py-2 rounded-xl"
+              className="press flex items-center gap-2 btn-brand text-body font-semibold min-h-[44px] px-3 py-2 rounded-xl"
             >
               <Plus className="w-4 h-4" /> Jadwal
             </button>
@@ -1162,7 +1162,7 @@ export default function JadwalPage() {
 
                 <div className="shrink-0">
                     {isBendahara ? (
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         {isSelesai ? (
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
@@ -1193,7 +1193,7 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className="btn-brand flex items-center gap-1.5 min-h-[44px] px-3.5 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm"
+                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-150 shadow-sm"
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses…' : 'Proses'}
@@ -1294,14 +1294,14 @@ export default function JadwalPage() {
                     openWa(null, pesanTarikan(rowTarikan.nomor, rowTarikan.tanggal, rowTarikan.sohibul_bait?.nama ?? '—', rowTarikan.jumlah_per_orang));
                     setRowTarikan(null);
                   }}
-                  className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-body font-semibold"
+                  className="press w-full flex items-center gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-body font-semibold"
                 >
                   <MessageCircle className="w-4 h-4" /> Bagikan pengingat WhatsApp
                 </button>
               )}
               <button
                 onClick={() => { setRowTarikan(null); setEditingTarikan(rowTarikan); }}
-                className="press w-full flex items-center gap-3 p-3.5 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-body font-semibold"
+                className="press w-full flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-body font-semibold"
               >
                 <Pencil className="w-4 h-4" /> Revisi jadwal
               </button>

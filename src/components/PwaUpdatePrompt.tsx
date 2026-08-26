@@ -63,7 +63,7 @@ export default function PwaUpdatePrompt() {
         </div>
         <button
           onClick={() => waiting.postMessage('SKIP_WAITING')}
-          className="press shrink-0 inline-flex items-center gap-1.5 bg-white text-brand text-caption font-bold px-3 py-2 rounded-xl"
+          className="press shrink-0 inline-flex items-center gap-2 bg-white text-brand text-caption font-bold px-3 py-2 rounded-xl"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Muat ulang

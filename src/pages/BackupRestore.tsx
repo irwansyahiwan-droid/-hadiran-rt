@@ -99,7 +99,7 @@ export default function BackupRestore({ open, onClose }: Props) {
             {backingUp ? <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan…</> : <><Download className="w-4 h-4" /> Unduh Backup Sekarang</>}
           </button>
           {lastBackup && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="mt-3 flex flex-wrap gap-2">
               {lastBackup.map((r) => (
                 <span key={r.table} className="text-micro px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
                   {r.table}: {r.count}
@@ -136,7 +136,7 @@ export default function BackupRestore({ open, onClose }: Props) {
               <div className="flex items-center gap-2 text-caption text-emerald-700 dark:text-emerald-400 font-semibold">
                 <CheckCircle2 className="w-4 h-4" /> File backup terbaca {pending.exportedAt ? `(${pending.exportedAt.slice(0, 10)})` : ''}
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {ringkasBackup(pending).map((r) => (
                   <span key={r.table} className="text-micro px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
                     {r.table}: {r.count}
@@ -157,7 +157,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                   onChange={(e) => setKonfirmasi(e.target.value)}
                   placeholder={KATA_KONFIRMASI}
                   autoCapitalize="characters"
-                  className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-body dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-neg dark:focus:ring-rose-400 transition"
+                  className="w-full px-3 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-body dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-neg dark:focus:ring-rose-400 transition"
                 />
               </div>
               <div className="flex items-center gap-2">

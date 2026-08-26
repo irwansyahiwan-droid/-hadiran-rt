@@ -84,10 +84,10 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Logika Iuran */}
         <Section icon={Coins} title="LOGIKA IURAN">
-          <ul className="space-y-2.5">
+          <ul className="space-y-3">
             {IURAN.map((i) => (
-              <li key={i.b} className="flex gap-2.5">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <li key={i.b} className="flex gap-3">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{i.b}:</b> {i.t}
                 </p>
@@ -100,7 +100,7 @@ export default function TentangApp({ open, onClose }: Props) {
         <Section icon={Users} title="STRUKTUR PENGURUS RT&nbsp;004/006">
           <div className="space-y-2">
             {PENGURUS.map((p) => (
-              <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl inset-soft p-2.5">
+              <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl inset-soft p-3">
                 <AvatarPeci nama={p.nama} className="w-10 h-10 rounded-xl" />
                 <div className="min-w-0">
                   <p className="text-micro font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>
@@ -113,10 +113,10 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Sumber Data */}
         <Section icon={Link2} title="SUMBER DATA">
-          <ul className="space-y-2.5">
+          <ul className="space-y-3">
             {SUMBER.map((s) => (
-              <li key={s.b} className="flex gap-2.5">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <li key={s.b} className="flex gap-3">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{s.b}:</b> {s.t}
                 </p>
@@ -130,10 +130,10 @@ export default function TentangApp({ open, onClose }: Props) {
           <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300 mb-3">
             Keamanan data dirancang sejak awal, bukan tambalan:
           </p>
-          <ul className="space-y-2.5">
+          <ul className="space-y-3">
             {KEAMANAN.map((k) => (
-              <li key={k.b} className="flex gap-2.5">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <li key={k.b} className="flex gap-3">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{k.b}:</b> {k.t}
                 </p>
@@ -143,7 +143,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </Section>
 
         {/* Footer */}
-        <div className="text-center pt-2 pb-1 space-y-1.5">
+        <div className="text-center pt-2 pb-1 space-y-2">
           <p className="text-micro text-ink-faint dark:text-gray-400">© 2026 RT&nbsp;004/006 Tanah Baru, Beji, Kota Depok</p>
           <p className="text-caption text-gray-500 dark:text-gray-400 inline-flex items-center justify-center gap-1">
             Dibuat oleh <b className="text-gray-700 dark:text-gray-200">Irwansyah (Bendahara)</b>, untuk warga
