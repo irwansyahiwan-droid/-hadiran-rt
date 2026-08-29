@@ -337,6 +337,41 @@ diubah dari kesamaan persis menjadi ARAH (garis cetak tak boleh lebih terang
 dari garis layar). **Mazhab adalah properti MEDIA, bukan properti app.**
 
 
+Yang ke-30 (26 Agu 2026) — **pass "KONTRAS MAKSIMAL" (4 Agu) sudah GUGUR
+berbulan-bulan tanpa satu pun sapuan protes.** Seluruh angkanya dihitung lawan
+kartu gelap LAMA `#111827`. Waktu palet pindah ke rona Hutan, kartu gelap naik
+ke `#22342A` — lebih terang — dan tiap rasio ikut turun ~25%:
+
+    gray-400 remap  8,85 → 6,58   (132 pemakaian, teks sekunder gelap)
+    rose-400 remap  9,38 → 6,97   (nominal uang KELUAR)
+    emerald-400     9,23 → 6,86   (nominal uang MASUK, 45 pemakaian)
+    nonaktif        9,27 → 6,89
+di permukaan TERBURUK (sheet `#26362D`) malah 6,36 / 6,74 / 6,63.
+
+Kenapa senyap: `audit:kontras` menjaga **AA (4,5)**, sedangkan yang hilang
+adalah **AAA (7)** — ambang yang dipilih app ini sendiri. **Sapuan hijau cuma
+membuktikan apa yang diukurnya, bukan apa yang kita niatkan.** Ambang yang
+tak dijaga alat sama dengan ambang yang tak ada.
+
+Pelajaran yang lebih besar: **mengubah warna PERMUKAAN membatalkan tiap
+angka kontras yang pernah ditulis di atasnya.** Daftar "yang harus diukur
+ulang saat kanvas/kartu bergeser" bukan cuma teks yang jelas berubah — ia
+mencakup SELURUH tabel remap, termasuk yang dulu disimpulkan "sudah aman, tak
+disentuh" (persis nasib emerald-400: aman di kartu lama, jatuh di kartu baru,
+dan karena tak pernah punya baris remap ia juga tak pernah ditengok lagi).
+
+Diukur di permukaan TERBURUK, bukan terbaik: sheet `#26362D`, bukan kartu.
+Semua dinaikkan dengan rona & kroma DIKUNCI di OKLab — cuma L yang bergerak —
+jadi keluarga warnanya tak bergeser sedikit pun.
+
+Sekalian: LIMA neutral HIDUP masih di keluarga BIRU (rona ~210°) di atas
+kanvas hijau — sisa sebelum migrasi rona: remap `.text-gray-400` terang
+`#41505F`, isian `.inset-soft` `#E9EEF5`, `.skeleton` `#E9ECEF`,
+`.skeleton-bar` `#D6DADE`, teks nonaktif `#B4BCC8`. Netral biru di atas
+kanvas hijau terbaca KOTOR, dan itu tak akan pernah dilaporkan sapuan
+kontras mana pun — rasionya sempurna, ronanya yang salah. **Cari sisa migrasi
+lewat RONA, bukan lewat rasio.**
+
 Yang ke-29 (26 Agu 2026, sesudah tangga spasi) — **`AvatarPeci` tampil dengan
 EMPAT bentuk sudut berbeda di app yang sama**, karena ukuran & radius dikirim
 lewat `className` oleh pemanggil: `w-8 rounded-lg`, `w-9 rounded-xl`,
