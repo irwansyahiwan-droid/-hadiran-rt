@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Search, X, Check, Coins, HandCoins, Users, CalendarDays, RotateCcw, RefreshCw, Loader2 } from 'lucide-react';
+import { FileText, Search, X, Check, Coins, Users, CalendarDays, RotateCcw, RefreshCw, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
@@ -33,10 +33,20 @@ const SUB_TABS = [
 ] as const;
 
 // Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
-// (min-height), pola HERO_MIN_H KasHadiran/KasRT/Talangan. Nama Sohibul Bait
-// panjang & chip "Titip" kondisional menambah tinggi natural — itu data-driven,
-// bukan drift. Ubah di sini bila anatomi hero berubah.
-const HERO_MIN_H = 198;
+// (min-height), pola HERO_MIN_H KasHadiran/KasRT/Talangan.
+//
+// 198 → 155 (29 Agu 2026): hero berhenti melaporkan kehadiran, jadi blok
+// progres (28px) & dua dari tiga chip hilang — dan chip yang tersisa TAK LAGI
+// MELIPAT di 360px. Diukur ulang, bukan dikurangi di atas kertas: eyebrow 20 +
+// gap 12 + blok judul 48 + gap 12 + chip 23 + bantalan 40 = 155 di 390px.
+// Dipakai 159, bukan 155: hero NYATA terukur 159px di 390px (selisih 4px dari
+// jumlah blok di atas — tinggi baris & pembulatan sub-piksel). Lantai wajib
+// setinggi hero terkecil yang BENAR-BENAR terjadi, bukan jumlah di atas kertas.
+// Di <=360px blok judul melipat jadi 70 → hero tumbuh sendiri ke 182.
+//
+// WAJIB diukur ulang tiap anatomi hero berubah — kerangka di bawah meniru
+// anatomi ini blok per blok, dan selisihnya langsung jadi CLS (`audit:lompat`).
+const HERO_MIN_H = 159;
 
 export default function JadwalWargaPage() {
   /* Cetak jadwal = aksi berat (chunk PDF + render di main thread). Lihat
@@ -215,21 +225,15 @@ export default function JadwalWargaPage() {
             <div className="skeleton h-4 w-3/4 rounded-full" />
             <div className="skeleton h-3 w-2/3 rounded-full" />
           </div>
-          <div className="h-7 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="skeleton h-2.5 w-20 rounded-full" />
-              <div className="skeleton h-2.5 w-24 rounded-full" />
-            </div>
-            <div className="skeleton h-2 w-full rounded-full" />
-          </div>
-          {/* `flex-wrap` + lebar disalin dari chip ASLI (diukur 360px: 82 / 107 /
-              99 px, lintasan 288 → melipat 2 baris). Tanpa `flex-wrap` skeleton
-              memampatkan chipnya jadi satu baris sementara hero asli melipat →
-              skeleton 32px lebih pendek dari yang digantikannya. */}
-          <div className="flex gap-2 flex-wrap">
-            <div className="skeleton h-[25px] w-[82px] rounded-full" />
-            <div className="skeleton h-[25px] w-[107px] rounded-full" />
-            <div className="skeleton h-[25px] w-[99px] rounded-full" />
+          {/* SATU chip sekarang (Rp terkumpul) — diukur 109×23px, dan ia tak
+              melipat di lebar mana pun (390/360/320 sama). Sebelum 29 Agu 2026
+              di sini ada TIGA chip (82/107/99px) yang sengaja diberi
+              `flex-wrap` karena hero asli MELIPAT dua baris di 360px; dua chip
+              kehadiran itu sudah pergi bersama pelaporan kehadiran hero, jadi
+              `flex-wrap` ikut dibuang — membungkus yang tak pernah membungkus
+              cuma menyisakan aturan yang tak bisa dibuktikan lagi. */}
+          <div className="flex gap-2">
+            <div className="skeleton h-[23px] w-[109px] rounded-full" />
           </div>
         </div>
         {/* Sub-tab switcher (2 tombol, min-h 44) */}
@@ -290,9 +294,6 @@ export default function JadwalWargaPage() {
   const tidakHadirCount = lastTarikan
     ? Object.values(absensiMap).filter(v => v === 'tidak_hadir').length
     : 0;
-  const pctHadir = lastTarikan && lastTarikan.total_warga > 0
-    ? Math.round((hadirCount / lastTarikan.total_warga) * 100)
-    : 0;
   const iuranTerkumpul = lastTarikan?.total_terkumpul ?? 0;
 
   const selesaiCount = allTarikan.filter(t => t.status === 'selesai').length;
@@ -344,33 +345,24 @@ export default function JadwalWargaPage() {
               </p>
             </div>
 
-            {/* Progress bar */}
-            <div>
-              <div className="flex items-center justify-between text-caption text-emerald-100 mb-1">
-                <span>Kehadiran</span>
-                <span className="font-bold tabular-nums">{hadirCount}/{lastTarikan.total_warga} ({pctHadir}%)</span>
-              </div>
-              <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-                <div
-                  className="h-full w-full origin-left bg-white rounded-full transition-transform duration-rayakan ease-out"
-                  style={{ transform: `scaleX(${Math.min(pctHadir, 100) / 100})` }}
-                />
-              </div>
-            </div>
+            {/* Kartu ini SENGAJA berhenti melaporkan kehadiran (29 Agu 2026).
+                Sebelumnya ia menyatakannya TIGA kali — bar "Kehadiran 56/69
+                (81%)", pil "56 Hadir", pil "14 Tidak Hadir" — lalu baris
+                statistik tepat di bawahnya menyatakannya LAGI. Terukur di
+                671px chrome sebelum nama pertama: angka "56" muncul 4×, "14"
+                2×. Halaman ini seluruhnya tentang kehadiran tarikan terakhir,
+                jadi dua ringkasan yang sama bukan penekanan, cuma kebisingan.
 
-            {/* Badges */}
+                Sekarang tiap blok punya SATU pekerjaan: kartu ini = tarikan
+                yang MANA (nomor, tanggal, sohibul, uang terkumpul); baris
+                statistik = ringkasan daftar, dan ia duduk tepat di atas daftar
+                yang diringkasnya.
+
+                Yang dihemat cuma ~35px, dan itu memang bukan intinya —
+                jarak hero ke nama pertama tetap ~636px. Yang diperbaiki
+                KEJELASAN, bukan ruang; ukur dulu sebelum mengharapkan
+                halaman ini jadi pendek. */}
             <div className="flex gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
-                <Check className="w-3 h-3" strokeWidth={2.5} /> {hadirCount} Hadir
-              </span>
-              {titipCount > 0 && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
-                  <HandCoins className="w-3 h-3" /> {titipCount} Titip
-                </span>
-              )}
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
-                <X className="w-3 h-3" strokeWidth={2.5} /> {tidakHadirCount} Tidak Hadir
-              </span>
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
                 <Coins className="w-3 h-3" /> <span className="font-display tabular-nums">{formatRupiahPlain(iuranTerkumpul)}</span>
               </span>
