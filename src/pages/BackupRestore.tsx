@@ -6,7 +6,7 @@ import OverlayHeader from '../components/layout/OverlayHeader';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
-import { haptic } from '../lib/utils';
+import { haptic, formatTanggal } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import {
   fetchBackup, downloadBackup, ringkasBackup, validasiBackup, restoreBackup, type BackupFile,
@@ -38,9 +38,11 @@ export default function BackupRestore({ open, onClose }: Props) {
       const b = await fetchBackup();
       downloadBackup(b);
       setLastBackup(ringkasBackup(b));
-      showToast('Backup berhasil diunduh');
+      /* Sebut ISInya, bukan "berhasil": bendahara perlu tahu cadangan ini
+         memuat apa sebelum ia menutup halaman. */
+      showToast(`Cadangan tersimpan — ${b.tables.warga?.length ?? 0} warga, ${b.tables.tarikan?.length ?? 0} tarikan`);
     } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Gagal membuat backup', 'error');
+      showToast(e instanceof Error ? e.message : 'Gagal membuat berkas cadangan. Cek koneksi lalu coba lagi.', 'error');
     } finally {
       setBackingUp(false);
     }
@@ -66,7 +68,7 @@ export default function BackupRestore({ open, onClose }: Props) {
     setRestoring(true);
     try {
       await restoreBackup(pending);
-      showToast('Data berhasil dipulihkan');
+      showToast(`Data dipulihkan dari cadangan ${formatTanggal(pending.exportedAt)}`);
       setPending(null);
       setTimeout(() => window.location.reload(), 1200); // muat ulang dengan data baru
     } catch (e) {

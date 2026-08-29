@@ -816,7 +816,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
       haptic(12);
       onSaved();
     } catch {
-      showToast('Gagal menambah tarikan', 'error');
+      showToast('Gagal menambah tarikan. Cek koneksi lalu coba lagi.', 'error');
     } finally {
       setSaving(false);
     }
@@ -1038,7 +1038,11 @@ export default function JadwalPage() {
               aria-label="Tambah jadwal tarikan"
               className="press flex items-center gap-2 btn-brand text-body min-h-[44px] px-3 py-2 rounded-xl"
             >
-              <Plus className="w-4 h-4" /> Jadwal
+              {/* "Tarikan", bukan "Jadwal": toast sesudahnya berbunyi "Tarikan #N
+                  ditambahkan", dan app menyebut bendanya "tarikan" di mana-mana.
+                  Tombol ini satu-satunya yang menyebutnya "jadwal" — yang ditekan
+                  dan yang muncul harus memakai kata yang sama. */}
+              <Plus className="w-4 h-4" /> Tarikan
             </button>
           )}
         </>}

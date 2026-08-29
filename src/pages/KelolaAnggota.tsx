@@ -95,7 +95,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         await updateAnggota(initial.id, {
           nama, no_rumah: noRumah, no_hp: noHp, role, status_aktif: aktif,
         });
-        showToast('Data anggota diperbarui');
+        showToast(`${nama} diperbarui`);
       } else {
         const baru = await tambahAnggota({ nama, no_rumah: noRumah, no_hp: noHp, role });
         if (susulan && pilih.size > 0) {

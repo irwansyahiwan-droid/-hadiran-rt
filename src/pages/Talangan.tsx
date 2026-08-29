@@ -138,7 +138,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         return;
       }
       load();
-      showToast('Ditandai lunas');
+      showToast(`${t.warga?.nama ?? 'Talangan'} lunas ${formatRupiahPlain(t.nominal)}`);
     } finally {
       setProcessingId(null);
     }
@@ -189,7 +189,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         return;
       }
       load();
-      showToast('Pelunasan dibatalkan', 'info');
+      showToast(`Pelunasan ${t.warga?.nama ?? ''} dibatalkan`.replace('  ', ' ').trim(), 'info');
     } finally {
       setProcessingId(null);
     }
@@ -207,7 +207,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     setHapusRow(null);
     setList(prev => prev.filter(x => x.id !== t.id)); // optimistik
     showUndo(
-      'Talangan dihapus',
+      `Talangan ${t.warga?.nama ?? ''} dihapus`.replace('  ', ' ').trim(),
       async () => {
         const { error: eTx } = await supabase
           .from('transaksi_kas')
@@ -216,7 +216,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           .eq('warga_id', t.warga_id)
           .eq('tarikan_id', t.tarikan_id);
         const { error: eTal } = await supabase.from('talangan').delete().eq('id', t.id);
-        if (eTx || eTal) showToast('Gagal menghapus talangan', 'error');
+        if (eTx || eTal) showToast('Gagal menghapus talangan. Cek koneksi lalu coba lagi — talangannya masih ada.', 'error');
         await load();
       },
       { onUndo: () => load() },

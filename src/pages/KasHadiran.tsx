@@ -458,7 +458,11 @@ export default function KasHadiranPage() {
       }),
     ]);
     if (tx.error || kr.error) {
-      showToast('Gagal menyetor: ' + (tx.error?.message ?? kr.error?.message ?? ''), 'error');
+      /* Dulu: `'Gagal menyetor: ' + tx.error?.message` — kalimatnya berakhir di
+         titik dua saat pesan kosong, dan saat tidak kosong ia menempelkan galat
+         MENTAH Supabase ke layar warga. Sekarang menyebut apa yang terjadi,
+         apa yang bisa dilakukan, dan menenangkan: setorannya belum tercatat. */
+      showToast('Gagal menyetor ke Kas RT. Cek koneksi lalu coba lagi — setoran belum tercatat.', 'error');
       return;
     }
     // Setoran SUDAH tercatat di dua ledger; sisa risikonya saldo berjalan Kas RT

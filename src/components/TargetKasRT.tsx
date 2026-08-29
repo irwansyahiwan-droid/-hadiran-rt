@@ -239,7 +239,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
     setSaving(true);
     const ok = await setTargetKasRT({ nominal, keterangan: keterangan.trim(), tanggal: tanggal || null });
     setSaving(false);
-    showToast(ok ? 'Target disimpan' : 'Gagal menyimpan target', ok ? 'success' : 'error');
+    showToast(ok ? 'Target disimpan' : 'Gagal menyimpan target. Cek koneksi lalu coba lagi.', ok ? 'success' : 'error');
     if (ok) onSaved();
   }
 
@@ -248,7 +248,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
     setSaving(true);
     const ok = await clearTargetKasRT();
     setSaving(false);
-    showToast(ok ? 'Target dihapus' : 'Gagal menghapus', ok ? 'info' : 'error');
+    showToast(ok ? 'Target dihapus' : 'Gagal menghapus target. Cek koneksi lalu coba lagi.', ok ? 'info' : 'error');
     if (ok) onSaved();
   }
 
