@@ -130,7 +130,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
            (fill .inset-soft + label ink-faint) ada di index.css, jadi keadaan
            nonaktif di sini terbaca 8,9:1 — bukan `opacity-50` yang dulu
            menjatuhkan label ke 2,2:1 (lihat `npm run audit:mati`). */
-        className="btn-mati press flex items-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-body font-semibold min-h-[44px] px-3 py-2 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:border-transparent disabled:shadow-none"
+        className="btn-mati press flex items-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 text-body font-semibold min-h-[44px] px-3 py-2 rounded-xl rest hover:bg-gray-50 dark:hover:bg-gray-700 disabled:border-transparent disabled:shadow-none"
       >
         {/* Ikon ditukar di tempat, label TETAP "Ekspor": label yang memanjang
             jadi "Menyiapkan…" menekan judul halaman di sebelahnya dan itu

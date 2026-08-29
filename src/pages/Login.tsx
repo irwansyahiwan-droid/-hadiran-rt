@@ -153,7 +153,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               fetchPriority="high"
               className="w-[5.5rem] h-[5.5rem] rounded-3xl object-cover
                          ring-1 ring-[var(--gold-songket)]/50
-                         shadow-[0_16px_38px_-12px_rgba(0,0,0,0.6)]"
+                         login-lift-logo"
             />
           </div>
 
@@ -196,7 +196,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             onClick={() => { haptic(12); onWargaMode(); }}
             className="press w-full min-h-[56px] px-6 rounded-2xl bg-white text-[#063A21]
                        font-bold text-subtitle flex items-center justify-center gap-3
-                       shadow-[0_12px_32px_-12px_rgba(0,0,0,0.65)]"
+                       login-lift-cta"
           >
             Masuk sebagai Warga
             <ArrowRight className="w-[1.125rem] h-[1.125rem]" />

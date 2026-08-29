@@ -21,6 +21,25 @@ export default {
      HP — satu-satunya perangkat yang dipakai warga. */
   future: { hoverOnlyWhenSupported: true },
   theme: {
+    /* ── TANGGA ELEVASI, di luar `extend` supaya MENIMPA skala bawaan ──────
+       Alasannya identik dgn tangga gerak di bawah: selama `shadow-sm/md/lg/
+       xl/2xl/inner` masih ada, tak ada yang menghalangi resep elevasi ke-12
+       lahir minggu depan — persis cara 11 yang pertama lahir. Delapan dari
+       sebelas itu memang nilai STOK Tailwind: tak seorang pun pernah memilih
+       `0 20px 25px -5px rgb(0 0 0 / .1)` untuk app ini, ia cuma tersedia.
+
+       Yang tersisa hanya `none` — dipakai `disabled:shadow-none` di ExportMenu
+       untuk mencabut elevasi saat nonaktif, dan itu memang keadaan, bukan
+       anak tangga.
+
+       Anak tangganya sendiri KELAS, bukan utility: `.rest` `.lift` `.float`
+       `.float-high` di index.css, karena tiap anak tangga berlapis-lapis dan
+       punya pasangan mode gelap yang berbeda bentuknya (di gelap separasi
+       dipikul ring cahaya, bukan drop). Dijaga `npm run audit:bayangan`. */
+    boxShadow: {
+      none: 'none',
+    },
+
     /* ── TANGGA GERAK, di luar `extend` supaya menimpa skala bawaan ────────
        Menimpa, bukan menambah: itu intinya. Selama `duration-150/200/300/700`
        masih ada, tak ada yang menghalangi durasi ke-25 lahir minggu depan —

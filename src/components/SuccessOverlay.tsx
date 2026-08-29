@@ -91,7 +91,7 @@ export default function SuccessOverlay({ show, message = 'Berhasil!', submessage
 
           {/* Lingkaran + centang. Variant honor → cincin emas tipis di tepi. */}
           <div
-            className="success-pop relative w-20 h-20 rounded-full bg-brand-600 flex items-center justify-center shadow-xl"
+            className="success-pop relative w-20 h-20 rounded-full bg-brand-600 flex items-center justify-center float-high"
             style={honor ? { boxShadow: '0 0 0 2px var(--gold-songket), 0 10px 28px -8px rgba(15,96,57,.7)' } : undefined}
           >
             <svg viewBox="0 0 32 32" className="w-10 h-10" fill="none" stroke="white" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">

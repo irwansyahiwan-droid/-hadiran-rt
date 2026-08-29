@@ -170,7 +170,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             /* Kotak layout tetap 36px (h-9); penyusutan ke 32px dilakukan transform
                scale 8/9. origin-left → tepi kiri logo diam, jarak ke wordmark tak
                bergeser. */
-            className={`h-9 w-9 shrink-0 object-contain rounded-full shadow-sm ring-1 ring-black/[0.08] dark:ring-white/10 origin-left transition-transform duration-masuk ${
+            className={`h-9 w-9 shrink-0 object-contain rounded-full rest ring-1 ring-black/[0.08] dark:ring-white/10 origin-left transition-transform duration-masuk ${
               scrolled ? 'scale-[0.889]' : 'scale-100'
             }`}
             style={{ transitionTimingFunction: 'var(--ease-out-expo)' }}

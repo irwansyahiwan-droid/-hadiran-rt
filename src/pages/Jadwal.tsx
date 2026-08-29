@@ -493,7 +493,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             <button
               onClick={handleBatalkanClick}
               disabled={saving || cancelling}
-              className="press w-full py-3 rounded-full font-bold text-body shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-neg dark:text-rose-400"
+              className="press w-full py-3 rounded-full font-bold text-body rest disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-neg dark:text-rose-400"
             >
               {cancelling
                 ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan…</>
@@ -1027,7 +1027,7 @@ export default function JadwalPage() {
               title="Unduh PDF"
               aria-label="Unduh PDF jadwal"
               aria-busy={pdfSibuk || undefined}
-              className="press relative w-10 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 rounded-xl shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 before:absolute before:-inset-1 before:content-['']"
+              className="press relative w-10 h-11 inline-flex items-center justify-center bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-gray-700 dark:text-gray-300 rounded-xl rest hover:bg-gray-50 dark:hover:bg-gray-700 before:absolute before:-inset-1 before:content-['']"
             >
               {pdfSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
             </button>
@@ -1193,7 +1193,7 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-ketuk shadow-sm"
+                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-ketuk"
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses…' : 'Proses'}

@@ -315,6 +315,20 @@ input, textarea  { caret-color: #1B7249; }
 .login-blob-a { animation: loginBlobA 14s ease-in-out infinite; }
 .login-blob-b { animation: loginBlobB 18s ease-in-out infinite; }
 
+/* ── Login = MEDIA TERSENDIRI, bukan anak tangga elevasi app ──────────────
+   Kanvas Login bukan kanvas app: ia hijau GELAP ber-aurora, jadi bayangan di
+   atasnya butuh tinta hitam pekat (.60/.65) yang di kanvas terang app akan
+   terbaca kotor. Ini keputusan MEDIA — logika yang sama dgn `warnaCetak.line`
+   yang sengaja lebih tegas dari `line` layar karena kertas tak punya langkah
+   nada (pelajaran ke-26).
+
+   Yang diperbaiki 29 Agu 2026 bukan NILAInya melainkan tempatnya: keduanya
+   dulu ditulis mentah di dalam className (`shadow-[0_16px_38px_-12px_...]`),
+   satu-satunya bayangan di app yang nilainya hidup di call-site. Nilai di
+   className tak bisa dijaga alat mana pun & tak punya pasangan gelap. */
+.login-lift-logo { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 16px 38px -12px rgba(0, 0, 0, 0.60); }
+.login-lift-cta  { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 12px 32px -12px rgba(0, 0, 0, 0.65); }
+
 /* Glassmorphism card — KHUSUS Login, tidak boleh di tempat lain */
 .login-card {
   background: rgba(255, 255, 255, 0.80);
@@ -741,21 +755,64 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      tak melebar/berkabut → tetap contact-class, bukan float. TETAP satu lapis,
      tanpa top-light/edge-ring/sheen. Kanvas L & border TIDAK disentuh (lever itu
      sengaja ditutup sejak Material-flat — lihat riwayat 9 pass di atas). */
+  /* ── TANGGA ELEVASI (29 Agu 2026) ─────────────────────────────────────
+     Sebelum ini app punya SEBELAS resep elevasi berbeda dan cuma TIGA yang
+     bernama. Delapan sisanya: `shadow-sm` ×7 & `shadow-xl` ×1 (nilai stok
+     Tailwind, tak pernah dipilih siapa pun untuk app ini), dua nilai mentah
+     di dalam className Login, dan tiga resep lokal komponen. Tak satu pun
+     keliru — yang tidak ada TANGGANYA. Bentuk masalah yang sama persis dgn
+     29 nilai spasi & 24 durasi.
+
+     EMPAT anak tangga, diurut dari paling menapak:
+
+       .rest        kontrol kecil yang naik dari KARTU (logo, pil, chip)
+       .lift        KARTU yang naik dari kanvas          ← 60 pemakai
+       .float       popover / menu / sheet di atas isi   ← 22 pemakai
+       .float-high  benda melayang di atas scrim (SuccessOverlay)
+
+     TIGA golongan yang SENGAJA di luar tangga — memaksanya masuk itu
+     perusakan, bukan kerapian:
+       FUNGSIONAL  cincin fokus (0 0 0 2px), inset gloss, keadaan :active
+       BERTINTA    --hero-shadow & .btn-brand/.btn-danger membawa tinta
+                   permukaannya sendiri; geometrinya ikut tangga, warnanya tidak
+       MEDIA LAIN  Login punya kanvas hijau gelap sendiri (lihat .login-card
+                   "KHUSUS Login") → token --login-shadow-*, bukan anak tangga
+
+     TINTA: satu keluarga rgba(8,30,19) — rona 159°, sama dgn kanvas (159,9°).
+     Sebelum pass ini `--shadow-float` & `.nav-dock` memakai rgba(16,24,40) &
+     rgba(15,23,42) — rona 263° & 266°, BIRU, sisa sebelum migrasi rona Hutan.
+     Diakui jujur: pada alpha .14 bedanya tak terbaca mata; yang diperbaiki
+     adalah SUMBERNYA, supaya kelasnya tak menumpuk kalau alpha naik nanti.
+     Kelas ini tak akan pernah dilaporkan sapuan kontras mana pun — rasionya
+     sempurna, ronanya yang salah (pelajaran ke-30). */
+  --shadow-rest:
+    0 1px 2px 0 rgba(8, 30, 19, 0.06);                       /* was shadow-sm rgba(0,0,0,.05) — alpha naik tipis krn tinta tak sehitam hitam */
   --shadow-card:
     0 1px 2px -1px rgba(8, 30, 19, 0.14),
-    0 6px 18px -6px rgba(8, 30, 19, 0.17);                   /* contact whisper — satu-satunya bayangan kartu */
-  /* Pass 7: float (popover/sheet/dropdown) ikut bahasa floating-glass berlapis
-     spt kartu, tapi melayang lebih tinggi (popover di atas konten). Dari satu
-     drop datar → glass top + edge crisp + key + ambient lega. */
+    0 6px 18px -6px rgba(8, 30, 19, 0.17);                   /* contact whisper — TIDAK berubah di pass ini */
   --shadow-float:
-    0 0 0 1px rgba(16, 24, 40, 0.04),
-    0 4px 12px -2px rgba(16, 24, 40, 0.08),
-    0 16px 32px -8px rgba(16, 24, 40, 0.14);
+    0 0 0 1px rgba(8, 30, 19, 0.04),
+    0 4px 12px -2px rgba(8, 30, 19, 0.08),
+    0 16px 32px -8px rgba(8, 30, 19, 0.14);                  /* geometri & alpha TETAP; hanya tinta biru → hijau */
+  --shadow-high:
+    0 8px 10px -6px rgba(8, 30, 19, 0.12),
+    0 20px 25px -5px rgba(8, 30, 19, 0.14);                  /* was shadow-xl rgba(0,0,0,.10) ×2 */
 }
 
-/* Soft layered elevation for surfaces */
-.lift  { box-shadow: var(--shadow-card); }
-.float { box-shadow: var(--shadow-float); }
+/* Soft layered elevation for surfaces.
+   `var(--tw-ring-*)` WAJIB ikut, dan ini bukan gaya-gayaan: utility `shadow-*`
+   Tailwind MENYUSUN dirinya dgn `ring-*` lewat dua custom property itu, jadi
+   `ring-1` + `shadow-sm` menghasilkan cincin DAN bayangan. `box-shadow` polos
+   menimpa keduanya. Waktu anak tangga ini pertama dipasang tanpa baris itu,
+   TIGA cincin lenyap sekaligus — logo Header, logo splash App, dan cincin emas
+   logo Login — dan tak satu pun sapuan repo melihatnya: geometri tak bergeser,
+   kontras teks tak berubah, tak ada yang terpotong. Yang menangkapnya cuma
+   diff piksel sebelum/sesudah (2.104 piksel identik di TIGA layar = chrome
+   bersama, bukan isi halaman). Fallback `0 0 #0000` = perilaku Tailwind. */
+.rest       { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-rest); }
+.lift       { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-card); }
+.float      { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-float); }
+.float-high { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--shadow-high); }
 
 /* ── Hero "momen warna" — Refined Emerald (29 Jun 2026) ─────────────────────
    SATU sumber gradient kartu saldo hero se-app: Beranda carousel (saldo slide) +
@@ -809,15 +866,26 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    penuh ke tepi bawah layar. Pemisah dari konten = hairline atas + bayangan
    NAIK tipis (bar dok tak butuh drop berlapis ke bawah; itu bahasa kapsul).
 
-   Hairline atas memakai warna PADAT token `line` (#B7C8BD), bukan alpha samar
-   0.07 seperti versi 2 Jul. Alasannya sama dgn tepi kartu di pass "etched":
-   garis yang nyaris tak terbaca membuat bar dok terlihat menyatu dgn kanvas
-   dan konten seakan tersapu keluar layar tanpa batas. Satu hairline tercetak =
-   bar terbaca sebagai permukaan sendiri, tanpa menambah lapisan baru. */
+   Hairline atas memakai warna PADAT token `line`, bukan alpha samar 0.07
+   seperti versi 2 Jul: garis yang nyaris tak terbaca membuat bar dok terlihat
+   menyatu dgn kanvas dan konten seakan tersapu keluar layar tanpa batas. Satu
+   hairline tercetak = bar terbaca sebagai permukaan sendiri, tanpa menambah
+   lapisan baru.
+
+   NILAINYA disalin dgn tangan, dan salinan itu BASI selama tiga generasi:
+   ditulis #B7C8BD waktu itu memang nilai `line`, lalu token mundur ke whisper
+   #D3E0D8 saat app pindah ke mazhab tonal (pelajaran ke-26) — dan bar dok
+   diam-diam tertinggal, sambil komentar ini terus mengklaim "= token line".
+   Kelas yang sama dgn palet keluaran sebelum `warnaCetak.ts` ada: yang
+   menyalin nilai tak punya cara tahu kalau sumbernya berubah. */
 .nav-dock {
   box-shadow:
-    0 -1px 0 0 #B7C8BD,                           /* hairline atas = token `line` */
-    0 -8px 24px -12px rgba(15, 23, 42, 0.14);     /* ambient naik tipis */
+    0 -1px 0 0 #D3E0D8,                           /* hairline atas = token `line` — DULU #B7C8BD, satu generasi
+                                                     lebih gelap: token mundur ke whisper waktu app pindah ke
+                                                     mazhab tonal (pelajaran ke-26) tapi salinan di sini tidak
+                                                     ikut, sementara komentarnya tetap mengklaim "= token line".
+                                                     Garis atas bar dok jadi lebih gelap dari SETIAP tepi kartu. */
+    0 -8px 24px -12px rgba(8, 30, 19, 0.14);      /* ambient naik tipis — tinta biru 266° → hijau 159° */
 }
 .dark .nav-dock {
   box-shadow:
@@ -984,10 +1052,19 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      Pass premium-menapak (9 Jul): contact 1px/2px/.4 → 2px/4px/-1px/.5 (grounding
      sedikit lebih tegas & lembut, paritas light); ring cahaya .10 tetap carry
      separasi di gelap. Tetap dua niat yg sama. */
+  /* Tangga elevasi sisi GELAP. `rest` & `high` ditambahkan 29 Agu 2026 —
+     sebelumnya `shadow-sm`/`shadow-xl` stok Tailwind dipakai di sini TANPA
+     pasangan gelap sama sekali, jadi kontrol kecil di mode gelap menjatuhkan
+     bayangan hitam .05 yang di atas kanvas near-black tak terlihat sama
+     sekali. Di gelap separasi dipikul RING CAHAYA, bukan drop. */
+  --shadow-rest: 0 0 0 1px rgba(255, 255, 255, 0.08);
   --shadow-card:
     0 0 0 1px rgba(255, 255, 255, 0.10),                      /* ring cahaya → separasi tenang di gelap */
     0 2px 4px -1px rgba(0, 0, 0, 0.5);                        /* contact whisper */
   --shadow-float: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
+  --shadow-high:
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 20px 25px -5px rgba(0, 0, 0, 0.65);
 }
 
 /* ── Overlay layar-penuh kebal jarak induknya (5 Agu 2026) ──────────────────

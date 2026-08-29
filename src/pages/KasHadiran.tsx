@@ -1019,7 +1019,7 @@ export default function KasHadiranPage() {
                     /* Ikon → pemintal saat berkas disiapkan; LABELNYA tetap supaya
                        lebar tombol tak berubah di tengah sheet (`audit:potong`). */
                     aria-busy={absensiSibuk || undefined}
-                    className="press shrink-0 inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-caption font-semibold px-3 py-2 rounded-xl shadow-sm"
+                    className="press shrink-0 inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-caption font-semibold px-3 py-2 rounded-xl rest"
                   >
                     {absensiSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Absensi
                   </button>
