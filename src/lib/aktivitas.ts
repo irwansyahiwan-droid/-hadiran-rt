@@ -215,7 +215,14 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
     }
     case 'warga': {
       const nama = str(data.nama);
-      let penjelasan = 'Data anggota diperbarui.';
+      /* Bukan "Data anggota diperbarui": judul entri SUDAH menyebut namanya
+         ("Ubah Anggota: …") dan daftar `changes` sudah merinci kolom mana yang
+         berubah, jadi kalimat itu tak menambah apa pun. Tetangganya di berkas
+         ini semua berpola "X diubah — konsekuensinya" ("Transaksi Kas RT
+         diubah — saldo Kas RT dihitung ulang"); yang hilang di sini justru
+         konsekuensinya, dan itu pertanyaan sebenarnya orang yang membaca log
+         audit: apakah ini mengubah hitungan uang yang sudah lewat? Tidak. */
+      let penjelasan = 'Keterangan anggota diubah — perhitungan iuran tarikan yang sudah berjalan tidak berubah.';
       if (row.action === 'INSERT') penjelasan = 'Anggota baru terdaftar. Mulai ikut perhitungan iuran pada tarikan berikutnya.';
       else if (row.action === 'DELETE') penjelasan = 'Anggota dihapus dari master anggota.';
       if (row.action === 'UPDATE') {

@@ -444,7 +444,7 @@ export default function KasRTPage() {
         .update({ tipe: data.tipe, nominal: data.nominal, keterangan: data.keterangan, tanggal: data.tanggal, kategori: data.kategori })
         .eq('id', editing.id)
         .select();
-      if (error) { showToast(pesanError(error, 'Gagal mengubah transaksi.'), 'error'); return; }
+      if (error) { showToast(pesanError(error, 'Gagal mengubah transaksi. Cek koneksi lalu coba lagi — perubahannya belum tersimpan.'), 'error'); return; }
       if (!upd || upd.length === 0) { showToast('Aplikasi belum diizinkan mengubah transaksi. Kabari yang mengurus aplikasi.', 'error'); return; }
     } else {
       const { error } = await supabase.from('kas_rt').insert({
@@ -455,7 +455,7 @@ export default function KasRTPage() {
         kategori: data.kategori,
         saldo_setelah: 0, // sementara; dihitung ulang di bawah
       });
-      if (error) { showToast(pesanError(error, 'Gagal menyimpan transaksi.'), 'error'); return; }
+      if (error) { showToast(pesanError(error, 'Gagal menyimpan transaksi. Cek koneksi lalu coba lagi — transaksinya belum tercatat.'), 'error'); return; }
     }
     /* Transaksinya SUDAH tersimpan di titik ini; yang bisa gagal tinggal hitung
        ulang saldo berjalan. Karena itu jangan batalkan alurnya — tutup modal &
@@ -484,7 +484,7 @@ export default function KasRTPage() {
       `${labelKategoriSingkat(row.tipe, row.kategori)} ${formatRupiahPlain(row.nominal)} dihapus`,
       async () => {
         const { data: del, error } = await supabase.from('kas_rt').delete().eq('id', row.id).select();
-        if (error) { showToast(pesanError(error, 'Gagal menghapus transaksi.'), 'error'); await load(); return; }
+        if (error) { showToast(pesanError(error, 'Gagal menghapus transaksi. Cek koneksi lalu coba lagi — transaksinya masih ada.'), 'error'); await load(); return; }
         if (!del || del.length === 0) { showToast('Aplikasi belum diizinkan menghapus transaksi. Kabari yang mengurus aplikasi.', 'error'); await load(); return; }
         // Baris sudah terhapus; sisa risikonya cuma saldo berjalan yang basi.
         try {

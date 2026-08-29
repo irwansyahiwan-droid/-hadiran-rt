@@ -111,7 +111,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
       haptic(12);
       onSaved();
     } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Gagal menyimpan', 'error');
+      showToast(e instanceof Error ? e.message : `Gagal menyimpan ${nama}. Cek koneksi lalu coba lagi.`, 'error');
     } finally {
       setSaving(false);
     }
