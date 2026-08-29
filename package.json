@@ -38,7 +38,8 @@
     "audit:kembali": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kembali.mjs",
     "audit:respon": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-respon.mjs",
     "audit:tulis": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-tulis.mjs",
-    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon && npm run audit:kembali && npm run audit:mundur"
+    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon && npm run audit:kembali && npm run audit:mundur",
+    "lembar-kontak": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/lembar-kontak.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
