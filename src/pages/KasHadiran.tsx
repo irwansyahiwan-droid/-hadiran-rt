@@ -736,7 +736,15 @@ export default function KasHadiranPage() {
                   kedua. Ikon biru dipertahankan sbg penanda kategori "transfer". */}
               <span className="text-body font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
-            <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
+            {/* `-mx-3` mengimbangi `p-3`: panel melebar 12px ke kiri & kanan
+                supaya ISInya kembali sejajar tepi isi kartu. Tanpa itu bantalan
+                panel menarik nominal 12px ke dalam, dan Total Bersih — angka
+                yang paling dilihat di kartu ini — jadi SATU-SATUNYA yang keluar
+                dari kolom (terukur: tiga baris di atasnya rata di 353, total di
+                341). Digeser PANELNYA, bukan tiga baris di atasnya: judul kartu,
+                pil hitungan, dan ketiga baris semuanya duduk di tepi isi kartu —
+                panel inilah yang menyimpang. */}
+            <div className={`-mx-3 flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-body font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
               <span className={`text-amount font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
