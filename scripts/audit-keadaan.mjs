@@ -23,7 +23,8 @@
 //
 // Pakai:  node scripts/audit-keadaan.mjs
 //   CAP_URL=http://localhost:5199   (default 5174; verifikasi lawan `vite preview`)
-//   MODE=kosong|gagal|dua           (default 'dua' — jalankan keduanya)
+//   MODE=kosong|gagal|memuat|semua  (default 'semua' — ketiganya)
+//     `dua` masih diterima = kosong + gagal (nama lama, sebelum mode memuat ada)
 //   PERAN=warga|bendahara|dua       (default 'dua')
 //   W=390                            (lebar viewport, default 360)
 import { chromium } from 'playwright';
@@ -31,7 +32,8 @@ import { readFileSync, mkdirSync } from 'node:fs';
 
 const URL_APP = process.env.CAP_URL || 'http://localhost:5174';
 const W = Number(process.env.W || 360);
-const MODES = (process.env.MODE ?? 'dua') === 'dua' ? ['kosong', 'gagal'] : [process.env.MODE];
+const MODE_SET = { semua: ['kosong', 'gagal', 'memuat'], dua: ['kosong', 'gagal'] };
+const MODES = MODE_SET[process.env.MODE ?? 'semua'] ?? [process.env.MODE];
 const PERAN = (process.env.PERAN ?? 'dua') === 'dua' ? ['warga', 'bendahara'] : [process.env.PERAN];
 const OUT = process.env.OUT_DIR || `.audit-keadaan-${W}`;
 mkdirSync(OUT, { recursive: true });
@@ -110,7 +112,27 @@ async function periksa(page, label, mode) {
     if (r.klaimKosong.length) m.push(`mengaku "belum ada data" padahal GAGAL: ${JSON.stringify(r.klaimKosong)}`);
     if (!r.adaError && !r.nominal.length && !r.klaimKosong.length) m.push('tak ada nominal, tapi juga tak ada ErrorState — layar bisu');
   }
-  if (r.skeleton) m.push(`skeleton tak selesai: ${r.skeleton}`);
+  if (mode === 'memuat') {
+    /* Aturan inti: selama layar MASIH memuat, tiap angka yang terlihat adalah
+       klaim tentang data yang app belum punya. Aturan & pengecualiannya sama
+       persis dgn bagian ANGKA TELANJANG di mode `gagal` — probe di atas dipakai
+       ulang apa adanya, tak ada logika kedua yang bisa menyimpang.
+
+       Ditambahkan 29 Agu 2026, dan kelasnya lolos bertahun-tahun karena `MODE`
+       cuma mengenal kosong & gagal: jendela MEMUAT tak pernah masuk populasi
+       sapuan mana pun. Ditemukan lewat `npm run lembar-kontak` — dua layar yang
+       sama-sama memuat, disandingkan, menjawab berbeda: `bendahara/Jadwal`
+       memasang "—", `warga/Hadiran` menyatakan "+Rp0 · -Rp0 · -Rp0 · Total
+       Bersih Rp0" + "0 tarikan". Untuk warga app ini (Android kelas bawah,
+       sinyal seadanya) jendela itu bukan kasus tepi — `audit:muat` sendiri
+       berjalan di 400 kbps. */
+    if (r.nominal.length) m.push(`MENYATAKAN NOMINAL saat memuat: ${JSON.stringify(r.nominal)}`);
+    if (r.angkaTelanjang.length) m.push(`MENYATAKAN ANGKA saat memuat: ${JSON.stringify(r.angkaTelanjang)}`);
+    if (r.klaimKosong.length) m.push(`mengaku "belum ada data" padahal MASIH MEMUAT: ${JSON.stringify(r.klaimKosong)}`);
+  }
+  /* Skeleton yang masih terpasang BENAR di mode memuat — di sana ia justru
+     bukti app mengaku belum tahu. Di mode lain ia berarti muat tak selesai. */
+  if (r.skeleton && mode !== 'memuat') m.push(`skeleton tak selesai: ${r.skeleton}`);
   if (r.bocor) m.push('bocor samping');
   if (m.length) gagalTotal++;
   console.log(`\n### ${mode}/${label}${m.length ? '' : '  OK'}`);
@@ -134,6 +156,12 @@ for (const mode of MODES) {
       const m = route.request().method();
       if (m !== 'GET' && m !== 'HEAD') return route.fulfill({ status: 403, contentType: 'application/json', body: '{"message":"audit: tulis diblokir"}' });
       if (mode === 'gagal') return route.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"audit: gagal muat"}' });
+      /* MEMUAT: GET DITAHAN, bukan dijawab — app tetap duduk di keadaan
+         `loading`. 25 dtk: cukup lama supaya kerangka masih terpasang saat
+         diperiksa, cukup pendek supaya `ctx.close()` tak menggantung menunggu
+         handler rute yang masih tidur. */
+      if (mode === 'memuat') return new Promise((res) => setTimeout(() => res(route.fulfill({
+        status: 200, contentType: 'application/json', headers: { 'content-range': '*/0' }, body: '[]' })), 25_000));
       return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'content-range': '*/0' }, body: '[]' });
     });
     if (bendahara) {
