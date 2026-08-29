@@ -132,6 +132,13 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
 // lantai sama dgn skeleton. Ubah di sini bila anatomi hero berubah.
 const HERO_MIN_H = 164;
 
+/* Lantai tinggi kartu "Alur Kas Hadiran" — SATU sumber utk kerangka & kartu asli,
+   pola HERO_MIN_H di atas. Diukur (bukan ditaksir): 270px @390, dan tumbuh sendiri
+   ke 317px @<=360 saat baris melipat. Karena `min-height`, angka terkecil yang benar.
+   WAJIB diukur ulang tiap baris kartu ini bertambah/berkurang — selisihnya langsung
+   jadi CLS (`audit:lompat`). */
+const ALUR_MIN_H = 270;
+
 interface KasHadiranCache {
   transaksi: TransaksiKas[];
   tarikanSelesai: Tarikan[];
@@ -612,8 +619,53 @@ export default function KasHadiranPage() {
         </HeroSaldo>
         </CrossFade>
 
-        {/* Alur Kas */}
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 overflow-hidden">
+        {/* Alur Kas.
+
+            DIBUNGKUS CrossFade (29 Agu 2026). Sebelumnya kartu ini satu-satunya
+            blok berangka di app yang tak ikut keadaan MEMUAT: hero di atasnya
+            sudah jadi kerangka, tapi kartu ini tetap merender dari daftar
+            kosong — jadi layar yang SEDANG memuat menyatakan empat fakta uang
+            (`+Rp0 · -Rp0 · -Rp0 · Total Bersih Rp0`) plus badge "0 tarikan".
+
+            Bahayanya lahir dari komentar hero tepat di atas: hero SENGAJA
+            melepas kaki statistiknya karena kartu inilah yang memikul
+            Terkumpul/Talangan/Setoran. Waktu kartu itu tak ikut memuat, hero
+            mengaku "belum tahu" sementara pemikul faktanya menjawab "nol".
+
+            Terukur 2 dari 9 layar (warga & bendahara Kas Hadiran); tujuh
+            lainnya bersih. Bentuk yang BENAR sudah ada di app — bendahara
+            Jadwal memasang "—" untuk Selesai/Terjadwal/Total — jadi ini bukan
+            aturan baru, cuma yang sudah benar disebarkan. */}
+        <CrossFade
+          loading={loading}
+          skeleton={
+            <div style={{ minHeight: ALUR_MIN_H }} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
+              {/* Anatomi dicermin baris per baris: judul + pil hitungan, tiga
+                  baris ikon+label|nominal, lalu panel Total Bersih. Bar sengaja
+                  lebih tipis dari huruf, jadi tiap blok dipatok tingginya —
+                  kalau tidak kerangka berakhir lebih pendek dari yang
+                  digantikannya (pelajaran kerangka hero JadwalWarga). */}
+              <div className="flex items-center justify-between mb-4 h-[23px]">
+                <div className="skeleton h-4 w-40 rounded-full" />
+                <div className="skeleton h-[26px] w-20 rounded-full" />
+              </div>
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex items-center justify-between py-2 h-[39px]">
+                  <div className="flex items-center gap-2">
+                    <div className="skeleton h-3.5 w-3.5 rounded-full" />
+                    <div className="skeleton h-3.5 w-32 rounded-full" />
+                  </div>
+                  <div className="skeleton h-3.5 w-20 rounded-full" />
+                </div>
+              ))}
+              <div className="inset-soft flex items-center justify-between rounded-2xl p-3 mt-1 h-[52px]">
+                <div className="skeleton h-4 w-24 rounded-full" />
+                <div className="skeleton h-5 w-28 rounded-full" />
+              </div>
+            </div>
+          }
+        >
+        <div style={{ minHeight: ALUR_MIN_H }} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <p className="inline-flex items-center gap-1 text-body font-bold text-ink dark:text-gray-100">
               Alur Kas Hadiran
@@ -688,6 +740,7 @@ export default function KasHadiranPage() {
             </div>
           </div>
         </div>
+        </CrossFade>
 
         </>
         )}
