@@ -14,7 +14,7 @@
  *   pdfTheme         pos #047857 · neg #DC2626 · warn #B45309 · line #E5E7EB
  *   shareReceipt     pos #047857 · neg #BE123C · warn #B45309 · line #C5CFDB
  *   shareLaporanKas  pos #047857 · neg #DC2626 · label #9CA3AF (2,50:1 di putih)
- *   token app kini   pos #05543E · neg #941136 · warn #78350F · line #B8C4D3
+ *   token app kini   pos #05543E · neg #941136 · warn #75320B · line #D3E0D8
  *
  * Ini bukan soal rapi-rapi. Kartu PNG-lah yang benar-benar dilihat warga di
  * WhatsApp, dan PDF-lah yang dicetak & diarsipkan — dua permukaan yang paling
@@ -29,7 +29,7 @@
 
 export const CETAK = {
   // Permukaan & garis
-  canvas:  '#E4ECE7', // = token `sunken` / body / .app-bg (palet Hutan, 24 Agu 2026)
+  canvas:  '#D8E2DC', // = token `sunken` / body / .app-bg (langkah nada, 29 Agu 2026)
   surface: '#FFFFFF',
   /* SENGAJA TIDAK sama dgn token `line` sejak app pindah ke mazhab tonal
      (24 Agu 2026). Di LAYAR kartu dipisahkan langkah nada + bayangan bertinta,
@@ -51,7 +51,7 @@ export const CETAK = {
   brand: '#0F4C2E', // = token `brand.DEFAULT`, wordmark & aksen tunggal
   pos:   '#05543E', // = token `pos`
   neg:   '#941136', // = token `neg`
-  warn:  '#78350F', // = token `warn`
+  warn:  '#75320B', // = token `warn` (diangkat 29 Agu: 6,84 → 7,14 di kanvas baru)
 
   posTint: '#ECFDF5', // emerald-50 — fill baris saldo di kartu PNG
 

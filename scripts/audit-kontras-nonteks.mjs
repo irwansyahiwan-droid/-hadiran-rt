@@ -64,6 +64,7 @@ mkdirSync(OUT, { recursive: true });
 
 const NEED = 3;                // §1.4.11 & §2.4.13 sama-sama 3:1
 const results = [];
+const goyah = []; // rect tak sezaman dgn piksel — tak terukur, bukan lulus
 const seen = new Set();
 /* Band glyph yang tak menemukan tinta. Dicetak terpisah — sapuan tak boleh
    menyempitkan populasinya sendiri tanpa mengaku (pelajaran cacat ke-17/18). */
@@ -134,9 +135,24 @@ const clamp = (pts) => pts.map(([x, y]) => [Math.max(0, Math.min(389, x)), Math.
 // ── pengumpul di dalam halaman ────────────────────────────────────────────
 const PAGE_HELPERS = `
   const CTRL_SEL = 'button,a,[role="button"],[role="tab"],[role="menuitem"],[role="switch"],[role="checkbox"],summary,label';
+  /* Opacity TIDAK diwariskan ke computed style anak: svg di dalam pembungkus
+     ber-'opacity:0' tetap melaporkan opacity 1. Tanpa memanjat leluhur, kontrol
+     yang sedang DISEMBUNYIKAN masuk populasi — terukur 29 Agu 2026: FAB
+     'useScrollHide' dipungut saat pembungkusnya opacity 0, lalu pikselnya
+     disampel di tempat FAB sudah tak ada → "ikon putih di atas kanvas" 1,33:1.
+     Cacat ALAT, bukan cacat app: ikonnya duduk di rgb(10,86,50) padat. */
+  const opacityEfektif = (el) => {
+    let o = 1;
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      const v = +getComputedStyle(n).opacity;
+      if (!Number.isNaN(v)) o *= v;
+      if (o < 0.4) return o;
+    }
+    return o;
+  };
   const vis = (el) => {
     const cs = getComputedStyle(el);
-    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.4) return false;
+    if (cs.display === 'none' || cs.visibility === 'hidden' || opacityEfektif(el) < 0.4) return false;
     const r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
   };
@@ -176,7 +192,13 @@ async function collectIcons(page) {
   return page.evaluate(`(() => {
     ${PAGE_HELPERS}
     const out = [];
+    /* Penanda LAMA wajib dibuang: indeks di-reset tiap tampilan sedangkan
+       halaman di belakang overlay tak di-unmount, jadi atribut sisa membuat
+       'data-nt-ikon="3"' menunjuk elemen tampilan SEBELUMNYA — penjaga
+       sezaman lalu membandingkan dua elemen berbeda. */
+    for (const n of document.querySelectorAll('[data-nt-ikon]')) n.removeAttribute('data-nt-ikon');
     for (const svg of document.querySelectorAll('svg')) {
+      const el2 = svg;
       if (!vis(svg) || mati(svg)) continue;
       if (svg.closest('[aria-hidden="true"]') && !svg.matches('[role="img"]')) continue;
       const r = svg.getBoundingClientRect();
@@ -192,6 +214,7 @@ async function collectIcons(page) {
       const cs = getComputedStyle(svg);
       const stroke = cs.stroke && cs.stroke !== 'none' ? cs.stroke : null;
       const fill = cs.fill && cs.fill !== 'none' ? cs.fill : null;
+      el2.setAttribute('data-nt-ikon', String(out.length));
       out.push({
         nama: (ctrl && (ctrl.getAttribute('aria-label') || labelTerlihat(ctrl))) || svg.getAttribute('aria-label') || jejak(svg),
         warna: stroke || fill || cs.color,
@@ -226,7 +249,13 @@ async function collectGrafik(page) {
   return page.evaluate(`(() => {
     ${PAGE_HELPERS}
     const out = [];
+    /* Penanda LAMA wajib dibuang: indeks di-reset tiap tampilan sedangkan
+       halaman di belakang overlay tak di-unmount, jadi atribut sisa membuat
+       'data-nt-grafik="3"' menunjuk elemen tampilan SEBELUMNYA — penjaga
+       sezaman lalu membandingkan dua elemen berbeda. */
+    for (const n of document.querySelectorAll('[data-nt-grafik]')) n.removeAttribute('data-nt-grafik');
     for (const el of document.querySelectorAll('[data-grafik]')) {
+      const el2 = el;
       if (!vis(el) || mati(el)) continue;
       const r = el.getBoundingClientRect();
       /* Bar yang nilainya nyaris nol tetap dirender setinggi <1px. Ia tak
@@ -239,6 +268,7 @@ async function collectGrafik(page) {
       const isi = cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)' ? cs.backgroundColor : null;
       const warna = stroke || isi || (isSvg ? cs.fill : null);
       if (!warna || warna === 'none') continue;
+      el2.setAttribute('data-nt-grafik', String(out.length));
       out.push({
         nama: el.getAttribute('data-grafik'),
         warna,
@@ -255,8 +285,14 @@ async function collectFields(page) {
   return page.evaluate(`(() => {
     ${PAGE_HELPERS}
     const out = [];
+    /* Penanda LAMA wajib dibuang: indeks di-reset tiap tampilan sedangkan
+       halaman di belakang overlay tak di-unmount, jadi atribut sisa membuat
+       'data-nt-field="3"' menunjuk elemen tampilan SEBELUMNYA — penjaga
+       sezaman lalu membandingkan dua elemen berbeda. */
+    for (const n of document.querySelectorAll('[data-nt-field]')) n.removeAttribute('data-nt-field');
     const sel = 'input:not([type="hidden"]):not([type="file"]):not([type="range"]),select,textarea,[role="switch"],[role="checkbox"]';
     for (const el of document.querySelectorAll(sel)) {
+      const el2 = el;
       if (!vis(el) || mati(el)) continue;
       if (el.type === 'checkbox' || el.type === 'radio') continue; // dirender UA, dikecualikan §1.4.11
       if (!takTerhalang(el)) continue;
@@ -265,6 +301,7 @@ async function collectFields(page) {
         w: parseFloat(cs['border' + s + 'Width']) || 0,
         c: cs['border' + s + 'Color'],
       })).filter((s) => s.w >= 0.5);
+      el2.setAttribute('data-nt-field', String(out.length));
       out.push({
         nama: el.id || el.name || el.getAttribute('placeholder') || el.getAttribute('aria-label') || jejak(el),
         garis: sisi.map((s) => s.c),
@@ -282,11 +319,18 @@ async function collectGlyphNative(page) {
   return page.evaluate(`(() => {
     ${PAGE_HELPERS}
     const out = [];
+    /* Penanda LAMA wajib dibuang: indeks di-reset tiap tampilan sedangkan
+       halaman di belakang overlay tak di-unmount, jadi atribut sisa membuat
+       'data-nt-glyph="3"' menunjuk elemen tampilan SEBELUMNYA — penjaga
+       sezaman lalu membandingkan dua elemen berbeda. */
+    for (const n of document.querySelectorAll('[data-nt-glyph]')) n.removeAttribute('data-nt-glyph');
     for (const el of document.querySelectorAll('select,input[type="date"],input[type="time"]')) {
+      const el2 = el;
       if (!vis(el) || mati(el)) continue;   // nonaktif = pengecualian eksplisit §1.4.11
       if (!takTerhalang(el)) continue;
       const r = rectOf(el);
       if (r.w < 48 || r.h < 20) continue;   // terlalu sempit utk punya band glyph
+      el2.setAttribute('data-nt-glyph', String(out.length));
       out.push({
         nama: el.id || el.name || el.getAttribute('aria-label') || jejak(el),
         jenisKontrol: el.tagName.toLowerCase() + (el.type ? '[' + el.type + ']' : ''),
@@ -433,6 +477,35 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
 
   if (ikon.length || field.length || grafik.length || glyph.length) {
     const shot = (await page.screenshot()).toString('base64');
+    /* SEZAMAN: rect dibaca SEBELUM screenshot; kalau elemennya bergerak atau
+       menghilang di antara keduanya, titik sampel menunjuk tempat yang sudah
+       kosong dan sapuan melaporkan latar milik HALAMAN, bukan milik kontrol.
+       Terukur 29 Agu 2026: FAB `useScrollHide` bergeser 84px di celah itu →
+       dua "ikon gagal 1,33:1" yang sepenuhnya palsu (ikonnya duduk di
+       rgb(10,86,50)). Yang bergeser dihitung `goyah`, BUKAN lulus & bukan
+       gagal — sapuan tak boleh menyempitkan populasinya sendiri diam-diam. */
+    const rectKini = await page.evaluate(() => {
+      const baca = (attr) => {
+        const out = {};
+        for (const el of document.querySelectorAll('[' + attr + ']')) {
+          const r = el.getBoundingClientRect();
+          let o = 1;
+          for (let n = el; n && n.nodeType === 1; n = n.parentElement) o *= (+getComputedStyle(n).opacity || 0);
+          out[el.getAttribute(attr)] = { x: r.x, y: r.y, o };
+        }
+        return out;
+      };
+      return { ikon: baca('data-nt-ikon'), field: baca('data-nt-field'), grafik: baca('data-nt-grafik'), glyph: baca('data-nt-glyph') };
+    });
+    const sezaman = (jenis, i, e) => {
+      const k = rectKini[jenis] && rectKini[jenis][String(i)];
+      if (!k) { goyah.push(`${ctxName} ${jenis}#${i} ${e.nama}`); return false; }
+      if (k.o < 0.4 || Math.abs(k.x - e.rect.x) > 1 || Math.abs(k.y - e.rect.y) > 1) {
+        goyah.push(`${ctxName} ${jenis} "${e.nama}" geser ${Math.round(Math.hypot(k.x - e.rect.x, k.y - e.rect.y))}px / opacity ${k.o.toFixed(2)}`);
+        return false;
+      }
+      return true;
+    };
     const ptsIkon = ikon.map((e) => clamp(insidePoints(e.rect, 1).concat(outsidePoints(e.rect, 3))));
     const ptsLuar = field.map((e) => clamp(outsidePoints(e.rect, 3)));
     const ptsDalam = field.map((e) => clamp(insidePoints(e.rect, 6)));
@@ -457,21 +530,25 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
     const sGlyph = potong(ptsGlyph, nIkon + nLuar + nDalam + ptsGrafik.flat().length);
 
     ikon.forEach((e, i) => {
+      if (!sezaman('ikon', i, e)) return;
       const res = nilaiIkon(e, sIkon[i]);
       if (!res) return;
       push({ jenis: 'ikon', ctx: ctxName, nama: e.nama, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
     });
     field.forEach((e, i) => {
+      if (!sezaman('field', i, e)) return;
       const res = nilaiField(e, sLuar[i], sDalam[i]);
       if (!res) return;
       push({ jenis: 'batas-kontrol', ctx: ctxName, nama: e.nama, tag: e.tag, lewat: res.lewat, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
     });
     grafik.forEach((e, i) => {
+      if (!sezaman('grafik', i, e)) return;
       const res = nilaiIkon(e, sGrafik[i]);
       if (!res) return;
       push({ jenis: 'grafik', ctx: ctxName, nama: e.nama, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
     });
     glyph.forEach((e, i) => {
+      if (!sezaman('glyph', i, e)) return;
       const res = nilaiGlyph(sGlyph[i]);
       if (!res) { glyphButa.push(`[${ctxName}] ${e.jenisKontrol} "${e.nama}"`); return; }
       push({ jenis: 'glyph-native', ctx: ctxName, nama: `${e.nama} (${e.jenisKontrol})`, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
@@ -618,6 +695,10 @@ console.log(`  TOTAL          ${String(results.length).padStart(4)} sampel, ${fa
 if (glyphButa.length) {
   console.log(`  glyph tak terukur (band tanpa tinta): ${glyphButa.length}`);
   if (process.env.SHOW_BUTA) glyphButa.forEach((g) => console.log(`    · ${g}`));
+}
+if (goyah.length) {
+  console.log(`  tak terukur (rect tak sezaman dgn piksel — kontrol bergerak/menghilang): ${goyah.length}`);
+  if (process.env.SHOW_BUTA) [...new Set(goyah)].forEach((g) => console.log(`    · ${g}`));
 }
 console.log('');
 for (const f of fails) {

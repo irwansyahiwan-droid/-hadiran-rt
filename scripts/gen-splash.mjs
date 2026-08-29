@@ -7,9 +7,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 const svg = readFileSync(new URL('../src/assets/logo-rt.svg', import.meta.url), 'utf8');
 
-// Selaras index.html: #E4ECE7 (kanvas palet Hutan 24 Agu 2026 = manifest background_color).
+// Selaras index.html: #D8E2DC (langkah nada 29 Agu 2026 = manifest background_color).
 // WAJIB sama dgn token `sunken`, body, .app-bg, manifest, landing.html & warnaCetak.
-const BG = '#E4ECE7';
+const BG = '#D8E2DC';
 
 // 8 ukuran sesuai apple-touch-startup-image di index.html
 const SIZES = [

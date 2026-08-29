@@ -171,9 +171,15 @@ export default {
           DEFAULT: '#0F4C2E', // deep — fill chip aktif, judul kuat, ink tab aktif (8,1:1 di atas pil nav)
           600: '#145D39',
           500: '#1B7249',
-          /* #0D6B5E → #0A5B4E: teal lama 6,39:1 di putih & 5,63:1 di kanvas —
-             lolos AA, gagal AAA. Turun satu step: 8,02:1 / 7,07:1. */
-          link: '#0A5B4E',    // teal-green untuk tautan "Lihat semua"
+          /* #0D6B5E → #0A5B4E (4 Agu) → #005044 (29 Agu).
+             Angka 7,07:1 yang ditulis pass 4 Agu dihitung lawan kanvas #ECF1F7
+             — kanvas SEBELUM palet Hutan. Waktu kanvas turun ke #E4ECE7 nilai
+             itu ikut turun ke 6,66:1 dan GUGUR dari ambang app tanpa satu pun
+             sapuan protes: `audit:kontras` menjaga AA (4,5), bukan AAA (7).
+             Ini pelajaran ke-30 terulang di sisi TERANG — pass 26 Agu mengukur
+             ulang permukaan GELAP saja. Kini 7,10:1 di kanvas #D8E2DC,
+             9,09 di kartu, 9,41 di putih. ΔH 0,04° ΔC 0,0036 (rona terkunci). */
+          link: '#005044',    // teal-green untuk tautan "Lihat semua"
           /* #1A9B86 → #34D399 (emerald-400): teal lama cuma 5,13:1 di atas kartu
              gray-900. #34D399 = 9,25:1, DAN menyatukan aksen gelap app — warna
              ini sudah dipakai cincin fokus `.field` gelap, jadi bukan hex baru:
@@ -220,7 +226,12 @@ export default {
           'dark-fill': '#F43F5E', // tanda grafik mode gelap (rose-500) — 4,83:1
         },
         warn: {           // tunggakan / perhatian (amber-900) — amber-700 gagal AA di kanvas/banner, amber-800 #92400E 7,10/6,26; kini 9,07 / 8,00
-          DEFAULT: '#78350F',
+          /* #92400E → #78350F (4 Agu) → #75320B (29 Agu, langkah nada kanvas).
+             Judul & penghitung "Tunggakan Berganda" duduk LANGSUNG di kanvas;
+             di kanvas #D8E2DC nilai lama tinggal 6,84:1. Kini 7,14 di kanvas,
+             8,50 di banner amber-100, 9,47 di putih. Cermin di `warnaCetak.ts`
+             WAJIB ikut (dikunci `warnaCetak.test.ts`). */
+          DEFAULT: '#75320B',
           dark: '#FBBF24',  // = amber-400 yg sudah dipakai `dark:text-amber-400`; 10,63:1 di kartu gelap
         },
         /* ── Status SETOR (kartu hero Kas Hadiran saat sudah disetor) ──
@@ -233,7 +244,40 @@ export default {
         },
         /* ── Permukaan & garis: satu hairline, bukan 3 abu berbeda ──── */
         surface: '#FFFFFF',
-        sunken: '#E4ECE7', // background app — WAJIB sama dgn body & .app-bg di index.css + manifest background_color + landing.html (anti strip beda tone saat overscroll). MATERIAL-FLAT (2 Jul): #EAEFF6→#ECF1F7 (nada Gmail/Google apps) + seluruh sistem kartu pindah ke bahasa FLAT ala Google/myBCA/BYOND — kanvas rata tanpa whisper radial, kartu putih murni ber-hairline, bayangan tinggal satu contact whisper. 9 pass naik-turun L kanvas tak pernah selesai karena akar masalahnya dua bahasa visual campur (nav/pill/banner sudah flat, kartu masih floating-glass) — bukan nilai L. Jangan tuning L lagi.
+        /* Background app — WAJIB sama dgn body & .app-bg di index.css + manifest
+           background_color + splash index.html + gen-splash.mjs + landing.html
+           (anti strip beda tone saat overscroll) + CETAK.canvas (dikunci uji).
+
+           LANGKAH NADA (29 Agu 2026): #E4ECE7 → #D8E2DC. Sampai hari ini
+           pemisahan kanvas→kartu di sisi TERANG cuma 1,162:1 sementara sisi
+           GELAP 1,400:1 — kartu terang kurang terangkat, dan itu sisa terbesar
+           dari rasa "belum maksimal". Kini 1,281:1.
+
+           Komentar lama di sini berbunyi "9 pass naik-turun L kanvas tak pernah
+           selesai … jangan tuning L lagi". Itu benar untuk zamannya dan SUDAH
+           TIDAK berlaku: pelajaran ke-26 menemukan sebab sembilan pass itu
+           bukan nilai L, tapi hasil bermazhab TONAL dikejar memakai sistem
+           FLAT. Sesudah app pindah ke mazhab tonal, langkah nada JUSTRU tuas
+           yang benar — dan tuas yang dilarang itu HAIRLINE. Hairline tidak
+           disentuh di pass ini.
+
+           Rona & kroma DIKUNCI di OKLab, cuma L yang bergerak (ΔH 1,05° ΔC
+           0,0026) — disiplin yang sama dgn migrasi rona Hutan.
+
+           KONSEKUENSI, dan ini yang wajib diingat kalau kanvas digeser lagi:
+           kanvas lebih gelap menurunkan rasio SETIAP teks yang duduk langsung
+           di atasnya. Diukur lewat .audit-kontras/hasil.json, bukan ditebak:
+           EMPAT warna teks benar-benar mendarat di kanvas (#07160D, #34453B,
+           `brand.link`, dan `warn` di permukaan bendahara). `brand.link` sudah
+           di bawah 7:1 SEBELUM pass ini; `warn` jatuh karenanya. Keduanya
+           diangkat — lihat komentarnya masing-masing.
+
+           JEBAKAN yang termakan sekali saat mengerjakan ini: jarak numerik ke
+           warna kanvas BUKAN bukti "duduk di kanvas". Pil Tag di Header (tint
+           abu 12% di atas kartu) mendarat 5,1 unit dari kanvas LAMA, jadi
+           terbaca "di kanvas" padahal permukaannya lain sama sekali. Vonis
+           wajib dari `r.bg` sampel itu sendiri, bukan dari kemiripan warna. */
+        sunken: '#D8E2DC',
         line: '#D3E0D8',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk). Pass kontras-tercetak (8 Jul): #DAE0E8→#D3DAE3 — user minta kontras lebih premium; naikkan SATU step di dalam bahasa flat (hairline = lever sah) agar tepi kartu "tercetak", tetap whisper-class bukan bingkai. Pass "Etched Premium" (26 Jul): #D3DAE3→#C5CFDB — user minta warna/kontras lebih mahal (trend 2026); tepi kartu dinaikkan SATU step lagi (lever hairline yg sama, BUKAN glass/shadow) agar "tercetak" ala Linear/Stripe/Mercury light. Edge-family digelapkan serempak menjaga hierarki control > line > divider. Pass KONTRAS MAKSIMAL (4 Agu): #C5CFDB→#B8C4D3 — satu step lagi di lever yang SAMA (hairline), bukan glass/shadow/kanvas. Nilainya persis `control` sebelum pass non-teks, jadi hierarki control #64748B > line #B8C4D3 > divider baris #D1DAE5 tetap utuh. Hairline ini juga jadi garis atas bar nav dok (.nav-dock) supaya tepi bar & tepi kartu satu bahasa.
         /* border kontrol (input/tombol) — lebih kuat dari line. Riwayat: #E2E8F0→#CBD5E1
            (8 Jul, dulu malah LEBIH TERANG dari line) → #B8C4D3 (26 Jul "Etched Premium",

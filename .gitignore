@@ -29,6 +29,7 @@ dist-ssr
 
 # Keluaran sapuan audit (screenshot) — lokal saja
 .audit-*/
+.varian-nada/
 
 # Berkas berat yang nyasar di akar — bukan aset app.
 # Aset app yang SAH duduk di public/ (dan tak satu pun berupa video/installer

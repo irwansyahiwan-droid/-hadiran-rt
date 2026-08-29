@@ -117,7 +117,8 @@ body {
      (nada Gmail/Google apps) RATA tanpa radial whisper; kartu putih MURNI flat
      ber-hairline; bayangan tinggal satu contact whisper. Separasi = step tonal
      + hairline + geometri, titik. Jangan tambah lapisan lagi. */
-  background-color: #E4ECE7;
+  /* LANGKAH NADA (29 Agu 2026): #E4ECE7 → #D8E2DC. Lihat token `sunken`. */
+  background-color: #D8E2DC;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -390,8 +391,10 @@ input, textarea  { caret-color: #1B7249; }
      radial whisper emerald+sky DIHAPUS (hijau di atas abu sejuk = zona
      transisi muddy, biang rasa "kurang bersih"). Ala Gmail/myBCA/BYOND:
      kanvas polos, kartu putih flat, atmosfer datang dari konten & warna
-     hero — bukan dari aura di latar. Samakan dgn body/sunken/manifest/landing. */
-  background-color: #E4ECE7;
+     hero — bukan dari aura di latar. Samakan dgn body/sunken/manifest/landing.
+     LANGKAH NADA (29 Agu 2026): #E4ECE7 → #D8E2DC — kanvas→kartu naik dari
+     1,162:1 ke 1,281:1, mendekati sisi gelap yang sudah 1,400:1. */
+  background-color: #D8E2DC;
 }
 /* MATERIAL-FLAT DARK (12 Jul 2026) — menuntaskan keputusan 2 Jul ke sisi gelap.
    Aura radial (emerald .30 + teal .22 + sky .15) DIHAPUS. Kanvas light sudah
@@ -424,6 +427,21 @@ input, textarea  { caret-color: #1B7249; }
    gray-400-remap #41505F (7,30 kanvas). */
 html:not(.dark) .text-gray-400 { color: #3E4F44; }  /* gray-400→slate-ink: nyaman (≈7.3:1 di kanvas) */
 html:not(.dark) .text-gray-500 { color: #34453B; }  /* gray-500→slate-700: tegas (≈10.4:1) */
+/* `.text-gray-600` TAK PERNAH punya remap, dan akibatnya tangga ini TERBALIK
+   persis di anak tangga yang namanya paling gelap: gray-400 dirender #3E4F44,
+   gray-500 dirender #34453B, sedangkan gray-600 jatuh ke palet mentah #48594E
+   — L 0,446, LEBIH TERANG dari keduanya. Siapa pun yang membaca kode berhak
+   mengira 600 lebih gelap dari 500; di layar justru kebalikannya.
+   Konsekuensi terukurnya (39 sampel light di .audit-kontras/hasil.json):
+   35 dari 39 mendarat di 6,05–6,80:1 — di bawah ambang app SEBELUM langkah
+   nada sudah, di permukaan apa pun yang disentuhnya (pil Tag "WARGA" di
+   Header 6,27; tombol urut FilterChips 6,80). Hanya di kartu #F8FCF9 ia
+   menyentuh 7,21. Jadi rung ini praktis TAK PERNAH lolos ambangnya sendiri.
+   Dilipat ke rung yang sama dgn gray-500 (#34453B, 7,68:1 di kanvas baru),
+   bukan diberi nilai keempat: tangga TEKS light mode app ini memang tiga rung
+   (ink > sub > faint), bukan seluruh ramp abu Tailwind — `.text-slate-600`
+   sudah dilipat ke sini lebih dulu dgn alasan yang sama. */
+html:not(.dark) .text-gray-600 { color: #34453B; }  /* gray-600→faint: buang tangga terbalik (7,68:1 di kanvas) */
 
 /* ── Kontras teks (DARK MODE) — cermin aturan light di atas ──────────────────
    Pass KONTRAS MAKSIMAL (4 Agu 2026). Sisi TERANG punya remap tangga teks sejak
@@ -495,7 +513,7 @@ html:not(.dark) .text-emerald-600 { color: #065F46; }  /* 7,69:1 putih */
 html:not(.dark) .text-emerald-700 { color: #064E3B; }  /* 8,57:1 di emerald-100 */
 html:not(.dark) .text-emerald-800 { color: #053D2E; }  /* 8,39:1 di kanvas mint Login */
 html:not(.dark) .text-rose-700    { color: #881337; }  /* 8,93:1 di rose-50 */
-html:not(.dark) .text-amber-800   { color: #78350F; }  /* 7,95:1 di amber-100 */
+html:not(.dark) .text-amber-800   { color: #75320B; }  /* = token `warn`; 8,50:1 di amber-100, 7,14:1 di kanvas */
 html:not(.dark) .text-slate-600   { color: #34453B; }  /* 8,49:1 di tile abu (inisial AvatarPeci) */
 html:not(.dark) .text-blue-700    { color: #1E3A8A; }  /* 8,38:1 di pil "WARGA" */
 /* blue-600 terlewat di pass 4 Agu — satu-satunya literal biru yang tak ikut,
