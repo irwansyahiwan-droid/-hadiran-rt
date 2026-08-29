@@ -113,7 +113,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             <button type="button" onClick={drag.dismiss}
               className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
             <button type="submit" disabled={saving || !nominal}
-              className="btn-brand flex-1 py-3 text-body font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2">
+              className="btn-brand flex-1 py-3 text-body active:scale-[0.97] transition flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
               {saving ? 'Menyimpan…' : 'Setor'}
             </button>
@@ -585,7 +585,7 @@ export default function KasHadiranPage() {
              putih premium; negatif ditandai chip KATA "Defisit" — rona salmon
              (text-rose-200) dulu = sinyal lemah utk mata yg sulit bedakan warna. */
           status={saldo < 0 ? (
-            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-semibold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
               Defisit
             </span>
           ) : undefined}
@@ -622,7 +622,7 @@ export default function KasHadiranPage() {
               </InfoTip>
             </p>
             <span
-              className="flex items-center gap-1 px-3 py-1 bg-emerald-700 rounded-full text-white text-micro font-bold"
+              className="flex items-center gap-1 px-3 py-1 bg-emerald-700 rounded-full text-white text-micro font-semibold"
               aria-label={`${tarikanSelesai.length} tarikan selesai`}
             >
               {tarikanSelesai.length}
@@ -682,7 +682,7 @@ export default function KasHadiranPage() {
             </div>
             <div className={`flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-body font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-amount font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
+              <span className={`text-amount font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
@@ -1066,7 +1066,7 @@ export default function KasHadiranPage() {
                       yang diunduh dari tombol "PDF" di strip aksi kartu tarikan */}
                   {(detailHadir.length > 0 || detailTitip.length > 0 || detailTidak.length > 0) && (
                     <div className="inset-soft rounded-2xl px-4 py-4">
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-3">Pendapatan Sohibul Bait</p>
+                      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-3">Pendapatan Sohibul Bait</p>
                       <div className="space-y-2 text-body">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × <span className="font-display tabular-nums">{formatRupiahPlain(SOHIBUL_PER)}</span></span>
@@ -1078,7 +1078,7 @@ export default function KasHadiranPage() {
                         </div>
                         <div className="flex items-center justify-between gap-3 pt-2 border-t border-line dark:border-gray-800">
                           <span className="font-bold text-ink dark:text-gray-100">Bersih diterima SB</span>
-                          <span className="font-display font-bold tabular-nums text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
+                          <span className="font-display font-semibold tabular-nums text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kas Hadiran tarikan ini</span>
@@ -1089,7 +1089,7 @@ export default function KasHadiranPage() {
                   )}
                   {detailTitip.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">Titip · iuran masuk ({detailTitip.length})</p>
+                      <p className="text-micro font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">Titip · iuran masuk ({detailTitip.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailTitip.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
@@ -1104,7 +1104,7 @@ export default function KasHadiranPage() {
                   )}
                   {detailTidak.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Tidak Hadir / Talangan ({detailTidak.length})</p>
+                      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Tidak Hadir / Talangan ({detailTidak.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailTidak.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
@@ -1123,7 +1123,7 @@ export default function KasHadiranPage() {
                   )}
                   {detailHadir.length > 0 && (
                     <div>
-                      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Hadir ({detailHadir.length})</p>
+                      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Hadir ({detailHadir.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
                         {detailHadir.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">

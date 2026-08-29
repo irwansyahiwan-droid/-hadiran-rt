@@ -72,8 +72,15 @@ export default function SectionTitle({ children, count, action, tone = 'default'
 
              `min-w` + `text-center` supaya "5" dan "103" sama-sama bulat rapi:
              tanpa itu satu digit menghasilkan kapsul yang lebih sempit dari
-             tingginya dan terbaca gepeng. */
-          <span className={`font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center ${
+             tingginya dan terbaca gepeng.
+
+             TEBAL `font-semibold`, BUKAN bold: ini BADGE, dan badge adalah anak
+             tangga KONTROL di tangga tebal (29 Agu 2026). Sampai hari itu
+             komponen ini menulis `font-bold` sementara `Tag.tsx` — pil kecil
+             yang pekerjaannya sama persis — menulis `font-semibold`. Dua
+             komponen BERSAMA, dua keputusan berbeda: bukti paling telak bahwa
+             tebal dulu dipilih dari kebiasaan, bukan dari peran. */
+          <span className={`font-display text-micro font-semibold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center ${
             tone === 'warn'
               ? 'text-warn dark:text-amber-300 ring-amber-600/30 dark:ring-amber-400/30'
               : 'text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700'

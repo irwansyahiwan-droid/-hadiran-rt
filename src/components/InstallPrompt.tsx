@@ -125,7 +125,7 @@ export default function InstallPrompt() {
                 const Icon = s.icon;
                 return (
                   <li key={i} className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-full bg-brand text-white text-caption font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                    <span className="w-7 h-7 rounded-full bg-brand text-white text-caption font-semibold flex items-center justify-center shrink-0">{i + 1}</span>
                     <span className="flex-1 text-body text-gray-700 dark:text-gray-200">{s.text}</span>
                     <Icon className="w-4 h-4 text-brand dark:text-emerald-400 shrink-0" />
                   </li>
@@ -134,7 +134,7 @@ export default function InstallPrompt() {
             </ol>
             <button
               onClick={guideDrag.dismiss}
-              className="press w-full mt-5 py-3 rounded-xl bg-brand text-white font-bold text-body"
+              className="press w-full mt-5 py-3 rounded-xl bg-brand text-white font-semibold text-body"
             >
               Mengerti
             </button>

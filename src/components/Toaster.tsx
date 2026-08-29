@@ -115,7 +115,7 @@ function ToastStack({
             {t.actionLabel && (
               <button
                 onClick={() => onAction(t)}
-                className="press shrink-0 -mr-1 px-3 py-2 rounded-xl text-body font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                className="press shrink-0 -mr-1 px-3 py-2 rounded-xl text-body font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
               >
                 {t.actionLabel}
               </button>

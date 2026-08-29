@@ -1139,6 +1139,14 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 
   .btn-brand {
     border-radius: 0.75rem;   /* = rounded-xl (token ada, bukan nilai baru) */
+    /* TEBAL dimiliki RESEP, bukan pemanggil (29 Agu 2026). Sebelum ini 20
+       call-site `.btn-brand`/`.btn-danger` memilih sendiri — 8× `font-bold`
+       lawan 12× `font-semibold` untuk pekerjaan yang persis sama. Tak ada
+       pemanggil yang salah; yang salah keputusan itu boleh diambil di tempat
+       pemanggil (pelajaran `AvatarPeci`). 600 = anak tangga KONTROL: tombol
+       menyampaikan aksi, bukan judul. `.btn-secondary` sudah begini sejak
+       dibuat — sekarang seluruh keluarga tombol satu bahasa. */
+    font-weight: 600;
     /* Pass KONTRAS MAKSIMAL (4 Agu): stop atas #18A055 → #0F7A45. Label putih
        di TENGAH tombol memang aman sejak dulu (6,57:1 di atas #0F6B40 — itu
        sebabnya audit kontras selalu lolos), tapi tepi ATAS gradient cuma
@@ -1186,6 +1194,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      contact whisper rose-ink — flat, bukan glow. */
   .btn-danger {
     border-radius: 0.75rem;   /* = rounded-xl */
+    font-weight: 600;         /* anatomi kembar .btn-brand — tebal dimiliki resep */
     /* Pass KONTRAS MAKSIMAL (4 Agu): ramp lama #F43F5E→#E11D48→#BE123C memberi
        putih 3,67:1 di tepi atas & 4,70:1 di tengah — lolos AA tipis sekali,
        padahal ini tombol HAPUS/BATALKAN yang paling tak boleh salah baca.

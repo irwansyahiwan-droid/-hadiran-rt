@@ -58,7 +58,7 @@ export default function ErrorState({
         <button
           onClick={onRetry}
           disabled={retrying}
-          className="press btn-brand mt-5 inline-flex items-center gap-2 px-5 py-3 text-body font-semibold"
+          className="press btn-brand mt-5 inline-flex items-center gap-2 px-5 py-3 text-body"
         >
           <RotateCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} strokeWidth={2.2} />
           {retrying ? 'Memuat…' : 'Coba lagi'}

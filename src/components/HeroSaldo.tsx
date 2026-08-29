@@ -208,7 +208,7 @@ export default function HeroSaldo({
               Beranda. Label terpanjang ("Total Talangan Belum Lunas", 26 huruf)
               butuh 206px pada 11px sementara ruang sisa cuma 196px di 360px →
               tanpa clamp, kata terakhir hilang ditelan ellipsis. */}
-          <p className="flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white/90">
+          <p className="flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-semibold uppercase tracking-[0.12em] text-white/90">
             {Icon && <Icon className="h-4 w-4 shrink-0 text-white/80" />}
             <span className="potong-lentur">{label}</span>
             {info}

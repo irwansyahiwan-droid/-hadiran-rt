@@ -327,7 +327,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="press w-full min-h-[50px] rounded-xl font-bold text-body
+                  className="press w-full min-h-[50px] rounded-xl font-semibold text-body
                              bg-[var(--gold-songket)] text-[#063A21]
                              disabled:bg-[#C2A052] disabled:text-[#04180E]
                              transition-colors"

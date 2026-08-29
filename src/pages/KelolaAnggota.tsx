@@ -188,7 +188,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark mb-4"
           >
             <span className="text-body font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
-            <span className={`text-caption font-bold px-3 py-1 rounded-full ${
+            <span className={`text-caption font-semibold px-3 py-1 rounded-full ${
               aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
             }`}>
               {aktif ? 'Aktif' : 'Nonaktif'}
@@ -276,7 +276,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           <button
             onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
             disabled={saving || !nama.trim()}
-            className={`flex-1 py-3 rounded-full text-white text-body font-bold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
+            className={`flex-1 py-3 rounded-full text-white text-body font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
               /* btn-danger, bukan bg-rose-600 tangan: satu sumber CTA merah →
                  ikut state nonaktif ber-fill abu (label tetap terbaca). */
               jadwalNonaktif ? 'btn-danger' : 'btn-brand'

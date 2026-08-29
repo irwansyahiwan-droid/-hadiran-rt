@@ -103,7 +103,7 @@ export default function TentangApp({ open, onClose }: Props) {
               <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl inset-soft p-3">
                 <AvatarPeci nama={p.nama} ukuran={10} />
                 <div className="min-w-0">
-                  <p className="text-micro font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>
+                  <p className="text-micro font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">{p.jabatan}</p>
                   <p className="text-body font-semibold text-gray-900 dark:text-gray-100 truncate">{p.nama}</p>
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         <button
           onClick={() => { haptic(); exit.requestClose(); }}
-          className="btn-brand w-full min-h-[44px] py-3 font-semibold text-body"
+          className="btn-brand w-full min-h-[44px] py-3 text-body"
         >
           Tutup
         </button>

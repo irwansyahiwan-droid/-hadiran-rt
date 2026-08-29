@@ -325,7 +325,7 @@ export default function JadwalWargaPage() {
       {lastTarikan ? (
         <div className="hero-card hero-noise" style={{ minHeight: HERO_MIN_H }}>
           <div className="relative p-5 space-y-3">
-            <p className="inline-flex items-center gap-1 text-emerald-100 text-micro font-bold uppercase tracking-widest">
+            <p className="inline-flex items-center gap-1 text-emerald-100 text-micro font-semibold uppercase tracking-widest">
               Tarikan Terakhir
               <InfoTip label="Tarikan" tone="onDark">
                 Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima total iuran anggota.

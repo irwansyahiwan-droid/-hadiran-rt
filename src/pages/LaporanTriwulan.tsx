@@ -23,7 +23,7 @@ interface Props {
 function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number; keluar: number; saldo: number }) {
   return (
     <div className="rounded-2xl inset-soft p-3">
-      <p className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">{judul}</p>
+      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">{judul}</p>
       <div className="space-y-2">
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
@@ -44,7 +44,7 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
         </div>
         <div className="flex items-center justify-between text-caption pt-2 border-t border-control dark:border-control-dark">
           <span className="font-semibold text-gray-700 dark:text-gray-300">Saldo akhir</span>
-          <span className={`font-display font-bold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
+          <span className={`font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}
           </span>
         </div>
@@ -164,7 +164,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           <div className="rise hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
             <div className="relative flex items-center gap-2 mb-3">
               <CalendarCheck className="w-4 h-4 text-emerald-200" strokeWidth={2.2} />
-              <p className="text-micro font-bold uppercase text-white" style={{ letterSpacing: '0.14em' }}>
+              <p className="text-micro font-semibold uppercase text-white" style={{ letterSpacing: '0.14em' }}>
                 Tutup Buku Sekarang
               </p>
             </div>
@@ -179,18 +179,18 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1. */}
               <div className="rounded-2xl bg-black/10 px-3 py-2">
                 <p className="text-micro text-white uppercase tracking-wide">Kas RT (final)</p>
-                <p className="text-caption font-display font-bold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
+                <p className="text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="rounded-2xl bg-black/10 px-3 py-2">
                 <p className="text-micro text-white uppercase tracking-wide">Hadiran · belum disetor</p>
-                <p className="text-caption font-display font-bold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
+                <p className="text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
               </div>
             </div>
 
             <button
               onClick={() => bagikan('snap', snapToCard(snap))}
               disabled={sharingKey !== null}
-              className="press relative w-full min-h-[44px] py-3 rounded-2xl bg-white text-brand font-bold text-body hover:bg-emerald-50 transition flex items-center justify-center gap-2 disabled:opacity-60"
+              className="press relative w-full min-h-[44px] py-3 rounded-2xl bg-white text-brand font-semibold text-body hover:bg-emerald-50 transition flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {sharingKey === 'snap' ? (
                 <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan gambar…</>
@@ -260,7 +260,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 <button
                   onClick={() => bagikan(r.key, triwulanToCard(r))}
                   disabled={sharingKey !== null}
-                  className="press btn-brand flex-1 min-h-[44px] py-3 text-white font-semibold text-body flex items-center justify-center gap-2"
+                  className="press btn-brand flex-1 min-h-[44px] py-3 text-white text-body flex items-center justify-center gap-2"
                 >
                   {sharingKey === r.key ? (
                     <><RefreshCw className="w-4 h-4 animate-spin" /> Menyiapkan…</>

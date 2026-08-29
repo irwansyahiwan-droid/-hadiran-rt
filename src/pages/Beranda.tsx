@@ -470,8 +470,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             sejajar"), dan alasan yang sama sudah dipakai SectionTitle untuk
             menolak `px-1`. Satu kartu = satu tepi. */}
         <div className={`flex items-baseline justify-between gap-3 px-4 pt-5 pb-3 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
-          <span className="text-micro font-bold uppercase tracking-wide angka-prosa text-ink-faint dark:text-gray-400">{g.label}</span>
-          <span className={`font-display text-micro font-bold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
+          <span className="text-micro font-semibold uppercase tracking-wide angka-prosa text-ink-faint dark:text-gray-400">{g.label}</span>
+          <span className={`font-display text-micro font-semibold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
             {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
           </span>
         </div>
@@ -620,7 +620,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     : <Odometer value={animatedSaldo} />}
                 </span>
                 {saldo < 0 && (
-                  <span className="mb-1 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                  <span className="mb-1 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-semibold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
                     Defisit
                   </span>
                 )}
@@ -705,7 +705,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 memecah kalimat jadi 2 baris di 360px. Bentuk label-lalu-angka juga
                 memberi nominal bobot yang seharusnya — ia satu-satunya informasi
                 baru di kartu ini. */}
-            <p className="font-display text-caption font-bold tabular-nums text-amber-800 dark:text-amber-300 mt-0.5">
+            <p className="font-display text-caption font-semibold tabular-nums text-amber-800 dark:text-amber-300 mt-0.5">
               {maskRp(formatRupiahPlain(talangan), hidden, 4)}
             </p>
           </div>
@@ -718,7 +718,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={jadwalList.length}
           action={
-            <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-medium">
+            <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" strokeWidth={2.25} />
             </button>
@@ -793,7 +793,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={trxItems.length}
           action={
-            <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-medium">
+            <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" strokeWidth={2.25} />
             </button>

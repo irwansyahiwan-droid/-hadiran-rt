@@ -97,7 +97,7 @@ export default function WelcomeSheet() {
 
         <button
           onClick={dismiss}
-          className="btn-brand w-full min-h-[48px] py-3 font-bold text-body flex items-center justify-center gap-2"
+          className="btn-brand w-full min-h-[48px] py-3 text-body flex items-center justify-center gap-2"
         >
           Mengerti <ArrowRight className="w-4 h-4" />
         </button>

@@ -140,7 +140,7 @@ export default function ConfirmDestruktif({
           <button
             onClick={() => { haptic(20); onConfirm(); }}
             disabled={!cocok || loading}
-            className="btn-danger press flex-1 py-3 font-semibold text-body disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="btn-danger press flex-1 py-3 text-body disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading
               ? <><RefreshCw className="w-4 h-4 animate-spin" />{loadingLabel}</>

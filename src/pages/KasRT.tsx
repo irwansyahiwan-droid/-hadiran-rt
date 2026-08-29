@@ -203,11 +203,11 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               <p className="text-caption text-gray-500 dark:text-gray-400">
                 Saldo setelah transaksi:{' '}
                 {saldoPreview === null ? (
-                  <span className="font-display font-bold text-ink-sub dark:text-gray-300">
+                  <span className="font-display font-semibold text-ink-sub dark:text-gray-300">
                     — <span className="font-sans font-normal">(data belum termuat)</span>
                   </span>
                 ) : (
-                  <span className={`font-display font-bold tabular-nums ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
+                  <span className={`font-display font-semibold tabular-nums ${saldoPreview < 0 ? 'text-neg dark:text-rose-400' : tipe === 'masuk' ? 'text-pos dark:text-emerald-400' : 'text-ink-sub dark:text-gray-300'}`}>
                     {/* formatRupiahPlain pakai Math.abs → tanda minus ditambah sendiri */}
                     {(saldoPreview < 0 ? '-' : '') + formatRupiahPlain(saldoPreview)}
                   </span>
@@ -601,7 +601,7 @@ export default function KasRTPage() {
           /* The Saldo-Defisit Rule (selaras Beranda & KasHadiran): nominal TETAP
              putih premium; negatif ditandai chip KATA "Defisit". */
           status={saldo < 0 ? (
-            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-semibold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
               Defisit
             </span>
           ) : undefined}
@@ -804,8 +804,8 @@ export default function KasRTPage() {
                     x=477 pada viewport 360 — terukur sbg penyumbang TUNGGAL
                     geser samping 117px halaman Kas RT. */}
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                  <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Penerimaan</span>
-                  <span className="text-caption font-display font-bold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
+                  <span className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400">Penerimaan</span>
+                  <span className="text-caption font-display font-semibold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
                 </div>
                 {/* Label BOLEH membungkus (`min-w-0 flex-1`), nominalnya TIDAK ikut
                     turun. `flex-wrap` sempat dipasang di baris ini 17 Agu untuk
@@ -827,8 +827,8 @@ export default function KasRTPage() {
               {/* Pengeluaran */}
               <div className="inset-soft rounded-xl p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                  <span className="text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400">Pengeluaran</span>
-                  <span className="text-caption font-display font-bold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
+                  <span className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400">Pengeluaran</span>
+                  <span className="text-caption font-display font-semibold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
                 </div>
                 <div className="space-y-2">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
@@ -1074,19 +1074,19 @@ export default function KasRTPage() {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => { setEditing(selectedRow); setSelectedRow(null); setShowModal(true); }}
-                  className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 text-body font-bold"
+                  className="btn-brand flex-1 inline-flex items-center justify-center gap-2 py-3 text-body"
                 >
                   <Pencil className="w-4 h-4" /> Edit
                 </button>
                 <button
                   onClick={() => setHapusRow(selectedRow)}
-                  className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-body font-bold border bg-white dark:bg-gray-800 text-neg dark:text-rose-400 border-rose-200 dark:border-rose-900"
+                  className="press flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-xl text-body font-semibold border bg-white dark:bg-gray-800 text-neg dark:text-rose-400 border-rose-200 dark:border-rose-900"
                 >
                   <Trash2 className="w-4 h-4" /> Hapus
                 </button>
               </div>
             ) : (
-              <button onClick={rowDrag.dismiss} className="btn-secondary w-full py-3 mt-4 text-body font-bold">
+              <button onClick={rowDrag.dismiss} className="btn-secondary w-full py-3 mt-4 text-body">
                 Tutup
               </button>
             )}

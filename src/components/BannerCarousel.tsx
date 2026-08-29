@@ -697,7 +697,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
-                  <div className={`mt-4 text-balance text-title font-extrabold ${tw}`}>{promo!.judul}</div>
+                  <div className={`mt-4 text-balance text-title font-bold ${tw}`}>{promo!.judul}</div>
                   {promo!.desc && (
                     <div className={`mt-3 text-pretty text-body font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}

@@ -340,7 +340,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
         <p className="text-body font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
-        <span className="font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700">
+        <span className="font-display text-micro font-semibold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700">
           {pembayarList.length}
         </span>
       </div>
@@ -481,7 +481,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || cancelling}
-            className="btn-brand w-full py-4 font-bold text-body flex items-center justify-center gap-2"
+            className="btn-brand w-full py-4 text-body flex items-center justify-center gap-2"
           >
             <RefreshCw className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} />
             {saving ? 'Menghitung…' : tarikan.status === 'selesai' ? 'Hitung Ulang Iuran' : 'Simpan & Hitung Iuran'}
@@ -493,7 +493,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             <button
               onClick={handleBatalkanClick}
               disabled={saving || cancelling}
-              className="press w-full py-3 rounded-full font-bold text-body rest disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-neg dark:text-rose-400"
+              className="press w-full py-3 rounded-full font-semibold text-body rest disabled:opacity-70 flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-neg dark:text-rose-400"
             >
               {cancelling
                 ? <><RefreshCw className="w-4 h-4 animate-spin" />Membatalkan…</>
@@ -591,11 +591,11 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         {/* Dua nominal utama bersisian */}
         <div className="grid grid-cols-2 divide-x divide-line dark:divide-gray-800 border-t border-line dark:border-gray-800">
           <div className="px-4 py-3 min-w-0">
-            <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400">Kas Terkumpul</p>
+            <p className="text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Kas Terkumpul</p>
             <p className="font-display text-amount font-semibold text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
           </div>
           <div className="px-4 py-3 min-w-0">
-            <p className="text-micro font-bold uppercase tracking-wider text-ink-faint dark:text-gray-400">Sohibul Terima</p>
+            <p className="text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Sohibul Terima</p>
             <p className="font-display text-amount font-semibold text-pos dark:text-pos-dark tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
           </div>
         </div>
@@ -618,7 +618,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         {/* Daftar tidak hadir — kontrol cocokkan uang fisik vs data */}
         {result.tidakHadirNama.length > 0 && (
           <div className="px-4 py-3 border-t border-line dark:border-gray-800">
-            <p className="text-micro font-bold uppercase tracking-wider text-warn dark:text-amber-400 mb-2">
+            <p className="text-micro font-semibold uppercase tracking-wider text-warn dark:text-amber-400 mb-2">
               Tidak hadir ({result.tidakHadirNama.length}) — cek vs uang fisik
             </p>
             <ol className="space-y-1">
@@ -647,7 +647,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           <button
             onClick={share}
             disabled={sharing}
-            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-3 text-caption font-semibold"
+            className="btn-brand press w-full inline-flex items-center justify-center gap-2 py-3 text-caption"
           >
             <Share2 className="w-3.5 h-3.5" /> {sharing ? 'Menyiapkan…' : 'Bagikan PNG'}
           </button>
@@ -767,7 +767,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="btn-brand flex-1 py-3 text-body font-bold flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 text-body flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan…' : 'Simpan Revisi'}
@@ -873,7 +873,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           <button
             onClick={() => { haptic(12); simpan(); }}
             disabled={saving || !tanggal}
-            className="btn-brand flex-1 py-3 text-body font-bold flex items-center justify-center gap-2"
+            className="btn-brand flex-1 py-3 text-body flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
             {saving ? 'Menyimpan…' : 'Simpan Tarikan'}
@@ -1036,7 +1036,7 @@ export default function JadwalPage() {
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
               aria-label="Tambah jadwal tarikan"
-              className="press flex items-center gap-2 btn-brand text-body font-semibold min-h-[44px] px-3 py-2 rounded-xl"
+              className="press flex items-center gap-2 btn-brand text-body min-h-[44px] px-3 py-2 rounded-xl"
             >
               <Plus className="w-4 h-4" /> Jadwal
             </button>
@@ -1193,7 +1193,7 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-bold active:scale-[0.97] active:opacity-90 transition duration-ketuk"
+                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption active:scale-[0.97] active:opacity-90 transition duration-ketuk"
                           >
                             <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                             {navigatingId === t.id ? 'Memproses…' : 'Proses'}

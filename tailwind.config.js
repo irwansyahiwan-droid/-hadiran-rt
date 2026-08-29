@@ -21,6 +21,35 @@ export default {
      HP — satu-satunya perangkat yang dipakai warga. */
   future: { hoverOnlyWhenSupported: true },
   theme: {
+    /* ── TANGGA TEBAL, di luar `extend` supaya MENIMPA skala bawaan ───────
+       Tangga tipografi app mengatur UKURAN, tinggi baris, dan tracking — tapi
+       tak pernah tebal, jadi tebal jadi variabel bebas di 286 call-site.
+       Hasilnya terukur 29 Agu 2026: 8 dari 13 kombinasi (jenis elemen × peran
+       teks) memakai 2–3 tebal untuk pekerjaan yang sama. Yang paling telak
+       BELAH PERSIS DUA — tombol `text-body` 13× semibold lawan 13× bold, badge
+       `text-micro` 5× lawan 6× — dan itu mustahil lahir dari peran.
+       Bahkan dua komponen BERSAMA tak sepakat: `Tag.tsx` semibold, badge
+       `SectionTitle.tsx` bold, untuk pil kecil yang pekerjaannya sama persis.
+
+       Tangganya bersumbu KERJA, bukan ukuran:
+
+         normal      redup — mundur di dalam teks yang ditekankan
+         medium      prosa — kalimat, caption, label grafik
+         semibold    nilai & kontrol — nominal, tombol, badge, item menu, eyebrow
+         bold        judul — h1–h3, judul seksi & kartu
+         extrabold   angka besar & wordmark — HANYA bersama `font-display` (Sora)
+
+       `thin/extralight/light/black` dibuang: Inter & Sora variabel memang bisa
+       merendernya, dan justru itu bahayanya — ia tersedia tanpa pernah dipilih,
+       persis cara `shadow-xl` & `duration-150` masuk ke app ini. */
+    fontWeight: {
+      normal: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+      extrabold: '800',
+    },
+
     /* ── TANGGA ELEVASI, di luar `extend` supaya MENIMPA skala bawaan ──────
        Alasannya identik dgn tangga gerak di bawah: selama `shadow-sm/md/lg/
        xl/2xl/inner` masih ada, tak ada yang menghalangi resep elevasi ke-12

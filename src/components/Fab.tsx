@@ -104,7 +104,7 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
       aria-label={ariaLabel ?? label}
       disabled={disabled}
       title={disabled ? 'Data belum termuat — tekan "Coba lagi" dulu' : undefined}
-      className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-body font-bold overflow-hidden"
+      className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-body overflow-hidden"
       style={{ transition: 'box-shadow 0.2s ease, transform 0.15s var(--ease-spring)' }}
     >
       <Icon className="w-5 h-5 shrink-0" strokeWidth={2.4} />
