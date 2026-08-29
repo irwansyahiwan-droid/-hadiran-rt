@@ -1056,14 +1056,32 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      sebelumnya `shadow-sm`/`shadow-xl` stok Tailwind dipakai di sini TANPA
      pasangan gelap sama sekali, jadi kontrol kecil di mode gelap menjatuhkan
      bayangan hitam .05 yang di atas kanvas near-black tak terlihat sama
-     sekali. Di gelap separasi dipikul RING CAHAYA, bukan drop. */
+     sekali. Di gelap separasi dipikul RING CAHAYA, bukan drop.
+
+     RING DIBUAT MENAIK (29 Agu 2026, .08 → .10 → .12 → .14). Sebelumnya
+     `--shadow-float` satu-satunya rung TANPA ring — cuma drop hitam, padahal
+     komentar di atas sudah menyatakan drop tak bekerja di kanvas near-black.
+     Terukur dari piksel (kartu uji identik di atas kanvas, dua tema): tangga
+     gelap TIDAK menaik, dan `float` justru yang TERLEMAH dari keempatnya —
+
+         terang  rest 16/1px  → lift 47/9px  → float 55/17px → high 60/19px
+         gelap   rest 32/0px  → lift 35/1px  → float 10/21px → high 33/16px
+                                               ^^^^ popover terpisah lebih
+                                               lemah daripada chip diam
+
+     Nilai lama itu mendahului tangga ini (dulu `.float` berdiri sendiri, tak
+     pernah dibandingkan dgn rung lain), jadi tak ada yang menangkapnya sampai
+     paritas terang-gelap benar-benar diukur. Drop hitamnya DIPERTAHANKAN — ia
+     yang memberi jangkauan; ring-nya yang memberi tingkat. */
   --shadow-rest: 0 0 0 1px rgba(255, 255, 255, 0.08);
   --shadow-card:
     0 0 0 1px rgba(255, 255, 255, 0.10),                      /* ring cahaya → separasi tenang di gelap */
     0 2px 4px -1px rgba(0, 0, 0, 0.5);                        /* contact whisper */
-  --shadow-float: 0 16px 40px -10px rgba(0, 0, 0, 0.7);
+  --shadow-float:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 16px 40px -10px rgba(0, 0, 0, 0.7);
   --shadow-high:
-    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.14),
     0 20px 25px -5px rgba(0, 0, 0, 0.65);
 }
 
