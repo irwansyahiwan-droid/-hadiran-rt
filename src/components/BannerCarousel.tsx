@@ -277,7 +277,7 @@ function TarikanArt() {
           <Coins className="h-6 w-6 text-white" strokeWidth={1.8} />
         </div>
         <Crown
-          className="absolute left-1/2 top-[-9px] h-[18px] w-[18px] -translate-x-1/2 -rotate-[8deg] text-amber-200"
+          className="absolute left-1/2 top-[-9px] h-5 w-5 -translate-x-1/2 -rotate-[8deg] text-amber-200"
           fill="currentColor" strokeWidth={0}
           style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,.4))' }}
         />
@@ -681,7 +681,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                       tabIndex={active ? 0 : -1}
                       className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
                     >
-                      <ChevronRight className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                      <ChevronRight className="h-5 w-5" strokeWidth={2.2} />
                     </button>
                   )}
 

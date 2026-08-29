@@ -45,7 +45,7 @@ export default function ErrorState({
 
         {/* Tile ikon di tengah — token `lift` (bahasa kartu crisp), bukan shadow generik. */}
         <div className="empty-bob lift absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">
-          <Icon className="w-7 h-7 text-warn dark:text-amber-400" strokeWidth={1.7} />
+          <Icon className="w-7 h-7 text-warn dark:text-amber-400" />
         </div>
       </div>
 
@@ -60,7 +60,7 @@ export default function ErrorState({
           disabled={retrying}
           className="press btn-brand mt-5 inline-flex items-center gap-2 px-5 py-3 text-body"
         >
-          <RotateCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} strokeWidth={2.2} />
+          <RotateCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} />
           {retrying ? 'Memuat…' : 'Coba lagi'}
         </button>
       )}

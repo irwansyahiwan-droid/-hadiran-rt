@@ -80,7 +80,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
           className="press w-full flex items-center gap-3 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 px-4 py-4 text-left hover:border-emerald-400 hover:bg-emerald-50/40 dark:hover:bg-emerald-900/10 transition-colors"
         >
           <span className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-            <Target className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
+            <Target className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </span>
           <span className="flex-1 min-w-0">
             <span className="block text-body font-bold text-gray-800 dark:text-gray-100">Tetapkan Target Kas RT</span>

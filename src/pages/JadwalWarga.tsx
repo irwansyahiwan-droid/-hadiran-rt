@@ -549,11 +549,11 @@ export default function JadwalWargaPage() {
                     {!lastTarikan ? (
                       <Tag tone="neutral" className="shrink-0">—</Tag>
                     ) : st === 'hadir' ? (
-                      <Tag tone="success" className="shrink-0"><Check className="w-3 h-3" strokeWidth={2.5} />Hadir</Tag>
+                      <Tag tone="success" className="shrink-0"><Check className="w-3 h-3" />Hadir</Tag>
                     ) : st === 'titip' ? (
                       <Tag tone="info" className="shrink-0"><Coins className="w-3 h-3" />Titip</Tag>
                     ) : (
-                      <Tag tone="danger" className="shrink-0"><X className="w-3 h-3" strokeWidth={2.5} />Tidak</Tag>
+                      <Tag tone="danger" className="shrink-0"><X className="w-3 h-3" />Tidak</Tag>
                     )}
                   </div>
                 );
@@ -634,7 +634,7 @@ export default function JadwalWargaPage() {
                         tangan (border+bg sendiri) padahal Tag sudah jadi sumber
                         tunggal pill status se-app (tone + ring "tercetak"). */}
                     <Tag tone={isSelesai ? 'neutral' : 'success'} className="shrink-0">
-                      {isSelesai ? <Check className="w-3 h-3" strokeWidth={2.5} /> : <span className="w-1.5 h-1.5 rounded-full bg-current" />}
+                      {isSelesai ? <Check className="w-3 h-3" /> : <span className="w-1.5 h-1.5 rounded-full bg-current" />}
                       {isSelesai ? 'Selesai' : 'Terjadwal'}
                     </Tag>
                   </div>

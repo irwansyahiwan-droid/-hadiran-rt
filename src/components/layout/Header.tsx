@@ -92,7 +92,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-700'
       }`}
     >
-      <Icon className={`w-[18px] h-[18px] ${danger ? 'text-rose-500' : 'text-gray-400'}`} />
+      <Icon className={`w-5 h-5 ${danger ? 'text-rose-500' : 'text-gray-400'}`} />
       {label}
     </button>
   );

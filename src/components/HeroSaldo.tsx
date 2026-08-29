@@ -112,7 +112,7 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
         const sep = i < items.length - 1 ? 'border-r border-white/15' : '';
         const inner = (
           <>
-            {Icon && <Icon className="h-[17px] w-[17px] text-white/80" strokeWidth={1.7} />}
+            {Icon && <Icon className="h-[17px] w-[17px] text-white/80" />}
             <span className="mt-0.5 text-micro font-medium text-white/95">{s.label}</span>
             <span
               className="whitespace-nowrap font-display font-extrabold tabular-nums text-white"

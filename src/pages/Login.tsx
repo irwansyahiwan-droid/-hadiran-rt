@@ -199,7 +199,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                        login-lift-cta"
           >
             Masuk sebagai Warga
-            <ArrowRight className="w-[1.125rem] h-[1.125rem]" />
+            <ArrowRight className="w-5 h-5" />
           </button>
           <p className="mt-3 text-center text-caption text-white/70">
             Lihat saldo, jadwal, absensi &amp; talangan

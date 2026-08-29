@@ -109,7 +109,7 @@ function ToastStack({
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${s.dot}`}>
-              <Icon className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+              <Icon className="w-3.5 h-3.5 text-white" />
             </span>
             <p className="flex-1 text-body font-semibold text-gray-800 dark:text-gray-100">{t.message}</p>
             {t.actionLabel && (

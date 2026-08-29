@@ -321,8 +321,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     >
       <div className={`icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
         {trx.tipe === 'setor'
-          ? <ArrowUpRight className="w-[18px] h-[18px] text-blue-600 dark:text-blue-400" />
-          : <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
+          ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          : <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         }
       </div>
       <div className="flex-1 min-w-0">
@@ -381,7 +381,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
         >
           <div className="icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
-            <ArrowDownLeft className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400" />
+            <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           {/* Hierarki dibalik dari `sub` aslinya: NOMOR TARIKAN jadi judul, jenis
               + jumlah jadi sub. Baris ini menanggung 4 kolom (tile, teks, nominal,
@@ -397,7 +397,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <span className="font-display text-amount font-semibold shrink-0 tabular-nums text-pos dark:text-emerald-400">
             {maskRp(`+Rp${run.total.toLocaleString('id-ID')}`, hidden, 4)}
           </span>
-          <ChevronDown className={`w-4 h-4 -ml-1 -mr-1 shrink-0 text-gray-400 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
+          <ChevronDown className={`w-4 h-4 -ml-1 -mr-1 shrink-0 text-gray-400 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} />
         </button>
         {open && run.items.map((trx, ii) => trxRow(trx, idx, lastInGroup && ii === run.items.length - 1, false, true))}
       </div>
@@ -582,8 +582,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   aria-label={hidden ? 'Tampilkan nominal' : 'Sembunyikan nominal'}
                 >
                   {hidden
-                    ? <EyeOff className="h-[18px] w-[18px] text-white/90" />
-                    : <Eye className="h-[18px] w-[18px] text-white/90" />}
+                    ? <EyeOff className="h-5 w-5 text-white/90" />
+                    : <Eye className="h-5 w-5 text-white/90" />}
                 </button>
                 <button
                   onClick={() => load(true)}
@@ -591,7 +591,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   className="press relative grid h-[38px] w-[38px] place-items-center rounded-full transition-colors hover:bg-white/10 before:absolute before:-inset-[3px] before:content-[''] disabled:opacity-60"
                   aria-label="Muat ulang"
                 >
-                  <RefreshCw className={`h-[18px] w-[18px] text-white/90 ${refreshing ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-5 w-5 text-white/90 ${refreshing ? 'animate-spin' : ''}`} />
                 </button>
               </div>
             </div>
@@ -697,7 +697,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                      bg-amber-50/90 dark:bg-amber-900/20
                      border border-amber-200/60 dark:border-amber-800/40"
         >
-          <AlertTriangle className="w-[1.125rem] h-[1.125rem] shrink-0 text-amber-600 dark:text-amber-400" />
+          <AlertTriangle className="w-5 h-5 shrink-0 text-amber-600 dark:text-amber-400" />
           <div className="flex-1 min-w-0 text-left">
             <p className="text-body font-semibold text-amber-800 dark:text-amber-300">Talangan belum lunas</p>
             {/* Sub = ANGKANYA saja. "Total … belum diselesaikan" mengulang judul
@@ -709,7 +709,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               {maskRp(formatRupiahPlain(talangan), hidden, 4)}
             </p>
           </div>
-          <ChevronRight className="w-4 h-4 shrink-0 text-amber-700 dark:text-amber-400" strokeWidth={2.25} />
+          <ChevronRight className="w-4 h-4 shrink-0 text-amber-700 dark:text-amber-400" />
         </button>
       )}
 
@@ -720,7 +720,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           action={
             <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
               Lihat semua
-              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" strokeWidth={2.25} />
+              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" />
             </button>
           }
         >
@@ -795,7 +795,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           action={
             <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
               Lihat semua
-              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" strokeWidth={2.25} />
+              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" />
             </button>
           }
         >
@@ -822,7 +822,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               className="press w-full flex items-center justify-center gap-1 px-4 py-4 text-body font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
             >
               Lihat semua transaksi
-              <ChevronRight className="w-4 h-4" strokeWidth={2.25} />
+              <ChevronRight className="w-4 h-4" />
             </button>
           )}
         </div>

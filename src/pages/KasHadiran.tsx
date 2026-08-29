@@ -606,7 +606,7 @@ export default function KasHadiranPage() {
               kontras 13 Jul: panel di hero gelapkan, jangan terangkan. */}
           {sudahSetor && (
             <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-black/25 border border-white/20 rounded-full text-white text-caption font-semibold">
-              <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Sudah disetor ke Kas RT
+              <Check className="w-3.5 h-3.5" /> Sudah disetor ke Kas RT
             </span>
           )}
         </HeroSaldo>
@@ -781,7 +781,7 @@ export default function KasHadiranPage() {
                         {talanganInfo.count > 0 ? (
                           <Tag tone="danger" className="angka-prosa">{talanganInfo.count} belum bayar</Tag>
                         ) : (
-                          <Tag tone="success"><Check className="w-3 h-3" strokeWidth={2.5} /> Lunas semua</Tag>
+                          <Tag tone="success"><Check className="w-3 h-3" /> Lunas semua</Tag>
                         )}
                       </div>
 
@@ -1112,7 +1112,7 @@ export default function KasHadiranPage() {
                             <AvatarPeci nama={p.nama} ukuran={8} />
                             <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
                             {p.lunas ? (
-                              <Tag tone="success"><Check className="w-3 h-3" strokeWidth={2.5} />Lunas</Tag>
+                              <Tag tone="success"><Check className="w-3 h-3" />Lunas</Tag>
                             ) : (
                               <Tag tone="danger"><AlertTriangle className="w-3 h-3" />Belum bayar</Tag>
                             )}
@@ -1135,7 +1135,7 @@ export default function KasHadiranPage() {
                                 ("Hadir (N)" + nama) sehingga centang ini
                                 dihitung dekoratif — tapi "tak wajib" bukan
                                 "boleh nyaris tak terlihat" buat warga lansia. */}
-                            <Check className="w-4 h-4 text-pos dark:text-pos-dark shrink-0" strokeWidth={2.5} />
+                            <Check className="w-4 h-4 text-pos dark:text-pos-dark shrink-0" />
                           </div>
                         ))}
                       </div>

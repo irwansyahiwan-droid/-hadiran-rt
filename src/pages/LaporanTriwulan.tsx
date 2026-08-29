@@ -163,7 +163,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
         {!loading && snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
           <div className="rise hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
             <div className="relative flex items-center gap-2 mb-3">
-              <CalendarCheck className="w-4 h-4 text-emerald-200" strokeWidth={2.2} />
+              <CalendarCheck className="w-4 h-4 text-emerald-200" />
               <p className="text-micro font-semibold uppercase text-white" style={{ letterSpacing: '0.14em' }}>
                 Tutup Buku Sekarang
               </p>

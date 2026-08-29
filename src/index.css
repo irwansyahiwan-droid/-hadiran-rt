@@ -55,7 +55,48 @@
    Catatan CSS: `stroke-width` presentation attribute SELALU kalah dari
    properti CSS, jadi tak perlu !important, dan tak perlu menyisir 200+
    call-site ikon satu per satu. */
-svg.lucide[stroke-width='2']:not(.w-3) { stroke-width: 1.75; }
+/* ── TANGGA IKON (29 Agu 2026) ─────────────────────────────────────────────
+   Terukur sebelum ditulis: 170 pemakaian lucide, 11 UKURAN berbeda, 9 nilai
+   stroke, dan 7 ukuran memakai LEBIH DARI SATU stroke — 16px sendirian dipakai
+   dengan LIMA (warisan, 2,2, 2,25, 2,5, 0).
+
+   Tapi stroke berat itu BUKAN kecerobohan. Diperiksa call-site per call-site,
+   polanya rapi: `Check`/`X` 12–14px di dalam pil memakai 2,5–3 karena ikon
+   kecil ber-stroke tipis HILANG, dan chevron memakai 2,25 karena ia cuma dua
+   goresan sehingga optis lebih ringan dari ikon lain. Aturannya sudah ada di
+   kepala orang — cuma belum punya nama, jadi diterapkan dengan tangan lalu
+   menyimpang. Bentuk masalah yang sama dgn tangga tebal huruf.
+
+   Sekarang stroke DITURUNKAN dari ukuran, bukan diketik ulang di tiap tempat:
+
+     12px  .w-3     2,25   bersama text-micro    — badge / pil
+     14px  .w-3.5   2      bersama text-caption
+     16px  .w-4     1,75   bersama text-body     — baris, tombol   (dasar)
+     20px  .w-5     1,6    mandiri               — tombol ikon, toolbar
+
+   Makin kecil ikon, makin TEBAL stroke-nya — kalau tidak ia lenyap. Nilai
+   dasar 1,75 tetap berlaku untuk ukuran di luar tangga (mis. `h-[17px]` di
+   HeroSaldo) supaya tak ada ikon yang jatuh kembali ke 2 bawaan lucide.
+
+   PENGECUALIAN BERNAMA — keluarga chevron, +0,25 di atas rungnya. Chevron
+   hanya dua goresan miring; pada bobot yang sama ia terbaca lebih tipis dari
+   ikon bertubuh. Ini keputusan yang sudah ditimbang di 6 call-site, dan
+   dituliskan sebagai ATURAN, bukan dibiarkan jadi kebiasaan.
+
+   Selektor tetap `[stroke-width="2"]` — yang menulis bobotnya SENDIRI tetap
+   menang. Itu menjaga `strokeWidth={0}` (ikon ber-fill) dan golongan GAMBAR
+   (ilustrasi BannerCarousel 3–3,5) di luar jangkauan tangga ini.
+
+   Catatan CSS: `stroke-width` presentation attribute SELALU kalah dari
+   properti CSS, jadi tak perlu !important & tak perlu menyisir call-site. */
+svg.lucide[stroke-width='2']          { stroke-width: 1.75; }
+svg.lucide[stroke-width='2'].w-3      { stroke-width: 2.25; }
+svg.lucide[stroke-width='2'].w-3\.5   { stroke-width: 2; }
+svg.lucide[stroke-width='2'].w-5      { stroke-width: 1.6; }
+svg.lucide[stroke-width='2'][class*='lucide-chevron']        { stroke-width: 2; }
+svg.lucide[stroke-width='2'][class*='lucide-chevron'].w-3    { stroke-width: 2.5; }
+svg.lucide[stroke-width='2'][class*='lucide-chevron'].w-3\.5 { stroke-width: 2.25; }
+svg.lucide[stroke-width='2'][class*='lucide-chevron'].w-5    { stroke-width: 1.85; }
 /* Util eksplisit untuk elemen non-heading yang ingin Sora (mis. nominal hero). */
 .font-display { font-family: var(--font-display); }
 

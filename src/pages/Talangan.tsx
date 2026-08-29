@@ -365,7 +365,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                 </span>
               )}
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isExpanded ? 'rotate-180' : ''}`} strokeWidth={2.25} />
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isExpanded ? 'rotate-180' : ''}`} />
             </div>
           </button>
           {isBendahara && g.countBelum > 0 && (
@@ -375,7 +375,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               aria-label={`Ingatkan ${g.nama} via WhatsApp`}
               className="press shrink-0 w-11 h-11 mt-3 mr-2 inline-flex items-center justify-center rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
             >
-              <MessageCircle className="w-[18px] h-[18px]" />
+              <MessageCircle className="w-5 h-5" />
             </button>
           )}
         </div>

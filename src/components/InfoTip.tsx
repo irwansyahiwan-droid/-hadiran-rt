@@ -107,7 +107,7 @@ export default function InfoTip({ label, children, tone = 'default', align = 'le
         aria-expanded={open}
         className={`press relative inline-flex items-center justify-center w-5 h-5 rounded-full transition-colors before:absolute before:-inset-3 before:content-[''] ${trigger}`}
       >
-        <Info className="w-3.5 h-3.5" strokeWidth={2.25} />
+        <Info className="w-3.5 h-3.5" />
       </button>
       {open && createPortal(
         <>

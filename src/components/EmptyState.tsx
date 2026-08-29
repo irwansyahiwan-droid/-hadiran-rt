@@ -39,7 +39,7 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
         {/* Tile ikon di tengah — token `lift` (crisp card language), bukan shadow-lg
             generik. `empty-bob` = pop masuk lalu mengambang halus (scene bernapas). */}
         <div className="empty-bob lift absolute inset-0 m-auto w-14 h-14 rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">
-          <Icon className="w-7 h-7 text-emerald-500 dark:text-emerald-400" strokeWidth={1.7} />
+          <Icon className="w-7 h-7 text-emerald-500 dark:text-emerald-400" />
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export default function EmptyState({ icon: Icon, title, subtitle, className = ''
           onClick={action.onClick}
           className="press mt-4 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-xl text-body font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-200/60 dark:ring-emerald-800/40 active:bg-emerald-100 dark:active:bg-emerald-900/30 transition-colors"
         >
-          {action.icon && <action.icon className="w-4 h-4" strokeWidth={2} />}
+          {action.icon && <action.icon className="w-4 h-4" />}
           {action.label}
         </button>
       )}

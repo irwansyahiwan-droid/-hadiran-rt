@@ -139,7 +139,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
             region live permanen Toaster. */}
         {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
         Ekspor
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} strokeWidth={2.25} />
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} />
       </button>
       {disabled && disabledReason && <span id={alasanId} className="sr-only">{disabledReason}</span>}
 
@@ -170,7 +170,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
                 onClick={() => { haptic(); setOpen(false); onClick(); }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-body font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-gray-800 dark:active:bg-gray-700 transition-colors"
               >
-                <Icon className={`w-[18px] h-[18px] ${tone ?? 'text-gray-400'}`} />
+                <Icon className={`w-5 h-5 ${tone ?? 'text-gray-400'}`} />
                 {label}
               </button>
             ))}

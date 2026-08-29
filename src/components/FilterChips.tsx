@@ -148,7 +148,7 @@ export default function FilterChips<T extends string, S extends string = string>
                       }`}
                     >
                       {o.label}
-                      {selected && <Check className="w-4 h-4 shrink-0" strokeWidth={2.5} />}
+                      {selected && <Check className="w-4 h-4 shrink-0" />}
                     </button>
                   );
                 })}

@@ -66,7 +66,7 @@ export default function SmartInsight({ label, current, previous, className = '' 
   return (
     <div className={`flex items-center gap-3 rounded-3xl border border-line dark:border-gray-800/60 bg-white dark:bg-gray-900 lift px-4 py-3 ${className}`}>
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${tone.bg}`}>
-        <Sparkles className={`w-[18px] h-[18px] ${tone.c}`} strokeWidth={2} />
+        <Sparkles className={`w-5 h-5 ${tone.c}`} />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-caption font-bold text-gray-800 dark:text-gray-100 leading-tight">
@@ -77,7 +77,7 @@ export default function SmartInsight({ label, current, previous, className = '' 
             KALIMAT[alasan!]
           ) : (
             <>
-              <Ic className={`w-3.5 h-3.5 ${tone.c}`} strokeWidth={2.5} />
+              <Ic className={`w-3.5 h-3.5 ${tone.c}`} />
               <span className={`font-semibold ${tone.c} tabular-nums`}>
                 {pct > 0 ? '+' : ''}{pct}%
               </span>

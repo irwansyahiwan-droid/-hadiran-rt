@@ -241,7 +241,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
             aria-label="Kembali"
             className="press w-9 h-9 rounded-xl border border-line dark:border-gray-800/60 flex items-center justify-center shrink-0"
           >
-            <ArrowLeft className="w-[18px] h-[18px] text-gray-600 dark:text-gray-300" />
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           <h2 className="text-subtitle font-display font-bold text-ink dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
@@ -577,7 +577,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         {/* Header — badge sukses + judul + tutup */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
           <span className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5" strokeWidth={2.5} />
+            <CheckCircle2 className="w-5 h-5" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-body font-bold text-gray-900 dark:text-gray-100 leading-tight">Tarikan #{result.tarikanNomor} selesai dihitung</p>
@@ -1186,7 +1186,7 @@ export default function JadwalPage() {
                                cuma garisnya. */
                             className="w-11 h-11 rounded-xl text-ink-faint dark:text-gray-300 inline-flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-800 active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
                           >
-                            <RefreshCw className={`w-[18px] h-[18px] ${navigatingId === t.id ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`w-5 h-5 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
                           </button>
                         ) : isNext ? (
                           // Giliran berikutnya = satu-satunya baris yang tombolnya BERLABEL.
@@ -1212,8 +1212,8 @@ export default function JadwalPage() {
                             className="w-11 h-11 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-brand dark:text-emerald-300 inline-flex items-center justify-center active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
                           >
                             {navigatingId === t.id
-                              ? <RefreshCw className="w-[18px] h-[18px] animate-spin" />
-                              : <Play className="w-[18px] h-[18px]" strokeWidth={2.2} />}
+                              ? <RefreshCw className="w-5 h-5 animate-spin" />
+                              : <Play className="w-5 h-5" />}
                           </button>
                         )}
 
@@ -1233,7 +1233,7 @@ export default function JadwalPage() {
                                terbaca: satu chip ber-tint (Play) + satu ikon tenang. */
                             className="w-11 h-11 rounded-xl text-ink-faint dark:text-gray-300 inline-flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-800 active:scale-[0.97] transition cursor-pointer"
                           >
-                            <MoreVertical className="w-[18px] h-[18px]" />
+                            <MoreVertical className="w-5 h-5" />
                           </button>
                         )}
                       </div>
