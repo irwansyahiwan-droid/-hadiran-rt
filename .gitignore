@@ -31,6 +31,7 @@ dist-ssr
 .audit-*/
 .varian-nada/
 .diff-bayangan/
+.diff-ikon/
 
 # Berkas berat yang nyasar di akar — bukan aset app.
 # Aset app yang SAH duduk di public/ (dan tak satu pun berupa video/installer
