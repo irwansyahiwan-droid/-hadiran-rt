@@ -8,6 +8,7 @@ import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import FilterChips from '../components/FilterChips';
 import StatRow from '../components/StatRow';
+import { HeroStats } from '../components/HeroSaldo';
 import Tag from '../components/Tag';
 import SuccessOverlay from '../components/SuccessOverlay';
 import ConfirmDestruktif from '../components/ConfirmDestruktif';
@@ -22,6 +23,15 @@ import { fetchAbsensiTersimpan } from '../lib/absensiTersimpan';
 import { hitungUlangNomorJadwal } from '../lib/jadwalNomor';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+
+/* Lantai tinggi hero (px) — pola HERO_MIN_H KasHadiran/KasRT/Talangan/JadwalWarga.
+   WAJIB diukur ulang tiap anatomi hero berubah: ia menahan tinggi saat isinya
+   belum datang, dan lantai yang meleset justru MELAHIRKAN geseran yang hendak
+   dicegahnya (lihat `audit:lompat`). Diukur pada build nyata: 193px @390,
+   192px @360, 214px @320 (judul melipat). Dipakai 192 — tinggi TERKECIL yang
+   benar-benar terjadi, bukan jumlah di atas kertas; nilai di bawah itu tak
+   pernah jadi lantai sama sekali. */
+const HERO_MIN_H = 192;
 import { useDialog } from '../hooks/useDialog';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast, showUndo } from '../lib/toast';
@@ -1001,8 +1011,8 @@ export default function JadwalPage() {
         <ResultCard result={lastResult} onDismiss={() => setLastResult(null)} />
       )}
       {/* Kepala halaman = PageHeader bersama (30 Jul). Tanpa subjudul angka —
-          StatRow tepat di bawah sudah memuat selesai/terjadwal/total; satu
-          fakta satu suara. */}
+          hero tepat di bawah sudah memuat selesai/terjadwal/total; satu fakta
+          satu suara. */}
       <PageHeader
         title="Jadwal Tarikan"
         /* Tombol muat-ulang 40px lebar (kotak sentuh tetap 44 lewat
@@ -1048,33 +1058,79 @@ export default function JadwalPage() {
         </>}
       />
 
-      {/* Stats — StatRow bersama (dialek "N kartu terpisah" yang tersisa di sini)
+      {/* Hero Jadwal (30 Agu 2026) — halaman ini satu-satunya tab bendahara tanpa
+          hero, dan itu terlihat begitu kelima tab dijajarkan berdampingan.
 
-          Penjaga `|| error` ditambahkan 24 Agu 2026. Sampai saat itu barisnya
-          hanya menjaga `loading`, jadi begitu pemuatan SELESAI DENGAN GAGAL
-          ketiga hitungan jatuh ke `0` (daftarnya memang kosong) dan dirender
-          sebagai FAKTA: layar menampilkan "0 Selesai · 0 Terjadwal · 0 Total"
-          tepat di atas ErrorState yang berbunyi "Gagal memuat data". Dua
-          pernyataan yang saling bertentangan di satu layar, dan yang dipercaya
-          bendahara adalah angkanya — terbaca "RT ini belum punya jadwal sama
-          sekali", padahal app justru sedang tak tahu apa-apa.
+          Ia MENGGANTIKAN pita StatRow, bukan menumpuk di atasnya. Versi pertama
+          yang digambar melakukan yang kedua dan mendorong pita + seluruh daftar
+          tarikan turun ~180px — menukar aksi dgn hiasan di permukaan yang justru
+          permukaan KERJA (bendahara datang ke sini untuk memproses tarikan,
+          bukan untuk membaca ringkasan). Karena kakinya menyerap ketiga hitungan
+          itu, ongkos tingginya tinggal selisih hero-lawan-pita, bukan satu blok
+          penuh.
 
-          Ini kanon yang sama dgn "app kas DILARANG menyatakan nominal saat muat
-          gagal"; `audit:keadaan` tak menangkapnya karena ia memburu nominal
-          ber-"Rp", sedangkan angka telanjang lewat begitu saja. Diukur di 9
-          layar × 2 peran: hanya SATU yang merender StatRow berdampingan dgn
-          ErrorState — layar ini. Delapan sisanya sudah benar menyembunyikan.
+          ANATOMI = `hero-emerald` + `HeroStats`, BUKAN komponen `HeroSaldo`.
+          HeroSaldo dibangun di sekitar NOMINAL (`measure`/`amount` wajib, badan
+          FitAmount 30–48px) dan halaman ini tak punya nominal; memaksanya masuk
+          ke sana akan menyalahgunakan anatominya. Presedennya sudah ada &
+          tertulis di HeroSaldo sendiri: hero Beranda juga bukan HeroSaldo, tapi
+          kakinya memakai `HeroStats` yang sama. Kelas label/kaki disalin PERSIS
+          dari HeroSaldo supaya ini tidak melahirkan dialek hero ketiga.
 
-          Tetap "—" (bukan disembunyikan) karena itu konvensi baris ini sendiri
-          saat `loading`, dan menyembunyikannya membuat barisnya muncul kembali
-          saat "Coba lagi" berhasil → tata letak melompat (lihat audit:lompat). */}
-      <StatRow
-        items={[
-          { label: 'Selesai', value: loading || error ? '—' : selesaiCount },
-          { label: 'Terjadwal', value: loading || error ? '—' : dijadwalCount, tone: 'pos' },
-          { label: 'Total', value: loading || error ? '—' : tarikanList.length },
-        ]}
-      />
+          Penjaga `loading || error` DIPERTAHANKAN kata demi kata dari pita lama,
+          dan alasannya tak berubah sedikit pun: tanpa itu, pemuatan yang SELESAI
+          DENGAN GAGAL menjatuhkan ketiga hitungan ke `0` lalu merendernya sebagai
+          FAKTA — "0 Selesai · 0 Terjadwal · 0 Total" tepat di atas ErrorState
+          "Gagal memuat data". Bendahara mempercayai angkanya. Kanon yang sama dgn
+          "app kas DILARANG menyatakan nominal saat muat gagal", dan `audit:keadaan`
+          tak menangkapnya sendiri karena ia memburu nominal ber-"Rp" sedangkan
+          angka telanjang lewat begitu saja.
+
+          Judul & keterangan SELALU dirender (isi "—" saat belum tahu), bukan
+          disembunyikan: blok yang muncul dari NOL persis yang diburu
+          `audit:lompat`, dan lantai `HERO_MIN_H` menahan sisanya. */}
+      <div
+        className="relative overflow-hidden rounded-3xl hero-emerald"
+        style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}
+      >
+        <div className="hero-sheen pointer-events-none absolute inset-0" />
+        <div className="relative p-6">
+          <p className="flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-semibold uppercase tracking-[0.12em] text-white/90">
+            <Calendar className="h-4 w-4 shrink-0 text-white/80" />
+            <span className="potong-lentur">{nextDijadwal ? 'Tarikan Berikutnya' : 'Jadwal Tarikan'}</span>
+          </p>
+          {/* Dua baris DICADANGKAN di bawah 360px, dan angkanya diukur bukan
+              ditebak: judul "Tarikan ke-19 · Min, 6 Sep 2026" muat satu baris di
+              390/360 (hero 193/192px) tapi MELIPAT di 320px (214px). Tanpa
+              cadangan itu keadaan memuat berhenti di 192px lalu melonjak 22px
+              begitu data datang — geseran yang justru diburu `audit:lompat`, di
+              lebar yang WAJIB pula (§1.4.10). Digerbang `max-[359px]:` supaya
+              390/360 tak membayar 24px ruang kosong untuk baris yang di sana tak
+              pernah ada. */}
+          <p className="mt-2 text-subtitle font-bold leading-tight text-white angka-prosa max-[359px]:min-h-[3rem]">
+            {loading || error
+              ? '—'
+              : nextDijadwal
+                ? `Tarikan ke-${nextDijadwal.nomor} · ${formatTanggal(nextDijadwal.tanggal)}`
+                : 'Belum ada tarikan terjadwal'}
+          </p>
+          <p className="mt-1 text-caption angka-prosa text-white/90">
+            {loading || error
+              ? 'Sohibul Bait —'
+              : nextDijadwal
+                ? `Sohibul Bait: ${nextDijadwal.sohibul_bait?.nama ?? '—'}`
+                : 'Tambahkan tarikan lewat tombol di atas.'}
+          </p>
+          <HeroStats
+            className="mt-4 pt-5"
+            items={[
+              { label: 'Selesai', value: loading || error ? '—' : selesaiCount },
+              { label: 'Terjadwal', value: loading || error ? '—' : dijadwalCount },
+              { label: 'Total', value: loading || error ? '—' : tarikanList.length },
+            ]}
+          />
+        </div>
+      </div>
 
       {/* List — cross-fade skeleton → konten */}
       <CrossFade loading={loading} skeleton={(
