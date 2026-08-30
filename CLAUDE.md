@@ -598,7 +598,18 @@ splash inline · `gen-splash.mjs` BG · `useTheme` (gelap). Splash PNG di-BAKE
 pada tone kanvas, jadi WAJIB diregenerasi & **pikselnya diperiksa** — bukan
 dipercaya dari baris "ok →" milik generatornya.
 
-**MASIH TERBUKA — langkah nada GELAP tak sesuai catatan.** Pelajaran ke-26
+**DITUTUP 30 Agu 2026** (`9d83587`) — dan penutupannya membatalkan targetnya
+sendiri. Mengejar 12 % lewat KARTU mendaratkannya 0,8 % L dari sheet (hierarki
+kanvas<kartu<sheet runtuh) DAN menjatuhkan `gray-400` ke 5,22; lewat KANVAS ia
+menabrak gamut sRGB (rona melenceng 157,2° → 152,9°), yaitu membayar dgn kroma
+yang baru saja dipilih. Yang dikerjakan dua tuas yang tak menyentuh kartu:
+kanvas `#00190B` → `#001709` (langkah 7,6 % → 8,3 %, setara sisi terang) + ring
+kartu gelap `.10` → `.16` (tepi lawan kanvas 1,63 → 2,01:1). Nol rasio bergerak
+turun. **Pelajarannya: angka target yang diwarisi dari catatan WAJIB diuji
+kelayakannya dulu — 12 % itu tak pernah bisa dicapai, dan mengejarnya buta akan
+merusak dua hal sekaligus.** Catatan aslinya di bawah ini dipertahankan.
+
+**(ASAL TEMUAN) langkah nada GELAP tak sesuai catatan.** Pelajaran ke-26
 mencatat langkah nada gelap dinaikkan ke **12,0 % L**. Angka itu benar untuk
 `#22342A`, tapi kartu tidak memakai nilai itu: `gray-900` = `#192920`, dan
 langkah aslinya **7,6 % L** — lebih KECIL daripada sisi terang (8,4 %).
