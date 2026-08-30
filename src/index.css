@@ -838,9 +838,17 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      sempurna, ronanya yang salah (pelajaran ke-30). */
   --shadow-rest:
     0 1px 2px 0 rgba(8, 30, 19, 0.06);                       /* was shadow-sm rgba(0,0,0,.05) — alpha naik tipis krn tinta tak sehitam hitam */
+  /* Pass "Bayangan Dipertegas" (30 Agu 2026): user minta kartu putih
+     "diterangin lagi biar nendang". Diukur dulu lewat pembanding visual:
+     #F8FCF9 → #FFFFFF cuma menaikkan kontras thd kanvas 1,271→1,316:1
+     (+3,5%) — kartu sudah 97% menuju putih murni, lever WARNA nyaris habis
+     (kelas yang sama dgn "Kanvas: Kroma, Bukan L"). Lever yang dipilih
+     BAYANGAN, fill TETAP #F8FCF9: contact 1px/2px/.14 → 2px/5px/.18,
+     ambient 6px/18px/.17 → 12px/28px/.26. Tinta & hue tak berubah
+     (rgba(8,30,19), satu keluarga dgn seluruh tangga elevasi). */
   --shadow-card:
-    0 1px 2px -1px rgba(8, 30, 19, 0.14),
-    0 6px 18px -6px rgba(8, 30, 19, 0.17);                   /* contact whisper — TIDAK berubah di pass ini */
+    0 2px 5px -2px rgba(8, 30, 19, 0.18),
+    0 12px 28px -10px rgba(8, 30, 19, 0.26);
   --shadow-float:
     0 0 0 1px rgba(8, 30, 19, 0.04),
     0 4px 12px -2px rgba(8, 30, 19, 0.08),
