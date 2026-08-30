@@ -849,13 +849,22 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   --shadow-card:
     0 2px 5px -2px rgba(8, 30, 19, 0.18),
     0 12px 28px -10px rgba(8, 30, 19, 0.26);
+  /* ALPHA DINAIKKAN (30 Agu 2026) — konsekuensi dari "Bayangan Dipertegas"
+     di atas. Diukur pakai canvas shadow rig (sample piksel di bawah tepi
+     kartu, delta dari kanvas #CFE6D8): `.lift` yg baru punya PUNCAK 106,8
+     — lebih gelap dari `.float` lama (57,7) MAUPUN `.float-high` lama
+     (79,1). Kartu jadi terasa lebih "berat" dari sheet yg harusnya
+     melayang di atasnya — tangga kebalik. (Sudah miring tipis dari dulu,
+     71,6 vs 57,7 — dipertajam, bukan diciptakan, oleh pass di atas.)
+     Geometri (offset/blur/spread) TETAP; cuma alpha naik supaya urutan
+     PUNCAK balik monoton: rest 14 < lift 107 < float 114 < high 141. */
   --shadow-float:
-    0 0 0 1px rgba(8, 30, 19, 0.04),
-    0 4px 12px -2px rgba(8, 30, 19, 0.08),
-    0 16px 32px -8px rgba(8, 30, 19, 0.14);                  /* geometri & alpha TETAP; hanya tinta biru → hijau */
+    0 0 0 1px rgba(8, 30, 19, 0.06),
+    0 4px 12px -2px rgba(8, 30, 19, 0.21),
+    0 16px 32px -8px rgba(8, 30, 19, 0.25);
   --shadow-high:
-    0 8px 10px -6px rgba(8, 30, 19, 0.12),
-    0 20px 25px -5px rgba(8, 30, 19, 0.14);                  /* was shadow-xl rgba(0,0,0,.10) ×2 */
+    0 8px 10px -6px rgba(8, 30, 19, 0.22),
+    0 20px 25px -5px rgba(8, 30, 19, 0.28);
 }
 
 /* Soft layered elevation for surfaces.
