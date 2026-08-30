@@ -1,5 +1,8 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 /**
  * Stylesheet utama dilepas dari jalur render-blocking.
@@ -34,9 +37,91 @@ function cssNonBlocking(): Plugin {
   };
 }
 
+
+/**
+ * Menyuntik SHELL ber-hash & VERSI ke `dist/sw.js` saat BUILD.
+ *
+ * Kenapa ada: sampai 30 Agu 2026 `sw.js` memegang daftar shell TULISAN TANGAN
+ * berisi lima path tanpa satu pun JS/CSS — dan tak mungkin ditulis tangan,
+ * karena nama chunk ber-hash isi berubah tiap build. Akibatnya terukur dan
+ * DETERMINISTIK (3/3 run): pada kunjungan PERTAMA, `index.html` meminta entry
+ * chunk + vendor-react + CSS pada +180 ms, sedangkan SW baru mengontrol halaman
+ * ~+250 ms (ia didaftarkan dari React, jadi selalu SESUDAH ketiganya). Ketiganya
+ * lewat tanpa dicegat, tak pernah masuk cache, dan begitu warga kehilangan
+ * sinyal sebelum kunjungan kedua app-nya MATI di splash.
+ *
+ * Yang dipracache = graf impor STATIS milik entry (yang dirujuk `index.html`),
+ * BUKAN semua aset. Diukur di dist: shell 302 kB, sedangkan chunk ekspor
+ * (exceljs 920 kB + PDF triwulan 390 kB + html2canvas 198 kB) 1,75 MB — memaksa
+ * warga bersinyal 400 kbps mengunduh itu saat install demi fitur bendahara yang
+ * bisa menunggu sinyal. Chunk lazy tetap stale-while-revalidate spt sebelumnya.
+ *
+ * VERSI = hash daftar itu, jadi nama cache berubah HANYA kalau shell berubah,
+ * dan `activate` membuang cache versi lain — inilah yang menutup jebakan chunk
+ * basi sesudah deploy.
+ */
+function swManifest(): Plugin {
+  let outDir = 'dist';
+  let shell: string[] = [];
+  return {
+    name: 'sw-manifest',
+    apply: 'build',
+    configResolved(c) { outDir = c.build.outDir; },
+    generateBundle(_opts, bundle) {
+      const entry = Object.values(bundle).find((b) => b.type === 'chunk' && b.isEntry);
+      if (!entry || entry.type !== 'chunk') this.error('sw-manifest: entry chunk tak ketemu');
+      const set = new Set<string>();
+      /* Impor STATIS saja — `dynamicImports` justru yang sengaja dibiarkan lazy. */
+      const walk = (nama: string) => {
+        if (set.has(nama)) return;
+        set.add(nama);
+        const c = bundle[nama];
+        if (!c || c.type !== 'chunk') return;
+        for (const css of c.viteMetadata?.importedCss ?? []) set.add(css);
+        for (const imp of c.imports) walk(imp);
+      };
+      const nEntry = (entry as { fileName: string }).fileName;
+      walk(nEntry);
+      /* HALAMAN = dynamic import KEDALAMAN-1 dari entry. Itu bukan ambang
+         karangan melainkan bentuk app-nya: router memanggil `lazy()` di entry,
+         sedangkan chunk berat (exceljs, jspdf, html2canvas) di-`import()` dari
+         DALAM halaman — satu tingkat lebih dalam. Jadi "yang dibutuhkan untuk
+         MEMAKAI app" dan "fitur ekspor yang boleh menunggu sinyal" terpisah
+         secara struktural, tanpa perlu mencocokkan nama berkas.
+         Tanpa ini shell memang boot tapi langsung jatuh ke ErrorBoundary:
+         terukur 3/3 run, 12 chunk gagal (Beranda, CrossFade, Odometer, …). */
+      const eChunk = bundle[nEntry];
+      if (eChunk && eChunk.type === 'chunk') for (const d of eChunk.dynamicImports) walk(d);
+      shell = [
+        '/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png',
+        ...[...set].sort().map((f) => '/' + f),
+      ];
+      const byte = [...set].reduce((n, f) => n + ((bundle[f] as { code?: string; source?: string })?.code?.length ?? (bundle[f] as { source?: string })?.source?.length ?? 0), 0);
+      this.info?.(`sw-manifest: shell ${Math.round(byte / 1024)} kB`);
+    },
+    closeBundle() {
+      const p = resolve(outDir, 'sw.js');
+      const src = readFileSync(p, 'utf8');
+      const versi = createHash('sha256').update(shell.join('|')).digest('hex').slice(0, 8);
+      /* Kalau kaitnya tak ketemu, MELEDAK — daftar kosong yang lolos diam-diam
+         mengembalikan persis bug yang plugin ini ada untuk menutupnya. */
+      let out = src;
+      for (const [pola, ganti, nama] of [
+        [/const VERSI = 'dev';/, `const VERSI = '${versi}';`, 'VERSI'],
+        [/const SHELL = \[\];/, `const SHELL = ${JSON.stringify(shell)};`, 'SHELL'],
+      ] as [RegExp, string, string][]) {
+        if (!pola.test(out)) this.error(`sw-manifest: kait ${nama} tak ada di dist/sw.js`);
+        out = out.replace(pola, ganti);
+      }
+      writeFileSync(p, out);
+      this.info?.(`sw-manifest: ${shell.length} berkas shell · versi ${versi}`);
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), cssNonBlocking()],
+  plugins: [react(), cssNonBlocking(), swManifest()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
