@@ -1505,7 +1505,18 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.rise { animation: riseIn var(--dur-masuk) var(--ease-out-expo) both; }
+/* `backwards`, BUKAN `both` (30 Agu 2026). Keyframe akhir `riseIn` —
+   opacity 1, translateY(0) — PERSIS sama dgn keadaan dasar elemen, jadi bagian
+   `forwards` dari `both` tak menahan apa pun yang berguna; yang ia tahan justru
+   `transform: matrix(1,0,0,1,0,0)`. Matrix identitas tetap TRANSFORM: elemennya
+   naik ke lapisan komposit sendiri dan bertahan di sana SELAMANYA, dan teks di
+   lapisan komposit dirasterisasi grayscale — tipis & berpinggir di kartu putih,
+   apa pun setelan font-smoothing. Terukur di satu layar: 18 elemen `.rise`,
+   semuanya kartu daftar putih, semuanya menyimpan matrix itu.
+   `backwards` DIPERTAHANKAN & wajib: ia yang menahan baris di keyframe `from`
+   sebelum gilirannya datang, dan itulah yang membuat stagger bekerja.
+   Aman terhadap reduced-motion — blok di bawah sudah menolkan `animation-delay`. */
+.rise { animation: riseIn var(--dur-masuk) var(--ease-out-expo) backwards; }
 
 /* ── Isi yang lahir DI TEMPAT (akordeon dibuka, pesan galat muncul) ──────────
    Bukan layar/lembar baru, jadi bukan `.rise` (10px, 0.5s — itu untuk daftar
