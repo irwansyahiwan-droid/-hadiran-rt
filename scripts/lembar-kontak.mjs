@@ -19,7 +19,7 @@
 // data produksi dari sapuan.
 //
 //   npm run lembar-kontak
-//   BAGIAN=normal|kosong|memuat  — batasi bagian (default: semuanya)
+//   BAGIAN=normal|kosong|memuat|gagal|luring  — batasi (default: semuanya)
 //
 // Keluaran: .lembar-kontak/lembar.png (+ potret satuan di folder yang sama).
 
@@ -29,7 +29,7 @@ import { newCtx, loginWarga, gotoTab, openMenuItem, fakeSession, REF, ANON } fro
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const OUT = '.lembar-kontak';
-const BAGIAN = process.env.BAGIAN ? [process.env.BAGIAN] : ['normal', 'kosong', 'memuat'];
+const BAGIAN = process.env.BAGIAN ? [process.env.BAGIAN] : ['normal', 'kosong', 'memuat', 'gagal', 'luring'];
 mkdirSync(OUT, { recursive: true });
 
 const TAB_W = ['Beranda', 'Jadwal', 'Hadiran', 'Kas RT'];
@@ -58,6 +58,7 @@ async function pasangMode(ctx, mode, bendahara) {
     /* 25 dtk: cukup lama supaya kerangka tetap terpasang saat dipotret (~1 dtk
        sesudah pindah tab), cukup pendek supaya `ctx.close()` tak menggantung
        menunggu handler rute yang masih tidur. */
+    if (mode === 'gagal') return route.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"lembar-kontak: gagal muat"}' });
     if (mode === 'memuat') await new Promise((r) => setTimeout(r, 25_000));
     return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'content-range': '*/0' }, body: '[]' });
   });
@@ -79,6 +80,7 @@ for (const bagian of BAGIAN) {
      tanpa menambah pertanyaan baru — yang diperiksa BENTUK keadaannya, bukan
      paletnya (palet sudah punya empat sapuan kontras sendiri). */
   const tema = bagian === 'normal' ? ['light', 'dark'] : ['light'];
+  if (bagian === 'luring') continue;   // ditangani blok tersendiri di bawah (service worker HIDUP)
 
   for (const t of tema) {
     // ── LOGIN ──
@@ -129,6 +131,35 @@ for (const bagian of BAGIAN) {
       await ctx.close();
     }
   }
+}
+/* ── LURING: satu-satunya bagian yang membiarkan service worker HIDUP ──────
+   Semua sapuan lain memakai `serviceWorkers: 'block'` demi hasil stabil, dan
+   justru itu titik butanya: jalur luring memakai KODE BERBEDA (shell dari
+   cache, Supabase sengaja dilewati sw.js). Urutannya wajib: daftar SW saat
+   ONLINE dulu, pastikan ia MENGONTROL halaman, baru putus jaringan — kalau
+   tidak, yang terpotret cuma layar kosong dan itu bukan keadaan luring app. */
+if (BAGIAN.includes('luring')) {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, colorScheme: 'light' });
+  await ctx.addInitScript(() => { try { localStorage.setItem('hadiran-welcome-v2', '1'); localStorage.setItem('hadiran-theme', 'light'); } catch {} });
+  const page = await ctx.newPage();
+  await page.goto(URL, { waitUntil: 'networkidle' });
+  await loginWarga(page).catch(() => false);
+  await page.waitForTimeout(4500);
+  const dikontrol = await page.evaluate(() => !!navigator.serviceWorker?.controller);
+  if (!dikontrol) {
+    console.log('\n  ! PROBE CACAT: service worker tak mengontrol halaman — bagian luring dilewati');
+  } else {
+    await ctx.setOffline(true);
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
+    await page.waitForTimeout(8000);
+    await ambil(page, 'luring-light', 'warga · sesudah reload');
+    for (const tab of TAB_W.slice(1)) {
+      await page.locator('nav button', { hasText: tab }).first().click({ force: true }).catch(() => {});
+      await page.waitForTimeout(1400);
+      await ambil(page, 'luring-light', `warga · ${tab}`);
+    }
+  }
+  await ctx.close();
 }
 process.stdout.write('\n');
 
