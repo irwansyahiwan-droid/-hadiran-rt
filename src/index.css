@@ -425,7 +425,7 @@ input, textarea  { caret-color: #1B7249; }
 }
 
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
-.dark body { background-color: #00190B; }
+.dark body { background-color: #001709; }
 
 /* (Konsolidasi 10 Jul) Blok `*:focus-visible` kedua dihapus — dobel dgn aturan
    :is(button,a,...) di atas memakai DUA hijau berbeda (#0F6039 vs #1B7249) dan
@@ -472,7 +472,7 @@ input, textarea  { caret-color: #1B7249; }
    Kini kanvas gelap RATA (#030712), separasi datang dari step tonal (kartu
    gray-900) + ring cahaya + geometri — sama persis dgn logika sisi light. */
 .dark .app-bg {
-  background-color: #00190B;
+  background-color: #001709;
 }
 
 /* ── Kontras teks (LIGHT MODE saja) ──────────────────────────────────
@@ -1126,15 +1126,29 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      pernah dibandingkan dgn rung lain), jadi tak ada yang menangkapnya sampai
      paritas terang-gelap benar-benar diukur. Drop hitamnya DIPERTAHANKAN — ia
      yang memberi jangkauan; ring-nya yang memberi tingkat. */
-  --shadow-rest: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  /* RING DINAIKKAN .08/.10/.12/.14 → .12/.16/.19/.22 (30 Agu 2026).
+     Ini jawaban atas "langkah nada gelap" — dan sengaja BUKAN dgn menggeser L.
+     Catatan lama menulis langkah gelap 12 % L; angka itu dihitung utk `#22342A`
+     sementara kartu memakai `gray-900` = `#192920`, jadi langkah aslinya 7,6 %.
+     Mengejar 12 % ternyata mustahil tanpa membayar: menaikkan KARTU ke sana
+     mendaratkannya 0,8 % L dari sheet (`gray-800` 31,6 %) — hierarki
+     kanvas<kartu<sheet runtuh — dan menjatuhkan teks sekunder `gray-400` dari
+     6,06 ke 5,22; menurunkan KANVAS sejauh itu menabrak gamut sRGB (kroma
+     0,0446 tak terpegang di L rendah, rona melenceng 157,2° → 152,9°).
+     Ring TIDAK punya ongkos itu: ia bukan teks & tak menyentuh permukaan mana
+     pun, jadi tak ada satu pun rasio yang bergerak. Tepi kartu lawan kanvas
+     1,63:1 → 2,01:1. Urutannya tetap menaik, jadi tangga elevasi utuh.
+     Sisa langkahnya diambil dari kanvas (#00190B → #001709, 7,6 % → 8,3 %) —
+     kartu tak disentuh, jadi teks di atasnya juga tidak. */
+  --shadow-rest: 0 0 0 1px rgba(255, 255, 255, 0.12);
   --shadow-card:
-    0 0 0 1px rgba(255, 255, 255, 0.10),                      /* ring cahaya → separasi tenang di gelap */
+    0 0 0 1px rgba(255, 255, 255, 0.16),                      /* ring cahaya → separasi tenang di gelap */
     0 2px 4px -1px rgba(0, 0, 0, 0.5);                        /* contact whisper */
   --shadow-float:
-    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.19),
     0 16px 40px -10px rgba(0, 0, 0, 0.7);
   --shadow-high:
-    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(255, 255, 255, 0.22),
     0 20px 25px -5px rgba(0, 0, 0, 0.65);
 }
 
