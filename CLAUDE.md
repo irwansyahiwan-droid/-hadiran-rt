@@ -620,6 +620,34 @@ hari ini (di bawah AAA), dan menaikkan permukaan kartu menurunkannya lagi ke
 lagi: mengubah permukaan membatalkan tiap angka di atasnya.
 
 
+
+Yang ke-33 (30 Agu 2026) — **ambang AAA app tak pernah DIUKUR, dan itu sebab
+tiga pelajaran sebelumnya bisa terjadi diam-diam.**
+
+Seluruh sapuan kontras memvonis `need = large ? 3 : 4.5` — murni WCAG AA —
+sementara app menyatakan ambangnya sendiri **AAA 7:1** sejak 4 Agu. Ambang yang
+tak dijaga alat sama dengan ambang yang tak ada. Biayanya sudah dibayar: ke-25
+(alpha `/55` pindah permukaan → 4,13), ke-30 (SELURUH tabel remap gugur waktu
+kartu gelap naik, `gray-400` 8,85 → 6,58), dan dua kali nyaris hari ini.
+
+Datanya SUDAH ada sejak dulu — tiap sampel membawa rasionya. Yang tak ada cuma
+yang mencetaknya. Jadi obatnya penambahan PELAPORAN, bukan mesin sampling baru.
+Dilaporkan TERPISAH & tak menggagalkan rantai (disiplin sama dgn bagian 200% di
+`audit:potong`), dan judulnya sengaja bukan `=== … ===` supaya ringkasan
+`sapu-semua` tetap vonis AA.
+
+**GARIS DASAR PERTAMA** (lokal): warga **12/1214**, bendahara **7/2199**.
+**TUJUH dari 12 temuan warga ada di layar LOGIN** — terburuk **4,77**
+("Bendahara lupa password?"), lalu 5,99 · 6,29 ("atau") · 6,42 · 6,68 · 6,99.
+Login jadi permukaan TERLEMAH app menurut ukurannya sendiri, dan itu tak pernah
+terlihat sebelum ada yang mencetaknya. Sisanya berdempet di 6,55–6,95: pil rose
+"belum bayar" di gelap, chip WARGA & BENDAHARA.
+
+**Pelajaran yang lebih besar dari satu seksi laporan: kalau app menetapkan
+ambang yang LEBIH KETAT dari standar, ambang itu wajib punya alat yang
+mencetaknya — kalau tidak, ia cuma niat, dan niat tak menahan regresi.**
+
+
 **Stack back-dismiss memuat entri TAB, dan itu BUKAN lapisan.** App
 mendaftarkan `activeTab !== 'beranda'` ke `useBackDismiss` supaya Back kembali
 ke Beranda — entri sah, tapi tak ada yang menutupi layar. Penjaga gestur yang
