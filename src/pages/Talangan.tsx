@@ -610,12 +610,24 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             </div>
           )}
 
+          {/* Nama keadaan "yang dicari tak ada" = `Tidak ada hasil` di SELURUH app
+              (Kas RT, Kas Hadiran, Kelola Anggota, Riwayat, Jadwal warga).
+              Layar ini dulu satu-satunya yang menyebutnya "Data tidak ditemukan"
+              dgn subjudul "Silakan periksa kembali kata kunci atau ejaan nama
+              warga." — register yang lebih formal & panjang daripada mana pun,
+              untuk keadaan yang PERSIS sama. Dihitung sebelum diseragamkan:
+              `Tidak ada hasil` 5 pemakaian, `Tidak ditemukan` 1, `Data tidak
+              ditemukan` 1 — jadi yang dipakai anak tangga yang sudah ada, bukan
+              yang paling enak dibaca sendirian.
+              Cabang FILTER sengaja TIDAK disamakan: "Belum ada talangan yang
+              lunas" menyebut bendanya & keadaannya, dan itu memang keterangan
+              yang berbeda dari pencarian yang meleset. */}
           {visibleCount === 0 && (
             <EmptyState
               icon={search ? Search : CheckCircle2}
-              title={search ? 'Data tidak ditemukan' : statusFilter !== 'semua' ? 'Tidak ada hasil' : 'Belum ada talangan'}
+              title={search || statusFilter !== 'semua' ? 'Tidak ada hasil' : 'Belum ada talangan'}
               subtitle={search
-                ? 'Silakan periksa kembali kata kunci atau ejaan nama warga.'
+                ? 'Coba kata kunci lain.'
                 : statusFilter === 'lunas'
                   ? 'Belum ada talangan yang lunas.'
                   : statusFilter === 'belum'

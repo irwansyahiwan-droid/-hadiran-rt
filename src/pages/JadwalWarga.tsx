@@ -486,7 +486,7 @@ export default function JadwalWargaPage() {
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
             {filteredWarga.length === 0 ? (
               /* Kosong karena TAK ADA DATA ≠ kosong karena pencarian. Dulu layar
-                 ini selalu bilang "Tidak ditemukan · Coba kata kunci lain" +
+                 ini selalu bilang "tak ada hasil · coba kata kunci lain" +
                  tombol "Reset filter" — padahal saat daftar anggota memang masih
                  kosong (RT baru, atau bendahara belum menambah warga) tak ada
                  kata kunci yang diketik dan tak ada filter yang bisa direset:
@@ -501,7 +501,7 @@ export default function JadwalWargaPage() {
               ) : (
                 <EmptyState
                   icon={Search}
-                  title="Tidak ditemukan"
+                  title="Tidak ada hasil"
                   subtitle="Coba kata kunci lain."
                   action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setWargaFilter('semua'); } }}
                 />
