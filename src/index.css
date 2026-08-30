@@ -168,8 +168,6 @@ body {
   background-color: #CFE6D8;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   /* Tabular figures app-wide: tiap digit selebar sama → angka rupiah tidak
      "goyang/loncat" saat count-up atau saat disusun kolom (terasa seperti
      running text bank).
@@ -877,6 +875,39 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    terlalu terang utk teks putih kecil (eyebrow ≈2.4:1). Radial gelap tipis
    menurunkan HANYA pojok itu; sejak 13 Jul stop start ikut diredupkan ke
    #157A45 (lihat catatan di dalam rule). Bahasa sama dgn scrim foto promo. */
+/* ── Font smoothing DIPILIH PER PERMUKAAN (30 Agu 2026) ────────────────────
+   Sampai hari ini `-webkit-font-smoothing: antialiased` dipasang di `body`,
+   global — dan di berkas yang hampir tiap barisnya berkomentar, baris itu tak
+   punya satu pun alasan tertulis. Ciri kebiasaan yang ikut tersalin, bukan
+   keputusan yang pernah diukur.
+
+   Ia MEMATIKAN subpixel antialiasing. Untuk teks TERANG di atas GELAP itu
+   benar — tanpa ia, huruf putih di hero terbaca gemuk. Untuk teks GELAP di
+   atas TERANG ia membuang kepadatan goresan: huruf jadi tipis & berpinggir,
+   dan itu persis laporan "font pecah di kartu putih".
+
+   Populasinya DIUKUR dari app yang berjalan, bukan dikira: di mode terang,
+   tinta terang duduk di `hero-emerald` (355 sampel), `bg-brand` (7),
+   `hero-noise` (5, layar Login), panel `bg-black/*` di dalam hero (4), dan
+   segelintir pil gelap. Karena properti ini MEWARISI, satu selektor per
+   permukaan menutup seluruh keturunannya — 355 sampel itu cukup satu baris.
+
+   `.dark` diborong dan itu AMAN: diukur di empat tab mode gelap, teks gelap di
+   mode gelap = 0 sampel, jadi tak ada yang ikut tertipiskan.
+
+   Pil gelap satuan (`bg-rose-700` "Defisit", `bg-emerald-700`) tidak didaftar
+   sendiri: yang di dalam hero sudah mewarisi, dan sisanya badge 11-12px
+   semibold — mengejarnya berarti mendaftar utility satu per satu, dan daftar
+   semacam itu yang selalu menyimpang. */
+.dark,
+.hero-emerald,
+.hero-noise,
+.btn-brand,
+.bg-brand {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .hero-emerald {
   background-image:
     radial-gradient(130% 72% at 0% 0%, rgba(4, 38, 24, 0.48), transparent 55%),
