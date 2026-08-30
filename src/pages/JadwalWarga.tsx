@@ -35,6 +35,12 @@ const SUB_TABS = [
 // Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
 // (min-height), pola HERO_MIN_H KasHadiran/KasRT/Talangan.
 //
+// 159 → 167 (30 Agu 2026): bantalan hero naik p-5 → p-6 mengikuti anatomi
+// bersama HeroSaldo. Diukur ulang pada build nyata: hero 167px @390 · 190 @360
+// · 190 @320; kerangka 161/183/183 sebelum disetel. Lantai = 167 (tinggi hero
+// TERKECIL yang benar-benar terjadi), dan blok judul sempit 68 → 75px supaya
+// kerangka setinggi hero di 360/320 juga — selisih 7px yang tersisa itu persis
+// geseran yang `audit:lompat` ukur.
 // 198 → 155 (29 Agu 2026): hero berhenti melaporkan kehadiran, jadi blok
 // progres (28px) & dua dari tiga chip hilang — dan chip yang tersisa TAK LAGI
 // MELIPAT di 360px. Diukur ulang, bukan dikurangi di atas kertas: eyebrow 20 +
@@ -46,7 +52,7 @@ const SUB_TABS = [
 //
 // WAJIB diukur ulang tiap anatomi hero berubah — kerangka di bawah meniru
 // anatomi ini blok per blok, dan selisihnya langsung jadi CLS (`audit:lompat`).
-const HERO_MIN_H = 159;
+const HERO_MIN_H = 167;
 
 export default function JadwalWargaPage() {
   /* Cetak jadwal = aksi berat (chunk PDF + render di main thread). Lihat
@@ -206,9 +212,17 @@ export default function JadwalWargaPage() {
             yang menentukan tinggi & ikut melipat di titik yang SAMA, jadi
             HERO_MIN_H kembali jadi lantai (persis perannya di hero asli), bukan
             angka yang harus ditebak ulang tiap kali anatomi berubah. */}
+        {/* PERMUKAAN kerangka = permukaan tujuannya (30 Agu 2026). Sebelumnya
+            kartu PUTIH ber-hairline, sementara yang menggantikannya hero HIJAU —
+            jadi tiap muat, layar bertukar putih→emerald di depan mata warga.
+            Anatominya benar & tingginya benar, jadi tak satu pun sapuan geometri
+            protes; yang salah materialnya. Halaman lain sudah lama begini
+            (KasHadiran/KasRT/Talangan), halaman ini yang tertinggal. Bar isian
+            ikut `.skeleton-hero` (putih beralpha) — `.skeleton` abu di atas
+            gradient hijau terbaca seperti lubang, bukan isian yang sedang dimuat. */}
         <div
-          style={{ minHeight: HERO_MIN_H }}
-          className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5 space-y-3"
+          style={{ minHeight: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }}
+          className="relative overflow-hidden rounded-3xl hero-emerald p-6 space-y-3"
         >
           {/* Tinggi tiap blok = tinggi KOTAK BARIS aslinya (diukur 360px: eyebrow
               20, judul 68, progres 28). Batang skeleton sengaja lebih tipis dari
@@ -220,10 +234,10 @@ export default function JadwalWargaPage() {
               MELIPAT di bawah 390px (68px) dan tidak di atasnya (46px). Angkanya
               bukan tebakan: 390 persis titik chip berhenti melipat juga, dan
               tinggi hero terukur 253 vs 198 di dua sisi ambang itu. */}
-          <div className="skeleton h-5 w-32 rounded-full" />
-          <div className="h-[46px] max-[389px]:h-[68px] space-y-2">
-            <div className="skeleton h-4 w-3/4 rounded-full" />
-            <div className="skeleton h-3 w-2/3 rounded-full" />
+          <div className="skeleton skeleton-hero h-5 w-32 rounded-full" />
+          <div className="h-[46px] max-[389px]:h-[75px] space-y-2">
+            <div className="skeleton skeleton-hero h-4 w-3/4 rounded-full" />
+            <div className="skeleton skeleton-hero h-3 w-2/3 rounded-full" />
           </div>
           {/* SATU chip sekarang (Rp terkumpul) — diukur 109×23px, dan ia tak
               melipat di lebar mana pun (390/360/320 sama). Sebelum 29 Agu 2026
@@ -233,7 +247,7 @@ export default function JadwalWargaPage() {
               `flex-wrap` ikut dibuang — membungkus yang tak pernah membungkus
               cuma menyisakan aturan yang tak bisa dibuktikan lagi. */}
           <div className="flex gap-2">
-            <div className="skeleton h-[23px] w-[109px] rounded-full" />
+            <div className="skeleton skeleton-hero h-[23px] w-[109px] rounded-full" />
           </div>
         </div>
         {/* Sub-tab switcher (2 tombol, min-h 44) */}
@@ -322,11 +336,23 @@ export default function JadwalWargaPage() {
           Nilainya sekarang `kepalaHalaman` di atas — dipakai cabang memuat juga. */}
       {kepalaHalaman}
 
-      {/* Hero Card — material/warna disamakan dengan hero Beranda (.hero-card) */}
+      {/* Hero — permukaan `hero-emerald`, ANATOMI sama dgn HeroSaldo (30 Agu 2026).
+          Sebelumnya `.hero-card hero-noise` + `p-5`, dgn alasan tertulis
+          "material/warna disamakan dengan hero Beranda". Alasan itu sudah BASI:
+          Beranda pindah ke `hero-emerald` (lihat BannerCarousel), dan halaman ini
+          ditinggal menunjuk keputusan yang tak ada lagi — satu-satunya hero warga
+          dgn gradient berbeda (`.hero-card` 135deg gelap→terang lawan
+          `hero-emerald` 150deg terang→gelap + scrim AA pojok kiri-atas).
+          Label & keterangan ikut kelas HeroSaldo PERSIS (`text-white/90`,
+          `tracking-[0.12em]`, clamp ukuran) supaya ini tak jadi dialek ketiga. */}
       {lastTarikan ? (
-        <div className="hero-card hero-noise" style={{ minHeight: HERO_MIN_H }}>
-          <div className="relative p-5 space-y-3">
-            <p className="inline-flex items-center gap-1 text-emerald-100 text-micro font-semibold uppercase tracking-widest">
+        <div
+          className="relative overflow-hidden rounded-3xl hero-emerald"
+          style={{ minHeight: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }}
+        >
+          <div className="hero-sheen pointer-events-none absolute inset-0" />
+          <div className="relative p-6 space-y-3">
+            <p className="inline-flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-semibold uppercase tracking-[0.12em] text-white/90">
               Tarikan Terakhir
               <InfoTip label="Tarikan" tone="onDark">
                 Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima total iuran anggota.
@@ -336,7 +362,7 @@ export default function JadwalWargaPage() {
               <p className="text-white text-subtitle font-bold leading-tight angka-prosa">
                 Tarikan ke-{lastTarikan.nomor} · {formatTanggal(lastTarikan.tanggal)}
               </p>
-              <p className="text-emerald-100 text-body mt-0.5">
+              <p className="text-white/90 text-body mt-0.5">
                 Sohibul Bait
                 <InfoTip label="Sohibul Bait" tone="onDark" className="mx-1">
                   Anggota yang menerima seluruh hasil tarikan pada giliran ini (penerima arisan).

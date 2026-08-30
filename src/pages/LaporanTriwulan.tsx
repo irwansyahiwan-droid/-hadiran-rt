@@ -161,7 +161,14 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
 
         {/* Tutup Buku Sekarang — snapshot posisi kas s/d hari ini */}
         {!loading && snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
-          <div className="rise hero-card hero-noise" style={{ padding: '18px 20px 16px' }}>
+          <div className="rise relative overflow-hidden rounded-3xl hero-emerald" style={{ padding: '18px 20px 16px', boxShadow: 'var(--hero-shadow)' }}>
+            {/* Permukaan `hero-emerald` (30 Agu 2026) — sebelumnya `.hero-card
+                hero-noise`, gradient BERBEDA dari hero se-app lainnya. Bersama
+                JadwalWarga ini dua sisa terakhir yang memakainya; Beranda —
+                alasan asal keduanya memilih `.hero-card` — sudah pindah lebih
+                dulu. Yang disamakan MATERIALnya saja; tata letak kartu ini
+                (dua panel + kaki) memang komposisi tersendiri. */}
+            <div className="hero-sheen pointer-events-none absolute inset-0" />
             <div className="relative flex items-center gap-2 mb-3">
               <CalendarCheck className="w-4 h-4 text-emerald-200" />
               <p className="text-micro font-semibold uppercase text-white" style={{ letterSpacing: '0.14em' }}>
