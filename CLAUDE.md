@@ -324,6 +324,10 @@ justru lebih berisik daripada sebelum diperbaiki. **Kalau nanti terasa kurang
 "nendang": geser LANGKAH NADA (kanvas vs kartu) atau bayangannya — JANGAN
 menggelapkan hairline lagi. Itu jalan yang sudah dicoba sembilan kali.**
 
+(30 Agu 2026: nasihat ini SUDAH dijalankan sampai habis — lihat pelajaran
+ke-32. Langkah nada digeser dua kali, keluhannya tetap kembali. Tuas
+berikutnya BUKAN L lagi, melainkan KROMA.)
+
 Aturan itu langsung diuji di hari yang sama: user menilai versi pertama "kurang
 tegas". Yang digeser LANGKAH NADA-nya (terang 2,75% → 6,3% L; gelap 8,1% →
 12,0% L) + bayangan (.10/.13 → .14/.17), dan hairline TIDAK disentuh sama
@@ -547,6 +551,62 @@ IKUT menutupi kegagalan selama entrinya belum dibuang. Yang diperbaiki mengubah
 **Sapuan yang dikunci `chmod a-w` TIDAK dibuka diam-diam.** `audit-luring.mjs`
 salah satu dari 13 sapuan read-only; detektornya dipasang sbg sapuan BARU
 (`audit:luring-pertama`), bukan dgn membuka kunci yang dipasang sengaja.
+
+
+
+Yang ke-32 (30 Agu 2026) — **"kurang nendang" ternyata bukan soal KONTRAS,
+tapi soal WARNA. Tuas yang benar KROMA, bukan L.**
+
+Keluhan kalimat yang sama datang untuk KETIGA kalinya (16 Jun, 26 Agu, 30 Agu).
+Dua jawaban pertama sama-sama menggeser L — `#DCE1EA→#D4DAE4`, lalu langkah
+nada 2,75% → 6,3% — dan pelajaran ke-26 bahkan menuliskannya sbg nasihat untuk
+kejadian berikutnya. Nasihat itu diikuti, dan keluhannya tetap kembali.
+
+Yang belum pernah diukur sampai hari ini:
+
+    kanvas  L*90,3%  C=0,0134
+    hero             C=0,0883      ← 6,6× lebih berwarna
+
+Layarnya satu blok hijau pekat berdiri di padang abu. Warga tidak sedang
+mengeluh kartunya menempel di kanvas; ia mengeluh layarnya PUCAT. Dua hal itu
+terdengar sama di telinga dan menuntut tuas yang berbeda.
+
+Kanvas `#D8E2DC` → `#CFE6D8`: kroma 0,0134 → 0,0308 (2,3×), **L & rona
+DIKUNCI** di OKLab. Karena L terkunci, tak ada satu pun rasio yang turun —
+`#005044` 7,10 → 7,16 · `#75320B` 7,14 → 7,20 · `#34453B` 7,68 → 7,75. Itu
+seluruh alasan memilih tuas ini: ia menambah "hidup" tanpa membelanjakan
+kontras sepeser pun.
+
+**Bandingkan varian yang TIDAK dipilih**, karena di situ pelajarannya: varian
+"langkah nada 13%" menjatuhkan `#34453B` di kanvas ke **6,64** — di bawah
+ambang AAA app — dan **tak satu pun sapuan akan protes**, karena
+`audit:kontras` menjaga AA 4,5. Pelajaran ke-30 mau terulang, dan kali ini
+ketahuan SEBELUM dikerjakan justru karena tiap varian diukur dulu, bukan
+digambar lalu dipilih dengan rasa saja.
+
+**Gamut itu batas nyata, bukan formalitas.** Nilai gelap yang pertama dirender
+(`#001A09`, C diminta 0,055) terpotong sRGB dan ronanya melenceng 157,8° →
+153,4°. Yang dipakai `#00190B`: C 0,0446, rona bergeser 0,6°. **Sesudah
+mengonversi OKLab→sRGB, periksa apakah hasilnya terpotong** — kalau ya, rona
+yang tadi "dikunci" sebenarnya sudah lepas.
+
+**TITIK SINKRON KANVAS — sepuluh, dan berhenti di CSS berarti gagal**
+(pelajaran ke-27): `body` · `.app-bg` · token `sunken` · `warnaCetak.ts`
+(dikunci `warnaCetak.test.ts`) · `manifest.background_color` ·
+`landing.html --canvas` & `--alt-bg` · `index.html` theme-color statis ·
+splash inline · `gen-splash.mjs` BG · `useTheme` (gelap). Splash PNG di-BAKE
+pada tone kanvas, jadi WAJIB diregenerasi & **pikselnya diperiksa** — bukan
+dipercaya dari baris "ok →" milik generatornya.
+
+**MASIH TERBUKA — langkah nada GELAP tak sesuai catatan.** Pelajaran ke-26
+mencatat langkah nada gelap dinaikkan ke **12,0 % L**. Angka itu benar untuk
+`#22342A`, tapi kartu tidak memakai nilai itu: `gray-900` = `#192920`, dan
+langkah aslinya **7,6 % L** — lebih KECIL daripada sisi terang (8,4 %).
+Perbaikannya (varian "C") sengaja TIDAK dikerjakan bersama pass ini karena ia
+punya biaya sendiri: teks sekunder `gray-400` di kartu gelap sudah **6,06:1**
+hari ini (di bawah AAA), dan menaikkan permukaan kartu menurunkannya lagi ke
+5,07–5,22. **Kalau dikerjakan, tintanya WAJIB ikut naik** — pelajaran ke-30
+lagi: mengubah permukaan membatalkan tiap angka di atasnya.
 
 
 **Stack back-dismiss memuat entri TAB, dan itu BUKAN lapisan.** App
