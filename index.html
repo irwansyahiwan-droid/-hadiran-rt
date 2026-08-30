@@ -19,7 +19,7 @@
     <meta name="robots" content="noindex, nofollow" />
     <!-- Status bar mengikuti tema PILIHAN warga, bukan OS (di-override dinamis
          oleh useTheme saat toggle, dan oleh inline script di bawah saat load). -->
-    <meta name="theme-color" content="#D8E2DC" />
+    <meta name="theme-color" content="#CFE6D8" />
     <!-- Pasang tema SEBELUM paint pertama: tanpa ini pengguna yang memilih gelap
          melihat kilatan putih tiap buka app (class .dark baru dipasang React
          setelah bundle). Logika harus sama dgn useTheme: TERANG kecuali warga
@@ -30,7 +30,7 @@
           document.documentElement.classList.add('dark');
           document
             .querySelectorAll('meta[name="theme-color"]')
-            .forEach(function (m) { m.setAttribute('content', '#07170E'); });
+            .forEach(function (m) { m.setAttribute('content', '#00190B'); });
         }
       } catch (e) { /* abaikan (mis. storage diblokir) */ }
     </script>
@@ -45,10 +45,10 @@
       #app-splash {
         position: fixed; inset: 0; z-index: 60;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 18px; background: #D8E2DC;
+        gap: 18px; background: #CFE6D8;
         opacity: 1; transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      .dark #app-splash { background: #07170E; }
+      .dark #app-splash { background: #00190B; }
       #app-splash.as-hide { opacity: 0; pointer-events: none; }
       .as-logo {
         width: 64px; height: 64px; border-radius: 16px; overflow: hidden;
@@ -93,7 +93,7 @@
          kini default terang, splash terang = tebakan yang benar untuk hampir semua
          warga (yang memilih gelap sendiri lihat splash terang sesaat — trade-off
          sadar, lebih baik daripada splash gelap untuk semua pengguna HP dark).
-         PNG di-bake pada tone kanvas AKTIF #D8E2DC (langkah nada, 29 Agu 2026) —
+         PNG di-bake pada tone kanvas AKTIF #CFE6D8 (kroma, 30 Agu 2026) —
          sinkron body/sunken/manifest. Bila kanvas berubah: regen via
          scripts/gen-splash.mjs. Tanpa ini iOS standalone = blank putih. -->
     <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-640x1136.png" />

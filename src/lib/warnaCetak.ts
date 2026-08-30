@@ -29,7 +29,7 @@
 
 export const CETAK = {
   // Permukaan & garis
-  canvas:  '#D8E2DC', // = token `sunken` / body / .app-bg (langkah nada, 29 Agu 2026)
+  canvas:  '#CFE6D8', // = token `sunken` / body / .app-bg (kroma, 30 Agu 2026)
   surface: '#FFFFFF',
   /* SENGAJA TIDAK sama dgn token `line` sejak app pindah ke mazhab tonal
      (24 Agu 2026). Di LAYAR kartu dipisahkan langkah nada + bayangan bertinta,

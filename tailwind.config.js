@@ -225,7 +225,7 @@ export default {
              itu ikut turun ke 6,66:1 dan GUGUR dari ambang app tanpa satu pun
              sapuan protes: `audit:kontras` menjaga AA (4,5), bukan AAA (7).
              Ini pelajaran ke-30 terulang di sisi TERANG — pass 26 Agu mengukur
-             ulang permukaan GELAP saja. Kini 7,10:1 di kanvas #D8E2DC,
+             ulang permukaan GELAP saja. Kini 7,16:1 di kanvas #CFE6D8,
              9,09 di kartu, 9,41 di putih. ΔH 0,04° ΔC 0,0036 (rona terkunci). */
           link: '#005044',    // teal-green untuk tautan "Lihat semua"
           /* #1A9B86 → #34D399 (emerald-400): teal lama cuma 5,13:1 di atas kartu
@@ -276,7 +276,7 @@ export default {
         warn: {           // tunggakan / perhatian (amber-900) — amber-700 gagal AA di kanvas/banner, amber-800 #92400E 7,10/6,26; kini 9,07 / 8,00
           /* #92400E → #78350F (4 Agu) → #75320B (29 Agu, langkah nada kanvas).
              Judul & penghitung "Tunggakan Berganda" duduk LANGSUNG di kanvas;
-             di kanvas #D8E2DC nilai lama tinggal 6,84:1. Kini 7,14 di kanvas,
+             di kanvas #CFE6D8 nilai lama tinggal 6,84:1. Kini 7,20 di kanvas,
              8,50 di banner amber-100, 9,47 di putih. Cermin di `warnaCetak.ts`
              WAJIB ikut (dikunci `warnaCetak.test.ts`). */
           DEFAULT: '#75320B',
@@ -325,7 +325,7 @@ export default {
            abu 12% di atas kartu) mendarat 5,1 unit dari kanvas LAMA, jadi
            terbaca "di kanvas" padahal permukaannya lain sama sekali. Vonis
            wajib dari `r.bg` sampel itu sendiri, bukan dari kemiripan warna. */
-        sunken: '#D8E2DC',
+        sunken: '#CFE6D8',
         line: '#D3E0D8',    // garis/divider tipis. MATERIAL-FLAT (2 Jul): #CFD5DF→#DAE0E8 — border kartu kini SATU-SATUNYA tepi (edge ring di --shadow-card dihapus), jadi diringankan ke hairline whisper ala Google (#DADCE0 versi sejuk). Pass kontras-tercetak (8 Jul): #DAE0E8→#D3DAE3 — user minta kontras lebih premium; naikkan SATU step di dalam bahasa flat (hairline = lever sah) agar tepi kartu "tercetak", tetap whisper-class bukan bingkai. Pass "Etched Premium" (26 Jul): #D3DAE3→#C5CFDB — user minta warna/kontras lebih mahal (trend 2026); tepi kartu dinaikkan SATU step lagi (lever hairline yg sama, BUKAN glass/shadow) agar "tercetak" ala Linear/Stripe/Mercury light. Edge-family digelapkan serempak menjaga hierarki control > line > divider. Pass KONTRAS MAKSIMAL (4 Agu): #C5CFDB→#B8C4D3 — satu step lagi di lever yang SAMA (hairline), bukan glass/shadow/kanvas. Nilainya persis `control` sebelum pass non-teks, jadi hierarki control #64748B > line #B8C4D3 > divider baris #D1DAE5 tetap utuh. Hairline ini juga jadi garis atas bar nav dok (.nav-dock) supaya tepi bar & tepi kartu satu bahasa.
         /* border kontrol (input/tombol) — lebih kuat dari line. Riwayat: #E2E8F0→#CBD5E1
            (8 Jul, dulu malah LEBIH TERANG dari line) → #B8C4D3 (26 Jul "Etched Premium",

@@ -23,7 +23,7 @@ export function useTheme() {
     // SAMA dan WAJIB dijaga sepasang: memperbaiki satu saja berarti bar status
     // balik ke palet lama begitu warga menekan toggle tema (persis yang terjadi
     // 26 Agu 2026 — index.html diperbaiki, hook ini terlewat).
-    const color = isDark ? '#07170E' : '#F8FCF9';
+    const color = isDark ? '#00190B' : '#F8FCF9';
     document
       .querySelectorAll('meta[name="theme-color"]')
       .forEach((m) => m.setAttribute('content', color));

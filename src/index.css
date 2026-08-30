@@ -158,8 +158,14 @@ body {
      (nada Gmail/Google apps) RATA tanpa radial whisper; kartu putih MURNI flat
      ber-hairline; bayangan tinggal satu contact whisper. Separasi = step tonal
      + hairline + geometri, titik. Jangan tambah lapisan lagi. */
-  /* LANGKAH NADA (29 Agu 2026): #E4ECE7 → #D8E2DC. Lihat token `sunken`. */
-  background-color: #D8E2DC;
+  /* LANGKAH NADA (29 Agu 2026): #E4ECE7 → #D8E2DC. Lihat token `sunken`.
+     KROMA (30 Agu 2026): #D8E2DC → #CFE6D8. Warga bilang "kurang nendang" —
+     keluhan yang SAMA sudah dua kali dijawab dgn L (16 Jun, 26 Agu) dan kembali
+     lagi, jadi kali ini yang digeser KROMA: 0,0134 → 0,0308 (2,3×), L & rona
+     DIKUNCI di OKLab. Layar berhenti terbaca abu tanpa satu pun angka kontras
+     bergerak turun — `#005044` 7,10 → 7,16 · `#75320B` 7,14 → 7,20 ·
+     `#34453B` 7,68 → 7,75. Itu seluruh alasan memilih tuas kroma, bukan L. */
+  background-color: #CFE6D8;
   /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -419,7 +425,7 @@ input, textarea  { caret-color: #1B7249; }
 }
 
 /* Dark: body terlihat saat overscroll/safe-area → samakan dgn root gray-950 */
-.dark body { background-color: #07170E; }
+.dark body { background-color: #00190B; }
 
 /* (Konsolidasi 10 Jul) Blok `*:focus-visible` kedua dihapus — dobel dgn aturan
    :is(button,a,...) di atas memakai DUA hijau berbeda (#0F6039 vs #1B7249) dan
@@ -440,7 +446,7 @@ input, textarea  { caret-color: #1B7249; }
 /* ── Panggung app: latar dalam + aura emerald lembut (brand) ──────────
    Glow halus di atas & sudut bikin tampilan "hidup"/wah tapi tetap clean;
    attachment:fixed → aura diam saat scroll (terasa atmosferik, bukan ramai).
-   Dipakai di wrapper App (kanvas #F2F5FA — samakan dgn body/sunken/manifest). */
+   Dipakai di wrapper App — samakan dgn body/sunken/manifest/landing/splash. */
 .app-bg {
   /* MATERIAL-FLAT (2 Jul): kanvas Google-light #ECF1F7 benar-benar RATA —
      radial whisper emerald+sky DIHAPUS (hijau di atas abu sejuk = zona
@@ -448,8 +454,14 @@ input, textarea  { caret-color: #1B7249; }
      kanvas polos, kartu putih flat, atmosfer datang dari konten & warna
      hero — bukan dari aura di latar. Samakan dgn body/sunken/manifest/landing.
      LANGKAH NADA (29 Agu 2026): #E4ECE7 → #D8E2DC — kanvas→kartu naik dari
-     1,162:1 ke 1,281:1, mendekati sisi gelap yang sudah 1,400:1. */
-  background-color: #D8E2DC;
+     1,162:1 ke 1,281:1, mendekati sisi gelap yang sudah 1,400:1.
+     KROMA (30 Agu 2026): #D8E2DC → #CFE6D8, L & rona DIKUNCI. Tuas yang
+     DIPILIH sesudah keluhan "kurang nendang" datang KETIGA kalinya: dua
+     jawaban sebelumnya (16 Jun, 26 Agu) sama-sama menggeser L, dan keluhannya
+     kembali. Diukur, layarnya memang bukan kurang kontras melainkan kurang
+     WARNA — kroma kanvas 0,0134 lawan hero 0,0883, sekitar 6,6×. Karena L
+     terkunci, tak ada rasio yang turun (lihat body). */
+  background-color: #CFE6D8;
 }
 /* MATERIAL-FLAT DARK (12 Jul 2026) — menuntaskan keputusan 2 Jul ke sisi gelap.
    Aura radial (emerald .30 + teal .22 + sky .15) DIHAPUS. Kanvas light sudah
@@ -460,7 +472,7 @@ input, textarea  { caret-color: #1B7249; }
    Kini kanvas gelap RATA (#030712), separasi datang dari step tonal (kartu
    gray-900) + ring cahaya + geometri — sama persis dgn logika sisi light. */
 .dark .app-bg {
-  background-color: #07170E;
+  background-color: #00190B;
 }
 
 /* ── Kontras teks (LIGHT MODE saja) ──────────────────────────────────
