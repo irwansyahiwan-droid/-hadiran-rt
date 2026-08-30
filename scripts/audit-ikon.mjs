@@ -47,13 +47,26 @@ const SRC = new URL('../src', import.meta.url).pathname;
 const RUNG = { 12: '.w-3  · text-micro', 14: '.w-3\\.5 · text-caption', 16: '.w-4  · text-body', 20: '.w-5  · mandiri' };
 
 /* ── IZIN — golongan GAMBAR, satu per satu dengan alasan ─────────────────── */
+/* Bentuk kunci, dan kenapa BUKAN nomor baris. Entri terakhir dulu ditulis
+   `pages/Talangan.tsx:520`, dan tiap kali seseorang menyunting apa pun DI ATAS
+   baris itu izinnya meleset lalu sapuan memerah untuk ikon yang tak berubah
+   sedikit pun — terjadi 30 Agu 2026 waktu subjudul "Per <tanggal>" menambah 6
+   baris (520 → 526). Alarm yang berbunyi karena berkasnya bergeser melatih
+   orang mengabaikan alarm. Kuncinya sekarang `berkas#Ikon@px`: tetap sempit
+   (satu ikon, satu ukuran, satu berkas) tapi tak peduli ia duduk di baris
+   berapa. Bentuk `berkas:baris` masih didukung untuk entri yang memang butuh. */
 const IZIN = [
   ['components/BannerCarousel.tsx', 'ilustrasi kartu promo — centang/silang/koin di dalam gambar mini-app'],
   ['components/SuccessOverlay.tsx', 'mahkota & centang perayaan — ilustrasi, bukan ikon antarmuka'],
   ['components/ErrorBoundary.tsx', 'segitiga peringatan besar layar galat — ornamen, satu-satunya isi layar'],
-  ['pages/Talangan.tsx:520', 'CheckCircle2 40px penanda keadaan tuntas — ornamen, bukan ikon baris'],
+  ['pages/Talangan.tsx#CheckCircle2@40', 'penanda keadaan tuntas — ornamen, bukan ikon baris'],
 ];
-const berizin = (nama, baris) => IZIN.some(([b]) => {
+const berizin = (nama, baris, ikon, px) => IZIN.some(([b]) => {
+  if (b.includes('#')) {
+    const [f, sisa] = b.split('#');
+    const [ik, ukuran] = sisa.split('@');
+    return nama.endsWith(f) && ik === ikon && (!ukuran || +ukuran === px);
+  }
   const [f, l] = b.split(':');
   return nama.endsWith(f) && (!l || +l === baris);
 });
@@ -86,7 +99,6 @@ for (const p of berkas) {
     const props = m[2];
     const baris = teks.slice(0, m.index).split('\n').length;
     diperiksa++;
-    if (berizin(nama, baris)) continue;
 
     /* className bisa berupa template literal `{`...`}` — pola yang menuntut
        kutip TEPAT setelah `className=` membaca 20 ikon sbg "tanpa ukuran"
@@ -95,6 +107,9 @@ for (const p of berkas) {
     const arb = cls.match(/[wh]-\[(\d+(?:\.\d+)?)(px|rem)\]/);
     const sk = cls.match(/\b[wh]-(\d+(?:\.\d+)?)\b/);
     const px = arb ? (arb[2] === 'rem' ? +arb[1] * 16 : +arb[1]) : sk ? +sk[1] * 4 : null;
+
+    /* Izin diuji SESUDAH ukuran diketahui — kunci `#Ikon@px` butuh keduanya. */
+    if (berizin(nama, baris, m[1], px)) continue;
 
     if (px === null) {
       temuan.push({ nama, baris, apa: m[1], sebab: 'ikon tanpa kelas ukuran — ia mewarisi 24px bawaan lucide, ukuran yang tak pernah dipilih siapa pun' });

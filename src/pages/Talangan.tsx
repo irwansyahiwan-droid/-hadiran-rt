@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
-import { useCountUp, useHideAmount, toggleHideAmount, useKembaliDariLatar } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useKembaliDariLatar, usePerTanggal } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
@@ -42,6 +42,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const [list, setList] = useState<Talangan[]>(cached ?? []);
   const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(false);
+  /* Halaman ber-SALDO yang ketiga: heronya menyatakan UANG ("Total Talangan
+     Belum Lunas"), jadi ia ikut aturan "per <tanggal>" yang sama dgn Kas RT &
+     Kas Hadiran. Sebelum 30 Agu 2026 halaman ini satu-satunya dari ketiganya
+     yang tak punya, tanpa alasan tertulis di mana pun. */
+  const perTanggal = usePerTanggal(loading, error);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   // Aksi merusak (batalkan pelunasan / hapus talangan) lewat dialog konfirmasi,
@@ -455,6 +460,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           tetap hanya muncul di mode warga (bendahara membukanya sbg tab). */}
       <PageHeader
         title="Talangan"
+        subtitle={perTanggal}
         onBack={onBack}
         /* InfoTip istilah pindah ke sini dari label hero: dua tooltip berisi
            kalimat yang SAMA di satu layar itu pengulangan, dan tempatnya yang

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useReducer, useCallback} from 'react';
 import { showToast } from './toast';
+import { useOnline } from '../hooks/useOnline';
 
 /* ── Tinggi layar & hero ringkas ─────────────────────────────────
  * Dipakai BERSAMA oleh kartu saldo (Beranda), skeleton-nya, dan rumus tinggi
@@ -404,4 +405,52 @@ export function useCountUp(target: number, duration = 1000, animate = true): num
   }, [target, duration, animate]);
 
   return current;
+}
+
+/**
+ * Subjudul "Per <tanggal>" untuk halaman ber-SALDO — beserta penjaganya.
+ *
+ * Dua hal yang dulu salah, dan yang kedua jauh lebih serius.
+ *
+ * (1) POPULASI tak beraturan: dari lima halaman ber-PageHeader hanya DUA yang
+ *     memakainya (Kas RT & Kas Hadiran), tanpa aturan tertulis di mana pun.
+ *     Aturannya sekarang eksplisit: "per <tanggal>" itu KUALIFIKASI atas sebuah
+ *     SALDO — angka uang tak lengkap tanpa "per kapan". Jadi ia milik halaman
+ *     yang heronya menyatakan UANG (Kas RT, Kas Hadiran, Talangan), dan BUKAN
+ *     milik halaman jadwal: di sana tanggal hidup di tiap baris, dan satu
+ *     tanggal di kepala halaman justru menambah satu suara yang tak menerangkan
+ *     apa-apa (lihat komentar PageHeader di Jadwal.tsx — keputusan yang sudah
+ *     ada di sana sejak 30 Jul: "satu fakta satu suara").
+ *
+ * (2) Nilainya `new Date()` — TANGGAL SAAT MERENDER, bukan kesegaran datanya.
+ *     Terukur 30 Agu 2026: saat muat GAGAL dan saat LURING, layar tetap
+ *     berbunyi "Per 30 Agustus 2026" — berdampingan dgn "Gagal memuat data"
+ *     dan strip "Tanpa sinyal — angka yang tampil salinan terakhir". Dua
+ *     pernyataan yang saling bertentangan di satu layar, dan yang lebih
+ *     dipercaya justru tanggalnya: ia terbaca sebagai jaminan bahwa saldo di
+ *     bawahnya berlaku HARI INI.
+ *
+ *     Kelas yang SAMA dgn "0 Selesai · 0 Terjadwal" di Jadwal (ditutup 24 Agu)
+ *     dan dgn kanon "app kas DILARANG menyatakan nominal saat muat gagal".
+ *     `audit:keadaan` tak menangkapnya sendiri karena ia sengaja mengecualikan
+ *     TANGGAL dari daftar klaim — pengecualian yang benar untuk tanggal baris,
+ *     dan justru buta untuk tanggal yang berfungsi sebagai "per".
+ *
+ * Karena itu: tak tahu → tak bilang. Menyembunyikannya berbiaya 1px (tinggi
+ * PageHeader ditentukan baris tombol 44px, bukan blok judul — diukur 45 → 44),
+ * jadi tak ada geseran yang perlu ditukar demi kejujuran ini.
+ */
+export function usePerTanggal(loading: boolean, error: boolean): string {
+  const online = useOnline();
+  /* Barisnya DICADANGKAN (spasi tak-putus), bukan dihilangkan — dan angkanya
+     diukur, bukan diasumsikan. Di Kas Hadiran menyembunyikannya cuma berbiaya
+     1px karena tinggi PageHeader di sana ditentukan baris tombol 44px; di
+     TALANGAN, yang tak punya tombol aksi sama sekali, tingginya ditentukan blok
+     judul sehingga subjudul bernilai 21px PENUH (kepala 24 → 45). Muncul-sesudah-
+     muat di sana menggeser seluruh halaman: `audit:lompat` b-Talangan 0,022 →
+     0,056 (dibuktikan dgn `git stash` + build ulang, bukan disimpulkan).
+     Spasi tak-putus menahan tingginya tanpa menyatakan apa pun — pembaca layar
+     tak membacakannya, dan layar tak berpindah. */
+  if (loading || error || !online) return '\u00A0';
+  return `Per ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
 }

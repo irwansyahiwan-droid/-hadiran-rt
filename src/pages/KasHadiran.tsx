@@ -6,7 +6,7 @@ import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
-import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -253,9 +253,7 @@ export default function KasHadiranPage() {
   // sumber untuk dua gerbang di bawah supaya ErrorState tak tampil dua kali.
   const gagalTotal = error && transaksi.length === 0 && tarikanSelesai.length === 0;
 
-  const today = new Date().toLocaleDateString('id-ID', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  });
+  const perTanggal = usePerTanggal(loading, error);
 
   // Bagikan ringkasan Kas Hadiran sbg kartu PNG bermerek → grup WA warga.
   async function handleShareReceipt() {
@@ -502,7 +500,7 @@ export default function KasHadiranPage() {
             dua baris dulu menambah ±56px chrome di atas hero. */}
         <PageHeader
           title="Kas Hadiran"
-          subtitle={`Per ${today}`}
+          subtitle={perTanggal}
           actions={<>
             <button onClick={load} aria-label="Muat ulang" className="press w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <RefreshCw className={`w-4 h-4 text-gray-500 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />

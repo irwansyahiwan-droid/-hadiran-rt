@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2 } from 'lucide-react';
-import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
+import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
 import InfoTip from '../components/InfoTip';
@@ -433,9 +433,7 @@ export default function KasRTPage() {
   }, [list]);
 
 
-  const today = new Date().toLocaleDateString('id-ID', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  });
+  const perTanggal = usePerTanggal(loading, error);
 
   async function handleSave(data: { tipe: Tipe; nominal: number; keterangan: string; tanggal: string; kategori: string }) {
     if (editing) {
@@ -505,7 +503,7 @@ export default function KasRTPage() {
             tumpukan dua baris dulu menambah ±56px chrome sebelum hero. */}
         <PageHeader
           title="Kas RT"
-          subtitle={`Per ${today}`}
+          subtitle={perTanggal}
           info={
             <InfoTip label="Kas RT">
               Kas besar RT&nbsp;004/006. Sebagian iuran tiap tarikan (Rp5.000/anggota) disetor ke sini untuk kebutuhan RT — terpisah dari Kas Hadiran.
