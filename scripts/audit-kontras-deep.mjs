@@ -493,3 +493,32 @@ if (process.env.SHOW_BUTA) for (const b of [...new Set(buta)]) console.log('  bu
 for (const f of fails) {
   console.log(`${f.ratio} (butuh ${f.need}) [${f.ctx}] "${f.text}" fg rgb(${f.color}) a=${f.alpha} bg rgb(${f.bg}) ${f.size}px/${f.weight} <${f.tag}>`);
 }
+
+/* ── AMBANG APP · AAA ─────────────────────────────────────────────────────
+   Ditambahkan 30 Agu 2026. Sampai hari ini SELURUH sapuan kontras memvonis
+   `need = large ? 3 : 4.5` — murni WCAG AA — sementara app ini menyatakan
+   ambangnya sendiri AAA 7:1 sejak pass "KONTRAS MAKSIMAL" (4 Agu). Ambang yang
+   tak dijaga alat sama dengan ambang yang tak ada, dan biayanya sudah dibayar
+   tiga kali: pelajaran ke-25 (alpha /55 dipindah ke permukaan hijau lalu jatuh
+   ke 4,13), ke-30 (SELURUH tabel remap gugur diam-diam waktu kartu gelap naik
+   — `gray-400` 8,85 → 6,58 tanpa satu pun sapuan protes), dan dua kali nyaris
+   hari ini (varian langkah-nada menjatuhkan `#34453B` ke 6,64; `text-white/90`
+   di hero sempat dihitung 6,82 sebelum diukur ulang dari piksel).
+
+   DILAPORKAN TERPISAH & TIDAK MENGGAGALKAN rantai — disiplin yang sama dgn
+   bagian 200% di `audit:potong` & `audit:reflow`: ini ambang APP, bukan
+   pelanggaran konformansi, dan menyebutnya "gagal WCAG" akan keliru.
+   Judulnya sengaja BUKAN `=== … ===`: `sapu-semua` mengambil baris `===`
+   TERAKHIR sebagai ringkasan, dan ringkasan sapuan ini harus tetap vonis AA.
+
+   Yang sudah gagal AA tidak diulang di sini (`r.pass` menyaringnya) — ia sudah
+   punya barisnya sendiri di atas. */
+const perluAAA = (r) => (r.need === 3 ? 4.5 : 7);   // AAA: 4,5 teks besar · 7 teks normal
+const aaa = results.filter((r) => r.pass && r.ratio < perluAAA(r)).sort((a, b) => a.ratio - b.ratio);
+console.log(`\n── AMBANG APP · AAA (7:1 · teks besar 4,5:1) — DI ATAS AA, bukan pelanggaran WCAG ──`);
+console.log(`   ${aaa.length} dari ${results.length} sampel lolos AA tapi DI BAWAH AAA`);
+for (const f of aaa.slice(0, 12)) {
+  console.log(`   ${f.ratio} (AAA butuh ${perluAAA(f)}) [${f.ctx}] "${String(f.text).slice(0, 34)}" fg rgb(${f.color}) bg rgb(${f.bg}) ${f.size}px/${f.weight}`);
+}
+if (aaa.length > 12) console.log(`   … ${aaa.length - 12} lagi — rinci lengkap di ${OUT}/hasil.json`);
+
