@@ -58,10 +58,14 @@ export default function MonthlyBars({ data }: { data: MonthBar[] }) {
       {/* `min-w-0` pada tiap label: `flex-1` saja TIDAK cukup — flex item punya
           `min-width:auto`, jadi label menolak menyusut di bawah lebar teksnya
           dan barisan label mendorong halaman geser samping saat teks dasar
-          browser 200%. `truncate` menjaga potongnya rapi. */}
+          browser 200%. `truncate` menjaga potongnya rapi.
+
+          Kelas `.label-bulan` (30 Agu 2026) ada untuk aturan TEKS 200% di
+          index.css — pada setelan itu `truncate` memotong label jadi SATU huruf
+          dan sumbu berhenti bisa dibaca; alasan lengkapnya di sana. */}
       <div className="flex justify-between gap-2 mt-2">
         {data.map((d, i) => (
-          <span key={i} className="flex-1 min-w-0 truncate text-center text-micro font-medium text-ink-faint dark:text-gray-400">{d.label}</span>
+          <span key={i} className="label-bulan flex-1 min-w-0 truncate text-center text-micro font-medium text-ink-faint dark:text-gray-400">{d.label}</span>
         ))}
       </div>
     </div>

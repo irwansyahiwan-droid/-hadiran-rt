@@ -346,6 +346,33 @@ input, textarea  { caret-color: #1B7249; }
     linear-gradient(160deg, #031B14 0%, #05351F 45%, #010F0A 100%);
 }
 
+/* ── Label bulan grafik saat TEKS DASAR 200% ──────────────────────────────
+   Pada setelan font browser 200%, enam label bulan berbagi 316px: tiap slot
+   tinggal 22px sementara "Agu" butuh 46px. `truncate` memotongnya jadi SATU
+   huruf, dan sumbu berhenti membawa informasi — terukur persis:
+   `M · A. · M · J. · J. · A.`, di mana Mar & Mei sama-sama "M", Jun & Jul
+   sama-sama "J.".
+
+   Obatnya BUKAN mengecilkan hurufnya: pengguna baru saja MEMINTA teks besar.
+   Yang dilakukan MENJARANGKAN — satu dari dua label disembunyikan, dan yang
+   tersisa boleh meluber ke slot tetangganya yang kini kosong. Karena yang
+   disembunyikan `visibility` (bukan `display`), slotnya TETAP memakai ruang,
+   jadi label yang tersisa masih lurus di atas batangnya masing-masing.
+
+   Dihitung DARI UJUNG (`nth-last-child`), bukan dari awal: dgn `nth-child`
+   label TERAKHIR ikut hilang saat jumlah bulannya genap — padahal bulan
+   terbaru justru yang paling dibaca. Dari ujung, ia selalu selamat berapa pun
+   jumlahnya.
+
+   Ambangnya `em`, bukan `px`: ia mengacu ke font BAWAAN BROWSER, jadi menyala
+   tepat saat pengguna menaikkan teks — bukan saat layar menyempit (lihat
+   catatan `pasangTeks200` di audit-potong.mjs). 22.4em ambang yang sudah
+   dipakai `.potong-lentur`, bukan angka baru. */
+@media (max-width: 22.4em) {
+  .label-bulan:nth-last-child(even) { visibility: hidden; }
+  .label-bulan:nth-last-child(odd)  { overflow: visible; }
+}
+
 /* Aurora blob animation (hanya .login-bg, tidak menyentuh .app-bg) */
 @keyframes loginBlobA {
   0%, 100% { transform: translate(0, 0) scale(1); }

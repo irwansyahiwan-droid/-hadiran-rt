@@ -67,6 +67,15 @@ const PUNGUT = () => {
     const t = (el.textContent || '').trim();
     if (!t) return;
     const cs = getComputedStyle(el);
+    /* `text-overflow: ellipsis` TIDAK memotong apa pun selama overflow-nya
+       `visible` — itu spec CSS: elipsis hanya berlaku pada isi yang benar-benar
+       TERKURUNG. Tanpa penjaga ini, elemen yang SENGAJA dibiarkan meluber
+       dilaporkan "terpotong" padahal terbaca utuh di layar; terjadi 30 Agu 2026
+       pada label bulan grafik yang di teks 200% dijarangkan & diberi
+       `overflow: visible` supaya muat — sapuan tetap melaporkan 6 temuan untuk
+       teks yang justru sudah bisa dibaca penuh. Aturan alat repo ini: temuan
+       palsu → betulkan ALATNYA. */
+    if (cs.overflowX === 'visible') return;
     if (cs.textOverflow !== 'ellipsis' && cs.overflow !== 'hidden') return;
     if (el.clientWidth <= 0 || cs.visibility === 'hidden') return;
     const rg = document.createRange();
