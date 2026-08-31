@@ -635,18 +635,16 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   --hero-divider: rgba(255, 255, 255, 0.16);
 }
 
-.hero-card {
-  position: relative;
-  border-radius: var(--hero-radius);
-  background: var(--hero-glow), var(--hero-gradient);
-  box-shadow: var(--hero-shadow);
-  overflow: hidden;
-}
+/* Pasangan GELAP untuk token `--hero-gradient` / `--hero-glow`. Ramp diturunkan
+   sepadan .hero-emerald & glow sudut diredam (.34 → .18; halo terang di atas
+   near-black = biang silau). Putih di atas stop paling terang = AA aman.
 
-/* Pasangan dark .hero-card (JadwalWarga, Laporan Triwulan) — token, bukan kelas
-   baru, supaya SATU jalur tetap: ramp diturunkan sepadan .hero-emerald dan glow
-   sudut diredam (.34 → .18; halo terang di atas near-black = biang silau).
-   Putih di atas stop paling terang (#147044) = 6.1:1 → AA aman. */
+   PEMAKAINYA SIAPA (30 Agu 2026): dulu `.hero-card` (JadwalWarga & Laporan
+   Triwulan). Keduanya sudah pindah ke `.hero-emerald`, dan kelas `.hero-card`
+   ikut dibuang bersama pass itu. Yang MASIH memakai kedua token ini tinggal
+   LAYAR LOGIN — ia menulisnya inline: `background: var(--hero-glow),
+   var(--hero-gradient)`. Jadi blok ini BUKAN sisa mati; membuangnya karena
+   `.hero-card` sudah tiada akan memadamkan latar Login. */
 .dark {
   /* Pass kontras maksimal: stop terang #147044 (6,12:1) → #094B2C (8,68:1),
      glow .18 → .05 — paritas dgn sisi terang yang juga turun dua lever. */
@@ -1816,9 +1814,8 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 /* One-time specular sheen sweep on hero card when dashboard loads.
    Hanya saat `.hero-sheen-sweep` (kunjungan pertama sesi) — balik ke Beranda
    via tab/back tak menyapu ulang. Lihat useFirstPlay di lib/hooks.
-   `.sheen-sweep` = varian generik (mis. kartu saldo di dalam carousel 3D yang
-   tak lagi memakai `.hero-card` namun tetap ingin sapuan sekali-muat). */
-.hero-card.hero-sheen-sweep::before,
+   Sejak `.hero-card` dibuang (30 Agu 2026) tinggal SATU selektor: `.sheen-sweep`,
+   dipakai kartu saldo di dalam carousel 3D. */
 .sheen-sweep::before {
   content: '';
   position: absolute;
