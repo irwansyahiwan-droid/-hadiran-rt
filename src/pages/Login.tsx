@@ -85,7 +85,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
      ulang; jangan salin alpha antar permukaan. */
   const field =
     'w-full pl-11 pr-4 py-4 rounded-xl bg-black/25 backdrop-blur-sm ' +
-    'border border-white/45 text-body text-white placeholder-white/75 ' +
+    'border border-white/45 text-body text-white placeholder-white/85 ' +
     'focus:outline-none focus:ring-2 focus:ring-[var(--gold-songket)] ' +
     'focus:border-[var(--gold-songket)] transition';
 
@@ -201,7 +201,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             Masuk sebagai Warga
             <ArrowRight className="w-5 h-5" />
           </button>
-          <p className="mt-3 text-center text-caption text-white/70">
+          <p className="mt-3 text-center text-caption text-white/80">
             Lihat saldo, jadwal, absensi &amp; talangan
           </p>
         </div>
@@ -212,7 +212,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           {/* /55 → /75: `audit:kontras` mengukur 4,13:1 di atas hijau hero —
               di bawah AA 4,5 untuk teks 11px/600. Nilai /55 warisan pass
               pertama layar ini, tak pernah diukur di permukaan HIJAU. */}
-          <span className="text-overline font-semibold uppercase text-white/75">
+          <span className="text-overline font-semibold uppercase text-white/85">
             atau
           </span>
           <span className="h-px flex-1 bg-white/20" />
@@ -253,7 +253,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             <div className="rounded-2xl bg-black/25 backdrop-blur-sm border border-white/12 p-4">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="login-email" className="block mb-2 text-caption font-semibold text-white/75">
+                  <label htmlFor="login-email" className="block mb-2 text-caption font-semibold text-white/85">
                     Email
                   </label>
                   <div className="relative">
@@ -279,7 +279,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                 </div>
 
                 <div>
-                  <label htmlFor="login-password" className="block mb-2 text-caption font-semibold text-white/75">
+                  <label htmlFor="login-password" className="block mb-2 text-caption font-semibold text-white/85">
                     Password
                   </label>
                   <div className="relative">
@@ -339,7 +339,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-caption text-white/60">
+        <p className="mt-8 text-center text-caption text-white/80">
           Bendahara lupa password? Hubungi pengurus RT
         </p>
       </div>
