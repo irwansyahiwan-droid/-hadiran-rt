@@ -86,6 +86,26 @@ const PUNGUT = () => {
   return out;
 };
 
+/* KENAPA `.potong-lentur` TIDAK ikut disasar — diselidiki & diputuskan 30 Agu
+   2026, supaya tak ada yang mengejarnya lagi.
+
+   Gejalanya menggoda: `MUTASI=1` tak pernah menaikkan angka bagian C, dan itu
+   TERBACA seperti kontrol yang tak bergigi. Diukur: dari 73 elemen populasi
+   teks-200% di Jadwal, NOL punya `.truncate`/`.min-w-0` — semuanya
+   `.potong-lentur`. Jadi mutasi memang tak menyentuh mereka.
+
+   Tapi menambahkannya SALAH, dan sebabnya ada di kelas itu sendiri: pada
+   `@media (max-width: 22.4em)` — persis kondisi teks 200% — `.potong-lentur`
+   berpindah ke `white-space: normal` + `overflow-wrap: anywhere`. Teksnya
+   MELIPAT, bukan terpotong. Elemen yang melipat tak bisa "terpotong mendatar"
+   berapa pun ia disempitkan, jadi nol di bagian C itu BENAR, bukan buta —
+   satu-satunya yang masih memotong di 200% adalah `.truncate` (label bulan
+   grafik, 12 temuan, ditutup 26a17a3).
+
+   Dicoba juga, dan hasilnya jadi alasan kedua: menyempitkan `.potong-lentur`
+   MEMBEBASKAN ruang untuk saudara `flex` di sebelahnya, sehingga bagian B
+   justru TURUN 6 → 3 temuan. Mutasi yang melemahkan dirinya sendiri lebih
+   buruk daripada mutasi yang sempit. */
 const MUTASI_CSS = '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}';
 
 function pasangMutasi(ctx) {
