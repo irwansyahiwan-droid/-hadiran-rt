@@ -732,7 +732,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={jadwalList.length}
           action={
-            <button onClick={() => onNavigate('jadwal')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
+            /* `aria-label` menyebut TUJUANNYA (30 Agu 2026): Beranda punya DUA
+                tombol "Lihat semua" — satu ke Jadwal, satu ke Transaksi — dan
+                keduanya dulu bernama sama persis. Teks yang TERLIHAT tak berubah
+                (judul seksi di sebelahnya sudah menerangkannya bagi yang
+                melihat); yang ditambah cuma nama untuk yang tidak melihat.
+                Nama barunya MEMUAT teks terlihat, jadi §2.5.3 "Label in Name"
+                tetap terpenuhi & perintah suara "lihat semua" tetap cocok. */
+            <button onClick={() => onNavigate('jadwal')} aria-label="Lihat semua jadwal" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" />
             </button>
@@ -825,7 +832,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={trxItems.length}
           action={
-            <button onClick={() => onNavigate('kas')} className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
+            <button onClick={() => onNavigate('kas')} aria-label="Lihat semua transaksi" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" />
             </button>

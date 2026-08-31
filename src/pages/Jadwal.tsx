@@ -1227,8 +1227,19 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            title="Hitung Ulang"
-                            aria-label="Hitung Ulang"
+                            /* Nama IKUT NOMOR TARIKAN (30 Agu 2026). Sebelumnya
+                               string tetap "Hitung Ulang", dan daftar ini punya
+                               18 tarikan selesai — jadi 18 tombol dgn nama yang
+                               sama persis. Yang melihat layar membedakannya dari
+                               BARIS tempat ia duduk; yang memakai pembaca layar
+                               atau Voice Control iOS hanya punya namanya, dan
+                               "Hitung Ulang" mengembalikan delapan belas jawaban.
+                               Polanya bukan hal baru: dua tetangga langsungnya
+                               di baris yang SAMA sudah begini sejak lama
+                               (`Proses tarikan #N`, `Aksi lainnya tarikan #N`) —
+                               tombol ini satu-satunya yang terlewat. */
+                            title={`Hitung ulang tarikan #${t.nomor}`}
+                            aria-label={`Hitung ulang tarikan #${t.nomor}`}
                             /* Tanpa bingkai (4 Agu 2026). Daftar ini 71 baris, dan
                                dulu tiap barisnya membawa satu–dua kotak bergaris
                                `control` yang identik: berjejer ke bawah, ia terbaca
