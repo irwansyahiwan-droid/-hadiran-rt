@@ -40,6 +40,7 @@ const VISUAL = [
   ['kontras-deep', 'node scripts/audit-kontras-deep.mjs'],
   ['kontras-nonteks', 'node scripts/audit-kontras-nonteks.mjs'],
   ['mati', 'node scripts/audit-mati.mjs'],
+  ['nama', 'node scripts/audit-nama.mjs'],
   ['potong', 'node scripts/audit-potong.mjs'],
   ['lebar', 'node scripts/audit-lebar-nominal.mjs'],
   ['sentuh', 'node scripts/audit-sentuh.mjs'],

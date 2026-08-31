@@ -958,6 +958,19 @@ export default function KasHadiranPage() {
                           <button
                             onClick={() => { haptic(); handleBatalkanClick(t); }}
                             disabled={processingId === t.id}
+                            /* Nama IKUT NOMOR (30 Agu 2026). Teks terlihatnya
+                               "Batalkan" saja, dan daftar ini punya 18 tarikan
+                               selesai — jadi 18 aksi MERUSAK dgn nama identik
+                               bagi yang memakai pembaca layar atau Voice Control.
+                               Kedua tetangganya di baris yang SAMA sudah bernomor
+                               (`Unduh PDF pendapatan tarikan #N`, `Hapus tarikan
+                               #N`); yang di TENGAH terlewat — pengulangan persis
+                               kasus "Hitung Ulang" di Jadwal (308559a).
+                               Kata-katanya bukan karangan baru: dialog
+                               konfirmasinya sendiri sudah berbunyi "Batalkan
+                               hasil Tarikan #N". Teks terlihat tak berubah, dan
+                               nama barunya MEMUAT teks itu → §2.5.3 aman. */
+                            aria-label={`Batalkan hasil tarikan #${t.nomor}`}
                             className="press flex items-center gap-2 min-h-[44px] px-2 rounded-lg text-caption font-semibold whitespace-nowrap transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
                           >
                             <RotateCcw className={`w-4 h-4 ${processingId === t.id ? 'animate-spin' : ''}`} />
