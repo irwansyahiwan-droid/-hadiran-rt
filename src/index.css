@@ -527,7 +527,7 @@ html:not(.dark) .text-gray-500 { color: #34453B; }  /* gray-500→slate-700: teg
    Konsekuensi terukurnya (39 sampel light di .audit-kontras/hasil.json):
    35 dari 39 mendarat di 6,05–6,80:1 — di bawah ambang app SEBELUM langkah
    nada sudah, di permukaan apa pun yang disentuhnya (pil Tag "WARGA" di
-   Header 6,27; tombol urut FilterChips 6,80). Hanya di kartu #F8FCF9 ia
+   Header 6,27; tombol urut FilterChips 6,80). Hanya di kartu (waktu itu #F8FCF9) ia
    menyentuh 7,21. Jadi rung ini praktis TAK PERNAH lolos ambangnya sendiri.
    Dilipat ke rung yang sama dgn gray-500 (#34453B, 7,68:1 di kanvas baru),
    bukan diberi nilai keempat: tangga TEKS light mode app ini memang tiga rung
@@ -868,9 +868,14 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      #F8FCF9 → #FFFFFF cuma menaikkan kontras thd kanvas 1,271→1,316:1
      (+3,5%) — kartu sudah 97% menuju putih murni, lever WARNA nyaris habis
      (kelas yang sama dgn "Kanvas: Kroma, Bukan L"). Lever yang dipilih
-     BAYANGAN, fill TETAP #F8FCF9: contact 1px/2px/.14 → 2px/5px/.18,
+     BAYANGAN, fill saat itu TETAP #F8FCF9: contact 1px/2px/.14 → 2px/5px/.18,
      ambient 6px/18px/.17 → 12px/28px/.26. Tinta & hue tak berubah
-     (rgba(8,30,19), satu keluarga dgn seluruh tangga elevasi). */
+     (rgba(8,30,19), satu keluarga dgn seluruh tangga elevasi).
+     CATATAN SUSULAN (hari itu juga, sesudah pass kroma): fill AKHIRNYA ikut
+     dinaikkan ke #FFFFFF — bukan karena angka +3,5% itu keliru, tapi karena
+     pass kroma mengubah nisbah se-rona kartu 43% → 18,7% dan menaruhnya di
+     antara dua mazhab. Bayangan yang dipertegas di sini TETAP dipakai; keduanya
+     bekerja bersama, bukan saling menggantikan. Lihat blok MAZHAB TONAL. */
   --shadow-card:
     0 2px 5px -2px rgba(8, 30, 19, 0.18),
     0 12px 28px -10px rgba(8, 30, 19, 0.26);
@@ -1931,7 +1936,7 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    kanvas polos menuntut kartu putih, kanvas ber-rona menuntut kartu senada.
    Sampai hari ini app memakai separuh dari masing-masing.
 
-   Kartu kini membawa jejak rona kanvasnya (#F8FCF9) dan pemisahannya datang
+   Kartu SEMPAT membawa jejak rona kanvasnya (#F8FCF9) dan pemisahannya datang
    dari LANGKAH NADA + bayangan bertinta hijau — bukan lagi dari hairline.
    Hairline mundur ke whisper (#D3E0D8) justru karena itu.
 
@@ -1939,8 +1944,35 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    selesai. Sebabnya bukan nilai L-nya belum ketemu, tapi karena hasil bermazhab
    TONAL dikejar memakai sistem FLAT. Kalau nanti terasa kurang "nendang":
    geser LANGKAH NADA-nya (kanvas vs kartu) atau bayangannya — JANGAN
-   menggelapkan hairline lagi, itu jalan yang sudah terbukti buntu. */
-html:not(.dark) .bg-white { background-color: #F8FCF9; }
+   menggelapkan hairline lagi, itu jalan yang sudah terbukti buntu.
+
+   ── DIBALIKKAN 30 Agu 2026: kartu kembali PUTIH MURNI ────────────────────
+   Override `#F8FCF9` DIBUANG; `.bg-white` kembali ke nilai Tailwind (#FFFFFF).
+
+   Membalikkan keputusan tonal di atas menuntut alasan, dan alasannya bukan
+   selera melainkan angka yang BERUBAH — oleh pass kroma pagi ini juga:
+
+       24 Agu   kanvas C=0,0134 · kartu C=0,0058 → kartu 43,0% se-rona kanvas
+       hari ini kanvas C=0,0308 · kartu C=0,0058 → kartu 18,7% se-rona kanvas
+
+   Aturan mazhabnya tak berubah; NISBAHNYA yang berubah. Waktu kanvas
+   dinaikkan kromanya 2,3×, kartu berhenti terbaca "senada" tanpa pernah
+   menjadi putih — ia terjebak di antara dua mazhab, dan itulah yang dilaporkan
+   user sbg "putihnya belum nendang". Memutihkannya MENGAKHIRI ambiguitas yang
+   pass kroma ciptakan, bukan melanggar mazhabnya.
+
+   Diukur: langkah nada 8,3 → 9,6 % L, rasio kanvas↔kartu 1,271 → 1,316:1, dan
+   NOL angka kontras turun — kartu yang lebih terang justru menaikkan teks di
+   atasnya (`#34453B` 9,84 → 10,19). Kanvas TIDAK disentuh, jadi seluruh tabel
+   rasio di atas kanvas tetap berlaku apa adanya.
+
+   Sekalian menyelaraskan layar dgn KERTAS: `warnaCetak.surface` sudah `#FFFFFF`
+   sejak dulu, jadi kartu layar & kartu cetak kini satu nilai.
+
+   Kalau nanti terasa terlalu klinis, jalan koherennya BUKAN mengembalikan
+   #F8FCF9 setengah jalan — melainkan menaikkan kroma kartu sampai nisbah
+   ~43% pulih (C≈0,0132 pada L yang sama). Setengah jalan itu justru keadaan
+   yang baru saja kita tinggalkan. */
 
 /* Gelap: tangga elevasi dipertegas satu langkah — kartu naik lepas dari
    kanvas, tepi diringankan sepadan sisi terang. */
