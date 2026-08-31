@@ -784,14 +784,32 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-body font-semibold text-ink dark:text-gray-100 leading-tight potong-lentur flex-1">{j.sohibul_bait?.nama ?? '-'}</p>
-                    {next ? (
-                      <Tag tone="success" className="shrink-0">
-                        <Crown className="h-3 w-3" style={{ color: 'var(--gold-songket)' }} fill="currentColor" strokeWidth={0} />
-                        Giliran berikutnya
-                      </Tag>
-                    ) : (
-                      <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>
-                    )}
+                    {/* Pil "Giliran berikutnya" DIBUANG dari baris `next`
+                        (30 Agu 2026) — ORNAMEN KEEMPAT untuk satu fakta yang
+                        sama. Mahkota di atas avatar, cincin emas songket, dan
+                        latar emerald sudah mengatakannya; pil itu mengatakannya
+                        sekali lagi, dan ia yang paling mahal karena `shrink-0`
+                        selebar 138px memotong NAMA orang.
+
+                        Ini melanjutkan keputusan yang sudah diambil sekali di
+                        baris ini juga: chip nomor tarikan dibuang 6 Agu dgn
+                        alasan persis sama ("4 ornamen pada avatar 44px"), dan
+                        catatannya sendiri menulis bahwa meredam ornamen cuma
+                        menunda, membuangnya menyelesaikan.
+
+                        Diukur @390px: nama butuh 178px, dapat 126px — kurang
+                        52px, jadi "Nisan Nasrullah ( Icang )" tampil sebagai
+                        "Nisan Nasrulla…" dan justru nama panggilannya yang
+                        hilang. Memendekkan KATA pil sempat diukur & DITOLAK:
+                        "Berikutnya" muat di 390px tapi masih kurang 24px di
+                        360px, dan "Giliran" cuma menyisakan 1px — margin yang
+                        patah pada nama lain. Sesudah dibuang: nama dapat 272px
+                        penuh di ketiga lebar, tinggi baris TIDAK berubah (76px).
+
+                        `Terjadwal` DIPERTAHANKAN di baris lain: di sana tak ada
+                        mahkota/cincin/tint yang mengatakannya, pilnya pendek,
+                        dan tak satu nama pun terpotong karenanya. */}
+                    {!next && <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>}
                   </div>
                   <p className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-0.5">Tarikan ke-{j.nomor} · {formatTanggal(j.tanggal)}</p>
                 </div>
