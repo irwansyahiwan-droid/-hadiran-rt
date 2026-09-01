@@ -99,7 +99,19 @@ async function ujiMasuk(nama, pasang, harap) {
   await page.locator('#login-password').fill('sandi-benar-banget');
 
   const form = page.locator('form');
-  const tombol = form.getByRole('button', { name: /Masuk sebagai Bendahara|Memproses/ });
+  /* Kait `id`, BUKAN teks tombol — dan ini bukan preferensi gaya, ini cacat
+     yang sudah dibayar. Sampai 1 Sep 2026 baris ini berbunyi
+     `form.getByRole('button', { name: /Masuk sebagai Bendahara|Memproses/ })`.
+     Sesudah Login digambar ulang (24 Agu), "Masuk sebagai Bendahara" pindah
+     jadi pemilih peran di LUAR <form>, dan submit di DALAM form tinggal
+     berbunyi "Masuk" saat diam — "Memproses…" cuma muncul selagi memuat.
+     Tak ada yang cocok, `click()` menunggu 30 dtk, sapuan MATI. Selama ~8 hari
+     `audit:masuk` tak punya vonis sama sekali: gerbang masuk & keluar saat
+     jaringan busuk tak terjaga, dan tak ada yang tahu karena tak ada yang
+     menjalankannya. Pelajaran ke-24 persis, di jalur yang dulu terlewat —
+     jalur warga sudah dapat `id="masuk-warga"`, bendahara belum.
+     Yang menyelamatkan waktu itu: ia MELEDAK, bukan melapor hijau palsu. */
+  const tombol = page.locator('#masuk-bendahara');
   await tombol.click();
 
   let pesan = null;

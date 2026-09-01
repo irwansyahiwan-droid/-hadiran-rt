@@ -326,6 +326,19 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     ~7,4:1) lalu diverifikasi ulang dgn alat yang sama. */}
                 <button
                   type="submit"
+                  /* KONTRAK, sepasang dgn `id="masuk-warga"` di atas — dan ini
+                     lahir dari cacat yang sudah terjadi. `audit:masuk`
+                     mengaitkan diri ke TEKS tombol (/Masuk sebagai Bendahara|
+                     Memproses/) di dalam <form>; sesudah Login digambar ulang,
+                     "Masuk sebagai Bendahara" pindah ke pemilih peran di LUAR
+                     form dan submit ini tinggal berbunyi "Masuk" saat diam.
+                     Sapuan itu lalu mati ~8 hari tanpa vonis — gerbang masuk &
+                     keluar saat jaringan busuk tak terjaga selama itu.
+                     Pelajaran ke-24, terulang di jalur yang dulu terlewat:
+                     kait WAJIB `id`, JANGAN teks tombol — teks berubah di tiap
+                     pass penyuntingan kata. Jangan ganti/lepas tanpa mengubah
+                     scripts/audit-masuk.mjs. */
+                  id="masuk-bendahara"
                   disabled={loading}
                   className="press w-full min-h-[50px] rounded-xl font-semibold text-body
                              bg-[var(--gold-songket)] text-[#063A21]

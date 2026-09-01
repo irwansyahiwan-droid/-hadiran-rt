@@ -50,6 +50,23 @@ await ctx.addInitScript(() => {
     localStorage.setItem('hadiran-theme', 'light');
   } catch { /* abaikan */ }
 });
+/* Saringan `_vercel/` dipasang di SUMBERnya (lihat CATATAN localhost di kepala
+   berkas). Sampai 1 Sep 2026 saringan itu cuma ada di handler `response` di
+   bawah — jalur `pageerror` tak punya saringan sama sekali, dan artefak yang
+   SAMA masuk lewat pintu yang tak dijaga: skrip analitik dibalas index.html di
+   `vite preview`, peramban melempar "Unexpected token '<'", dan sapuan berubah
+   MERAH untuk sesuatu yang di produksi tak pernah terjadi (diverifikasi ulang
+   1 Sep 2026: lokal `text/html`, produksi `application/javascript`).
+
+   Dibatalkan, bukan dicocokkan teksnya: mencocokkan pesan galat itu rapuh dan
+   bisa menelan galat ASLI yang kebetulan berbunyi mirip. Analitik pihak ketiga
+   bukan yang diukur sapuan ini — yang diukur apakah SHELL app hidup tanpa
+   sinyal — jadi membuangnya membuat lokal berperilaku seperti produksi, bukan
+   menyembunyikan apa pun. Jumlahnya DIHITUNG supaya saringan ini tak bisa
+   diam-diam menelan lebih dari yang seharusnya. */
+let vercelDibatalkan = 0;
+await ctx.route('**/_vercel/**', (r) => { vercelDibatalkan++; return r.abort(); });
+
 const page = await ctx.newPage();
 const errJs = [];
 page.on('pageerror', (e) => errJs.push(e.message.replace(/\s+/g, ' ').slice(0, 140)));
@@ -139,6 +156,11 @@ if (asetAneh.length) lapor('luring/aset', [`aset .js membalas non-JS: ${asetAneh
 if (errJs.length) lapor('luring/galat js', [`pageerror: ${errJs.slice(0, 3).join(' | ')}`]);
 
 await browser.close();
-console.log(`\n=== luring @390px · ${gagal} bermasalah ===`);
+/* Dicetak supaya saringannya AKUNTABEL: kalau angkanya 0 padahal sasarannya
+   localhost, saringan tak menyentuh apa pun dan "Unexpected token '<'" yang
+   dulu muncul berasal dari tempat LAIN — itu temuan sungguhan, bukan artefak.
+   Saringan yang tak bisa dilihat kerjanya sama saja dgn temuan yang hilang. */
+console.log(`\n_vercel/ dibatalkan: ${vercelDibatalkan} (artefak lokal, lihat catatan kepala berkas)`);
+console.log(`=== luring @390px · ${gagal} bermasalah ===`);
 if (MUTASI && gagal === 0) { console.log('\nPROBE CACAT: MUTASI=1 tapi nol temuan — sapuan tak menguji apa pun.'); process.exit(2); }
 process.exit(gagal ? 1 : 0);
