@@ -149,7 +149,7 @@ describe('baris DELETE — jejak tak boleh jadi kosong', () => {
     }));
     expect(v.amount).toBe(150_000);
     expect(v.detail).toBe('Iuran tarikan #12');
-    expect(v.title).toBe('Hapus Kas Masuk');
+    expect(v.title).toBe('Hapus iuran tarikan');
     expect(v.accent).toBe('rose');
   });
 });
@@ -241,6 +241,37 @@ describe('perubahan status yang punya akibat nyata', () => {
      bernominal, sementara baris kas pasangannya WAJIB tetap bernominal —
      memperbaiki yang pertama dgn membisukan yang kedua akan menghapus uangnya
      dari riwayat sama sekali. */
+  /* Judul menyebut PERISTIWA, bukan operasi tabel (disetujui user 1 Sep 2026).
+     Sampai hari itu judulnya `${actionLabel} ${TIPE_KAS[enum]}` — "Tambah
+     Talangan Masuk" — nama kolom database yang dibaca warga awam. Yang dikunci
+     di sini DUA sifat sekaligus, karena memperbaiki satu gampang melupakan
+     yang lain:
+       INSERT  → peristiwanya menamai dirinya, TANPA "Tambah"
+       UBAH/HAPUS → kata kerja + bentuk BENDA ("setoran", bukan "setor")
+     Kosakatanya bukan karangan: "Pemasukan"/"Pengeluaran"/"Setor ke Kas RT"
+     sudah dipakai app di layar lain — ini menyamakan Riwayat dgn bahasa app
+     sendiri, bukan memperkenalkan istilah baru. */
+  it('judul menyebut peristiwa: INSERT tanpa kata kerja, UBAH/HAPUS pakai bentuk benda', () => {
+    const kas = (tipe: string, action: 'INSERT' | 'UPDATE' | 'DELETE') =>
+      formatAktivitas(row({ table_name: 'transaksi_kas', action, new_data: { tipe, nominal: 50_000 } })).title;
+
+    expect(kas('talangan_masuk', 'INSERT')).toBe('Pelunasan talangan');
+    expect(kas('kas_masuk', 'INSERT')).toBe('Iuran tarikan');
+    expect(kas('setor_kas_rt', 'INSERT')).toBe('Setor ke Kas RT');
+    // "Hapus setor ke Kas RT" janggal — bentuk bendanya "setoran".
+    expect(kas('setor_kas_rt', 'DELETE')).toBe('Hapus setoran ke Kas RT');
+    expect(kas('talangan_masuk', 'UPDATE')).toBe('Ubah pelunasan talangan');
+
+    const rt = (tipe: string, action: 'INSERT' | 'DELETE') =>
+      formatAktivitas(row({ table_name: 'kas_rt', action, new_data: { tipe, nominal: 50_000 } })).title;
+    expect(rt('masuk', 'INSERT')).toBe('Pemasukan Kas RT');
+    expect(rt('keluar', 'INSERT')).toBe('Pengeluaran Kas RT');
+    expect(rt('keluar', 'DELETE')).toBe('Hapus pengeluaran Kas RT');
+
+    // Tipe tak dikenal tetap punya judul — jangan pernah kosong.
+    expect(kas('entah_apa', 'INSERT')).toBe('Transaksi Kas');
+  });
+
   it('perubahan status talangan TIDAK bernominal — uangnya milik baris kas', () => {
     const lunas = formatAktivitas(row({ table_name: 'talangan', action: 'UPDATE', new_data: { status_lunas: true, nominal: 50_000 } }));
     const batal = formatAktivitas(row({ table_name: 'talangan', action: 'UPDATE', new_data: { status_lunas: false, nominal: 50_000 } }));

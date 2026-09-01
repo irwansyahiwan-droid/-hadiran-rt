@@ -22,13 +22,42 @@ export interface AktivitasView {
   penjelasan: string | null;     // narasi alur/proses/pencatatan utk warga awam
 }
 
-const TIPE_KAS: Record<string, string> = {
-  kas_masuk: 'Kas Masuk',
-  kas_keluar: 'Kas Keluar',
-  setor_kas_rt: 'Setor ke Kas RT',
-  talangan_masuk: 'Talangan Masuk',
-  talangan_keluar: 'Talangan Keluar',
+/* Nama PERISTIWA — bukan nama kolom (1 Sep 2026).
+ *
+ * Sampai hari ini judul baris dirakit `${actionLabel} ${TIPE_KAS[enum]}`,
+ * sehingga berbunyi "Tambah Talangan Masuk": nama OPERASI TABEL, bukan yang
+ * terjadi. Riwayat jadi satu-satunya layar yang bicara bahasa database —
+ * padahal app di layar lain sudah lama memakai kata manusia: "Pemasukan" (5×),
+ * "Pengeluaran" (6×), "Setor ke Kas RT" (3×), dan toast "Iuran tersimpan &
+ * dihitung". Jadi ini BUKAN kosakata baru; ini menyamakan Riwayat dengan
+ * bahasa app sendiri (kanon: yang muncul sesudahnya memakai kata yang sama).
+ *
+ * DUA bentuk per peristiwa, dan itu keharusan bahasa Indonesia, bukan
+ * kerapian: `judul` berdiri sendiri saat peristiwanya dicatat ("Setor ke Kas
+ * RT"), sedangkan `benda` dipakai SETELAH kata kerja — "Hapus setor ke Kas RT"
+ * janggal, yang benar "Hapus setoran ke Kas RT".
+ *
+ * Sebaran nyata 1 Sep 2026: talangan_masuk 175 · kas_masuk 75 · setor_kas_rt 4
+ * · kas_keluar 0 · talangan_keluar 0. Dua yang nol tetap dinamai — nol hari ini
+ * bukan nol selamanya, dan baris tanpa nama akan jatuh ke label generik persis
+ * saat seseorang pertama kali memakainya. */
+const PERISTIWA_KAS: Record<string, { judul: string; benda: string }> = {
+  kas_masuk:       { judul: 'Iuran tarikan',            benda: 'iuran tarikan' },
+  kas_keluar:      { judul: 'Pengeluaran Kas Hadiran',  benda: 'pengeluaran Kas Hadiran' },
+  setor_kas_rt:    { judul: 'Setor ke Kas RT',          benda: 'setoran ke Kas RT' },
+  talangan_masuk:  { judul: 'Pelunasan talangan',       benda: 'pelunasan talangan' },
+  talangan_keluar: { judul: 'Talangan keluar',          benda: 'talangan keluar' },
 };
+
+/** INSERT: peristiwanya menamai dirinya — "Tambah" cuma mengulang apa yang
+ *  sudah dikatakan ikon `+` di sebelahnya. UBAH/HAPUS tetap berkata kerja,
+ *  karena di situ kata kerjanya justru inti beritanya. */
+function judulPeristiwa(
+  action: AktivitasLog['action'],
+  p: { judul: string; benda: string },
+): string {
+  return action === 'INSERT' ? p.judul : `${ACTION_LABEL[action] ?? action} ${p.benda}`;
+}
 
 const STATUS_TARIKAN: Record<string, string> = {
   dijadwalkan: 'Dijadwalkan',
@@ -150,11 +179,11 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
     }
     case 'transaksi_kas': {
       const tipeRaw = str(data.tipe);
-      const tipe = TIPE_KAS[tipeRaw] ?? 'Transaksi Kas';
+      const p = PERISTIWA_KAS[tipeRaw] ?? { judul: 'Transaksi Kas', benda: 'transaksi kas' };
       diffNominal();
       diffText('keterangan', 'Keterangan');
       let penjelasan: string;
-      if (row.action === 'DELETE') penjelasan = `Transaksi ${tipe} dihapus — saldo Kas Hadiran dihitung ulang.`;
+      if (row.action === 'DELETE') penjelasan = `Transaksi ${p.benda} dihapus — saldo Kas Hadiran dihitung ulang.`;
       else if (row.action === 'UPDATE') penjelasan = 'Transaksi Kas Hadiran diubah — saldo berjalan disesuaikan otomatis.';
       else if (tipeRaw === 'setor_kas_rt') penjelasan = 'Setoran dari Kas Hadiran ke Kas RT. Dicatat ganda: saldo Kas Hadiran berkurang, Kas RT bertambah dengan nilai sama.';
       else if (tipeRaw === 'kas_masuk') penjelasan = 'Iuran satu tarikan tercatat sebagai pemasukan Kas Hadiran (Rp5.000 per pembayar). Otomatis dibuat saat tarikan ditutup.';
@@ -162,7 +191,7 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
       else if (tipeRaw === 'talangan_masuk') penjelasan = 'Pelunasan talangan tercatat. Ini mengganti dana yang sempat ditalangi panitia, bukan pendapatan kas baru.';
       else penjelasan = 'Transaksi Kas Hadiran tercatat.';
       return {
-        title: `${actionLabel} ${tipe}`,
+        title: judulPeristiwa(row.action, p),
         detail: str(data.keterangan) || null,
         amount: num(data.nominal),
         changes, actor, accent, actionLabel, tableLabel, penjelasan,
@@ -170,7 +199,9 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
     }
     case 'kas_rt': {
       const isKeluar = str(data.tipe) === 'keluar';
-      const arah = isKeluar ? 'Keluar' : 'Masuk';
+      const p = isKeluar
+        ? { judul: 'Pengeluaran Kas RT', benda: 'pengeluaran Kas RT' }
+        : { judul: 'Pemasukan Kas RT',   benda: 'pemasukan Kas RT' };
       diffNominal();
       diffText('keterangan', 'Keterangan');
       let penjelasan: string;
@@ -179,7 +210,7 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
       else if (isKeluar) penjelasan = 'Pengeluaran Kas RT (mis. kegiatan/operasional RT) — saldo Kas RT berkurang.';
       else penjelasan = 'Pemasukan Kas RT — bisa setoran dari Kas Hadiran atau iuran manual dari anggota di luar hadiran. Saldo Kas RT bertambah.';
       return {
-        title: `${actionLabel} Kas RT ${arah}`,
+        title: judulPeristiwa(row.action, p),
         detail: str(data.keterangan) || null,
         amount: num(data.nominal),
         changes, actor, accent, actionLabel, tableLabel, penjelasan,
