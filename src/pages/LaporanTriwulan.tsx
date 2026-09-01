@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, Share2, CalendarCheck, Loader2 } from 'lucide-react';
+import { FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, AlertTriangle, Share2, CalendarCheck, Loader2 } from 'lucide-react';
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
@@ -11,7 +11,7 @@ import { fetchRekapTriwulan, fetchSnapshotKas } from '../lib/laporan';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat } from '../lib/hooks';
-import { shareLaporanKas } from '../lib/shareLaporanKas';
+import { shareLaporanKas, rpBertanda } from '../lib/shareLaporanKas';
 import type { LaporanKasCard } from '../lib/shareLaporanKas';
 import type { RekapTriwulan, SnapshotKas } from '../lib/laporan';
 
@@ -20,11 +20,30 @@ interface Props {
   onClose: () => void;
 }
 
-function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number; keluar: number; saldo: number }) {
+/** `talangan` opsional: hanya Kas Hadiran yang punya baris ini. Ditampilkan
+ *  di BAWAH baris saldo sbg info tambahan — SENGAJA tidak mengurangi `saldo`
+ *  ("Belum Disetor" = masuk − keluar saja). Talangan itu bagian alur proses
+ *  tarikan (yg absen ditalangi dulu), bukan bagian "sudah/belum disetor" yang
+ *  jadi hasil akhir laporan tutup buku — lihat komentar `laporan.ts`.
+ *
+ *  `saldoAwal` opsional: hanya Kas RT (& hanya triwulan yang benar-benar
+ *  memilikinya, mis. Triwulan I 2026) yang punya baris ini — persis caption
+ *  hero `KasRT.tsx` (`saldoAwal > 0 && …`). Ditampilkan di ATAS "Masuk" &
+ *  BUKAN pengurang: `masuk` di sini sudah pemasukan NYATA saja (Saldo Awal
+ *  dikecualikan sebelum sampai ke komponen ini, lihat `laporan.ts`). */
+function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', saldo, saldoLabel = 'Saldo akhir', talangan }: {
+  judul: string; saldoAwal?: number; masuk: number; keluar: number; keluarLabel?: string; saldo: number; saldoLabel?: string; talangan?: number;
+}) {
   return (
     <div className="rounded-2xl inset-soft p-3">
       <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">{judul}</p>
       <div className="space-y-2">
+        {!!saldoAwal && (
+          <div className="flex items-center justify-between text-caption">
+            <span className="text-gray-500 dark:text-gray-400">Saldo Awal</span>
+            <span className="font-display font-semibold text-gray-700 dark:text-gray-300 tabular-nums">{formatRupiahPlain(saldoAwal)}</span>
+          </div>
+        )}
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
             {/* Ikon = token yang SAMA dgn nominal di kanannya (5 Agu 2026).
@@ -38,16 +57,24 @@ function Ledger({ judul, masuk, keluar, saldo }: { judul: string; masuk: number;
         </div>
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
-            <ArrowUpRight className="w-3.5 h-3.5 text-neg dark:text-neg-dark" /> Keluar
+            <ArrowUpRight className="w-3.5 h-3.5 text-neg dark:text-neg-dark" /> {keluarLabel}
           </span>
           <span className="font-display font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
         </div>
         <div className="flex items-center justify-between text-caption pt-2 border-t border-control dark:border-control-dark">
-          <span className="font-semibold text-gray-700 dark:text-gray-300">Saldo akhir</span>
+          <span className="font-semibold text-gray-700 dark:text-gray-300">{saldoLabel}</span>
           <span className={`font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}
           </span>
         </div>
+        {talangan !== undefined && (
+          <div className="flex items-center justify-between text-caption">
+            <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
+              <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" /> Talangan belum lunas
+            </span>
+            <span className="font-display font-semibold text-warn dark:text-amber-400 tabular-nums">-{formatRupiahPlain(talangan)}</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -124,10 +151,10 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       title: 'Total Kas RT',
       periodeLabel: r.label,
       rentang: r.rentang,
-      hadiranMasuk: r.hadiranMasuk, hadiranKeluar: r.hadiranKeluar, hadiranSaldoAkhir: r.hadiranSaldoAkhir,
-      rtMasuk: r.rtMasuk, rtKeluar: r.rtKeluar, rtSaldoAkhir: r.rtSaldoAkhir,
+      hadiranMasuk: r.hadiranMasuk, hadiranSetor: r.hadiranSetor, hadiranBelumSetor: r.hadiranBelumSetor, hadiranTalangan: r.hadiranTalangan,
+      rtSaldoAwal: r.rtSaldoAwal, rtMasuk: r.rtMasuk, rtKeluar: r.rtKeluar, rtSaldoAkhir: r.rtSaldoAkhir,
       tarikanSelesai: r.tarikanSelesai, talanganLunas: r.talanganLunas, jumlahTransaksi: r.jumlahTransaksi,
-      shareText: `*Tutup Buku ${r.label}* (${r.rentang})\n*Total Kas RT: ${formatRupiahPlain(r.rtSaldoAkhir)}*\nKas Hadiran (belum disetor): ${formatRupiahPlain(r.hadiranSaldoAkhir)}\n— Hadiran RT 004/006`,
+      shareText: `*Tutup Buku ${r.label}* (${r.rentang})\n*Total Kas RT: ${formatRupiahPlain(r.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(r.hadiranBelumSetor)}\n— Hadiran RT 004/006`,
     };
   }
 
@@ -136,10 +163,10 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       title: 'Total Kas RT',
       periodeLabel: `Per ${s.tanggal}`,
       rentang: s.rentang,
-      hadiranMasuk: s.hadiranMasuk, hadiranKeluar: s.hadiranKeluar, hadiranSaldoAkhir: s.hadiranSaldoAkhir,
-      rtMasuk: s.rtMasuk, rtKeluar: s.rtKeluar, rtSaldoAkhir: s.rtSaldoAkhir,
+      hadiranMasuk: s.hadiranMasuk, hadiranSetor: s.hadiranSetor, hadiranBelumSetor: s.hadiranBelumSetor, hadiranTalangan: s.hadiranTalangan,
+      rtSaldoAwal: s.rtSaldoAwal, rtMasuk: s.rtMasuk, rtKeluar: s.rtKeluar, rtSaldoAkhir: s.rtSaldoAkhir,
       tarikanSelesai: s.tarikanSelesai, talanganLunas: s.talanganLunas, jumlahTransaksi: s.jumlahTransaksi,
-      shareText: `*Tutup Buku — Kas RT 004/006*\n${s.tanggal}\n*Total Kas RT: ${formatRupiahPlain(s.rtSaldoAkhir)}*\nKas Hadiran (belum disetor): ${formatRupiahPlain(s.hadiranSaldoAkhir)}\n— Hadiran RT`,
+      shareText: `*Tutup Buku — Kas RT 004/006*\n${s.tanggal}\n*Total Kas RT: ${formatRupiahPlain(s.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(s.hadiranBelumSetor)}\n— Hadiran RT`,
     };
   }
 
@@ -190,7 +217,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
               </div>
               <div className="rounded-2xl bg-black/10 px-3 py-2">
                 <p className="text-micro text-white uppercase tracking-wide">Hadiran · belum disetor</p>
-                <p className="text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.hadiranSaldoAkhir)}</p>
+                <p className="text-caption font-display font-semibold text-white tabular-nums">{rpBertanda(snap.hadiranBelumSetor)}</p>
               </div>
             </div>
 
@@ -253,8 +280,8 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   7 digit + label "Keluar" tak muat → angka terpotong. Pola sama
                   "Rekap per Kategori" Kas RT: grid-cols-1 sm:grid-cols-2. */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Ledger judul="Kas Hadiran" masuk={r.hadiranMasuk} keluar={r.hadiranKeluar} saldo={r.hadiranSaldoAkhir} />
-                <Ledger judul="Kas RT" masuk={r.rtMasuk} keluar={r.rtKeluar} saldo={r.rtSaldoAkhir} />
+                <Ledger judul="Kas Hadiran" masuk={r.hadiranMasuk} keluar={r.hadiranSetor} keluarLabel="Setor ke Kas RT" saldo={r.hadiranBelumSetor} saldoLabel="Belum disetor" talangan={r.hadiranTalangan} />
+                <Ledger judul="Kas RT" saldoAwal={r.rtSaldoAwal} masuk={r.rtMasuk} keluar={r.rtKeluar} saldo={r.rtSaldoAkhir} />
               </div>
 
               <div className="flex items-center gap-2 text-micro text-gray-500 dark:text-gray-400">

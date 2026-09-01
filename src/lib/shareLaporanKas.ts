@@ -11,10 +11,12 @@ export interface LaporanKasCard {
   title: string;        // mis. 'Tutup Buku · Posisi Kas'
   periodeLabel: string; // mis. 'Per 10 Juni 2026' / 'Triwulan II 2026'
   rentang: string;      // mis. 's/d 10 Jun 2026' / 'Apr–Jun 2026'
-  hadiranMasuk: number;
-  hadiranKeluar: number;
-  hadiranSaldoAkhir: number;
-  rtMasuk: number;
+  hadiranMasuk: number;      // "Kas Terkumpul"
+  hadiranSetor: number;      // "Setor ke Kas RT" (sudah disetor)
+  hadiranBelumSetor: number; // masuk − setor — "Belum Disetor", boleh minus
+  hadiranTalangan: number;   // "Talangan Belum Lunas" — informasional, lihat laporan.ts
+  rtSaldoAwal: number;    // "Saldo Awal Kas RT" — dikecualikan dari rtMasuk, lihat laporan.ts
+  rtMasuk: number;        // pemasukan NYATA saja
   rtKeluar: number;
   rtSaldoAkhir: number;
   tarikanSelesai: number;
@@ -36,8 +38,8 @@ export function rpBertanda(n: number): string {
 /** Nominal yang jadi ANGKA UTAMA kartu.
  *
  *  Aturan bisnisnya, bukan pilihan tata letak: Kas RT adalah pool final /
- *  akumulasi, jadi ia yang tampil besar. Saldo Kas Hadiran (yang BELUM disetor)
- *  muncul terpisah di panel dan TIDAK boleh dijumlahkan ke sini — menjumlahkan
+ *  akumulasi, jadi ia yang tampil besar. "Belum Disetor" Kas Hadiran muncul
+ *  terpisah di panel dan TIDAK boleh dijumlahkan ke sini — menjumlahkan
  *  keduanya menghitung uang yang sama dua kali di kartu yang dibaca puluhan
  *  warga. Diekspor supaya aturan itu punya uji, bukan cuma komentar. */
 export function nominalHeroKartu(d: Pick<LaporanKasCard, 'rtSaldoAkhir'>): number {
@@ -78,17 +80,67 @@ const PANEL_GAP = 12;
 const ACT_H = 38;
 const FOOTER_H = 40;
 
-const panelH = PANEL_PAD_T + PANEL_TITLE + 3 * ROW_H + PANEL_PAD_B;
+/** Tinggi panel gantung jumlah baris — Kas Hadiran (4 baris: Kas Terkumpul,
+ *  Setor ke Kas RT, Belum Disetor, Talangan Belum Lunas) tak lagi sama
+ *  tingginya dgn Kas RT (3 baris: Masuk, Keluar, Saldo akhir). */
+function panelH(rows: number): number {
+  return PANEL_PAD_T + PANEL_TITLE + rows * ROW_H + PANEL_PAD_B;
+}
+
+/** Baris satu panel ledger. `tone` menentukan warna nilai — persis anatomi
+ *  panel "Alur Kas Hadiran" (KasHadiran.tsx) & kartu shareReceipt di sana:
+ *  pos (hijau, masuk) · warn (amber, talangan) · ink (netral — dipakai utk DUA
+ *  makna berbeda: transfer keluar yg BUKAN kerugian ATAU kontribusi positif yg
+ *  sengaja tak dihijaukan, lihat `minus`) · neg (merah, pengeluaran nyata).
+ *  `minus` menentukan tanda "-" secara EKSPLISIT — tak bisa disimpulkan dari
+ *  `tone` karena "Setor ke Kas RT" (ink, minus) dan "Saldo Awal" (ink, BUKAN
+ *  minus) berbagi tone yang sama. `saldo` = baris total berpita tint, warnanya
+ *  dinamis mengikuti tanda nilainya (boleh minus). */
+interface PanelRow {
+  label: string;
+  val: number;
+  tone: 'pos' | 'neg' | 'warn' | 'ink';
+  minus?: boolean;
+  saldo?: boolean;
+}
 
 /** Render kartu laporan kas → PNG → bagikan (Web Share API + fallback WA). */
 export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
-  // Kas RT = pool final/akumulasi → jadi angka utama. Saldo Kas Hadiran
-  // (belum disetor) ditampilkan terpisah di panel, TIDAK dijumlah ke total.
+  // Kas RT = pool final/akumulasi → jadi angka utama. "Belum Disetor" Kas
+  // Hadiran ditampilkan terpisah di panel, TIDAK dijumlah ke total.
   const heroAmount = nominalHeroKartu(d);
+
+  /* Kas Hadiran = 4 baris (dulu 3: Masuk/Keluar/"Belum disetor" yg lumat Setor
+     + talangan jadi satu "Keluar" — itu yg bikin kartu terbaca "setorannya
+     macet Rp1,1jt" padahal Setor ke Kas RT sudah nyaris penuh). Urutannya
+     sengaja: Terkumpul → Setor (sudah disetor) → Belum Disetor (baris saldo,
+     HASIL AKHIR yang dilaporkan) → Talangan Belum Lunas (informasional,
+     bukan pengurang "Belum Disetor" — talangan itu bagian alur proses
+     tarikan, lihat komentar `laporan.ts`). Kas RT tetap 3 baris. */
+  const hadiranRows: PanelRow[] = [
+    { label: 'Kas Terkumpul', val: d.hadiranMasuk, tone: 'pos' },
+    { label: 'Setor ke Kas RT', val: d.hadiranSetor, tone: 'ink', minus: true },
+    { label: 'Belum Disetor', val: d.hadiranBelumSetor, tone: 'pos', saldo: true },
+    { label: 'Talangan Belum Lunas', val: d.hadiranTalangan, tone: 'warn', minus: true },
+  ];
+  // Saldo Awal ("kas RT sebelum app ini mulai mencatat") HANYA ditampilkan
+  // kalau ada isinya — kartu triwulan lain (bukan triwulan awal) tak pernah
+  // punya baris ini, persis caption hero KasRT.tsx (`saldoAwal > 0 && …`).
+  // `Masuk` di sini pemasukan NYATA saja — Saldo Awal TIDAK ikut terhitung,
+  // lihat komentar `laporan.ts`. Bukan pengurang (tanpa `minus`) — ia
+  // kontribusi POSITIF ke saldo, cuma sengaja tak dihijaukan (netral, sama
+  // spt kartu shareReceipt KasRT.tsx: `{ label: 'Saldo Awal', value: … }`
+  // tanpa tanda + di depannya).
+  const rtRows: PanelRow[] = [
+    ...(d.rtSaldoAwal > 0 ? [{ label: 'Saldo Awal', val: d.rtSaldoAwal, tone: 'ink' as const }] : []),
+    { label: 'Masuk', val: d.rtMasuk, tone: 'pos' },
+    { label: 'Keluar', val: d.rtKeluar, tone: 'neg', minus: true },
+    { label: 'Saldo akhir', val: d.rtSaldoAkhir, tone: 'pos', saldo: true },
+  ];
 
   // Tinggi total dihitung dulu → kanvas pas, isi TIDAK akan terpotong.
   const H =
-    PAD + HERO_H + GAP + panelH + PANEL_GAP + panelH + GAP + ACT_H + FOOTER_H;
+    PAD + HERO_H + GAP + panelH(hadiranRows.length) + PANEL_GAP + panelH(rtRows.length) + GAP + ACT_H + FOOTER_H;
 
   const scale = Math.min(3, window.devicePixelRatio || 2) * 1.5;
   const canvas = document.createElement('canvas');
@@ -167,9 +219,15 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   ctx.fillText(`${d.periodeLabel} · ${d.rentang}`, hx + 20, hy + 162);
 
   // ── Panel ledger ────────────────────────────────────────────
-  function drawPanel(y: number, judul: string, masuk: number, keluar: number, saldo: number, saldoLabel = 'Saldo akhir') {
+  function warnaTone(r: PanelRow): string {
+    if (r.saldo) return r.val < 0 ? CETAK.neg : CETAK.pos;
+    return r.tone === 'pos' ? CETAK.pos : r.tone === 'neg' ? CETAK.neg : r.tone === 'warn' ? CETAK.warn : CETAK.ink;
+  }
+
+  function drawPanel(y: number, judul: string, rows: PanelRow[]): number {
+    const h = panelH(rows.length);
     ctx.fillStyle = '#FFFFFF';
-    roundRect(ctx, IX, y, IW, panelH, 18);
+    roundRect(ctx, IX, y, IW, h, 18);
     ctx.fill();
 
     // Judul
@@ -180,15 +238,10 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
     ctx.font = `700 11px ${FONT}`;
     ctx.fillText(judul.toUpperCase(), IX + 16, y + PANEL_PAD_T + 12);
 
-    const rows: { label: string; val: number; minus?: boolean; saldo?: boolean }[] = [
-      { label: 'Masuk', val: masuk },
-      { label: 'Keluar', val: keluar, minus: true },
-      { label: saldoLabel, val: saldo, saldo: true },
-    ];
     let ry = y + PANEL_PAD_T + PANEL_TITLE;
     rows.forEach((r) => {
       if (r.saldo) {
-        ctx.fillStyle = CETAK.posTint;
+        ctx.fillStyle = r.val < 0 ? CETAK.negTint : CETAK.posTint;
         roundRect(ctx, IX + 8, ry - 4, IW - 16, ROW_H - 6, 8);
         ctx.fill();
       }
@@ -196,25 +249,25 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
       // label
       ctx.textAlign = 'left';
       ctx.font = `${r.saldo ? '700' : '500'} 13px ${FONT}`;
-      ctx.fillStyle = r.saldo ? CETAK.pos : CETAK.faint;
+      ctx.fillStyle = r.saldo ? warnaTone(r) : CETAK.faint;
       ctx.fillText(r.label, IX + 16, cy);
-      // value
+      // value — tanda minus dari flag `minus` EKSPLISIT, bukan disimpulkan
+      // dari `tone` (Setor ke Kas RT & Saldo Awal berbagi tone 'ink' tapi
+      // cuma yang pertama pengurang).
       ctx.textAlign = 'right';
       ctx.font = `700 13px ${FONT}`;
-      ctx.fillStyle = r.saldo
-        ? (r.val < 0 ? CETAK.neg : CETAK.pos)
-        : r.minus ? CETAK.neg : CETAK.pos;
-      const valStr = r.minus && r.val > 0 ? `-${rpBertanda(r.val)}` : rpBertanda(r.val);
+      ctx.fillStyle = warnaTone(r);
+      const perluMinus = !r.saldo && r.minus && r.val > 0;
+      const valStr = perluMinus ? `-${rpBertanda(r.val)}` : rpBertanda(r.val);
       ctx.fillText(valStr, IX + IW - 16, cy);
       ry += ROW_H;
     });
+    return h;
   }
 
   let y = PAD + HERO_H + GAP;
-  drawPanel(y, 'Kas Hadiran', d.hadiranMasuk, d.hadiranKeluar, d.hadiranSaldoAkhir, 'Belum disetor');
-  y += panelH + PANEL_GAP;
-  drawPanel(y, 'Kas RT', d.rtMasuk, d.rtKeluar, d.rtSaldoAkhir, 'Saldo akhir');
-  y += panelH + GAP;
+  y += drawPanel(y, 'Kas Hadiran', hadiranRows) + PANEL_GAP;
+  y += drawPanel(y, 'Kas RT', rtRows) + GAP;
 
   // ── Baris aktivitas (satu baris, terpusat) ──────────────────
   ctx.textAlign = 'center';

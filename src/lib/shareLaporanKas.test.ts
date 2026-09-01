@@ -22,7 +22,7 @@ describe('nominalHeroKartu — angka utama kartu', () => {
      kali di kartu yang dibaca puluhan warga. Kalau suatu saat ada yang
      "merapikan" hero jadi total gabungan, uji ini yang menahannya. */
   it('TIDAK menjumlahkan saldo Kas Hadiran yang belum disetor', () => {
-    const hasil = nominalHeroKartu({ ...dasar, hadiranSaldoAkhir: 4_830_000 } as { rtSaldoAkhir: number });
+    const hasil = nominalHeroKartu({ ...dasar, hadiranBelumSetor: 4_830_000 } as { rtSaldoAkhir: number });
     expect(hasil).toBe(17_157_000);
     expect(hasil).not.toBe(17_157_000 + 4_830_000);
   });

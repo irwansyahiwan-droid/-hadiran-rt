@@ -54,6 +54,7 @@ export const CETAK = {
   warn:  '#75320B', // = token `warn` (diangkat 29 Agu: 6,84 → 7,14 di kanvas baru)
 
   posTint: '#ECFDF5', // emerald-50 — fill baris saldo di kartu PNG
+  negTint: '#FFF1F2', // rose-50 — fill baris saldo NEGATIF (paritas bg-rose-50 KasHadiran.tsx)
 
   /** Ramp kartu hero — cermin `.hero-emerald` di index.css (pass 4 Agu). */
   heroRamp: ['#0A5230', '#08492B', '#032A17'] as const,

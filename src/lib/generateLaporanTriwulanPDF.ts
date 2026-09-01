@@ -22,27 +22,36 @@ export function generateLaporanTriwulanPDF(r: RekapTriwulan) {
   const SEC_GAP = 5;       // jarak antar seksi
   const MAST = 38;         // tinggi masthead (wordmark + judul + meta + hairline)
 
-  const hadiranNet = r.hadiranMasuk - r.hadiranKeluar;
+  // Kas Hadiran: "hasil akhir" yg dilaporkan = sudah/belum disetor SAJA.
+  // Talangan Belum Lunas ikut ditampilkan (bendahara minta talangan tetap
+  // terlihat di tutup buku) tapi INFORMASIONAL — bukan pengurang
+  // "Selisih triwulan"/"Belum disetor". Lihat komentar `laporan.ts`.
+  const hadiranNet = r.hadiranMasuk - r.hadiranSetor;
   const rtNet = r.rtMasuk - r.rtKeluar;
 
-  type Baris = { label: string; nilai: string; tone?: keyof typeof C; saldo?: boolean };
+  type Baris = { label: string; nilai: string; tone?: keyof typeof C; saldo?: boolean; neg?: boolean };
   const seksi: { judul: string; rows: Baris[] }[] = [
     {
       judul: 'KAS HADIRAN',
       rows: [
-        { label: 'Pemasukan', nilai: rp(r.hadiranMasuk), tone: 'pos' },
-        { label: 'Pengeluaran', nilai: `-${rp(r.hadiranKeluar)}`, tone: 'neg' },
+        { label: 'Kas Terkumpul', nilai: rp(r.hadiranMasuk), tone: 'pos' },
+        { label: 'Setor ke Kas RT', nilai: `-${rp(r.hadiranSetor)}` },
         { label: 'Selisih triwulan', nilai: rp(hadiranNet) },
-        { label: 'Saldo akhir', nilai: rp(r.hadiranSaldoAkhir), saldo: true },
+        { label: 'Belum disetor', nilai: rp(r.hadiranBelumSetor), saldo: true, neg: r.hadiranBelumSetor < 0 },
+        { label: 'Talangan belum lunas', nilai: `-${rp(r.hadiranTalangan)}`, tone: 'warn' },
       ],
     },
     {
       judul: 'KAS RT',
       rows: [
-        { label: 'Pemasukan', nilai: rp(r.rtMasuk), tone: 'pos' },
-        { label: 'Pengeluaran', nilai: `-${rp(r.rtKeluar)}`, tone: 'neg' },
+        // Saldo Awal (kas RT sebelum app ini mencatat) HANYA muncul di
+        // triwulan yg benar-benar memilikinya (mis. Triwulan I 2026) — bukan
+        // pengeluaran/pemasukan periode ini, jadi TIDAK ikut "Selisih triwulan".
+        ...(r.rtSaldoAwal > 0 ? [{ label: 'Saldo Awal', nilai: rp(r.rtSaldoAwal) }] : []),
+        { label: 'Pemasukan', nilai: rp(r.rtMasuk), tone: 'pos' as const },
+        { label: 'Pengeluaran', nilai: `-${rp(r.rtKeluar)}`, tone: 'neg' as const },
         { label: 'Selisih triwulan', nilai: rp(rtNet) },
-        { label: 'Saldo akhir', nilai: rp(r.rtSaldoAkhir), saldo: true },
+        { label: 'Saldo akhir', nilai: rp(r.rtSaldoAkhir), saldo: true, neg: r.rtSaldoAkhir < 0 },
       ],
     },
     {
@@ -109,7 +118,7 @@ export function generateLaporanTriwulanPDF(r: RekapTriwulan) {
       doc.setFont('helvetica', b.saldo ? 'bold' : 'normal');
       ink(b.saldo ? C.ink : C.faint);
       doc.text(b.label, M + 0.5, y);
-      ink(b.saldo ? C.ink : (b.tone ? C[b.tone] : C.sub));
+      ink(b.saldo ? (b.neg ? C.neg : C.ink) : (b.tone ? C[b.tone] : C.sub));
       doc.text(b.nilai, W - M - 0.5, y, { align: 'right' });
       y += ROW;
     });
