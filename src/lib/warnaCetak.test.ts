@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { CETAK, rgb, argb } from './warnaCetak';
 // @ts-expect-error — config Tailwind JS polos, tanpa deklarasi tipe.
 import tw from '../../tailwind.config.js';
+import stok from 'tailwindcss/colors';
 
 /**
  * Penjaga DRIFT palet keluaran.
@@ -59,6 +60,26 @@ describe('warnaCetak = cermin token app', () => {
   it('muted tak boleh lebih terang dari ink.faint', () => {
     const terang = (hex: string) => rgb(hex).reduce((s, v) => s + v, 0);
     expect(terang(CETAK.muted)).toBeLessThanOrEqual(terang(CETAK.faint) + 60);
+  });
+
+  /* Dua tint baris saldo mencerminkan UTILITY app (`bg-emerald-50` di
+     KasRT/SmartInsight, `bg-rose-50` di TargetKasRT/Jadwal/KasRT), bukan token
+     `extend` — jadi keduanya luput dari kunci di atas dan sempat jadi
+     satu-satunya nilai `CETAK` yang tak terikat apa pun. `posTint` malah sudah
+     begitu sejak lahir; `negTint` (1 Sep 2026) lahir langsung di luar jaring.
+
+     Yang dikunci nilai EFEKTIF, bukan palet stok saja: kalau keluarga
+     emerald/rose suatu saat di-remap lewat `extend` — persis yang dulu
+     dilakukan ke seluruh keluarga abu waktu app pindah ke rona Hutan — utility
+     app bergeser sementara stok Tailwind diam, dan kunci yang cuma membaca
+     stok akan tetap hijau sambil kartu WhatsApp diam-diam beda dari layar.
+     Urutannya meniru Tailwind sendiri: `extend` menang, stok jadi cadangan. */
+  it('tint baris saldo persis utility emerald-50 / rose-50 app', () => {
+    const efektif = (keluarga: 'emerald' | 'rose') =>
+      String(c[keluarga]?.[50] ?? stok[keluarga][50]).toUpperCase();
+
+    expect(CETAK.posTint.toUpperCase()).toBe(efektif('emerald'));
+    expect(CETAK.negTint.toUpperCase()).toBe(efektif('rose'));
   });
 
   it('semua nilai berupa hex 6 digit (bukan rgb()/nama warna)', () => {
