@@ -246,12 +246,26 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
         changes, actor, accent, actionLabel, tableLabel, penjelasan,
       };
     }
+    /* Baris ini PERUBAHAN STATUS, bukan perpindahan uang — dan itu sebabnya ia
+       tak lagi bernominal (1 Sep 2026). `talangan.nominal` adalah besar UTANG,
+       properti catatannya, bukan yang bergerak saat status dibalik. Uangnya
+       dicatat terpisah di `transaksi_kas` tipe `talangan_masuk`
+       (Talangan.tsx) — dan pasangan itulah yang jadi masalah: satu ketukan
+       "tandai lunas" menulis DUA baris audit, dan dulu keduanya mencetak
+       Rp50.000 hijau berturut-turut. Warga yang membacanya wajar menyimpulkan
+       Rp100.000 bergerak. Di app kas itu bukan soal rasa.
+
+       Yang dibuang cuma ANGKAnya, bukan barisnya: perbuatannya nyata dan tetap
+       layak terlihat di riwayat — nominalnya sudah diwakili baris kas
+       pasangannya, lengkap dgn nama & nomor tarikan di keterangannya.
+       Berlaku untuk kedua arah: membatalkan pelunasan juga menghapus baris kas
+       pasangannya, dan penghapusan itu punya entri auditnya sendiri. */
     case 'talangan': {
       const lunas = baru.status_lunas === true;
       return {
         title: lunas ? 'Tandai Talangan Lunas' : 'Batalkan Pelunasan Talangan',
         detail: null,
-        amount: num(data.nominal),
+        amount: null,
         changes, actor,
         accent: lunas ? 'emerald' : 'amber',
         actionLabel, tableLabel,

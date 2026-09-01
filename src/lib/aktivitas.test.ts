@@ -227,6 +227,33 @@ describe('perubahan status yang punya akibat nyata', () => {
     expect(lunas.accent).toBe('emerald');
     expect(batal.title).toBe('Batalkan Pelunasan Talangan');
   });
+
+  /* Penjaga UANG, bukan penjaga tampilan. Satu ketukan "tandai lunas" menulis
+     DUA baris audit — UPDATE `talangan` (status) + INSERT `transaksi_kas`
+     (uangnya). Sampai 1 Sep 2026 keduanya mencetak nominal yang SAMA, jadi
+     riwayat memperlihatkan Rp50.000 dua kali berturut-turut untuk satu
+     perbuatan, dan warga wajar membacanya Rp100.000. Ketahuan lewat lembar
+     kontak, bukan lewat sapuan mana pun: tiap sapuan menilai SATU layar, dan
+     baris ini memang tak salah sendirian — ia salah karena BERPASANGAN.
+
+     `talangan.nominal` besar UTANG, properti catatannya; yang bergerak hidup
+     di baris kas. Jadi yang dikunci di sini: baris status TIDAK boleh
+     bernominal, sementara baris kas pasangannya WAJIB tetap bernominal —
+     memperbaiki yang pertama dgn membisukan yang kedua akan menghapus uangnya
+     dari riwayat sama sekali. */
+  it('perubahan status talangan TIDAK bernominal — uangnya milik baris kas', () => {
+    const lunas = formatAktivitas(row({ table_name: 'talangan', action: 'UPDATE', new_data: { status_lunas: true, nominal: 50_000 } }));
+    const batal = formatAktivitas(row({ table_name: 'talangan', action: 'UPDATE', new_data: { status_lunas: false, nominal: 50_000 } }));
+    expect(lunas.amount).toBeNull();
+    expect(batal.amount).toBeNull();
+
+    // Sisi lain pasangan — kalau ini ikut null, uangnya hilang dari riwayat.
+    const kas = formatAktivitas(row({
+      table_name: 'transaksi_kas', action: 'INSERT',
+      new_data: { tipe: 'talangan_masuk', nominal: 50_000, keterangan: 'Talangan lunas — Ustad Saiful Hadi' },
+    }));
+    expect(kas.amount).toBe(50_000);
+  });
 });
 
 describe('namaAktor — audit log tanpa pelaku yang jelas tak ada gunanya', () => {
