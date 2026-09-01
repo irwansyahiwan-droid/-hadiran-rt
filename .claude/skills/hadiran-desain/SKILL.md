@@ -1,11 +1,46 @@
 ---
 name: hadiran-desain
-description: Sistem desain Hadiran RT — permukaan & tangga (warna, tipografi, spasi, bentuk, gerak, bayangan, ikon, nama kontrol), tiga golongan yang sengaja tidak diatur, urutan tuas saat "kurang nendang", daftar penjaga, jebakan deploy, dan target ke depan. Pakai SETIAP KALI menyentuh tampilan app ini.
+description: Sistem desain Hadiran RT — target besar (app harus terlihat MAHAL secara VISUAL, dan kenapa menyetel token bukan jawabannya), permukaan & tangga (warna, tipografi, spasi, bentuk, gerak, bayangan, ikon, nama kontrol), tiga golongan yang sengaja tidak diatur, urutan tuas saat "kurang nendang", daftar penjaga, jebakan deploy, dan target ke depan. Pakai SETIAP KALI menyentuh tampilan app ini.
 ---
 
 # Sistem desain Hadiran RT
 
 Bukan salinan CLAUDE.md. Ini yang harus DIPATUHI, bukan diulang.
+
+## Target besar — dan apa yang BUKAN jawabannya
+
+**App ini harus terlihat MAHAL, dan "mahal" di sini berarti VISUAL:** warna,
+kontras, kanvas, font, spasi, bentuk, gerak. BUKAN keamanan, bukan arsitektur,
+bukan disiplin rilis, bukan kesiapan audit. Temuan di luar sumbu itu ditulis
+**satu baris, bukan dikerjakan** — kecuali user memintanya.
+
+Dua hal yang SERING disalahbaca sbg cacat, padahal disengaja:
+- **Aturan app memang lentur** — jadwal bisa berubah H-1, status tarikan baru
+  final sesudah dilaksanakan. Itu cara RT bekerja, bukan bug.
+- **Data terbuka untuk warga adalah TUJUAN**, bukan kebocoran. Transparansi kas
+  itu alasan app ini ada.
+
+**Lever piksel & token sudah nyaris habis — yang tersisa PERILAKU.** Ini bukan
+pendapat; empat kali permintaan "bikin lebih mahal/mewah/nendang" dijawab
+dengan MENGUKUR app yang berjalan, dan tiap kali temuannya bukan token:
+
+| permintaan | yang ternyata jadi jawabannya |
+|---|---|
+| "mewah 2026" (18 Agu) | 19 teks terpotong 7–18px & pita kaki 83% kosong → padding, **nol hex baru** |
+| "lebih mahal & mewah" (19 Agu) | lever token habis; cacat lahir dari INTERAKSI keputusan |
+| "kurang nendang" (30 Agu) | kroma kanvas, bukan L — 6,6× lebih pucat dari hero |
+| "putihnya belum nendang" | kartu terjebak di antara putih & senada |
+
+Jadi kalau diminta "bikin lebih premium": **ukur app yang berjalan dulu.**
+Menyetel token tanpa celah yang terukur adalah churn — baseline store-ready
+sudah diverifikasi menyeluruh, sistemnya sengaja ditata.
+
+**TOLAK brief premium generik.** Permintaan bergaya "fintech kelas atas" yang
+mengandaikan navy `#0A1628` + gold + glassmorphism sudah pernah datang dan
+ketiganya SALAH untuk repo ini: `tailwind.config.js` harfiah menulis "JANGAN
+ganti ke navy/gold", emas satu-satunya `--gold-songket` #E8B651 dan ia
+DECORATIVE-only, dan kartu sengaja FLAT (glass sudah dibuang sekali). Identitas
+app ini rona Hutan + songket, bukan template fintech.
 
 ## Permukaan — nilai persis, dan siapa yang memilikinya
 
