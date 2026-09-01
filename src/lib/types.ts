@@ -73,8 +73,13 @@ export interface AktivitasLog {
   table_name: 'transaksi_kas' | 'kas_rt' | 'tarikan' | 'talangan' | string;
   record_id: string | null;
   action: 'INSERT' | 'UPDATE' | 'DELETE';
-  actor_id: string | null;
-  actor_email: string | null;
+  /* Opsional karena TIDAK ikut diambil `fetchAktivitas` — keduanya dicabut
+     dari peran `anon` di database supaya email pengurus tak terbaca warga.
+     Tetap ada di tipe: kolomnya masih hidup di tabel & terbaca bendahara,
+     dan `namaAktor` masih menyediakan jatuh-tempo ke email untuk baris yang
+     `actor_name`-nya kosong. */
+  actor_id?: string | null;
+  actor_email?: string | null;
   actor_name: string | null;
   old_data: Record<string, unknown> | null;
   new_data: Record<string, unknown> | null;

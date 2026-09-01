@@ -269,10 +269,19 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
   }
 }
 
+/* Kolom disebut SATU-SATU, bukan '*' — dan ini syarat, bukan kerapian.
+   `actor_email` & `actor_id` DICABUT dari peran `anon` di database (izin
+   per-kolom, lihat 20260901010000_audit_log_sembunyikan_email.sql): warga
+   berhak tahu SIAPA yang mengubah kas, bukan alamat email pengurusnya —
+   garis yang sama yang sudah dipakai mengecualikan tabel `warga` karena
+   diff-nya memuat no_hp. Dgn izin per-kolom terpasang, `select=*` melebar ke
+   kolom yang ditolak dan SELURUH Riwayat warga gagal muat; menyebut kolom di
+   sini yang membuatnya tetap jalan. Nama aktor datang dari `actor_name`
+   (lihat `namaAktor`), yang diisi trigger dari user_metadata. */
 export async function fetchAktivitas(limit = 200): Promise<AktivitasLog[]> {
   const { data, error } = await supabase
     .from('audit_log')
-    .select('*')
+    .select('id, table_name, record_id, action, actor_name, old_data, new_data, created_at')
     .order('created_at', { ascending: false })
     .limit(limit);
   if (error) throw error;
