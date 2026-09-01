@@ -1,13 +1,34 @@
 ---
 name: hadiran-desain
-description: Sistem desain Hadiran RT — enam tangga (warna, tipografi, spasi, bentuk, gerak, bayangan, ikon), tiga golongan yang sengaja tidak diatur, daftar penjaga, dan jebakan deploy. Pakai SETIAP KALI menyentuh tampilan app ini.
+description: Sistem desain Hadiran RT — permukaan & tangga (warna, tipografi, spasi, bentuk, gerak, bayangan, ikon, nama kontrol), tiga golongan yang sengaja tidak diatur, urutan tuas saat "kurang nendang", daftar penjaga, jebakan deploy, dan target ke depan. Pakai SETIAP KALI menyentuh tampilan app ini.
 ---
 
 # Sistem desain Hadiran RT
 
 Bukan salinan CLAUDE.md. Ini yang harus DIPATUHI, bukan diulang.
 
-## Enam tangga — nilai di luar tangga dibikin MUSTAHIL, bukan dijanjikan
+## Permukaan — nilai persis, dan siapa yang memilikinya
+
+| | TERANG | GELAP |
+|---|---|---|
+| kanvas | `#CFE6D8` L\*90,4 C=0,0308 | `#001709` |
+| kartu | `#FFFFFF` **putih murni** | `gray-900` `#192920` |
+| sheet | kartu + bayangan | `gray-800` `#26362D` |
+| langkah nada kanvas→kartu | **9,6 % L** | **8,3 % L** |
+| hairline `line` | `#D3E0D8` — whisper, JANGAN digelapkan | ring cahaya `.12/.16/.19/.22` |
+
+**Hero cuma SATU permukaan: `.hero-emerald`.** `.hero-card` sudah dibuang (nol
+pemakai). Hero ber-NOMINAL memakai komponen `HeroSaldo`; hero tanpa nominal
+memakai `hero-emerald` + `HeroStats` langsung (preseden: Beranda carousel,
+Jadwal bendahara, Jadwal warga). Jangan lahirkan permukaan hero ketiga.
+
+Kanvas punya **sepuluh titik sinkron** — berhenti di CSS berarti gagal:
+`body` · `.app-bg` · token `sunken` · `warnaCetak.ts` (dikunci uji) ·
+`manifest.background_color` · `landing.html --canvas` & `--alt-bg` ·
+`index.html` theme-color statis · splash inline · `gen-splash.mjs` ·
+`useTheme`. Splash PNG di-BAKE pada tone kanvas → regen + **periksa pikselnya**.
+
+## Delapan tangga — nilai di luar tangga dibikin MUSTAHIL, bukan dijanjikan
 
 | sumbu | tangga | ditegakkan oleh |
 |---|---|---|
@@ -19,9 +40,36 @@ Bukan salinan CLAUDE.md. Ini yang harus DIPATUHI, bukan diulang.
 | **bayangan** | `.rest · .lift · .float · .float-high` | `npm run audit:bayangan` |
 | **tebal huruf** | sumbu KERJA: `normal` redup · `medium` prosa · `semibold` nilai & kontrol · `bold` judul · `extrabold` angka besar (HANYA `font-display`) | `npm run audit:tebal` |
 | **ikon** | `12px/2,25 · 14px/2 · 16px/1,75 · 20px/1,6`; stroke DITURUNKAN dari ukuran | `npm run audit:ikon` |
+| **nama kontrol** | tiap kontrol punya nama, dan nama itu UNIK per layar | `npm run audit:nama` |
 
 **Pola yang WAJIB diikuti saat menambah tangga:** timpa skala Tailwind DI LUAR
 `extend`. Selama nilai lama masih ada, nilai ke-25 lahir minggu depan.
+
+**AAA sekarang DIUKUR, bukan cuma dinyatakan.** `audit:kontras` & `-deep`
+mencetak seksi terpisah "AMBANG APP · AAA" — dilaporkan tapi TIDAK menggagalkan
+rantai (disiplin sama bagian 200% di `audit:potong`). Garis dasar hari ini:
+**0 dari 1219** (warga) dan **0 dari 2199** (bendahara). Kalau angka itu naik,
+sesuatu baru saja mundur.
+
+## Aturan yang gampang terlewat
+
+- **Kontrol berulang WAJIB bernama per-item.** `aria-label` string tetap di
+  dalam daftar = N kontrol bernama sama; yang tak melihat layar tak bisa
+  membedakannya, dan Voice Control menerima perintah lewat nama itu. Pola app:
+  `Proses tarikan #N`, `Hapus tarikan #N`, `Batalkan hasil tarikan #N`.
+- **`-webkit-font-smoothing: antialiased` HANYA di permukaan gelap**
+  (`.dark`, `.hero-emerald`, `.hero-noise`, `.btn-brand`, `.bg-brand`).
+  Global = teks gelap di kartu terang jadi tipis & "pecah". Properti ini
+  mewarisi, jadi satu selektor per permukaan menutup keturunannya.
+- **Animasi masuk pakai `backwards`, bukan `both`,** kalau keyframe akhirnya
+  sama dgn keadaan dasar. `both` menahan `transform: matrix(…)` selamanya →
+  elemen naik ke lapisan komposit dan tak pernah turun.
+- **"Per ⟨tanggal⟩" itu KLAIM atas saldo**, jadi ia milik halaman ber-UANG
+  (Kas RT, Kas Hadiran, Talangan) — bukan halaman jadwal — dan WAJIB
+  ber-penjaga `usePerTanggal(loading, error)`: app tak boleh menyatakan tanggal
+  yang tak ia ketahui.
+- **Lapisan baru WAJIB `useBackDismiss` berdampingan `useDialog`.** Escape saja
+  meninggalkan seluruh warga Android tanpa jalan keluar.
 
 ## Tiga golongan yang SENGAJA tidak diatur
 
@@ -35,7 +83,7 @@ Memaksanya masuk tangga itu **perusakan, bukan kerapian**:
    hijau gelap; `warnaCetak` untuk KERTAS. Mazhab adalah properti MEDIA.
 
 Tiap sapuan punya daftar **IZIN** — tulis alasannya per baris, jangan
-menggeneralisir.
+menggeneralisir. Kunci izin JANGAN nomor baris; pakai bentuk `berkas#Ikon@px`.
 
 ## Kepemilikan: keputusan tidak boleh diambil di tempat pemanggil
 
@@ -43,18 +91,43 @@ Pelajaran `AvatarPeci`. Kalau sebuah nilai bisa diketik di call-site, ia akan
 menyimpang. Yang sudah dipindah ke pemiliknya:
 `.btn-brand`/`.btn-danger`/`.btn-secondary` memiliki **tebalnya**; `<Tag>` &
 `<SectionTitle>` memiliki tebal badge-nya; stroke ikon hidup di **CSS**, bukan
-`strokeWidth` di call-site; hero saldo = `HeroSaldo`.
+`strokeWidth` di call-site; hero saldo = `HeroSaldo`; subjudul tanggal =
+`usePerTanggal`.
+
+## Kalau user bilang "kurang nendang" — urutan tuas, jangan menebak
+
+Keluhan ini sudah datang **empat kali**, dan tiga jawaban pertama menggeser tuas
+yang berbeda. Urutan yang terbukti:
+
+1. **Ukur kroma dulu.** Kanvas jauh lebih pucat dari hero → soalnya WARNA, bukan
+   kontras. Geser kroma dgn **L & rona DIKUNCI** di OKLab → nol rasio turun.
+2. **Periksa nisbah se-rona kartu terhadap kanvas.** Kartu harus jelas putih
+   ATAU jelas senada — di antaranya terbaca "kusam". (Kartu kini putih murni;
+   kalau nanti terasa klinis, naikkan kroma kartu sampai nisbah ~43% pulih,
+   `C≈0,0132` — JANGAN kembali ke `#F8FCF9` setengah jalan.)
+3. **Bayangan / ring**, bukan permukaan. Nol biaya kontras.
+4. **Langkah nada** — paling akhir, dan ukur ongkosnya dulu: menggelapkan kanvas
+   3% menjatuhkan `#34453B` ke 7,04, sisa 0,04 dari ambang AAA.
+
+**JANGAN menggelapkan hairline.** Jalan itu sudah terbukti buntu berkali-kali.
+**Sesudah konversi OKLab→sRGB, periksa apakah hasilnya TERPOTONG gamut** —
+kalau ya, rona yang tadi "dikunci" sebenarnya sudah lepas.
 
 ## Perintah
 
 ```bash
-npm run periksa        # typecheck + lint + 6 sapuan statis + 269 tes
+npm run periksa        # typecheck + lint + 5 sapuan statis + 277 tes
 npm run sapu-semua     # SEMUA sapuan berurutan → satu ringkasan hijau/merah
 npm run lembar-kontak  # 55 layar (normal/kosong/memuat/gagal/luring) → 1 PNG
 ```
 
-Sapuan visual butuh build produksi hidup:
+29 sapuan. Yang visual butuh build produksi hidup:
 `npm run build && npx vite preview --port 5199`
+
+Sapuan yang paling sering menemukan cacat baru, dan apa yang HANYA ia lihat:
+`audit:keadaan` (layar kosong/gagal/memuat) · `audit:luring-pertama` (kunjungan
+pertama, server DIMATIKAN sungguhan) · `audit:nama` (kontrol bisa dibedakan
+tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP).
 
 ## Jebakan yang sudah mahal — jangan diulang
 
@@ -68,12 +141,34 @@ Sapuan visual butuh build produksi hidup:
   bukan rasio.
 - **Kelas `box-shadow` polos MENGHAPUS `ring-*` Tailwind.** Sertakan
   `var(--tw-ring-offset-shadow)` & `var(--tw-ring-shadow)`.
-- **15 sapuan matang dikunci read-only.** Jangan buka tanpa izin user.
+- **13 sapuan matang dikunci read-only.** Jangan buka tanpa izin user.
   `find . -path ./node_modules -prune -o -type f ! -perm -u+w -print`
 - **Login memakai kait `id="masuk-warga"`** — kait WAJIB `id`, bukan teks
   tombol. Sekali berubah, 20 sapuan mati serentak.
 - Sapuan memakai harness bersama `scripts/lib/audit-harness.mjs`. **Jangan
   tulis alur login sendiri.**
+- **Uji luring yang MENGEMULASI luring bukan uji luring.** `setOffline` tidak
+  memutus fetch service worker; matikan servernya.
+- **Komentar JSX `{/* */}` tak boleh jadi anak kedua** di `action={…}` atau di
+  `{cond && ( … )}` — ekspresi itu hanya boleh berisi SATU elemen.
+
+## Target ke depan — yang harus tetap benar saat app tumbuh
+
+- **300 KK.** App menjanjikan skala itu; hari ini ~79 aktif. Uji bentuk data
+  dgn `EKSTREM=1 npm run audit:potong` / `audit:lebar` — skala **×100**, bukan
+  ×1000 (nominal 16 milyar takkan pernah ada, dan "temuan" darinya karangan).
+  Jumlah baris SENGAJA tak digandakan: id kembar = agregat uang bohong.
+- **AAA harus TETAP 0.** Garis dasarnya baru tercapai; tiap perubahan permukaan
+  wajib menjalankan `audit:kontras` + `-deep` dan membaca seksi AAA-nya.
+- **Luring kunjungan pertama harus TETAP boot.** `SHELL` di `sw.js` disuntik
+  saat build dari graf impor entry + dynamic import kedalaman-1. Kalau kaitnya
+  hilang, build MELEDAK — jangan "perbaiki" dgn melunakkan itu.
+- **Single-RT.** Isolasi multi-tenant sengaja DITUNDA; jangan bangun untuk
+  multi-RT sebelum user memintanya.
+- **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
+  `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
+  yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:
+  default` dan perilakunya belum diverifikasi di perangkat nyata.
 
 ## Cara kerja yang diminta user
 
@@ -84,6 +179,11 @@ Sapuan visual butuh build produksi hidup:
 3. **Temuan lama dibiarkan terbuka, jangan diklaim.** Sapuan merah → buktikan
    dulu apakah dari perubahanmu (`git stash` + build ulang + banding).
 4. **Kalau sapuan melaporkan temuan palsu, betulkan ALATNYA, bukan kodenya.**
+   Daftar kejadiannya panjang & bernomor di CLAUDE.md — baca sebelum menuduh
+   kode.
 5. **Sapuan baru WAJIB divalidasi MUTASI** — rusak aturannya, sapuan harus
-   merah. Hijau tanpa mutasi tak membuktikan apa pun.
+   merah. Hijau tanpa mutasi tak membuktikan apa pun. Populasi kosong =
+   `PROBE CACAT`, bukan lulus.
 6. **Perubahan KATA disetujui user dulu** sebelum ditulis ke kode.
+7. **Curigai probe-mu sendiri sekuat kau mencurigai app.** Angka mustahil di
+   laporanmu sendiri adalah vonisnya, bukan detail.
