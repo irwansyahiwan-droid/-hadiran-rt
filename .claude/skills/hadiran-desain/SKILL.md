@@ -82,9 +82,19 @@ Kanvas punya **sepuluh titik sinkron** — berhenti di CSS berarti gagal:
 
 **AAA sekarang DIUKUR, bukan cuma dinyatakan.** `audit:kontras` & `-deep`
 mencetak seksi terpisah "AMBANG APP · AAA" — dilaporkan tapi TIDAK menggagalkan
-rantai (disiplin sama bagian 200% di `audit:potong`). Garis dasar hari ini:
-**0 dari 1219** (warga) dan **0 dari 2199** (bendahara). Kalau angka itu naik,
-sesuatu baru saja mundur.
+rantai (disiplin sama bagian 200% di `audit:potong`). Garis dasar (1 Sep 2026):
+**0 dari 1216** (warga) dan **0 dari 2256** (bendahara). Kalau angka GAGAL itu
+naik dari nol, sesuatu baru saja mundur.
+
+**Yang wajib nol PEMBILANGNYA, bukan penyebutnya.** Populasi memang bergerak
+tiap permukaan lahir atau berpindah peran, dan itu bukan regresi — 1 Sep 2026
+bendahara naik 2199 → 2256 (+57) semata karena Riwayat Aktivitas dibuka untuk
+warga, jadi ia permukaan yang belum pernah diukur di peran itu (warga sendiri
+1219 → 1216). Membandingkan penyebutnya lalu menyimpulkan "ada yang berubah"
+akan mengirim sesi berikutnya memburu hantu. **Yang menarik justru sebaliknya:
+sampel BARU adalah tempat teks lemah paling mungkin menyelinap** — sesudah
+membuka permukaan ke peran baru, jalankan kedua sapuan ini dan pastikan
+pembilangnya tetap nol di populasi yang sudah tumbuh.
 
 ## Aturan yang gampang terlewat
 
