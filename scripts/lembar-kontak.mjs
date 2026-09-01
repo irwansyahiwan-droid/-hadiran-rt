@@ -34,7 +34,23 @@ mkdirSync(OUT, { recursive: true });
 
 const TAB_W = ['Beranda', 'Jadwal', 'Hadiran', 'Kas RT'];
 const TAB_B = ['Beranda', 'Jadwal', 'Talangan', 'Hadiran', 'Kas RT'];
+/* Riwayat Aktivitas dibuka untuk WARGA 1 Sep 2026 (transparansi: siapa
+   bendahara yg mengubah data kas). Sampai hari itu ia cuma ada di OVERLAY_B,
+   jadi lembar kontak — alat yang tugasnya justru "lihat SEMUA layar
+   berdampingan" — tak pernah memuat satu pun tampilan warganya. Kelas titik
+   buta yang sama dgn `audit:masuk` yg mati 8 hari: POPULASI tak ikut
+   diperbarui saat sebuah permukaan berpindah peran. Kalau nanti ada overlay
+   lain dibuka ke warga, ia WAJIB masuk daftar ini di hari yang sama. */
+const OVERLAY_W = ['Riwayat Aktivitas'];
 const OVERLAY_B = ['Kelola Anggota', 'Riwayat Aktivitas'];
+
+/* Overlay dulu cuma dipotret saat `normal`, jadi keadaan pinggirnya tak pernah
+   terlihat sekali pun — padahal justru di situ app tercepat terasa murah, dan
+   Riwayat kini dibaca warga awam, bukan cuma bendahara yg paham datanya.
+   `memuat` SENGAJA di luar: saat semua request digantung, menu Header belum
+   tentu siap diketuk, dan yang terpotret jadi menunya sendiri — bukan
+   overlaynya. Lebih baik mengaku tak mengukur daripada memotret hal lain. */
+const MODE_OVERLAY = [null, 'kosong', 'gagal'];
 
 const shots = [];   // { grup, label, b64 }
 const ambil = async (page, grup, label) => {
@@ -105,6 +121,14 @@ for (const bagian of BAGIAN) {
           else await gotoTab(page, tab);
           await ambil(page, `${bagian}-${t}`, `warga · ${tab}`);
         }
+        if (MODE_OVERLAY.includes(mode)) {
+          for (const label of OVERLAY_W) {
+            if (await openMenuItem(page, label)) {
+              await ambil(page, `${bagian}-${t}`, `warga · ${label}`);
+              await page.keyboard.press('Escape'); await page.waitForTimeout(700);
+            }
+          }
+        }
       } else process.stdout.write('!');
       await ctx.close();
     }
@@ -120,7 +144,7 @@ for (const bagian of BAGIAN) {
         else await gotoTab(page, tab);
         await ambil(page, `${bagian}-${t}`, `bendahara · ${tab}`);
       }
-      if (!mode) {
+      if (MODE_OVERLAY.includes(mode)) {
         for (const label of OVERLAY_B) {
           if (await openMenuItem(page, label)) {
             await ambil(page, `${bagian}-${t}`, `bendahara · ${label}`);
