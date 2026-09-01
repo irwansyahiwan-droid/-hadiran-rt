@@ -290,7 +290,7 @@ export default function App() {
           onLogout={isWargaMode ? ctxValue.exitWargaMode : auth.signOut}
           isDark={isDark}
           onToggleTheme={toggleTheme}
-          onOpenRiwayat={ctxValue.isBendahara ? () => setRiwayatOpen(true) : undefined}
+          onOpenRiwayat={() => setRiwayatOpen(true)}
           onOpenLaporan={ctxValue.isBendahara ? () => setLaporanOpen(true) : undefined}
           onOpenBackup={ctxValue.isBendahara ? () => setBackupOpen(true) : undefined}
           onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
@@ -325,7 +325,11 @@ export default function App() {
         {/* Overlay bendahara/umum — chunk dimuat saat pertama dibuka (gate by state).
             Tiap overlay return null saat !open, jadi mount-on-open setara perilaku. */}
         <Suspense fallback={null}>
-          {ctxValue.isBendahara && riwayatOpen && (
+          {/* Riwayat Aktivitas terbuka utk warga juga (transparansi: siapa
+              bendahara yg meng-input/mengubah data kas) — lihat RLS
+              `20260901000000_audit_log_anon_read.sql`, dibatasi ke 4
+              kategori kas (bukan seluruhnya, warga tak diberi dump anggota). */}
+          {riwayatOpen && (
             <RiwayatAktivitas open onClose={() => setRiwayatOpen(false)} />
           )}
           {ctxValue.isBendahara && laporanOpen && (

@@ -254,9 +254,6 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                   {isBendahara && onOpenLaporan && (
                     <MenuItem icon={FileText} label="Tutup Buku Triwulan" onClick={onOpenLaporan} />
                   )}
-                  {isBendahara && onOpenRiwayat && (
-                    <MenuItem icon={History} label="Riwayat Aktivitas" onClick={onOpenRiwayat} />
-                  )}
                   {isBendahara && onOpenAnggota && (
                     <MenuItem icon={Users} label="Kelola Anggota" onClick={onOpenAnggota} />
                   )}
@@ -264,6 +261,12 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                     <MenuItem icon={DatabaseBackup} label="Backup & Restore" onClick={onOpenBackup} />
                   )}
                   {isBendahara && <div className="my-2 border-t border-line dark:border-gray-800" />}
+                  {/* Terbuka utk WARGA juga (transparansi kas — siapa bendahara
+                      yg input/ubah data): dipindah keluar dari blok admin di
+                      atas, sejajar "Tentang Aplikasi" yg juga milik semua peran. */}
+                  {onOpenRiwayat && (
+                    <MenuItem icon={History} label="Riwayat Aktivitas" onClick={onOpenRiwayat} />
+                  )}
                   {onOpenTentang && (
                     <MenuItem icon={Info} label="Tentang Aplikasi" onClick={onOpenTentang} />
                   )}
