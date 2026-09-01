@@ -186,10 +186,17 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP).
   bukan rasio.
 - **Kelas `box-shadow` polos MENGHAPUS `ring-*` Tailwind.** Sertakan
   `var(--tw-ring-offset-shadow)` & `var(--tw-ring-shadow)`.
-- **13 sapuan matang dikunci read-only.** Jangan buka tanpa izin user.
+- **14 sapuan matang dikunci read-only.** Jangan buka tanpa izin user.
   `find . -path ./node_modules -prune -o -type f ! -perm -u+w -print`
-- **Login memakai kait `id="masuk-warga"`** — kait WAJIB `id`, bukan teks
-  tombol. Sekali berubah, 20 sapuan mati serentak.
+- **Login memakai DUA kait `id`: `masuk-warga` & `masuk-bendahara`** — kait
+  WAJIB `id`, bukan teks tombol. Sekali berubah, 20 sapuan mati serentak.
+  Kait bendahara lahir 1 Sep 2026 karena pelajaran ke-24 TERULANG di jalur yang
+  dulu terlewat: perbaikan waktu itu cuma memasang kait warga, sedangkan
+  `audit:masuk` masih berkait ke teks — dan sesudah Login digambar ulang,
+  "Masuk sebagai Bendahara" pindah ke LUAR `<form>` sementara submit di dalam
+  tinggal berbunyi "Masuk". Sapuannya MATI ~8 hari tanpa vonis. **Kalau sebuah
+  kelas cacat diperbaiki di satu jalur, periksa jalur kembarannya di hari yang
+  sama** — kalau tidak, ia menunggu di sana sampai ada yang menyentuhnya.
 - Sapuan memakai harness bersama `scripts/lib/audit-harness.mjs`. **Jangan
   tulis alur login sendiri.**
 - **Uji luring yang MENGEMULASI luring bukan uji luring.** `setOffline` tidak
