@@ -223,9 +223,43 @@ describe('perubahan status yang punya akibat nyata', () => {
   it('talangan: lunas vs pembatalan pelunasan tak boleh tertukar', () => {
     const lunas = formatAktivitas(row({ table_name: 'talangan', action: 'UPDATE', new_data: { status_lunas: true, nominal: 50_000 } }));
     const batal = formatAktivitas(row({ table_name: 'talangan', action: 'UPDATE', new_data: { status_lunas: false, nominal: 50_000 } }));
-    expect(lunas.title).toBe('Tandai Talangan Lunas');
+    expect(lunas.title).toBe('Tandai talangan lunas');
     expect(lunas.accent).toBe('emerald');
-    expect(batal.title).toBe('Batalkan Pelunasan Talangan');
+    expect(batal.title).toBe('Batalkan pelunasan talangan');
+  });
+
+  /* Baris `talangan` cuma menyimpan UUID, jadi sampai 2 Sep 2026 ia tampil
+     YATIM: "Tandai talangan lunas" tanpa nama & tanpa nomor, tepat di bawah
+     baris kas yang menyebut keduanya. Kamus memberinya identitas.
+
+     Yang dikunci DUA sifat berlawanan sekaligus, dan itu disengaja: dgn kamus
+     ia WAJIB menyebut orang & tarikan; TANPA kamus ia WAJIB tetap `null` dan
+     tidak memuntahkan "undefined" ke layar. Sifat kedua yang menjaga jalur
+     luring/gagal — kamus dimuat terpisah dan boleh gagal sendirian. */
+  const kamus = {
+    warga: { 'w-1': 'Ustad Saiful Hadi' },
+    tarikan: { 't-9': 18 },
+  };
+  const barisTalangan = (extra: Record<string, unknown> = {}) => row({
+    table_name: 'talangan', action: 'UPDATE',
+    new_data: { status_lunas: true, nominal: 50_000, warga_id: 'w-1', tarikan_id: 't-9', ...extra },
+  });
+
+  it('dengan kamus: baris talangan menyebut nama & nomor tarikan', () => {
+    expect(formatAktivitas(barisTalangan(), kamus).detail).toBe('Ustad Saiful Hadi · Tarikan #18');
+  });
+
+  it('tanpa kamus: detail null — bukan "undefined" yang bocor ke layar', () => {
+    const v = formatAktivitas(barisTalangan());
+    expect(v.detail).toBeNull();
+  });
+
+  it('kamus tak lengkap: sebut yang diketahui saja, jangan setengah kalimat', () => {
+    // UUID asing (mis. anggota sudah dihapus) — nomor tarikan tetap berguna.
+    expect(formatAktivitas(barisTalangan({ warga_id: 'entah' }), kamus).detail)
+      .toBe('Tarikan #18');
+    expect(formatAktivitas(barisTalangan({ tarikan_id: 'entah' }), kamus).detail)
+      .toBe('Ustad Saiful Hadi');
   });
 
   /* Penjaga UANG, bukan penjaga tampilan. Satu ketukan "tandai lunas" menulis

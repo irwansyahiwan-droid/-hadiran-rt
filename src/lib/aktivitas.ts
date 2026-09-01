@@ -10,6 +10,18 @@ import type { AktivitasLog } from './types';
 
 export type Accent = 'emerald' | 'rose' | 'amber' | 'blue';
 
+/* Baris audit `talangan` menyimpan UUID saja — `warga_id` & `tarikan_id`, tak
+   ada nama & tak ada nomor. Akibatnya barisnya YATIM di layar: warga melihat
+   "Tandai talangan lunas" tanpa tahu milik siapa, sementara baris kas
+   pasangannya menyebut nama lengkap di keterangannya. Kamus ini yang
+   menutupnya. Obatnya sengaja MENAMBAH keterangan, bukan menyembunyikan baris
+   yang mubazir: layar ini dibuka ke warga justru demi transparansi, jadi
+   menghilangkan entri audit demi kerapian bertentangan dgn alasan ia ada. */
+export interface KamusNama {
+  warga: Record<string, string>;
+  tarikan: Record<string, number>;
+}
+
 export interface AktivitasView {
   title: string;                 // baris utama, mis. "Tambah Setoran"
   detail: string | null;         // keterangan / nama
@@ -116,7 +128,7 @@ const ACTION_LABEL: Record<AktivitasLog['action'], string> = {
   DELETE: 'Hapus',
 };
 
-export function formatAktivitas(row: AktivitasLog): AktivitasView {
+export function formatAktivitas(row: AktivitasLog, kamus?: KamusNama): AktivitasView {
   const data = (row.new_data ?? row.old_data ?? {}) as Record<string, unknown>;
   const old = (row.old_data ?? {}) as Record<string, unknown>;
   const baru = (row.new_data ?? {}) as Record<string, unknown>;
@@ -293,9 +305,19 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
        pasangannya, dan penghapusan itu punya entri auditnya sendiri. */
     case 'talangan': {
       const lunas = baru.status_lunas === true;
+      /* Identitas baris dirakit dari UUID lewat kamus. Tanpa kamus (uji, atau
+         pemanggil yang belum menyediakannya) hasilnya `null` — sama seperti
+         sebelumnya, jadi ketiadaan kamus MENURUNKAN mutu, tak pernah memecah.
+         Huruf kalimat, sejajar judul peristiwa lain sesudah pass kata 1 Sep. */
+      const namaWarga = kamus?.warga[str(data.warga_id)];
+      const nomorTarikan = kamus?.tarikan[str(data.tarikan_id)];
+      const jejak = [
+        namaWarga || null,
+        nomorTarikan != null ? `Tarikan #${nomorTarikan}` : null,
+      ].filter(Boolean).join(' · ');
       return {
-        title: lunas ? 'Tandai Talangan Lunas' : 'Batalkan Pelunasan Talangan',
-        detail: null,
+        title: lunas ? 'Tandai talangan lunas' : 'Batalkan pelunasan talangan',
+        detail: jejak || null,
         amount: null,
         changes, actor,
         accent: lunas ? 'emerald' : 'amber',
@@ -323,6 +345,28 @@ export function formatAktivitas(row: AktivitasLog): AktivitasView {
    kolom yang ditolak dan SELURUH Riwayat warga gagal muat; menyebut kolom di
    sini yang membuatnya tetap jalan. Nama aktor datang dari `actor_name`
    (lihat `namaAktor`), yang diisi trigger dari user_metadata. */
+/* Kamus UUID → nama/nomor untuk memberi identitas pada baris `talangan`.
+   Dua tabel kecil (69 warga, puluhan tarikan) & keduanya memang sudah terbuka
+   untuk warga — nama sohibul bait & daftar hadir tampil di layar lain.
+   MELEMPAR saat gagal, bukan mengembalikan kamus kosong: `.select()` Supabase
+   tidak melempar sendiri, dan `?? []` diam-diam mengubah kegagalan jadi "tak
+   ada data" (jebakan yang sudah tercatat di CLAUDE.md). Yang memutuskan boleh
+   atau tidaknya berjalan tanpa kamus adalah PEMANGGIL, bukan helper ini. */
+export async function fetchKamus(): Promise<KamusNama> {
+  const [w, t] = await Promise.all([
+    supabase.from('warga').select('id, nama'),
+    supabase.from('tarikan').select('id, nomor'),
+  ]);
+  if (w.error) throw w.error;
+  if (t.error) throw t.error;
+
+  const warga: Record<string, string> = {};
+  for (const r of (w.data ?? []) as { id: string; nama: string }[]) warga[r.id] = r.nama;
+  const tarikan: Record<string, number> = {};
+  for (const r of (t.data ?? []) as { id: string; nomor: number }[]) tarikan[r.id] = r.nomor;
+  return { warga, tarikan };
+}
+
 export async function fetchAktivitas(limit = 200): Promise<AktivitasLog[]> {
   const { data, error } = await supabase
     .from('audit_log')

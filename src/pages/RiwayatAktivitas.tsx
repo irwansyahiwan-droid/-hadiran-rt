@@ -12,7 +12,8 @@ import { useRealtime } from '../hooks/useRealtime';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
-import { fetchAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
+import { fetchAktivitas, fetchKamus, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
+import type { KamusNama } from '../lib/aktivitas';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat } from '../lib/hooks';
@@ -63,6 +64,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   /* Ekspor PDF = aksi berat (chunk diunduh saat diketuk). Lihat `useAksiBerat`. */
   const [pdfSibuk, jalankanPdf] = useAksiBerat();
   const [rows, setRows] = useState<AktivitasLog[]>([]);
+  const [kamus, setKamus] = useState<KamusNama | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]['id']>('semua');
@@ -72,8 +74,18 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   async function load() {
     setError(false);
     try {
-      const data = await fetchAktivitas();
+      /* Kamus dimuat BERBARENGAN tapi kegagalannya ditelan sengaja, dan
+         perbedaan itu penting: baris audit adalah ISI layar — gagal berarti
+         layar gagal; kamus cuma memberi NAMA pada baris `talangan` yang
+         datanya UUID. Kalau ia gagal, barisnya kembali seperti sebelum
+         2 Sep 2026 (tanpa nama) sementara sisa riwayat tetap utuh. Menjatuhkan
+         seluruh layar demi pelengkap = menukar kerugian kecil dgn besar. */
+      const [data, k] = await Promise.all([
+        fetchAktivitas(),
+        fetchKamus().catch(() => null),
+      ]);
       setRows(data);
+      setKamus(k);
     } catch {
       setError(true);
     } finally {
@@ -103,7 +115,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
     const filtered = rows.filter((r) => {
       if (filter !== 'semua' && r.table_name !== filter) return false;
       if (!q) return true;
-      const v = formatAktivitas(r);
+      const v = formatAktivitas(r, kamus ?? undefined);
       return (
         v.title.toLowerCase().includes(q) ||
         (v.detail ?? '').toLowerCase().includes(q) ||
@@ -118,7 +130,11 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
       else out.push({ hari, items: [r] });
     }
     return out;
-  }, [rows, filter, search]);
+    /* `kamus` WAJIB ikut: ia dipakai di dalam saringan pencarian, dan datangnya
+       bisa SESUDAH `rows` (dua request paralel). Tanpa dep ini, mencari
+       "Saiful" tak menemukan baris talangan sampai filter/ketikan lain
+       kebetulan memicu hitung ulang. */
+  }, [rows, filter, search, kamus]);
 
   /* Sampai 20 Agu 2026 jalur ini TANPA `catch` sama sekali: chunk gagal (mis.
      chunk basi sesudah deploy, yang dibalas HTML 200 oleh rewrite Vercel) cuma
@@ -218,7 +234,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
               <p className="text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400 pt-1">{grp.hari}</p>
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
                 {grp.items.map((row, idx) => {
-                  const v = formatAktivitas(row);
+                  const v = formatAktivitas(row, kamus ?? undefined);
                   const Icon = iconFor(row);
                   const isOpen = expanded === row.id;
                   const hasMore = v.changes.length > 0;
