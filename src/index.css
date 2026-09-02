@@ -877,36 +877,36 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      antara dua mazhab. Bayangan yang dipertegas di sini TETAP dipakai; keduanya
      bekerja bersama, bukan saling menggantikan. Lihat blok MAZHAB TONAL.
 
-     ── DIRAPATKAN 2 Sep 2026: pass di atas menarik tuas ke arah yang salah ──
-     Warga melapor kartu putih "terlihat redup" — sesudah kartunya justru
-     dijadikan #FFFFFF, seterang yang mungkin ada. Karena itu sebabnya
-     mustahil ada di nilai kartunya, dan pengukuran menemukannya di SELOKAN
-     antar-kartu. Ambient 28px/-10px/.26 menggelapkan kanvas (piksel nyata,
-     Kas RT @390px, diukur turun dari tepi bawah kartu):
+     ── JALAN BUNTU 2 Sep 2026, dicatat supaya tak dicoba lagi buta ──
+     Sempat DIRAPATKAN jadi `0 1px 2px -1px/.16 + 0 5px 12px -6px/.20` dgn
+     alasan yang pengukurannya BENAR: ambient 28px/-10px/.26 menodai SELOKAN
+     antar-kartu, sehingga kanvas tak pernah sempat pulih ke warnanya sendiri
+     sebelum kartu berikutnya datang (piksel nyata, Kas RT @390px, turun dari
+     tepi bawah kartu — luminans, makin tinggi makin terang):
 
-         1px +37 · 8px +17 · 16px +9 · 28px +2   ← kartu berikutnya mulai 33px
+         rapat   1px .608 · 8px .733 · 16px .748 · 28px .748   ← pulih di 16px
+         asli    1px .499 · 8px .627 · 16px .688 · 28px .733   ← masih menanjak
 
-     Kanvas tak pernah sempat pulih ke warnanya sendiri di antara dua kartu:
-     seluruh selokan tinggal di bawah bayangan. Yang redup bukan kartunya,
-     melainkan LADANGNYA — dan itu persis kebalikan dari yang diminta pass
-     "Bayangan Dipertegas", yang menaikkan alpha JUSTRU supaya kartu nendang.
-     Ia mengangkat kartu dengan cara menggelapkan sekelilingnya.
+     Angkanya sah, kesimpulannya tidak. Kanvas memang jadi lebih bersih — dan
+     user tetap melihatnya sbg "redup", karena yang hilang bersama bayangan itu
+     PEMISAH kartu: kartu melebur ke kanvas dan layarnya terbaca DATAR. "Redup"
+     dalam keluhan ini tak pernah berarti gelap; ia berarti tak ada kedalaman.
+     Dikembalikan ke nilai di bawah atas permintaan user, sesudah dua versinya
+     dirender berdampingan dan dilihat dengan mata.
 
-     Sesudah dirapatkan: 1px +19 · 8px +2 · 16px +0 · 28px +0 — kanvas kembali
-     jadi kanvas sebelum kartu berikutnya datang. NOL nilai warna berubah;
-     yang bergerak cuma geometri & alpha bayangan.
-
-     Tangga elevasi TETAP monoton (diverifikasi ulang, bukan diasumsikan —
-     lihat catatan alpha di bawah): menurunkan `.lift` menjauhkannya dari
-     `.float`, jadi sheet tetap terasa melayang di atas kartu.
-
-     PELAJARAN, karena kelasnya akan datang lagi: "kartu kurang nendang"
-     TIDAK otomatis berarti kartunya. Kartu selalu dibaca RELATIF terhadap
-     beberapa piksel kanvas di sebelahnya — jadi sebelum menyentuh kartu,
-     ukur dulu apakah kanvas di sebelahnya masih kanvas. */
+     DUA PELAJARAN, dan yang kedua lebih mahal dari nilai apa pun di sini:
+     (1) Selokan bersih BUKAN tujuan pada dirinya. Kanvas antar-kartu boleh
+         ternoda bayangan — itu justru yang membuat kartu terbaca terangkat.
+         Kalau selokan mau dibersihkan lagi, bayar pemisahnya dari tuas LAIN
+         (ring, langkah nada), jangan dari ambient.
+     (2) Perubahan RASA wajib dirender & disetujui SEBELUM dikirim. Nilai ini
+         sempat ter-deploy tanpa pernah ditunjukkan, menumpang `git add -A` di
+         commit yang judulnya soal §1.4.12 — user menemukannya dari layarnya
+         sendiri, bukan dari catatan rilis. Bayangan/warna/tipografi tidak
+         pernah "ikut" sebuah commit a11y. */
   --shadow-card:
-    0 1px 2px -1px rgba(8, 30, 19, 0.16),
-    0 5px 12px -6px rgba(8, 30, 19, 0.20);
+    0 2px 5px -2px rgba(8, 30, 19, 0.18),
+    0 12px 28px -10px rgba(8, 30, 19, 0.26);
   /* ALPHA DINAIKKAN (30 Agu 2026) — konsekuensi dari "Bayangan Dipertegas"
      di atas. Diukur pakai canvas shadow rig (sample piksel di bawah tepi
      kartu, delta dari kanvas #CFE6D8): `.lift` yg baru punya PUNCAK 106,8
@@ -917,21 +917,12 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
      Geometri (offset/blur/spread) TETAP; cuma alpha naik supaya urutan
      PUNCAK balik monoton: rest 14 < lift 107 < float 114 < high 141.
 
-     ALASAN INI SUDAH BASI (2 Sep 2026) — dicatat, sengaja BELUM dikerjakan.
-     Alpha di sini dinaikkan semata untuk mengejar `.lift` yang membengkak;
-     `.lift` kini dirapatkan lagi (lihat blok di atas), jadi jarak antar-anak
-     tangga melebar jauh melampaui yang pernah diniatkan. Diukur ulang dgn rig
-     4 kotak di atas kanvas app (delta luminans thd kanvas, bukan skala yang
-     sama dgn angka warisan di baris atas — jangan dibandingkan langsung):
-
-         terang  rest 5,8 · lift 19,7 · float 52,7 · high 67,9   MONOTON
-         gelap   rest 0,0 · lift  4,5 · float  7,4 · high  9,7   MONOTON
-
-     Jadi tangganya SEHAT dan tak ada yang patah — yang tersisa cuma sheet
-     terasa lebih tinggi di atas kartu daripada yang dulu dipilih siapa pun.
-     Itu keputusan rasa, bukan cacat, jadi ia menunggu orang yang memutuskan.
-     `.float`/`.float-high` duduk di atas scrim tanpa tetangga di sampingnya,
-     jadi ia TIDAK punya masalah selokan yang baru saja diperbaiki. */
+     Alasan ini SEMPAT dianggap basi (2 Sep 2026) sewaktu `.lift` dirapatkan;
+     `.lift` sudah dikembalikan (lihat blok JALAN BUNTU di atas), jadi alasan
+     di paragraf pertama BERLAKU LAGI apa adanya. Catatan itu dibiarkan mati
+     di sini dgn sengaja: kalau `.lift` nanti dirapatkan lagi, alpha di blok
+     ini ikut jadi kekencangan — keduanya satu pasangan, jangan digeser
+     sendiri-sendiri. */
   --shadow-float:
     0 0 0 1px rgba(8, 30, 19, 0.06),
     0 4px 12px -2px rgba(8, 30, 19, 0.21),
