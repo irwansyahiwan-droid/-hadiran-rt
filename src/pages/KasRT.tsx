@@ -599,7 +599,7 @@ export default function KasRTPage() {
           /* The Saldo-Defisit Rule (selaras Beranda & KasHadiran): nominal TETAP
              putih premium; negatif ditandai chip KATA "Defisit". */
           status={saldo < 0 ? (
-            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-semibold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
               Defisit
             </span>
           ) : undefined}

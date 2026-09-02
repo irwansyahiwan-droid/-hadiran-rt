@@ -389,7 +389,7 @@ export default function JadwalWargaPage() {
                 KEJELASAN, bukan ruang; ukur dulu sebelum mengharapkan
                 halaman ini jadi pendek. */}
             <div className="flex gap-2 flex-wrap">
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-semibold">
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-bold">
                 <Coins className="w-3 h-3" /> <span className="font-display tabular-nums">{formatRupiahPlain(iuranTerkumpul)}</span>
               </span>
             </div>

@@ -73,7 +73,7 @@ Kanvas punya **sepuluh titik sinkron** — berhenti di CSS berarti gagal:
 | **bentuk** | `lg8 · xl12 · 2xl16 · 3xl24 · full`; radius tile diturunkan dari sisinya | `npm run audit:bentuk` |
 | **gerak** | `0.12 · 0.16 · 0.24 · 0.40 · 0.60s`; KELUAR selalu di bawah MASUK | `--dur-*` + `theme.transitionDuration` (MENIMPA) |
 | **bayangan** | `.rest · .lift · .float · .float-high` | `npm run audit:bayangan` |
-| **tebal huruf** | sumbu KERJA: `normal` redup · `medium` prosa · `semibold` nilai & kontrol · `bold` judul · `extrabold` angka besar (HANYA `font-display`) | `npm run audit:tebal` |
+| **tebal huruf** | sumbu KERJA: `normal` redup · `medium` prosa · `semibold` nilai & kontrol · `bold` judul · `extrabold` angka besar (HANYA `font-display`). **Badge/tombol `text-micro` (11px) wajib `bold`** — kompensasi optis | `npm run audit:tebal` |
 | **ikon** | `12px/2,25 · 14px/2 · 16px/1,75 · 20px/1,6`; stroke DITURUNKAN dari ukuran | `npm run audit:ikon` |
 | **nama kontrol** | tiap kontrol punya nama, dan nama itu UNIK per layar | `npm run audit:nama` |
 
@@ -97,6 +97,23 @@ membuka permukaan ke peran baru, jalankan kedua sapuan ini dan pastikan
 pembilangnya tetap nol di populasi yang sudah tumbuh.
 
 ## Aturan yang gampang terlewat
+
+- **Perubahan RASA tak pernah menumpang commit lain.** Warna, bayangan,
+  tipografi, spasi — wajib DIRENDER & disetujui user sebelum dikirim, dan wajib
+  punya commit sendiri. 2 Sep 2026 nilai `--shadow-card` ikut ter-deploy lewat
+  `git add -A` di commit yang judulnya §1.4.12; user menemukannya dari layarnya
+  sendiri ("kok jadi redup"), bukan dari catatan rilis. **Sebelum commit:
+  `git diff --staged --stat`, lalu tanyakan tiap berkas — kenapa ini di sini?**
+- **"Redup" hampir tak pernah berarti GELAP.** Jawabannya tak sekali pun
+  menggelapkan sesuatu: ia berarti kartu kehilangan KEDALAMAN (bayangan
+  dipangkas → kartu melebur ke kanvas) atau huruf kecil kehilangan BERAT
+  (badge 11px 700 → 600 terbaca memudar). Ukur bayangan & tebal dulu — palet
+  dan kontras justru sedang hijau, jadi menyentuh warna itu salah tuas.
+- **Di 11px, satu anak tangga tebal = beda "terbaca" vs "memudar".** Prinsipnya
+  sama dgn tangga IKON (stroke diturunkan dari UKURAN). Kalau aturan tangga
+  meleset di satu ukuran, **ubah ATURANnya, jangan tulis izin** — izin menutup
+  satu call-site & membiarkan kelasnya terbuka. Begitu aturan micro-bold
+  ditegakkan, ia langsung menemukan 7 badge lain di luar `<Tag>`.
 
 - **Kontrol berulang WAJIB bernama per-item.** `aria-label` string tetap di
   dalam daftar = N kontrol bernama sama; yang tak melihat layar tak bisa

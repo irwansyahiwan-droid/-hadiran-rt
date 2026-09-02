@@ -80,7 +80,7 @@ export default function SectionTitle({ children, count, action, tone = 'default'
              yang pekerjaannya sama persis — menulis `font-semibold`. Dua
              komponen BERSAMA, dua keputusan berbeda: bukti paling telak bahwa
              tebal dulu dipilih dari kebiasaan, bukan dari peran. */
-          <span className={`font-display text-micro font-semibold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center ${
+          <span className={`font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center ${
             tone === 'warn'
               ? 'text-warn dark:text-amber-300 ring-amber-600/30 dark:ring-amber-400/30'
               : 'text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700'

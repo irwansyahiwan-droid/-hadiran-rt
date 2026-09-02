@@ -594,7 +594,7 @@ export default function KasHadiranPage() {
              putih premium; negatif ditandai chip KATA "Defisit" — rona salmon
              (text-rose-200) dulu = sinyal lemah utk mata yg sulit bedakan warna. */
           status={saldo < 0 ? (
-            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-semibold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+            <span className="mb-2 shrink-0 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
               Defisit
             </span>
           ) : undefined}
@@ -676,7 +676,7 @@ export default function KasHadiranPage() {
               </InfoTip>
             </p>
             <span
-              className="flex items-center gap-1 px-3 py-1 bg-emerald-700 rounded-full text-white text-micro font-semibold"
+              className="flex items-center gap-1 px-3 py-1 bg-emerald-700 rounded-full text-white text-micro font-bold"
               aria-label={`${tarikanSelesai.length} tarikan selesai`}
             >
               {tarikanSelesai.length}

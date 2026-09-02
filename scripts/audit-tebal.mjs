@@ -117,8 +117,17 @@ for (const p of berkas) {
       const k = `${jenis}  ·  text-${peran}`;
       if (!silang.has(k)) silang.set(k, {});
       silang.get(k)[tebal] = (silang.get(k)[tebal] || 0) + 1;
-      if ((jenis === 'tombol' || jenis === 'badge') && tebal !== 'semibold' && !berizin(nama, no)) {
-        temuan.push({ nama, baris: no, apa: `font-${tebal}`, sebab: `${jenis} = anak tangga KONTROL → wajib font-semibold` });
+      /* Anak tangga KONTROL = `semibold` — KECUALI di `text-micro` (11px), yang
+         wajib `bold`. Bukan kelonggaran: di 11px selisih 600 vs 700 terbaca sbg
+         teks MEMUDAR, bukan sbg hierarki (terukur 2 Sep 2026 — 22 badge turun
+         700 → 600 waktu tangga ini lahir, dan user melaporkannya sbg "font
+         kecilnya jadi pudar"). Sumbu lain repo ini sudah memakai prinsip yang
+         sama: tangga IKON menurunkan stroke dari UKURAN. Ditulis sbg ATURAN,
+         bukan baris IZIN, supaya badge 11px BERIKUTNYA ikut terjaga — izin
+         hanya menutup satu call-site & membiarkan kelasnya terbuka. */
+      const wajib = peran === 'micro' ? 'bold' : 'semibold';
+      if ((jenis === 'tombol' || jenis === 'badge') && tebal !== wajib && !berizin(nama, no)) {
+        temuan.push({ nama, baris: no, apa: `font-${tebal}`, sebab: `${jenis} text-${peran} = anak tangga KONTROL → wajib font-${wajib}` });
       }
     }
   });

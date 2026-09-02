@@ -634,7 +634,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     : <Odometer value={animatedSaldo} />}
                 </span>
                 {saldo < 0 && (
-                  <span className="mb-1 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-semibold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
+                  <span className="mb-1 rounded-full bg-rose-700 px-2 py-0.5 text-micro font-bold uppercase tracking-[0.08em] text-white ring-1 ring-inset ring-white/20">
                     Defisit
                   </span>
                 )}

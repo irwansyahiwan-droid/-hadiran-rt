@@ -51,10 +51,19 @@ interface TagProps {
   className?: string;
 }
 
+/* `font-bold`, BUKAN `font-semibold` — KOMPENSASI OPTIS, bukan pelanggaran
+   tangga (2 Sep 2026). Tangga tebal menempatkan kontrol & badge di `semibold`,
+   dan itu benar untuk badge seukuran tombol. Di `text-micro` (11px) tidak:
+   diukur pra/pasca tangga, 22 badge turun 700 -> 600 dan user membacanya
+   "font kecilnya jadi PUDAR" — di ukuran itu selisih satu anak tangga terbaca
+   sbg memudar, bukan sbg hierarki. Prinsipnya sudah jadi kanon di sumbu lain:
+   tangga IKON menurunkan stroke dari UKURAN. Tebal badge kini mengikuti hal
+   yang sama, dan `audit:tebal` menegakkannya (badge/tombol `text-micro` WAJIB
+   bold) — jadi ini aturan, bukan izin sekali pakai. */
 export default function Tag({ tone = 'neutral', children, className = '' }: TagProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-semibold leading-tight whitespace-nowrap ring-1 ring-inset ${TONES[tone]} ${className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold leading-tight whitespace-nowrap ring-1 ring-inset ${TONES[tone]} ${className}`}
     >
       {children}
     </span>
