@@ -38,15 +38,30 @@
  * Vonis WAJIB menyebut NAMA elemen yang dilihat, bukan cuma berapa — penghitung
  * yang benar bisa menyembunyikan peristiwa yang salah (pelajaran audit:mundur).
  *
- * Divalidasi MUTASI: `MUTASI=1` mencabut `animation-delay` dari blok
- * reduced-motion lewat suntikan CSS (mengembalikan keadaan pra-perbaikan) →
- * bagian R WAJIB merah.
+ * Divalidasi MUTASI, dan sejak 2 Sep 2026 DUA sisi — satu mutasi tak bisa
+ * menguji keduanya:
+ *   `MUTASI=1` mencabut `animation-delay` dari blok reduced-motion lewat
+ *              suntikan CSS (mengembalikan keadaan pra-perbaikan) → R merah.
+ *   `MUTASI=2` membekukan `.rise` di tengah jalan → D merah. Lahir bersama
+ *              perbaikan probe D (lihat `tungguDiam`): begitu D berhenti
+ *              memotret pada jeda tetap, hijau tanpa mutasi tak lagi
+ *              membedakan "tak ada yang nyangkut" dari "probe menunggu
+ *              selamanya".
  */
 import { chromium } from 'playwright';
 import { newCtx, loginWarga } from './lib/audit-harness.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const MUTASI = process.env.MUTASI === '1';
+/* MUTASI=2 menguji GIGI SIFAT D, yang sampai 2 Sep 2026 tak punya mutasi sama
+   sekali — dan justru bagian itulah yang pernah melaporkan temuan PALSU.
+   Sesudah probe D diubah dari "potret pada jeda tetap" jadi "tunggu keadaan
+   DIAM", hijau saja tak lagi membuktikan apa pun: probe yang menunggu
+   selamanya juga hijau. Mutasi ini membekukan `.rise` di tengah jalan
+   (opacity .5, tergeser 8px) — keadaan yang TIDAK pernah berubah, jadi ia
+   memenuhi syarat "diam" lebih cepat dan WAJIB dilaporkan. */
+const MUTASI_D = process.env.MUTASI === '2';
+const CSS_MUTASI_D = '.rise{animation:none!important;opacity:.5!important;transform:translateY(8px)!important}';
 
 /* Populasi = kelas animasi MASUK di index.css (finite, ber-fill-mode).
    Loop dekoratif abadi (skeleton shimmer, aurora Login, empty-bob float) SENGAJA
@@ -58,6 +73,63 @@ const KELAS_MASUK = [
 
 const temuan = [];
 const catat = (peran, layar, bagian, pesan) => temuan.push({ peran, layar, bagian, pesan });
+
+/** Satu bacaan sifat D: elemen animasi-masuk yang saat INI belum duduk di
+ *  keadaan akhirnya (opacity < 1 atau masih tergeser). */
+async function bacaNyangkut(page, sel) {
+  return page.evaluate((sel) => {
+    const out = [];
+    for (const el of document.querySelectorAll(sel.join(','))) {
+      const cs = getComputedStyle(el);
+      const m = new DOMMatrixReadOnly(cs.transform === 'none' ? '' : cs.transform);
+      const d = Math.hypot(m.m41, m.m42);
+      if (+cs.opacity < 0.99 || d > 1) {
+        const teks = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 32);
+        out.push(`${el.tagName.toLowerCase()} "${teks}" opacity ${(+cs.opacity).toFixed(2)} geser ${d.toFixed(1)}px`);
+      }
+    }
+    return out;
+  }, sel);
+}
+
+/**
+ * TENANG itu KEADAAN, bukan JEDA.
+ *
+ * Kenapa ini ada (2 Sep 2026): sifat D dulu memvonis pada satu titik waktu
+ * TETAP — `ms + 500` sesudah ketukan tab — dan sapuan ini karenanya MERAH
+ * 4 dari 8 jalan di mesin & build yang SAMA. Temuannya selalu di tab BERDATA
+ * (`warga/Hadiran`): fetch Kas Hadiran mendarat SESUDAH jendela itu, daftar
+ * dirender ulang, dan `.rise` MULAI tepat saat probe memotret — `opacity 0.86
+ * geser 1.4px` dilaporkan "NYANGKUT sesudah tenang" padahal ia justru sedang
+ * bekerja normal. Layarnya tak pernah tenang; probenya yang mengaku begitu.
+ *
+ * Kelas cacat alat yang SUDAH dibayar `audit:gestur` (cacat ke-23: jeda TETAP
+ * cukup untuk localhost, tidak untuk isi nyata) — dan aturan repo untuk ini
+ * tegas: temuan palsu → betulkan ALATNYA, bukan kodenya.
+ *
+ * Giginya SENGAJA tidak dilemahkan: yang dikembalikan bukan "kosong sesudah
+ * menunggu lebih lama" melainkan apa yang MASIH tersangkut saat keadaan sudah
+ * diam (dua bacaan berturut-turut identik & nol skeleton). Elemen yang
+ * benar-benar nyangkut — fill-mode `both` menahan `transform` selamanya —
+ * nilainya tak pernah berubah, jadi ia justru lolos syarat "diam" lebih cepat
+ * dan tetap dilaporkan. Yang hilang hanya elemen yang sedang BERGERAK, dan
+ * elemen yang sedang bergerak memang bukan temuan sifat D.
+ */
+async function tungguDiam(page, sel, batasMs = 9000) {
+  const habis = Date.now() + batasMs;
+  let sebelum = null;
+  while (Date.now() < habis) {
+    const skel = await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0);
+    const kini = await bacaNyangkut(page, sel);
+    const cap = JSON.stringify(kini);
+    if (!skel && sebelum === cap) return kini;
+    sebelum = cap;
+    await page.waitForTimeout(400);
+  }
+  /* Batas waktu habis tanpa pernah diam: laporkan bacaan terakhir apa adanya.
+     Diam yang tak pernah datang itu sendiri kabar — jangan disembunyikan. */
+  return bacaNyangkut(page, sel);
+}
 
 /** Ketuk tab DARI DALAM halaman lalu cuplik tiap frame sejak task yang sama.
  *  Wajib dari dalam: `locator.click()` Playwright mendarat di task berbeda dan
@@ -109,19 +181,7 @@ async function cuplikTab(page, label, sel, ms = 1800) {
 
   /* Sifat D diukur TERPISAH sesudah tenang — bukan dari jejak, karena elemen
      yang sehat memang sempat opacity 0 di awal. */
-  const nyangkut = await page.evaluate((sel) => {
-    const out = [];
-    for (const el of document.querySelectorAll(sel.join(','))) {
-      const cs = getComputedStyle(el);
-      const m = new DOMMatrixReadOnly(cs.transform === 'none' ? '' : cs.transform);
-      const d = Math.hypot(m.m41, m.m42);
-      if (+cs.opacity < 0.99 || d > 1) {
-        const teks = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 32);
-        out.push(`${el.tagName.toLowerCase()} "${teks}" opacity ${(+cs.opacity).toFixed(2)} geser ${d.toFixed(1)}px`);
-      }
-    }
-    return out;
-  }, sel);
+  const nyangkut = await tungguDiam(page, sel);
 
   return { ...jejak, nyangkut };
 }
@@ -154,6 +214,7 @@ for (const peran of ['warga', 'bendahara']) {
     if (MUTASI && gerak === 'reduce') {
       await page.addStyleTag({ content: '@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-delay:.4s!important}}' }).catch(() => {});
     }
+    if (MUTASI_D) await page.addStyleTag({ content: CSS_MUTASI_D }).catch(() => {});
 
     const tabs = peran === 'warga' ? ['Jadwal', 'Hadiran', 'Kas RT'] : ['Jadwal', 'Talangan', 'Hadiran', 'Kas RT'];
     for (const tab of tabs) {
@@ -194,4 +255,5 @@ for (const bagian of ['PROBE', 'K', 'R', 'D']) {
 }
 console.log(`\n=== ${temuan.length} temuan${probe.length ? ` (termasuk ${probe.length} PROBE/KONTROL — vonis TIDAK sah)` : ''} ===`);
 if (MUTASI) console.log('MUTASI=1 aktif — bagian R WAJIB merah, kalau hijau berarti mutasinya tak menggigit.');
+if (MUTASI_D) console.log('MUTASI=2 aktif — bagian D WAJIB merah, kalau hijau berarti probe "tunggu diam" menunggu selamanya.');
 process.exit(temuan.length ? 1 : 0);
