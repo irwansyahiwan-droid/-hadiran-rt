@@ -965,7 +965,14 @@ export default function KasRTPage() {
                         transaksi, sementara Beranda & Jadwal duduk di 68-97px).
                         Dipotong 2 baris supaya irama daftar Kas RT kembali ke
                         irama app; teks utuh ada di sheet detail (ketuk baris). */}
-                    <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2">
+                    {/* `data-ringkas` = pernyataan bahwa teks ini RINGKASAN dan
+                        ada jalan ke teks utuhnya (sheet detail di bawah merender
+                        `keterangan` TANPA clamp). Dibaca `audit:jarak-teks`, yang
+                        tak percaya begitu saja: penanda hanya berlaku kalau
+                        elemennya duduk di dalam kontrol yang bisa diaktifkan —
+                        jadi baris "Saldo Awal" yang bukan tombol TIDAK ikut
+                        dimaafkan — dan sapuan itu ikut MENGUKUR sheet tujuannya. */}
+                    <p data-ringkas className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2">
                       {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
                     </p>
                     {/* Meta = dialek baris KANONIK Beranda: satu <p>, bagian

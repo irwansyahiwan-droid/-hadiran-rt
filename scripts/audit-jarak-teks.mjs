@@ -87,9 +87,33 @@ const PUNGUT = (mutasi) => {
     cs.clip !== 'auto' || (cs.clipPath && cs.clipPath !== 'none') ||
     el.clientWidth <= 2 || el.clientHeight <= 2;
 
+  /* RINGKASAN BER-JALAN-KELUAR — dan kenapa ia tidak boleh jadi celah.
+     `line-clamp` pada baris daftar kadang keputusan yang sudah diukur: keterangan
+     Kas RT itu teks bebas, dan tanpa clamp 35 dari 36 baris membungkus >=3 baris
+     (terburuk 288px — sepertiga layar untuk SATU transaksi). Memotongnya SAH
+     selama teks utuhnya masih bisa dibaca. §1.4.12 melarang isi HILANG, bukan
+     isi yang diringkas dgn jalan keluar.
+     Tapi janji itu tak boleh dipercaya begitu saja — dan memang tak boleh:
+     saat penanda ini dipasang, "jalan keluar" nama Sohibul Bait ternyata
+     `truncate` juga (KasHadiran sheet detail), jadi ringkasannya dipotong DAN
+     tujuannya dipotong. Karena itu dua syarat, bukan satu:
+       (1) elemennya WAJIB duduk di dalam kontrol yang bisa diaktifkan — bukti
+           jalan keluarnya ADA. Baris "Saldo Awal" yang bukan tombol tak
+           dimaafkan meski ikut memakai kelas yang sama.
+       (2) sapuan ini WAJIB ikut mengukur sheet TUJUANnya (lihat `bukaDetail`),
+           kalau tidak ia memaafkan atas dasar janji yang tak pernah diperiksa.
+     Jumlahnya SELALU dicetak (`diringkas: N`) — sapuan tak boleh menyempitkan
+     populasinya sendiri tanpa mengaku. */
+  let ringkas = 0;
+
   const kandidat = [];
   akar.querySelectorAll('*').forEach((el) => {
     if (el.tagName === 'HTML' || el.tagName === 'BODY') return;
+    const rk = el.closest('[data-ringkas]');
+    if (rk && rk.closest('button,[role="button"],a[href]')) {
+      if (rk === el) ringkas++;
+      return;
+    }
     /* Pita digit Odometer SENGAJA terkurung — 10 digit di jendela setinggi
        satu baris. Probe `scrollHeight` akan selalu melaporkannya "hilang
        285-323px", dan itu fakta rancangan, bukan temuan (kelas cacat alat
@@ -135,7 +159,7 @@ const PUNGUT = (mutasi) => {
       if (k > 0.5) out.push({ ax: 'X', k: +k.toFixed(1), t: (el.textContent || '').trim().slice(0, 44), cls: nama(el) });
     }
   }
-  return { n: kandidat.length, out };
+  return { n: kandidat.length, ringkas, out };
 };
 
 /** Kunci identitas temuan — SENGAJA tanpa `k`: nilai luberannya memang berubah
@@ -154,7 +178,7 @@ async function pungutLayar(page, fase, nama, hasil) {
   }
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(320);
-  const { n, out } = await page.evaluate(PUNGUT, fase === 'pasang' && !!process.env.MUTASI);
+  const { n, ringkas, out } = await page.evaluate(PUNGUT, fase === 'pasang' && !!process.env.MUTASI);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(180);
   const uniq = new Map();
@@ -163,7 +187,7 @@ async function pungutLayar(page, fase, nama, hasil) {
     if (!uniq.has(k) || uniq.get(k).k < f.k) uniq.set(k, f);
   }
   const odo = await pungutOdometer(page);
-  hasil.push({ fase, layar: nama, populasi: n, odo, item: [...uniq.values()].sort((a, b) => b.k - a.k) });
+  hasil.push({ fase, layar: nama, populasi: n, ringkas, odo, item: [...uniq.values()].sort((a, b) => b.k - a.k) });
 }
 
 /**
@@ -219,6 +243,33 @@ async function kontrolOverride(page) {
   });
 }
 
+
+/**
+ * Buka SHEET DETAIL baris — tujuan dari tiap `data-ringkas`.
+ *
+ * Ini bukan tambahan layar biasa: tanpa mengukur sheet ini, penanda
+ * `data-ringkas` jadi pemaafan atas dasar janji yang tak pernah diperiksa —
+ * persis kelas "sapuan menyempitkan populasinya sendiri" yang sudah tiga kali
+ * menggigit repo ini. Dan janji itu memang pernah bohong: nama Sohibul Bait
+ * "punya jalan keluar" ke sheet yang barisnya `truncate` juga.
+ */
+async function bukaDetail(page, fase, hasil, awalan) {
+  for (const [tab, pemicu, nama] of [
+    ['Kas RT', () => page.locator('button[aria-label^="Lihat detail"], button[aria-label^="Aksi:"]').first(), 'sheet-detail-kasrt'],
+    ['Hadiran', () => page.locator('button', { hasText: 'Lihat detail' }).first(), 'sheet-detail-tarikan'],
+  ]) {
+    await gotoTab(page, tab);
+    const btn = pemicu();
+    if (!(await btn.count())) continue;
+    await btn.click({ timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(1100);
+    if (await page.locator('[role="dialog"]').count()) {
+      await pungutLayar(page, fase, `${awalan}-${nama}`, hasil);
+      await closeLayer(page);
+    }
+  }
+}
+
 async function jelajahWarga(page, fase, hasil) {
   await loginWarga(page);
   if (!(await page.locator('nav button').count())) {
@@ -227,6 +278,7 @@ async function jelajahWarga(page, fase, hasil) {
   }
   const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
   for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, fase, `w-${tab}`, hasil); }
+  await bukaDetail(page, fase, hasil, 'w');
 }
 
 async function jelajahBendahara(page, fase, hasil) {
@@ -236,6 +288,7 @@ async function jelajahBendahara(page, fase, hasil) {
   }
   const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
   for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, fase, `b-${tab}`, hasil); }
+  await bukaDetail(page, fase, hasil, 'b');
 
   for (const [tab, aria, nama] of [
     ['Hadiran', 'Setor ke Kas RT', 'b-sheet-setor'],
@@ -299,6 +352,7 @@ for (const h of per('pasang')) {
 }
 
 const populasi = per('pasang').reduce((s, h) => s + h.populasi, 0);
+const nRingkas = per('pasang').reduce((s, h) => s + (h.ringkas || 0), 0);
 const nDasar = per('dasar').reduce((s, h) => s + h.item.length, 0);
 const nPasang = per('pasang').reduce((s, h) => s + h.item.length, 0);
 const nBaru = baru.reduce((s, h) => s + h.item.length, 0);
@@ -311,6 +365,7 @@ const odoUniq = [...new Map(odo.map((o) => [o.nominal + o.beda, o])).values()];
 
 console.log(`\n=== JARAK TEKS · WCAG §1.4.12 (AA, WAJIB) ===`);
 console.log(`  populasi teks terukur     : ${populasi} elemen / ${per('pasang').length} layar`);
+console.log(`  diringkas + ada jalan     : ${nRingkas}   ← line-clamp yang teks utuhnya terbaca di sheet detail`);
 console.log(`  garis dasar (tanpa setel) : ${nDasar}   ← milik audit:potong, bukan temuan di sini`);
 console.log(`  sesudah §1.4.12 dipasang  : ${nPasang}`);
 console.log(`  ISI HILANG karena §1.4.12 : ${nBaru}`);

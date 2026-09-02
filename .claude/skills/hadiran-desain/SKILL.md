@@ -121,6 +121,14 @@ pembilangnya tetap nol di populasi yang sudah tumbuh.
   sementara isinya jadi 51px. Itu yang membuat saldo hero mencetak serpihan
   digit tetangga (Odometer, 2 Sep 2026): obatnya pengukur `visibility:hidden`
   di dalam jendela + langkah PERSENTASE, bukan angka `em`.
+- **Ringkasan boleh dipotong HANYA kalau tujuannya tidak.** `line-clamp` di
+  baris daftar itu sah (keterangan Kas RT tanpa clamp = 288px, sepertiga layar
+  untuk satu transaksi) — tapi ia WAJIB memakai penanda `data-ringkas` DAN
+  duduk di dalam kontrol yang bisa diaktifkan, dan **sheet tujuannya tak boleh
+  punya batas sama sekali**: bukan `truncate`, bukan juga `.potong-lentur`.
+  Ini bukan teori — waktu aturannya dipasang, jalan keluar nama Sohibul Bait
+  ternyata `truncate` juga. `audit:jarak-teks` ikut mengukur sheet detail
+  justru supaya janji itu diperiksa, bukan dipercaya.
 - **Teks BERMAKNA pakai `.potong-lentur`, bukan `truncate`.** Kelas itu kini
   berdasar clamp DUA baris: satu baris kalau muat, baris kedua lahir hanya saat
   ruangnya habis — termasuk saat yang menghabiskannya setelan jarak teks, yang
@@ -229,12 +237,8 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   hilang, build MELEDAK — jangan "perbaiki" dgn melunakkan itu.
 - **Single-RT.** Isolasi multi-tenant sengaja DITUNDA; jangan bangun untuk
   multi-RT sebelum user memintanya.
-- **§1.4.12 sisa 30, dan itu keputusan yang MENUNGGU user.** Semuanya
-  `line-clamp-2` bermakna — nama Sohibul Bait butuh baris ke-3, keterangan
-  Kas RT butuh ke-3/ke-4. Clamp berapa pun tetap batas; satu-satunya obat
-  penuh adalah TANPA clamp, dan itu menukar konformansi dgn tinggi baris tak
-  terbatas di halaman UANG. Jangan tutup diam-diam dgn menaikkan angka clamp:
-  itu memindahkan ambang, bukan menyelesaikannya.
+- **§1.4.12 = 0, dan jaga tetap 0.** Garis dasar 2 Sep 2026: populasi 6.036
+  elemen / 20 layar, temuan NOL. Kalau angka itu naik, sesuatu baru mundur.
 - **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
   `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
   yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:

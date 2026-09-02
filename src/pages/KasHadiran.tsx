@@ -864,7 +864,13 @@ export default function KasHadiranPage() {
                               pecah per-token panjang di kolom ~115px sehingga butuh
                               3 baris lalu kena clamp — nickname-nya hilang padahal
                               itu yang dikenal warga. */}
-                          <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
+                          {/* `data-ringkas` = pernyataan bahwa teks ini RINGKASAN
+                              dan ada jalan ke teks utuhnya. Dibaca `audit:jarak-teks`,
+                              yang TIDAK percaya begitu saja: penanda hanya berlaku
+                              kalau elemennya benar-benar duduk di dalam kontrol yang
+                              bisa diaktifkan (di sini tombol pembuka sheet Detail
+                              tarikan), dan sapuan itu ikut MENGUKUR sheet tujuannya. */}
+                          <p data-ringkas className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
                           <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">
@@ -1086,7 +1092,20 @@ export default function KasHadiranPage() {
                 <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} ukuran={11} />
                 <div className="min-w-0 flex-1">
                   <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
-                  <p className="text-caption text-ink-faint dark:text-gray-400 truncate">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
+                  {/* TANPA potongan apa pun — bukan `truncate`, bukan juga
+                      `.potong-lentur` (2 Sep 2026). Baris ini satu-satunya
+                      tempat nama Sohibul Bait tampil UTUH: nama di baris daftar
+                      sengaja `line-clamp-2` (lihat call-site di atas) dan sheet
+                      inilah jalan keluarnya. Ringkasan boleh dipotong HANYA
+                      kalau tujuannya tidak — jadi tujuan tak boleh punya batas
+                      sama sekali. Dua percobaan sebelum ini gagal & keduanya
+                      terukur: `truncate` memotong nama begitu warga menyetel
+                      jarak teks (§1.4.12), dan `.potong-lentur` pun masih
+                      kurang — "Jum, 28 Agu 2026 · Karta Saleh" butuh baris
+                      KETIGA, kurang 20px. `break-words` = penjaga token panjang;
+                      tingginya dibiarkan bebas karena isinya cuma tanggal +
+                      satu nama. */}
+                  <p className="text-caption text-ink-faint dark:text-gray-400 break-words">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
                 </div>
                 {isBendahara && !detailLoading && (
                   <button
@@ -1171,7 +1190,7 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
-                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 potong-lentur">{p.nama}</span>
                             <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
                           </div>
                         ))}
@@ -1186,7 +1205,7 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
-                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 potong-lentur">{p.nama}</span>
                             {p.lunas ? (
                               <Tag tone="success"><Check className="w-3 h-3" />Lunas</Tag>
                             ) : (
@@ -1205,7 +1224,7 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
-                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 truncate">{p.nama}</span>
+                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 potong-lentur">{p.nama}</span>
                             {/* emerald-500 di atas putih cuma 2,50:1. Ia lolos
                                 sapuan karena barisnya sudah berlabel teks
                                 ("Hadir (N)" + nama) sehingga centang ini
