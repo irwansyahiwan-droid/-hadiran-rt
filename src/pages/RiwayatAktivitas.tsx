@@ -297,7 +297,27 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col items-end gap-2 shrink-0">
+                      {/* Rail KANAN mendatar, bukan `flex-col` (2 Sep 2026). Waktu ia
+                          kolom, chevron ditumpuk DI BAWAH nominal — jadi letaknya
+                          ditentukan ADA/TIDAKNYA nominal: terukur 0px dari tepi atas
+                          baris saat baris tak bernominal, 30,1px saat bernominal
+                          (tinggi nominal + `gap-2`). Karena jenis baris di daftar ini
+                          berselang-seling ("Pelunasan talangan" bernominal, "Tandai
+                          talangan lunas" tidak), hasilnya chevron zigzag sepanjang
+                          daftar. Mendatar, keduanya duduk di 0px.
+
+                          `items-center`, bukan `items-start`: kotak chevron 16px lebih
+                          pendek dari kotak baris nominal, jadi rata-atas membuatnya
+                          terbaca menggantung. Sisa selisihnya 3px — di bawah ambang
+                          mata, dan tetap KONSTAN antar baris; itu yang dikejar.
+
+                          NOMINAL TIDAK BERGESER: ia sudah di 0px sebelum & sesudah.
+
+                          Catatan probe, karena ini nyaris salah didiagnosis: mengukur
+                          dari titik-TENGAH JUDUL memberi TIGA posisi semu (-2 / +17,8 /
+                          +28,1) — judul yang membungkus dua baris menggeser acuannya
+                          sendiri. Acuan yang sah tepi atas isi baris. */}
+                      <div className="flex items-center gap-2 shrink-0">
                         {v.amount != null && v.amount !== 0 && (
                           <span className={`font-display text-amount font-semibold tabular-nums ${
                             v.accent === 'rose' ? 'text-neg dark:text-rose-400' : v.accent === 'emerald' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'
@@ -332,7 +352,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                             labelnya, meleset untuk chevron yang membawa info yang tak ada
                             di label mana pun. */}
                         {hasDetail && (
-                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isOpen ? 'rotate-180' : ''}`} />
+                          <ChevronDown data-penanda className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isOpen ? 'rotate-180' : ''}`} />
                         )}
                       </div>
                     </button>

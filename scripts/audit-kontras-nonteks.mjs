@@ -40,6 +40,28 @@
  *    di-blend ke atas piksel tetangga yang disampel di LUAR elemen.
  * 2. Ikon dekoratif dikecualikan: aria-hidden, atau kontrolnya sudah punya
  *    teks terlihat. §1.4.11 hanya menuntut grafis yang DIPERLUKAN untuk paham.
+ *
+ *    KATUP `data-penanda` (2 Sep 2026) — dan ini menutup lubang yang sudah
+ *    memakan satu cacat nyata. Klausa "kontrolnya sudah punya teks terlihat"
+ *    benar untuk ikon yang MENGULANG labelnya (ikon unduh di sebelah kata
+ *    "Ekspor"), tapi SALAH untuk ikon yang membawa informasi yang tak ada di
+ *    label mana pun. Chevron baris Riwayat Aktivitas persis itu: labelnya
+ *    berbunyi "Pelunasan talangan · Talangan lunas — …", dan tak satu kata pun
+ *    mengatakan baris ini BISA DIBUKA. Ia satu-satunya penanda yang mengatakan
+ *    itu — dan ia hidup di 1,47:1 (terang) & 2,04:1 (gelap) selama berbulan-
+ *    bulan sementara sapuan ini dengan patuh mencetak "0 gagal", karena
+ *    klausa itu membuangnya dari populasi sebelum sempat diukur.
+ *
+ *    Populasinya OPT-IN, bukan tebakan selektor — preseden `data-grafik`
+ *    (bagian D) & `data-ptr` di `audit:gestur`: tak ada ciri STRUKTURAL yang
+ *    membedakan "chevron yang menyatakan bisa-dibuka" dari "ikon yang cuma
+ *    mengulang labelnya". Keduanya svg di dalam button berlabel. Jadi
+ *    call-site yang menyatakannya, dan penanda itu MENANG atas klausa
+ *    label-terlihat (bukan atas aria-hidden — grafis yang sengaja
+ *    disembunyikan dari a11y tree tetap di luar).
+ *
+ *    Ikon BARU yang menyatakan sesuatu yang tak tertulis di labelnya WAJIB
+ *    memasang `data-penanda` — kalau tidak, ia tak terukur.
  * 3. `.sr-only` bukan teks terlihat — dideteksi lewat rect ≤1px, bukan innerText.
  * 4. Kontrol nonaktif dikecualikan (pengecualian eksplisit di §1.4.11).
  * 5. Kontrol LOLOS bila salah satu penanda cukup: batas ≥3:1 ATAU fill ≥3:1.
@@ -205,8 +227,12 @@ async function collectIcons(page) {
       if (r.width < 8 || r.height < 8) continue;
       const ctrl = svg.closest(CTRL_SEL);
       const mandiri = svg.matches('[role="img"]') || svg.hasAttribute('aria-label');
+      /* Katup opt-in: call-site menyatakan "ikon ini membawa info yang TAK ada
+         di label" (aturan 2). Menang atas klausa label-terlihat di bawah, TIDAK
+         atas saringan aria-hidden di atas. */
+      const penanda = !!svg.closest('[data-penanda]');
       // Dekoratif: tak ada kontrol induk, atau kontrolnya sudah punya label teks.
-      if (!mandiri) {
+      if (!mandiri && !penanda) {
         if (!ctrl) continue;
         if (labelTerlihat(ctrl)) continue;
       }
