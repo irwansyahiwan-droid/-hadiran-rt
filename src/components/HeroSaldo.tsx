@@ -297,7 +297,13 @@ export default function HeroSaldo({
           </FitAmount>
           {/* Pembungkus supaya pil tak ikut melar saat `items-stretch`; di >=360px
               ia flex-item biasa sehingga tampilan lama tak bergerak sama sekali. */}
-          {status && <div className="flex shrink-0 items-end max-[359px]:self-start">{status}</div>}
+          {/* `self-start` WAJIB seambang dgn tumpukan di atas (390px, bukan 359):
+              saat menumpuk, induknya `items-stretch`, jadi tanpa ini pembungkus
+              pil melar selebar baris (terukur 280px @360 · 310px @390 untuk pil
+              64px). Pilnya sendiri tetap rata kiri sehingga TAK terlihat beda —
+              itulah kenapa ambang yang tertinggal ini gampang lolos. Kalau ambang
+              tumpuk digeser lagi, geser baris ini di commit yang SAMA. */}
+          {status && <div className="flex shrink-0 items-end max-[390px]:self-start">{status}</div>}
         </div>
 
         {caption && <p className="mt-1 text-caption angka-prosa text-white/90">{caption}</p>}
