@@ -178,7 +178,18 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari aktivitas / nama bendahara…"
+            /* Menyebut KETIGA sumbu yang benar-benar disaring di `grouped`:
+               nama (warga lewat detail, bendahara lewat actor), nomor tarikan,
+               dan jenis aktivitas lewat judul. Yang lama, "Cari aktivitas /
+               nama bendahara…", menyebut yang paling jarang dicari sambil
+               menghilangkan dua yang paling mungkin diketik warga.
+
+               PANJANGNYA TERIKAT: ruang teks kolom ini 248px @360px, dan yang
+               lama 253px — terpotong 5px diam-diam. Placeholder tak memakai
+               `truncate`, jadi ia dipangkas TANPA elipsis dan `audit:potong`
+               (yang memburu `truncate`/`line-clamp`) buta terhadapnya. Yang ini
+               223px. Kalau kata-katanya diubah lagi, UKUR ULANG. */
+            placeholder="Cari nama, tarikan, aktivitas…"
             aria-label="Cari aktivitas"
             inputMode="search"
             enterKeyHint="search"
