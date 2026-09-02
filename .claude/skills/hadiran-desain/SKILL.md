@@ -256,6 +256,13 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   multi-RT sebelum user memintanya.
 - **§1.4.12 = 0, dan jaga tetap 0.** Garis dasar 2 Sep 2026: populasi 6.036
   elemen / 20 layar, temuan NOL. Kalau angka itu naik, sesuatu baru mundur.
+- **`audit:lompat` punya EMPAT temuan terbuka & sengaja tidak diklaim** (3 Sep
+  2026, muncul begitu vonis PIKSEL dipasang — semuanya PRA-SESI, dibuktikan
+  lawan build `ec2884a`): Jadwal −56px "TARIKAN TERAKHIR", Kas RT +45px
+  "Target Saldo Kas RT" (dua peran), Talangan +35px `.cf-out`. Skor CLS-nya
+  0,02–0,05 — jauh di bawah 0,1 — jadi mereka lolos berbulan-bulan. `sapu-semua`
+  karena itu MERAH di sapuan ini; merah yang jujur, jangan dibungkam dgn
+  menaikkan `AMBANG_PX`.
 - **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
   `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
   yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:

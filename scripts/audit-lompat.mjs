@@ -24,6 +24,9 @@
 //   CAP_URL=https://hadiran-rt.vercel.app   (wajib sekali sebelum dianggap benar)
 //   CPU=4 KBPS=400 LATENCY=400              (kondisi HP warga; 0 = tanpa throttle)
 //   MUTASI=1                                (suntik geseran palsu → sapuan HARUS merah)
+//   MUTASI=2                                (geseran KECIL 30px sekali → menguji vonis
+//                                            PIKSEL saja: skornya di bawah ambang, jadi
+//                                            sapuan lama akan hijau & yang baru merah)
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 
@@ -31,11 +34,26 @@ const APP = process.env.CAP_URL || 'http://localhost:5199';
 const CPU = +(process.env.CPU || 4);
 const KBPS = +(process.env.KBPS || 400);
 const LATENCY = +(process.env.LATENCY || 400);
-const MUTASI = process.env.MUTASI === '1';
+const MUTASI = +(process.env.MUTASI || 0);
 // Ambang APP, bukan WCAG. Google menyebut CLS "baik" di <=0.1; app kas dipakai
 // sambil berdiri di majelis, jadi dipakai ambang yang sama tapi diberlakukan ke
 // angka TOTAL — termasuk geseran pasca-ketukan yang CLS resmi buang.
 const AMBANG = +(process.env.AMBANG || 0.1);
+/* AMBANG KEDUA, dalam PIKSEL — dan ini yang menutup titik buta skor.
+   Terukur 2 Sep 2026: hero Kas Hadiran melompat 164 -> 238px (74px, kartu
+   terbesar & terpenting di layar) saat kerangka berganti isi, dan sapuan ini
+   melaporkannya `OK` — skornya cuma 0,040 di warga & 0,041 di bendahara, jauh
+   di bawah 0,1. Skornya tidak salah hitung: CLS mengalikan jarak dgn FRAKSI
+   DAMPAK, dan hero duduk di puncak halaman sehingga sebagian isi yang terdorong
+   ada di bawah lipatan. Agregat yang benar menyembunyikan peristiwa yang salah —
+   cacat ke-19 repo ini, persis: `sapuan wajib menyebut NAMA apa yang ia lihat,
+   bukan berapa`.
+   Angkanya DIUKUR, bukan dikarang: layar app yang sehat memuncak di 13px
+   (`muat-awal` di dua peran), sedangkan satu anak tangga spasi terbesar app
+   = 32px.
+   24px = lebih besar dari gerakan sehat mana pun, lebih kecil dari satu langkah
+   tata letak yang berarti. */
+const AMBANG_PX = +(process.env.AMBANG_PX || 24);
 
 const env = readFileSync(new URL('../.env', import.meta.url), 'utf8');
 const SUPA = env.match(/VITE_SUPABASE_URL=(\S+)/)[1];
@@ -88,14 +106,23 @@ async function siapkan(browser, { bendahara }) {
       if (b) localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s));
     } catch { /* abaikan */ }
     if (mut) {
-      /* MUTASI: sisipkan pita yang tumbuh 120px sedetik sesudah muat. Sapuan yang
-         benar HARUS melihat ini. Kalau tetap hijau, observernya tak terpasang. */
+      /* MUTASI=1 — pita yang tumbuh 120px lalu 240px. Menguji vonis SKOR &
+         membuktikan observernya terpasang. Kalau tetap hijau, observernya mati.
+         MUTASI=2 — SATU geseran 30px saja. Sengaja kecil: skornya jatuh di bawah
+         AMBANG, jadi sapuan versi LAMA (yang cuma menilai skor) akan hijau dan
+         versi baru WAJIB merah lewat [piksel]. Tanpa mutasi terpisah ini, vonis
+         piksel tak pernah terbukti bergigi — persis pelajaran ke-34: probe yang
+         vonisnya berubah WAJIB dapat mutasinya sendiri di saat yang sama. */
       addEventListener('DOMContentLoaded', () => {
         const d = document.createElement('div');
         d.style.cssText = 'height:0;background:#f00';
         document.body.prepend(d);
-        setTimeout(() => { d.style.height = '120px'; }, 1000);
-        setTimeout(() => { d.style.height = '240px'; }, 2500);
+        if (mut === 1) {
+          setTimeout(() => { d.style.height = '120px'; }, 1000);
+          setTimeout(() => { d.style.height = '240px'; }, 2500);
+        } else {
+          setTimeout(() => { d.style.height = '30px'; }, 1500);
+        }
       });
     }
   }, { ref: REF, s: sesiPalsu(), b: bendahara, mut: MUTASI });
@@ -135,16 +162,54 @@ async function panen(page, sejak) {
   return { entri: semua.filter((e) => e.t >= sejak), tandaBaru: semua.length ? Math.max(...semua.map((e) => e.t)) + 1 : sejak };
 }
 
+/* DUA VONIS, dan yang kedua lahir dari kegagalan yang pertama.
+   (a) SKOR agregat > AMBANG — kualitas keseluruhan layar, definisi CLS.
+   (b) SATU geseran >= AMBANG_PX — peristiwa tunggal yang terlihat mata.
+   Keduanya wajib, karena tak satu pun menangkap yang lain: hero yang melompat
+   74px lolos (a) dgn skor 0,040, sementara banyak geseran kecil yang menumpuk
+   lolos (b) sambil merusak layar. Menilai cuma dari (a) = menyetujui lompatan
+   sebesar sepertiga hero asalkan halamannya cukup pendek.
+
+   Dan sumbernya kini SELALU dicetak, bukan hanya saat merah. Sebelumnya detail
+   muncul hanya di layar yang gagal, jadi 74px itu tak meninggalkan SATU BARIS
+   pun di laporan — pembacanya tak punya cara tahu ada yang bergerak. Laporan
+   yang cuma bicara saat gagal membuat regresi di bawah ambang jadi tak terlihat
+   sampai ia cukup besar untuk gagal. Garis dasar layar sehat (2 Sep 2026): puncak
+   dy 13px, dan itulah kenapa AMBANG_PX 24 punya margin. */
 function lapor(nama, entri) {
   const tanpaInput = entri.filter((e) => !e.input).reduce((s, e) => s + e.nilai, 0);
   const total = entri.reduce((s, e) => s + e.nilai, 0);
-  const buruk = total > AMBANG;
-  console.log(`\n### ${nama}   tanpa-input ${tanpaInput.toFixed(3)} · total ${total.toFixed(3)}${buruk ? '  ⚠ LOMPAT' : '  OK'}`);
-  if (buruk) {
-    for (const e of entri.filter((x) => x.nilai >= 0.01).sort((a, b) => b.nilai - a.nilai).slice(0, 5)) {
-      const asal = e.asal.map((s) => `${s.n} (dy ${s.dy > 0 ? '+' : ''}${s.dy})`).join(' | ') || '(tak ada sumber)';
-      console.log(`    ${e.nilai.toFixed(3)} @${e.t}ms${e.input ? ' [pasca-ketuk]' : ''}  ${asal}`);
+
+  /* PSEUDO-ELEMENT DIBUANG dari pemilihan puncak, dan alasannya bukan kerapian.
+     Satu geseran nyata bisa menyeret `::after` milik elemen yang bergerak, dan
+     angkanya membengkak: waktu vonis piksel ini pertama dijalankan lawan cacat
+     hero 74px yang sengaja direproduksi, sapuan dgn patuh melaporkan
+     `PUNCAK +629px ::after` — nama yang tak bisa ditunjuk siapa pun, sekaligus
+     menutupi sumber ASLINYA (`div.cf-out … dy +74`) yang ada di entri yang sama.
+     Nama yang tak bisa ditindaklanjuti sama buruknya dgn tak ada nama; angkanya
+     pun bukan gerakan isi, melainkan artefak hiasan yang ikut terseret.
+     Mereka tetap DICETAK di baris sumber di bawah — dibuang dari pemilihan
+     puncak, bukan dari laporan. */
+  let puncak = { dy: 0, n: '(tak ada sumber)', t: 0, input: false };
+  for (const e of entri) {
+    for (const src of e.asal) {
+      if (/^::/.test(src.n)) continue;
+      if (Math.abs(src.dy) > Math.abs(puncak.dy)) puncak = { dy: src.dy, n: src.n, t: e.t, input: e.input };
     }
+  }
+  const burukSkor = total > AMBANG;
+  const burukPx = Math.abs(puncak.dy) >= AMBANG_PX;
+  const buruk = burukSkor || burukPx;
+  const sebab = buruk ? `  ⚠ LOMPAT${burukSkor ? ' [skor]' : ''}${burukPx ? ' [piksel]' : ''}` : '  OK';
+  console.log(`\n### ${nama}   tanpa-input ${tanpaInput.toFixed(3)} · total ${total.toFixed(3)} · puncak ${puncak.dy > 0 ? '+' : ''}${puncak.dy}px${sebab}`);
+
+  if (burukPx) {
+    console.log(`    PUNCAK ${puncak.dy > 0 ? '+' : ''}${puncak.dy}px @${puncak.t}ms${puncak.input ? ' [pasca-ketuk]' : ''}  ${puncak.n}`);
+  }
+  /* SELALU, bukan cuma saat merah — lihat catatan di atas. */
+  for (const e of entri.filter((x) => x.nilai >= 0.005).sort((a, b) => b.nilai - a.nilai).slice(0, 5)) {
+    const asal = e.asal.map((x) => `${x.n} (dy ${x.dy > 0 ? '+' : ''}${x.dy})`).join(' | ') || '(tak ada sumber)';
+    console.log(`    ${e.nilai.toFixed(3)} @${e.t}ms${e.input ? ' [pasca-ketuk]' : ''}  ${asal}`);
   }
   return buruk;
 }
@@ -195,6 +260,6 @@ for (const bendahara of [false, true]) {
 }
 
 await browser.close();
-console.log(`\n=== ${diukur} layar diukur @390px · CPU ${CPU}x · ${KBPS}kbps · ambang ${AMBANG} · ${gagal} melompat ===`);
-if (MUTASI && gagal === 0) { console.log('\nPROBE CACAT: MUTASI=1 tapi nol temuan — observer tak terpasang.'); process.exit(2); }
+console.log(`\n=== ${diukur} layar diukur @390px · CPU ${CPU}x · ${KBPS}kbps · ambang skor ${AMBANG} + piksel ${AMBANG_PX}px · ${gagal} melompat ===`);
+if (MUTASI && gagal === 0) { console.log(`\nPROBE CACAT: MUTASI=${MUTASI} tapi nol temuan — ${MUTASI === 1 ? 'observer tak terpasang' : 'vonis PIKSEL tak bergigi'}.`); process.exit(2); }
 process.exit(gagal ? 1 : 0);
