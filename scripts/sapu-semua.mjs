@@ -42,6 +42,12 @@ const VISUAL = [
   ['mati', 'node scripts/audit-mati.mjs'],
   ['nama', 'node scripts/audit-nama.mjs'],
   ['potong', 'node scripts/audit-potong.mjs'],
+  /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
+     seperti bagian 200% `audit:potong`/`audit:reflow` (itu ambang APP, di atas
+     AA). Keputusan user 2 Sep 2026, dgn mata terbuka: selama sisa temuannya
+     belum ditutup, rantai pra-deploy memang merah. Merah yang jujur lebih baik
+     daripada hijau yang tak mengukur syarat wajib. */
+  ['jarak-teks', 'node scripts/audit-jarak-teks.mjs'],
   ['lebar', 'node scripts/audit-lebar-nominal.mjs'],
   ['sentuh', 'node scripts/audit-sentuh.mjs'],
   ['reflow', 'node scripts/audit-reflow.mjs'],

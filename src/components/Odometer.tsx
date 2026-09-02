@@ -72,13 +72,37 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
         return (
           <span
             key={`c${rightIndex}`}
+            /* Penanda OPT-IN untuk sapuan (preseden `data-grafik`/`data-ptr`/
+               `data-keadaan`): pita 10 digit memang SENGAJA terkurung, jadi
+               probe "isi terpotong" berbasis `scrollHeight` akan selalu
+               melaporkannya — 285-323px "hilang" yang bukan temuan. Sebagai
+               gantinya `audit:jarak-teks` menguji INVARIAN-nya di sini:
+               tinggi jendela WAJIB sama dgn tinggi satu sel. */
+            data-odo=""
             className={`overflow-hidden ${colIn}`}
-            style={{ ...cell, height: '1em' }}
+            style={{ ...cell, position: 'relative' }}
           >
+            {/* Pengukur TAK TERLIHAT — inilah yang memberi tinggi jendela.
+                Dulu jendela dipaku `height: 1em` & tiap sel `lineHeight: 1`,
+                dan itu patah persis di WCAG §1.4.12 (Text Spacing): pengguna
+                yang menyetel line-height 1,5 menimpa keduanya lewat
+                `!important`, sehingga jendela tetap 34px sementara tiap sel
+                jadi 51px — pita digit bergeser 34px per angka melewati sel
+                setinggi 51px, dan saldo hero mencetak serpihan digit TETANGGA
+                di atas angkanya. Terukur `audit:jarak-teks` 2 Sep 2026.
+                Sekarang jendela = SATU kotak baris (dari pengukur ini) dan
+                langkahnya persentase pita (10 sel → 10% per angka), jadi
+                keduanya lahir dari line-height yang SAMA berapa pun nilainya. */}
+            <span aria-hidden="true" style={{ visibility: 'hidden', display: 'block' }}>
+              0
+            </span>
             <span
               style={{
-                display: 'block',
-                transform: `translateY(-${d}em)`,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                transform: `translateY(-${d * 10}%)`,
                 transition: prefersReduced
                   ? 'none'
                   : `transform ${duration}ms var(--ease-out-expo)`,
@@ -86,7 +110,7 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
               }}
             >
               {DIGITS.map((n) => (
-                <span key={n} style={{ display: 'block', height: '1em', lineHeight: 1 }}>
+                <span key={n} style={{ display: 'block' }}>
                   {n}
                 </span>
               ))}

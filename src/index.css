@@ -1137,16 +1137,49 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    NOMINAL RUPIAH JANGAN memakai kelas ini — angka yang membungkus ke baris
    kedua lebih buruk daripada angka yang terpotong. Nominal tetap `truncate`,
    dan kepatutan lebarnya dijaga `audit:lebar`. */
+/* PEMBARUAN 2 Sep 2026 — WCAG §1.4.12 (Text Spacing, AA WAJIB).
+
+   Ambang `22.4em` di atas menjawab dua sebab kehabisan ruang: layar sempit dan
+   font browser 200%. Ia TIDAK menjawab sebab ketiga, dan sebab ketiga itu juga
+   syarat AA: pengguna yang menyetel JARAK TEKS (line-height 1,5 · letter 0,12em
+   · word 0,16em). Setelan itu tak menyentuh lebar viewport dalam `em`, jadi
+   media query mana pun tetap MATI sementara teksnya melebar ~15%. Terukur
+   `audit:jarak-teks`: 93 teks kehilangan isinya, dan mayoritasnya justru elemen
+   berkelas ini — "28 Agu · Kas Hadiran" kurang 48px, "Talangan · Tarikan #18"
+   kurang 35px, judul halaman "Jadwal Tarikan" kurang 44px.
+
+   Karena pemicunya tak bisa ditanyakan ke CSS, dasarnya diubah dari "satu baris,
+   selebihnya elipsis" jadi "SEBANYAK-BANYAKNYA DUA baris". Bentuk ini menjawab
+   tanpa menyentuh tampilan hari ini: teks yang muat satu baris tetap satu baris
+   — dan `audit:potong` mencatat NOL teks berkelas ini yang meluber di 390px
+   maupun 320px, jadi baris kedua hanya lahir saat ruangnya memang sudah habis.
+
+   Ini SEKALIGUS membalik keputusan lama "di 360px elipsis menang atas teks utuh
+   berkata-yatim" (percobaan (2) di catatan atas). Pembalikannya DISENGAJA &
+   disetujui user 2 Sep 2026: kata yatim itu soal rapi, sedangkan isi yang hilang
+   itu soal konformansi — dan yang kedua menang.
+
+   BATAS YANG DIAKUI: dua baris tetap BATAS. Teks yang di bawah setelan jarak
+   butuh lebih dari dua baris tetap kehilangan sisanya; itu sifat setiap clamp,
+   dan satu-satunya obat penuh adalah tanpa clamp sama sekali. Yang tersisa
+   dilaporkan `audit:jarak-teks`, jangan diklaim tertutup.
+
+   `display: -webkit-box` aman untuk SELURUH pemakai kelas ini — sudah diperiksa
+   satu per satu: setiap `<span>` berkelas ini duduk di induk `flex`/`inline-flex`
+   (HeroSaldo, PageHeader, Jadwal ×2, JadwalWarga, Beranda), sisanya `<p>`/`<h1>`
+   yang memang blok. Kalau nanti ada call-site `<span>` di dalam induk NON-flex,
+   ia akan turun ke barisnya sendiri — periksa induknya sebelum menambah. */
 .potong-lentur {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 @media (max-width: 22.4em) {
   .potong-lentur {
-    text-overflow: clip;
-    white-space: normal;
-    overflow-wrap: anywhere;
+    display: block;
+    -webkit-line-clamp: unset;
   }
 }
 

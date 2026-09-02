@@ -25,6 +25,7 @@
     "audit:mati": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-mati.mjs",
     "audit:nama": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-nama.mjs",
     "audit:potong": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-potong.mjs",
+    "audit:jarak-teks": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-jarak-teks.mjs",
     "audit:lebar": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-lebar-nominal.mjs",
     "audit:sentuh": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-sentuh.mjs",
     "audit:reflow": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-reflow.mjs",

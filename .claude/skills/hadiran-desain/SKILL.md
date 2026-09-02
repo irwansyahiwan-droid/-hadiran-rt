@@ -68,7 +68,7 @@ Kanvas punya **sepuluh titik sinkron** — berhenti di CSS berarti gagal:
 | sumbu | tangga | ditegakkan oleh |
 |---|---|---|
 | **warna** | rona Hutan 158°, ambang app **AAA 7:1** (bukan AA) | `audit:kontras`, `-deep`, `-nonteks`, `audit:mati` |
-| **tipografi** | 9 peran `display…overline`, tak ada 16px | `theme.fontSize` (MENIMPA) |
+| **tipografi** | 9 peran `display…overline`, tak ada 16px; **tahan setelan JARAK TEKS §1.4.12** | `theme.fontSize` (MENIMPA) + `npm run audit:jarak-teks` |
 | **spasi** | `0.5 · 1 · 2 · 3 · 4 · 5 · 6 · 8` (2–32px) | `npm run audit:spasi` |
 | **bentuk** | `lg8 · xl12 · 2xl16 · 3xl24 · full`; radius tile diturunkan dari sisinya | `npm run audit:bentuk` |
 | **gerak** | `0.12 · 0.16 · 0.24 · 0.40 · 0.60s`; KELUAR selalu di bawah MASUK | `--dur-*` + `theme.transitionDuration` (MENIMPA) |
@@ -115,6 +115,17 @@ pembilangnya tetap nol di populasi yang sudah tumbuh.
   yang tak ia ketahui.
 - **Lapisan baru WAJIB `useBackDismiss` berdampingan `useDialog`.** Escape saja
   meninggalkan seluruh warga Android tanpa jalan keluar.
+- **Tinggi kotak teks JANGAN dipaku angka `em`/`px` — biarkan LAHIR dari kotak
+  barisnya.** Pengguna yang menyetel jarak teks (§1.4.12, AA WAJIB) menimpa
+  `line-height` lewat `!important`, jadi `style={{height:'1em'}}` tetap 34px
+  sementara isinya jadi 51px. Itu yang membuat saldo hero mencetak serpihan
+  digit tetangga (Odometer, 2 Sep 2026): obatnya pengukur `visibility:hidden`
+  di dalam jendela + langkah PERSENTASE, bukan angka `em`.
+- **Teks BERMAKNA pakai `.potong-lentur`, bukan `truncate`.** Kelas itu kini
+  berdasar clamp DUA baris: satu baris kalau muat, baris kedua lahir hanya saat
+  ruangnya habis — termasuk saat yang menghabiskannya setelan jarak teks, yang
+  tak bisa ditanyakan ke media query mana pun. **NOMINAL tetap `truncate`**
+  (angka yang membungkus lebih buruk daripada angka terpotong).
 
 ## Tiga golongan yang SENGAJA tidak diatur
 
@@ -166,13 +177,14 @@ npm run sapu-semua     # SEMUA sapuan berurutan → satu ringkasan hijau/merah
 npm run lembar-kontak  # 55 layar (normal/kosong/memuat/gagal/luring) → 1 PNG
 ```
 
-29 sapuan. Yang visual butuh build produksi hidup:
+30 sapuan. Yang visual butuh build produksi hidup:
 `npm run build && npx vite preview --port 5199`
 
 Sapuan yang paling sering menemukan cacat baru, dan apa yang HANYA ia lihat:
 `audit:keadaan` (layar kosong/gagal/memuat) · `audit:luring-pertama` (kunjungan
 pertama, server DIMATIKAN sungguhan) · `audit:nama` (kontrol bisa dibedakan
-tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP).
+tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
+`audit:jarak-teks` (§1.4.12 — satu-satunya sapuan bersumbu TEGAK).
 
 ## Jebakan yang sudah mahal — jangan diulang
 
@@ -217,6 +229,12 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP).
   hilang, build MELEDAK — jangan "perbaiki" dgn melunakkan itu.
 - **Single-RT.** Isolasi multi-tenant sengaja DITUNDA; jangan bangun untuk
   multi-RT sebelum user memintanya.
+- **§1.4.12 sisa 30, dan itu keputusan yang MENUNGGU user.** Semuanya
+  `line-clamp-2` bermakna — nama Sohibul Bait butuh baris ke-3, keterangan
+  Kas RT butuh ke-3/ke-4. Clamp berapa pun tetap batas; satu-satunya obat
+  penuh adalah TANPA clamp, dan itu menukar konformansi dgn tinggi baris tak
+  terbatas di halaman UANG. Jangan tutup diam-diam dgn menaikkan angka clamp:
+  itu memindahkan ambang, bukan menyelesaikannya.
 - **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
   `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
   yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:
