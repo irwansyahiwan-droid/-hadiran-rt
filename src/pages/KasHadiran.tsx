@@ -126,11 +126,31 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
 
 // ── Main Page ────────────────────────────────────────────────
 
-// Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
-// (min-height) agar CrossFade bebas layout-jump. FitAmount bisa menyusut
-// (30–48px) → tinggi natural hero bervariasi ~146–166px; min-height menahan
-// lantai sama dgn skeleton. Ubah di sini bila anatomi hero berubah.
-const HERO_MIN_H = 164;
+/* Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
+   (min-height) agar CrossFade bebas layout-jump. FitAmount bisa menyusut
+   (30–48px) → tinggi natural hero bervariasi; min-height menahan lantai sama
+   dgn skeleton. Ubah di sini bila anatomi hero berubah.
+
+   DUA NILAI sejak 2 Sep 2026, dan itu KONSEKUENSI LANGSUNG dari ambang tumpuk
+   HeroSaldo yang naik 359 → 390px: di bawah/sama dgn 390px nominal turun ke
+   barisnya sendiri, jadi hero tumbuh. Diukur (bukan ditaksir), tinggi settle:
+   320px 226 · 360px 233 · 390px 238 · 430px 198. Lantai dipilih dari yang
+   TERTINGGI di tiap sisi ambang, supaya `min-height` menahan hero ke angka
+   yang sama persis dgn skeleton — selisih berapa pun langsung jadi CLS.
+
+   Ini pelajaran yang komentar versi lama sudah menuliskannya ("Ubah di sini
+   bila anatomi hero berubah") dan tetap nyaris terlewat: ambang tumpuk diubah
+   di HeroSaldo.tsx, sedangkan lantai yang harus mengikutinya hidup di SINI.
+   Terukur 164 → 238 = lompatan 74px, dan `audit:lompat` melaporkannya HIJAU. */
+/* Lantainya KELAS, bukan angka: dipakai di DUA tempat (kerangka & hero asli)
+   dan nilainya berbeda di dua sisi ambang tumpuk 390px —
+       > 390px  198px  nominal & pil berbagi satu baris
+       <= 390px 238px  nominal dapat barisnya sendiri
+   Angka JS tak dipakai lagi: satu nilai inline tak bisa mengikuti lebar layar,
+   dan mengejarnya dgn listener resize berarti lantai baru mendarat SESUDAH cat
+   pertama — persis lompatan yang mau dicegah. Geser salah satu = ukur ulang
+   tinggi settle di 320/360/390/430 lalu geser dua-duanya. */
+const HERO_H_CLS = 'min-h-[198px] max-[390px]:min-h-[238px]';
 
 /* Lantai tinggi kartu "Alur Kas Hadiran" — SATU sumber utk kerangka & kartu asli,
    pola HERO_MIN_H di atas. Diukur (bukan ditaksir): 270px @390, dan tumbuh sendiri
@@ -565,8 +585,13 @@ export default function KasHadiranPage() {
             HERO_MIN_H → tak ada layout jump saat CrossFade. */}
         <CrossFade
           loading={loading}
+          /* Tinggi kerangka lewat KELAS ber-media-query (`HERO_H_CLS`), bukan
+             `style` inline: lantainya berbeda di dua sisi ambang tumpuk 390px,
+             dan satu nilai inline tak bisa mengikuti lebar layar. Komentar ini
+             sengaja di LUAR `skeleton={…}` — komentar JSX di dalam prop jadi
+             anak KEDUA & ekspresi itu cuma boleh berisi satu elemen. */
           skeleton={
-            <div style={{ height: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }} className="relative overflow-hidden rounded-3xl hero-emerald p-6">
+            <div style={{ boxShadow: 'var(--hero-shadow)' }} className={`relative overflow-hidden rounded-3xl hero-emerald p-6 ${HERO_H_CLS}`}>
               <div className="flex items-center justify-between">
                 <div className="skeleton skeleton-hero h-3 w-28 rounded-full" />
                 <div className="flex gap-2">
@@ -585,7 +610,7 @@ export default function KasHadiranPage() {
         <HeroSaldo
           icon={Wallet}
           label="Saldo Kas Hadiran"
-          minHeight={HERO_MIN_H}
+          className={HERO_H_CLS}
           measure={`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`}
           amount={hidden
             ? maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(animatedSaldo).toLocaleString('id-ID')}`, hidden, 7)

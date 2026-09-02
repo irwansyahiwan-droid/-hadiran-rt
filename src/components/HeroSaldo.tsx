@@ -163,6 +163,12 @@ interface HeroSaldoProps {
   stats?: HeroStat[];
   /** Lantai tinggi — sinkron dgn skeleton halaman agar CrossFade tak melompat. */
   minHeight?: number;
+  /** Kelas tambahan pada kartu hero — dipakai halaman yang lantainya BERBEDA
+   *  di dua sisi ambang tumpuk 390px (mis. `min-h-[198px] max-[390px]:min-h-[238px]`).
+   *  Lewat CSS, bukan `minHeight` angka: lantai yang ikut lebar layar tak bisa
+   *  ditulis sbg satu nilai inline, dan mengejarnya dgn listener resize berarti
+   *  lantai baru mendarat SESUDAH cat pertama — persis lompatan yang mau dicegah. */
+  className?: string;
 }
 
 /**
@@ -191,10 +197,11 @@ export default function HeroSaldo({
   children,
   stats,
   minHeight,
+  className = '',
 }: HeroSaldoProps) {
   return (
     <div
-      className="relative overflow-hidden rounded-3xl hero-emerald"
+      className={`relative overflow-hidden rounded-3xl hero-emerald ${className}`}
       style={{ boxShadow: 'var(--hero-shadow)', minHeight }}
     >
       <div className="hero-sheen pointer-events-none absolute inset-0" />
@@ -243,32 +250,43 @@ export default function HeroSaldo({
             Beranda — `flex-wrap` di sana melakukan hal yang sama; HeroSaldo
             satu-satunya yang tak punya katupnya.
 
-            AMBANGNYA 360px, dan BATASNYA diakui di sini alih-alih disembunyikan.
-            Ambang 390 sempat dipasang & diukur supaya tahan pertumbuhan digit
-            (di sana sisa ruang tetap ~10px di ketiga skala: hari ini -10,1 ·
-            x10 -10,1 · x100 -10,7). Ia DIBATALKAN karena ongkosnya di 360px
-            lebih besar dari cacat yang ditutupnya: kartu tumbuh 192,7 -> 240,8px
-            (+48) dan nominal melonjak ke 47px — LEBIH BESAR daripada di 390px,
-            karena baris tumpuk memberi lebar penuh. Padahal 360px justru lebar
-            acuan terkecil app, dan tinggi hero di layar kecil sudah dua kali
-            sengaja DIPANGKAS (lihat `heroRingkas` & catatan tinggi kartu
-            carousel). Menukar satu cacat terukur dgn regresi tinggi di lebar
-            acuan bukan perbaikan.
+            AMBANGNYA 390px sejak 2 Sep 2026 — dinaikkan dari 359px atas
+            permintaan user ("hero 360 naikin juga"), dan catatan lama yang
+            MENOLAK ambang ini sengaja ditulis ulang di sini supaya tak
+            dikembalikan diam-diam oleh sesi berikutnya.
 
-            Jadi: 320px ditumpuk (di sanalah cacatnya nyata & terlihat), 360px ke
-            atas TAK disentuh sama sekali — byte-identik dgn kode ter-ship
-            (font 34/39px, sisa -9,1/-10,1). Batas yang diketahui: pada nominal
-            ~x100 (belasan milyar — skala yang CLAUDE.md sendiri sebut takkan
-            pernah ada di RT ini) 360px akan meluber lagi 12px. Kalau saldo RT
-            benar-benar tumbuh sampai baris 360px sesak, NAIKKAN ambangnya satu
-            langkah — jangan turunkan `minPx`, karena 30px itu lantai
-            keterbacaan warga lansia, bukan angka yang bisa ditawar.
+            Penolakan lama berbunyi: "kartu tumbuh 192,7 -> 240,8px (+48) dan
+            nominal melonjak ke 47px". Angkanya benar, LINGKUPNYA yang terlalu
+            luas — ia mengira SEMUA hero tumbuh. Diukur ulang per-hero di 360px:
+
+                Hadiran (punya pil "Defisit")  30 -> 40px · kartu 187 -> 233px
+                Kas RT  (tanpa pil)            39 -> 39px · kartu 256 -> 256px
+
+            Hanya hero BER-PIL yang tumbuh, karena hanya di sana ada dua anak
+            yang berebut satu baris. Dan hero ber-pil itu justru yang tadinya
+            duduk di 30px — LANTAI `minPx`, ukuran terkecil yang mungkin.
+
+            Yang memicu peninjauan: user melaporkan hero "kecil", dan
+            pengukuran menemukan ketidakmonotonan yang tak pernah terlihat —
+            360px (30px) lebih KECIL daripada 320px (34px), justru karena 320
+            sudah ditumpuk & dapat lebar penuh sementara 360 tidak. Layar lebih
+            besar memberi angka lebih kecil; itu bukan trade-off, itu cacat.
+
+            Sesudah ambang naik (Hadiran): 320 34px · 360 40px · 390 45px.
+            Ongkosnya jujur: kartu +46px di 360 dan +40px di 390, dan di 390
+            hero jadi lebih besar daripada di 430 (45 vs 40) karena baris tumpuk
+            memberi lebar penuh. Itu diterima sadar-sadar — nominal uang yang
+            terbaca menang atas tinggi kartu yang seragam.
+
+            `minPx` 30px TIDAK diturunkan & jangan pernah diturunkan: itu lantai
+            keterbacaan warga lansia. Kalau baris ini sesak lagi, naikkan
+            ambangnya satu langkah lagi — bukan lantainya.
 
             `items-stretch` WAJIB saat menumpuk: dgn `items-start` lebar <p>
             menyusut jadi max-content, dan FitAmount membaca `clientWidth`
             untuk menghitung skalanya — ia akan mengukur kotak yang sudah
             terlanjur mengecil. */}
-        <div className="mt-1 flex items-end gap-x-3 max-[359px]:flex-col max-[359px]:items-stretch max-[359px]:gap-y-2">
+        <div className="mt-1 flex items-end gap-x-3 max-[390px]:flex-col max-[390px]:items-stretch max-[390px]:gap-y-2">
           <FitAmount
             measure={measure}
             maxPx={48}
