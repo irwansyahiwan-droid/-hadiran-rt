@@ -33,7 +33,16 @@ interface WargaGroup {
 // asli (min-height) agar CrossFade bebas layout-jump (pola HERO_MIN_H
 // KasHadiran). Kartu "Semua Talangan Lunas" sengaja TIDAK di-min-height —
 // wujud pendek itu memang beda kartu, bukan drift.
-const HERO_MIN_H = 208;
+/* Diukur ulang 3 Sep 2026 sesudah `audit:lompat` dapat vonis PIKSEL: lantai ini
+   208px sementara hero SETTLE di 230/238/243/244px (320/360/390/430) —
+   kerangka lebih PENDEK dari isi yang menggantikannya, jadi tiap muat mendorong
+   seluruh halaman turun. Skor CLS-nya cuma 0,021, jauh di bawah 0,1, jadi ia lolos
+   berbulan-bulan sampai sapuan berhenti menilai peristiwa lewat agregat.
+   Nilainya = settle TERTINGGI, bukan rata-rata: `min-height` itu LANTAI, jadi
+   angka tertinggi membuat hero sama tinggi di semua lebar DAN kerangka persis
+   setinggi isinya. Tinggi hero yang berbeda-beda antar-lebar memang bukan
+   keuntungan yang hilang. WAJIB diukur ulang tiap anatomi hero berubah. */
+const HERO_MIN_H = 244;
 
 export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const { isBendahara } = useAuthContext();

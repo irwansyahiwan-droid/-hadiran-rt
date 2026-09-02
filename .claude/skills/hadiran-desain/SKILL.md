@@ -256,13 +256,20 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   multi-RT sebelum user memintanya.
 - **§1.4.12 = 0, dan jaga tetap 0.** Garis dasar 2 Sep 2026: populasi 6.036
   elemen / 20 layar, temuan NOL. Kalau angka itu naik, sesuatu baru mundur.
-- **`audit:lompat` punya EMPAT temuan terbuka & sengaja tidak diklaim** (3 Sep
-  2026, muncul begitu vonis PIKSEL dipasang — semuanya PRA-SESI, dibuktikan
-  lawan build `ec2884a`): Jadwal −56px "TARIKAN TERAKHIR", Kas RT +45px
-  "Target Saldo Kas RT" (dua peran), Talangan +35px `.cf-out`. Skor CLS-nya
-  0,02–0,05 — jauh di bawah 0,1 — jadi mereka lolos berbulan-bulan. `sapu-semua`
-  karena itu MERAH di sapuan ini; merah yang jujur, jangan dibungkam dgn
-  menaikkan `AMBANG_PX`.
+- **Lantai hero WAJIB = tinggi SETTLE tertinggi, dan diukur ulang tiap anatomi
+  hero berubah.** `HERO_MIN_H` dipakai kerangka (tinggi) SEKALIGUS hero asli
+  (lantai); begitu keduanya berbeda, tiap muat mendorong seluruh halaman.
+  Terukur 3 Sep 2026 di EMPAT halaman sekaligus — JadwalWarga 167 lawan settle
+  190, Talangan 208 lawan 244, Jadwal 192 lawan 217, KasRT 218 lawan 269 —
+  dan tak satu pun pernah dilaporkan karena skor CLS-nya cuma 0,02–0,05.
+  Ambil settle TERTINGGI dari 320/360/390/430: `min-height` itu lantai, jadi
+  nilai tertinggi membuat kerangka persis setinggi isinya di semua lebar.
+- **SATU temuan `audit:lompat` masih terbuka** (Jadwal warga, −56px): terjadi
+  saat transisi ANTAR-HALAMAN (Beranda→Jadwal), BUKAN saat kerangka berganti
+  isi — transisi kerangka→isi halaman itu sudah terukur 0 geseran. Belum
+  diperbaiki karena obatnya menyentuh `CrossFade` yang dipakai semua halaman,
+  dan halaman lain tak menunjukkan gejalanya. `sapu-semua` MERAH karenanya;
+  merah yang jujur, jangan dibungkam dgn menaikkan `AMBANG_PX`.
 - **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
   `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
   yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:

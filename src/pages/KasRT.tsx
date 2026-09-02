@@ -246,7 +246,16 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
 // Tinggi dasar hero (px) — SATU sumber utk skeleton (height) & hero asli
 // (min-height), pola HERO_MIN_H KasHadiran. Baris "Saldo Awal" kondisional
 // menambah tinggi natural — itu data-driven, bukan drift.
-const HERO_MIN_H = 218;
+/* Diukur ulang 3 Sep 2026 sesudah `audit:lompat` dapat vonis PIKSEL: lantai ini
+   218px sementara hero SETTLE di 269/256/263/268px (320/360/390/430) —
+   kerangka lebih PENDEK dari isi yang menggantikannya, jadi tiap muat mendorong
+   seluruh halaman turun. Skor CLS-nya cuma 0,027, jauh di bawah 0,1, jadi ia lolos
+   berbulan-bulan sampai sapuan berhenti menilai peristiwa lewat agregat.
+   Nilainya = settle TERTINGGI, bukan rata-rata: `min-height` itu LANTAI, jadi
+   angka tertinggi membuat hero sama tinggi di semua lebar DAN kerangka persis
+   setinggi isinya. Tinggi hero yang berbeda-beda antar-lebar memang bukan
+   keuntungan yang hilang. WAJIB diukur ulang tiap anatomi hero berubah. */
+const HERO_MIN_H = 269;
 
 export default function KasRTPage() {
   const { isBendahara } = useAuthContext();

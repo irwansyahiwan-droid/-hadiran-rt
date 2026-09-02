@@ -31,7 +31,16 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
    192px @360, 214px @320 (judul melipat). Dipakai 192 — tinggi TERKECIL yang
    benar-benar terjadi, bukan jumlah di atas kertas; nilai di bawah itu tak
    pernah jadi lantai sama sekali. */
-const HERO_MIN_H = 192;
+/* Diukur ulang 3 Sep 2026 sesudah `audit:lompat` dapat vonis PIKSEL: lantai ini
+   192px sementara hero SETTLE di 217/192/193/194px (320/360/390/430) —
+   kerangka lebih PENDEK dari isi yang menggantikannya, jadi tiap muat mendorong
+   seluruh halaman turun. Skor CLS-nya cuma 0,002 @390 — cacatnya di 320px, jauh di bawah 0,1, jadi ia lolos
+   berbulan-bulan sampai sapuan berhenti menilai peristiwa lewat agregat.
+   Nilainya = settle TERTINGGI, bukan rata-rata: `min-height` itu LANTAI, jadi
+   angka tertinggi membuat hero sama tinggi di semua lebar DAN kerangka persis
+   setinggi isinya. Tinggi hero yang berbeda-beda antar-lebar memang bukan
+   keuntungan yang hilang. WAJIB diukur ulang tiap anatomi hero berubah. */
+const HERO_MIN_H = 217;
 import { useDialog } from '../hooks/useDialog';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast, showUndo } from '../lib/toast';

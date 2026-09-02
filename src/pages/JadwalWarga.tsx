@@ -52,7 +52,16 @@ const SUB_TABS = [
 //
 // WAJIB diukur ulang tiap anatomi hero berubah — kerangka di bawah meniru
 // anatomi ini blok per blok, dan selisihnya langsung jadi CLS (`audit:lompat`).
-const HERO_MIN_H = 167;
+/* Diukur ulang 3 Sep 2026 sesudah `audit:lompat` dapat vonis PIKSEL: lantai ini
+   167px sementara hero SETTLE di 190/190/167/167px (320/360/390/430) —
+   kerangka lebih PENDEK dari isi yang menggantikannya, jadi tiap muat mendorong
+   seluruh halaman turun. Skor CLS-nya cuma 0,046, jauh di bawah 0,1, jadi ia lolos
+   berbulan-bulan sampai sapuan berhenti menilai peristiwa lewat agregat.
+   Nilainya = settle TERTINGGI, bukan rata-rata: `min-height` itu LANTAI, jadi
+   angka tertinggi membuat hero sama tinggi di semua lebar DAN kerangka persis
+   setinggi isinya. Tinggi hero yang berbeda-beda antar-lebar memang bukan
+   keuntungan yang hilang. WAJIB diukur ulang tiap anatomi hero berubah. */
+const HERO_MIN_H = 190;
 
 export default function JadwalWargaPage() {
   /* Cetak jadwal = aksi berat (chunk PDF + render di main thread). Lihat
