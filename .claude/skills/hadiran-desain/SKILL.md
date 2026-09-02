@@ -161,7 +161,7 @@ kalau ya, rona yang tadi "dikunci" sebenarnya sudah lepas.
 ## Perintah
 
 ```bash
-npm run periksa        # typecheck + lint + 5 sapuan statis + 277 tes
+npm run periksa        # typecheck + lint + 5 sapuan statis + 283 tes
 npm run sapu-semua     # SEMUA sapuan berurutan → satu ringkasan hijau/merah
 npm run lembar-kontak  # 55 layar (normal/kosong/memuat/gagal/luring) → 1 PNG
 ```
