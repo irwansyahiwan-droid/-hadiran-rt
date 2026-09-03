@@ -448,8 +448,6 @@ for (const peran of ['warga', 'bendahara']) {
 
   // Beranda
   await uji(`${peran}/Beranda`, 'menu-Header', klik(page, () => page.getByRole('button', { name: 'Menu' })));
-  await uji(`${peran}/Beranda`, 'popover-InfoTip', klik(page, () => page.getByRole('button', { name: /^Apa itu/i })));
-  await uji(`${peran}/Beranda`, 'popover-urutan', klik(page, () => page.getByRole('button', { name: /^Urutkan/i })));
 
   // D — entri yatim yang selamat dari reload
   if (tabSekarang && (await tabAktif(page)) !== tabSekarang) await keTab(page, tabSekarang);
@@ -457,6 +455,24 @@ for (const peran of ['warga', 'bendahara']) {
 
   // Kas RT — sheet aksi baris + konfirmasi merusak di atasnya
   await pindah('Kas RT');
+  /* DUA popover ini dulu diuji di BERANDA, dan karena itu tak pernah diuji sama
+     sekali (diperbaiki 3 Sep 2026). `Urutkan` milik `FilterChips`, dan Beranda
+     satu-satunya halaman berdata yang TIDAK memakainya — jadi pemicunya mustahil
+     ada di sana, di peran mana pun. `Apa itu` (InfoTip) memang ada di Beranda,
+     tapi hanya untuk WARGA ("Apa itu Mode Warga?"), sehingga sisi bendahara ikut
+     kosong. Keduanya dilaporkan `dilewat (pemicu tak ada di data hari ini)` —
+     kalimat yang benar untuk data, tapi MENYESATKAN di sini: yang salah bukan
+     datanya melainkan LAYARNYA.
+     Dipetakan dulu, bukan ditebak — `Urutkan` hidup di warga{Hadiran, Kas RT}
+     & bendahara{Talangan, Hadiran, Kas RT}; `Apa itu` di warga{Beranda, Jadwal,
+     Hadiran, Kas RT} & bendahara{Talangan, Hadiran, Kas RT}. Kas RT satu-satunya
+     layar yang memuat KEDUANYA di KEDUA peran, jadi ia menutup empat sel
+     sekaligus tanpa menambah navigasi.
+     PELAJARAN: "dilewat karena pemicunya tak ada" wajib dicurigai sekuat temuan
+     merah — ia bisa berarti sapuan mencari di tempat yang salah, dan bentuknya
+     sama persis dgn celah `audit:kontras-nonteks` bagian E. */
+  await uji(`${peran}/KasRT`, 'popover-InfoTip', klik(page, () => page.getByRole('button', { name: /^Apa itu/i })));
+  await uji(`${peran}/KasRT`, 'popover-urutan', klik(page, () => page.getByRole('button', { name: /^Urutkan/i })));
   await uji(`${peran}/KasRT`, 'menu-ekspor', klik(page, () => page.getByRole('button', { name: /^Ekspor/i })));
   await uji(`${peran}/KasRT`, 'sheet-aksi-baris', klik(page, () => page.getByRole('button', { name: /^(Aksi|Lihat detail):/i })));
 
