@@ -85,6 +85,13 @@
     <!-- PWA standalone (iOS) -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- `default` = teks status bar GELAP. Sengaja, dan DIVERIFIKASI di iPhone
+         nyata 3 Sep 2026 (oleh user): terbaca di mode gelap maupun terang.
+         `black-translucent` memaksa teks PUTIH → hilang di header terang.
+         Tak ada sapuan yang bisa menjaga ini — iOS memilih gaya status bar
+         di luar halaman, jadi tak ada piksel yang bisa dibaca probe (lihat
+         `src/lib/statusBar.test.ts`). Kalau warna Header atau nilai ini
+         berubah, verifikasinya HANGUS: ulangi di perangkat, jangan diasumsikan. -->
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Hadiran RT" />
     <!-- Splash standalone iOS (apple-touch-startup-image) — ikon di tengah canvas.

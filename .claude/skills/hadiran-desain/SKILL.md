@@ -324,9 +324,16 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   KETIGA (`HISTORY DESYNC`) tak terjangkau by construction — di bawah lapisan
   selalu ada entri TAB, jadi Back berikutnya selalu terlihat; butuh permukaan
   bertumpuk di Beranda yang app tak punya. Vonis 1 & 2 terbukti bergigi
-  (`MUTASI=2`); iOS mode gelap mengirim
-  `status-bar-style: default` dan perilakunya belum diverifikasi di perangkat
-  nyata.
+  (`MUTASI=2`).
+- **`status-bar-style: default` DIVERIFIKASI di iPhone nyata (3 Sep 2026, oleh
+  user): status bar TERBACA di mode gelap.** Ia sempat berdiri lama sbg
+  keraguan — `default` memberi teks status bar GELAP, dan kekhawatirannya teks
+  itu hilang di atas header hijau tua. Ternyata tidak. **Tak ada sapuan yang
+  bisa menutup item ini** — iOS memilih gaya status bar di luar halaman, jadi
+  tak ada satu piksel pun yang bisa dibaca probe (lihat `statusBar.test.ts`);
+  satu-satunya bukti yang sah adalah mata di perangkat nyata. Kalau warna
+  Header atau meta ini berubah, verifikasinya HANGUS dan harus diulang di
+  perangkat — bukan diasumsikan tetap benar.
 
 ## Cara kerja yang diminta user
 
