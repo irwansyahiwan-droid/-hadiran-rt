@@ -86,30 +86,42 @@ const PUNGUT = () => {
   return out;
 };
 
-/* KENAPA `.potong-lentur` TIDAK ikut disasar — diselidiki & diputuskan 30 Agu
-   2026, supaya tak ada yang mengejarnya lagi.
+/* KENAPA `.potong-lentur` TIDAK ikut disasar MUTASI=1 — diselidiki 30 Agu 2026,
+   supaya tak ada yang mengejarnya lagi.
 
    Gejalanya menggoda: `MUTASI=1` tak pernah menaikkan angka bagian C, dan itu
    TERBACA seperti kontrol yang tak bergigi. Diukur: dari 73 elemen populasi
    teks-200% di Jadwal, NOL punya `.truncate`/`.min-w-0` — semuanya
    `.potong-lentur`. Jadi mutasi memang tak menyentuh mereka.
 
-   Tapi menambahkannya SALAH, dan sebabnya ada di kelas itu sendiri: pada
-   `@media (max-width: 22.4em)` — persis kondisi teks 200% — `.potong-lentur`
-   berpindah ke `white-space: normal` + `overflow-wrap: anywhere`. Teksnya
-   MELIPAT, bukan terpotong. Elemen yang melipat tak bisa "terpotong mendatar"
-   berapa pun ia disempitkan, jadi nol di bagian C itu BENAR, bukan buta —
-   satu-satunya yang masih memotong di 200% adalah `.truncate` (label bulan
-   grafik, 12 temuan, ditutup 26a17a3).
-
-   Dicoba juga, dan hasilnya jadi alasan kedua: menyempitkan `.potong-lentur`
+   Dan menambahkannya ke MUTASI=1 SALAH: menyempitkan `.potong-lentur`
    MEMBEBASKAN ruang untuk saudara `flex` di sebelahnya, sehingga bagian B
    justru TURUN 6 → 3 temuan. Mutasi yang melemahkan dirinya sendiri lebih
-   buruk daripada mutasi yang sempit. */
-const MUTASI_CSS = '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}';
+   buruk daripada mutasi yang sempit.
+
+   NOL di bagian C memang BENAR, bukan buta: pada lebar/teks-200%
+   `.potong-lentur` MELIPAT, dan yang melipat tak bisa terpotong mendatar
+   berapa pun ia disempitkan. (Mekanismenya berganti 2 Sep 2026 — dulu
+   `white-space: normal`, kini `display: block` + `-webkit-line-clamp: unset`
+   di `@media (max-width: 22.4em)` — tapi efeknya sama: melipat.)
+
+   TAPI "nol itu benar" bukan alasan untuk membiarkan bagian C TANPA mutasi
+   sama sekali. Selama tak ada mutasi yang bisa memerahkannya, penjaganya tak
+   pernah terbukti menahan beban, dan kita cuma percaya pada penalaran —
+   persis kelas yang paling dihindari repo ini. Karena itu MUTASI=2 (3 Sep
+   2026): ia meniru REGRESI NYATA yang mungkin terjadi — pelonggaran 22.4em
+   hilang & `.potong-lentur` kembali memotong satu baris. Kalau bagian C tetap
+   nol di bawah mutasi itu, yang rusak SAPUANNYA. */
+const MUTASI_CSS = {
+  1: '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}',
+  2: '.potong-lentur{display:block!important;white-space:nowrap!important;text-overflow:ellipsis!important;-webkit-line-clamp:unset!important}',
+};
+const MUTASI = +(process.env.MUTASI || 0);
 
 function pasangMutasi(ctx) {
-  if (!process.env.MUTASI) return;
+  if (!MUTASI) return;
+  const css = MUTASI_CSS[MUTASI];
+  if (!css) return;
   return ctx.addInitScript((css) => {
     const pasang = () => {
       const s = document.createElement('style');
@@ -117,7 +129,7 @@ function pasangMutasi(ctx) {
       (document.head || document.documentElement).appendChild(s);
     };
     if (document.head) pasang(); else document.addEventListener('DOMContentLoaded', pasang);
-  }, MUTASI_CSS);
+  }, css);
 }
 
 /**
@@ -258,6 +270,13 @@ console.log(`  A. 390px  (acuan HP)        : ${jml('390')} temuan / ${layar('390
 console.log(`  B. 320px  (WAJIB §1.4.10)   : ${jml('320')} temuan / ${layar('320')} layar`);
 console.log(`  C. teks 200% (ambang APP,`);
 console.log(`     DI ATAS AA — bukan WCAG) : ${jml('200')} temuan / ${layar('200')} layar`);
+
+/* Penjaga MUTASI=2 — lihat catatan di atas: mutasi ini ADA justru untuk
+   membuktikan bagian C bisa merah. Kalau ia tetap nol, yang gagal sapuannya. */
+if (MUTASI === 2 && jml('200') === 0) {
+  console.log('\nPROBE CACAT: MUTASI=2 tapi bagian C tetap NOL — penjaga teks-200% tak bergigi.');
+  process.exit(2);
+}
 
 for (const b of ['390', '320', '200']) {
   const isi = hasil.filter((h) => h.bag === b && h.n);

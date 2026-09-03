@@ -291,10 +291,20 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   **Petakan dulu di mana pemicunya benar-benar hidup, jangan tebak.** Menambah
   populasi WAJIB diikuti mutasi ulang — hijau di populasi baru tak membuktikan
   apa pun sampai probe terbukti menggigit di sana.
-- **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
-  `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
-  yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:
-  default` dan perilakunya belum diverifikasi di perangkat nyata.
+- **Nol yang BENAR tetap butuh mutasi.** `audit:potong` bagian C (teks 200%)
+  nol karena `.potong-lentur` MELIPAT di sana — penalaran yang benar, tapi
+  selama tak ada mutasi yang bisa memerahkannya, penjaganya cuma penalaran.
+  `MUTASI=2` (3 Sep 2026) meniru regresi nyata — pelonggaran 22.4em hilang &
+  kelas itu kembali memotong satu baris — dan bagian C melonjak **0 → 68**.
+  Jangan hapus mutasi itu untuk "merapikan"; ia satu-satunya bukti bahwa
+  pelonggaran 22.4em memang yang menanggung beban.
+- **Yang masih terbuka & sengaja tidak diklaim:** `audit:mundur` bagian E2
+  (hijau, tapi failure mode-nya belum pernah terinduksi); `audit:kembali`
+  sifat 4 (pengakuan gagal-menyegarkan cuma toast ~2,6 dtk sementara basinya
+  permanen — presedennya strip LURING di Header); 6 label bulan Kas RT
+  terpotong di teks 200% (di ATAS AA); iOS mode gelap mengirim
+  `status-bar-style: default` dan perilakunya belum diverifikasi di perangkat
+  nyata.
 
 ## Cara kerja yang diminta user
 
