@@ -1,4 +1,5 @@
 import { useSaving, useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
+import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Calendar, CheckCircle2, Coins, Lock, MoreVertical, Pencil, Plus,
@@ -130,6 +131,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         let tersimpan: Record<string, AbsensiStatus>;
         try {
           tersimpan = await fetchAbsensiTersimpan(tarikan.id);
+          tandaiSegar();   // penyegaran berhasil → strip basi hilang
         } catch {
           setAbsensiError(true);
           setLoadingAbsensi(false);
@@ -972,7 +974,13 @@ export default function JadwalPage() {
       setWargaList((wargaRes.data as Warga[]) ?? []);
       setPageCache('jadwal', { tarikanList: tarikan, wargaList: (wargaRes.data as Warga[]) ?? [] });
     } catch {
-      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      if (silent) {
+        /* Toast = kabar SEKARANG; `tandaiBasi` = pengakuan yang BERTAHAN
+           selama angkanya masih basi. Toast hidup ~2,6 dtk, basinya tidak —
+           lihat `src/lib/basi.ts`. */
+        showToast('Gagal memperbarui data. Coba lagi.', 'error');
+        tandaiBasi();
+      }
       else setError(true);
     } finally {
       setLoading(false);

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { FileText, RefreshCw, RotateCcw, ArrowUpRight, Trash2, TrendingUp, AlertTriangle, Check, Coins, Download, ChevronRight, X, Wallet, Share2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import FilterChips from '../components/FilterChips';
@@ -236,8 +237,15 @@ export default function KasHadiranPage() {
       totalTalanganBelum: total,
       talanganMap: map,
     });
+      tandaiSegar();   // penyegaran berhasil → strip basi hilang
     } catch {
-      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      if (silent) {
+        /* Toast = kabar SEKARANG; `tandaiBasi` = pengakuan yang BERTAHAN
+           selama angkanya masih basi. Toast hidup ~2,6 dtk, basinya tidak —
+           lihat `src/lib/basi.ts`. */
+        showToast('Gagal memperbarui data. Coba lagi.', 'error');
+        tandaiBasi();
+      }
       else setError(true);
     } finally {
       setLoading(false);

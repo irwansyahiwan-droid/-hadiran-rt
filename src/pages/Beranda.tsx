@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Eye, EyeOff, ChevronRight, ChevronDown, Crown } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
@@ -228,10 +229,17 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       trxItems: withSaldo,
       lastDelta: lastDeltaVal,
     });
+      tandaiSegar();   // penyegaran berhasil → strip basi hilang
     } catch {
       // Data sudah tampil (refresh manual / revalidate cache) → jangan hapus
       // dashboard, cukup beri tahu. Cold load / retry gagal → error screen.
-      if (showRefreshing || silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      if (showRefreshing || silent) {
+        /* Toast = kabar SEKARANG; `tandaiBasi` = pengakuan yang BERTAHAN
+           selama angkanya masih basi. Toast hidup ~2,6 dtk, basinya tidak —
+           lihat `src/lib/basi.ts`. */
+        showToast('Gagal memperbarui data. Coba lagi.', 'error');
+        tandaiBasi();
+      }
       else setError(true);
     } finally {
       setLoading(false);

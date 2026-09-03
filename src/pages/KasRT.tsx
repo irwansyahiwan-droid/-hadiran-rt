@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2 } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
@@ -293,8 +294,15 @@ export default function KasRTPage() {
       if (eLoad) throw eLoad;
       setList((data as KasRT[]) ?? []);
       setPageCache('kas-rt', (data as KasRT[]) ?? []);
+      tandaiSegar();   // penyegaran berhasil → strip basi hilang
     } catch {
-      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      if (silent) {
+        /* Toast = kabar SEKARANG; `tandaiBasi` = pengakuan yang BERTAHAN
+           selama angkanya masih basi. Toast hidup ~2,6 dtk, basinya tidak —
+           lihat `src/lib/basi.ts`. */
+        showToast('Gagal memperbarui data. Coba lagi.', 'error');
+        tandaiBasi();
+      }
       else setError(true);
     } finally {
       setLoading(false);

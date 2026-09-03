@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, AlertTriangle, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
+import { useBasi } from '../../lib/basi';
 import { useBackDismiss } from '../../hooks/useBackDismiss';
 import { useScrolledPast } from '../../hooks/useScrollDirection';
 import { useOnline } from '../../hooks/useOnline';
@@ -30,6 +31,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   // Listener scroll dibagi pakai (lihat hook).
   const scrolled = useScrolledPast(6);
   const online = useOnline();
+  const basi = useBasi();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuMounted = useExitAnim(menuOpen);
   /* Tombol Back HP menutup menu ini — bukan meninggalkan app. Warga app ini
@@ -297,6 +299,34 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           <p className="mx-auto flex max-w-lg items-center justify-center gap-2 text-center text-micro font-semibold text-warn dark:text-amber-300">
             <WifiOff className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             Tanpa sinyal — angka yang tampil salinan terakhir
+          </p>
+        </div>
+      )}
+
+      {/* Strip BASI — kembaran strip LURING di atasnya, untuk sebab yang BERBEDA:
+          di sana sinyalnya hilang, di sini sinyalnya ADA tapi penyegaran ditolak
+          server. Akibatnya identik — angka di layar sudah tak dipercaya app —
+          jadi klausa keduanya sengaja PERSIS SAMA: warga yang pernah melihat
+          strip luring langsung tahu artinya sama.
+
+          Kenapa perlu (3 Sep 2026): `audit:kembali` sifat 4 sudah lama mencatat
+          bahwa app MENGAKU gagal menyegarkan, tapi pengakuannya SEMENTARA
+          (toast ~2,6 dtk) sementara basinya PERMANEN. Warga yang kembali dari
+          WhatsApp lalu melewatkan toast itu tinggal berhadapan dgn nominal yang
+          terlihat persis seperti angka sekarang.
+
+          `online &&` bukan kehati-hatian kosong: saat luring, strip di atas
+          sudah mengatakan hal yang sama, dan dua strip bertumpuk cuma kebisingan.
+          Tak bisa ditutup — ia hilang sendiri begitu satu penyegaran berhasil
+          (`tandaiSegar`), persis pola strip luring. */}
+      {online && basi && (
+        <div
+          role="status"
+          className="border-t border-amber-200/70 bg-amber-50 px-5 py-2 dark:border-amber-800/40 dark:bg-amber-900/25"
+        >
+          <p className="mx-auto flex max-w-lg items-center justify-center gap-2 text-center text-micro font-semibold text-warn dark:text-amber-300">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            Gagal memperbarui — angka yang tampil salinan terakhir
           </p>
         </div>
       )}

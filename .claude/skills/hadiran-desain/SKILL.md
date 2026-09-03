@@ -298,10 +298,15 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   kelas itu kembali memotong satu baris — dan bagian C melonjak **0 → 68**.
   Jangan hapus mutasi itu untuk "merapikan"; ia satu-satunya bukti bahwa
   pelonggaran 22.4em memang yang menanggung beban.
+- **Angka yang mungkin basi WAJIB mengaku SELAMA ia masih basi.** Toast tidak
+  cukup — ia hidup ~2,6 dtk sementara basinya permanen. App punya DUA strip
+  kembar di Header: LURING (sinyal hilang) & BASI (sinyal ada, server menolak).
+  Keduanya tak bisa ditutup dan hilang sendiri saat keadaannya pulih. Jalur
+  muat BARU wajib memanggil `tandaiBasi()`/`tandaiSegar()` (`src/lib/basi.ts`).
+  **Sapuan TIDAK menguji arah bersihnya** — ukur manual; strip yang tak pernah
+  pergi lebih buruk daripada toast.
 - **Yang masih terbuka & sengaja tidak diklaim:** `audit:mundur` bagian E2
-  (hijau, tapi failure mode-nya belum pernah terinduksi); `audit:kembali`
-  sifat 4 (pengakuan gagal-menyegarkan cuma toast ~2,6 dtk sementara basinya
-  permanen — presedennya strip LURING di Header); 6 label bulan Kas RT
+  (hijau, tapi failure mode-nya belum pernah terinduksi); 6 label bulan Kas RT
   terpotong di teks 200% (di ATAS AA); iOS mode gelap mengirim
   `status-bar-style: default` dan perilakunya belum diverifikasi di perangkat
   nyata.

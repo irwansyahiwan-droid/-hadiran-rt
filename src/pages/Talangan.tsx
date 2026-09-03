@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { AlertTriangle, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import { useCountUp, useHideAmount, toggleHideAmount, useKembaliDariLatar, usePerTanggal } from '../lib/hooks';
@@ -82,8 +83,15 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       if (eLoad) throw eLoad;
       setList((data as Talangan[]) ?? []);
       setPageCache('talangan', (data as Talangan[]) ?? []);
+      tandaiSegar();   // penyegaran berhasil → strip basi hilang
     } catch {
-      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      if (silent) {
+        /* Toast = kabar SEKARANG; `tandaiBasi` = pengakuan yang BERTAHAN
+           selama angkanya masih basi. Toast hidup ~2,6 dtk, basinya tidak —
+           lihat `src/lib/basi.ts`. */
+        showToast('Gagal memperbarui data. Coba lagi.', 'error');
+        tandaiBasi();
+      }
       else setError(true);
     } finally {
       setLoading(false);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { FileText, Search, X, Check, Coins, Users, CalendarDays, RotateCcw, RefreshCw, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
@@ -153,8 +154,15 @@ export default function JadwalWargaPage() {
         absensiMap: aMap,
         talanganLunas: lunasIds,
       });
+      tandaiSegar();   // penyegaran berhasil → strip basi hilang
     } catch {
-      if (silent) showToast('Gagal memperbarui data. Coba lagi.', 'error');
+      if (silent) {
+        /* Toast = kabar SEKARANG; `tandaiBasi` = pengakuan yang BERTAHAN
+           selama angkanya masih basi. Toast hidup ~2,6 dtk, basinya tidak —
+           lihat `src/lib/basi.ts`. */
+        showToast('Gagal memperbarui data. Coba lagi.', 'error');
+        tandaiBasi();
+      }
       else setError(true);
     } finally {
       setLoading(false);
