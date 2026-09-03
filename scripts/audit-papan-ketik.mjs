@@ -138,6 +138,10 @@ for (const bendahara of [false, true]) {
     await tombolTab.click({ force: true, timeout: 8000 })
       .catch(() => tombolTab.evaluate((el) => el.click()));
     await page.waitForTimeout(3500);
+    /* `data-kb` bertahan di DOM antar-layar; POP menimpanya untuk elemen yang
+       ia lihat, tapi elemen layar SEBELUMNYA yang masih tersisa membawa nomor
+       basi dan bisa ikut terhitung "tergapai". Dibersihkan dulu. */
+    await page.evaluate(() => document.querySelectorAll('[data-kb]').forEach((e) => e.removeAttribute('data-kb')));
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(400);
 
@@ -154,6 +158,10 @@ for (const bendahara of [false, true]) {
     }
     const luput = pop.filter((p) => !kena.has(p.i));
     layar++; totalKontrol += pop.length;
+    /* Populasi kosong = PROBE CACAT, bukan lulus. Sapuan ini belum punya
+       penjaganya — ketahuan 3 Sep 2026 waktu sebuah percobaan membuat POP
+       memungut nol dan layarnya tetap dilaporkan `OK`. */
+    if (!pop.length) { console.log(`\n### ${peran}-${t}   PROBE CACAT: populasi 0 — tak ada yang diperiksa`); gagal++; continue; }
     if (luput.length) gagal++;
     console.log(`\n### ${peran}-${t}   kontrol ${pop.length} · tergapai ${kena.size}${luput.length ? `  ⚠ LUPUT ${luput.length}` : '  OK'}`);
     luput.slice(0, 8).forEach((l) => console.log(`    ${l.tag} "${l.t}"`));
@@ -251,6 +259,29 @@ let lapisan = 0, lapisanGagal = 0;
 }
 
 await browser.close();
+/* POPULASINYA SAMPEL, dan itu wajib diakui — bukan disembunyikan.
+   App memakai `content-visibility: auto` di 8 daftar panjang (~79 baris),
+   sehingga baris di luar layar TIDAK dirender; pengukuran di `scrollTo(0,0)`
+   karena itu hanya melihat layar pertama, dan jumlahnya berayun antar-jalan
+   (terukur 3 Sep 2026: 601 · 284 · 380, 9 layar semua).
+
+   GULIR MENYELURUH SUDAH DICOBA & DITOLAK — dicatat supaya tak diulang. Tiga
+   varian, semuanya memburuk: (a) POP inkremental + gulir bertahap → tetap
+   berayun 427 · 333 · 427, sebab render baris bergantung timing, bukan posisi;
+   (b) ditambah `content-visibility: visible` paksa saat memungut → populasi
+   melonjak tapi muncul LUPUT PALSU, karena elemen yang dipungut saat dipaksa
+   render tak lagi sama saat override dicabut & Tab berjalan; (c) menaikkan
+   jeda tiap pas cuma memperlambat tanpa menstabilkan.
+
+   Yang TIDAK boleh dilakukan: memaksa render lalu men-Tab dalam keadaan itu —
+   yang diuji berhenti jadi perjalanan warga.
+
+   Jadi sampelnya dipertahankan, dan sapuan MENGAKU: baris daftar adalah
+   komponen yang sama berulang, sedangkan kontrol yang benar-benar berisiko
+   (FAB di ekor DOM, kontrol chrome) semuanya ada di layar pertama — di situlah
+   cacat FAB-tak-tergapai dulu ketemu. */
+console.log(`\n  (populasi = kontrol yang TER-RENDER di puncak tiap layar; baris daftar`);
+console.log(`   ber-\`content-visibility\` disampel, bukan dihitung penuh — lihat catatan di kode)`);
 console.log(`\n=== A. jangkauan: ${layar} layar · ${totalKontrol} kontrol @390px · ${gagal} layar punya kontrol tak tergapai ===`);
 console.log(`=== B. fokus lapisan: ${lapisan} lapisan diuji · ${lapisanGagal} bermasalah ===`);
 gagal += lapisanGagal;
