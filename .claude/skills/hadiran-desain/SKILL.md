@@ -323,8 +323,7 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
 - **Yang masih terbuka & sengaja tidak diklaim:** `audit:mundur` bagian E2
   (kini punya `MUTASI=2` & terbukti bisa merah, tapi cabang `HISTORY DESYNC`-nya
   sendiri belum terinduksi — sentinel `/landing.html` menyerap entri ekstra
-  lebih dulu); 6 label bulan Kas RT
-  terpotong di teks 200% (di ATAS AA); iOS mode gelap mengirim
+  lebih dulu); iOS mode gelap mengirim
   `status-bar-style: default` dan perilakunya belum diverifikasi di perangkat
   nyata.
 

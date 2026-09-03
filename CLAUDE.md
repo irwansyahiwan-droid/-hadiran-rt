@@ -457,8 +457,17 @@ kartu lega, baris padat.
 
 Satu temuan `audit:potong` yang TIDAK berasal dari sesi ini: 6 label bulan di
 Kas RT terpotong pada teks 200%. Diverifikasi dengan `git stash` + build
-ulang — jumlahnya identik sebelum & sesudah. **Ambang itu di ATAS AA (bukan
-syarat WCAG); dibiarkan terbuka, bukan diam-diam dianggap milik sesi ini.**
+ulang — jumlahnya identik sebelum & sesudah. Ambang itu di ATAS AA (bukan
+syarat WCAG), jadi dibiarkan terbuka alih-alih diam-diam diklaim.
+**DITUTUP `26a17a3`, dan diverifikasi ulang 3 Sep 2026** — catatannya sempat
+hidup sbg "masih terbuka" berbulan-bulan sesudah lunas. Bukti: pada font
+dasar 32px @360px, 3 dari 6 label disembunyikan (`visibility`, slotnya tetap
+memakai ruang) dan **ketiga yang tersisa ber-`overflow: visible`**, jadi
+teksnya meluber ke slot tetangga yang kosong alih-alih terklip — sumbu
+terbaca `Apr · Jun · Agu`, utuh. **Jebakan pengukuran yang nyaris membuatku
+melaporkannya masih rusak:** membandingkan lebar teks dgn `clientWidth`
+elemennya sendiri akan selalu berteriak "terpotong 20-24px", padahal
+meluber itu justru OBATNYA. Yang menentukan `overflow`, bukan selisih lebar.
 
 
 Yang ke-27 (26 Agu 2026) — **DEPLOY TIDAK OTOMATIS. `git push` TIDAK men-deploy
