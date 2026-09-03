@@ -76,6 +76,7 @@ Kanvas punya **sepuluh titik sinkron** — berhenti di CSS berarti gagal:
 | **tebal huruf** | sumbu KERJA: `normal` redup · `medium` prosa · `semibold` nilai & kontrol · `bold` judul · `extrabold` angka besar (HANYA `font-display`). **Badge/tombol `text-micro` (11px) wajib `bold`** — kompensasi optis | `npm run audit:tebal` |
 | **ikon** | `12px/2,25 · 14px/2 · 16px/1,75 · 20px/1,6`; stroke DITURUNKAN dari ukuran | `npm run audit:ikon` |
 | **nama kontrol** | tiap kontrol punya nama, dan nama itu UNIK per layar | `npm run audit:nama` |
+| **lantai huruf** | tak ada teks TERCAT di bawah anak tangga terkecil (**11px**) | `npm run audit:huruf` |
 
 **Pola yang WAJIB diikuti saat menambah tangga:** timpa skala Tailwind DI LUAR
 `extend`. Selama nilai lama masih ada, nilai ke-25 lahir minggu depan.
@@ -264,6 +265,13 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   dan tak satu pun pernah dilaporkan karena skor CLS-nya cuma 0,02–0,05.
   Ambil settle TERTINGGI dari 320/360/390/430: `min-height` itu lantai, jadi
   nilai tertinggi membuat kerangka persis setinggi isinya di semua lebar.
+- **`audit:huruf` MERAH di garis dasar, dan itu disengaja** (3 Sep 2026): 33
+  teks tercat di bawah 11px, semuanya dari DUA mesin susut-agar-muat —
+  eyebrow hero `clamp(0.575rem,2.55vw,0.6875rem)` (min 9,2px) & kaki stat
+  hero `ukuranMuat` (lantai 9,6px). Lantainya BELUM diputuskan user; sapuan
+  dipasang lebih dulu supaya keputusannya punya penjaga. **Jangan bungkam
+  dgn menurunkan `AMBANG`** — 11px itu anak tangga terkecil tangga tipografi,
+  bukan angka yang bisa ditawar.
 - **Kerangka wajib mencermin STRUKTUR DOM halaman aslinya, bukan cuma tinggi &
   permukaannya.** React merekonsiliasi per-POSISI, jadi kalau pohon kerangka
   berbeda bentuk, node dipakai ulang di peran yang BERBEDA dan rect-nya

@@ -23,6 +23,7 @@
     "audit:kontras-deep": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kontras-deep.mjs",
     "audit:kontras-nonteks": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kontras-nonteks.mjs",
     "audit:mati": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-mati.mjs",
+    "audit:huruf": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-huruf.mjs",
     "audit:nama": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-nama.mjs",
     "audit:potong": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-potong.mjs",
     "audit:jarak-teks": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-jarak-teks.mjs",

@@ -41,6 +41,7 @@ const VISUAL = [
   ['kontras-nonteks', 'node scripts/audit-kontras-nonteks.mjs'],
   ['mati', 'node scripts/audit-mati.mjs'],
   ['nama', 'node scripts/audit-nama.mjs'],
+  ['huruf', 'node scripts/audit-huruf.mjs'],
   ['potong', 'node scripts/audit-potong.mjs'],
   /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
      seperti bagian 200% `audit:potong`/`audit:reflow` (itu ambang APP, di atas
