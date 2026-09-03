@@ -264,12 +264,14 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   dan tak satu pun pernah dilaporkan karena skor CLS-nya cuma 0,02–0,05.
   Ambil settle TERTINGGI dari 320/360/390/430: `min-height` itu lantai, jadi
   nilai tertinggi membuat kerangka persis setinggi isinya di semua lebar.
-- **SATU temuan `audit:lompat` masih terbuka** (Jadwal warga, −56px): terjadi
-  saat transisi ANTAR-HALAMAN (Beranda→Jadwal), BUKAN saat kerangka berganti
-  isi — transisi kerangka→isi halaman itu sudah terukur 0 geseran. Belum
-  diperbaiki karena obatnya menyentuh `CrossFade` yang dipakai semua halaman,
-  dan halaman lain tak menunjukkan gejalanya. `sapu-semua` MERAH karenanya;
-  merah yang jujur, jangan dibungkam dgn menaikkan `AMBANG_PX`.
+- **Kerangka wajib mencermin STRUKTUR DOM halaman aslinya, bukan cuma tinggi &
+  permukaannya.** React merekonsiliasi per-POSISI, jadi kalau pohon kerangka
+  berbeda bentuk, node dipakai ulang di peran yang BERBEDA dan rect-nya
+  melompat — `audit:lompat` melaporkan geseran yang tak pernah dilihat siapa
+  pun (JadwalWarga, −56px hantu: bantalan `p-6` menempel di kotak hero
+  kerangka, sedangkan hero asli menaruhnya di anak). Hanya mungkin di halaman
+  ber-`if (loading) return` — satu-satunya JadwalWarga; halaman ber-`CrossFade`
+  kebal karena kerangka & isi jadi dua anak terpisah.
 - **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
   `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
   yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:

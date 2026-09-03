@@ -229,10 +229,26 @@ export default function JadwalWargaPage() {
             (KasHadiran/KasRT/Talangan), halaman ini yang tertinggal. Bar isian
             ikut `.skeleton-hero` (putih beralpha) — `.skeleton` abu di atas
             gradient hijau terbaca seperti lubang, bukan isian yang sedang dimuat. */}
+        {/* STRUKTUR DOM-nya ikut dicermin, bukan cuma anatomi visualnya
+            (3 Sep 2026). Dulu bantalan `p-6 space-y-3` menempel di kotak hero
+            ini sendiri, sedangkan hero ASLI menaruhnya di anak: hero > sheen >
+            `div.relative.p-6.space-y-3`. React merekonsiliasi per-POSISI, jadi
+            anak KEDUA kerangka (`h-[46px]`) dipakai ulang menjadi
+            `div.relative.p-6.space-y-3` milik isi — satu node yang rect-nya
+            melompat 217..263 → 161..328, dan `audit:lompat` melaporkannya
+            sbg geseran -56px. Kotak hero-nya sendiri TIDAK pernah bergerak
+            (terukur `heroTop` 161 di kedua keadaan), jadi warga tak melihat
+            apa pun; yang salah bentuk pohonnya, bukan tata letaknya.
+            Dgn struktur yang sama, tiap node dipakai ulang di peran yang SAMA
+            dan geseran hantu itu hilang. Pelajaran: kerangka wajib mencermin
+            POHON, bukan cuma tinggi & permukaan — kalau tidak, alat geometri
+            melaporkan lompatan yang tak pernah dilihat siapa pun. */}
         <div
           style={{ minHeight: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }}
-          className="relative overflow-hidden rounded-3xl hero-emerald p-6 space-y-3"
+          className="relative overflow-hidden rounded-3xl hero-emerald"
         >
+          <div className="hero-sheen pointer-events-none absolute inset-0" />
+          <div className="relative p-6 space-y-3">
           {/* Tinggi tiap blok = tinggi KOTAK BARIS aslinya (diukur 360px: eyebrow
               20, judul 68, progres 28). Batang skeleton sengaja lebih tipis dari
               huruf, jadi kalau blok pembungkusnya tak dipatok, skeleton berakhir
@@ -257,6 +273,7 @@ export default function JadwalWargaPage() {
               cuma menyisakan aturan yang tak bisa dibuktikan lagi. */}
           <div className="flex gap-2">
             <div className="skeleton skeleton-hero h-[23px] w-[109px] rounded-full" />
+          </div>
           </div>
         </div>
         {/* Sub-tab switcher (2 tombol, min-h 44) */}
