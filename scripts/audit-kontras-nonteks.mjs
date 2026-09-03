@@ -686,6 +686,59 @@ for (const theme of ['light', 'dark']) {
         await closeLayer(page);
       }
     }
+    /* TIGA permukaan ber-KOLOM TANGGAL yang sampai 3 Sep 2026 tak pernah dibuka
+       sapuan ini sekali pun. Bagian E menghitung 5 kolom `input[type=date]` di
+       app; dua di antaranya (sheet FAB di atas) sudah terukur, tiga sisanya —
+       target Kas RT, tambah jadwal, revisi jadwal — hidup di balik pemicu yang
+       tak pernah diklik, jadi glyph pickernya tak pernah masuk populasi.
+       Populasi yang tak pernah diukur adalah celah termahal di repo ini: kelas
+       yang SAMA sudah menggigit sekali (ikon kalender jadi glyph PADAT milik OS
+       di app yang tiap ikonnya lucide outline — 1,31:1, diperbaiki `70aadd9`),
+       dan ia lolos justru karena pseudo shadow UA bukan simpul DOM.
+       Pemicunya BERBEDA bentuk (satu tombol, satu FAB, satu di dalam sheet
+       aksi), jadi tiap entri membawa pembukanya sendiri — bukan satu pola aria
+       yang dipaksakan ke tiga bentuk yang berbeda. */
+    for (const [tab, buka, name] of [
+      ['Kas RT', async (pg) => {
+        const ubah = pg.getByRole('button', { name: 'Ubah target' });
+        if (await ubah.count()) { await ubah.click(); return true; }
+        /* Belum ada target → pemicunya tombol putus-putus BERTEKS, bukan
+           ber-aria-label. Dua wujud untuk satu aksi: pelajaran ke-13. */
+        const tetap = pg.getByRole('button', { name: /Tetapkan Target/i });
+        if (await tetap.count()) { await tetap.click(); return true; }
+        return false;
+      }, 'b-sheet-target'],
+      ['Jadwal', async (pg) => {
+        const b = pg.getByRole('button', { name: 'Tambah jadwal tarikan' });
+        if (!(await b.count())) return false;
+        await b.click(); return true;
+      }, 'b-sheet-jadwal-tambah'],
+      ['Jadwal', async (pg) => {
+        const aksi = pg.getByRole('button', { name: /^Aksi lainnya tarikan/ }).first();
+        if (!(await aksi.count())) return false;
+        await aksi.click();
+        await pg.waitForTimeout(800);
+        const rev = pg.getByRole('button', { name: /Revisi jadwal/i }).first();
+        if (!(await rev.count())) return false;
+        await rev.click(); return true;
+      }, 'b-sheet-jadwal-revisi'],
+    ]) {
+      await gotoTab(page, tab);
+      await page.waitForTimeout(600);
+      let ok = false;
+      try { ok = await buka(page); } catch { ok = false; }
+      if (!ok) { console.log(`  [${theme}] DILEWAT ${name} — pemicunya tak ada di data hari ini`); continue; }
+      await page.waitForTimeout(1000);
+      if (await page.locator('[role="dialog"]').count()) {
+        await auditView(page, `${theme}/${name}`, { fokus: true });
+        await page.screenshot({ path: `${OUT}/${theme}_${name}.png` });
+      } else {
+        console.log(`  [${theme}] DILEWAT ${name} — dialog tak terbuka`);
+      }
+      /* Sheet revisi dibuka DI ATAS sheet aksi → dua lapisan, dua kali tutup. */
+      for (let i = 0; i < 2 && (await page.locator('[role="dialog"]').count()); i++) await closeLayer(page);
+    }
+
     for (const [label, name] of [['Kelola Anggota', 'b-anggota'], ['Riwayat Aktivitas', 'b-riwayat']]) {
       if (await openMenuItem(page, label)) {
         await page.waitForTimeout(700);

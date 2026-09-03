@@ -281,6 +281,12 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   kerangka, sedangkan hero asli menaruhnya di anak). Hanya mungkin di halaman
   ber-`if (loading) return` — satu-satunya JadwalWarga; halaman ber-`CrossFade`
   kebal karena kerangka & isi jadi dua anak terpisah.
+- **Populasi yang tak pernah diukur = celah termahal.** Kalau sebuah sapuan
+  mengaku melewatkan sebagian populasinya, itu hutang, bukan catatan kaki:
+  `audit:kontras-nonteks` bagian E melewatkan 3 dari 5 kolom tanggal selama
+  berminggu-minggu karena pemicunya tak pernah diklik (ditutup 3 Sep 2026,
+  9 → 18 sampel). Menambah populasi WAJIB diikuti mutasi ulang — hijau di
+  populasi baru tak membuktikan apa pun sampai probe terbukti menggigit di sana.
 - **Yang masih terbuka & sengaja tidak diklaim:** kontrol MUTASI bagian C
   `audit:potong` belum terbukti bergigi (populasi 200% memakai `.potong-lentur`
   yang MELIPAT, bukan memotong); iOS mode gelap mengirim `status-bar-style:
