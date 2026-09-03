@@ -307,9 +307,12 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   longgar justru meloloskan penurunan 12% yang memicu penjaga ini. Kalau data
   memang bertambah, **perbarui lantainya, jangan longgarkan**. Pola yang tak
   cocok = MERAH (`POLA POPULASI HILANG`), bukan aman: penjaga buta yang diam
-  adalah cacat yang mau ditutup. Tiga sapuan masih tanpa lantai (`lebar`,
-  `reflow`, `gerak` — keluarannya tak menyebut populasi) dan itu DICETAK tiap
-  jalan, bukan disembunyikan.
+  adalah cacat yang mau ditutup. Ketiga sapuan yang sempat tanpa lantai
+  (`lebar`, `reflow`, `gerak`) kini mencetak populasinya sendiri dan ikut
+  dijaga. **Sapuan BARU wajib mencetak berapa yang diukurnya** — yang tidak,
+  tak bisa dijaga sama sekali. `test` pun dijaga (jumlah TES, bukan berkas:
+  berkas bisa tetap 23 sementara isinya menyusut); hanya `typecheck` & `lint`
+  yang memang tak punya populasi terhitung.
 - **Angka yang mungkin basi WAJIB mengaku SELAMA ia masih basi.** Toast tidak
   cukup — ia hidup ~2,6 dtk sementara basinya permanen. App punya DUA strip
   kembar di Header: LURING (sinyal hilang) & BASI (sinyal ada, server menolak).

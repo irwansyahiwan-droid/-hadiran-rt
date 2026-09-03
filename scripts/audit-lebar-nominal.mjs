@@ -42,6 +42,13 @@ const REF = SUPA_URL.match(/https:\/\/([^.]+)\./)[1];
 
 const findings = [];
 
+/* Penghitung POPULASI — bukan hiasan laporan. `sapu-semua` menjaga LANTAI
+   populasi tiap sapuan sejak 3 Sep 2026, dan sapuan yang tak mencetak berapa
+   yang diukurnya TIDAK BISA dijaga: ia boleh mengukur separuh konteks lalu
+   tetap melapor "TEMUAN: 0". Sapuan ini salah satu dari tiga yang buta begitu
+   (`lebar`, `reflow`, `gerak`) — ditutup 3 Sep 2026. */
+let diperiksa = 0;
+
 async function measure(page, ctxName) {
   const res = await page.evaluate((ctxName) => {
     const out = { ctx: ctxName, pageW: document.documentElement.scrollWidth, viewW: innerWidth, items: [] };
@@ -159,6 +166,7 @@ async function measure(page, ctxName) {
     findings.push({ ctx: ctxName, w: W, kind: 'halaman-geser', detail: `scrollWidth ${res.pageW} > ${res.viewW}` });
   }
   for (const it of res.items) findings.push({ ctx: ctxName, w: W, kind: 'nominal', ...it });
+  diperiksa++;
   const n = res.items.length + (res.pageW > res.viewW + 1 ? 1 : 0);
   console.log(`  ${n === 0 ? 'ok' : `⚠ ${n} temuan`}  ${ctxName}`);
 }
@@ -383,6 +391,7 @@ for (const lebar of LEBAR) {
   const label = lebar === 320 ? 'WAJIB §1.4.10' : lebar === 360 ? 'acuan terkecil app' : '';
   console.log(`  ${String(lebar).padStart(4)}px ${label.padEnd(20)}: ${n} temuan`);
 }
+console.log(`\n  ${diperiksa} konteks diperiksa`);
 console.log(`\n=== TEMUAN: ${findings.length} (${LEBAR.join(' + ')}px) ===`);
 for (const f of findings) {
   if (f.kind === 'halaman-geser') console.log(`[${f.w}px ${f.ctx}] HALAMAN GESER — ${f.detail}`);

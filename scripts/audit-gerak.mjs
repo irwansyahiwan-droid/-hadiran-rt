@@ -134,7 +134,14 @@ async function tungguDiam(page, sel, batasMs = 9000) {
 /** Ketuk tab DARI DALAM halaman lalu cuplik tiap frame sejak task yang sama.
  *  Wajib dari dalam: `locator.click()` Playwright mendarat di task berbeda dan
  *  frame-frame pertama animasi — justru yang diukur — sudah lewat. */
+/* Penghitung POPULASI — lihat catatan yang sama di `audit-reflow.mjs`:
+   sapuan yang tak mencetak berapa yang diukurnya tak bisa dijaga lantai
+   populasi `sapu-semua`, dan boleh mengukur separuh tab lalu tetap melapor
+   "0 temuan". */
+let diperiksa = 0;
+
 async function cuplikTab(page, label, sel, ms = 1800) {
+  diperiksa++;
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(250);
   await page.evaluate(({ label, sel, ms }) => {
@@ -253,6 +260,7 @@ for (const bagian of ['PROBE', 'K', 'R', 'D']) {
   console.log(`\n── ${bagian} ──`);
   for (const x of t) console.log(`  ${x.peran}/${x.layar}: ${x.pesan}`);
 }
+console.log(`\n  ${diperiksa} tab diperiksa`);
 console.log(`\n=== ${temuan.length} temuan${probe.length ? ` (termasuk ${probe.length} PROBE/KONTROL — vonis TIDAK sah)` : ''} ===`);
 if (MUTASI) console.log('MUTASI=1 aktif — bagian R WAJIB merah, kalau hijau berarti mutasinya tak menggigit.');
 if (MUTASI_D) console.log('MUTASI=2 aktif — bagian D WAJIB merah, kalau hijau berarti probe "tunggu diam" menunggu selamanya.');

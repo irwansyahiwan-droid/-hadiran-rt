@@ -66,7 +66,15 @@ const PROBE = `(() => {
   return { geser, pelaku: lewat.sort((a, b) => b.lebih - a.lebih).slice(0, 5) };
 })()`;
 
+/* Penghitung POPULASI — bukan hiasan laporan. `sapu-semua` menjaga LANTAI
+   populasi tiap sapuan sejak 3 Sep 2026, dan sapuan yang tak mencetak berapa
+   yang diukurnya TIDAK BISA dijaga: ia boleh mengukur separuh layar lalu tetap
+   melapor "0 geser samping". Sebelum ini sapuan ini salah satu dari tiga yang
+   buta begitu (`lebar`, `reflow`, `gerak`). */
+let diperiksa = 0;
+
 async function periksa(page, jenis, nama) {
+  diperiksa++;
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(350);
   const total = await page.evaluate(() => document.documentElement.scrollHeight);
@@ -129,6 +137,7 @@ writeFileSync(`${OUT}/hasil.json`, JSON.stringify(hasil, null, 1));
 const a = hasil.filter((h) => h.jenis === 'reflow-320');
 const b = hasil.filter((h) => h.jenis === 'teks-200');
 console.log('\n=== REFLOW & TEKS BESAR ===');
+console.log(`  ${diperiksa} layar diperiksa`);
 console.log(`  A. reflow 320px (WAJIB §1.4.10) : ${a.length} layar geser samping`);
 console.log(`  B. teks dasar 200% (di atas AA) : ${b.length} layar geser samping`);
 for (const h of hasil) {

@@ -80,6 +80,10 @@ const VISUAL = [
    bentuk membuat penjaga ini buta, dan penjaga buta yang diam persis kelas
    cacat yang mau ditutup. */
 const LANTAI = {
+  /* `test` ikut dijaga: vitest yang diam-diam menjalankan separuh berkasnya
+     tetap mencetak "passed". Populasinya JUMLAH TES, bukan berkas — berkas
+     bisa tetap 23 sementara isinya menyusut. */
+  test:             [/Tests\s+(\d+) passed/, 270],
   spasi:            [/(\d+) pemakaian spasi diperiksa/, 980],
   bentuk:           [/(\d+) pemakaian radius diperiksa/, 405],
   bayangan:         [/(\d+) pemakaian elevasi diperiksa/, 93],
@@ -94,22 +98,21 @@ const LANTAI = {
   huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],
   potong:           [/A\. 390px[^:]*:\s*\d+ temuan \/ (\d+) layar/, 15],
   'jarak-teks':     [/populasi teks terukur\s*:\s*(\d+)/, 5700],
+  lebar:            [/(\d+) konteks diperiksa/, 112],
+  reflow:           [/(\d+) layar diperiksa/, 9],
+  gerak:            [/(\d+) tab diperiksa/, 13],
   sentuh:           [/TARGET SENTUH @360px — (\d+) kontrol/, 390],
   sheet:            [/(\d+) permukaan diukur/, 12],
   lompat:           [/(\d+) layar diukur/, 8],
   publik:           [/(\d+) halaman diperiksa/, 7],
 };
-/* TANPA LANTAI — diakui, bukan disembunyikan. Ketiganya tak mencetak satu pun
-   angka populasi di keluarannya (ringkasan `lebar` cuma TEMUAN; `reflow` &
-   `gerak` cuma vonis), jadi penjaga ini tak punya apa pun untuk dibandingkan.
-   Dicetak di tiap jalan supaya pembacanya tahu tiga sapuan itu masih bisa
-   mengukur separuh populasi tanpa ketahuan — kalau salah satunya nanti mulai
-   mencetak populasinya, pindahkan ke LANTAI. */
-const TANPA_LANTAI = {
-  lebar: 'ringkasannya cuma TEMUAN, tak menyebut berapa nominal yang diperiksa',
-  reflow: 'tak mencetak jumlah halaman/elemen yang diukur',
-  gerak: 'tak mencetak jumlah elemen animasi yang diamati',
-};
+/* TANPA LANTAI — daftar ini KOSONG sejak 3 Sep 2026, dan mekanismenya sengaja
+   dipertahankan. `lebar`, `reflow` & `gerak` dulu di sini karena keluarannya
+   tak menyebut satu pun angka populasi; ketiganya kini mencetaknya (`konteks
+   diperiksa` / `layar diperiksa` / `tab diperiksa`) dan pindah ke LANTAI.
+   Kalau nanti ada sapuan BARU yang belum mencetak populasinya, taruh di sini —
+   supaya celahnya tercetak tiap jalan, bukan jadi catatan yang nyaman. */
+const TANPA_LANTAI = {};
 
 /* MUTASI=1 menaikkan tiap lantai 10× — SEMUA sapuan berlantai wajib melapor
    POPULASI TURUN. Tanpa ini penjaga baru cuma janji: hijau tak membuktikan
