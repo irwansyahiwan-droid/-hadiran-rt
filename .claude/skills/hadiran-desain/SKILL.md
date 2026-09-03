@@ -200,17 +200,26 @@ kalau ya, rona yang tadi "dikunci" sebenarnya sudah lepas.
 ```bash
 npm run periksa        # typecheck + lint + 5 sapuan statis + 283 tes
 npm run sapu-semua     # SEMUA sapuan berurutan → satu ringkasan hijau/merah
+                       # + LANTAI POPULASI: turun di bawah garis dasar = MERAH,
+                       #   dan pola yang tak cocok juga MERAH (penjaga buta)
 npm run lembar-kontak  # 55 layar (normal/kosong/memuat/gagal/luring) → 1 PNG
 ```
 
-30 sapuan. Yang visual butuh build produksi hidup:
+31 sapuan. Yang visual butuh build produksi hidup:
 `npm run build && npx vite preview --port 5199`
 
 Sapuan yang paling sering menemukan cacat baru, dan apa yang HANYA ia lihat:
 `audit:keadaan` (layar kosong/gagal/memuat) · `audit:luring-pertama` (kunjungan
 pertama, server DIMATIKAN sungguhan) · `audit:nama` (kontrol bisa dibedakan
 tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
-`audit:jarak-teks` (§1.4.12 — satu-satunya sapuan bersumbu TEGAK).
+`audit:jarak-teks` (§1.4.12 — satu-satunya sapuan bersumbu TEGAK) ·
+`audit:huruf` (lantai keterbacaan — satu-satunya yang menjaga UKURAN huruf).
+
+**Yang tak dijalankan `sapu-semua`, dan wajib diingat:** 7 sapuan PERILAKU —
+`masuk` · `tulis` · `kembali` · `respon` · `gestur` · `mundur` · `papan-ketik`
+— plus `luring`, `luring-pertama` & `muat`. Rantai hijau TIDAK berarti mereka
+hijau; jalankan terpisah sebelum rilis besar. Di situlah cacat "terasa murah"
+bersembunyi, dan tak satu pun terlihat oleh review visual.
 
 ## Jebakan yang sudah mahal — jangan diulang
 
@@ -224,7 +233,7 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   bukan rasio.
 - **Kelas `box-shadow` polos MENGHAPUS `ring-*` Tailwind.** Sertakan
   `var(--tw-ring-offset-shadow)` & `var(--tw-ring-shadow)`.
-- **14 sapuan matang dikunci read-only.** Jangan buka tanpa izin user.
+- **15 sapuan matang dikunci read-only.** Jangan buka tanpa izin user; kunci lagi (`chmod a-w`) sesudah selesai.
   `find . -path ./node_modules -prune -o -type f ! -perm -u+w -print`
 - **Login memakai DUA kait `id`: `masuk-warga` & `masuk-bendahara`** — kait
   WAJIB `id`, bukan teks tombol. Sekali berubah, 20 sapuan mati serentak.
@@ -352,3 +361,38 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
 6. **Perubahan KATA disetujui user dulu** sebelum ditulis ke kode.
 7. **Curigai probe-mu sendiri sekuat kau mencurigai app.** Angka mustahil di
    laporanmu sendiri adalah vonisnya, bukan detail.
+8. **Kalau user melihat sesuatu yang keliru sementara SEMUA sapuan hijau —
+   percayai mata user, lalu cari sapuan mana yang mengukur hal yang salah.**
+   Terbukti ENAM kali dalam satu sesi (3 Sep 2026). Hijau cuma membuktikan apa
+   yang DIUKUR; ia tak pernah membuktikan bahwa yang diukur itu yang penting.
+9. **Perubahan RASA tak pernah menumpang commit lain**, dan wajib dirender &
+   disetujui sebelum dikirim. Sebelum tiap commit: `git diff --staged --stat`,
+   lalu tanyakan tiap berkas — kenapa ini di sini? `git add -A` buta pernah
+   men-deploy perubahan bayangan yang tak pernah dilihat siapa pun.
+10. **Catatan yang menunjuk mekanisme MATI menyesatkan sesi berikutnya.** Kalau
+   kau mengubah cara sesuatu bekerja, cari catatan lama yang menjelaskan cara
+   LAMANYA dan tulis ulang — bukan tambahkan di bawahnya. Dua kali hari ini
+   sebuah item berdiri di daftar "masih terbuka" berbulan-bulan sesudah lunas.
+
+## Lima cara sebuah sapuan BERBOHONG (semua ketemu 3 Sep 2026)
+
+Semuanya melapor `0` dengan jujur, dan semuanya salah. Periksa kelima ini
+sebelum percaya pada hijau:
+
+1. **Populasi yang tak pernah disentuh.** Kontrol di balik pemicu yang tak
+   pernah diklik (`audit:mundur` menguji dua popover di layar yang tak pernah
+   memuatnya; `audit:kontras-nonteks` melewatkan 3 dari 5 kolom tanggal).
+   Gejalanya: baris `dilewat` — **curigai sekuat temuan merah**, ia sering
+   berarti sapuan mencari di tempat yang salah, bukan data yang kurang.
+2. **Agregat menyembunyikan peristiwa.** Skor CLS 0,040 untuk hero yang
+   melompat 74px — hitungannya benar, akibatnya buta. Vonis wajib menyebut NAMA
+   yang ia lihat, bukan cuma berapa.
+3. **Populasi menyusut diam-diam.** "0 temuan" terbaca sama saja dari 410
+   kontrol maupun 360. Obatnya LANTAI populasi di `sapu-semua`.
+4. **Uji kontrol yang mengandaikan bentuk DATA.** Kontrol "harus melihat teks
+   besar" berteriak palsu di halaman yang memang tak punya nominal. Kontrol
+   harus menguji PROBE, bukan menebak isi layar.
+5. **Nol yang benar tapi tak terbukti.** Kalau sebuah bagian selalu nol,
+   pastikan ada mutasi yang BISA memerahkannya — kalau tidak, ia bukan penjaga
+   melainkan janji. Dan mutasi yang membunuh PRASYARAT sebuah bagian tidak
+   menguji bagian itu; ia melewatinya.
