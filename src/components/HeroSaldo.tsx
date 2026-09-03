@@ -114,7 +114,20 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
           <>
             {Icon && <Icon className="h-[17px] w-[17px] text-white/80" />}
             <span className="mt-0.5 text-micro font-medium text-white/95">{s.label}</span>
+            {/* `data-susut` = pengakuan bahwa nilai ini BOLEH turun di bawah anak
+                tangga terkecil (11px), dibaca `audit:huruf`. Bukan kelonggaran
+                bebas: sapuan itu tetap menegakkan LANTAI KERAS `MIN_KAKI_PX`,
+                jadi yang dimaafkan cuma rentang 9,6–11px dan tak pernah lebih
+                rendah. Alasannya terukur, bukan selera — dinaikkan ke 11px,
+                nominal ini MELUBER 6px dari kolomnya di 360px pada skala ×100
+                (janji 300 KK, `EKSTREM=1`), dan itu mengembalikan kelas
+                tumpang-tindih kaki hero yang sudah pernah ditutup. Tiga kolom
+                di kartu 284px memang tak punya ruang itu.
+                Kalau kaki ini nanti tinggal DUA kolom atau kartunya melebar,
+                ukur ulang: lantai 11px mungkin sudah muat, dan penanda ini
+                harus dicabut, bukan diwariskan. */}
             <span
+              data-susut=""
               className="whitespace-nowrap font-display font-extrabold tabular-nums text-white"
               style={{ fontSize: px }}
             >
@@ -215,7 +228,7 @@ export default function HeroSaldo({
               Beranda. Label terpanjang ("Total Talangan Belum Lunas", 26 huruf)
               butuh 206px pada 11px sementara ruang sisa cuma 196px di 360px →
               tanpa clamp, kata terakhir hilang ditelan ellipsis. */}
-          <p className="flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-semibold uppercase tracking-[0.12em] text-white/90">
+          <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
             {Icon && <Icon className="h-4 w-4 shrink-0 text-white/80" />}
             <span className="potong-lentur">{label}</span>
             {info}

@@ -1104,7 +1104,7 @@ export default function JadwalPage() {
       >
         <div className="hero-sheen pointer-events-none absolute inset-0" />
         <div className="relative p-6">
-          <p className="flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-semibold uppercase tracking-[0.12em] text-white/90">
+          <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
             <Calendar className="h-4 w-4 shrink-0 text-white/80" />
             <span className="potong-lentur">{nextDijadwal ? 'Tarikan Berikutnya' : 'Jadwal Tarikan'}</span>
           </p>

@@ -49,13 +49,24 @@ import { newCtx, loginWarga, gotoTab } from './lib/audit-harness.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const AMBANG = +(process.env.AMBANG || 11);      // px — anak tangga terkecil
+/* LANTAI KERAS untuk teks ber-`data-susut`. Mesin susut-agar-muat memang boleh
+   turun di bawah anak tangga — tapi tidak sampai hilang. Angkanya = `MIN_KAKI_PX`
+   di `HeroSaldo.tsx`, lantai keterbacaan yang dipilih untuk warga lansia; kalau
+   di sana digeser, geser juga di sini. */
+const LANTAI_KERAS = +(process.env.LANTAI_KERAS || 9.6);
 const LEBAR = (process.env.LEBAR || '320,360,390').split(',').map(Number);
-const MUTASI = process.env.MUTASI === '1';
+const MUTASI = +(process.env.MUTASI || 0);
 
-const PUNGUT = (ambang) => {
+const PUNGUT = ([ambang, lantaiKeras]) => {
+  /* SUSUT-AGAR-MUAT — pengecualian OPT-IN, dan sengaja tidak dipercaya begitu
+     saja. Sebuah nilai boleh turun di bawah anak tangga HANYA kalau (a) ia
+     menyatakannya lewat `data-susut` di call-site, dan (b) ia tetap di atas
+     LANTAI KERAS. Tanpa syarat (b) penanda ini jadi pintu belakang: siapa pun
+     bisa memasangnya lalu menyusut sampai 6px. Jumlah yang dimaafkan SELALU
+     dicetak — sapuan tak boleh menyempitkan populasinya sendiri tanpa mengaku. */
   const hasil = [];
   const ukuran = new Set();
-  let populasi = 0, maks = 0;
+  let populasi = 0, maks = 0, susut = 0;
   const dilewat = { srOnly: 0, takTerlihat: 0 };
 
   document.querySelectorAll('*').forEach((el) => {
@@ -82,17 +93,26 @@ const PUNGUT = (ambang) => {
     populasi++;
     ukuran.add(px);
     if (px > maks) maks = px;
+    const boleh = el.closest('[data-susut]');
+    if (boleh && px >= lantaiKeras) { susut++; return; }
     if (px < ambang) {
-      hasil.push({ px, teks: teks.slice(0, 30), cls: (typeof el.className === 'string' ? el.className : '').trim().slice(0, 58) });
+      hasil.push({ px, teks: teks.slice(0, 30), cls: (typeof el.className === 'string' ? el.className : '').trim().slice(0, 58),
+                   tembusKeras: !!boleh });
     }
   });
-  return { hasil, populasi, maks, ragam: ukuran.size, dilewat };
+  return { hasil, populasi, maks, ragam: ukuran.size, susut, dilewat };
 };
 
-const MUT_CSS = '.text-caption{font-size:9px!important}';
+/* DUA mutasi, karena ada DUA vonis dan satu tak bisa menguji yang lain.
+   1 — `.text-caption` → 9px: menguji ambang tangga (11px) & membuktikan probe
+       mendarat di populasi.
+   2 — `[data-susut]` → 8px: menguji LANTAI KERAS. Tanpa ini penanda `data-susut`
+       cuma pintu belakang yang tak pernah diuji — sapuan akan tetap hijau
+       walau nilai yang "dimaafkan" menyusut sampai tak terbaca. */
+const MUT_CSS = { 1: '.text-caption{font-size:9px!important}', 2: '[data-susut]{font-size:8px!important}' };
 
 const browser = await chromium.launch();
-let gagal = 0, cacat = 0, totalPop = 0;
+let gagal = 0, cacat = 0, totalPop = 0, totalSusut = 0;
 const ringkas = [];
 
 for (const bendahara of [false, true]) {
@@ -102,15 +122,15 @@ for (const bendahara of [false, true]) {
     await page.setViewportSize({ width: lebar, height: 844 });
     await page.goto(URL, { waitUntil: 'networkidle' });
     if (!bendahara) await loginWarga(page);
-    if (MUTASI) await page.addStyleTag({ content: MUT_CSS });
+    if (MUTASI) await page.addStyleTag({ content: MUT_CSS[MUTASI] });
 
     const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
     for (const tab of tabs) {
       await gotoTab(page, tab);
       await page.waitForTimeout(2400);
-      if (MUTASI) await page.addStyleTag({ content: MUT_CSS });
-      const { hasil, populasi, maks, ragam, dilewat } = await page.evaluate(PUNGUT, AMBANG);
-      totalPop += populasi;
+      if (MUTASI) await page.addStyleTag({ content: MUT_CSS[MUTASI] });
+      const { hasil, populasi, maks, ragam, susut, dilewat } = await page.evaluate(PUNGUT, [AMBANG, LANTAI_KERAS]);
+      totalPop += populasi; totalSusut += susut;
 
       /* Uji KONTROL — menguji PROBE, bukan menebak isi layar. Probe yang rusak
          (mis. membaca ukuran warisan satu kali lalu memakainya untuk semua)
@@ -134,16 +154,18 @@ await browser.close();
 console.log('\n=== LANTAI HURUF · ambang APP (BUKAN WCAG) ===');
 console.log(`  ambang                    : ${AMBANG}px — anak tangga TERKECIL (\`micro\`/\`overline\`)`);
 console.log(`  populasi daun teks        : ${totalPop} di ${ringkas.length} layar-lebar`);
+console.log(`  dimaafkan (data-susut)    : ${totalSusut}   ← susut-agar-muat, tetap >= lantai keras ${LANTAI_KERAS}px`);
 const semua = ringkas.flatMap((r) => r.item);
 console.log(`  DI BAWAH LANTAI           : ${semua.length} (unik per layar-lebar)`);
 
 for (const r of ringkas.filter((x) => x.item.length)) {
   console.log(`\n  ${r.nama}   populasi ${r.populasi}`);
-  for (const i of r.item.slice(0, 6)) console.log(`    ${String(i.px).padStart(5)}px  "${i.teks}"  .${i.cls}`);
+  for (const i of r.item.slice(0, 6)) console.log(`    ${String(i.px).padStart(5)}px${i.tembusKeras ? '  [TEMBUS LANTAI KERAS]' : ''}  "${i.teks}"  .${i.cls}`);
   if (r.item.length > 6) console.log(`    … +${r.item.length - 6} lagi`);
 }
 
 if (cacat) { console.log(`\nPROBE CACAT di ${cacat} layar — sapuan tak boleh LULUS dari populasi yang tak terukur.`); }
-if (MUTASI && semua.length === 0) { console.log('\nPROBE CACAT: MUTASI=1 tapi nol temuan — probe tak mendarat.'); process.exit(2); }
+if (MUTASI && semua.length === 0) { console.log(`\nPROBE CACAT: MUTASI=${MUTASI} tapi nol temuan — ${MUTASI === 1 ? 'probe tak mendarat' : 'lantai keras tak bergigi'}.`); process.exit(2); }
+if (MUTASI === 2 && !semua.some((x) => x.tembusKeras)) { console.log('\nPROBE CACAT: MUTASI=2 tapi tak satu pun ditandai TEMBUS LANTAI KERAS.'); process.exit(2); }
 console.log(`\n=== ${ringkas.length} layar-lebar diperiksa · ${gagal} layar punya teks di bawah ${AMBANG}px ===`);
 process.exit(gagal || cacat ? 1 : 0);

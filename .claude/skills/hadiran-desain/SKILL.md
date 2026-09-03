@@ -265,13 +265,14 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   dan tak satu pun pernah dilaporkan karena skor CLS-nya cuma 0,02–0,05.
   Ambil settle TERTINGGI dari 320/360/390/430: `min-height` itu lantai, jadi
   nilai tertinggi membuat kerangka persis setinggi isinya di semua lebar.
-- **`audit:huruf` MERAH di garis dasar, dan itu disengaja** (3 Sep 2026): 33
-  teks tercat di bawah 11px, semuanya dari DUA mesin susut-agar-muat —
-  eyebrow hero `clamp(0.575rem,2.55vw,0.6875rem)` (min 9,2px) & kaki stat
-  hero `ukuranMuat` (lantai 9,6px). Lantainya BELUM diputuskan user; sapuan
-  dipasang lebih dulu supaya keputusannya punya penjaga. **Jangan bungkam
-  dgn menurunkan `AMBANG`** — 11px itu anak tangga terkecil tangga tipografi,
-  bukan angka yang bisa ditawar.
+- **Teks boleh turun di bawah 11px HANYA lewat `data-susut`, dan tak pernah di
+  bawah 9,6px.** Mesin susut-agar-muat (`ukuranMuat` kaki hero) sah menyusut —
+  dinaikkan ke 11px ia meluber 6px dari kolomnya di 360px pada skala ×100 —
+  tapi penandanya bukan pintu bebas: `audit:huruf` tetap menegakkan LANTAI
+  KERAS 9,6px (= `MIN_KAKI_PX`). Eyebrow hero TIDAK dapat pengecualian; ia
+  dinaikkan ke `text-micro` karena ongkosnya diukur nol (melipat 2 baris hanya
+  di 320px, hero tak tumbuh). **Jangan bungkam sapuan dgn menurunkan `AMBANG`**
+  — 11px itu anak tangga terkecil, bukan angka yang bisa ditawar.
 - **Kerangka wajib mencermin STRUKTUR DOM halaman aslinya, bukan cuma tinggi &
   permukaannya.** React merekonsiliasi per-POSISI, jadi kalau pohon kerangka
   berbeda bentuk, node dipakai ulang di peran yang BERBEDA dan rect-nya

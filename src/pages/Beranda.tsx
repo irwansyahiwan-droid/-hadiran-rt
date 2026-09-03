@@ -579,7 +579,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     ditelan ellipsis. clamp menyusutkan huruf ~2px di HP tersempit
                     (dan tracking sedikit dirapatkan) supaya TIGA katanya utuh, lalu
                     kembali ke 11px begitu ada ruang. truncate = jaring pengaman. */}
-                <span className="potong-lentur text-[clamp(0.575rem,2.55vw,0.6875rem)] font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
+                <span className="potong-lentur text-micro font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 {/* Ikon POLOS, tanpa chip lingkaran. Dua kapsul `bg-white/15

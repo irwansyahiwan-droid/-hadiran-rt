@@ -378,7 +378,7 @@ export default function JadwalWargaPage() {
         >
           <div className="hero-sheen pointer-events-none absolute inset-0" />
           <div className="relative p-6 space-y-3">
-            <p className="inline-flex min-w-0 items-center gap-2 text-[clamp(0.575rem,2.55vw,0.6875rem)] font-semibold uppercase tracking-[0.12em] text-white/90">
+            <p className="inline-flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
               Tarikan Terakhir
               <InfoTip label="Tarikan" tone="onDark">
                 Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima total iuran anggota.
