@@ -320,10 +320,11 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   muat BARU wajib memanggil `tandaiBasi()`/`tandaiSegar()` (`src/lib/basi.ts`).
   **Sapuan TIDAK menguji arah bersihnya** — ukur manual; strip yang tak pernah
   pergi lebih buruk daripada toast.
-- **Yang masih terbuka & sengaja tidak diklaim:** `audit:mundur` bagian E2
-  (kini punya `MUTASI=2` & terbukti bisa merah, tapi cabang `HISTORY DESYNC`-nya
-  sendiri belum terinduksi — sentinel `/landing.html` menyerap entri ekstra
-  lebih dulu); iOS mode gelap mengirim
+- **Yang masih terbuka & sengaja tidak diklaim:** `audit:mundur` bagian E2 vonis
+  KETIGA (`HISTORY DESYNC`) tak terjangkau by construction — di bawah lapisan
+  selalu ada entri TAB, jadi Back berikutnya selalu terlihat; butuh permukaan
+  bertumpuk di Beranda yang app tak punya. Vonis 1 & 2 terbukti bergigi
+  (`MUTASI=2`); iOS mode gelap mengirim
   `status-bar-style: default` dan perilakunya belum diverifikasi di perangkat
   nyata.
 

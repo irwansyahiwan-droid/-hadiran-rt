@@ -465,14 +465,30 @@ for (const peran of ['warga', 'bendahara']) {
        menabrak sentinel dan terbaca "keluar app" sebelum sempat jadi desync.
        Dicoba menunda entri yatimnya 900 ms — hasil sama.
        Jadi yang terbukti: E2 BISA merah, dan merahnya menyebut lapisan yang
-       tepat. Yang BELUM terbukti: cabang `backTerlihat`-nya sendiri. Itu naik
-       dari "tak ada mutasi sama sekali" ke "satu dari tiga vonis terinduksi" —
-       kemajuan, bukan penutupan. */
+       tepat.
+
+       CABANG `HISTORY DESYNC` TERNYATA TAK BISA MENYALA DI SINI, dan sebabnya
+       BUKAN mutasi yang kurang tajam — diselidiki 3 Sep 2026, dicatat supaya
+       tak dikejar lagi. Gejalanya sendiri jelas bisa dideteksi: probe terpisah
+       menyuntik entri YATIM (`pushState` url sama, tanpa state) dan
+       `backTerlihat` dgn benar melaporkan url/tab/lapisan TAK BERUBAH. Tapi di
+       permukaan yang E2 uji (`KasRT`, sheet baris + konfirmasi), di BAWAH
+       lapisan selalu ada entri TAB — app mendaftarkan `activeTab !== 'beranda'`
+       ke back-stack — jadi ketukan Back berikutnya SELALU menghasilkan
+       perubahan terlihat:
+
+           a {tab:"Kas RT", n:0} → b {tab:"Beranda", n:0}   terlihat: true
+
+       Artinya vonis ketiga E2 tak terjangkau BY CONSTRUCTION di posisi itu,
+       bukan lemah. Untuk menjangkaunya butuh permukaan bertumpuk yang duduk di
+       Beranda (tanpa entri tab di bawahnya) — dan app tak punya satu pun.
+       Nilai E2 karena itu ada pada vonis 1 & 2; jangan hitung vonis 3 sbg
+       penjaga sampai permukaan seperti itu benar-benar ada. */
     await ctx.addInitScript(() => {
       const asli = history.back.bind(history);
       history.back = () => {
         asli();
-        if (window.__mutE2) setTimeout(asli, 250);   // entri yatim dimakan back() tertunda
+        if (window.__mutE2) setTimeout(asli, 250);   // entri dimakan back() tertunda
       };
     });
   }
@@ -556,7 +572,7 @@ if (temuan.length) {
   for (const t of temuan) console.log(`  [${t.layar}] ${t.nama}\n      ${t.pesan}`);
 }
 if (MUTASI && temuan.length === 0) {
-  console.log('\nPROBE CACAT: MUTASI=1 tapi nol temuan — pemicu/deteksi tak bekerja.');
+  console.log(`\nPROBE CACAT: MUTASI=${MUTASI} tapi nol temuan — pemicu/deteksi tak bekerja.`);
   process.exit(2);
 }
 process.exit(temuan.length ? 1 : 0);
