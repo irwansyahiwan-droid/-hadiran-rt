@@ -51,7 +51,7 @@ import { newCtx, loginWarga } from './lib/audit-harness.mjs';
 
 const APP = process.env.CAP_URL || 'http://localhost:5199';
 const SENTINEL = `${APP.replace(/\/$/, '')}/landing.html`;
-const MUTASI = process.env.MUTASI === '1';
+const MUTASI = +(process.env.MUTASI || 0);
 /* Sasaran JAUH (produksi) bukan sekadar "localhost yang lebih lambat": tiap
    navigasi menempuh cold start + Supabase nyata, dan sapuan ini yang paling
    banyak bernavigasi dari semua sapuan repo (tiap `pulih()` memuat app dari
@@ -389,6 +389,7 @@ async function ujiSaatKeluar(page, layar, bukaBawah, bukaAtas, tutupUI, pulih) {
 
   /* Tutup lewat UI lalu Back 60 ms kemudian — di TENGAH fase keluar 120–150 ms,
      saat lapisannya masih terdaftar di `stack`. Keduanya dari dalam halaman. */
+  if (MUTASI === 2) await page.evaluate(() => { window.__mutE2 = true; });
   const adaTombol = await tutupUI();
   if (!adaTombol) { probeCacat.push(`${layar}/saat-keluar: tombol tutup tak ada`); await bersihkan(page, n0); return; }
   await page.evaluate(() => new Promise((r) => setTimeout(() => { window.history.back(); r(); }, 60)));
@@ -404,6 +405,7 @@ async function ujiSaatKeluar(page, layar, bukaBawah, bukaAtas, tutupUI, pulih) {
       `${JSON.stringify(cek.a)} → ${JSON.stringify(cek.b)}. Entri yatim dimakan `+
       '`back()` tertunda milik fase keluar (penyakit yang sama dgn bagian D, sumber berbeda).');
   }
+  if (MUTASI === 2) await page.evaluate(() => { window.__mutE2 = false; }).catch(() => {});
   await pulih();
 }
 
@@ -424,10 +426,54 @@ const browser = await chromium.launch();
 for (const peran of ['warga', 'bendahara']) {
   const bendahara = peran === 'bendahara';
   const { ctx, page } = await newCtx(browser, 'light', { bendahara });
-  if (MUTASI) {
+  /* DUA mutasi, dan yang kedua ada justru karena yang pertama TAK BISA menguji
+     bagian E2.
+
+     MUTASI=1 mematikan `pushState` & `back` sekaligus. Itu tepat untuk bagian
+     A-C (lapisan tak pernah terdaftar → Back melempar keluar app), tapi ia
+     MEMBUNUH PRASYARAT E2: tanpa `pushState`, tumpukan dua lapisan tak pernah
+     terbentuk, `lapisan(page) < 2`, dan E2 keluar sbg PROBE CACAT sebelum
+     sempat memvonis apa pun. Itulah kenapa E2 berbulan-bulan hijau tanpa
+     failure mode-nya pernah terinduksi — bukan karena ia kuat, tapi karena
+     tak ada mutasi yang bisa menyentuhnya.
+
+     MUTASI=2 meniru penyakit E2 yang SEBENARNYA: `back()` tertunda milik fase
+     keluar menyusul dan memakan SATU entri lagi. Jadi `pushState` dibiarkan
+     UTUH — lapisan tetap terdaftar, tumpukan tetap terbentuk, E2 sampai ke
+     vonisnya — dan yang dirusak hanya JUMLAH entri yang dikonsumsi tiap Back:
+     satu sekarang, satu lagi 250 ms kemudian. Sesudah itu ketukan Back
+     BERIKUTNYA tak menemukan apa pun, dan itu persis `HISTORY DESYNC` yang E2
+     dibuat untuk menangkap. */
+  if (MUTASI === 1) {
     await ctx.addInitScript(() => {
       history.pushState = () => {};
       history.back = () => {};
+    });
+  } else if (MUTASI === 2) {
+    /* Digerbang `window.__mutE2`, dan itu BUKAN kerapian — percobaan pertama
+       menggandakan SETIAP `back()` dan app keluar dari halaman sebelum E2
+       tercapai (`nav button` hilang, sapuan mati time-out). Itu kegagalan yang
+       sama persis dgn MUTASI=1: meledak di jalur lain sebelum menyentuh yang
+       mau diuji. Mutasi ini karena itu hidup HANYA di jendela yang E2 ukur —
+       dinyalakan tepat sebelum tutup-lewat-UI, dimatikan sesudah vonisnya.
+
+       BATAS YANG DIAKUI, jangan diklaim lebih: mutasi ini memerahkan E2 lewat
+       vonis PERTAMA ("MELEMPAR KELUAR APP"), bukan lewat vonis `HISTORY
+       DESYNC` yang jadi inti bagian itu. Sebabnya struktural, bukan kebetulan:
+       sapuan ini singgah di SENTINEL (`/landing.html`) supaya Back yang lolos
+       mendarat di halaman yang bisa dikenali, jadi entri ekstra apa pun akan
+       menabrak sentinel dan terbaca "keluar app" sebelum sempat jadi desync.
+       Dicoba menunda entri yatimnya 900 ms — hasil sama.
+       Jadi yang terbukti: E2 BISA merah, dan merahnya menyebut lapisan yang
+       tepat. Yang BELUM terbukti: cabang `backTerlihat`-nya sendiri. Itu naik
+       dari "tak ada mutasi sama sekali" ke "satu dari tiga vonis terinduksi" —
+       kemajuan, bukan penutupan. */
+    await ctx.addInitScript(() => {
+      const asli = history.back.bind(history);
+      history.back = () => {
+        asli();
+        if (window.__mutE2) setTimeout(asli, 250);   // entri yatim dimakan back() tertunda
+      };
     });
   }
   page.setDefaultNavigationTimeout(NAV_MS);

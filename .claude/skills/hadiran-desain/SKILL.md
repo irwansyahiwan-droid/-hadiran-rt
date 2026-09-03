@@ -321,7 +321,9 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   **Sapuan TIDAK menguji arah bersihnya** — ukur manual; strip yang tak pernah
   pergi lebih buruk daripada toast.
 - **Yang masih terbuka & sengaja tidak diklaim:** `audit:mundur` bagian E2
-  (hijau, tapi failure mode-nya belum pernah terinduksi); 6 label bulan Kas RT
+  (kini punya `MUTASI=2` & terbukti bisa merah, tapi cabang `HISTORY DESYNC`-nya
+  sendiri belum terinduksi — sentinel `/landing.html` menyerap entri ekstra
+  lebih dulu); 6 label bulan Kas RT
   terpotong di teks 200% (di ATAS AA); iOS mode gelap mengirim
   `status-bar-style: default` dan perilakunya belum diverifikasi di perangkat
   nyata.
