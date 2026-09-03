@@ -298,6 +298,18 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
   kelas itu kembali memotong satu baris — dan bagian C melonjak **0 → 68**.
   Jangan hapus mutasi itu untuk "merapikan"; ia satu-satunya bukti bahwa
   pelonggaran 22.4em memang yang menanggung beban.
+- **`sapu-semua` menjaga LANTAI POPULASI, bukan cuma temuan.** Ia pernah
+  mencetak 24 hijau dari jalan yang diam-diam mengukur separuh populasinya
+  (`sentuh` 410 → 360, `sheet` 13 → 7) — tiap sapuan tetap keluar 0 karena
+  memang tak ada temuan pada apa pun yang sempat diukur. Cacat ke-23 menutup
+  populasi KOSONG; populasi SEPARUH lolos sampai 3 Sep 2026. Lantainya ketat
+  (~95% garis dasar) karena populasi app ini stabil antar-jalan — toleransi
+  longgar justru meloloskan penurunan 12% yang memicu penjaga ini. Kalau data
+  memang bertambah, **perbarui lantainya, jangan longgarkan**. Pola yang tak
+  cocok = MERAH (`POLA POPULASI HILANG`), bukan aman: penjaga buta yang diam
+  adalah cacat yang mau ditutup. Tiga sapuan masih tanpa lantai (`lebar`,
+  `reflow`, `gerak` — keluarannya tak menyebut populasi) dan itu DICETAK tiap
+  jalan, bukan disembunyikan.
 - **Angka yang mungkin basi WAJIB mengaku SELAMA ia masih basi.** Toast tidak
   cukup — ia hidup ~2,6 dtk sementara basinya permanen. App punya DUA strip
   kembar di Header: LURING (sinyal hilang) & BASI (sinyal ada, server menolak).

@@ -58,6 +58,77 @@ const VISUAL = [
   ['publik', 'node scripts/audit-publik.mjs'],
 ];
 
+/* ── LANTAI POPULASI ────────────────────────────────────────────────────────
+   Kenapa ada (3 Sep 2026): `sapu-semua` pernah mencetak **24 hijau** dari jalan
+   yang diam-diam mengukur SEPARUH populasinya — `sentuh` 410 → 360 kontrol dan
+   `sheet` 13 → 7 permukaan, sementara tiap sapuan tetap keluar 0. Diperiksa
+   ulang satu per satu, keduanya pulih; itu flake mesin, dan justru itu
+   masalahnya: **tak ada yang memberi tahu pembacanya bahwa laporan itu berdiri
+   di atas populasi separuh.**
+
+   Cacat ke-23 dulu mengajarkan "sapuan tak boleh LULUS dari populasi KOSONG".
+   Populasi yang tinggal separuh lolos sampai hari ini, karena tiap sapuan
+   memang menemukan 0 temuan pada apa pun yang sempat diukurnya.
+
+   Lantainya SENGAJA ketat (~95% dari garis dasar terukur), bukan longgar:
+   populasi app ini stabil antar-jalan (`sentuh` 410/412/410, `sheet` 13 selalu),
+   jadi toleransi 15% justru akan meloloskan penurunan 12% yang memicu penjaga
+   ini dibuat. Kalau DATA memang berubah (warga bertambah), lantai ini WAJIB
+   diperbarui — dan pesannya menyuruh begitu, bukan menyuruh melonggarkan.
+
+   Pola yang TAK COCOK = masalah, bukan "aman": keluaran sapuan yang berubah
+   bentuk membuat penjaga ini buta, dan penjaga buta yang diam persis kelas
+   cacat yang mau ditutup. */
+const LANTAI = {
+  spasi:            [/(\d+) pemakaian spasi diperiksa/, 980],
+  bentuk:           [/(\d+) pemakaian radius diperiksa/, 405],
+  bayangan:         [/(\d+) pemakaian elevasi diperiksa/, 93],
+  tebal:            [/(\d+) pemakaian tebal diperiksa/, 244],
+  ikon:             [/(\d+) pemakaian ikon diperiksa/, 163],
+  keadaan:          [/(\d+) layar diperiksa/, 34],
+  kontras:          [/TOTAL sampel:\s*(\d+)/, 1140],
+  'kontras-deep':   [/TOTAL sampel:\s*(\d+)/, 2140],
+  'kontras-nonteks':[/TOTAL\s+(\d+) sampel/, 700],
+  mati:             [/(\d+) sampel, \d+ tombol unik/, 140],
+  nama:             [/(\d+) kontrol di \d+ layar/, 500],
+  huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],
+  potong:           [/A\. 390px[^:]*:\s*\d+ temuan \/ (\d+) layar/, 15],
+  'jarak-teks':     [/populasi teks terukur\s*:\s*(\d+)/, 5700],
+  sentuh:           [/TARGET SENTUH @360px — (\d+) kontrol/, 390],
+  sheet:            [/(\d+) permukaan diukur/, 12],
+  lompat:           [/(\d+) layar diukur/, 8],
+  publik:           [/(\d+) halaman diperiksa/, 7],
+};
+/* TANPA LANTAI — diakui, bukan disembunyikan. Ketiganya tak mencetak satu pun
+   angka populasi di keluarannya (ringkasan `lebar` cuma TEMUAN; `reflow` &
+   `gerak` cuma vonis), jadi penjaga ini tak punya apa pun untuk dibandingkan.
+   Dicetak di tiap jalan supaya pembacanya tahu tiga sapuan itu masih bisa
+   mengukur separuh populasi tanpa ketahuan — kalau salah satunya nanti mulai
+   mencetak populasinya, pindahkan ke LANTAI. */
+const TANPA_LANTAI = {
+  lebar: 'ringkasannya cuma TEMUAN, tak menyebut berapa nominal yang diperiksa',
+  reflow: 'tak mencetak jumlah halaman/elemen yang diukur',
+  gerak: 'tak mencetak jumlah elemen animasi yang diamati',
+};
+
+/* MUTASI=1 menaikkan tiap lantai 10× — SEMUA sapuan berlantai wajib melapor
+   POPULASI TURUN. Tanpa ini penjaga baru cuma janji: hijau tak membuktikan
+   apa pun kalau ia tak pernah bisa merah. */
+const KALI = process.env.MUTASI === '1' ? 10 : 1;
+
+function periksaPopulasi(nama, keluaran) {
+  const aturan = LANTAI[nama];
+  if (!aturan) return null;
+  const [pola, dasar] = aturan;
+  const lantai = Math.round(dasar * KALI);
+  if (lantai === 0) return null;
+  const m = keluaran.match(pola);
+  if (!m) return { turun: true, pesan: 'POLA POPULASI HILANG — keluaran sapuan berubah bentuk, penjaga ini jadi buta' };
+  const n = +m[1];
+  if (n < lantai) return { turun: true, pesan: `POPULASI TURUN ${n} < lantai ${lantai} — periksa flake vs perubahan data; kalau nyata, perbarui LANTAI` };
+  return { turun: false, n };
+}
+
 const hidup = () => {
   const r = spawnSync('curl', ['-s', '-o', '/dev/null', '-w', '%{http_code}', '--max-time', '5', URL], { encoding: 'utf8' });
   return r.stdout?.trim() === '200';
@@ -87,8 +158,11 @@ const bagian = async (nama, daftar, lewati) => {
     const t0 = Date.now();
     const { kode, keluaran } = jalan(cmd);
     const dtk = Math.round((Date.now() - t0) / 1000);
-    hasil.push({ n, status: kode === 0 ? 'hijau' : 'MERAH', ket: ringkas(keluaran), dtk });
-    process.stdout.write(kode === 0 ? '.' : 'x');
+    const pop = periksaPopulasi(n, keluaran);
+    const merah = kode !== 0 || pop?.turun;
+    const ket = pop?.turun ? `${pop.pesan}  ·  ${ringkas(keluaran)}` : ringkas(keluaran);
+    hasil.push({ n, status: merah ? 'MERAH' : 'hijau', ket, dtk });
+    process.stdout.write(merah ? 'x' : '.');
   }
 };
 
@@ -106,6 +180,10 @@ if (!CEPAT && !hidup()) {
 if (!CEPAT) { process.stdout.write('  visual  '); await bagian('visual', VISUAL, lewatiVisual); process.stdout.write('\n'); }
 
 console.log('\n─────────────────────────────────────────────────────────────────────');
+{
+  const buta = Object.keys(TANPA_LANTAI).filter((k) => hasil.some((h) => h.n === k && h.status !== 'dilewat'));
+  if (buta.length) console.log(`  (tanpa lantai populasi: ${buta.join(', ')} — masih bisa mengukur separuh tanpa ketahuan)`);
+}
 for (const h of hasil) {
   const tanda = h.status === 'hijau' ? '  hijau ' : h.status === 'MERAH' ? '  MERAH ' : '  lewat ';
   console.log(`${tanda} ${h.n.padEnd(16)} ${h.dtk !== undefined ? String(h.dtk).padStart(3) + 's' : '   '}  ${h.ket}`);
