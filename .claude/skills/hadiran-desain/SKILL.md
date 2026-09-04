@@ -344,6 +344,34 @@ bersembunyi, dan tak satu pun terlihat oleh review visual.
   Header atau meta ini berubah, verifikasinya HANGUS dan harus diulang di
   perangkat — bukan diasumsikan tetap benar.
 
+## Kertas — permukaan yang paling lama tak dijaga
+
+App punya **9 generator PDF/Excel** (1.109 baris, 29 call-site) dan sampai
+4 Sep 2026 tak satu pun diuji ISInya: yang ada cuma `warnaCetak` (palet) &
+pembungkus berbagi. `audit:respon` menyentuh jalur ekspor, tapi hanya bertanya
+"apakah ketukannya diakui" — bukan "apakah dokumennya benar". **Layar dijaga 31
+sapuan, kertas nol** — padahal PDF-lah yang dicetak, di-WA-kan ke grup, dan
+jadi catatan resmi RT.
+
+- **Generator sudah punya seam-nya**: `buildXxxPDF()` mengembalikan
+  `{ doc, filename }` TANPA mengeluarkan berkas, jadi bisa diuji di Node tanpa
+  mock apa pun. Seam itu sudah lama ada dan tak pernah dipakai.
+- **Isi dokumen dibaca dari `doc.internal.pages`** (literal string di isi
+  halaman) — tak perlu parser PDF. Batasnya: hanya teks, BUKAN tata letak.
+- **Yang dijaga INVARIAN, bukan tata letak:** ringkasan bertanda tangan wajib
+  REKONSILIASI dgn baris di atasnya. `buildKasRTPDF` menerima `stats` dari
+  pemanggil dan mencetaknya apa adanya — ia tak pernah menghitung ulang dari
+  `list`. Terukur: dgn stats bertentangan, dokumen tetap tercetak rapi —
+  ringkasan Rp88.000.000 di atas baris berjumlah Rp6.250.000, tanpa keberatan.
+  Call-site hari ini BENAR (mengirim `list` utuh, bukan `displayList` yang
+  tersaring), tapi jaraknya satu kata.
+- **Kategori di data uji WAJIB dari `kategoriKasRt.ts`, bukan karangan.**
+  Generator menyaring baris per kategori, jadi kunci yang salah membuat SELURUH
+  tabel kosong dan uji lulus PALSU. Terjadi saat probe pertama ditulis — dan
+  nyaris dilaporkan sbg "generator tak mencetak tabel".
+- **Delapan generator lain masih tanpa penjaga isi.** `cetakKasRT.test.ts`
+  polanya; ikuti bentuknya, jangan bikin dialek baru.
+
 ## Cara kerja yang diminta user
 
 1. **Ukur dulu, baru bervonis.** Jangan sebut "tidak konsisten" sebelum
