@@ -24,12 +24,20 @@
 // Keluaran: .lembar-kontak/lembar.png (+ potret satuan di folder yang sama).
 
 import { chromium } from 'playwright';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { newCtx, loginWarga, gotoTab, openMenuItem, fakeSession, REF, ANON } from './lib/audit-harness.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const OUT = '.lembar-kontak';
 const BAGIAN = process.env.BAGIAN ? [process.env.BAGIAN] : ['normal', 'kosong', 'memuat', 'gagal', 'luring'];
+/* EKSTRA — folder PNG yang sudah jadi, ditelan apa adanya sbg bagian sendiri.
+   Ada karena WAJAH LUAR app (PDF, Excel, kartu bagikan, halaman publik) tak
+   lahir dari halaman yang bisa dipotret Playwright: PDF dirender pdftoppm,
+   Excel dibaca ulang dari workbook, kartu bagikan digambar di <canvas> lewat
+   jalur kode aslinya. Menyalin ketiga pipeline itu ke dalam sini akan
+   melahirkan alat kedua; menelan hasilnya tidak. Nama berkas `grup__label.png`.
+     BAGIAN=ekstra EKSTRA=/path/ke/png npm run lembar-kontak */
+const EKSTRA = process.env.EKSTRA || '';
 mkdirSync(OUT, { recursive: true });
 
 const TAB_W = ['Beranda', 'Jadwal', 'Hadiran', 'Kas RT'];
@@ -90,7 +98,10 @@ async function pasangMode(ctx, mode, bendahara) {
 
 const browser = await chromium.launch();
 
-for (const bagian of BAGIAN) {
+/* `luring` & `ekstra` punya blok sendiri di bawah — kalau ikut loop ini,
+   keduanya diperlakukan sbg MODE app dan menghasilkan potret liar
+   (`ekstra-light`, 9 layar) yang tak pernah diminta siapa pun. */
+for (const bagian of BAGIAN.filter((b) => b !== 'ekstra' && b !== 'luring')) {
   const mode = bagian === 'normal' ? null : bagian;
   /* KOSONG & MEMUAT hanya tema TERANG: dua tema di sana melipatgandakan ubin
      tanpa menambah pertanyaan baru — yang diperiksa BENTUK keadaannya, bukan
@@ -185,6 +196,18 @@ if (BAGIAN.includes('luring')) {
   }
   await ctx.close();
 }
+if (BAGIAN.includes('ekstra')) {
+  if (!EKSTRA) { console.log('\n  ! PROBE CACAT: BAGIAN=ekstra tanpa EKSTRA=<folder>'); }
+  else {
+    const berkas = readdirSync(EKSTRA).filter((f) => f.endsWith('.png')).sort();
+    if (!berkas.length) console.log(`\n  ! PROBE CACAT: nol PNG di ${EKSTRA}`);
+    for (const f of berkas) {
+      const [grup, label] = f.replace(/\.png$/, '').split('__');
+      shots.push({ grup: grup || 'ekstra', label: (label || grup).replace(/-/g, ' '), b64: readFileSync(`${EKSTRA}/${f}`).toString('base64') });
+      process.stdout.write('.');
+    }
+  }
+}
 process.stdout.write('\n');
 
 /* ── susun jadi satu lembar ──────────────────────────────────────────────── */
@@ -224,7 +247,14 @@ const png = await p.evaluate(async ({ shots, grup }) => {
     y += HEAD + Math.ceil(idx.length / KOL) * (TH + LBL + GAP) + 16;
   }
   for (const t of tata) {
-    g2.drawImage(imgs[t.i], t.x, t.y, TW, TH);
+    /* CONTAIN, bukan stretch: rasio adalah salah satu hal yang dinilai lembar
+       ini, jadi meregangkannya akan membuat buktinya berbohong. Sisa kotak
+       diberi plat netral supaya batas ubin tetap terbaca. */
+    const im = imgs[t.i];
+    const sk = Math.min(TW / im.width, TH / im.height);
+    const w = im.width * sk, h = im.height * sk;
+    g2.fillStyle = '#16211C'; g2.fillRect(t.x, t.y, TW, TH);
+    g2.drawImage(im, t.x + (TW - w) / 2, t.y + (TH - h) / 2, w, h);
     g2.strokeStyle = '#33443B'; g2.lineWidth = 1.5;
     g2.strokeRect(t.x - 0.75, t.y - 0.75, TW + 1.5, TH + 1.5);
     g2.fillStyle = '#A9C2B4'; g2.font = '500 15px system-ui';
