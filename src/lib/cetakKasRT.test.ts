@@ -73,10 +73,13 @@ describe('PDF Kas RT — isi dokumen', () => {
 
   it('RINGKASAN rekonsiliasi dengan baris di atasnya', () => {
     const stats = { saldo: jml('masuk') - jml('keluar'), totalMasuk: jml('masuk'), totalKeluar: jml('keluar'), saldoAwal: 0 };
-    const t = teksPdf(buildKasRTPDF(LIST, stats).doc).join(' | ');
-    expect(t).toContain(rp(jml('masuk')));
-    expect(t).toContain(rp(jml('keluar')));
-    expect(t).toContain(rp(jml('masuk') - jml('keluar')));
+    const t = teksPdf(buildKasRTPDF(LIST, stats).doc);
+    /* Kesamaan PERSIS + tanda. Substring buta tanda: `"6.250.000"` cocok di
+       dalam `"-Rp6.250.000"`, jadi rumus yang terbalik tetap lolos. Ketahuan
+       lewat mutasi di `cetakLaporanTriwulan.test.ts`. */
+    expect(t, `total masuk harus "+Rp${rp(jml('masuk'))}"`).toContain(`+Rp${rp(jml('masuk'))}`);
+    expect(t, `total keluar harus "-Rp${rp(jml('keluar'))}"`).toContain(`-Rp${rp(jml('keluar'))}`);
+    expect(t, 'saldo bersih salah/tak tercetak').toContain(`Rp${rp(jml('masuk') - jml('keluar'))}`);
   });
 
   it('PENJAGA BERGIGI: stats yang bertentangan menghasilkan dokumen yang membantah dirinya sendiri', () => {
@@ -84,9 +87,9 @@ describe('PDF Kas RT — isi dokumen', () => {
        Generator memang tak menghitung ulang — jadi angka bohong ikut tercetak,
        dan itulah yang membuat penjaga ini perlu ada. */
     const bohong = { saldo: 99_000_000, totalMasuk: 88_000_000, totalKeluar: 1_000, saldoAwal: 0 };
-    const t = teksPdf(buildKasRTPDF(LIST, bohong).doc).join(' | ');
-    expect(t).toContain('88.000.000');            // ringkasan palsu tercetak…
-    expect(t).toContain('Setoran kas Hadiran');   // …di atas baris yang benar
-    expect(t).not.toContain(rp(jml('masuk')));    // dan total yang BENAR tak ada
+    const t = teksPdf(buildKasRTPDF(LIST, bohong).doc);
+    expect(t.join(' | ')).toContain('88.000.000');          // ringkasan palsu tercetak…
+    expect(t.join(' | ')).toContain('Setoran kas Hadiran');  // …di atas baris yang benar
+    expect(t).not.toContain(`+Rp${rp(jml('masuk'))}`);   // dan total yang BENAR tak ada
   });
 });

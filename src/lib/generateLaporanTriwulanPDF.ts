@@ -14,7 +14,11 @@ function rp(n: number) {
  * teks besar, tinggi halaman menyesuaikan isi sehingga tidak ada yang terpotong.
  * Gaya minimalis tanpa header bar — selaras pdfTheme.
  */
-export function generateLaporanTriwulanPDF(r: RekapTriwulan) {
+/* Seam `build*` — pola yang sama dgn `generateKasRTPDF` & `generateKasHadiranPDF`
+   (4 Sep 2026). Generator ini satu-satunya yang belum punya, jadi isinya tak
+   bisa diuji tanpa mem-mock `outputPdf`. Murni ekstraksi: nol perubahan pada
+   dokumen yang dihasilkan. */
+export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filename: string } {
   const W = 80;            // lebar halaman (mm) — selebar layar HP
   const M = 6;             // margin
   const ROW = 6.5;         // tinggi baris data
@@ -141,5 +145,10 @@ export function generateLaporanTriwulanPDF(r: RekapTriwulan) {
   doc.setFontSize(6); doc.setFont('helvetica', 'normal'); ink(C.muted);
   doc.text(`Dicetak ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 5, { align: 'center' });
 
-  return outputPdf(doc, `Laporan-Keuangan-TW${r.triwulan}-${r.tahun}.pdf`);
+  return { doc, filename: `Laporan-Keuangan-TW${r.triwulan}-${r.tahun}.pdf` };
+}
+
+export function generateLaporanTriwulanPDF(r: RekapTriwulan) {
+  const { doc, filename } = buildLaporanTriwulanPDF(r);
+  return outputPdf(doc, filename);
 }

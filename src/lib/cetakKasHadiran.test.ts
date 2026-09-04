@@ -70,9 +70,20 @@ describe('PDF Kas Hadiran — isi dokumen', () => {
   });
 
   it('KAKI TABEL & RINGKASAN menyebut angka yang SAMA', () => {
-    const gab = teksPdf(buildKasHadiranPDF(LIST, TALANGAN, SETOR, konsisten).doc).join(' | ');
-    for (const [nama, n] of [['kas terkumpul', KAS], ['talangan', TAL], ['setor', SET], ['saldo bersih', NET]] as const) {
-      expect(gab, `${nama} tak tercetak utuh`).toContain(rp(n));
+    const t = teksPdf(buildKasHadiranPDF(LIST, TALANGAN, SETOR, konsisten).doc);
+    /* Dipatok DUA KALI, karena dokumen memang mencetaknya dua kali dari dua
+       sumber: kaki TABEL tanpa prefiks (`3.000.000`), ringkasan dgn prefiks
+       (`Rp3.000.000`). Menuntut keduanya ada = menuntut keduanya SEPAKAT.
+       Kesamaan PERSIS + tanda; substring buta tanda (`"150.000"` cocok di
+       dalam `"-150.000"`). */
+    for (const [nama, kaki, ringkas] of [
+      ['kas terkumpul', rp(KAS), `Rp${rp(KAS)}`],
+      ['talangan', `-${rp(TAL)}`, `-Rp${rp(TAL)}`],
+      ['setor', `-${rp(SET)}`, `-Rp${rp(SET)}`],
+      ['saldo bersih', rp(NET), `Rp${rp(NET)}`],
+    ] as const) {
+      expect(t, `${nama}: kaki tabel harus "${kaki}"`).toContain(kaki);
+      expect(t, `${nama}: ringkasan harus "${ringkas}"`).toContain(ringkas);
     }
   });
 
@@ -81,8 +92,8 @@ describe('PDF Kas Hadiran — isi dokumen', () => {
        pernah merekonsiliasi keduanya, jadi angka pemanggil ikut tercetak
        berdampingan dgn angka kaki tabel yang benar. */
     const menyimpang = { ...konsisten, totalKasTerkumpul: 77_000_000 };
-    const gab = teksPdf(buildKasHadiranPDF(LIST, TALANGAN, SETOR, menyimpang).doc).join(' | ');
-    expect(gab).toContain('77.000.000');   // ringkasan (pemanggil)
-    expect(gab).toContain(rp(KAS));        // kaki tabel (dihitung generator) — DUA angka, satu halaman
+    const t = teksPdf(buildKasHadiranPDF(LIST, TALANGAN, SETOR, menyimpang).doc);
+    expect(t).toContain('Rp77.000.000');   // ringkasan (pemanggil)
+    expect(t).toContain(rp(KAS));          // kaki tabel (generator) — DUA angka, satu halaman
   });
 });

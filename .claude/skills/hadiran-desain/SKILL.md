@@ -376,12 +376,26 @@ jadi catatan resmi RT.
   keduanya tak butuh angka harapan dari luar, jadi ia tak rapuh saat fixture
   berubah. (Risikonya bahkan sudah diakui di kode — `totalSetor` "TIDAK
   struktural" — diakui, tapi tak pernah dijaga.)
+- **Substring BUTA TANDA.** `toContain('6.250.000')` cocok di dalam
+  `'-Rp6.250.000'`, jadi rumus yang TERBALIK tetap lolos. Di dokumen keuangan
+  itu bukan kelonggaran, itu kebutaan. Pungut string per-elemen
+  (`doc.internal.pages` menghasilkan tiap nilai sbg string UTUH berikut
+  tandanya) lalu bandingkan PERSIS — `expect(arr).toContain('-Rp2.750.000')`.
+  Ketemu lewat mutasi, dan lubangnya ada di TIGA berkas uji sekaligus.
 - **`toContain('')` SELALU benar.** Uji isi dokumen wajib memastikan fixture-nya
   bermakna lebih dulu (`expect(nama.length).toBeGreaterThan(2)`), kalau tidak
   pemeriksaannya HAMPA: nama/keterangan kosong membuat uji lulus tanpa
   memeriksa apa pun. Ketemu lewat mutasi, dan ada di DUA berkas uji sekaligus.
-- **Tujuh generator lain masih tanpa penjaga isi.** `cetakKasRT.test.ts` &
-  `cetakKasHadiran.test.ts` polanya; ikuti bentuknya, jangan bikin dialek baru.
+- **Jangan tuntut "computed == given" tanpa membaca tipenya.** Di Laporan
+  Triwulan, `hadiranBelumSetor` & `rtSaldoAkhir` KUMULATIF lintas triwulan,
+  sedangkan `Selisih triwulan` hanya periode ini — menuntut keduanya sama =
+  temuan PALSU. Yang sah dijaga di sana: rumus milik generator sendiri, baris
+  BERSYARAT (`Saldo Awal` hanya bila > 0), dan KELENGKAPAN — tinggi halaman
+  dihitung dari isi, jadi baris yang luput HILANG tanpa jejak, tidak meluber.
+- **Enam generator lain masih tanpa penjaga isi.** `cetakKasRT` /
+  `cetakKasHadiran` / `cetakLaporanTriwulan` polanya; ikuti bentuknya, jangan
+  bikin dialek baru. Yang belum punya seam `build*`, ekstrak dulu — murni
+  ekstraksi, nol perubahan pada dokumen.
 
 ## Cara kerja yang diminta user
 
