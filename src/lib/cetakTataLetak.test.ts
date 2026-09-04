@@ -15,7 +15,10 @@
  * `generateLaporanTriwulanPDF`: "tinggi halaman menyesuaikan isi sehingga
  * tidak ada yang terpotong". Sekarang ada yang memeriksanya.
  *
- * BATAS: hanya TEKS. Garis, kotak, dan latar tabel tak ikut diukur.
+ * BATAS ini DITUTUP 5 Sep 2026 oleh `cetakNonTeks.test.ts`: garis, kotak &
+ * gambar kini punya populasinya sendiri, berikut vonis tumpang tindih lawan
+ * teks. Berkas ini tetap mengurus SATU pertanyaan — apakah teks muat di
+ * halaman & margin — dan tak perlu ikut tumbuh.
  */
 import { describe, it, expect } from 'vitest';
 import jsPDF from 'jspdf';
