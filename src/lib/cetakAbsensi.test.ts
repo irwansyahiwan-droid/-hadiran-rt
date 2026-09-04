@@ -5,15 +5,18 @@
  * dua kali — strip statistik di atas, dan baris tabel di bawah. Kalau keduanya
  * berselisih, daftar hadir bertanda tangan membantah dirinya sendiri.
  *
- * CELAH YANG DIPATOK, BUKAN DITUTUP DIAM-DIAM (4 Sep 2026): strip hanya
- * menyebut HADIR · TIDAK HADIR · TALANGAN LUNAS — status **TITIP tidak ada di
- * sana**, padahal ia ada di tabel DAN ikut "Total Anggota Tercatat". Terukur
- * dgn 5 hadir / 1 titip / 2 tidak: strip berbunyi 5 dan 2, kaki berbunyi 8 —
- * 5 + 2 = 7, dan orang ke-8 (Titip) tak disebut di ringkasan mana pun.
- * Layar app justru MENAMPILKAN Titip sbg stat sendiri, jadi kertas yang ganjil.
- * Belum diubah: menambah kolom ke strip itu perubahan KATA & tata letak yang
- * wajib disetujui user dulu. Uji terakhir memaku selisih itu apa adanya supaya
- * ia tak bergeser diam-diam — dan supaya keputusannya diambil sadar.
+ * CELAH TITIP — DITEMUKAN, DIPATOK, LALU DITUTUP (4 Sep 2026). Strip dulu hanya
+ * menyebut HADIR · TIDAK HADIR · TALANGAN LUNAS, sementara status TITIP ada di
+ * tabel DAN ikut "Total Anggota Tercatat". Terukur dgn 5 hadir/1 titip/2 tidak:
+ * strip berbunyi 5 dan 2, kaki berbunyi 8 — orang ke-8 tak disebut di ringkasan
+ * mana pun. Layar app sudah lama menampilkan Titip sbg stat sendiri; kertasnya
+ * yang tertinggal.
+ *
+ * Alurnya sengaja dua langkah: celah dipatok dulu sbg uji (supaya tak bergeser
+ * diam-diam), keputusan menambah kolom diambil user, BARU diubah. Waktu kolom
+ * Titip dipasang, uji ketiga langsung merah dgn pesan "perbarui catatan" —
+ * penjaga yang memberi tahu bahwa keputusan sudah diambil, persis maksudnya.
+ * Kini uji itu menuntut REKONSILIASI PENUH: Hadir + Titip + Tidak = Total.
  */
 import { describe, it, expect } from 'vitest';
 import { buildAbsensiPDF } from './generateAbsensiPDF';
@@ -67,16 +70,21 @@ describe('PDF Daftar Hadir — isi dokumen', () => {
     expect(angkaSesudah('TALANGAN LUNAS'), 'strip TALANGAN LUNAS ≠ baris lunas').toBe(String(TIDAK.filter((x) => x.lunas).length));
   });
 
-  it('CELAH DIPATOK: Total mencakup TITIP, sementara strip tak pernah menyebutnya', () => {
+  it('REKONSILIASI PENUH: strip menjumlah tepat ke Total Anggota Tercatat', () => {
     const t = build();
     const total = HADIR.length + TITIP.length + TIDAK.length;
+    const angkaSesudah = (label: string) => Number(t[t.indexOf(label) + 1]);
+
     expect(t, 'kaki Total Anggota Tercatat salah/hilang').toContain(`Total Anggota Tercatat: ${total}`);
-    /* Inilah selisihnya: HADIR + TIDAK HADIR di strip ≠ total, dan yang hilang
-       persis jumlah TITIP. Dipatok apa adanya — kalau nanti Titip ditambahkan
-       ke strip (perubahan kata, perlu persetujuan user), uji ini yang pertama
-       memberi tahu bahwa keputusan itu sudah diambil. */
-    expect(HADIR.length + TIDAK.length, 'strip kini rekonsiliasi — perbarui uji & catatan')
-      .toBe(total - TITIP.length);
-    expect(t, 'Titip muncul di strip — perilaku berubah, perbarui catatan').not.toContain('TITIP');
+    expect(t, 'kolom TITIP hilang dari strip — celah rekonsiliasi kembali terbuka').toContain('TITIP');
+    expect(angkaSesudah('TITIP'), 'strip TITIP ≠ baris Titip').toBe(TITIP.length);
+
+    /* Inti dokumen ini: ketiga status di strip WAJIB menjumlah tepat ke total
+       di kaki. Sebelum kolom Titip ada, 5 + 2 = 7 sementara kaki berbunyi 8 —
+       pembaca menemukan satu nama hilang tanpa penjelasan. */
+    expect(
+      angkaSesudah('HADIR') + angkaSesudah('TITIP') + angkaSesudah('TIDAK HADIR'),
+      'strip tak menjumlah ke Total Anggota Tercatat — ada status yang tak diringkas',
+    ).toBe(total);
   });
 });

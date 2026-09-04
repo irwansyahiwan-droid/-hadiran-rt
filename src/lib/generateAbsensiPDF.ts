@@ -35,8 +35,23 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
     subtitle: `${tglTarikan} · Sohibul Bait: ${tarikan.sohibul_bait?.nama ?? '—'}`,
   });
 
+  /* TITIP ikut di strip sejak 4 Sep 2026 — sebelumnya hanya Hadir/Tidak
+     Hadir/Talangan Lunas, sehingga orang berstatus Titip ada di TABEL dan ikut
+     "Total Anggota Tercatat", tapi tak disebut di ringkasan mana pun. Terukur
+     dgn 5 hadir/1 titip/2 tidak: strip berbunyi 5 dan 2 sementara kaki berbunyi
+     8 — pembaca yang merekonsiliasi menemukan satu nama hilang tanpa penjelasan.
+     Layar app sudah lama menampilkan Titip sbg stat sendiri; kertasnya yang
+     tertinggal.
+     Ongkos tata letak DIUKUR dulu, bukan ditaksir: 4 kolom → colW 45,5mm (isi
+     efektif 41,9mm) sementara label terpanjang `TALANGAN LUNAS` 26,1mm pada
+     skala RAPAT — sisa 38%, nilai dua digit hanya 4,9mm. Nol risiko luber.
+     Urutannya mengikuti LAYAR (Hadir · Titip · Tidak Hadir), supaya warga yang
+     membaca keduanya tak perlu memetakan ulang.
+     Tone `ink` untuk Titip disengaja: ia bukan kabar baik maupun buruk — iuran
+     tetap masuk, orangnya tak hadir. */
   Y = drawStatStrip(doc, Y, [
     { label: 'Hadir',          value: String(hadirS.length), tone: 'pos' },
+    { label: 'Titip',          value: String(titipS.length) },
     { label: 'Tidak Hadir',    value: String(tidakS.length), tone: tidakS.length > 0 ? 'neg' : 'ink' },
     { label: 'Talangan Lunas', value: String(lunasCount) },
   ], W, M);
