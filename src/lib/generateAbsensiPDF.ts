@@ -10,7 +10,8 @@ interface Hadir { nama: string }
 interface Tidak { nama: string; lunas: boolean }
 
 /** Daftar hadir (absensi) satu tarikan → unduh PDF. */
-export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[], titip: Hadir[] = []) {
+/* Seam `build*` — pola sama dgn generator lain (4 Sep 2026). Murni ekstraksi. */
+export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[], titip: Hadir[] = []): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
@@ -82,5 +83,10 @@ export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tida
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);
 
-  return outputPdf(doc, `Daftar-Hadir-Tarikan-${tarikan.nomor}.pdf`);
+  return { doc, filename: `Daftar-Hadir-Tarikan-${tarikan.nomor}.pdf` };
+}
+
+export function generateAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[], titip: Hadir[] = []) {
+  const { doc, filename } = buildAbsensiPDF(tarikan, hadir, tidak, titip);
+  return outputPdf(doc, filename);
 }

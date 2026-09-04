@@ -392,7 +392,13 @@ jadi catatan resmi RT.
   temuan PALSU. Yang sah dijaga di sana: rumus milik generator sendiri, baris
   BERSYARAT (`Saldo Awal` hanya bila > 0), dan KELENGKAPAN — tinggi halaman
   dihitung dari isi, jadi baris yang luput HILANG tanpa jejak, tidak meluber.
-- **Enam generator lain masih tanpa penjaga isi.** `cetakKasRT` /
+- **Daftar Hadir: strip statistik TIDAK menyebut TITIP** (terukur 4 Sep 2026 —
+  5 hadir/1 titip/2 tidak → strip "5" & "2", kaki "Total 8"; orang ke-8 tak
+  disebut di ringkasan mana pun). Layar app justru menampilkan Titip sbg stat
+  sendiri, jadi KERTAS yang ganjil. Dipatok apa adanya di `cetakAbsensi.test.ts`
+  — menambah kolom ke strip itu perubahan KATA & tata letak, wajib disetujui
+  user dulu.
+- **Lima generator lain masih tanpa penjaga isi.** `cetakKasRT` /
   `cetakKasHadiran` / `cetakLaporanTriwulan` polanya; ikuti bentuknya, jangan
   bikin dialek baru. Yang belum punya seam `build*`, ekstrak dulu — murni
   ekstraksi, nol perubahan pada dokumen.
