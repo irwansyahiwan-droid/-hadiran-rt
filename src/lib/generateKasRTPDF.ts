@@ -79,7 +79,7 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
   let Y = drawMasthead(doc, {
     W, M, docCode, tanggalCetak,
     title: 'Laporan Pertanggungjawaban Kas RT',
-    subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Kota Depok${periode}`,
+    subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Depok${periode}`,
   }, SK);
 
   // ── Bagian per jenis transaksi ────────────────────────────────
@@ -177,7 +177,7 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
     const headY = drawContinuationHeader(doc, {
       W, M,
       title: 'Laporan Pertanggungjawaban Kas RT',
-      subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Kota Depok${periode} · ${docCode}`,
+      subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Depok${periode} · ${docCode}`,
     }, SK);
     const recapY = sectionLabel(doc, headY + 8, 'Ringkasan Tutup Buku', W, M, undefined, SK);
     ttdY = drawSummary(doc, recapY, ringkasan, saldoBersih, W, M, undefined, SK) + 18;

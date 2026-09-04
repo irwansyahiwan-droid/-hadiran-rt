@@ -75,18 +75,22 @@ const DOK: { nama: string; doc: unknown; M: number }[] = [
       [{ ...wg(0), nama: 'Karta Saleh' }, wg(1), wg(2), wg(3), wg(4), wg(5)], ABSENSI, new Set(['w4'])).doc },
 ];
 
-/* IZIN BERBATAS — luapan yang sudah DIUKUR, diakui, dan dipatok maksimumnya.
-   Bukan pelonggaran toleransi (yang akan membutakan seluruh dokumen), melainkan
-   pengecualian bernama dgn plafon sendiri. Kalau luapannya tumbuh, uji kembali
-   merah — pola yang sama dgn `data-susut` di `audit:huruf`.
+/* IZIN BERBATAS — daftar ini KOSONG, dan mekanismenya sengaja dipertahankan.
+   Satu-satunya penghuninya (subtitle masthead Kas Hadiran, luber 0,43mm)
+   DIPERBAIKI 4 Sep 2026 dgn membuang kata "Kota", jadi izinnya dicabut —
+   izin mati yang dibiarkan hidup akan memaafkan luapan BARU yang kebetulan
+   berawalan sama.
 
-   Kas Hadiran, subtitle HEADER LANJUTAN (halaman ke-2+): lewat 1,0pt = 0,35mm
-   dari margin 14mm. Tetap di DALAM halaman, jadi tak ada isi yang hilang —
-   yang termakan hanya margin. Belum diperbaiki karena memperpendek teks pada
-   dokumen bertanda tangan adalah perubahan KATA yang wajib disetujui user. */
-const IZIN = [
-  { dok: 'Kas Hadiran', awalan: 'Kas masuk, talangan & setoran', maksPt: 2 },
-];
+   Kalau nanti ada luapan yang memang diputuskan diterima, taruh di sini dgn
+   PLAFON-nya sendiri (bukan dgn melonggarkan `TOL`, yang akan membutakan
+   seluruh dokumen sekaligus) — pola yang sama dgn `data-susut` di
+   `audit:huruf`.
+
+   CATATAN, karena aku sempat salah menamainya: run yang luber dulu berukuran
+   10,5pt = subtitle MASTHEAD halaman 1, bukan header lanjutan (`lanjutSub`
+   hanya 7pt). Kalau ada luapan baru, periksa UKURAN FONT-nya dulu sebelum
+   menyimpulkan baris mana yang bersalah. */
+const IZIN: { dok: string; awalan: string; maksPt: number }[] = [];
 const z0 = (r: { teks: string }) => r.teks.slice(0, 30);
 
 describe('Tata letak dokumen cetak', () => {

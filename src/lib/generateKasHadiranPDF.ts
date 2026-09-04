@@ -57,7 +57,14 @@ export function buildKasHadiranPDF(
   const Y = drawMasthead(doc, {
     W, M, docCode, tanggalCetak,
     title: 'Laporan Alur Kas Hadiran',
-    subtitle: `Kas masuk, talangan & setoran RT 004/006 Tanah Baru, Beji, Kota Depok${periode}`,
+    /* "Kota" dibuang 4 Sep 2026: dgn `periode` terpanjang, baris ini terukur
+       182,4mm sementara lebar isi A4 bermargin 14mm cuma 182,0mm — luber
+       0,43mm ke margin. Sesudahnya 173,8mm (sisa 8,2mm), cukup menahan kalau
+       string periode memanjang. Nol informasi hilang, dan Header app sendiri
+       sudah lama menulis alamatnya begitu ("RT 004/006 TANAH BARU · BEJI,
+       DEPOK"). Ejaan yang sama dipakai di SELURUH generator — alamat yang
+       ditulis dua cara di dokumen dari app yang sama itu drift. */
+    subtitle: `Kas masuk, talangan & setoran RT 004/006 Tanah Baru, Beji, Depok${periode}`,
   }, SK);
 
   // (Strip statistik atas dihapus — angka yang sama sudah di Ringkasan tutup buku.)
