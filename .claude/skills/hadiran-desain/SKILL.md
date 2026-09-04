@@ -408,6 +408,14 @@ jadi catatan resmi RT.
   Excel-nya `saldo`. Cast `as never` / `as unknown as` di fixture menyembunyikan
   ketidakcocokan itu & menghasilkan sel KOSONG yang lolos diam-diam. Memakan
   korban dua kali dalam satu sesi — jangan pakai cast di fixture `Stats`.
+- **TATA LETAK dijaga terpisah dari ISI** (4 Sep 2026, `cetakTataLetak.test.ts`).
+  Teks yang meluber keluar halaman tetap ADA di aliran isi PDF — jadi ke-23
+  penjaga isi tetap hijau — tapi HILANG dari kertas. Posisi dipungut dari blok
+  `BT … Td … Tj … ET` (poin, origin kiri-bawah); lebar diukur ulang dgn model
+  yang SAMA dgn jsPDF, yakni **tanpa charSpace** — menambahkan `Tc` membuat
+  probe melaporkan luber 33pt untuk teks yang menurut jsPDF pas.
+  Luapan yang sudah diukur dipatok lewat IZIN BERBATAS (nama + plafon pt),
+  bukan dgn melonggarkan toleransi — pola yang sama dgn `data-susut`.
 - **Uji yang tak MEMBACA dokumennya bukan penjaga.** Versi pertama uji populasi
   Pendapatan hanya menjumlah fixture-nya sendiri — tautologi yang tak bisa
   menangkap cacat generator apa pun. Tiap assertion wajib berangkat dari
