@@ -369,8 +369,19 @@ jadi catatan resmi RT.
   Generator menyaring baris per kategori, jadi kunci yang salah membuat SELURUH
   tabel kosong dan uji lulus PALSU. Terjadi saat probe pertama ditulis — dan
   nyaris dilaporkan sbg "generator tak mencetak tabel".
-- **Delapan generator lain masih tanpa penjaga isi.** `cetakKasRT.test.ts`
-  polanya; ikuti bentuknya, jangan bikin dialek baru.
+- **Invarian TERKUAT: dokumen dibandingkan dgn DIRINYA SENDIRI.** PDF Kas
+  Hadiran mencetak totalnya DUA KALI dari DUA sumber di halaman yang sama —
+  kaki TABEL dihitung generator dari baris nyata (`hitungSaldoHadiran`),
+  blok RINGKASAN dari `stats` pemanggil, apa adanya. Uji yang membandingkan
+  keduanya tak butuh angka harapan dari luar, jadi ia tak rapuh saat fixture
+  berubah. (Risikonya bahkan sudah diakui di kode — `totalSetor` "TIDAK
+  struktural" — diakui, tapi tak pernah dijaga.)
+- **`toContain('')` SELALU benar.** Uji isi dokumen wajib memastikan fixture-nya
+  bermakna lebih dulu (`expect(nama.length).toBeGreaterThan(2)`), kalau tidak
+  pemeriksaannya HAMPA: nama/keterangan kosong membuat uji lulus tanpa
+  memeriksa apa pun. Ketemu lewat mutasi, dan ada di DUA berkas uji sekaligus.
+- **Tujuh generator lain masih tanpa penjaga isi.** `cetakKasRT.test.ts` &
+  `cetakKasHadiran.test.ts` polanya; ikuti bentuknya, jangan bikin dialek baru.
 
 ## Cara kerja yang diminta user
 

@@ -59,7 +59,13 @@ describe('PDF Kas RT — isi dokumen', () => {
   it('mencetak setiap baris transaksi', () => {
     const { doc } = buildKasRTPDF(LIST, { saldo: jml('masuk') - jml('keluar'), totalMasuk: jml('masuk'), totalKeluar: jml('keluar'), saldoAwal: 0 });
     const t = teksPdf(doc).join(' | ');
-    for (const k of LIST) expect(t, `keterangan "${k.keterangan}" hilang dari kertas`).toContain(k.keterangan);
+    for (const k of LIST) {
+      /* Fixture WAJIB bermakna dulu — `toContain('')` selalu benar, jadi
+         keterangan kosong membuat pemeriksaan di bawahnya HAMPA. Kelas yang
+         sama ketemu lewat mutasi di `cetakKasHadiran.test.ts`. */
+      expect(k.keterangan.length, 'fixture cacat: keterangan kosong').toBeGreaterThan(2);
+      expect(t, `keterangan "${k.keterangan}" hilang dari kertas`).toContain(k.keterangan);
+    }
     /* Populasi kosong = penjaga buta: kalau saringan kategori meleset, tabel
        kosong dan pemeriksaan di atas bisa lulus tanpa isi. */
     expect(teksPdf(doc).length, 'terlalu sedikit string — tabel kemungkinan kosong').toBeGreaterThan(40);
