@@ -67,7 +67,6 @@ export function geometriPdf(doc: unknown, jsPDFCtor: new (o?: object) => { setFo
       const f = blok.match(/\/(F\d+)\s+([\d.]+)\s+Tf/);
       const td = blok.match(/([-\d.]+)\s+([-\d.]+)\s+Td/);
       const tj = blok.match(/\(((?:\\.|[^()\\])*)\)\s*Tj/);
-      const tc = blok.match(/([-\d.]+)\s+Tc/);
       if (!f || !td || !tj) continue;
       const size = parseFloat(f[2]);
       const bold = f[1] === 'F2';
