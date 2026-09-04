@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { amankanPdf } from './pdfTeks';
 import { outputPdf } from './pdfOut';
 import { C, SIGNERS } from './pdfTheme';
 import type { RekapTriwulan } from './laporan';
@@ -78,6 +79,7 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
   H = Math.ceil(H);
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [W, H] });
+  amankanPdf(doc);
   const now = new Date();
   const docCode = `LK-TW${r.triwulan}-${r.tahun}`;
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });

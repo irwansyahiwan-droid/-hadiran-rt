@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { amankanPdf } from './pdfTeks';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
@@ -62,6 +63,7 @@ const HEAD = ['NO', 'TANGGAL', 'KETERANGAN', 'JUMLAH (Rp)'];
  */
 export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  amankanPdf(doc);
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
   const now = new Date();

@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { amankanPdf } from './pdfTeks';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
@@ -13,6 +14,7 @@ interface Tidak { nama: string; lunas: boolean }
 /* Seam `build*` — pola sama dgn generator lain (4 Sep 2026). Murni ekstraksi. */
 export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[], titip: Hadir[] = []): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  amankanPdf(doc);
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
   const now = new Date();

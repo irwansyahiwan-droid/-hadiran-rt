@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { amankanPdf } from './pdfTeks';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import { TABLE, drawMasthead, drawSignatures, drawFooter, ensureSpace, C, alignHeadFoot } from './pdfTheme';
@@ -19,6 +20,7 @@ function tgl(d: string | null): string {
 /* Seam `build*` — pola sama dgn generator lain (4 Sep 2026). Murni ekstraksi. */
 export function buildJadwalPDF(list: Tarikan[]): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  amankanPdf(doc);
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
   const now = new Date();
