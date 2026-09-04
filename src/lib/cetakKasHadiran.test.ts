@@ -23,16 +23,7 @@ import { describe, it, expect } from 'vitest';
 import { buildKasHadiranPDF } from './generateKasHadiranPDF';
 import { hitungSaldoHadiran } from './utils';
 import type { Tarikan } from './types';
-
-function teksPdf(doc: unknown): string[] {
-  const pages = (doc as { internal: { pages: string[][] } }).internal.pages;
-  const isi = pages.flat().filter(Boolean).join('\n');
-  const out: string[] = [];
-  const re = /\(((?:\\.|[^()\\])*)\)/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(isi))) out.push(m[1].replace(/\\([()\\])/g, '$1'));
-  return out;
-}
+import { teksPdf } from './pdfTeksUji';
 
 const tarikan = (n: number, terkumpul: number): Tarikan => ({
   id: `t${n}`, nomor: n, tanggal: `2026-0${n}-10`, jumlah_per_orang: 50_000,

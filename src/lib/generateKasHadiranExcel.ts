@@ -13,11 +13,13 @@ interface Stats {
 
 const CUR = '#,##0';
 
-export async function generateKasHadiranExcel(
+/* Seam `build*` — pola sama dgn generator PDF (4 Sep 2026). SINKRON: yang async
+   hanya pengunduhannya, bukan penyusunan workbook-nya. Murni ekstraksi. */
+export function buildKasHadiranExcel(
   tarikan: Tarikan[],
   talanganMap: Record<string, TalanganInfo>,
   stats: Stats,
-): Promise<void> {
+): { wb: ExcelJS.Workbook; filename: string } {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Hadiran RT';
   wb.created = new Date();
@@ -73,5 +75,14 @@ export async function generateKasHadiranExcel(
     r.eachCell((c) => (c.border = border));
   });
 
-  await downloadWorkbook(wb, `Kas-Hadiran-${stamp()}.xlsx`);
+  return { wb, filename: `Kas-Hadiran-${stamp()}.xlsx` };
+}
+
+export async function generateKasHadiranExcel(
+  tarikan: Tarikan[],
+  talanganMap: Record<string, TalanganInfo>,
+  stats: Stats,
+): Promise<void> {
+  const { wb, filename } = buildKasHadiranExcel(tarikan, talanganMap, stats);
+  await downloadWorkbook(wb, filename);
 }

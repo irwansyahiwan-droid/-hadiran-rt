@@ -21,16 +21,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildAbsensiPDF } from './generateAbsensiPDF';
 import type { Tarikan } from './types';
-
-function teksPdf(doc: unknown): string[] {
-  const pages = (doc as { internal: { pages: string[][] } }).internal.pages;
-  const isi = pages.flat().filter(Boolean).join('\n');
-  const out: string[] = [];
-  const re = /\(((?:\\.|[^()\\])*)\)/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(isi))) out.push(m[1].replace(/\\([()\\])/g, '$1'));
-  return out;
-}
+import { teksPdf } from './pdfTeksUji';
 
 const TARIKAN = {
   id: 't1', nomor: 18, tanggal: '2026-08-28', jumlah_per_orang: 50_000,

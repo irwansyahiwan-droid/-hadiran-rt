@@ -400,10 +400,18 @@ jadi catatan resmi RT.
   **Alurnya patut ditiru:** celah dipatok sbg uji dulu, keputusan diambil user,
   baru diubah — dan penjaganya sendiri yang memberi tahu ("perbarui catatan")
   begitu keputusan itu mendarat.
-- **Lima generator lain masih tanpa penjaga isi.** `cetakKasRT` /
-  `cetakKasHadiran` / `cetakLaporanTriwulan` polanya; ikuti bentuknya, jangan
-  bikin dialek baru. Yang belum punya seam `build*`, ekstrak dulu — murni
-  ekstraksi, nol perubahan pada dokumen.
+- **KESEMBILAN generator kini punya seam `build*` + penjaga isi** (4 Sep 2026).
+  Excel lebih tegas daripada PDF & pakailah itu: `exceljs` menyimpan NILAI SEL,
+  jadi perbandingannya ANGKA lawan ANGKA — bukan cocok-cocokan string. Invarian
+  terkuatnya LINTAS-SHEET: Σ kolom rincian wajib sama dgn total di Ringkasan.
+- **Bentuk `Stats` BERBEDA antar-modul** — PDF Kas Hadiran memakai `saldoAktif`,
+  Excel-nya `saldo`. Cast `as never` / `as unknown as` di fixture menyembunyikan
+  ketidakcocokan itu & menghasilkan sel KOSONG yang lolos diam-diam. Memakan
+  korban dua kali dalam satu sesi — jangan pakai cast di fixture `Stats`.
+- **Uji yang tak MEMBACA dokumennya bukan penjaga.** Versi pertama uji populasi
+  Pendapatan hanya menjumlah fixture-nya sendiri — tautologi yang tak bisa
+  menangkap cacat generator apa pun. Tiap assertion wajib berangkat dari
+  keluaran `build*`, bukan dari data masukan.
 
 ## Cara kerja yang diminta user
 

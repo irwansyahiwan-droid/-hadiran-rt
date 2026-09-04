@@ -6,7 +6,8 @@ import { formatAktivitas, formatWaktu } from './aktivitas';
 import type { AktivitasLog } from './types';
 
 /** Ekspor daftar riwayat aktivitas (audit log) ke PDF untuk arsip / lampiran LPJ. */
-export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua') {
+/* Seam `build*` — pola sama dgn generator lain (4 Sep 2026). Murni ekstraksi. */
+export function buildAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
@@ -54,5 +55,10 @@ export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);
 
-  return outputPdf(doc, `Riwayat-Aktivitas-${docCode}.pdf`);
+  return { doc, filename: `Riwayat-Aktivitas-${docCode}.pdf` };
+}
+
+export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua') {
+  const { doc, filename } = buildAktivitasPDF(rows, filterLabel);
+  return outputPdf(doc, filename);
 }

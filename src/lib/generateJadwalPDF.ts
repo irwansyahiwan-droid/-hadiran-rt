@@ -16,7 +16,8 @@ function tgl(d: string | null): string {
 }
 
 /** Jadwal tarikan arisan (semua tarikan + Sohibul Bait) → unduh PDF. */
-export function generateJadwalPDF(list: Tarikan[]) {
+/* Seam `build*` — pola sama dgn generator lain (4 Sep 2026). Murni ekstraksi. */
+export function buildJadwalPDF(list: Tarikan[]): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
@@ -71,5 +72,10 @@ export function generateJadwalPDF(list: Tarikan[]) {
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);
 
-  return outputPdf(doc, `Jadwal-Tarikan-${now.getFullYear()}.pdf`);
+  return { doc, filename: `Jadwal-Tarikan-${now.getFullYear()}.pdf` };
+}
+
+export function generateJadwalPDF(list: Tarikan[]) {
+  const { doc, filename } = buildJadwalPDF(list);
+  return outputPdf(doc, filename);
 }

@@ -27,16 +27,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildKasRTPDF } from './generateKasRTPDF';
 import type { KasRT } from './types';
-
-function teksPdf(doc: unknown): string[] {
-  const pages = (doc as { internal: { pages: string[][] } }).internal.pages;
-  const isi = pages.flat().filter(Boolean).join('\n');
-  const out: string[] = [];
-  const re = /\(((?:\\.|[^()\\])*)\)/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(isi))) out.push(m[1].replace(/\\([()\\])/g, '$1'));
-  return out;
-}
+import { teksPdf } from './pdfTeksUji';
 
 /* Kategori WAJIB dari `kategoriKasRt.ts` — bukan karangan. Generator menyaring
    baris per kategori, jadi kunci yang salah membuat SELURUH tabel kosong dan

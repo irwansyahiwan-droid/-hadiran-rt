@@ -9,12 +9,13 @@ import type { AbsensiStatus, Tarikan, Warga } from './types';
 function rp(n: number) { return `Rp${n.toLocaleString('id-ID')}`; }
 const DASH = '—';
 
-export function generatePendapatanPDF(
+/* Seam `build*` — pola sama dgn generator lain (4 Sep 2026). Murni ekstraksi. */
+export function buildPendapatanPDF(
   tarikan: Tarikan,
   wargaList: Warga[],
   absensiMap: Record<string, AbsensiStatus>,
   talanganLunasSet: Set<string>,
-) {
+): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const M = 14;
@@ -154,5 +155,15 @@ export function generatePendapatanPDF(
   const H = doc.internal.pageSize.getHeight();
   drawFooter(doc, W, H, tanggalCetak);
 
-  return outputPdf(doc, `Rincian-Pendapatan-Tarikan-${tarikan.nomor}-${now.getFullYear()}.pdf`);
+  return { doc, filename: `Rincian-Pendapatan-Tarikan-${tarikan.nomor}-${now.getFullYear()}.pdf` };
+}
+
+export function generatePendapatanPDF(
+  tarikan: Tarikan,
+  wargaList: Warga[],
+  absensiMap: Record<string, AbsensiStatus>,
+  talanganLunasSet: Set<string>,
+) {
+  const { doc, filename } = buildPendapatanPDF(tarikan, wargaList, absensiMap, talanganLunasSet);
+  return outputPdf(doc, filename);
 }
