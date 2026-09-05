@@ -36,7 +36,19 @@
 @font-face {
   font-family: 'Sora Variable';
   font-style: normal;
-  font-display: swap;
+  /* `optional`, BUKAN `swap` — dan ini keputusan yang diukur, bukan kerapian.
+     Dgn `swap` Sora tiba 1.898 ms SESUDAH layar bisa dipakai, jadi tiap judul
+     & wordmark berganti rupa di bawah jempol warga. Menutupnya lewat preload
+     memundurkan tombol Masuk 471 ms — mahal untuk typeface yang cuma menyentuh
+     JUDUL. `optional` menutupnya tanpa membayar apa pun: peramban memberi
+     jendela blok ~100 ms lalu TIDAK PERNAH menukar, jadi tak ada yang bergeser.
+     Di kunjungan pertama judul karena itu dirender Inter — pasangan fallback
+     yang memang sudah ditulis di `--font-display`, bukan font sistem asing.
+     Mulai kunjungan kedua Sora langsung dipakai, dan itu dijamin `swManifest`:
+     Sora ikut DIPRACACHE saat install, jadi ia sudah ada walau peramban
+     memutuskan tak mengunduhnya di kunjungan pertama (yang memang boleh
+     dilakukan untuk `optional` di jaringan lambat). */
+  font-display: optional;
   font-weight: 400 800;
   src: url('./fonts/sora-latin.woff2') format('woff2-variations');
   unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;

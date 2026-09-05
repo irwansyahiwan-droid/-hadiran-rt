@@ -91,6 +91,26 @@ if (!existsSync(join(ROOT, 'index.html'))) {
   process.exit(2);
 }
 
+/* BUILD BASI = HIJAU PALSU. Sapuan ini mengukur `dist/`, bukan sumber — jadi
+   sesudah mengubah kode dan LUPA membangun ulang, ia dgn patuh mengukur build
+   kemarin lalu melaporkan hijau untuk perubahan yang belum pernah ada di sana.
+   Kelas yang sama dgn cacat ke-23 & pelajaran ke-27 ("push berhasil" bukan
+   bukti "live"): laporan hijau dari langkah yang tak pernah diperiksa. */
+const mtimeTerbaru = (dir) => {
+  let t = 0;
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const f = join(dir, e.name);
+    t = Math.max(t, e.isDirectory() ? mtimeTerbaru(f) : statSync(f).mtimeMs);
+  }
+  return t;
+};
+const tSumber = Math.max(mtimeTerbaru('src'), statSync('index.html').mtimeMs, statSync('vite.config.ts').mtimeMs);
+const tBuild = statSync(join(ROOT, 'index.html')).mtimeMs;
+if (tSumber > tBuild) {
+  console.log(`PROBE CACAT: ${ROOT}/ lebih tua dari sumber (${Math.round((tSumber - tBuild) / 1000)} dtk) — jalankan \`npm run build\` dulu`);
+  process.exit(2);
+}
+
 const aset = readdirSync(join(ROOT, 'assets'));
 const cariAset = (awalan) => aset.find((f) => f.startsWith(awalan)) ?? null;
 

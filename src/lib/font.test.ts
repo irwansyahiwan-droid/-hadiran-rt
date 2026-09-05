@@ -59,6 +59,25 @@ describe('font app', () => {
     expect(main).not.toMatch(/@fontsource/);
   });
 
+  it('Sora dipasang optional — kalau kembali ke swap, kedip 1.898 ms ikut kembali', () => {
+    const css = baca('src/index.css');
+    const sora = (css.match(/@font-face\s*\{[^}]*\}/g) ?? []).find((b) => b.includes('sora-latin'));
+    expect(sora, 'blok @font-face Sora tak ketemu').toBeTruthy();
+    expect(sora!, 'Sora bukan `optional` lagi').toMatch(/font-display:\s*optional/);
+  });
+
+  it('vite.config.ts masih memasang plugin preload font body', () => {
+    /* Penjaga NYATA-nya `audit:unduh` bagian F: tanpa preload, Inter tiba
+       +843 ms sesudah layar bisa dipakai dan sapuan itu merah. Uji ini cuma
+       membuat kegagalannya CEPAT — plugin yang dicabut dari daftar `plugins`
+       tak meledak sendiri (pengaman `throw` di dalamnya hanya berjalan kalau
+       pluginnya memang jalan), jadi kedipnya kembali tanpa satu pun tanda
+       sampai seseorang mengingat menjalankan sapuannya. */
+    const cfg = baca('vite.config.ts');
+    expect(cfg).toContain('function preloadFontBody');
+    expect(cfg, 'plugin preload tak terdaftar di `plugins`').toMatch(/plugins:\s*\[[^\]]*preloadFontBody\(\)/);
+  });
+
   it('unicode-range disalin persis dari subset latin fontsource', () => {
     /* Kalau rentang ini menyempit, karakter yang HARI INI dirender Inter/Sora
        diam-diam pindah ke font sistem — perubahan rupa yang tak satu pun
