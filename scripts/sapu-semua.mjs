@@ -131,7 +131,7 @@ const LANTAI = {
   /* Populasi = PERMUKAAN, bukan jumlah teks. Jumlah teks bergerak mengikuti
      isi DB (69 warga hari ini, 300 KK yang dijanjikan), jadi lantai berbasis
      teks salah tiap kali datanya tumbuh. Jumlah permukaan properti APP. */
-  'fallback-sora':  [/(\d+) permukaan diperiksa/, 36],
+  'fallback-sora':  [/(\d+) permukaan diperiksa/, 38],
 };
 /* TANPA LANTAI — daftar ini KOSONG sejak 3 Sep 2026, dan mekanismenya sengaja
    dipertahankan. `lebar`, `reflow` & `gerak` dulu di sini karena keluarannya
