@@ -63,7 +63,7 @@ const ABSENSI: Record<string, AbsensiStatus> = { w1: 'hadir', w2: 'hadir', w3: '
 
 /* Margin per dokumen — angka yang dipakai generatornya sendiri. */
 const DOK: { nama: string; doc: unknown; M: number }[] = [
-  { nama: 'Laporan Triwulan', doc: buildLaporanTriwulanPDF(REKAP).doc, M: 6 },
+  { nama: 'Laporan Triwulan', doc: buildLaporanTriwulanPDF(REKAP).doc, M: 14 },
   { nama: 'Kas RT', M: 14, doc: buildKasRTPDF(
       [kasrt(1, 'masuk', 5_000_000, 'hadiran', 'Setoran kas Hadiran bulan Agustus'), kasrt(2, 'keluar', 750_000, 'sosial', 'Santunan warga sakit')],
       { saldo: 4_250_000, totalMasuk: 5_000_000, totalKeluar: 750_000, saldoAwal: 0 }).doc },

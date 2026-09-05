@@ -135,7 +135,15 @@ const ABSENSI: Record<string, AbsensiStatus> = { w1: 'hadir', w2: 'hadir', w3: '
    perubahan TITIP yang baru mendarat. Kalau kolomnya berubah lagi, angka ini
    yang pertama protes. */
 const DOK: { nama: string; doc: unknown; M: number; garis: number; tegakN: number; gambar: number }[] = [
-  { nama: 'Laporan Triwulan', M: 6, garis: 9, tegakN: 0, gambar: 0, doc: buildLaporanTriwulanPDF(REKAP).doc },
+  /* A4 + kop bersama (5 Sep 2026). `gambar` 0 → 1: sebelumnya dokumen ini
+     satu-satunya dari tujuh yang tak memakai `drawMasthead`, jadi satu-satunya
+     yang beredar TANPA lambang RT — padahal ia yang bertanda tangan tiga.
+     `garis` tetap 9, tapi SUSUNANNYA berubah dan itu diverifikasi satu per
+     satu, bukan diterima karena angkanya kebetulan sama: 1 hairline masthead
+     (y41) + 3 hairline seksi (y53/110/168) + 2 rule di atas baris saldo
+     (y73/137) + 3 garis tanda tangan (y226). Dulu: 1 hairline masthead
+     tipografis + 3 seksi + 2 saldo + 3 ttd bertumpuk. */
+  { nama: 'Laporan Triwulan', M: 14, garis: 9, tegakN: 0, gambar: 1, doc: buildLaporanTriwulanPDF(REKAP).doc },
   /* 25 → 21 (5 Sep 2026): kepala kolom kini dicetak sekali per HALAMAN, bukan
      sekali per kategori, jadi seksi kedua di halaman yang sama kehilangan 4
      rule tepi-bawah selnya. Turunnya DIVERIFIKASI dgn menyebut ruasnya satu
