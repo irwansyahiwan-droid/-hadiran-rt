@@ -92,6 +92,33 @@ function swManifest(): Plugin {
          terukur 3/3 run, 12 chunk gagal (Beranda, CrossFade, Odometer, …). */
       const eChunk = bundle[nEntry];
       if (eChunk && eChunk.type === 'chunk') for (const d of eChunk.dynamicImports) walk(d);
+      /* FONT — dipungut dari CSS yang sudah masuk `set`, BUKAN dari graf impor.
+         Sampai 5 Sep 2026 inilah lubangnya: shell berisi 40 entri dan NOL font,
+         walau `main.tsx` menyatakan "ke-cache service worker → font tetap ada
+         saat offline". Sebabnya struktural, bukan kelalaian — pemetanya
+         berjalan di sisi IMPOR, sedangkan font dirujuk `url()` dari DALAM CSS,
+         jadi tak ada satu pun sisi impor yang menuju ke sana. Kelas pelajaran
+         ke-31 (shell tak pernah ke-cache di kunjungan pertama) yang tersisa.
+         Akibatnya terukur, 3 kunjungan berturut-turut: cache 40 entri / 0 font
+         di kunjungan 1, baru 44/2 di kunjungan 2 — warga yang memasang app lalu
+         kehilangan sinyal mendapat app yang boot berhuruf sistem.
+         Dipungut dgn membaca isi CSS-nya, jadi ia mengikuti apa pun yang benar-
+         benar dirujuk; kalau nanti ada gambar/ikon ber-`url()` ia ikut sendiri. */
+      const fontDariCss = new Set<string>();
+      for (const nama of set) {
+        if (!nama.endsWith('.css')) continue;
+        const src = (bundle[nama] as { source?: string | Uint8Array })?.source;
+        if (typeof src !== 'string') continue;
+        for (const m of src.matchAll(/url\(\s*["']?\/?([^"')\s]+\.woff2)["']?\s*\)/g)) {
+          fontDariCss.add(m[1].replace(/^\/+/, ''));
+        }
+      }
+      /* Kalau app memang memakai webfont tapi tak satu pun terpungut, yang
+         rusak PEMUNGUTNYA — dan shell yang diam-diam kehilangan font persis
+         bug yang blok ini ada untuk menutupnya. Meledak, jangan dilewati. */
+      const adaFont = Object.keys(bundle).some((f) => f.endsWith('.woff2'));
+      if (adaFont && fontDariCss.size === 0) this.error('sw-manifest: ada .woff2 di bundel tapi nol terpungut dari CSS');
+      for (const f of fontDariCss) set.add(f);
       shell = [
         '/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png',
         ...[...set].sort().map((f) => '/' + f),
@@ -120,8 +147,58 @@ function swManifest(): Plugin {
 }
 
 // https://vitejs.dev/config/
+
+/**
+ * Menyuntik `<link rel="preload">` untuk font BODY (Inter) ke index.html.
+ *
+ * Kenapa plugin dan bukan satu baris di index.html: namanya ber-hash isi, jadi
+ * berubah tiap kali fontnya berubah. Baris tulisan tangan akan menunjuk berkas
+ * yang tak ada — dan `preload` yang meleset GAGAL DIAM-DIAM (peramban cuma
+ * memuat yang benar belakangan, tanpa satu pun galat).
+ *
+ * Kenapa perlu sama sekali: `cssNonBlocking` melepas stylesheet dari jalur
+ * render, dan konsekuensinya font baru DITEMUKAN sesudah CSS diunduh & di-
+ * parse. Terukur 400 kbps / CPU 4x: tombol Masuk terlihat 2760 ms sementara
+ * Inter baru tiba 3603 ms — jadi selama 843 ms warga membaca layar berhuruf
+ * sistem, lalu SELURUH kartu bergeser ~24px saat huruf aslinya masuk. Preload
+ * memulai unduhannya saat HTML masih di-parse: Inter tiba 209 ms SEBELUM
+ * tombolnya muncul, nol geseran.
+ *
+ * HANYA Inter. Sora (judul & wordmark) sengaja TIDAK di-preload — diukur, ia
+ * memundurkan tombol Masuk 3291 -> 3762 ms, dan 471 ms itu dibayar untuk
+ * typeface yang cuma menyentuh judul. Sora dipasang `font-display: optional`
+ * di index.css: ia tak pernah menukar glyph, jadi ketiadaannya di kunjungan
+ * pertama BUKAN kedip melainkan pilihan — judul dirender Inter (pasangan
+ * fallback yang memang sudah ditulis di `--font-display`), dan mulai kunjungan
+ * kedua Sora langsung dipakai. Yang membuat itu aman adalah `swManifest`:
+ * Sora ikut dipracache saat install, jadi ia SUDAH ADA di kunjungan kedua
+ * sekalipun peramban memutuskan tak mengunduhnya di kunjungan pertama (yang
+ * memang boleh dilakukan untuk `optional` di jaringan lambat).
+ */
+function preloadFontBody(): Plugin {
+  return {
+    name: 'preload-font-body',
+    apply: 'build',
+    enforce: 'post',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        const nama = Object.keys(ctx.bundle ?? {}).find((f) => /inter-latin-[^/]*\.woff2$/.test(f));
+        /* Kait yang hilang harus MELEDAK (pelajaran ke-24). `preload` yang
+           diam-diam tak tersuntik mengembalikan persis 843 ms kedip yang
+           plugin ini ada untuk menutupnya, dan tak ada yang akan tahu. */
+        if (!nama) throw new Error('preload-font-body: berkas inter-latin-*.woff2 tak ada di bundel');
+        return html.replace(
+          '</head>',
+          `  <link rel="preload" href="/${nama}" as="font" type="font/woff2" crossorigin>\n  </head>`,
+        );
+      },
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), cssNonBlocking(), swManifest()],
+  plugins: [react(), cssNonBlocking(), preloadFontBody(), swManifest()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

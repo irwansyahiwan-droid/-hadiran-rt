@@ -56,6 +56,14 @@ const VISUAL = [
   ['lompat', 'node scripts/audit-lompat.mjs'],
   ['gerak', 'node scripts/audit-gerak.mjs'],
   ['publik', 'node scripts/audit-publik.mjs'],
+  /* `unduh` mengukur `dist/`, bukan CAP_URL — tapi ia ditaruh di VISUAL
+     karena prasyaratnya SAMA: preview yang hidup menyajikan `dist`, jadi
+     liveness-nya berarti build ada. Ia memegang server & port-nya SENDIRI
+     (5198, dalam proses) sehingga tak menyentuh preview bersama — beda
+     dgn `luring-pertama` yang MEMBUNUH pemegang port dan karena itu
+     sengaja di luar rantai ini. Build BASI ditolaknya sendiri (PROBE
+     CACAT), jadi ia tak bisa hijau dari build kemarin. */
+  ['unduh', 'node scripts/audit-unduh.mjs'],
 ];
 
 /* ── LANTAI POPULASI ────────────────────────────────────────────────────────
@@ -109,6 +117,10 @@ const LANTAI = {
   sheet:            [/(\d+) permukaan diukur/, 12],
   lompat:           [/(\d+) layar diukur/, 8],
   publik:           [/(\d+) halaman diperiksa/, 7],
+  /* Populasi = berkas yang benar-benar diminta di kunjungan pertama.
+     Garis dasar 19; lantai ~95%. Turun di bawahnya berarti sapuan
+     mengukur separuh jalur kritis lalu tetap melapor 0 temuan. */
+  unduh:            [/(\d+) berkas diperiksa/, 18],
 };
 /* TANPA LANTAI — daftar ini KOSONG sejak 3 Sep 2026, dan mekanismenya sengaja
    dipertahankan. `lebar`, `reflow` & `gerak` dulu di sini karena keluarannya
@@ -143,7 +155,17 @@ const hidup = () => {
 
 const jalan = (cmd) => {
   const r = spawnSync('npx', ['--no-install', ...cmd.split(' ')], {
-    encoding: 'utf8', env: { ...process.env, CAP_URL: URL, APP_URL: URL },
+    /* MUTASI SENGAJA TIDAK diteruskan. Di sini `MUTASI=1` berarti SATU hal:
+       naikkan tiap lantai populasi 10x. Tapi hampir tiap sapuan punya knob
+       `MUTASI` SENDIRI dgn arti yang sama sekali berbeda (audit-unduh
+       menyuntik chunk ekspor 214 kB, audit-gerak memaksa animation-delay,
+       audit-mundur mematikan pushState). Diteruskan, satu perintah menjalankan
+       DUA eksperimen sekaligus dan populasinya bergeser justru saat lantainya
+       sedang diuji — uji lantai lalu "lulus" karena sebab yang salah.
+       Validasi lantai dulu terbukti 5/5 hanya di jalur STATIS, dan di sana
+       kebetulan tak ada satu pun sapuan ber-MUTASI, jadi tabrakannya tak
+       pernah terlihat. Mutasi sapuan dijalankan sendiri-sendiri, memang. */
+    encoding: 'utf8', env: { ...process.env, MUTASI: '', CAP_URL: URL, APP_URL: URL },
   });
   return { kode: r.status, keluaran: (r.stdout || '') + (r.stderr || '') };
 };
