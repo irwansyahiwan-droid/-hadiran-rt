@@ -91,7 +91,11 @@ const LANTAI = {
   ikon:             [/(\d+) pemakaian ikon diperiksa/, 163],
   keadaan:          [/(\d+) layar diperiksa/, 34],
   kontras:          [/TOTAL sampel:\s*(\d+)/, 1140],
-  'kontras-deep':   [/TOTAL sampel:\s*(\d+)/, 2140],
+  /* 2140 → 2386 (5 Sep 2026): PART L naik dari 1 halaman publik jadi 3
+     (panduan-install & warta belum pernah diukur sekali pun), dan perbaikan
+     sampling titik atas/bawah membuat lebih banyak elemen cukup titik untuk
+     TERUKUR sama sekali. Garis dasar baru 2512; lantai ~95%. */
+  'kontras-deep':   [/TOTAL sampel:\s*(\d+)/, 2386],
   'kontras-nonteks':[/TOTAL\s+(\d+) sampel/, 700],
   mati:             [/(\d+) sampel, \d+ tombol unik/, 140],
   nama:             [/(\d+) kontrol di \d+ layar/, 500],

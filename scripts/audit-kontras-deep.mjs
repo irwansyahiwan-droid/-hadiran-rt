@@ -1,5 +1,5 @@
 // Audit kontras piksel LANJUTAN: sheet/modal warga, SEMUA permukaan bendahara,
-// dan landing /info. Pelengkap scripts/audit-kontras.mjs (permukaan tab warga).
+// dan KETIGA halaman publik (landing, panduan-install, warta). Pelengkap scripts/audit-kontras.mjs (permukaan tab warga).
 //
 // Bendahara di-MOCK 3 lapis aman (tanpa kredensial, tanpa sentuh data):
 //   1. Sesi palsu di localStorage sb-<ref>-auth-token (user_metadata.role=bendahara)
@@ -163,7 +163,19 @@ function perimeterPoints(r, fontSize) {
     [r.x + inX, my], [r.x + inX + 1, my], [r.x + r.w - inX, my], [r.x + r.w - inX - 1, my],
     [r.x + inX, my - 3], [r.x + r.w - inX, my - 3], [r.x + inX, my + 3], [r.x + r.w - inX, my + 3],
   ];
-  if (r.h < fontSize * 2.2) {
+  /* Baris ATAS & BAWAH kotak — di situlah leading/padding berada, yaitu satu-
+     satunya tempat yang DIJAMIN bukan glyph. Ambangnya dinaikkan 2,2 → 3,6em
+     (5 Sep 2026): syarat lama memakai TINGGI sbg proksi "elemen tinggi = wadah,
+     jangan disampel jauh dari teksnya", dan proksi itu meleset persis di
+     kontrol SATU BARIS yang bantalannya lega. `a.tautan` di /warta (15px,
+     padding 8px 2px) tingginya 34 > 33, jadi baris ini DILEWATI dan yang
+     tersisa cuma 8 titik garis-tengah — semuanya berjarak `inX` dari tepi,
+     sementara bantalan mendatarnya cuma 2px. Titik-titik itu mendarat DI ATAS
+     glyph, piksel antialias menang jadi MODUS, dan sapuan melaporkan 3,99:1
+     untuk tautan yang sebenarnya 7,20:1 di kanvas krem — lulus AA maupun AAA.
+     Kelas yang sama dgn FP ke-11 & ke-12; ketiganya berakhir di "yang menang
+     jadi latar ternyata bukan latar". */
+  if (r.h < fontSize * 3.6) {
     const n = 6;
     for (let i = 0; i <= n; i++) {
       const x = r.x + inX + (i * (r.w - 2 * inX)) / n;
@@ -474,13 +486,28 @@ for (const theme of ['light', 'dark']) {
     await ctx.close();
   }
 
-  // ── PART L: landing /info ─────────────────────────────────────────────
+  // ── PART L: HALAMAN PUBLIK ────────────────────────────────────────────
+  /* Sampai 5 Sep 2026 bagian ini cuma memuat `landing`, jadi kontras
+     `panduan-install` & `warta` TAK PERNAH DIUKUR sekali pun — di sapuan mana
+     pun. `audit:publik` menyentuh keempatnya tapi hanya tata letak @360px.
+     Biayanya nyata: footer panduan-install hidup di 3,96:1 (di bawah AA 4,5
+     untuk teks 12px) berbulan-bulan tanpa satu pun laporan, dan baru ketahuan
+     waktu halaman itu dilihat MATA di lembar kontak wajah-luar.
+
+     `nobar` sengaja DI LUAR: halaman itu sudah lewat masanya (keputusan user
+     5 Sep 2026) & sengaja dibiarkan, bukan kandidat pekerjaan. Kalau ia
+     dihidupkan lagi, ia masuk ke sini di hari yang sama.
+
+     Kelas yang sama dgn seluruh sesi ini: populasi yang tak pernah dipungut.
+     Nol temuan dari halaman yang tak pernah dibuka bukan hijau, itu diam. */
   if (!ONLY || ONLY === 'landing') {
-    const { ctx, page } = await newCtx(browser, theme);
-    await page.goto(`${URL}/landing.html`, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(800);
-    await auditPage(page, `${theme}/landing`);
-    await ctx.close();
+    for (const nm of ['landing', 'panduan-install', 'warta']) {
+      const { ctx, page } = await newCtx(browser, theme);
+      await page.goto(`${URL}/${nm}.html`, { waitUntil: 'networkidle' });
+      await page.waitForTimeout(800);
+      await auditPage(page, `${theme}/${nm}`);
+      await ctx.close();
+    }
   }
 }
 
