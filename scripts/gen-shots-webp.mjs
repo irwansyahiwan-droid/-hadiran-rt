@@ -5,7 +5,7 @@
 import { chromium } from 'playwright';
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const DIR = 'public/screenshots';
+const DIR = process.env.SHOT_OUT || 'public/screenshots';
 const FILES = ['1-beranda', '2-jadwal', '3-kas'];
 const TARGET_W = 780; // frame showcase ~260px CSS → 780 = @3x, tetap tajam
 

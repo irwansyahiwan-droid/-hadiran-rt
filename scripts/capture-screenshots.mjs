@@ -3,8 +3,15 @@
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 
-const URL = process.env.CAP_URL || 'http://localhost:5174';
-const OUT = 'public/screenshots';
+/* 5173 = port BAWAAN `npm run dev` (vite.config.ts tak menyetel server.port).
+   Sampai 5 Sep 2026 nilai di sini 5174 — port yang cuma dipakai vite kalau
+   5173 sudah terpakai — jadi `npm run tangkap` gagal konek di mesin bersih
+   dan penembakan ulang tak pernah semudah yang dikira. */
+const URL = process.env.CAP_URL || 'http://localhost:5173';
+/* SHOT_OUT ada supaya rantai ini bisa DILATIH tanpa menimpa aset sungguhan —
+   menembak ke public/ hanya untuk mencoba mekanismenya akan merusak showcase
+   landing dgn layar keadaan-kosong. */
+const OUT = process.env.SHOT_OUT || 'public/screenshots';
 mkdirSync(OUT, { recursive: true });
 
 const browser = await chromium.launch();
