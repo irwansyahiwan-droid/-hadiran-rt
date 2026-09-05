@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import { amankanPdf } from './pdfTeks';
 import { outputPdf } from './pdfOut';
-import { C, SIGNERS } from './pdfTheme';
+import { C, RAPAT, drawMasthead, sectionLabel, drawSignatures, drawFooter, signH, ensureSpace } from './pdfTheme';
 import type { RekapTriwulan } from './laporan';
 
 function rp(n: number) {
@@ -19,13 +19,30 @@ function rp(n: number) {
    (4 Sep 2026). Generator ini satu-satunya yang belum punya, jadi isinya tak
    bisa diuji tanpa mem-mock `outputPdf`. Murni ekstraksi: nol perubahan pada
    dokumen yang dihasilkan. */
+/* A4 + kop bersama sejak 5 Sep 2026 — sebelumnya 80mm ("selebar layar HP")
+   dgn masthead tipografisnya sendiri, tanpa lambang.
+   Itu keputusan sadar pada zamannya, tapi biayanya baru terlihat waktu
+   KESEMBILAN keluaran dijajarkan di lembar kontak wajah-luar:
+
+   - 80×235mm BUKAN ukuran kertas. Enam laporan lain A4. Bendahara yang
+     mencetaknya dapat halaman terskala dgn margin raksasa, atau penolakan
+     printer — padahal INI satu-satunya dokumen triwulan yang bertanda tangan
+     TIGA (Ketua, Sekretaris, Bendahara).
+   - Ia satu-satunya dari tujuh yang TIDAK memakai `drawMasthead`, jadi
+     satu-satunya yang beredar TANPA lambang & kop RT. Dokumen
+     pertanggungjawaban yang paling formal justru yang paling anonim.
+
+   Alasan asli "selebar layar HP" tetap dilayani, dan lebih baik, oleh jalur
+   yang memang untuk itu: `shareLaporanKas()` menggambar kartu PNG untuk WA.
+   Keduanya berdampingan di `LaporanTriwulan.tsx` — "Bagikan" memanggil kartu,
+   "Cetak" memanggil berkas ini. Jadi 80mm di sini menduplikasi pekerjaan yang
+   sudah dikerjakan lebih baik di sebelahnya, dgn ongkos pekerjaan yang cuma
+   DIA yang punya: dicetak, ditandatangani, diarsipkan. */
 export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filename: string } {
-  const W = 80;            // lebar halaman (mm) — selebar layar HP
-  const M = 6;             // margin
-  const ROW = 6.5;         // tinggi baris data
-  const LBL = 7;           // tinggi label seksi (teks + hairline)
-  const SEC_GAP = 5;       // jarak antar seksi
-  const MAST = 38;         // tinggi masthead (wordmark + judul + meta + hairline)
+  const SK = RAPAT;
+  const M = 14;            // margin — sama dgn enam laporan lain
+  const ROW = 7;           // tinggi baris data
+  const SEC_GAP = 7;       // jarak antar seksi
 
   // Kas Hadiran: "hasil akhir" yg dilaporkan = sudah/belum disetor SAJA.
   // Talangan Belum Lunas ikut ditampilkan (bendahara minta talangan tetap
@@ -69,83 +86,50 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
     },
   ];
 
-  // ── Hitung tinggi halaman lebih dulu agar tidak ada ruang kosong / terpotong ──
-  const TTD_ENTRY = 18;
-  let H = MAST;
-  for (const s of seksi) H += LBL + 2 + s.rows.length * ROW + SEC_GAP;
-  H += 6;                     // jarak sebelum TTD
-  H += SIGNERS.length * TTD_ENTRY;
-  H += 10;                    // footer
-  H = Math.ceil(H);
-
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [W, H] });
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   amankanPdf(doc);
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
   const now = new Date();
   const docCode = `LK-TW${r.triwulan}-${r.tahun}`;
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const ink   = (c: readonly number[]) => doc.setTextColor(c[0], c[1], c[2]);
-  const draw  = (c: readonly number[]) => doc.setDrawColor(c[0], c[1], c[2]);
+  const ink  = (c: readonly number[]) => doc.setTextColor(c[0], c[1], c[2]);
+  const draw = (c: readonly number[]) => doc.setDrawColor(c[0], c[1], c[2]);
 
-  // ── Masthead tipografis (tanpa bar) ───────────────────────
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); ink(C.brand);
-  doc.text('HADIRAN RT', M, 10, { charSpace: 0.6 });
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(6); ink(C.faint);
-  doc.text('RT 004/006 · Tanah Baru · Beji, Depok', M, 14.5);
-
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(12.5); ink(C.ink);
-  doc.text('Laporan Keuangan', M, 23);
-  doc.setFontSize(10.5); ink(C.brand);
-  doc.text(r.label, M, 29);
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); ink(C.faint);
-  doc.text(`Periode ${r.rentang} · ${docCode}`, M, 34);
-
-  draw(C.line); doc.setLineWidth(0.3);
-  doc.line(M, MAST - 2, W - M, MAST - 2);
-
-  let y = MAST + 3;
+  /* SATU sumber untuk masthead — pola yang sama dgn enam laporan lain. */
+  let y = drawMasthead(doc, {
+    W, M, docCode, tanggalCetak,
+    title: 'Laporan Keuangan',
+    subtitle: `${r.label} · Periode ${r.rentang}`,
+  }, SK);
 
   // ── Seksi ─────────────────────────────────────────────────
   for (const s of seksi) {
-    // label seksi ber-letterspace + hairline (pengganti bar hijau)
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(7); ink(C.ink);
-    doc.text(s.judul, M, y + 3, { charSpace: 0.8 });
-    draw(C.line); doc.setLineWidth(0.3);
-    doc.line(M, y + LBL - 2, W - M, y + LBL - 2);
-    y += LBL + 2;
-
+    y = sectionLabel(doc, y + 4, s.judul, W, M, undefined, SK);
+    y += 3;
     s.rows.forEach((b) => {
       if (b.saldo) {
         // rule tegas di atas saldo akhir — gaya tutup buku, bukan blok fill
-        draw(C.ink); doc.setLineWidth(0.3);
-        doc.line(M, y - 4.4, W - M, y - 4.4);
+        draw(C.ink); doc.setLineWidth(0.35);
+        doc.line(M, y - 4.6, W - M, y - 4.6);
       }
-      doc.setFontSize(8.5);
+      doc.setFontSize(b.saldo ? SK.ringkasTotal : SK.ringkasBaris);
       doc.setFont('helvetica', b.saldo ? 'bold' : 'normal');
       ink(b.saldo ? C.ink : C.faint);
-      doc.text(b.label, M + 0.5, y);
+      doc.text(b.label, M, y);
       ink(b.saldo ? (b.neg ? C.neg : C.ink) : (b.tone ? C[b.tone] : C.sub));
-      doc.text(b.nilai, W - M - 0.5, y, { align: 'right' });
+      doc.text(b.nilai, W - M, y, { align: 'right' });
       y += ROW;
     });
     y += SEC_GAP;
   }
 
-  // ── TTD (ditumpuk, pas untuk lebar sempit) ────────────────
-  y += 2;
-  SIGNERS.forEach((p) => {
-    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); ink(C.faint);
-    doc.text(p.role, M + 0.5, y);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); ink(C.ink);
-    doc.text(`( ${p.name} )`, W - M - 0.5, y, { align: 'right' });
-    draw(C.line); doc.setLineWidth(0.3);
-    doc.line(M + 0.5, y + 3.5, W - M - 0.5, y + 3.5);
-    y += 18;
-  });
+  // ── Tanda tangan — blok 3 kolom bersama, bukan tumpukan sempit ────────
+  y = ensureSpace(doc, y + 4, signH(SK));
+  drawSignatures(doc, y, W, M, { dateline: `Depok, ${tanggalCetak}`, sk: SK });
 
-  // ── Footer ────────────────────────────────────────────────
-  doc.setFontSize(6); doc.setFont('helvetica', 'normal'); ink(C.muted);
-  doc.text(`Dicetak ${tanggalCetak} · Hadiran RT Digital System`, W / 2, H - 5, { align: 'center' });
+  drawFooter(doc, W, H, tanggalCetak, M, SK);
 
   return { doc, filename: `Laporan-Keuangan-TW${r.triwulan}-${r.tahun}.pdf` };
 }

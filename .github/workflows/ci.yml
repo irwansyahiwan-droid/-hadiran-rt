@@ -17,6 +17,21 @@ jobs:
   quality:
     name: Typecheck, Lint, Test, Build
     runs-on: ubuntu-latest
+    # Uji mengimpor `src/lib/supabase.ts`, yang MEMBUAT klien saat modul dimuat
+    # — jadi tanpa dua nilai ini `createClient` melempar "supabaseUrl is
+    # required" dan TIGA berkas uji gagal DIIMPOR (bukan gagal ujinya).
+    # Nilainya sengaja BOHONGAN: tak satu pun uji menyentuh jaringan, dan
+    # menaruh kredensial asli di berkas publik ini tak ada gunanya sekaligus
+    # berisiko. Build di sini cuma pagar mutu — Vercel membangun sendiri dgn
+    # env-nya sendiri, jadi bundel ber-URL bohongan ini tak pernah dikirim.
+    #
+    # Kelas yang sama dgn `npm ci` yang gagal di klon segar: apa yang jalan di
+    # mesin dev karena ada `.env` (gitignored) tak jalan di tempat lain, dan
+    # yang memberitahu justru CI yang merah berbulan-bulan.
+    env:
+      VITE_SUPABASE_URL: https://ci-dummy.supabase.co
+      VITE_SUPABASE_ANON_KEY: ci-dummy-anon-key-tidak-dipakai-untuk-apa-pun
+
     steps:
       - uses: actions/checkout@v4
 

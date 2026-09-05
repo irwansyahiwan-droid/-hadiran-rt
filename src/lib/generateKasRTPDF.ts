@@ -3,7 +3,7 @@ import { amankanPdf } from './pdfTeks';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
-  tabelSkala, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum,
+  tabelSkala, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, seksiMinH, C, fmtNum,
   alignHeadFoot, drawContinuationHeaders, LANJUT_TOP, signH, LANSIA,
 } from './pdfTheme';
 import type { KasRT } from './types';
@@ -93,7 +93,7 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
   const keluarList    = sorted.filter(k => k.tipe === 'keluar');
 
   if (saldoAwalList.length > 0) {
-    Y = sectionLabel(doc, ensureSpace(doc, Y + 7, 38), 'Saldo Awal', W, M, undefined, SK);
+    Y = sectionLabel(doc, ensureSpace(doc, Y + 7, seksiMinH(SK, saldoAwalList.length)), 'Saldo Awal', W, M, undefined, SK);
     autoTable(doc, {
       ...TABEL,
       startY: Y,
@@ -125,7 +125,7 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
     if (rows.length === 0) return startY;
     const sub = rows.reduce((s, k) => s + k.nominal, 0);
     // Guard: label seksi jangan yatim di dasar halaman (butuh label + kepala tabel + ±2 baris)
-    const y = sectionLabel(doc, ensureSpace(doc, startY + 6, 38), `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone }, SK);
+    const y = sectionLabel(doc, ensureSpace(doc, startY + 6, seksiMinH(SK, rows.length)), `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone }, SK);
     /* Kepala dicetak kalau (a) ini seksi PERTAMA di halaman ini, atau (b) tabel
        ini mungkin MELUAP — halaman lanjutan yang barisnya tanpa nama kolom
        lebih buruk daripada kepala yang berulang, jadi taksirannya sengaja

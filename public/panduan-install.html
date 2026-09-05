@@ -21,7 +21,18 @@
   }
   .poster { padding: 26px 24px 30px; }
   .header {
-    background: linear-gradient(135deg, #0F4C2E 0%, #145D39 50%, #1B7249 100%);
+    /* CERMIN `.hero-emerald` app (index.css) — scrim + ramp, nilai & sudut sama
+       persis. Sampai 5 Sep 2026 di sini `#0F4C2E → #145D39 → #1B7249`, yaitu
+       ramp pra-13-Jul yang app SUDAH BUANG justru karena teks putih kecil di
+       atasnya tak lolos: stop paling terangnya #1B7249 = 5,92:1 lawan putih,
+       di bawah ambang AAA 7 yang app tetapkan untuk dirinya. Komentar di
+       `src/lib/shareLaporanKas.ts` menyebut ketiga nilai itu satu per satu
+       sebagai ramp lama. Commit 3cade3d memindahkan KANVAS halaman ini ke rona
+       Hutan tapi tidak heronya — migrasi yang berhenti separuh.
+       Sesudah: 9,28:1 di stop paling terang, 15,59:1 di yang paling gelap. */
+    background-image:
+      radial-gradient(130% 72% at 0% 0%, rgba(4, 38, 24, 0.48), transparent 55%),
+      linear-gradient(150deg, #0A5230 0%, #08492B 52%, #032A17 100%);
     border-radius: 26px;
     padding: 24px;
     color: #fff;
@@ -62,7 +73,7 @@
   .link svg.i { vertical-align: -3px; color: #0F4C2E; }
   .step svg.ok { vertical-align: -2px; color: #0F4C2E; }
   .step svg.i { vertical-align: -2px; color: #34453B; }
-  .warn svg.i { vertical-align: -3px; color: #78350F; flex: none; }
+  .warn svg.i { vertical-align: -3px; color: #75320B; flex: none; }
   .card-title .tag { margin-left: auto; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #ECFDF5; color: #0F4C2E; }
   .step { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
   .step:last-child { margin-bottom: 0; }
@@ -75,10 +86,10 @@
     border-radius: 16px;
     padding: 14px 16px;
     font-size: 13px;
-    color: #78350F;
+    color: #75320B;
     line-height: 1.45;
   }
-  .warn b { color: #78350F; }
+  .warn b { color: #75320B; }
   .footer { text-align: center; font-size: 12px; color: #34453B; margin-top: 18px; }
 </style>
 </head>

@@ -3,8 +3,23 @@
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 
-const URL = process.env.CAP_URL || 'http://localhost:5174';
-const OUT = 'public/screenshots';
+/* 5173 = port BAWAAN `npm run dev` (vite.config.ts tak menyetel server.port).
+   Sampai 5 Sep 2026 nilai di sini 5174 — port yang cuma dipakai vite kalau
+   5173 sudah terpakai — jadi `npm run tangkap` gagal konek di mesin bersih
+   dan penembakan ulang tak pernah semudah yang dikira. */
+const URL = process.env.CAP_URL || 'http://localhost:5173';
+/* Sasaran JAUH (produksi) menempuh cold start + Supabase nyata, jadi 30 dtk
+   bawaan Playwright tak cukup — pelajaran ke-20: `audit:mundur` MATI dua kali
+   berturut-turut persis karena ini, dan matinya di tengah jalan sesudah
+   sebagian populasi selesai. Menembak langsung ke produksi adalah cara
+   TERMUDAH menyegarkan showcase (tak perlu dev server maupun `.env`), jadi
+   jalur itu wajib tahan. */
+const JAUH = !/^https?:\/\/(localhost|127\.0\.0\.1)/.test(URL);
+const NAV_MS = JAUH ? 90_000 : 30_000;
+/* SHOT_OUT ada supaya rantai ini bisa DILATIH tanpa menimpa aset sungguhan —
+   menembak ke public/ hanya untuk mencoba mekanismenya akan merusak showcase
+   landing dgn layar keadaan-kosong. */
+const OUT = process.env.SHOT_OUT || 'public/screenshots';
 mkdirSync(OUT, { recursive: true });
 
 const browser = await chromium.launch();
@@ -20,12 +35,19 @@ await page.addInitScript(() => localStorage.setItem('hadiran-welcome-v2', '1'));
 page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log('  [console]', m.type(), m.text().slice(0, 200)); });
 page.on('pageerror', (e) => console.log('  [pageerror]', e.message.slice(0, 200)));
 page.on('load', () => console.log('  [load]', page.url()));
-await page.goto(URL, { waitUntil: 'networkidle' });
+/* Sekali ulang: cegukan tunggal tak boleh membunuh seluruh penembakan;
+   gagal DUA kali tetap menyerah keras, karena itu memang bukan cegukan. */
+try {
+  await page.goto(URL, { waitUntil: 'networkidle', timeout: NAV_MS });
+} catch {
+  console.log('  navigasi pertama gagal, mengulang sekali…');
+  await page.goto(URL, { waitUntil: 'networkidle', timeout: NAV_MS });
+}
 
 // Masuk mode Warga — ketik per-karakter (onChange per huruf) lalu Enter
 // (input punya handler Enter → handleWargaSubmit). Paling andal utk controlled input.
 const pw = page.locator('#masuk-warga');
-await pw.waitFor({ timeout: 15000 });
+await pw.waitFor({ timeout: NAV_MS });
 await pw.click();
 
 // Tunggu betul-betul masuk: bottom nav muncul (poll, toleran animasi)

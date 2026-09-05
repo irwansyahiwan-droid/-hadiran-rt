@@ -23,6 +23,7 @@
 import { describe, it, expect } from 'vitest';
 import jsPDF from 'jspdf';
 import { geometriPdf } from './pdfTeksUji';
+import { barisH, seksiMinH, LANSIA } from './pdfTheme';
 import { buildLaporanTriwulanPDF } from './generateLaporanTriwulanPDF';
 import { buildKasRTPDF } from './generateKasRTPDF';
 import { buildKasHadiranPDF } from './generateKasHadiranPDF';
@@ -63,7 +64,7 @@ const ABSENSI: Record<string, AbsensiStatus> = { w1: 'hadir', w2: 'hadir', w3: '
 
 /* Margin per dokumen — angka yang dipakai generatornya sendiri. */
 const DOK: { nama: string; doc: unknown; M: number }[] = [
-  { nama: 'Laporan Triwulan', doc: buildLaporanTriwulanPDF(REKAP).doc, M: 6 },
+  { nama: 'Laporan Triwulan', doc: buildLaporanTriwulanPDF(REKAP).doc, M: 14 },
   { nama: 'Kas RT', M: 14, doc: buildKasRTPDF(
       [kasrt(1, 'masuk', 5_000_000, 'hadiran', 'Setoran kas Hadiran bulan Agustus'), kasrt(2, 'keluar', 750_000, 'sosial', 'Santunan warga sakit')],
       { saldo: 4_250_000, totalMasuk: 5_000_000, totalKeluar: 750_000, saldoAwal: 0 }).doc },
@@ -95,6 +96,46 @@ const DOK: { nama: string; doc: unknown; M: number }[] = [
    menyimpulkan baris mana yang bersalah. */
 const IZIN: { dok: string; awalan: string; maksPt: number }[] = [];
 const z0 = (r: { teks: string }) => r.teks.slice(0, 30);
+
+/* ── GEOMETRI SEKSI ────────────────────────────────────────────────────────
+   `seksiMinH` menggantikan angka mati `38` yang dulu menentukan apakah sebuah
+   seksi boleh dimulai di halaman berjalan. Angka itu tak tahu SKALA (Kas RT
+   dicetak LANSIA, enam laporan lain RAPAT) maupun ISI, jadi ia melempar seksi
+   ke halaman baru padahal muat — Kas RT contohnya 4 halaman, sekarang 3.
+
+   Yang dijaga di sini rumusnya BERPIJAK pada geometri nyata, bukan cocok
+   dengan dirinya sendiri: jarak baris diukur dari DOKUMEN JADI lalu dibanding
+   dgn `barisH`. Kalau jsPDF mengubah lineHeightFactor atau autoTable mengubah
+   cara menghitung sel, uji ini yang memberitahu — bukan laporan 4 halaman yang
+   diam-diam kembali. Pola yang sama dgn `signH`. */
+describe('Geometri seksi cetak', () => {
+  it('barisH cocok dgn jarak baris yang TERUKUR di dokumen jadi', () => {
+    const doc = buildKasRTPDF(
+      Array.from({ length: 12 }, (_, i) => kasrt(i, 'masuk', 500_000 + i * 1000, 'hadiran', `Setoran ke-${i + 1}`)),
+      { saldo: 6_066_000, totalMasuk: 6_066_000, totalKeluar: 0, saldoAwal: 0 },
+    ).doc;
+    const { H, runs } = geometriPdf(doc, jsPDF);
+    /* Baseline sel TANGGAL — satu run per baris data, jaraknya = tinggi baris. */
+    const y = (runs as { teks: string; y: number }[])
+      .filter((r) => /^\d{2} \w{3} \d{2}$/.test(r.teks))
+      .map((r) => (H - r.y) / MM).sort((a, b) => a - b);
+    expect(y.length, 'nol baris tanggal terbaca — probe tak mendarat').toBeGreaterThan(6);
+    const jarak = y.slice(1, 7).map((v, i) => v - y[i]);
+    const rata = jarak.reduce((a, b) => a + b, 0) / jarak.length;
+    expect(rata, `jarak baris terukur ${rata.toFixed(2)}mm ≠ barisH(LANSIA) ${barisH(LANSIA).toFixed(2)}mm`)
+      .toBeCloseTo(barisH(LANSIA), 1);
+  });
+
+  it('seksiMinH tak pernah menuntut lebih dari tinggi seksinya sendiri', () => {
+    /* Cabang yang dulu tak ada: seksi 1 baris dilempar ke halaman baru karena
+       diminta 38mm, padahal seluruhnya cuma ±25mm. */
+    const satu = seksiMinH(LANSIA, 1), dua = seksiMinH(LANSIA, 2), banyak = seksiMinH(LANSIA, 40);
+    expect(satu, 'seksi 1 baris menuntut lebih dari seksi 2 baris').toBeLessThan(dua);
+    expect(banyak, 'seksi panjang menuntut lebih dari ambang minimum').toBe(dua);
+    expect(dua, 'ambang minimum melampaui angka mati lama (38mm) — bukan perbaikan')
+      .toBeLessThan(38);
+  });
+});
 
 describe('Tata letak dokumen cetak', () => {
   for (const { nama, doc, M } of DOK) {

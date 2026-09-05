@@ -15,6 +15,7 @@
     "audit:bayangan": "node scripts/audit-bayangan.mjs",
     "audit:tebal": "node scripts/audit-tebal.mjs",
     "audit:ikon": "node scripts/audit-ikon.mjs",
+    "audit:aset": "node scripts/audit-aset.mjs",
     "periksa": "npm run typecheck && npm run lint && npm run audit:spasi && npm run audit:bentuk && npm run audit:bayangan && npm run audit:tebal && npm run audit:ikon && npm run test",
     "audit:keadaan": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-keadaan.mjs",
     "audit:sheet": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-sheet-geometri.mjs",
@@ -42,8 +43,9 @@
     "audit:kembali": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kembali.mjs",
     "audit:respon": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-respon.mjs",
     "audit:tulis": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-tulis.mjs",
-    "audit": "npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon && npm run audit:kembali && npm run audit:mundur",
+    "audit": "npm run audit:aset && npm run audit:keadaan && npm run audit:sheet && npm run audit:publik && npm run audit:masuk && npm run audit:tulis && npm run audit:potong && npm run audit:respon && npm run audit:kembali && npm run audit:mundur",
     "lembar-kontak": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/lembar-kontak.mjs",
+    "tangkap": "node scripts/capture-screenshots.mjs && node scripts/gen-shots-webp.mjs",
     "sapu-semua": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/sapu-semua.mjs"
   },
   "dependencies": {

@@ -62,10 +62,24 @@ describe('Excel Kas RT — isi workbook', () => {
   const MASUK = 5_000_000 + 1_250_000, KELUAR = 750_000;
   const wbOf = () => buildKasRTExcel(LIST, { saldo: MASUK - KELUAR, totalMasuk: MASUK, totalKeluar: KELUAR, saldoAwal: 0 }).wb;
 
-  it('RINGKASAN rekonsiliasi sendiri: awal + masuk − keluar = akhir', () => {
+  /* Sejak 5 Sep 2026 nilai Ringkasan BERTANDA, jadi invariannya naik dari
+     "awal + masuk − keluar = akhir" (rumus yang cuma kita yang tahu) menjadi
+     "=SUM() ketiga baris = baris terakhir" — yaitu hal yang bisa diperiksa
+     bendahara SENDIRI di dalam Excel, tanpa memercayai kita. */
+  it('RINGKASAN rekonsiliasi sendiri: =SUM(baris atas) = Saldo Akhir', () => {
     const ws = wbOf().getWorksheet('Ringkasan')!;
     const [awal, masuk, keluar, akhir] = [5, 6, 7, 8].map((r) => angka(ws, r, 2));
-    expect(awal + masuk - keluar, 'Saldo Akhir tak sama dgn awal + masuk − keluar').toBe(akhir);
+    expect(awal + masuk + keluar, 'kolom Ringkasan tak menjumlah ke Saldo Akhir').toBe(akhir);
+  });
+
+  it('ARAH UANG dibawa TANDA, bukan cuma warna', () => {
+    const ws = wbOf().getWorksheet('Ringkasan')!;
+    /* Kolomnya tunggal (`Nominal (Rp)`) dan headernya tak membawa arah apa pun,
+       jadi tanpa tanda satu-satunya pembeda masuk/keluar adalah WARNA — dan
+       warna saja bukan penyandian yang sah. PDF untuk angka yang sama sudah
+       lama mencetak `-Rp…`. */
+    expect(angka(ws, 7, 2), 'Total Keluar wajib NEGATIF di kolom bernilai campur').toBeLessThan(0);
+    expect(angka(ws, 6, 2), 'Total Masuk wajib positif').toBeGreaterThan(0);
   });
 
   it('LINTAS-SHEET: kolom Mutasi menjumlah tepat ke Ringkasan', () => {
@@ -73,7 +87,11 @@ describe('Excel Kas RT — isi workbook', () => {
     const sum = wb.getWorksheet('Ringkasan')!, mut = wb.getWorksheet('Mutasi')!;
     const H = 4;
     expect(jumlahKolom(mut, H, kolom(mut, H, 'Masuk (Rp)')), 'Σ kolom Masuk ≠ Total Masuk di Ringkasan').toBe(angka(sum, 6, 2));
-    expect(jumlahKolom(mut, H, kolom(mut, H, 'Keluar (Rp)')), 'Σ kolom Keluar ≠ Total Keluar di Ringkasan').toBe(angka(sum, 7, 2));
+    /* Mutasi menyimpan MAGNITUDO positif — di sana arah dibawa NAMA KOLOM
+       (Masuk/Keluar), jadi tanda akan mubazir & merusak filter/pivot. Ringkasan
+       menyimpan BERTANDA karena kolomnya tunggal. Keduanya benar untuk
+       tempatnya masing-masing; yang menghubungkan mereka tanda minus di sini. */
+    expect(jumlahKolom(mut, H, kolom(mut, H, 'Keluar (Rp)')), 'Σ kolom Keluar ≠ |Total Keluar| di Ringkasan').toBe(-angka(sum, 7, 2));
     expect(mut.rowCount - H, 'jumlah baris mutasi ≠ jumlah transaksi').toBe(LIST.length);
   });
 });
@@ -88,8 +106,17 @@ describe('Excel Kas Hadiran — isi workbook', () => {
   it('RINGKASAN memakai rumus saldo yang SAMA dengan app', () => {
     const ws = wbOf().getWorksheet('Ringkasan')!;
     const [kas, tal, setor, saldo] = [5, 6, 7, 8].map((r) => angka(ws, r, 2));
-    expect(saldo, 'saldo di Excel ≠ hitungSaldoHadiran(kas, talangan, setor)').toBe(hitungSaldoHadiran(kas, tal, setor));
+    /* Sel talangan & setoran kini BERTANDA (negatif), jadi rumus app dipanggil
+       dgn magnitudonya — `hitungSaldoHadiran` = kas − talangan − setor. */
+    expect(saldo, 'saldo di Excel ≠ hitungSaldoHadiran(kas, talangan, setor)').toBe(hitungSaldoHadiran(kas, -tal, -setor));
+    expect(kas + tal + setor, 'kolom Ringkasan tak menjumlah ke Saldo Kas Hadiran').toBe(saldo);
     expect(saldo, 'sel saldo kosong — periksa nama field Stats (saldo vs saldoAktif)').not.toBeNaN();
+  });
+
+  it('ARAH UANG dibawa TANDA: talangan & setoran negatif', () => {
+    const ws = wbOf().getWorksheet('Ringkasan')!;
+    expect(angka(ws, 6, 2), 'Talangan Belum Lunas wajib negatif').toBeLessThan(0);
+    expect(angka(ws, 7, 2), 'Setoran ke Kas Besar RT wajib negatif').toBeLessThan(0);
   });
 
   it('LINTAS-SHEET: kolom Kas Terkumpul menjumlah tepat ke Ringkasan', () => {

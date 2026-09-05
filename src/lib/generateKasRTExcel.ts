@@ -29,10 +29,19 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
      yang sampai 5 Sep cuma ditegakkan di PDF. Di Excel `Talangan` (cacah) dan
      `Kas Terkumpul` (rupiah) karena itu cuma bisa dibedakan dari besarnya. */
   headerRow(sum, 4, ['Keterangan', 'Nominal (Rp)']);
+  /* NILAI BERTANDA (5 Sep 2026). Sebelumnya `Total Keluar` disimpan POSITIF
+     dan cuma diwarnai merah — arah uang disandikan lewat WARNA SAJA, di kolom
+     tunggal `Nominal (Rp)` yang headernya tak membawa arah apa pun. PDF untuk
+     angka yang sama mencetak `-Rp11.070.000`: satu nominal, dua konvensi,
+     tergantung media. Di sheet Mutasi positif memang BENAR — di sana arah
+     dibawa nama kolom (Masuk/Keluar); di sini tidak ada yang membawanya.
+     Bertanda sekaligus membuat kolomnya REKONSILIASI SENDIRI: =SUM() atas
+     keempat baris menghasilkan Saldo Akhir, jadi bendahara bisa memeriksanya
+     di dalam Excel tanpa memercayai kita. `|| 0` mencegah `-0`. */
   const ringkasan: [string, number, 'pos' | 'neg' | 'ink'][] = [
     ['Saldo Awal', stats.saldoAwal, 'ink'],
     ['Total Masuk', stats.totalMasuk, 'pos'],
-    ['Total Keluar', stats.totalKeluar, 'neg'],
+    ['Total Keluar', -stats.totalKeluar || 0, 'neg'],
     ['Saldo Akhir', stats.saldo, stats.saldo < 0 ? 'neg' : 'pos'],
   ];
   ringkasan.forEach(([label, val, tone], i) => {
