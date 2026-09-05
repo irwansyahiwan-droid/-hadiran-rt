@@ -211,7 +211,10 @@ body {
      bergerak turun — `#005044` 7,10 → 7,16 · `#75320B` 7,14 → 7,20 ·
      `#34453B` 7,68 → 7,75. Itu seluruh alasan memilih tuas kroma, bukan L. */
   background-color: #CFE6D8;
-  /* 'Inter Variable' = self-hosted (@fontsource-variable/inter, import di main.tsx). */
+  /* 'Inter Variable' = self-hosted; @font-face-nya di ATAS berkas ini, menunjuk
+     `src/fonts/inter-latin.woff2` (hasil `npm run gen:font`). Sampai 5 Sep 2026
+     baris ini menunjuk `import '@fontsource-variable/inter'` di main.tsx —
+     mekanisme yang sudah tidak ada. */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   /* Tabular figures app-wide: tiap digit selebar sama → angka rupiah tidak
      "goyang/loncat" saat count-up atau saat disusun kolom (terasa seperti
