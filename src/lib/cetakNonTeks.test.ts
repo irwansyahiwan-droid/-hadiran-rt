@@ -136,7 +136,13 @@ const ABSENSI: Record<string, AbsensiStatus> = { w1: 'hadir', w2: 'hadir', w3: '
    yang pertama protes. */
 const DOK: { nama: string; doc: unknown; M: number; garis: number; tegakN: number; gambar: number }[] = [
   { nama: 'Laporan Triwulan', M: 6, garis: 9, tegakN: 0, gambar: 0, doc: buildLaporanTriwulanPDF(REKAP).doc },
-  { nama: 'Kas RT', M: 14, garis: 25, tegakN: 0, gambar: 1, doc: buildKasRTPDF(
+  /* 25 → 21 (5 Sep 2026): kepala kolom kini dicetak sekali per HALAMAN, bukan
+     sekali per kategori, jadi seksi kedua di halaman yang sama kehilangan 4
+     rule tepi-bawah selnya. Turunnya DIVERIFIKASI dgn menyebut ruasnya satu
+     per satu — bukan diterima begitu saja: 21 itu masthead + 2 rule seksi +
+     4 rule kepala (satu set, bukan dua) + 8 rule baris + double-rule ringkasan
+     + 3 garis tanda tangan. Tak ada yang hilang. */
+  { nama: 'Kas RT', M: 14, garis: 21, tegakN: 0, gambar: 1, doc: buildKasRTPDF(
       [kasrt(1, 'masuk', 5_000_000, 'hadiran', 'Setoran kas Hadiran bulan Agustus'), kasrt(2, 'keluar', 750_000, 'sosial', 'Santunan warga sakit')],
       { saldo: 4_250_000, totalMasuk: 5_000_000, totalKeluar: 750_000, saldoAwal: 0 }).doc },
   { nama: 'Kas Hadiran', M: 14, garis: 33, tegakN: 0, gambar: 1, doc: buildKasHadiranPDF(

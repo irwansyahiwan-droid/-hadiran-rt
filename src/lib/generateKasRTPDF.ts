@@ -110,6 +110,14 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
 
   // Satu sub-bagian per kategori (label "PENERIMAAN/PENGELUARAN — <kategori>" +
   // subtotal + tabel) → laporan berkelompok untuk pertanggungjawaban.
+  /* Halaman yang kepala kolomnya SUDAH tercetak. Sembilan kategori berbagi
+     kolom yang IDENTIK (NO · TANGGAL · KETERANGAN · JUMLAH), jadi sebelum
+     5 Sep 2026 laporan 12 transaksi mencetak 9 label seksi + 9 baris kepala =
+     18 baris chrome untuk 12 baris data. Label seksinya jelas berhak — itu
+     pengelompokan pertanggungjawabannya, berikut subtotal. Yang tak berhak
+     diulang sembilan kali cuma NAMA KOLOMNYA. */
+  let halamanBerkepala = 0;
+
   const renderKategori = (
     startY: number, prefix: string, label: string, rows: KasRT[],
     tone: 'pos' | 'neg', sign: '+' | '-',
@@ -118,10 +126,20 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
     const sub = rows.reduce((s, k) => s + k.nominal, 0);
     // Guard: label seksi jangan yatim di dasar halaman (butuh label + kepala tabel + ±2 baris)
     const y = sectionLabel(doc, ensureSpace(doc, startY + 6, 38), `${prefix} — ${label}`, W, M, { text: `${sign}${rp(sub)}`, tone }, SK);
+    /* Kepala dicetak kalau (a) ini seksi PERTAMA di halaman ini, atau (b) tabel
+       ini mungkin MELUAP — halaman lanjutan yang barisnya tanpa nama kolom
+       lebih buruk daripada kepala yang berulang, jadi taksirannya sengaja
+       MURAH HATI dan arah salahnya aman: kelebihan taksir cuma mengembalikan
+       perilaku lama. Taksiran ini BUKAN penjaganya — invariannya ("tiap
+       halaman berisi baris transaksi punya nama kolom") dijaga uji. */
+    const halIni = doc.getNumberOfPages();
+    const tinggiKira = rows.length * 9.5 + 8;
+    const adaKepala = halIni !== halamanBerkepala || y + tinggiKira > doc.internal.pageSize.getHeight() - 16;
     autoTable(doc, {
       ...TABEL,
       startY: y,
-      head: [HEAD],
+      head: adaKepala ? [HEAD] : [],
+      showHead: adaKepala ? 'everyPage' : 'never',
       body: rows.map((k, i) => [
         String(i + 1), fmtDate(k.tanggal), k.keterangan, `${sign}${fmtNum(k.nominal)}`,
       ]),
@@ -150,6 +168,9 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
         sectionLabel(doc, LANJUT_TOP - 4, `${prefix} — ${label} (lanjutan)`, W, M, undefined, SK);
       },
     });
+    /* Sesudah tabel: kalau kepala tadi dicetak, ia tercetak di TIAP halaman yg
+       disentuh tabel ini — jadi halaman saat ini pasti sudah berkepala. */
+    if (adaKepala) halamanBerkepala = doc.getNumberOfPages();
     return getY(doc);
   };
 

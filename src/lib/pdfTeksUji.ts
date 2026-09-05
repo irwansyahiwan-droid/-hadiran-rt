@@ -62,7 +62,16 @@ export function geometriPdf(doc: unknown, jsPDFCtor: new (o?: object) => { setFo
   d.internal.pages.forEach((pg, hal) => {
     if (!Array.isArray(pg)) return;
     const isi = pg.join('\n');
-    const re = /BT\s+([\s\S]*?)ET/g;
+    /* `ET` WAJIB berdiri sendiri sbg token, bukan substring. Pola lama
+       (`[\s\S]*?ET`) berhenti di `ET` PERTAMA — dan "K(ET)ERANGAN" memuatnya,
+       jadi blok itu terpotong sebelum `Tj`-nya lalu DIBUANG diam-diam. Kepala
+       kolom Kas RT karena itu tak pernah terlihat penjaga tata letak, non-teks,
+       maupun halaman-lanjutan; ketiganya mengira ia tak ada. Ditemukan 5 Sep
+       2026 lewat angka mustahil: `teksPdf` melihat 1 "KETERANGAN",
+       `geometriPdf` melihat 0, dari dokumen yang sama.
+       Kelas yang SAMA sudah diantisipasi di `nonTeksPdf` — teks yang tercetak
+       bisa memuat token apa pun di dalam kurungnya. */
+    const re = /BT\s+([\s\S]*?)\bET\b/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(isi))) {
       const blok = m[1];
@@ -129,7 +138,7 @@ export function nonTeksPdf(doc: unknown): { W: number; H: number; segmen: Segmen
 
   d.internal.pages.forEach((pg, hal) => {
     if (!Array.isArray(pg)) return;
-    const tok = pg.join('\n').replace(/BT[\s\S]*?ET/g, ' ').split(/\s+/).filter(Boolean);
+    const tok = pg.join('\n').replace(/BT[\s\S]*?\bET\b/g, ' ').split(/\s+/).filter(Boolean);
     let ctm: M6 = [...IDEN] as M6, tebal = 1;
     const tumpuk: { ctm: M6; tebal: number }[] = [];
     let ops: number[] = [], kini: { x: number; y: number } | null = null;
