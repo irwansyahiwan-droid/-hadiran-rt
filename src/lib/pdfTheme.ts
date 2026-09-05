@@ -225,6 +225,9 @@ export function drawStatStrip(doc: jsPDF, y: number, stats: Stat[], W: number, M
 }
 
 /** Label seksi: uppercase ber-letterspace + nilai kanan opsional + hairline. */
+/** Tinggi blok label seksi: teks di y+5, hairline di y+7,5, isi mulai di y+SEKSI_H. */
+export const SEKSI_H = 8.5;
+
 export function sectionLabel(
   doc: jsPDF, y: number, label: string, W: number, M: number,
   extra?: { text: string; tone?: keyof typeof C }, sk: SkalaTeks = RAPAT,
@@ -237,7 +240,7 @@ export function sectionLabel(
   }
   setDraw(doc, C.line); doc.setLineWidth(0.3);
   doc.line(M, y + 7.5, W - M, y + 7.5);
-  return y + 8.5;
+  return y + SEKSI_H;
 }
 
 /** Gaya dasar autoTable: plain, header rule tegas, baris hairline, foot tanpa blok. */
@@ -362,6 +365,25 @@ export function drawContinuationHeader(
  * nilai balik `ensureSpace` saat ia membuka halaman.
  */
 export const LANJUT_TOP = 30;
+
+/** Y label seksi "(lanjutan)" di halaman sambungan. */
+export const LANJUT_LABEL_Y = LANJUT_TOP - 4;
+
+/**
+ * Y tempat ISI (tabel) boleh mulai di halaman sambungan.
+ *
+ * WAJIB di bawah blok label "(lanjutan)", dan itu bukan kerapian: sampai
+ * 5 Sep 2026 tabel memakai `margin.top = LANJUT_TOP` (30) sementara labelnya
+ * digambar di `LANJUT_TOP - 4` (26) dan blok label setinggi `SEKSI_H` — jadi
+ * hairline label jatuh di 33,5mm sementara baris KEPALA KOLOM berbaseline
+ * 34,5mm. Garisnya menembus badan huruf "NO TANGGAL KETERANGAN JUMLAH (Rp)"
+ * di TIAP halaman sambungan. Ditemukan user dari laporan Kas RT yang benar-
+ * benar dicetak, bukan dari sapuan.
+ *
+ * Diturunkan, bukan dipaku: kalau `LANJUT_TOP` atau `SEKSI_H` bergeser, nilai
+ * ini ikut. Itu sebabnya ia ada di sini dan bukan angka di call-site.
+ */
+export const LANJUT_ISI_TOP = LANJUT_LABEL_Y + SEKSI_H;
 
 /**
  * Kepala lanjutan di SETIAP halaman ≥ 2. Panggil SEKALI di akhir, tepat
