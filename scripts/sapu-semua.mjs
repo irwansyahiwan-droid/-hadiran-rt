@@ -64,6 +64,13 @@ const VISUAL = [
      sengaja di luar rantai ini. Build BASI ditolaknya sendiri (PROBE
      CACAT), jadi ia tak bisa hijau dari build kemarin. */
   ['unduh', 'node scripts/audit-unduh.mjs'],
+  /* `fallback-sora` menuntut DATA NYATA, bukan cuma preview hidup: dua
+     permukaannya (target Kas RT, revisi jadwal) hanya ADA kalau DB-nya
+     berisi, dan luapan teks bergantung pada STRING nyata — nama warga,
+     keterangan. Di lingkungan tanpa Supabase ia keluar PROBE CACAT, dan itu
+     memang jawaban yang benar: hijau dari populasi yang distarve adalah
+     kepercayaan palsu (cacat ke-23). */
+  ['fallback-sora', 'node scripts/audit-fallback-sora.mjs'],
 ];
 
 /* ── LANTAI POPULASI ────────────────────────────────────────────────────────
@@ -121,6 +128,10 @@ const LANTAI = {
      Garis dasar 19; lantai ~95%. Turun di bawahnya berarti sapuan
      mengukur separuh jalur kritis lalu tetap melapor 0 temuan. */
   unduh:            [/(\d+) berkas diperiksa/, 18],
+  /* Populasi = PERMUKAAN, bukan jumlah teks. Jumlah teks bergerak mengikuti
+     isi DB (69 warga hari ini, 300 KK yang dijanjikan), jadi lantai berbasis
+     teks salah tiap kali datanya tumbuh. Jumlah permukaan properti APP. */
+  'fallback-sora':  [/(\d+) permukaan diperiksa/, 36],
 };
 /* TANPA LANTAI — daftar ini KOSONG sejak 3 Sep 2026, dan mekanismenya sengaja
    dipertahankan. `lebar`, `reflow` & `gerak` dulu di sini karena keluarannya
