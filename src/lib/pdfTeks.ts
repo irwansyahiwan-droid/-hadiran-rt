@@ -50,7 +50,13 @@ const bisaDicetak = (k: number): boolean =>
 const PETA: Record<string, string> = {
   '→': '->', '←': '<-', '↑': '^', '↓': 'v', '↔': '<->', '↗': '->', '↘': '->',
   '⇒': '=>', '⇐': '<=',
-  '✓': 'v', '✔': 'v', '☑': 'v', '✗': 'x', '✘': 'x', '☒': 'x',
+  /* CENTANG DIBUANG, SILANG TIDAK — dan itu bukan ketidakkonsistenan.
+     Membuang centang aman: "musholah ✓ selesai" → "musholah selesai", makna
+     utuh. Membuang SILANG MEMBALIK makna: "atap ✗ selesai" → "atap selesai",
+     yaitu pernyataan yang berlawanan — dan di dokumen uang itu jauh lebih
+     buruk daripada satu huruf yang terbaca janggal. Centang jatuh ke jalur
+     "tak bisa di-encode → dibuang" di bawah; keputusan user 5 Sep 2026. */
+  '✗': 'x', '✘': 'x', '☒': 'x',
   '−': '-', '‒': '-', '―': '-', '≈': '~', '≠': '!=', '≤': '<=', '≥': '>=',
   '‣': '-', '▪': '-', '▸': '-', '●': '-', '○': '-',
   /* Ditulis sbg ESCAPE, bukan karakter harfiah: yang tak terlihat di editor

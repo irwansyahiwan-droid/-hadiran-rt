@@ -121,7 +121,10 @@ describe('Encoding teks dokumen cetak', () => {
 describe('amanWinAnsi', () => {
   it('mentransliterasi yang bisa, membuang yang tidak, menjaga yang sah', () => {
     expect(amanWinAnsi('a → b')).toBe('a -> b');
-    expect(amanWinAnsi('Perbaikan ✓ selesai')).toBe('Perbaikan v selesai');
+    expect(amanWinAnsi('Perbaikan ✓ selesai'), 'centang DIBUANG — maknanya utuh tanpanya')
+      .toBe('Perbaikan selesai');
+    expect(amanWinAnsi('Atap ✗ selesai'), 'silang DIPERTAHANKAN — membuangnya MEMBALIK makna')
+      .toBe('Atap x selesai');
     expect(amanWinAnsi('Iuran \u{1F64F} terima kasih'), 'emoji dibuang, spasi ganda dirapikan').toBe('Iuran terima kasih');
     expect(amanWinAnsi('Rp1.250.000 – Rp2.000.000'), 'en-dash SAH di cp1252').toBe('Rp1.250.000 – Rp2.000.000');
     expect(amanWinAnsi('Lomba — juara “1” · A'), 'em-dash, kutip lengkung & middot SAH')
