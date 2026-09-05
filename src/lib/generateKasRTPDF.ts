@@ -4,7 +4,7 @@ import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
   tabelSkala, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, seksiMinH, C, fmtNum,
-  alignHeadFoot, drawContinuationHeaders, LANJUT_TOP, signH, LANSIA,
+  alignHeadFoot, drawContinuationHeaders, LANJUT_LABEL_Y, LANJUT_ISI_TOP, signH, LANSIA,
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
@@ -143,9 +143,9 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
       body: rows.map((k, i) => [
         String(i + 1), fmtDate(k.tanggal), k.keterangan, `${sign}${fmtNum(k.nominal)}`,
       ]),
-      /* top 26 = ruang untuk label "(lanjutan)" di halaman sambungan (hanya
-         berlaku utk halaman kedua dst; halaman pertama pakai startY). */
-      margin: { left: M, right: M, top: LANJUT_TOP },
+      /* Isi halaman sambungan mulai DI BAWAH blok label "(lanjutan)" — dulu
+         `LANJUT_TOP` (30), yang menaruh kepala kolom tepat di garis label. */
+      margin: { left: M, right: M, top: LANJUT_ISI_TOP },
       columnStyles: COL,
       didParseCell(data) {
         alignHeadFoot(data, COL);
@@ -165,7 +165,7 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
         if (data.pageNumber === 1) return;
         /* Di BAWAH pita kepala lanjutan (0..24). Dulu 14 — yang sejak kepala
            lanjutan jadi tak-bersyarat akan tertimpa olehnya. */
-        sectionLabel(doc, LANJUT_TOP - 4, `${prefix} — ${label} (lanjutan)`, W, M, undefined, SK);
+        sectionLabel(doc, LANJUT_LABEL_Y, `${prefix} — ${label} (lanjutan)`, W, M, undefined, SK);
       },
     });
     /* Sesudah tabel: kalau kepala tadi dicetak, ia tercetak di TIAP halaman yg

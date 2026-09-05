@@ -150,6 +150,32 @@ const DOK: { nama: string; doc: unknown; M: number; garis: number; tegakN: numbe
      per satu — bukan diterima begitu saja: 21 itu masthead + 2 rule seksi +
      4 rule kepala (satu set, bukan dua) + 8 rule baris + double-rule ringkasan
      + 3 garis tanda tangan. Tak ada yang hilang. */
+  /* HALAMAN SAMBUNGAN (5 Sep 2026) — populasi yang tak pernah dipungut.
+     Vonis `silang()` sudah ada sejak berkas ini lahir, tapi tiap dokumen di
+     daftar ini muat SATU halaman atau menumpah tanpa label seksi, jadi
+     kombinasi "label (lanjutan) + kepala kolom terulang" tak pernah masuk
+     populasi sekali pun. Ongkosnya nyata & ditemukan USER dari laporan yang
+     benar-benar dicetak: hairline label jatuh di 33,5mm sementara kepala kolom
+     berbaseline 34,5mm — garis menembus "NO TANGGAL KETERANGAN JUMLAH (Rp)"
+     di TIAP halaman sambungan.
+
+     Fixture ini MENYASAR: 40 baris di SATU kategori memaksa tabelnya menumpah,
+     yang tak pernah terjadi pada fixture merata di atas. Kalau `LANJUT_ISI_TOP`
+     dikembalikan ke `LANJUT_TOP`, uji `tak ada teks yang tersilang garis` yang
+     memerahkannya — terbukti: mutasi itu mencetak `"NO" disilang rule MENDATAR
+     (tembus 0,85pt)` berikut TANGGAL, KETERANGAN & JUMLAH.
+
+     `garis: 183` DIUKUR, bukan ditaksir. Tebakan pertamaku 47 dan itu lolos —
+     lantai yang kekecilan meloloskan penyusutan populasi 74% tanpa protes,
+     yaitu persis kegagalan yang mekanisme lantai ini dibuat untuk mencegah.
+     Angkanya wajar: 40 baris x 4 rule tepi-sel + kepala kolom 2 halaman +
+     rule seksi + masthead + kepala lanjutan + double-rule ringkasan + 3 garis
+     tanda tangan. */
+  { nama: 'Kas RT (seksi menumpah)', M: 14, garis: 183, tegakN: 0, gambar: 1,
+    doc: buildKasRTPDF(
+      Array.from({ length: 40 }, (_, i) =>
+        kasrt(i, 'keluar', 350_000, 'donasi_rawat_inap', `Donasi Rawat Inap orang ke-${i + 1}`)),
+      { saldo: -14_000_000, totalMasuk: 0, totalKeluar: 14_000_000, saldoAwal: 0 }).doc },
   { nama: 'Kas RT', M: 14, garis: 21, tegakN: 0, gambar: 1, doc: buildKasRTPDF(
       [kasrt(1, 'masuk', 5_000_000, 'hadiran', 'Setoran kas Hadiran bulan Agustus'), kasrt(2, 'keluar', 750_000, 'sosial', 'Santunan warga sakit')],
       { saldo: 4_250_000, totalMasuk: 5_000_000, totalKeluar: 750_000, saldoAwal: 0 }).doc },
