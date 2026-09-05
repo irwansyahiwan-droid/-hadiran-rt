@@ -49,12 +49,15 @@ const URL_APP = process.env.CAP_URL || 'http://localhost:5199';
 const LEBAR = (process.env.LEBAR || '320,390').split(',').map(Number);
 const MUTASI = +(process.env.MUTASI || 0);
 /* Lantai dihitung dari PERMUKAAN, bukan jumlah teks. Jumlah teks bergerak
-   mengikuti isi DB (69 warga hari ini, 300 KK yang dijanjikan besok), jadi
-   lantai berbasis teks akan salah setiap kali datanya tumbuh atau menyusut.
-   Jumlah permukaan adalah properti APP: 4 tab warga + 5 tab bendahara + 3 FAB/
-   sheet + menu aksi + revisi + 5 overlay admin + form anggota = 19 per lebar,
-   x 2 lebar = 38. Lantai ~95%. */
-const LANTAI = 36;
+   mengikuti isi DB (69 warga hari ini, 300 KK yang dijanjikan), jadi lantai
+   berbasis teks salah setiap kali datanya tumbuh atau menyusut.
+
+   Angkanya dari GARIS DASAR NYATA (5 Sep 2026, lawan DB hidup): 40 permukaan
+   — 4 tab warga + 16 permukaan bendahara, x 2 lebar. Lantai 38 = ~95%,
+   disiplin yang sama dgn lantai `sapu-semua`: KETAT, karena jumlah permukaan
+   adalah properti APP dan tak bergerak antar-jalan. Sempat 36 waktu ditulis,
+   ditebak dari pencacahan kode sebelum ada jalan bernyawa. */
+const LANTAI = 38;
 
 /* Aturan terkurung SAMA PERSIS `audit:potong` — termasuk penjaga
    `overflowX === 'visible'` yang di sana ditambahkan karena elemen yang
@@ -206,6 +209,21 @@ async function jalan(browser, w, peran, blokir) {
   const soraAda = await page.evaluate(() => document.fonts.check('700 32px "Sora Variable"'));
   await ctx.close();
   return { ke, keM, ditolak, soraAda, nPermukaan, dilewat };
+}
+
+/* Preview mati -> PROBE CACAT yang menyebut sebabnya, BUKAN stack trace
+   `net::ERR_CONNECTION_REFUSED` dari dalam `page.goto`. Terjadi 5 Sep 2026:
+   sapuan dijalankan ulang sesudah preview-nya dimatikan, dan yang dilihat
+   pemakainya 20 baris jejak tumpukan menunjuk baris 196 — bukan kalimat
+   "servernya belum hidup". Sapuan yang gagal dgn cara yang tak terbaca
+   membuat orang menduga APP-nya yang rusak. */
+try {
+  const r = await fetch(URL_APP, { signal: AbortSignal.timeout(4000) });
+  if (!r.ok) throw new Error(String(r.status));
+} catch {
+  console.log(`PROBE CACAT: ${URL_APP} tak menjawab — hidupkan dulu:`);
+  console.log('  npm run build && npx vite preview --port 5199 &');
+  process.exit(2);
 }
 
 const browser = await chromium.launch();
