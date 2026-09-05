@@ -223,9 +223,14 @@ bersembunyi, dan tak satu pun terlihat oleh review visual.
 
 ## Jebakan yang sudah mahal — jangan diulang
 
-- **DEPLOY TIDAK OTOMATIS.** `git push` tidak men-deploy apa pun.
-  `vercel --prod --yes` dari akar repo. **Vonis "live" WAJIB dari mengambil
-  produksi lalu memeriksa ISInya**, bukan dari exit code.
+- **`git push` ke `main` MEN-DEPLOY ke produksi** (dikoreksi 5 Sep 2026 —
+  catatan lama menyatakan sebaliknya, dan itu benar sampai ~24 Agu). Alias ikut
+  otomatis. Jadi **PUSH sekali di akhir sesi** bukan lagi kerapian, ia satu-
+  satunya rem: tiap push membatalkan cache SW warga & memunculkan toast versi
+  baru. `vercel --prod --yes` masih sah untuk mengirim tanpa push atau mengirim
+  ulang — tapi SESUDAH push ia cuma membuat deployment kedua yang mubazir.
+  **Vonis "live" WAJIB dari mengambil produksi lalu memeriksa ISInya**, bukan
+  dari exit code maupun dari "push berhasil".
 - **Verifikasi build**: pastikan `npm run build` BERHASIL sebelum memeriksa
   keluarannya — grep pada `dist` yang basi pernah menjawab "0" yang menyesatkan.
 - **Mengubah warna PERMUKAAN membatalkan tiap angka kontras di atasnya** —

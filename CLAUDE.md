@@ -470,14 +470,34 @@ elemennya sendiri akan selalu berteriak "terpotong 20-24px", padahal
 meluber itu justru OBATNYA. Yang menentukan `overflow`, bukan selisih lebar.
 
 
-Yang ke-27 (26 Agu 2026) — **DEPLOY TIDAK OTOMATIS. `git push` TIDAK men-deploy
-apa pun.** Catatan lama (termasuk di skill rt-dev) menulis "auto-deploy via
-GitHub push ke main". Itu TIDAK BENAR untuk proyek ini: integrasi Git Vercel
-tak tersambung, dan `vercel ls` menunjukkan SELURUH deployment dibuat manual
-lewat CLI. Produksi tertinggal DUA HARI sementara tiga perubahan besar (Login,
-Beranda, palet) sudah dilaporkan "live" berdasarkan push yang sukses.
+Yang ke-27 (26 Agu 2026, **DIKOREKSI 5 Sep 2026**) — soal deploy.
 
-Deploy yang benar: `vercel --prod --yes` dari akar repo.
+**KEADAAN SEKARANG: `git push` ke `main` MEN-DEPLOY ke produksi.** Integrasi Git
+Vercel tersambung, dan alias `hadiran-rt.vercel.app` ikut ke deployment itu
+tanpa promosi manual. Terukur 5 Sep 2026: commit `7485c76` di-push 07:15:40,
+deployment `esgcnl26d` lahir **07:15:44** — empat detik kemudian, dan
+`vercel --prod` TIDAK dijalankan sekali pun untuk perubahan itu.
+
+**Yang ditulis di sini sebelumnya ("DEPLOY TIDAK OTOMATIS") BENAR pada
+zamannya** — 24 Agu 2026 diverifikasi keras: push, ditunggu 7 menit, nama aset
+tak bergerak. Sesuatu tersambung di antara kedua tanggal itu. Catatan ini
+ditulis ULANG, bukan ditambahi, karena catatan yang menunjuk mekanisme MATI
+menyesatkan sesi berikutnya (aturan ke-10 di skill).
+
+**AKIBAT YANG LANGSUNG MENGGIGIT: "push bebas, deploy sekali" sudah TIDAK BISA
+dijaga.** Aturan user 19 Agu — commit sebanyak apa pun, PUSH hanya SEKALI di
+akhir sesi — kini bukan soal kerapian melainkan satu-satunya rem yang tersisa:
+tiap push membatalkan cache service worker warga & memunculkan toast versi
+baru. Sesi 5 Sep melanggarnya 3× sebelum sadar.
+
+**Menjalankan `vercel --prod` SESUDAH push membuat deployment KEDUA** dari
+sumber yang sama. Tak berbahaya (hash aset identik kalau sumbernya identik,
+jadi warga tak mengunduh ulang apa pun) tapi mubazir — dan itulah "dua
+deployment dari satu perintah" yang sempat dilaporkan sbg anomali tak
+terjelaskan di sesi yang sama, sebelum korelasi waktunya diperiksa.
+
+Deploy manual masih sah & kadang perlu (mis. mengirim tanpa push, atau
+mengirim ulang): `vercel --prod --yes` dari akar repo.
 
 Pelajaran yang lebih besar dari satu perintah: **"push berhasil" bukan bukti
 "live".** Bukti live cuma satu — MENGAMBIL produksi lalu memeriksa isinya:
