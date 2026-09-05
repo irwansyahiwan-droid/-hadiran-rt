@@ -254,7 +254,11 @@
   }
   .foto-bingkai img {
     display: block; width: 100%; height: auto;
-    aspect-ratio: 1170 / 2532; background: #ECF1F7;
+    /* Latar penampung foto = kanvas app, supaya tak ada KEDIP biru sebelum
+       gambarnya termuat. Sampai 5 Sep 2026 nilainya #ECF1F7 — kanvas pra-Hutan,
+       basi dua migrasi (rona 24 Agu + kroma 30 Agu), sama persis dgn kanvas
+       yang baru ditembak ulang dari screenshot-nya sendiri. */
+    aspect-ratio: 1170 / 2532; background: #CFE6D8;
   }
   .foto figcaption { margin-top: 12px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
   .foto figcaption b { font-family: 'Fraunces', serif; font-weight: 640; font-size: 15px; color: var(--ink); }
