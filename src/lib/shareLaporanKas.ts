@@ -25,7 +25,23 @@ export interface LaporanKasCard {
   shareText: string;    // teks pendamping saat share ke WA
 }
 
-const FONT = 'Inter, system-ui, -apple-system, sans-serif';
+/* DUA font, paritas `shareReceipt.ts` (5 Sep 2026).
+   Sampai hari ini berkas ini memakai Inter untuk SEMUANYA, termasuk brandmark
+   & nominal hero — sementara struk di sebelahnya sudah lama memakai Sora untuk
+   keduanya, berikut alasannya tertulis: "struk share = suara visual yang sama
+   dgn hero in-app, bukan Inter polos". Dua kartu ini mendarat di grup WA yang
+   SAMA, di hari yang sama, dari app yang sama; alasan yang berlaku untuk satu
+   berlaku untuk yang lain. Yang tertinggal cuma berkas ini — tak ada keputusan
+   di baliknya, ia memang tak pernah ditengok.
+
+   Sora dipakai PERSIS di tempat yang sama dgn struk: brandmark + nominal hero.
+   Nilai baris TIDAK ikut — di struk pun baris detail memakai Inter, dan yang
+   Sora hanya baris kesimpulan yang ukurannya memang beda (17px). Menyoranya di
+   sini pada 13px yang sama dgn tetangganya akan terbaca sbg ketidakkonsistenan,
+   bukan sbg tekanan. */
+const rupiahFont = "'Inter Variable', Inter, system-ui, -apple-system, sans-serif";
+const displayFont = `'Sora Variable', Sora, ${rupiahFont}`;
+const FONT = rupiahFont;
 
 /** Nominal BERTANDA untuk kartu ("-Rp390.000"). Dibangun di atas
  *  `formatRupiahPlain` (yang sengaja memakai Math.abs) supaya format "Rp" cuma
@@ -106,6 +122,13 @@ interface PanelRow {
 
 /** Render kartu laporan kas → PNG → bagikan (Web Share API + fallback WA). */
 export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
+  /* Pastikan Sora/Inter siap sebelum menggambar — paritas `shareReceipt`.
+     TANPA ini seluruh perbaikan font di atas TAK TERLIHAT: canvas diam-diam
+     jatuh ke font sistem, kartunya tetap tercetak rapi, dan tak ada satu pun
+     tanda bahwa Sora tak pernah terpakai. Kegagalan senyap semacam itu justru
+     yang paling lama hidup. */
+  try { await document.fonts.ready; } catch { /* lanjut dgn fallback */ }
+
   // Kas RT = pool final/akumulasi → jadi angka utama. "Belum Disetor" Kas
   // Hadiran ditampilkan terpisah di panel, TIDAK dijumlah ke total.
   const heroAmount = nominalHeroKartu(d);
@@ -179,7 +202,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   } catch { /* logo opsional */ }
   ctx.textAlign = 'left';
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = `700 16px ${FONT}`;
+  ctx.font = `700 16px ${displayFont}`; // brandmark = Sora, paritas header app
   ctx.fillText('Hadiran RT', hx + 64, hy + 35);
   ctx.fillStyle = 'rgba(255,255,255,0.7)';
   ctx.font = `500 11px ${FONT}`;
@@ -192,10 +215,13 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
 
   const amountStr = rpBertanda(heroAmount);
   let fs = 40;
-  ctx.font = `800 ${fs}px ${FONT}`;
+  /* Nominal hero = Sora (font-display app), paritas struk & hero in-app.
+     Penyusutan WAJIB mengukur dgn font yang sama dgn yang akhirnya dicat —
+     mengukur pakai Inter lalu mencat pakai Sora membuat lebarnya meleset. */
+  ctx.font = `800 ${fs}px ${displayFont}`;
   while (ctx.measureText(amountStr).width > hw - 40 && fs > 22) {
     fs -= 1;
-    ctx.font = `800 ${fs}px ${FONT}`;
+    ctx.font = `800 ${fs}px ${displayFont}`;
   }
   /* Nominal TETAP putih walau minus — DESIGN.stitch §7 melarang mewarnai
      nominal hero salmon/merah ("saldo minus disengaja"; sinyalnya chip KATA,
