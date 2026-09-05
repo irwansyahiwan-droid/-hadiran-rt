@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import type { Tarikan } from './types';
 import { formatTanggal } from './utils';
-import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, ZEBRA } from './excelStyle';
+import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA } from './excelStyle';
 
 interface TalanganInfo { count: number; total: number }
 interface Stats {
@@ -29,19 +29,22 @@ export function buildKasHadiranExcel(
   const sum = wb.addWorksheet('Ringkasan');
   sum.columns = [{ width: 28 }, { width: 20 }];
   titleBlock(sum, 'Kas Hadiran RT 004/006', `Ringkasan · ${tgl}`, 2);
-  headerRow(sum, 4, ['Keterangan', 'Nominal']);
-  const ringkasan: [string, number][] = [
-    ['Kas Hadiran Terkumpul', stats.totalKasTerkumpul],
-    ['Talangan Belum Lunas', stats.totalTalanganBelum],
-    ['Setoran ke Kas Besar RT', stats.totalSetor],
-    ['Saldo Kas Hadiran', stats.saldo],
+  headerRow(sum, 4, ['Keterangan', 'Nominal (Rp)']);
+  /* Nada mencermin PDF-nya baris demi baris: talangan `neg`, setoran `warn`,
+     saldo pos/neg menurut tandanya. Lihat didParseCell generateKasHadiranPDF. */
+  const ringkasan: [string, number, 'pos' | 'neg' | 'warn' | 'ink'][] = [
+    ['Kas Hadiran Terkumpul', stats.totalKasTerkumpul, 'ink'],
+    ['Talangan Belum Lunas', stats.totalTalanganBelum, 'neg'],
+    ['Setoran ke Kas Besar RT', stats.totalSetor, 'warn'],
+    ['Saldo Kas Hadiran', stats.saldo, stats.saldo < 0 ? 'neg' : 'pos'],
   ];
-  ringkasan.forEach(([label, val], i) => {
+  ringkasan.forEach(([label, val, tone], i) => {
     const r = sum.addRow([label, val]);
     r.getCell(2).numFmt = CUR;
     r.getCell(2).alignment = { horizontal: 'right' };
     r.eachCell((c) => (c.border = border));
     if (i === ringkasan.length - 1) r.font = { bold: true };
+    warnaiUang(r.getCell(2), tone);
   });
 
   // ── Sheet 2: Rekap Tarikan ──
@@ -51,7 +54,10 @@ export function buildKasHadiranExcel(
     { width: 16 }, { width: 16 }, { width: 12 }, { width: 16 },
   ];
   titleBlock(ws, 'Kas Hadiran RT 004/006', `Rekap per Tarikan · ${tgl}`, 9);
-  headerRow(ws, 4, ['No', 'Tanggal', 'Sohibul Bait', 'Hadir', 'Total Warga', 'Kas Terkumpul', 'Sohibul Terima', 'Talangan', 'Talangan (Rp)']);
+  /* `Talangan` (cacah) sengaja TANPA satuan — begitu tetangganya menyebut
+     (Rp), kolom tanpa satuan terbaca sbg cacah dgn sendirinya, sama seperti
+     `Hadir` & `Total Warga`. */
+  headerRow(ws, 4, ['No', 'Tanggal', 'Sohibul Bait', 'Hadir', 'Total Warga', 'Kas Terkumpul (Rp)', 'Sohibul Terima (Rp)', 'Talangan', 'Talangan (Rp)']);
 
   tarikan.forEach((t, i) => {
     const info = talanganMap[t.id] ?? { count: 0, total: 0 };
@@ -71,6 +77,10 @@ export function buildKasHadiranExcel(
       r.getCell(ci).alignment = { horizontal: 'right' };
     });
     [1, 4, 5, 8].forEach((ci) => (r.getCell(ci).alignment = { horizontal: 'center' }));
+    /* Talangan yang BELUM lunas itu uang yang ditalangi kas — di PDF ia `neg`
+       (didParseCell kolom 4). Nol dibiarkan netral: memerahkan nol membuat
+       tarikan yang justru bersih terbaca bermasalah. */
+    if (info.total > 0) warnaiUang(r.getCell(9), 'neg');
     if (i % 2 === 1) r.eachCell((c) => (c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ZEBRA } }));
     r.eachCell((c) => (c.border = border));
   });

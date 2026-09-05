@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import type { KasRT } from './types';
 import { formatTanggal } from './utils';
-import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, ZEBRA } from './excelStyle';
+import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA } from './excelStyle';
 import { labelKategori } from './kategoriKasRt';
 
 interface Stats {
@@ -25,19 +25,23 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
   const sum = wb.addWorksheet('Ringkasan');
   sum.columns = [{ width: 24 }, { width: 20 }];
   titleBlock(sum, 'Kas Besar RT 004/006', `Ringkasan · ${tgl}`, 2);
-  headerRow(sum, 4, ['Keterangan', 'Nominal']);
-  const ringkasan: [string, number][] = [
-    ['Saldo Awal', stats.saldoAwal],
-    ['Total Masuk', stats.totalMasuk],
-    ['Total Keluar', stats.totalKeluar],
-    ['Saldo Akhir', stats.saldo],
+  /* Satuan di HEADER kolom, angkanya polos — aturan app sejak 11 Jun 2026,
+     yang sampai 5 Sep cuma ditegakkan di PDF. Di Excel `Talangan` (cacah) dan
+     `Kas Terkumpul` (rupiah) karena itu cuma bisa dibedakan dari besarnya. */
+  headerRow(sum, 4, ['Keterangan', 'Nominal (Rp)']);
+  const ringkasan: [string, number, 'pos' | 'neg' | 'ink'][] = [
+    ['Saldo Awal', stats.saldoAwal, 'ink'],
+    ['Total Masuk', stats.totalMasuk, 'pos'],
+    ['Total Keluar', stats.totalKeluar, 'neg'],
+    ['Saldo Akhir', stats.saldo, stats.saldo < 0 ? 'neg' : 'pos'],
   ];
-  ringkasan.forEach(([label, val], i) => {
+  ringkasan.forEach(([label, val, tone], i) => {
     const r = sum.addRow([label, val]);
     r.getCell(2).numFmt = CUR;
     r.getCell(2).alignment = { horizontal: 'right' };
     r.eachCell((c) => (c.border = border));
     if (i === ringkasan.length - 1) r.font = { bold: true };
+    warnaiUang(r.getCell(2), tone);
   });
 
   // ── Sheet 2: Mutasi ──
@@ -51,7 +55,7 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
      mencari transaksi yang masih perlu dirapikan. */
   ws.columns = [{ width: 18 }, { width: 10 }, { width: 30 }, { width: 42 }, { width: 16 }, { width: 16 }, { width: 18 }];
   titleBlock(ws, 'Kas Besar RT 004/006', `Mutasi · ${tgl}`, 7);
-  headerRow(ws, 4, ['Tanggal', 'Tipe', 'Kategori', 'Keterangan', 'Masuk', 'Keluar', 'Saldo']);
+  headerRow(ws, 4, ['Tanggal', 'Tipe', 'Kategori', 'Keterangan', 'Masuk (Rp)', 'Keluar (Rp)', 'Saldo (Rp)']);
   /* Baris kepala jadi filter — kolom kategori tak ada gunanya kalau harus
      disaring manual. Rentangnya baris kepala saja; Excel meluaskan sendiri ke
      data di bawahnya. */
@@ -71,6 +75,12 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
       r.getCell(ci).numFmt = CUR;
       r.getCell(ci).alignment = { horizontal: 'right' };
     });
+    /* Arah uang, cermin PDF: kolom masuk hijau, keluar merah. Saldo berjalan
+       netral kecuali ia MINUS — di app kas saldo minus itu keadaan sah
+       (lihat `hitungSaldoHadiran`), jadi ia dilaporkan, bukan disembunyikan. */
+    warnaiUang(r.getCell(5), 'pos');
+    warnaiUang(r.getCell(6), 'neg');
+    warnaiUang(r.getCell(7), (k.saldo_setelah ?? 0) < 0 ? 'neg' : 'ink');
     if (i % 2 === 1) r.eachCell((c) => (c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ZEBRA } }));
     r.eachCell((c) => (c.border = border));
   });

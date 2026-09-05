@@ -24,7 +24,10 @@ import { buildKasHadiranExcel } from './generateKasHadiranExcel';
 import { hitungSaldoHadiran } from './utils';
 import type { KasRT, Tarikan } from './types';
 
-/** Cari indeks kolom lewat NAMA di baris header — bukan indeks yang dipaku. */
+/** Cari indeks kolom lewat NAMA di baris header — bukan indeks yang dipaku.
+ *  Nama kolom uang MEMBAWA satuan (`Masuk (Rp)`): aturan app menaruh satuan di
+ *  header, bukan di sel. Kalau uji ini merah dgn "kolom tak ada", periksa dulu
+ *  apakah headernya memang berubah — 5 Sep 2026 ia menangkap persis itu. */
 function kolom(ws: Worksheet, headerRow: number, nama: string): number {
   const v = ws.getRow(headerRow).values as unknown[];
   const i = v.findIndex((x) => String(x).trim() === nama);
@@ -69,8 +72,8 @@ describe('Excel Kas RT — isi workbook', () => {
     const wb = wbOf();
     const sum = wb.getWorksheet('Ringkasan')!, mut = wb.getWorksheet('Mutasi')!;
     const H = 4;
-    expect(jumlahKolom(mut, H, kolom(mut, H, 'Masuk')), 'Σ kolom Masuk ≠ Total Masuk di Ringkasan').toBe(angka(sum, 6, 2));
-    expect(jumlahKolom(mut, H, kolom(mut, H, 'Keluar')), 'Σ kolom Keluar ≠ Total Keluar di Ringkasan').toBe(angka(sum, 7, 2));
+    expect(jumlahKolom(mut, H, kolom(mut, H, 'Masuk (Rp)')), 'Σ kolom Masuk ≠ Total Masuk di Ringkasan').toBe(angka(sum, 6, 2));
+    expect(jumlahKolom(mut, H, kolom(mut, H, 'Keluar (Rp)')), 'Σ kolom Keluar ≠ Total Keluar di Ringkasan').toBe(angka(sum, 7, 2));
     expect(mut.rowCount - H, 'jumlah baris mutasi ≠ jumlah transaksi').toBe(LIST.length);
   });
 });
@@ -93,7 +96,78 @@ describe('Excel Kas Hadiran — isi workbook', () => {
     const wb = wbOf();
     const sum = wb.getWorksheet('Ringkasan')!, rek = wb.getWorksheet('Rekap Tarikan')!;
     const H = 4;
-    expect(jumlahKolom(rek, H, kolom(rek, H, 'Kas Terkumpul')), 'Σ Kas Terkumpul ≠ Ringkasan').toBe(angka(sum, 5, 2));
+    expect(jumlahKolom(rek, H, kolom(rek, H, 'Kas Terkumpul (Rp)')), 'Σ Kas Terkumpul ≠ Ringkasan').toBe(angka(sum, 5, 2));
     expect(rek.rowCount - H, 'jumlah baris rekap ≠ jumlah tarikan').toBe(LIST.length);
+  });
+});
+
+/* ── SATUAN & ARAH UANG ────────────────────────────────────────────────────
+   Dua aturan app yang sampai 5 Sep 2026 hanya ditegakkan di PDF, sehingga
+   lembar yang paling sering dibuka bendahara justru satu-satunya permukaan
+   yang membuangnya:
+
+   (1) SATUAN di header kolom, angkanya polos (aturan user 11 Jun 2026).
+       Tanpa itu kolom cacah `Talangan` dan kolom rupiah `Kas Terkumpul` cuma
+       bisa dibedakan dari besarnya angka.
+   (2) ARAH UANG diberi warna (`pos`/`neg`/`warn`) — PDF & app melakukannya,
+       Excel mencetak semuanya hitam. Ini bukan perbedaan MEDIA: Excel
+       mendukung warna dgn baik.
+
+   Diuji dari WORKBOOK, bukan dari pemanggilan — jadi generator baru yang lupa
+   gagal di sini. */
+describe('Excel — satuan & arah uang', () => {
+  const rt = buildKasRTExcel(
+    [b(1, 'masuk', 5_000_000, 'hadiran', 'Setoran'), b(2, 'keluar', 750_000, 'sosial', 'Santunan')],
+    { saldo: 4_250_000, totalMasuk: 5_000_000, totalKeluar: 750_000, saldoAwal: 0 },
+  ).wb;
+  const hd = buildKasHadiranExcel([tk(1, 3_000_000)], { t1: { count: 2, total: 100_000 } },
+    { totalKasTerkumpul: 3_000_000, totalTalanganBelum: 100_000, totalSetor: 500_000,
+      saldo: hitungSaldoHadiran(3_000_000, 100_000, 500_000) }).wb;
+
+  const hdr = (ws: Worksheet, baris: number) =>
+    (ws.getRow(baris).values as unknown[]).slice(1).map((v) => String(v ?? ''));
+  const tinta = (ws: Worksheet, r: number, c: number) =>
+    (ws.getCell(r, c).font?.color?.argb ?? '').slice(-6).toUpperCase();
+
+  it('tiap kolom UANG menyebut satuannya di header', () => {
+    /* Dicocokkan PERSIS, bukan lewat awalan — percobaan pertama memakai
+       `startsWith('Talangan')` dan menangkap kolom CACAH `Talangan` lebih dulu
+       daripada kolom rupiah `Talangan (Rp)`, lalu melaporkan kegagalan palsu.
+       Dua kolom bertetangga yang namanya berawalan sama memang ada di sini,
+       dan itu justru alasan aturan satuan ini dibuat. */
+    const uang = [
+      ['Kas RT/Ringkasan', hdr(rt.getWorksheet('Ringkasan')!, 4), ['Nominal (Rp)']],
+      ['Kas RT/Mutasi', hdr(rt.getWorksheet('Mutasi')!, 4), ['Masuk (Rp)', 'Keluar (Rp)', 'Saldo (Rp)']],
+      ['Hadiran/Ringkasan', hdr(hd.getWorksheet('Ringkasan')!, 4), ['Nominal (Rp)']],
+      ['Hadiran/Rekap', hdr(hd.getWorksheet('Rekap Tarikan')!, 4),
+        ['Kas Terkumpul (Rp)', 'Sohibul Terima (Rp)', 'Talangan (Rp)']],
+    ] as const;
+    const telanjang: string[] = [];
+    for (const [sheet, head, wajib] of uang) {
+      for (const h of wajib) if (!head.includes(h)) telanjang.push(`${sheet} "${h}"`);
+    }
+    expect(telanjang, 'kolom uang tanpa satuan di header').toEqual([]);
+  });
+
+  it('kolom CACAH sengaja TANPA satuan — supaya kontrasnya bermakna', () => {
+    /* Kalau semua kolom diberi (Rp), aturan di atas berhenti membedakan apa
+       pun. `Hadir` & `Total Warga` orang, bukan rupiah. */
+    const head = hdr(hd.getWorksheet('Rekap Tarikan')!, 4);
+    for (const c of ['Hadir', 'Total Warga']) expect(head).toContain(c);
+  });
+
+  it('arah uang diberi warna, mencermin PDF', () => {
+    const mut = rt.getWorksheet('Mutasi')!;
+    expect(tinta(mut, 5, 5), 'kolom Masuk = pos').toBe('05543E');
+    expect(tinta(mut, 5, 6), 'kolom Keluar = neg').toBe('941136');
+    const sum = hd.getWorksheet('Ringkasan')!;
+    expect(tinta(sum, 6, 2), 'Talangan Belum Lunas = neg').toBe('941136');
+    expect(tinta(sum, 7, 2), 'Setoran ke Kas Besar RT = warn').toBe('75320B');
+  });
+
+  it('KONTROL: kolom bukan-uang TIDAK diwarnai', () => {
+    /* Tanpa ini "semuanya berwarna" lolos sbg "arah uang dijaga". */
+    const mut = rt.getWorksheet('Mutasi')!;
+    for (const c of [1, 2, 3, 4]) expect(tinta(mut, 5, c), `kolom ${c} tak boleh berwarna`).toBe('');
   });
 });
