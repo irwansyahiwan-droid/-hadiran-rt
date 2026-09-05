@@ -76,6 +76,7 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis + potong + respo
 | `audit:reflow` | Halaman geser samping di 320px (§1.4.10, WAJIB) + saat font dasar browser 200% (di atas AA) | Yang WAJIB cuma 320px dan itu bersih. Bagian 200% sengaja dipisah supaya tak dilaporkan sebagai "gagal WCAG" — ia ambang app sendiri untuk warga lansia. Probe WAJIB menyaring elemen ber-leluhur `position:fixed`: isi bottom-nav tak menciptakan scroll dokumen, dan melaporkannya = menyuruh orang membetulkan yang bukan penyebab |
 | `audit:sentuh` | Luas area sentuh tiap kontrol di 360px (§2.5.8 min 24px, ambang app 44px) | Warga pakai jempol, sebagian lansia. **Diukur lewat hit-test `elementFromPoint`, BUKAN geometri CSS**: percobaan pertama membaca `cs.insetTop` (properti yang tak ada — yang benar `top/right/bottom/left`) sehingga semua pelebaran `before:-inset-*` terbaca nol dan 19 kontrol dilaporkan gagal padahal semuanya sudah 44px. Tiap kontrol WAJIB di-`scrollIntoView` dulu sebelum diukur — kalau tidak, kontrol yang kebetulan separuh di bawah Header sticky terukur separuh tinggi |
 | `audit:muat` | FCP & siap-pakai (CPU 4× lambat, 400 kbps) | Warga pakai Android kelas bawah, sinyal seadanya |
+| `audit:unduh` | **B.** generator ekspor tetap lazy · **U.** anggaran byte kunjungan pertama · **F.** font tiba sebelum warga membaca · **S.** aset render ada di SHELL SW · **K.** kontrol populasi | `audit:muat` mengukur KAPAN app tercat dan tak pernah bertanya BERAPA yang dikirim untuk sampai ke sana. Dari 34 sapuan tak satu pun pernah menghitung byte kunjungan pertama — jadi 19 kB yang dihemat hari ini bisa kembali minggu depan tanpa satu pun laporan (pelajaran ke-33). **Ia memegang SERVERNYA SENDIRI, dan itu inti alatnya:** `vite preview` tak mengompresi apa pun sedangkan Vercel membalas brotli, jadi tiap angka byte yang diukur lawan preview PESIMIS ~2,5× (jalur kritis 567 kB terdekode vs 209 kB di kabel). Sapuan yang melaporkan angka terdekode menyuruh orang mengejar 350 kB yang tak pernah ada — dan, lebih buruk, tak bisa MELIHAT penghematan yang nyata: woff2 sudah terkompres di dalam, jadi gzip menambah 0 byte (48.256 → 48.254). **Vonis F bukan "kapan berkasnya tiba" melainkan "apakah teks BERGANTI RUPA"** — percobaan pertama memvonis dari waktu tiba lalu melaporkan GAGAL untuk font ber-`font-display: optional`, yang menurut definisinya tak pernah menukar glyph; kini ia membaca `font-display` dari CSS yang BENAR-BENAR dikirim dan hanya menilai auto/swap/fallback, dan kalau SEMUA font dikecualikan ia keluar PROBE CACAT bukan hijau. **Penjaga BUILD BASI:** ia mengukur `dist/`, jadi lupa membangun ulang membuatnya mengukur build kemarin lalu melaporkan hijau untuk perubahan yang belum pernah ada di sana — mtime sumber > mtime dist = PROBE CACAT (exit 2). Divalidasi TIGA mutasi, satu per vonis, semuanya DARI GARIS DASAR HIJAU: `MUTASI=1` suntik chunk ekspor → B & U merah; `MUTASI=2` tunda woff2 3 dtk → F merah tepat +3000 ms; `MUTASI=3` buang font dari SHELL → S merah menyebut kedua berkas. **`MUTASI=3` sengaja divalidasi BELAKANGAN**: selama S masih merah ia tak bisa diinduksi sama sekali — mutasi yang prasyaratnya tak terpenuhi bukan mutasi yang kuat, ia mutasi yang tak pernah diuji (pelajaran E2 `audit:mundur`) |
 | `audit:masuk` | Gerbang masuk & keluar saat jaringan busuk (chunk gagal, request menggantung, logout luring) + **RELOAD di tengah sesi** & gate sesi baru | Semua audit lain menguji layar SESUDAH masuk. **Tombol "Masuk" yang terkunci tak menyisakan jalan lain sama sekali**, dan kegagalan jaringan yang dilaporkan sebagai "password salah" bikin bendahara mengganti sandi yang sudah benar. **Bagian reload (19 Agu)** ada karena SEMUA sapuan repo memuat halaman SEKALI lalu berinteraksi — tak satu pun pernah MEMUAT ULANG, dan di situlah cacat nyata bersembunyi: `wargaMode` cuma state React, jadi reload melempar warga ke Login. Bukan skenario langka — `PwaUpdatePrompt` MEMANGGIL `location.reload()` saat warga menekan "Muat ulang" pada toast versi baru, jadi tiap deploy = satu lemparan (dan 4 deploy dalam sehari = keluhan "mental terus balik ke login"). Diuji EMPAT sifat sekaligus, karena memperbaiki "bertahan" gampang diam-diam MEMBUKA PINTU: bertahan saat reload · tab aktif ikut pulih · Back sesudah pemulihan kembali ke Beranda (bukan keluar app) · **sesi/tab BARU tetap minta sandi**. Divalidasi MUTASI (kembalikan `useState(false)` → sapuan wajib merah dgn pesan yang tepat) |
 | `audit:luring` | App dibuka & dipakai saat TAK ADA SINYAL sama sekali (service worker AKTIF) | `audit:keadaan` memaksa SERVER membalas gagal, `audit:masuk` menguji auth saat jaringan busuk — keduanya tetap PUNYA jaringan. Tak satu pun pernah MEMATIKANNYA, dan semua sapuan lain memakai `serviceWorkers: 'block'` demi hasil stabil; justru karena itu jalur luring tak pernah terlihat oleh satu pun dari mereka. Padahal itu KODE BERBEDA: shell dari cache, chunk dari stale-while-revalidate, sementara Supabase sengaja DILEWATI `sw.js` sehingga tiap request data gagal keras. Warga app ini pakai Android kelas bawah bersinyal seadanya — "dibuka tanpa sinyal" bukan kasus tepi. Empat sifat: shell tetap terbuka · TIDAK terlempar ke Login (gate warga bertahan tanpa jaringan) · app MENGAKU tanpa sinyal (angka basi dilarang tampil seolah angka sekarang) · pindah tab tetap bekerja dari cache. **Jebakan localhost:** `@vercel/analytics` & `@vercel/speed-insights` menyuntik `/_vercel/*/script.js`; path itu HANYA ada di Vercel, di `vite preview` ia 404 lalu dibalas index.html oleh fallback SPA → console memuntahkan "Unexpected token '<'". Artefak lokal, BUKAN cacat — di produksi keduanya balas `application/javascript` (diverifikasi 22 Agu 2026), jadi sapuan MENYARING `_vercel/`. Odometer juga dikecualikan dari deteksi "Rp0": ia merender pita digit `0 1 2 3 4 5 6 7 8 9`. Divalidasi MUTASI (cabut service worker + hapus cache → layar kosong saat luring, sapuan WAJIB merah) |
 | `audit:luring-pertama` | Kunjungan PERTAMA → sinyal hilang → buka lagi. Servernya BENAR-BENAR DIMATIKAN, bukan diemulasikan | `audit:luring` memakai `ctx.setOffline(true)`, dan itu **TIDAK memutus fetch milik SERVICE WORKER** — terukur 30 Agu 2026: isi cache SW tumbuh **0 → 16 aset SELAMA fase yang disebut "luring"**, dan menambah 16 berkas segar ke cache tanpa jaringan itu mustahil. Jadi sapuan itu berbulan-bulan menguji app yang MASIH ONLINE lalu melaporkan hijau, sementara shell-nya GAGAL BOOT di kunjungan pertama (3/3 run). Sapuan ini karena itu menyalakan preview-nya sendiri lalu MEMBUNUHNYA — tak ada yang bisa berbohong tentang server yang sudah tak ada. **`npx` cuma pembungkus**: membunuh pid yang di-spawn meninggalkan proses vite asli tetap melayani, jadi yang dibunuh siapa pun yang MEMEGANG PORT-nya (percobaan pertama melaporkan BOOT dari server yang masih hidup). **UJI KONTROL wajib** (`KUNJUNGAN=2`): kunjungan kedua HARUS boot — tanpa itu "app cacat" & "alatku memutus lebih dari seharusnya" mencetak hasil sama. Divalidasi MUTASI (buang JS/CSS dari cache → merah dgn tanda tangan PERSIS bug aslinya). **BATAS:** lokal saja, ia harus memegang tombol matinya; lawan produksi penjaga setaranya = `SHELL` di /sw.js wajib menyebut aset ber-hash yang dirujuk /index.html |
@@ -767,6 +768,115 @@ tanpa syarat.
 **Jebakan Supabase yang berulang:** `.select()` TIDAK melempar saat gagal — ia mengembalikan
 `{data: null, error}`. Tiap `?? []` tanpa cek `res.error` mengubah kegagalan jadi "tidak ada
 data". Cek di halaman TIDAK cukup; helper di `src/lib/` juga wajib melempar.
+
+Yang ke-35 (5 Sep 2026) — **tangga yang ditegakkan di CSS tapi tidak di
+BERKASNYA cuma setengah ditegakkan.**
+
+`tailwind.config.js` menaruh `fontWeight` DI LUAR `extend` dgn hanya
+400/500/600/700/800, dan komentarnya menjelaskan kenapa
+`thin/extralight/light/black` dibuang: "ia tersedia tanpa pernah dipilih,
+persis cara `shadow-xl` & `duration-150` masuk ke app ini." Itu disiplin yang
+sama dgn tangga gerak & tangga elevasi, dan ia bekerja — tak ada satu pun
+`font-thin` di app.
+
+Yang tak pernah ditanya: **berkas fontnya sendiri masih memuat 100..900.** Tiap
+HP warga mengunduh sumbu bobot penuh, termasuk empat anak tangga yang app
+sudah putuskan tak boleh dipakai. Dijepit ke 400..800: 81.908 → 62.448 B, dan
+**19,0 kB itu byte NYATA di kabel** karena woff2 sudah terkompres di dalam
+(gzip menambah 0 byte: 48.256 → 48.254).
+
+Pelajarannya lebih luas dari font: **tiap kali sebuah tangga ditegakkan lewat
+CSS/config, tanya apakah ADA ARTEFAK di belakangnya yang masih memuat anak
+tangga yang dibuang.** Ikon, sprite, dan berkas font semuanya bisa membawa
+varian yang tak akan pernah dipilih siapa pun.
+
+Dan pasangannya, yang justru TIDAK dikerjakan meski lebih hemat: subset
+KARAKTER menghemat 13 kB lagi dan sudah diukur (nol glyph yang dipakai SUMBER
+hilang). Ditolak karena yang dibuangnya memuat **aksen GABUNGAN**
+(U+0300..U+0323) dan spasi nol-lebar — dan nama warga datang dari BASIS DATA,
+bukan dari sumber yang bisa dipindai. **Pemindaian sumber tak bisa membuktikan
+apa pun tentang data.** 260 ms tak sepadan dgn satu nama warga tercetak salah.
+
+Yang ke-36 (5 Sep 2026) — **`SHELL` service worker diturunkan dari graf IMPOR,
+jadi apa pun yang dirujuk `url()` dari dalam CSS tak pernah masuk.**
+
+Komentar `main.tsx` menyatakan font "di-bundle Vite → same-origin → ke-cache
+service worker → font tetap ada saat offline". Terukur: **SHELL 40 entri, NOL
+font.** Bukan kelalaian, melainkan struktural — `swManifest` berjalan di sisi
+IMPOR, dan tak ada satu pun sisi impor yang menuju berkas woff2.
+
+Akibatnya diukur, 3 kunjungan berturut-turut: cache **40 entri / 0 font** di
+kunjungan pertama, baru **44/2** di kunjungan kedua (lewat
+stale-while-revalidate). Warga yang memasang app lalu kehilangan sinyal sebelum
+kunjungan kedua mendapat app yang boot berhuruf sistem. **Kelas pelajaran
+ke-31 yang tersisa** — di sana yang hilang chunk JS/CSS, di sini font, dan
+sebabnya identik: daftar yang diturunkan dari satu jenis sisi graf buta
+terhadap sisi yang lain.
+
+Pemungutnya kini membaca ISI CSS (`url(...)`), jadi ia mengikuti apa pun yang
+benar-benar dirujuk — dan **MELEDAK** kalau ada `.woff2` di bundel tapi nol
+terpungut. **Klaim yang ditulis di komentar kode tidak menahan apa pun**; yang
+menahan cuma alat yang mencetaknya (`audit:unduh` bagian S).
+
+Yang ke-37 (5 Sep 2026) — **`sapu-semua` MENERUSKAN env `MUTASI` ke anak, jadi
+uji lantai populasi menguji dua hal sekaligus.**
+
+Di `sapu-semua`, `MUTASI=1` berarti SATU hal: naikkan tiap lantai populasi 10×.
+Tapi hampir tiap sapuan punya knob `MUTASI` SENDIRI dgn arti yang sama sekali
+berbeda — `audit:unduh` menyuntik chunk ekspor 214 kB, `audit:gerak` memaksa
+`animation-delay`, `audit:mundur` mematikan `pushState`. Diteruskan, satu
+perintah menjalankan DUA eksperimen sekaligus dan **populasinya bergeser justru
+saat lantainya sedang diuji**, sehingga uji lantai "lulus" karena sebab yang
+salah.
+
+Kenapa tak pernah terlihat: validasi lantai (3 Sep) terbukti **5/5 di jalur
+STATIS**, dan di sana kebetulan tak ada satu pun sapuan ber-`MUTASI`.
+**Bukti yang dikumpulkan hanya dari keadaan paling bersih tak mengatakan apa pun
+tentang keadaan lain** — bentuknya sama persis dgn G1 `audit:gestur` yang lolos
+karena cuma berjalan di Beranda.
+
+Yang ke-38 (5 Sep 2026) — **vonis harus menyasar GEJALA, bukan proksi yang
+kebetulan berkorelasi.**
+
+`audit:unduh` bagian F semula memvonis dari WAKTU TIBA font, dan itu terbaca
+masuk akal: font yang tiba sesudah layar dipakai = teks berganti rupa. Lalu
+Sora dipasang `font-display: optional` — yang menurut definisinya memberi
+jendela blok ~100 ms lalu **TIDAK PERNAH menukar** — dan sapuan dgn patuh
+melaporkan GAGAL untuk font yang tak bisa menggeser satu glyph pun. Temuan
+palsu; **alatnya yang dibetulkan, bukan kodenya** (aturan alat repo ini, kini
+13×). F kini membaca `font-display` dari CSS yang BENAR-BENAR DIKIRIM dan hanya
+menilai `auto/swap/fallback`; kalau SEMUA font dikecualikan ia keluar PROBE
+CACAT, bukan hijau.
+
+Dua cacat probe lain di sesi yang sama, keduanya kelas POPULASI:
+
+- Probe fallback-Sora pertamaku memungut lewat **nama tag**
+  (`h1,h2,h3,.font-display`) dan menemukan **1–4 elemen**, lalu melaporkan
+  "0 pelebaran". Yang menentukan **computed `font-family`**, bukan nama tag.
+  Diperbaiki jadi memungut tiap elemen yang computed-nya benar-benar tumpukan
+  Sora (populasi 21) + gerbang `< 20 = PROBE CACAT`. Hasil sebenarnya:
+  pelebaran terburuk **+16,5px**, nol teks yang muat dgn Sora tapi tidak dgn
+  Inter.
+- Probe blokir-Sora pertamaku **tak pernah menggigit** dan tetap mencetak
+  "0px selisih" — hijau yang berasal dari blokir yang tak terjadi. Kini ia
+  mencetak `ditolak N permintaan` + `Sora terpasang=false` sbg kontrol.
+
+**PENJAGA BUILD BASI**, yang lahir dari kekhawatiran yang sama: `audit:unduh`
+mengukur `dist/`, jadi lupa `npm run build` membuatnya mengukur build kemarin
+lalu melaporkan hijau untuk perubahan yang belum pernah ada di sana. Sekarang
+mtime sumber > mtime dist = **PROBE CACAT (exit 2)**. Kelas pelajaran ke-27:
+"push berhasil" bukan bukti "live"; di sini "sapuan hijau" bukan bukti "kode
+ini yang diukur".
+
+**CATATAN untuk sesi berikutnya — keadaan yang kini BENAR-BENAR dikirim dan
+belum dijaga sapuan mana pun:** dgn Sora `optional`, di jaringan lambat
+kunjungan PERTAMA judul dirender **Inter**, dan Inter **8,7% LEBIH LEBAR** dari
+Sora (238,3 → 259 px pada 700/32px). Semua sapuan geometri jalan di localhost,
+tempat Sora selalu menang balapan 100 ms, jadi tak satu pun pernah melihat
+keadaan itu. Diukur manual sekali (3 lebar × 4 tab warga, populasi 21, nol
+luapan baru) — **batasnya diakui: permukaan bendahara & sheet BELUM diukur.**
+Kalau ada judul baru yang ketat di 320px, ia wajib diukur ulang dgn Sora
+diblokir, bukan diandaikan aman.
 
 ## gstack (REQUIRED — global install)
 
