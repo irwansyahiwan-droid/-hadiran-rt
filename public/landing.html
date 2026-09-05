@@ -8,8 +8,20 @@
 
 <!-- Halaman promosi warga — tidak perlu diindeks mesin pencari (data app tetap privat). -->
 <meta name="robots" content="noindex, nofollow" />
-<meta name="color-scheme" content="light dark" />
-<meta name="theme-color" content="#0D5B36" />
+<!-- TERANG SAJA, dan itu keputusan yang alasannya ditulis di `:root
+     { color-scheme: light }` di bawah: app default terang apa pun tema HP,
+     landing tak punya toggle, jadi dark otomatis cuma bikin nada melompat saat
+     warga masuk. Sampai 5 Sep 2026 meta ini berbunyi "light dark" — menjanjikan
+     dukungan yang CSS-nya sendiri tolak (terukur: `colorScheme` computed =
+     light di KEDUA mode). Janji itu tak gratis: sebelum CSS terurai, peramban
+     bermode gelap memakai meta ini untuk mengecat kanvas awal & UI-nya sendiri,
+     jadi yang didapat warga kedip gelap sebelum halaman terang muncul. -->
+<meta name="color-scheme" content="light" />
+<!-- = `--emerald-deep`, stop PERTAMA hero — yaitu warna yang benar-benar ada
+     tepat di bawah bilah alamat. Dulu #0D5B36, meleset 32/255 dari piksel
+     puncak halaman (#063B22 terukur), jadi bilah alamat HP dan hero di
+     bawahnya dua hijau yang berbeda. -->
+<meta name="theme-color" content="#063A21" />
 
 <link rel="icon" href="/favicon.png" type="image/png" />
 <link rel="apple-touch-icon" href="/icon-192.png" />
