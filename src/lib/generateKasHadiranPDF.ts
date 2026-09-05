@@ -4,7 +4,7 @@ import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
   tabelSkala, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, signH, C, fmtNum,
-  alignHeadFoot, drawContinuationHeader, sectionLabel, LANSIA,
+  alignHeadFoot, drawContinuationHeaders, LANJUT_TOP, sectionLabel, LANSIA,
 } from './pdfTheme';
 import { hitungSaldoHadiran } from './utils';
 import type { Tarikan } from './types';
@@ -56,8 +56,9 @@ export function buildKasHadiranPDF(
     ? ` · Periode ${fmtLong(byTanggal[0].tanggal)} – ${fmtLong(byTanggal[byTanggal.length - 1].tanggal)}`
     : '';
 
-  const Y = drawMasthead(doc, {
-    W, M, docCode, tanggalCetak,
+  /* SATU sumber untuk masthead & kepala lanjutan — kalau dua-duanya mengetik
+     judulnya sendiri, salah satunya akan menyimpang tanpa ada yang tahu. */
+  const IDENT = {
     title: 'Laporan Alur Kas Hadiran',
     /* "Kota" dibuang 4 Sep 2026: dgn `periode` terpanjang, baris ini terukur
        182,4mm sementara lebar isi A4 bermargin 14mm cuma 182,0mm — luber
@@ -67,7 +68,8 @@ export function buildKasHadiranPDF(
        DEPOK"). Ejaan yang sama dipakai di SELURUH generator — alamat yang
        ditulis dua cara di dokumen dari app yang sama itu drift. */
     subtitle: `Kas masuk, talangan & setoran RT 004/006 Tanah Baru, Beji, Depok${periode}`,
-  }, SK);
+  };
+  const Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT }, SK);
 
   // (Strip statistik atas dihapus — angka yang sama sudah di Ringkasan tutup buku.)
   // ── Tabel per tarikan ─────────────────────────────────────
@@ -159,7 +161,7 @@ export function buildKasHadiranPDF(
       { content: totalNet < 0 ? `-${fmtNum(Math.abs(totalNet))}` : fmtNum(totalNet), styles: { halign: 'right' } },
     ]],
     showFoot: 'lastPage',
-    margin: { left: M, right: M },
+    margin: { left: M, right: M, top: LANJUT_TOP },
     columnStyles: KAS_COL,
     didParseCell(data) {
       alignHeadFoot(data, KAS_COL);
@@ -219,17 +221,15 @@ export function buildKasHadiranPDF(
   const halamanSebelum = doc.getNumberOfPages();
   let ttdY = ensureSpace(doc, sumY + 14, signH(SK));
   if (doc.getNumberOfPages() > halamanSebelum) {
-    const headY = drawContinuationHeader(doc, {
-      W, M,
-      title: 'Laporan Alur Kas Hadiran',
-      subtitle: `Kas masuk, talangan & setoran RT 004/006${periode} · ${docCode}`,
-    }, SK);
-    const recapY = sectionLabel(doc, headY + 8, 'Ringkasan Tutup Buku', W, M, undefined, SK);
+    /* Kepala lanjutannya kini dicetak TERPUSAT di akhir (tiap halaman >= 2),
+       jadi di sini tinggal mengulang angka yang disahkan tanda tangan. */
+    const recapY = sectionLabel(doc, ttdY + 4, 'Ringkasan Tutup Buku', W, M, undefined, SK);
     ttdY = drawSummary(doc, recapY, ringkasan, saldoBersih, W, M, undefined, SK) + 18;
   }
   drawSignatures(doc, ttdY, W, M, { dateline: `Depok, ${tanggalCetak}`, sk: SK });
 
   const H = doc.internal.pageSize.getHeight();
+  drawContinuationHeaders(doc, { W, M, title: IDENT.title, subtitle: `${IDENT.subtitle} · ${docCode}` }, SK);
   drawFooter(doc, W, H, tanggalCetak, M, SK);
 
   return { doc, filename: `Laporan-Kas-Hadiran-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf` };

@@ -4,6 +4,7 @@ import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
   TABLE, drawMasthead, drawStatStrip, drawSignatures, drawFooter, ensureSpace, C, alignHeadFoot,
+  drawContinuationHeaders, LANJUT_TOP,
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
@@ -31,11 +32,11 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
     ? new Date(tarikan.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     : '—';
 
-  let Y = drawMasthead(doc, {
-    W, M, docCode, tanggalCetak,
+  const IDENT = {
     title: `Daftar Hadir Tarikan ke-${tarikan.nomor}`,
     subtitle: `${tglTarikan} · Sohibul Bait: ${tarikan.sohibul_bait?.nama ?? '—'}`,
-  });
+  };
+  let Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT });
 
   /* TITIP ikut di strip sejak 4 Sep 2026 — sebelumnya hanya Hadir/Tidak
      Hadir/Talangan Lunas, sehingga orang berstatus Titip ada di TABEL dan ikut
@@ -76,7 +77,7 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
     startY: Y + 7,
     head: [['NO', 'NAMA ANGGOTA', 'STATUS']],
     body: rows,
-    margin: { left: M, right: M },
+    margin: { left: M, right: M, top: LANJUT_TOP },
     columnStyles: ABS_COL,
     didParseCell(data) {
       alignHeadFoot(data, ABS_COL);
@@ -98,6 +99,7 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
   drawSignatures(doc, afterY + 16, W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
+  drawContinuationHeaders(doc, { W, M, title: IDENT.title, subtitle: `${IDENT.subtitle} · ${docCode}` });
   drawFooter(doc, W, H, tanggalCetak);
 
   return { doc, filename: `Daftar-Hadir-Tarikan-${tarikan.nomor}.pdf` };

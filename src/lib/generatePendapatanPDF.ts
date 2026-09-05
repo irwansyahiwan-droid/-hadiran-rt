@@ -4,6 +4,7 @@ import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
   TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, ensureSpace, SIGN_H, C, fmtNum, alignHeadFoot,
+  drawContinuationHeaders, LANJUT_TOP,
 } from './pdfTheme';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
 
@@ -46,11 +47,11 @@ export function buildPendapatanPDF(
 
   const tglTarikan = new Date(tarikan.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  let Y = drawMasthead(doc, {
-    W, M, docCode, tanggalCetak,
+  const IDENT = {
     title: `Rincian Pendapatan Tarikan ke-${tarikan.nomor}`,
     subtitle: `${tglTarikan} · Sohibul Bait: ${tarikan.sohibul_bait?.nama ?? '—'}`,
-  });
+  };
+  let Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT });
 
   Y = drawStatStrip(doc, Y, [
     { label: 'Total Anggota',       value: String(wargaList.length) },
@@ -107,7 +108,7 @@ export function buildPendapatanPDF(
     body: tableRows,
     foot: [['', `TOTAL · ${payingCount} pembayar`, '', fmtNum(totalSohibul), fmtNum(totalKas), fmtNum(totalSemua)]],
     showFoot: 'lastPage',
-    margin: { left: M, right: M },
+    margin: { left: M, right: M, top: LANJUT_TOP },
     columnStyles: PDPT_COL,
     didParseCell(data) {
       alignHeadFoot(data, PDPT_COL);
@@ -155,6 +156,7 @@ export function buildPendapatanPDF(
   drawSignatures(doc, ensureSpace(doc, sumY + 14, SIGN_H), W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
+  drawContinuationHeaders(doc, { W, M, title: IDENT.title, subtitle: `${IDENT.subtitle} · ${docCode}` });
   drawFooter(doc, W, H, tanggalCetak);
 
   return { doc, filename: `Rincian-Pendapatan-Tarikan-${tarikan.nomor}-${now.getFullYear()}.pdf` };

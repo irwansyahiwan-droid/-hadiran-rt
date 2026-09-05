@@ -4,7 +4,7 @@ import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
   tabelSkala, drawMasthead, sectionLabel, drawSummary, drawSignatures, drawFooter, ensureSpace, C, fmtNum,
-  alignHeadFoot, drawContinuationHeader, signH, LANSIA,
+  alignHeadFoot, drawContinuationHeaders, LANJUT_TOP, signH, LANSIA,
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
@@ -78,11 +78,13 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
     ? ` · Periode ${fmtLong(sorted[0].tanggal)} – ${fmtLong(sorted[sorted.length - 1].tanggal)}`
     : '';
 
-  let Y = drawMasthead(doc, {
-    W, M, docCode, tanggalCetak,
+  /* SATU sumber untuk masthead & kepala lanjutan — kalau dua-duanya mengetik
+     judulnya sendiri, salah satunya akan menyimpang tanpa ada yang tahu. */
+  const IDENT = {
     title: 'Laporan Pertanggungjawaban Kas RT',
     subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Depok${periode}`,
-  }, SK);
+  };
+  let Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT }, SK);
 
   // ── Bagian per jenis transaksi ────────────────────────────────
   // (Strip statistik atas dihapus — angka total sudah di Ringkasan tutup buku.)
@@ -125,7 +127,7 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
       ]),
       /* top 26 = ruang untuk label "(lanjutan)" di halaman sambungan (hanya
          berlaku utk halaman kedua dst; halaman pertama pakai startY). */
-      margin: { left: M, right: M, top: 30 },
+      margin: { left: M, right: M, top: LANJUT_TOP },
       columnStyles: COL,
       didParseCell(data) {
         alignHeadFoot(data, COL);
@@ -143,7 +145,9 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
          baris sambungan saja. */
       didDrawPage(data) {
         if (data.pageNumber === 1) return;
-        sectionLabel(doc, 14, `${prefix} — ${label} (lanjutan)`, W, M, undefined, SK);
+        /* Di BAWAH pita kepala lanjutan (0..24). Dulu 14 — yang sejak kepala
+           lanjutan jadi tak-bersyarat akan tertimpa olehnya. */
+        sectionLabel(doc, LANJUT_TOP - 4, `${prefix} — ${label} (lanjutan)`, W, M, undefined, SK);
       },
     });
     return getY(doc);
@@ -176,17 +180,15 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
   const halamanSebelum = doc.getNumberOfPages();
   let ttdY = ensureSpace(doc, Y + 14, signH(SK));
   if (doc.getNumberOfPages() > halamanSebelum) {
-    const headY = drawContinuationHeader(doc, {
-      W, M,
-      title: 'Laporan Pertanggungjawaban Kas RT',
-      subtitle: `Kas Besar RT 004/006 Tanah Baru, Beji, Depok${periode} · ${docCode}`,
-    }, SK);
-    const recapY = sectionLabel(doc, headY + 8, 'Ringkasan Tutup Buku', W, M, undefined, SK);
+    /* Kepala lanjutannya kini dicetak TERPUSAT di akhir (tiap halaman >= 2),
+       jadi di sini tinggal mengulang angka yang disahkan tanda tangan. */
+    const recapY = sectionLabel(doc, ttdY + 4, 'Ringkasan Tutup Buku', W, M, undefined, SK);
     ttdY = drawSummary(doc, recapY, ringkasan, saldoBersih, W, M, undefined, SK) + 18;
   }
   drawSignatures(doc, ttdY, W, M, { dateline: `Depok, ${tanggalCetak}`, sk: SK });
 
   const H = doc.internal.pageSize.getHeight();
+  drawContinuationHeaders(doc, { W, M, title: IDENT.title, subtitle: `${IDENT.subtitle} · ${docCode}` }, SK);
   drawFooter(doc, W, H, tanggalCetak, M, SK);
 
   return { doc, filename: `Laporan-Kas-RT-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}.pdf` };

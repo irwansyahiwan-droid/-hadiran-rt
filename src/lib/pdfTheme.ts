@@ -148,7 +148,10 @@ export function drawMasthead(
  */
 export function ensureSpace(doc: jsPDF, y: number, needed: number): number {
   const H = doc.internal.pageSize.getHeight();
-  if (y + needed > H - 16) { doc.addPage(); return 16; }
+  /* Halaman yang lahir di sini SELALU halaman lanjutan, jadi isinya wajib
+     mulai di bawah pita kepala lanjutan — kalau tidak, blok tanda tangan
+     duduk menimpa identitas dokumennya sendiri. Dulu `return 16`. */
+  if (y + needed > H - 16) { doc.addPage(); return LANJUT_TOP; }
   return y;
 }
 
@@ -305,6 +308,43 @@ export function drawContinuationHeader(
   setDraw(doc, C.line); doc.setLineWidth(0.3);
   doc.line(M, 24, W - M, 24);
   return 24;
+}
+
+/**
+ * Y pertama yang boleh dipakai isi di halaman LANJUTAN — pita kepala berakhir
+ * di 24, sisanya napas. Dipakai sbg `margin.top` autoTable (yang HANYA berlaku
+ * untuk halaman kedua dst; halaman pertama dikendalikan `startY`) sekaligus
+ * nilai balik `ensureSpace` saat ia membuka halaman.
+ */
+export const LANJUT_TOP = 30;
+
+/**
+ * Kepala lanjutan di SETIAP halaman ≥ 2. Panggil SEKALI di akhir, tepat
+ * sebelum `drawFooter` — pola yang sama, dan alasan yang sama: identitas
+ * halaman baru bisa ditentukan hanya setelah semua halaman ada.
+ *
+ * KENAPA TAK BERSYARAT LAGI. Sampai 5 Sep 2026 `drawContinuationHeader`
+ * dipanggil hanya kalau blok TANDA TANGAN sendiri yang terlempar ke halaman
+ * baru (`doc.getNumberOfPages()` naik di sekitar `ensureSpace`). Kalau yang
+ * meluap TABELNYA dan tanda tangan ikut mendarat di halaman itu, syaratnya tak
+ * pernah benar — dan itu justru kasus yang lebih sering. Terukur hari itu:
+ * KETIGA dokumen multi-halaman (Kas RT, Daftar Hadir, Rincian Pendapatan)
+ * mencetak tiga tanda tangan di lembar TANPA judul, kode dokumen, maupun
+ * periode. Lepas dari berkasnya, tak ada yang bisa tahu apa yang disahkan.
+ *
+ * Invariannya karena itu bukan "halaman tanda tangan" melainkan **tiap halaman
+ * ≥ 2** — halaman kedua tabel kas yang terlepas juga tak bisa
+ * dipertanggungjawabkan. Ruangnya DIPESAN lewat `LANJUT_TOP`, jadi urutan cat
+ * tak penting: pita itu memang kosong.
+ */
+export function drawContinuationHeaders(
+  doc: jsPDF,
+  o: { W: number; M: number; title: string; subtitle: string },
+  sk: SkalaTeks = RAPAT,
+): void {
+  const total = doc.getNumberOfPages();
+  for (let p = 2; p <= total; p++) { doc.setPage(p); drawContinuationHeader(doc, o, sk); }
+  doc.setPage(total);
 }
 
 /**

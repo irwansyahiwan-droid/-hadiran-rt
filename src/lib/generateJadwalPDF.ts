@@ -2,7 +2,10 @@ import jsPDF from 'jspdf';
 import { amankanPdf } from './pdfTeks';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
-import { TABLE, drawMasthead, drawSignatures, drawFooter, ensureSpace, C, alignHeadFoot } from './pdfTheme';
+import {
+  TABLE, drawMasthead, drawSignatures, drawFooter, ensureSpace, C, alignHeadFoot,
+  drawContinuationHeaders, LANJUT_TOP,
+} from './pdfTheme';
 import type { Tarikan } from './types';
 
 const STATUS: Record<string, string> = {
@@ -31,11 +34,11 @@ export function buildJadwalPDF(list: Tarikan[]): { doc: jsPDF; filename: string 
   const selesai = sorted.filter((t) => t.status === 'selesai').length;
   const terjadwal = sorted.filter((t) => t.status === 'dijadwalkan' || t.status === 'berlangsung').length;
 
-  const Y = drawMasthead(doc, {
-    W, M, docCode, tanggalCetak,
+  const IDENT = {
     title: 'Jadwal Tarikan Arisan',
     subtitle: `${sorted.length} tarikan · ${selesai} selesai · ${terjadwal} terjadwal`,
-  });
+  };
+  const Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT });
 
   const rows = sorted.map((t) => [
     String(t.nomor),
@@ -55,7 +58,7 @@ export function buildJadwalPDF(list: Tarikan[]): { doc: jsPDF; filename: string 
     startY: Y + 7,
     head: [['NO', 'SOHIBUL BAIT', 'TANGGAL', 'STATUS']],
     body: rows,
-    margin: { left: M, right: M },
+    margin: { left: M, right: M, top: LANJUT_TOP },
     columnStyles: JDW_COL,
     didParseCell(data) {
       alignHeadFoot(data, JDW_COL);
@@ -72,6 +75,7 @@ export function buildJadwalPDF(list: Tarikan[]): { doc: jsPDF; filename: string 
   drawSignatures(doc, afterY, W, M, { dateline: `Depok, ${tanggalCetak}` });
 
   const H = doc.internal.pageSize.getHeight();
+  drawContinuationHeaders(doc, { W, M, title: IDENT.title, subtitle: `${IDENT.subtitle} · ${docCode}` });
   drawFooter(doc, W, H, tanggalCetak);
 
   return { doc, filename: `Jadwal-Tarikan-${now.getFullYear()}.pdf` };

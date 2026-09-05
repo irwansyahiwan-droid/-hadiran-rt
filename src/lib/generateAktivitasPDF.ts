@@ -2,7 +2,10 @@ import jsPDF from 'jspdf';
 import { amankanPdf } from './pdfTeks';
 import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
-import { TABLE, drawMasthead, drawFooter, fmtNum, alignHeadFoot } from './pdfTheme';
+import {
+  TABLE, drawMasthead, drawFooter, fmtNum, alignHeadFoot,
+  drawContinuationHeaders, LANJUT_TOP,
+} from './pdfTheme';
 import { formatAktivitas, formatWaktu } from './aktivitas';
 import type { AktivitasLog } from './types';
 
@@ -17,11 +20,11 @@ export function buildAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'): 
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const docCode = `RA-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
 
-  const Y = drawMasthead(doc, {
-    W, M, docCode, tanggalCetak,
+  const IDENT = {
     title: 'Riwayat Aktivitas',
     subtitle: `Kategori: ${filterLabel} · ${rows.length} aktivitas tercatat`,
-  });
+  };
+  const Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT });
 
   type Row = [string, string, string, string, string];
   const body: Row[] = rows.map((r, i) => {
@@ -48,13 +51,14 @@ export function buildAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'): 
     startY: Y + 7,
     head: [['NO', 'WAKTU', 'AKTIVITAS', 'OLEH', 'NILAI (Rp)']],
     body,
-    margin: { left: M, right: M },
+    margin: { left: M, right: M, top: LANJUT_TOP },
     bodyStyles: { ...TABLE.bodyStyles, valign: 'top' },
     columnStyles: AKT_COL,
     didParseCell: (data) => alignHeadFoot(data, AKT_COL),
   });
 
   const H = doc.internal.pageSize.getHeight();
+  drawContinuationHeaders(doc, { W, M, title: IDENT.title, subtitle: `${IDENT.subtitle} · ${docCode}` });
   drawFooter(doc, W, H, tanggalCetak);
 
   return { doc, filename: `Riwayat-Aktivitas-${docCode}.pdf` };
