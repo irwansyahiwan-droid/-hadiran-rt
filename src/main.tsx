@@ -4,12 +4,13 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import App from './App.tsx';
 import ErrorBoundary from './components/ErrorBoundary';
-// Inter self-hosted (variable, satu file woff2): di-bundle Vite → same-origin →
-// ke-cache service worker → font tetap ada saat offline, tanpa FOUT CDN.
-import '@fontsource-variable/inter';
-// Sora self-hosted (variable) — typeface display berkarakter untuk judul & nominal
-// hero. Body tetap Inter (readability). Same-origin → ke-cache SW, tanpa FOUT CDN.
-import '@fontsource-variable/sora';
+// Inter & Sora self-hosted: @font-face-nya kini hidup di index.css dan menunjuk
+// berkas hasil `scripts/gen-font.mjs` (sumbu bobot dijepit ke tangga app 400..800).
+// Sampai 5 Sep 2026 dua baris import fontsource di sini yang memuatnya, dan
+// komentarnya mengklaim "ke-cache service worker" — klaim yang TIDAK BENAR:
+// SHELL diturunkan dari graf IMPOR, sedangkan font dirujuk `url()` dari dalam
+// CSS, jadi pemetanya tak pernah melihatnya. Terukur 40 entri SHELL, nol font.
+// Sekarang `swManifest` memungutnya dari bundel, dan `audit:unduh` menjaganya.
 import './index.css';
 
 // Pulih otomatis dari "chunk basi": setelah versi baru di-deploy, index.html lama

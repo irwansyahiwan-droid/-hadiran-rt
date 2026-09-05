@@ -92,6 +92,33 @@ function swManifest(): Plugin {
          terukur 3/3 run, 12 chunk gagal (Beranda, CrossFade, Odometer, …). */
       const eChunk = bundle[nEntry];
       if (eChunk && eChunk.type === 'chunk') for (const d of eChunk.dynamicImports) walk(d);
+      /* FONT — dipungut dari CSS yang sudah masuk `set`, BUKAN dari graf impor.
+         Sampai 5 Sep 2026 inilah lubangnya: shell berisi 40 entri dan NOL font,
+         walau `main.tsx` menyatakan "ke-cache service worker → font tetap ada
+         saat offline". Sebabnya struktural, bukan kelalaian — pemetanya
+         berjalan di sisi IMPOR, sedangkan font dirujuk `url()` dari DALAM CSS,
+         jadi tak ada satu pun sisi impor yang menuju ke sana. Kelas pelajaran
+         ke-31 (shell tak pernah ke-cache di kunjungan pertama) yang tersisa.
+         Akibatnya terukur, 3 kunjungan berturut-turut: cache 40 entri / 0 font
+         di kunjungan 1, baru 44/2 di kunjungan 2 — warga yang memasang app lalu
+         kehilangan sinyal mendapat app yang boot berhuruf sistem.
+         Dipungut dgn membaca isi CSS-nya, jadi ia mengikuti apa pun yang benar-
+         benar dirujuk; kalau nanti ada gambar/ikon ber-`url()` ia ikut sendiri. */
+      const fontDariCss = new Set<string>();
+      for (const nama of set) {
+        if (!nama.endsWith('.css')) continue;
+        const src = (bundle[nama] as { source?: string | Uint8Array })?.source;
+        if (typeof src !== 'string') continue;
+        for (const m of src.matchAll(/url\(\s*["']?\/?([^"')\s]+\.woff2)["']?\s*\)/g)) {
+          fontDariCss.add(m[1].replace(/^\/+/, ''));
+        }
+      }
+      /* Kalau app memang memakai webfont tapi tak satu pun terpungut, yang
+         rusak PEMUNGUTNYA — dan shell yang diam-diam kehilangan font persis
+         bug yang blok ini ada untuk menutupnya. Meledak, jangan dilewati. */
+      const adaFont = Object.keys(bundle).some((f) => f.endsWith('.woff2'));
+      if (adaFont && fontDariCss.size === 0) this.error('sw-manifest: ada .woff2 di bundel tapi nol terpungut dari CSS');
+      for (const f of fontDariCss) set.add(f);
       shell = [
         '/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png',
         ...[...set].sort().map((f) => '/' + f),

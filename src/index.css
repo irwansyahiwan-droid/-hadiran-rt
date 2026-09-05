@@ -9,6 +9,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Berkas font: DIBANGKITKAN, bukan diimpor mentah ───────────────────
+   Sampai 5 Sep 2026 dua baris `import '@fontsource-variable/…'` di main.tsx
+   mengirimkan sumbu bobot PENUH 100..900 ke tiap HP warga — termasuk
+   thin/extralight/light/black yang `tailwind.config.js` sudah putuskan tak
+   boleh dipakai ("tersedia tanpa pernah dipilih"). Tangganya ditegakkan di
+   CSS tapi tidak di berkasnya. `scripts/gen-font.mjs` menjepit sumbunya ke
+   400..800 — 81.908 -> 62.448 B, hemat 19,0 kB DI KABEL (woff2 sudah
+   terkompres di dalam, jadi brotli tak menyentuhnya: 48.256 -> 48.254).
+   Glyph terverifikasi identik, 0 hilang; generator MENOLAK kalau tidak.
+
+   `unicode-range` disalin PERSIS dari fontsource `latin` supaya tak ada satu
+   pun karakter yang hari ini dirender Inter/Sora berpindah ke font sistem.
+   Enam subset lain (cyrillic/greek/vietnamese/latin-ext) sengaja TIDAK
+   dideklarasikan lagi: terukur nol byte diunduh di kunjungan pertama, dan
+   latin-ext sendirian adalah ranjau 85 kB yang bisa meledak karena satu
+   karakter tunggal. Di luar rentang ini → font sistem, bukan unduhan. */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 800;
+  src: url('./fonts/inter-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: 'Sora Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 800;
+  src: url('./fonts/sora-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
 /* ── Typeface system ──────────────────────────────────────────────────
    Body = Inter (readability maksimal). Display = Sora (grotesk geometrik
    berkarakter) untuk judul & nominal hero → app punya "suara" visual sendiri,
