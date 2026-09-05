@@ -44,6 +44,36 @@ const rp = (n: number) => n.toLocaleString('id-ID');
 
 const konsisten = { totalKasTerkumpul: KAS, totalTalanganBelum: TAL, totalSetor: SET, saldoAktif: NET };
 
+/* Penanda NIHIL (5 Sep 2026): sel uang yang nol dicetak en dash, bukan '0'.
+   Dikunci karena dua arah sama-sama gampang kembali: seseorang "merapikan"
+   dash jadi 0 demi konsistensi dgn Excel (padahal Excel kosong justru karena
+   alasan DATA, bukan tipografi), atau memakai hyphen ASCII yang di kolom uang
+   bisa terbaca sbg minus tanpa angka. */
+describe('PDF Kas Hadiran — penanda nihil', () => {
+  it('sel uang NOL memakai en dash, bukan angka 0', () => {
+    /* t2 sengaja tanpa talangan & tanpa setoran di fixture. */
+    const { doc } = buildKasHadiranPDF(LIST, TALANGAN, SETOR, konsisten);
+    const t = teksPdf(doc);
+    expect(t, "sel nihil masih mencetak '0'").not.toContain('0');
+    /* Di ISI PDF-nya en dash tersimpan sbg byte WinAnsi 0x96, bukan U+2013 —
+       dan itu justru BUKTI `amankanPdf` memetakannya dgn benar: kalau ia lolos
+       sbg U+2013 mentah, jsPDF akan memindahkan SELURUH string ke UTF-16BE dan
+       font standarnya tak bisa menggambarnya (lihat pdfTeks.ts). Keduanya
+       diterima di sini supaya uji ini menguji PENANDA-nya, bukan kebetulan
+       representasi ekstraktor. */
+    const nihil = t.filter((x) => x === '\u0096' || x === '\u2013').length;
+    expect(nihil, 'nol penanda nihil — fixture tak punya sel kosong?').toBeGreaterThanOrEqual(2);
+  });
+
+  it('nilai BUKAN nol tetap tercetak apa adanya', () => {
+    const { doc } = buildKasHadiranPDF(LIST, TALANGAN, SETOR, konsisten);
+    const t = teksPdf(doc);
+    /* Kontrol: penanda nihil tak boleh menelan angka yang benar-benar ada. */
+    expect(t, 'talangan t1 hilang').toContain(`-${rp(TALANGAN.t1.total)}`);
+    expect(t, 'setoran t1 hilang').toContain(`-${rp(SETOR.t1)}`);
+  });
+});
+
 describe('PDF Kas Hadiran — isi dokumen', () => {
   it('mencetak tiap tarikan & sohibulnya', () => {
     const t = teksPdf(buildKasHadiranPDF(LIST, TALANGAN, SETOR, konsisten).doc);

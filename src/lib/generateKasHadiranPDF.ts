@@ -33,6 +33,29 @@ const SK = LANSIA;
 const TABEL = tabelSkala(SK);
 
 /** Bangun dokumennya saja — lihat catatan sama di `generateKasRTPDF.ts`. */
+/** Penanda NIHIL di kolom uang — en dash, konvensi akuntansi.
+ *
+ * Sampai 5 Sep 2026 di sini literal `'0'`, dan pada laporan nyata itu berarti
+ * satu halaman bisa memuat 20 angka nol berderet di kolom Talangan & Setor.
+ * Nolnya tidak SALAH — talangannya memang nol — tapi ia membuat mata bekerja
+ * membaca angka yang tak membawa kabar apa pun, tepat di dokumen yang dibaca
+ * untuk mencari baris yang BERBEDA.
+ *
+ * Kenapa en dash dan bukan sel KOSONG seperti Excel: keduanya benar untuk
+ * medianya, dan itu BUKAN dua konvensi yang bertengkar. Di Excel sel nihil
+ * WAJIB kosong — ia data, dan menaruh teks di sana mengubah tipenya lalu
+ * merusak SUM/filter/pivot. Di KERTAS tak ada tipe; yang ada cuma mata, dan
+ * sel kosong di dokumen bertanda tangan bisa terbaca "belum diisi" alih-alih
+ * "memang tidak ada". En dash menyatakannya dgn sengaja. Preseden yang sama
+ * sudah ada di repo ini: `warnaCetak.line` sengaja LEPAS dari token layar
+ * karena kertas tak punya langkah nada — mazhab adalah properti MEDIA.
+ *
+ * Aman melewati `amankanPdf`: U+2013 = cp1252 0x96, ada di dalam WinAnsi, jadi
+ * ia TIDAK memaksa jsPDF pindah ke UTF-16BE (lihat pdfTeks.ts). Diuji.
+ * Tak bisa dikelirukan dgn minus: nilai negatif di kolom ini selalu berdigit
+ * (`-250.000`), tak pernah tanda sendirian. */
+const NIHIL = '\u2013';
+
 export function buildKasHadiranPDF(
   tarikanList: Tarikan[],
   talanganMap: Record<string, TalanganInfo>,
@@ -142,8 +165,8 @@ export function buildKasHadiranPDF(
       `#${t.nomor} · ${new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}`,
       t.sohibul_bait?.nama ?? '—',
       fmtNum(kasIn),
-      tal.total > 0 ? `-${fmtNum(tal.total)}` : '0',
-      setor > 0 ? `-${fmtNum(setor)}` : '0',
+      tal.total > 0 ? `-${fmtNum(tal.total)}` : NIHIL,
+      setor > 0 ? `-${fmtNum(setor)}` : NIHIL,
       net < 0 ? `-${fmtNum(Math.abs(net))}` : fmtNum(net),
     ];
   });
@@ -156,8 +179,8 @@ export function buildKasHadiranPDF(
     foot: [[
       { content: 'TOTAL', colSpan: 3, styles: { halign: 'right' } },
       { content: fmtNum(totalKas), styles: { halign: 'right' } },
-      { content: totalTal > 0 ? `-${fmtNum(totalTal)}` : '0', styles: { halign: 'right' } },
-      { content: totalSetor > 0 ? `-${fmtNum(totalSetor)}` : '0', styles: { halign: 'right' } },
+      { content: totalTal > 0 ? `-${fmtNum(totalTal)}` : NIHIL, styles: { halign: 'right' } },
+      { content: totalSetor > 0 ? `-${fmtNum(totalSetor)}` : NIHIL, styles: { halign: 'right' } },
       { content: totalNet < 0 ? `-${fmtNum(Math.abs(totalNet))}` : fmtNum(totalNet), styles: { halign: 'right' } },
     ]],
     showFoot: 'lastPage',
