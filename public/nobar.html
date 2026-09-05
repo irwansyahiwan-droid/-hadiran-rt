@@ -291,6 +291,10 @@ try { if (localStorage.getItem('nobar-theme') === 'light') document.documentElem
     font-family: 'Sora', sans-serif; font-size: 19px; font-weight: 800; color: var(--pitch);
   }
   .live-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--pitch); animation: liveP 1.6s ease-in-out infinite; }
+  /* Keadaan USAI — tenang & tanpa titik berdenyut. Hijau "pitch" itu warna
+     ajakan; memakainya untuk pertandingan yang sudah lewat = mengajak warga
+     ke tribun yang sudah kosong. */
+  .cd-live.usai { color: var(--sub); font-size: 16px; font-weight: 700; }
   @keyframes liveP { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 
   /* Sobekan tiket */
@@ -500,6 +504,18 @@ try { if (localStorage.getItem('nobar-theme') === 'light') document.documentElem
 (() => {
   // Countdown kick-off 01.30 WIB dini hari, 15 Juli 2026.
   const kickoff = new Date('2026-07-15T01:30:00+07:00').getTime();
+  /* Berapa lama pertandingan dianggap BERLANGSUNG. 3 jam menutup 2×45 menit +
+     turun minum + perpanjangan waktu + adu penalti — ini semifinal, ketiganya
+     mungkin. Lewat dari itu, halaman ini TIDAK boleh lagi mengajak siapa pun
+     merapat ke tribun.
+
+     Kenapa ini ada (5 Sep 2026): countdown-nya cuma punya DUA cabang — belum
+     kick-off, dan "sudah kick-off, merapat ke tribun!". Cabang kedua tak punya
+     ujung, jadi tujuh minggu sesudah peluit panjang halaman ini masih menyuruh
+     warga bergegas ke lapangan. Kodenya bekerja persis seperti yang ditulis;
+     yang tak pernah ditulis adalah keadaan SESUDAHNYA. Ini bukan halaman basi,
+     ini cabang yang hilang. */
+  const DURASI_MS = 3 * 60 * 60 * 1000;
   const elH = document.getElementById('cd-h');
   const elM = document.getElementById('cd-m');
   const elS = document.getElementById('cd-s');
@@ -514,6 +530,12 @@ try { if (localStorage.getItem('nobar-theme') === 'light') document.documentElem
       box.style.display = 'none';
       label.style.display = 'none';
       live.style.display = 'flex';
+      if (d < -DURASI_MS) {
+        /* textContent sekaligus membuang <i class="live-dot"> — titik berdenyut
+           itu penanda SEDANG berlangsung, dan tak ada lagi yang berlangsung. */
+        live.textContent = 'Pertandingan sudah selesai. Terima kasih yang sudah hadir!';
+        live.classList.add('usai');
+      }
       clearInterval(timer);
       return;
     }
