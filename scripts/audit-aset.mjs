@@ -28,19 +28,19 @@
  * aset yang dijaganya.
  *
  * ── Validasi ──────────────────────────────────────────────────────────────
- * Bagian S sudah MERAH lawan cacat NYATA (tiga screenshot basi), jadi giginya
- * terbukti tanpa mutasi. Yang justru perlu dibuktikan sebaliknya: bahwa ia BISA
- * hijau — probe yang selalu merah bukan penjaga, ia kebisingan. Itu tugas
- * `KONTROL=1`.
+ * KEDUA bagian terbukti DUA ARAH lawan BERKAS NYATA, bukan sintetis — dan itu
+ * bukti yang lebih kuat daripada mutasi, karena kedua sisinya benar-benar
+ * pernah ada di repo ini:
  *
- * Bagian O terbukti DUA ARAH lawan berkas nyata, bukan sintetis: gambar lama
- * `#30AA71` = 2,95:1 MERAH, gambar baru `#0E5132` = 9,37:1 HIJAU, dgn populasi
- * piksel yang IDENTIK (366.336) — jadi vonisnya berubah karena isinya, bukan
- * karena populasinya menyusut.
+ *   bagian S  aset LAMA (kanvas biru) → 3/3 MERAH, `#ECF1F7 ≠ #CFE6D8,
+ *             beda 31/255`. Aset BARU (tembakan 5 Sep) → 3/3 HIJAU.
+ *   bagian O  gambar LAMA `#30AA71` = 2,95:1 MERAH; gambar BARU `#0E5132`
+ *             = 9,37:1 HIJAU, dgn populasi piksel IDENTIK (366.336) — jadi
+ *             vonisnya berubah karena ISI, bukan karena populasi menyusut.
  *
  *   node scripts/audit-aset.mjs
- *   KONTROL=1  harapan kanvas dibalik ke nilai LAMA → bagian S wajib HIJAU
- *              (bukti probe membaca piksel, bukan selalu merah)
+ *   MUTASI=1   harapan kanvas dibalik ke nilai LAMA → bagian S wajib MERAH
+ *              (bukti probe membaca piksel, bukan selalu hijau)
  *   MUTASI=2   batas hero dilonggarkan ke nilai lama → bagian O wajib
  *              MENERIMA gambar lama (bukti ambangnya yang bekerja)
  */
@@ -49,7 +49,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { CETAK } from './lib/palet.mjs';
 
 const MUTASI = process.env.MUTASI || '';
-const KONTROL = process.env.KONTROL === '1';
+
 const lin = (c) => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
 const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 const kontrasPutih = (rgb) => 1.05 / (lum(rgb) + 0.05);
@@ -58,7 +58,7 @@ const toHex = (a) => '#' + a.map((v) => v.toString(16).padStart(2, '0')).join(''
 
 /* Ambang. Kanvas PNG itu lossless jadi harapannya SAMA PERSIS; toleransi 2/255
    hanya untuk menyerap perbedaan pembulatan encoder, bukan untuk melonggarkan. */
-const KANVAS = KONTROL ? '#ECF1F7' : CETAK.canvas;
+const KANVAS = MUTASI === '1' ? '#ECF1F7' : CETAK.canvas;
 const TOLERANSI = 2;
 /* Hero: bukan kesamaan (JPEG lossy) melainkan BATAS — tak boleh ada hijau yang
    lebih terang dari stop paling terang hero app. Itu invarian yang benar-benar
@@ -88,21 +88,55 @@ console.log(`\n=== S. TANGKAPAN LAYAR — kanvas wajib ${KANVAS} ===`);
 const DIR = 'public/screenshots';
 const shots = existsSync(DIR) ? readdirSync(DIR).filter((f) => f.endsWith('.png')).sort() : [];
 for (const f of shots) {
-  /* Talang KIRI, bukan modus se-gambar: kartu putih menutupi sebagian besar
-     layar dan akan menang jadi modus. Pita y 20–85% melewati header & bottom-nav. */
+  /* Kanvas = piksel PALING TERANG di talang kiri, BUKAN modusnya.
+     CACAT ALAT (5 Sep 2026, diperbaiki di hari yang sama ia lahir): probe
+     pertama memakai MODUS dan melaporkan `3-kas.png` GAGAL dgn `#CAE1D3`,
+     beda 5/255. Itu temuan PALSU — kanvasnya benar. Yang menggelapkan adalah
+     BAYANGAN KARTU (`lift`) yang menyapu talang; Kas RT halaman paling padat
+     kartunya (hero + target + insight bertumpuk), jadi di sanalah piksel
+     berbayang MENGALAHKAN kanvas telanjang sbg modus. Dua angka di laporan
+     probe itu sendiri sudah menunjukkannya & sempat kuabaikan: populasinya
+     cuma 4.763px (lawan 56.685 & 22.807 di dua berkas lain — kanvas yg benar2
+     salah warna tetap punya populasi BESAR), dan arah selisihnya selalu lebih
+     GELAP, tak pernah lebih terang.
+
+     Bayangan hanya bisa MENGGELAPKAN, dan di talang tak ada satu pun piksel
+     putih (diverifikasi: 0 dari 5 berkas uji) — jadi piksel paling terang di
+     situ ADALAH kanvas tanpa bayangan, secara konstruksi. Kesamaannya tetap
+     PERSIS; yang berubah besaran yang diukur, bukan ambangnya.
+
+     Diuji lawan LIMA berkas nyata: tiga tembakan baru → #CFE6D8 semua, dan
+     dua berkas LAMA berkanvas biru → #ECF1F7, tetap ketahuan basi. Modus
+     gagal di satu dari lima; tertevrang benar di lima dari lima.
+
+     Talang dipersempit ke x 0,3–1,5% (dari 1,5–4,5%) supaya menjauh dari tepi
+     kartu — bukan itu yang memperbaiki vonisnya, tapi ia mengurangi porsi
+     piksel berbayang sehingga `putih` & populasi lebih mudah dibaca manusia. */
   const top = await piksel(`${DIR}/${f}`, (x, w, h) => {
-    const d = x.getImageData(w * 0.015 | 0, h * 0.20 | 0, Math.max(1, w * 0.03 | 0), h * 0.65 | 0).data;
-    const t = new Map();
-    for (let i = 0; i < d.length; i += 4) { const k = `${d[i]},${d[i + 1]},${d[i + 2]}`; t.set(k, (t.get(k) || 0) + 1); }
-    const [k, n] = [...t].sort((a, b) => b[1] - a[1])[0];
-    return { rgb: k.split(',').map(Number), n };
+    const x0 = Math.max(1, w * 0.003 | 0), lebar = Math.max(2, w * 0.012 | 0);
+    const d = x.getImageData(x0, h * 0.20 | 0, lebar, h * 0.65 | 0).data;
+    let best = null, bl = -1, putih = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      n++;
+      const L = 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+      if (L > bl) { bl = L; best = [d[i], d[i + 1], d[i + 2]]; }
+      /* Prasyarat metode ini: tak boleh ada putih di talang. Kalau suatu hari
+         ada, vonisnya jadi tak sah — dan itu WAJIB diakui, bukan lolos diam2. */
+      if (d[i] > 245 && d[i + 1] > 245 && d[i + 2] > 245) putih++;
+    }
+    return { rgb: best, n, putih };
   });
   populasi++;
   const want = toRgb(KANVAS);
   const beda = Math.max(...top.rgb.map((v, i) => Math.abs(v - want[i])));
+  if (top.putih > 0) {
+    gagal++;
+    console.log(`  ! TAK TERUKUR ${f} — ada ${top.putih} piksel putih di talang, prasyarat "tertevrang = kanvas" tak berlaku`);
+    continue;
+  }
   const ok = beda <= TOLERANSI;
   if (!ok) gagal++;
-  console.log(`  ${ok ? 'ok  ' : 'GAGAL'} ${f.padEnd(16)} kanvas ${toHex(top.rgb)} (${top.n}px)${ok ? '' : `  ≠ ${KANVAS}, beda ${beda}/255`}`);
+  console.log(`  ${ok ? 'ok  ' : 'GAGAL'} ${f.padEnd(16)} kanvas ${toHex(top.rgb)} (${top.n}px talang)${ok ? '' : `  ≠ ${KANVAS}, beda ${beda}/255`}`);
 }
 if (!shots.length) { console.log('  ! PROBE CACAT: nol screenshot di ' + DIR); gagal++; }
 
@@ -168,5 +202,4 @@ console.log(`  ${splash.length} splash diperiksa`);
 await browser.close();
 console.log(`\n=== ${populasi} aset diperiksa · ${gagal} bermasalah ===`);
 if (MUTASI) console.log(`  (MUTASI=${MUTASI} aktif)`);
-if (KONTROL) console.log("  (KONTROL=1 aktif — bagian S wajib HIJAU: probe membaca piksel, bukan selalu merah)");
 process.exit(gagal ? 1 : 0);
