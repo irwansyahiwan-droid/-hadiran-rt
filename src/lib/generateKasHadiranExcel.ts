@@ -32,10 +32,14 @@ export function buildKasHadiranExcel(
   headerRow(sum, 4, ['Keterangan', 'Nominal (Rp)']);
   /* Nada mencermin PDF-nya baris demi baris: talangan `neg`, setoran `warn`,
      saldo pos/neg menurut tandanya. Lihat didParseCell generateKasHadiranPDF. */
+  /* NILAI BERTANDA — alasan sama dgn `generateKasRTExcel`. Talangan & setoran
+     KEDUANYA pengurang: `hitungSaldoHadiran` = kas − talangan − setor, dan
+     PDF-nya sudah mencetak `-Rp250.000` / `-Rp13.600.000`. Dgn tanda, =SUM()
+     atas keempat baris menghasilkan Saldo Kas Hadiran. */
   const ringkasan: [string, number, 'pos' | 'neg' | 'warn' | 'ink'][] = [
     ['Kas Hadiran Terkumpul', stats.totalKasTerkumpul, 'ink'],
-    ['Talangan Belum Lunas', stats.totalTalanganBelum, 'neg'],
-    ['Setoran ke Kas Besar RT', stats.totalSetor, 'warn'],
+    ['Talangan Belum Lunas', -stats.totalTalanganBelum || 0, 'neg'],
+    ['Setoran ke Kas Besar RT', -stats.totalSetor || 0, 'warn'],
     ['Saldo Kas Hadiran', stats.saldo, stats.saldo < 0 ? 'neg' : 'pos'],
   ];
   ringkasan.forEach(([label, val, tone], i) => {
