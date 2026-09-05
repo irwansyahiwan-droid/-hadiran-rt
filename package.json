@@ -37,6 +37,7 @@
     "audit:luring": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-luring.mjs",
     "audit:luring-pertama": "node scripts/audit-luring-pertama.mjs",
     "audit:unduh": "node scripts/audit-unduh.mjs",
+    "audit:fallback-sora": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-fallback-sora.mjs",
     "audit:lompat": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-lompat.mjs",
     "audit:gerak": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-gerak.mjs",
     "audit:papan-ketik": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-papan-ketik.mjs",
