@@ -142,6 +142,51 @@ export function drawMasthead(
   return 41;
 }
 
+/** Tinggi satu BARIS autoTable pada skala tertentu (mm).
+ *
+ *  jsPDF unit 'mm': tinggi sel = fontSize(pt) × lineHeightFactor(1,15) ÷ 72 ×
+ *  25,4 + bantalan atas + bawah. Diturunkan dari geometri NYATA, bukan
+ *  ditaksir — dan itu ujinya: untuk LANSIA rumus ini menghasilkan 9,263mm,
+ *  sementara jarak baris yang TERUKUR dari dokumen jadi adalah 9,26mm.
+ */
+export function barisH(sk: SkalaTeks, kepala = false): number {
+  const pt = kepala ? sk.tabelHead : sk.tabelBody;
+  const pad = kepala ? sk.tabelPad - 0.6 : sk.tabelPad;
+  return (pt * 1.15) / 72 * 25.4 + pad * 2;
+}
+
+/**
+ * Ruang minimum agar sebuah SEKSI boleh dimulai di halaman berjalan.
+ *
+ * Kenapa ini ada (5 Sep 2026): sebelumnya call-site memakai angka mati `38`.
+ * Angka itu tidak tahu SKALA maupun ISI, dan dua-duanya penting:
+ *
+ *   skala  Kas RT dicetak pada LANSIA (badan 11pt), enam laporan lain pada
+ *          RAPAT (7,5pt). Satu konstanta melayani keduanya, jadi ia terlalu
+ *          longgar di RAPAT (butuh 31,6mm, diminta 38) dan masih longgar di
+ *          LANSIA (butuh 34,3mm, diminta 38).
+ *   isi    seksi yang SELURUHNYA lebih pendek dari ambang tetap akan dilempar
+ *          ke halaman baru walau ia muat utuh — membuang ruang untuk mencegah
+ *          yatim yang tak mungkin terjadi.
+ *
+ * Kelas cacat yang SAMA sudah terdokumentasi di `signH`: rumus pertamanya
+ * mengarang angka & kelebihan ±4mm, dan akibatnya blok tanda tangan dilempar
+ * ke halaman baru padahal muat. Di sini bentuknya sama, cuma belum pernah
+ * ditengok.
+ *
+ * Yang dilindungi: label seksi + kepala kolom + `MIN_BARIS` baris data. Kurang
+ * dari itu, seksi yang dimulai di kaki halaman menjadi yatim — pembaca yang
+ * membalik halaman menemukan baris tanpa judul seksinya. Kalau seluruh seksi
+ * lebih pendek dari itu, yang dituntut cuma setinggi seksinya sendiri.
+ */
+export const MIN_BARIS = 2;
+export function seksiMinH(sk: SkalaTeks, jumlahBaris: number): number {
+  const LABEL = 8.5;                    // = kenaikan y yang dikembalikan sectionLabel
+  const utuh = LABEL + barisH(sk, true) + barisH(sk) * jumlahBaris;
+  const minimum = LABEL + barisH(sk, true) + barisH(sk) * MIN_BARIS;
+  return Math.min(utuh, minimum);
+}
+
 /**
  * Pastikan sisa ruang halaman cukup untuk blok setinggi `needed` mm;
  * kalau tidak, mulai halaman baru. Mengembalikan Y tempat blok digambar.
