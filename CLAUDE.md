@@ -972,7 +972,7 @@ Vonis hijau/merah boleh dipercaya; kolom durasi petunjuk, bukan bukti.
 Dijalankan di mesin dev lawan **DB HIDUP** (container CI/dev memakai `.env`
 dummy dan menstarve 13 sapuan — angkanya tak berlaku, lihat di bawah).
 
-    26 sapuan · 25 hijau · 1 TEMUAN TERBUKA
+    26 sapuan · 25 hijau · 1 temuan — DITUTUP di hari yang sama (lihat di bawah)
 
   · `kontras` 1.236 sampel AA 0 · `kontras-deep` 2.546 sampel AA 0
   · `fallback-sora` 40 permukaan / 1.032 teks / A 0 · B 0
@@ -981,7 +981,7 @@ dummy dan menstarve 13 sapuan — angkanya tak berlaku, lihat di bawah).
   · `huruf` 27 layar-lebar · 6.558 daun teks · dimaafkan 39 · di bawah lantai 0
   · produksi menyajikan `assets/index-DfwjGi6m.css`, cocok dgn build dari main
 
-**TERBUKA (bukan regresi, laten, baru terpapar data):** `jarak-teks` §1.4.12 —
+**DITUTUP 6 Sep 2026** (bukan regresi, laten, baru terpapar data): `jarak-teks` §1.4.12 —
 nama warga ber-`line-clamp-2` di **Talangan baris 368** kehilangan **23px ≈
 satu baris** saat line-height 1,5 dipasang, dan **tak punya jalan keluar
 visual**: `g.nama` cuma muncul sbg inisial `AvatarPeci`, di `aria-label` tombol
@@ -989,6 +989,23 @@ WA (tak terlihat mata), di teks pesan WhatsApp, dan di filter pencarian —
 sedangkan baris yang DIPERLUAS hanya menampilkan `Tarikan #N`. Karena itu
 `data-ringkas` TIDAK boleh dipasang di sini: syarat keduanya (teks utuh terbaca
 di tujuannya) tak terpenuhi, dan memasangnya jadi pintu belakang. Odometer 0.
+
+Obatnya: **clamp DILEPAS**, sesudah ongkosnya diukur dan ternyata ASIMETRIS —
+nama PENDEK tak tumbuh sama sekali (0px), hanya nama panjang menambah baris
+(+22,5px untuk 16 karakter). Itu yang membedakannya dari keterangan Kas RT,
+tempat melepas clamp pernah DITOLAK (35 dari 36 baris membungkus >=3 baris,
+terburuk 288px untuk SATU transaksi): **nama warga terbatas panjangnya,
+keterangan bebas tidak.** Sapuan juga melaporkan lebih ringan dari kenyataan —
+1 temuan 23px, padahal nama yang lebih panjang kehilangan 109px @360 (4-5
+baris). Bukti di build nyata: isi hilang −3,5px di semua nama, 360 & 390px.
+
+**`break-words` DIPERTAHANKAN, dan itu nyaris salah.** Di 360px nama panjang
+patah di tengah kata, jadi melepasnya sempat diukur — dan probe pertamanya
+bilang "aman, nol luber". Itu SALAH: ia membandingkan kotak `<p>` dgn induknya,
+padahal `<p>` blok yang lebarnya selalu = induk, sehingga kotaknya TAK PERNAH
+bisa menunjukkan luapan (cacat ke-16 persis: ukur TEKS lewat `Range`). Probe
+yang benar berbalik — tanpa `break-words` **4 nama MELUBER kolom @320**. Ia
+menanggung beban: menukar patah-tengah-kata dgn tidak-meluber.
 
 **Kenapa merah di rantai TIDAK selalu berarti cacat.** `test` & `huruf` merah
 di dalam `sapu-semua` tapi **hijau saat dijalankan SENDIRIAN** — `huruf`
