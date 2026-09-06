@@ -177,8 +177,20 @@ const jalan = (cmd) => {
        kebetulan tak ada satu pun sapuan ber-MUTASI, jadi tabrakannya tak
        pernah terlihat. Mutasi sapuan dijalankan sendiri-sendiri, memang. */
     encoding: 'utf8', env: { ...process.env, MUTASI: '', CAP_URL: URL, APP_URL: URL },
+    /* maxBuffer bawaan Node cuma 1 MB, dan kalau terlampaui keluarannya DIPOTONG
+       lalu `status` jadi null — sapuan sehat akan terbaca gagal, dan penjaga
+       populasi akan menyalahkan "bentuk keluaran" untuk sesuatu yang sebenarnya
+       cuma terpotong. Sapuan piksel bisa mencetak ribuan baris. */
+    maxBuffer: 64 * 1024 * 1024,
   });
-  return { kode: r.status, keluaran: (r.stdout || '') + (r.stderr || '') };
+  return {
+    kode: r.status,
+    keluaran: (r.stdout || '') + (r.stderr || ''),
+    /* Kenapa prosesnya berakhir, kalau bukan lewat exit code biasa. `status`
+       null berarti mati oleh sinyal atau gagal di-spawn — dua hal yang TIDAK
+       boleh dilaporkan sebagai "populasi berubah bentuk". */
+    sebab: r.error?.code || (r.signal ? `sinyal ${r.signal}` : null),
+  };
 };
 
 /* Ringkasan diambil dari baris `=== … ===` milik tiap sapuan — tiap sapuan
@@ -195,12 +207,42 @@ const hasil = [];
 const bagian = async (nama, daftar, lewati) => {
   for (const [n, cmd] of daftar) {
     if (lewati) { hasil.push({ n, status: 'dilewat', ket: 'preview mati' }); process.stdout.write('·'); continue; }
-    const t0 = Date.now();
-    const { kode, keluaran } = jalan(cmd);
-    const dtk = Math.round((Date.now() - t0) / 1000);
+    /* Jam MONOTONIK, bukan `Date.now()` — kebal terhadap lompatan wall-clock
+       (koreksi NTP, jam mesin diubah). Dilaporkan 6 Sep 2026 dari mesin dev:
+       `mati` tercatat 13.331 dtk (3,7 jam) & `kontras-nonteks` 5.097 dtk,
+       padahal seluruh jalannya jauh lebih pendek.
+
+       BATAS YANG DIAKUI: penyebab angka itu BELUM terbukti, dan perubahan ini
+       belum tentu menutupnya. Rumusnya cuma satu & bersatuan detik untuk SEMUA
+       sapuan, jadi "sebagian melaporkan milidetik" mustahil secara struktural;
+       yang tersisa dua kemungkinan — mesin TIDUR di tengah rantai (dan apakah
+       `performance.now()` ikut menghitung tidur itu bergantung platform:
+       libuv memakai jam yang pada macOS modern justru TETAP berjalan saat
+       tidur), atau sapuannya memang menggantung selama itu. Yang bisa
+       dipercaya cuma vonis hijau/merahnya; kolom durasi adalah petunjuk,
+       bukan bukti. */
+    const t0 = performance.now();
+    const { kode, keluaran, sebab } = jalan(cmd);
+    const dtk = Math.round((performance.now() - t0) / 1000);
     const pop = periksaPopulasi(n, keluaran);
     const merah = kode !== 0 || pop?.turun;
-    const ket = pop?.turun ? `${pop.pesan}  ·  ${ringkas(keluaran)}` : ringkas(keluaran);
+    /* URUTAN SEBAB — ini inti perbaikan 6 Sep 2026. Dulu vonis populasi selalu
+       menang, jadi sapuan yang GAGAL dilaporkan sbg "POLA POPULASI HILANG —
+       keluaran sapuan berubah bentuk". Kalimat itu menyalahkan bentuk keluaran
+       untuk sesuatu yang sebenarnya kegagalan proses, dan terbukti menyesatkan:
+       `test` merah karena dua vitest beradu, tapi laporannya menyuruh orang
+       memeriksa pola — lalu satu sesi penuh dihabiskan mengejar hipotesis versi
+       Node yang salah, sementara `vitest run` sendirian lulus 404.
+       Penjaga populasi hanya berhak bicara kalau sapuannya SELESAI NORMAL;
+       kalau tidak, yang dilaporkan kegagalannya, dan populasinya cuma catatan. */
+    let ket;
+    if (kode !== 0) {
+      const kenapa = sebab ? `proses berakhir: ${sebab}` : `keluar dgn kode ${kode}`;
+      const catatan = pop?.turun ? `  ·  (populasi tak terbaca — wajar untuk sapuan yang gagal)` : '';
+      ket = `${kenapa}  ·  ${ringkas(keluaran)}${catatan}`;
+    } else {
+      ket = pop?.turun ? `${pop.pesan}  ·  ${ringkas(keluaran)}` : ringkas(keluaran);
+    }
     hasil.push({ n, status: merah ? 'MERAH' : 'hijau', ket, dtk });
     process.stdout.write(merah ? 'x' : '.');
   }
