@@ -967,6 +967,40 @@ Diganti ke `performance.now()` (kebal koreksi NTP) **tanpa mengklaim itu
 menutup kasus tidur** — libuv pada macOS modern justru tetap menghitungnya.
 Vonis hijau/merah boleh dipercaya; kolom durasi petunjuk, bukan bukti.
 
+Yang ke-41 (6 Sep 2026) — **penjaga yang membaca teks MENTAH bergantung pada
+apakah anak proses kebetulan mewarnai keluarannya, dan itu berbeda
+antar-mesin.**
+
+`sapu-semua` melaporkan `test` POLA POPULASI HILANG **dua jalan berturut-turut
+di mesin dev**, keduanya SENDIRIAN tanpa proses lain, sementara `npx vitest run`
+sendirian lulus 404/404 tanpa satu pun Failed Test. Di container CI/dev gejalanya
+**MUSTAHIL direproduksi**: vitest mencetak polos di ketiga mode `FORCE_COLOR`,
+jadi `test` selalu hijau di sana.
+
+Yang memecahkannya justru penambahan sebelumnya — ekor keluaran sapuan gagal.
+Baris `Tests  404 passed (404)` **JELAS ADA**, terbaca di baris PERTAMA ekor itu.
+Barisnya ada, polanya tetap meleset: yang memisahkan keduanya sesuatu yang **tak
+terlihat di teks terrender** — pewarnaan menyisipkan `\x1b[..m` di antara
+`Tests` dan angkanya, sehingga `\s+` tak pernah cocok. Kini `bersih()` membuang
+CSI+OSC sebelum pencocokan.
+
+**Dua dugaan SALAH dibuang lebih dulu, dan keduanya terdengar masuk akal:**
+versi Node (diukur: Node 22 lulus, CI Node 24 hijau — gugur), dan "baris
+ringkasan terdorong keluar dari jendela ekor" (gugur karena `periksaPopulasi`
+mencocokkan ke SELURUH keluaran; ekor itu murni tampilan — dan barisnya justru
+terbaca DI DALAM ekor itu sendiri).
+
+**Pelajaran yang menyambung ke-40:** penjaga yang tak bisa menyebut byte-nya
+memaksa orang menebak. Kini kalau pola tetap meleset, laporan menunjukkan baris
+yang memuat jangkar polanya, JSON-escaped, atau menyatakan tak ada baris
+seperti itu. Divalidasi tiga kasus: ringkasan BERWARNA merah→hijau, ringkasan
+polos TAK BERUBAH, bentuk benar-benar berubah tetap merah + petunjuk byte.
+
+Catatan cara kerja yang ikut terbukti: **rantai yang sedang berjalan memakai
+skrip yang sudah termuat di memori node.** `git pull` di tengah jalan tidak
+mengubah vonis jalan itu — baris sapuan yang penjaganya baru diperbaiki akan
+tetap memakai penjaga LAMA sampai rantainya dijalankan ulang.
+
 **GARIS DASAR SAPUAN — 6 Sep 2026 · main `62a9d7e`**
 
 Dijalankan di mesin dev lawan **DB HIDUP** (container CI/dev memakai `.env`
