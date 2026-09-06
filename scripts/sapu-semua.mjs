@@ -243,7 +243,18 @@ const bagian = async (nama, daftar, lewati) => {
     } else {
       ket = pop?.turun ? `${pop.pesan}  ·  ${ringkas(keluaran)}` : ringkas(keluaran);
     }
-    hasil.push({ n, status: merah ? 'MERAH' : 'hijau', ket, dtk });
+    /* EKOR KELUARAN sapuan yang gagal ikut disimpan. Tanpa ini, laporan bilang
+       "keluar dgn kode 1" dan berhenti di situ — pembacanya tahu SESUATU gagal
+       tapi tak tahu apa, jadi tiap merah menuntut satu putaran bolak-balik
+       menjalankan ulang sapuan itu sendirian. Terjadi persis begitu 6 Sep 2026
+       pada `test`: merah dua jalan berturut-turut sementara `vitest run`
+       sendirian lulus 404/404, dan sebabnya tak terbaca dari laporan mana pun.
+       Kelas yang sama dgn pelajaran ke-40 — penjaga yang tak menyebut sebabnya
+       memaksa orang menebak. */
+    const ekor = merah
+      ? keluaran.split('\n').filter((l) => l.trim()).slice(-6).map((l) => l.slice(0, 150))
+      : null;
+    hasil.push({ n, status: merah ? 'MERAH' : 'hijau', ket, dtk, ekor });
     process.stdout.write(merah ? 'x' : '.');
   }
 };
@@ -269,6 +280,7 @@ console.log('\n─────────────────────�
 for (const h of hasil) {
   const tanda = h.status === 'hijau' ? '  hijau ' : h.status === 'MERAH' ? '  MERAH ' : '  lewat ';
   console.log(`${tanda} ${h.n.padEnd(16)} ${h.dtk !== undefined ? String(h.dtk).padStart(3) + 's' : '   '}  ${h.ket}`);
+  if (h.ekor?.length) for (const l of h.ekor) console.log(`${' '.repeat(24)}| ${l}`);
 }
 const merah = hasil.filter((h) => h.status === 'MERAH');
 const lewat = hasil.filter((h) => h.status === 'dilewat');
