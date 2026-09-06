@@ -146,14 +146,35 @@ const TANPA_LANTAI = {};
    apa pun kalau ia tak pernah bisa merah. */
 const KALI = process.env.MUTASI === '1' ? 10 : 1;
 
+/* Buang urutan kendali ANSI sebelum mencocokkan pola populasi.
+   Kenapa: 6 Sep 2026 `test` dilaporkan POLA POPULASI HILANG dua jalan
+   berturut-turut sementara baris `Tests  404 passed (404)` JELAS ADA di
+   keluarannya — terbaca langsung di ekor yang dicetak laporan. Barisnya ada,
+   polanya tetap meleset, jadi yang memisahkan keduanya sesuatu yang TAK
+   TERLIHAT di teks terrender: pewarnaan menyisipkan `\x1b[..m` di antara
+   `Tests` dan angkanya, sehingga `\s+` tak pernah cocok.
+   Penjaga yang membaca teks MENTAH karena itu bergantung pada apakah anak
+   proses kebetulan mewarnai keluarannya — dan itu berbeda antar-mesin. */
+const bersih = (t) => t.replace(/\u001B\[[0-9;?]*[ -/]*[@-~]/g, '').replace(/\u001B\][^\u0007\u001B]*(?:\u0007|\u001B\\)/g, '');
+
+/* Kalau pola TETAP meleset sesudah dibersihkan, tunjukkan BYTE-nya — tanpa ini
+   pembacanya cuma tahu "berubah bentuk" dan harus menebak bentuk barunya. */
+function petunjukPola(pola, teks) {
+  const jangkar = (pola.source.match(/^[A-Za-z][A-Za-z ]*/) || [''])[0].trim();
+  if (!jangkar) return '';
+  const baris = teks.split('\n').filter((l) => l.includes(jangkar)).slice(0, 2);
+  return baris.length ? `  (baris yang memuat "${jangkar}": ${baris.map((l) => JSON.stringify(l.trim().slice(0, 90))).join(' ')})` : `  (tak ada baris memuat "${jangkar}")`;
+}
+
 function periksaPopulasi(nama, keluaran) {
   const aturan = LANTAI[nama];
   if (!aturan) return null;
   const [pola, dasar] = aturan;
   const lantai = Math.round(dasar * KALI);
   if (lantai === 0) return null;
-  const m = keluaran.match(pola);
-  if (!m) return { turun: true, pesan: 'POLA POPULASI HILANG — keluaran sapuan berubah bentuk, penjaga ini jadi buta' };
+  const teks = bersih(keluaran);
+  const m = teks.match(pola);
+  if (!m) return { turun: true, pesan: 'POLA POPULASI HILANG — keluaran sapuan berubah bentuk, penjaga ini jadi buta' + petunjukPola(pola, teks) };
   const n = +m[1];
   if (n < lantai) return { turun: true, pesan: `POPULASI TURUN ${n} < lantai ${lantai} — periksa flake vs perubahan data; kalau nyata, perbarui LANTAI` };
   return { turun: false, n };
