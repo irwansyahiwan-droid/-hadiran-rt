@@ -1001,19 +1001,41 @@ skrip yang sudah termuat di memori node.** `git pull` di tengah jalan tidak
 mengubah vonis jalan itu — baris sapuan yang penjaganya baru diperbaiki akan
 tetap memakai penjaga LAMA sampai rantainya dijalankan ulang.
 
-**GARIS DASAR SAPUAN — 6 Sep 2026 · main `62a9d7e`**
+**GARIS DASAR SAPUAN — 6 Sep 2026 · app pada `1dbb865`**
 
 Dijalankan di mesin dev lawan **DB HIDUP** (container CI/dev memakai `.env`
-dummy dan menstarve 13 sapuan — angkanya tak berlaku, lihat di bawah).
+dummy dan menstarve 13 sapuan — angkanya tak berlaku, lihat di bawah). Kode APP
+tak berubah sejak `1dbb865`; commit sesudahnya hanya alat & dokumentasi.
 
-    26 sapuan · 25 hijau · 1 temuan — DITUTUP di hari yang sama (lihat di bawah)
+    26 sapuan · 26 HIJAU · nol temuan terbuka
 
-  · `kontras` 1.236 sampel AA 0 · `kontras-deep` 2.546 sampel AA 0
-  · `fallback-sora` 40 permukaan / 1.032 teks / A 0 · B 0
-  · `sentuh` 421 kontrol · `nama` 533 kontrol · `sheet` 13 permukaan
-  · `lompat` 0 · `lebar` 0 · `gerak` 0 · `publik` 8 halaman 0
-  · `huruf` 27 layar-lebar · 6.558 daun teks · dimaafkan 39 · di bawah lantai 0
-  · produksi menyajikan `assets/index-DfwjGi6m.css`, cocok dgn build dari main
+**Rantai itu sendiri mencetak `24 hijau · 2 MERAH`, dan kedua merahnya
+dibuktikan BUKAN temuan — masing-masing dgn sebab yang berbeda:**
+
+  · `test` — rantai memakai penjaga LAMA: skripnya sudah termuat di memori node
+    sebelum pull ke `b9bc8fc`, jadi perbaikan buta-ANSI (pelajaran ke-41) belum
+    berlaku di jalan itu. Diverifikasi terpisah `CEPAT=1`: statis 8/8, `test`
+    hijau.
+  · `fallback-sora` — merah di rantai dgn "keluar dgn kode 1 · (tanpa
+    ringkasan)". NOL ringkasan itu tanda crash, bukan vonis: baris `=== … ===`
+    dicetak SEBELUM tiap gerbang PROBE CACAT & lantai, jadi ketiadaannya berarti
+    mati sebelum sampai ke sana — dan jalur PROBE CACAT-nya keluar 2, bukan 1.
+    Dijalankan SENDIRIAN: **EXIT=0**, vonis lengkap, 40 permukaan / 948 teks /
+    A 0 · B 0.
+
+  · `keadaan` 36 layar 0 · `kontras` 1.244 sampel AA 0 · `kontras-deep` 2.533 AA 0
+  · `mati` 167 sampel · `nama` 535 kontrol 0 · `sentuh` 422 kontrol
+  · `huruf` 27 layar-lebar 0 · `potong` · `jarak-teks` 0 (275 dtk) · `lebar` 0
+  · `sheet` 13 permukaan 0 · `lompat` · `gerak` 0 · `publik` 8 halaman 0 · `unduh`
+  · `fallback-sora` 40 permukaan / 948 teks terkurung / 576 teks Sora / A 0 · B 0
+  · produksi menyajikan `assets/index-DfwjGi6m.css`, cocok dgn build dari main;
+    perbaikan Talangan terverifikasi live dari ISI chunk (`line-clamp-2` nol)
+
+**POPULASI BERGESER ANTAR-JALAN, dan itu NORMAL.** `huruf` 6.651 → 6.558,
+`fallback-sora` 1.032 → 948 teks terkurung (tapi 568 → 576 teks Sora — naik,
+bukan turun). Sebabnya data hidup yang berubah, bukan sapuan yang menyempitkan
+populasinya. Lantai populasi ada untuk menangkap penurunan BESAR (5–25%), bukan
+riak beberapa persen. Jangan kejar selisih sekecil ini.
 
 **DITUTUP 6 Sep 2026** (bukan regresi, laten, baru terpapar data): `jarak-teks` §1.4.12 —
 nama warga ber-`line-clamp-2` di **Talangan baris 368** kehilangan **23px ≈
@@ -1052,9 +1074,20 @@ seperti satu sebab. Ternyata DUA:
   · `huruf` — memang keadaan rantai. Sendirian ia cocok garis dasar di tiap
     sumbu (27 layar / 39 dimaafkan / 0 di bawah lantai). Rantai menyalakan 26
     Chromium berturut-turut; satu layar gugur, populasi 27 → 26.
+  · `fallback-sora` — keadaan rantai juga, tapi lebih keras: ia CRASH (exit 1
+    tanpa ringkasan) alih-alih kehilangan satu layar. Sendirian: EXIT=0, vonis
+    lengkap. Ia paling rentan karena posisinya TERAKHIR dalam antrean DAN ia
+    sendiri membuka empat konteks browser (2 lebar × 2 peran, masing-masing dua
+    pass).
   · `test` — BUKAN keadaan rantai sama sekali, melainkan penjaganya yang buta
     oleh warna ANSI (pelajaran ke-41). Diperbaiki `b9bc8fc`, terkonfirmasi
     hijau di mesin dev sesudahnya.
+
+**POLANYA: yang gugur adalah sapuan di EKOR antrean.** `huruf` (ke-7 visual)
+kehilangan satu layar; `fallback-sora` (terakhir) mati sama sekali. Mesin yang
+sudah menyalakan 25 Chromium bukan mesin yang sama dgn yang menyalakan satu.
+Kalau suatu saat rantai ini perlu dipercaya apa adanya, urutannya yang harus
+diubah — bukan vonisnya yang dilonggarkan.
 
 **Sapuan yang merah di rantai wajib diulang SENDIRIAN sebelum disebut temuan**
 — tapi "hijau sendirian" juga belum menjelaskan SEBABNYA, dan dua sapuan yang
