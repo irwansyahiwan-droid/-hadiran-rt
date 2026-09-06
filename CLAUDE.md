@@ -1089,6 +1089,29 @@ sudah menyalakan 25 Chromium bukan mesin yang sama dgn yang menyalakan satu.
 Kalau suatu saat rantai ini perlu dipercaya apa adanya, urutannya yang harus
 diubah — bukan vonisnya yang dilonggarkan.
 
+**URUTANNYA SUDAH DIUBAH (6 Sep 2026), dan hasilnya BELUM terbukti.**
+`fallback-sora` 18 → 2, `unduh` kini terakhir; himpunannya identik, cuma
+urutannya bergeser, dan tak satu vonis pun dilonggarkan — tak ada percobaan
+kedua, tak ada toleransi baru, tak ada lantai yang diturunkan. Alasannya
+tertulis di call-site `scripts/sapu-semua.mjs`: `fallback-sora` sapuan paling
+bergantung-klik di repo ini (40 permukaan, masing-masing dgn pemicunya sendiri)
+SEKALIGUS kanari lingkungan (tanpa DB hidup ia keluar PROBE CACAT — lebih baik
+diketahui di menit ke-2 daripada menit ke-25); `unduh` paling tahan di ekor
+(satu konteks, server & port sendiri, watchdog sendiri, dan tiap jalur
+keluarnya mencetak `PROBE CACAT: …` bernama).
+
+**Tersangka pertama sudah diperiksa dan GUGUR: tak ada Chromium yang bocor.**
+Tiap sapuan ber-browser di rantai memanggil `browser.close()`, dan tiap
+`process.exit()` yang ada duduk SEBELUM `chromium.launch()` atau SESUDAH
+`close()` — tak satu pun jalur keluar meninggalkan Chromium hidup. Jadi
+perubahan ini memindahkan yang paling rapuh menjauh dari slot terburuk; ia
+tidak menyembuhkan sebabnya, dan sebabnya masih belum diketahui.
+
+**Yang membuktikannya cuma satu hal: `fallback-sora` hijau DI DALAM rantai
+penuh, bukan sendirian** — dan itu hanya bisa dijalankan di mesin ber-DB nyata.
+Kalau ia tetap gugur di posisi ke-2, hipotesis posisi yang salah: kembalikan
+urutannya dan cari sebab lain, jangan tambah slot baru untuk dipindahi.
+
 **Sapuan yang merah di rantai wajib diulang SENDIRIAN sebelum disebut temuan**
 — tapi "hijau sendirian" juga belum menjelaskan SEBABNYA, dan dua sapuan yang
 bergejala sama di sini ternyata punya sebab yang sama sekali berbeda.

@@ -32,10 +32,61 @@ const STATIS = [
   ['test', 'vitest run'],
 ];
 
-/* Urutan VISUAL: yang paling sering menemukan cacat lebih dulu, supaya
-   sapuan yang dihentikan di tengah tetap memberi kabar paling berguna. */
+/* URUTAN VISUAL — DUA sumbu, dan yang kedua baru ditambahkan 6 Sep 2026.
+
+   (1) YANG PALING SERING MENEMUKAN CACAT LEBIH DULU, supaya rantai yang
+       dihentikan di tengah tetap memberi kabar paling berguna. Itu alasan
+       aslinya, dan ia masih memerintah bagian tengah daftar ini.
+
+   (2) YANG PALING RAPUH DI DEPAN, YANG PALING TAHAN DI EKOR. Sumbu ini lahir
+       dari garis dasar 6 Sep: `fallback-sora` — waktu itu TERAKHIR — keluar
+       kode 1 TANPA satu baris ringkasan pun di dalam rantai, lalu EXIT=0 dgn
+       vonis lengkap (40 permukaan · 948 teks · A 0 · B 0) saat dijalankan
+       SENDIRIAN di mesin & build yang sama. `huruf` (ke-7) kehilangan satu
+       layar di jalan yang sama, 27 → 26. Mesin yang sudah menyalakan 25
+       Chromium bukan mesin yang sama dgn yang menyalakan satu.
+
+   BATAS BUKTI, DIAKUI — ini SATU pengamatan kuat (fallback-sora) + satu lemah
+   (27 → 26 bisa juga satu klik yang meleset), dan sebabnya BELUM terbukti.
+   Tersangka pertama justru sudah DIPERIKSA & GUGUR: tak ada Chromium yang
+   bocor. Tiap sapuan ber-browser di rantai ini memanggil `browser.close()`,
+   dan tiap `process.exit()` yang ada duduk SEBELUM `chromium.launch()` atau
+   SESUDAH `close()` — tak satu pun jalur keluar meninggalkan Chromium hidup.
+   Jadi perubahan ini MEMINDAHKAN sapuan paling rapuh menjauh dari slot
+   terburuk; ia tidak menyembuhkan sebabnya. Yang TIDAK dilakukan: melonggarkan
+   vonis. Tak ada percobaan kedua, tak ada toleransi baru, tak ada lantai yang
+   diturunkan — merah tetap merah persis seperti sebelumnya.
+
+   KENAPA `fallback-sora` yang dipindah, dan ke DEPAN: ia sapuan paling
+   bergantung-klik di repo ini — 40 permukaan, masing-masing dibuka pemicunya
+   SENDIRI (target Kas RT, tambah jadwal, revisi jadwal dua langkah) — dan ekor
+   antrean justru tempat jalur klik paling mungkin meleset. Ia juga KANARI
+   LINGKUNGAN: tanpa DB hidup populasinya distarve dan ia keluar PROBE CACAT.
+   Mengetahui itu di menit ke-2 alih-alih menit ke-25 murni untung, dan itu
+   TIDAK melanggar sumbu (1) — sapuan yang memberi tahu bahwa seluruh jalan ini
+   tak bisa dipercaya adalah kabar paling berguna yang bisa datang lebih dulu.
+
+   KENAPA `unduh` yang menempati ekor: ia paling tak terpengaruh mesin yang
+   sudah lelah — satu konteks, memegang server & port-nya SENDIRI (5198), punya
+   watchdog 180 dtk sendiri sehingga tak bisa menggantungkan rantai, dan
+   menolak build BASI sendiri. Gagal di ekor pun ia gagal dgn NAMA: tiap jalur
+   keluarnya mencetak `PROBE CACAT: …` miliknya sendiri, jadi merah di slot
+   terakhir tetap bisa dibaca tanpa menjalankannya ulang.
+
+   BELUM TERBUKTI DARI SINI. Rantai penuh hanya sah di mesin ber-DB nyata.
+   Yang membuktikan urutan ini menolong cuma satu hal: `fallback-sora` hijau
+   DI DALAM rantai penuh, bukan cuma sendirian. Kalau ia tetap gugur di posisi
+   ke-2, sumbu (2) yang salah — kembalikan urutannya dan cari sebab lain. */
 const VISUAL = [
   ['keadaan', 'node scripts/audit-keadaan.mjs'],
+  /* `fallback-sora` menuntut DATA NYATA, bukan cuma preview hidup: dua
+     permukaannya (target Kas RT, revisi jadwal) hanya ADA kalau DB-nya
+     berisi, dan luapan teks bergantung pada STRING nyata — nama warga,
+     keterangan. Di lingkungan tanpa Supabase ia keluar PROBE CACAT, dan itu
+     memang jawaban yang benar: hijau dari populasi yang distarve adalah
+     kepercayaan palsu (cacat ke-23). Itu juga yang membuatnya berguna di
+     DEPAN — lihat sumbu (2). */
+  ['fallback-sora', 'node scripts/audit-fallback-sora.mjs'],
   ['kontras', 'node scripts/audit-kontras.mjs'],
   ['kontras-deep', 'node scripts/audit-kontras-deep.mjs'],
   ['kontras-nonteks', 'node scripts/audit-kontras-nonteks.mjs'],
@@ -62,15 +113,9 @@ const VISUAL = [
      (5198, dalam proses) sehingga tak menyentuh preview bersama — beda
      dgn `luring-pertama` yang MEMBUNUH pemegang port dan karena itu
      sengaja di luar rantai ini. Build BASI ditolaknya sendiri (PROBE
-     CACAT), jadi ia tak bisa hijau dari build kemarin. */
+     CACAT), jadi ia tak bisa hijau dari build kemarin. Sifat-sifat itu
+     pula yang membuatnya paling tahan di EKOR — lihat sumbu (2). */
   ['unduh', 'node scripts/audit-unduh.mjs'],
-  /* `fallback-sora` menuntut DATA NYATA, bukan cuma preview hidup: dua
-     permukaannya (target Kas RT, revisi jadwal) hanya ADA kalau DB-nya
-     berisi, dan luapan teks bergantung pada STRING nyata — nama warga,
-     keterangan. Di lingkungan tanpa Supabase ia keluar PROBE CACAT, dan itu
-     memang jawaban yang benar: hijau dari populasi yang distarve adalah
-     kepercayaan palsu (cacat ke-23). */
-  ['fallback-sora', 'node scripts/audit-fallback-sora.mjs'],
 ];
 
 /* ── LANTAI POPULASI ────────────────────────────────────────────────────────
