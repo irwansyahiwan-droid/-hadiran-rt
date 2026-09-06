@@ -906,6 +906,106 @@ semacam itu justru sudah dijaga bagian A. Yang benar-benar bisa dilihat warga
 adalah **jumlah BARIS**, dan itu terbaca langsung dari keadaan yang dirender
 (`getClientRects().length`), bukan dari pengukuran sintetis.
 
+Yang ke-39 (6 Sep 2026) — **`npm install` di macOS MEMANGKAS dependensi
+opsional per-platform dari `package-lock.json`, dan diff-nya terbaca tak
+berbahaya.**
+
+Terukur di mesin dev: **546 → 519 entri, 27 hilang, NOL versi berubah.** Karena
+tak ada versi yang bergerak, diff-nya terbaca seperti tulis-ulang npm biasa.
+Yang hilang justru yang menentukan: **9 di antaranya Linux**, termasuk
+`node_modules/vitest/node_modules/@esbuild/linux-x64` (`optional: true · os:
+["linux"] · cpu: ["x64"]`) — dan `ci.yml` berjalan di `ubuntu-latest` dgn
+`npm ci`, sedangkan Vercel juga membangun di Linux. Lockfile itu, kalau
+ter-commit, membuat esbuild terpasang tanpa binernya.
+
+**Jumlah BARIS menyesatkan, jangan dipakai memvonis.** Yang terhapus 512 baris,
+dan aku sempat menduga itu pemangkasan seluruh biner platform — lalu KUUKUR dan
+dugaanku gugur: `@esbuild/*` menempati 836 baris, `@rollup/*` 350, keduanya
+1.186. Tak ada yang mendekati 512. Yang menentukan **entri yang hilang & versi
+yang berubah**, bukan baris.
+
+Cara memvonisnya: petakan `path → version` dari kedua lockfile, lalu bandingkan
+tiga hal — versi yang TURUN, entri yang HILANG, dan berapa di antaranya
+ber-`os: linux`. **Lockfile yang lebih RAMPING sesudah `npm install` di Mac
+jangan pernah di-commit**; yang benar versi lengkapnya.
+
+Yang ke-40 (6 Sep 2026) — **penjaga yang menyebut sebab yang SALAH lebih buruk
+daripada penjaga yang diam: ia mengarahkan orang ke tempat yang keliru.**
+
+`sapu-semua` melaporkan `test` MERAH dgn *"POLA POPULASI HILANG — keluaran
+sapuan berubah bentuk, penjaga ini jadi buta"*, padahal `vitest run` sendirian
+lulus **404/404** tanpa satu pun Failed Test. Pesan itu menyalahkan BENTUK
+KELUARAN untuk sesuatu yang sebenarnya KEGAGALAN PROSES (dua vitest beradu).
+
+Ongkosnya terukur dalam satu sesi: aku menurutinya dan mengejar hipotesis versi
+Node — mengukur Node 22 (lulus), CI Node 24 (hijau), lalu menuduh Node 26 —
+sementara sebabnya tak ada hubungannya dgn Node sama sekali. **Penjaga yang
+salah menuduh memakan waktu lebih banyak daripada tak punya penjaga**, karena
+ia terdengar berwibawa.
+
+Akarnya URUTAN VONIS: `pop.turun` selalu menang atas `kode !== 0`, jadi sapuan
+yang gagal SEBELUM sempat mencetak populasinya dilaporkan sbg "populasi berubah
+bentuk". Kini penjaga populasi hanya berhak bicara kalau sapuannya SELESAI
+NORMAL; kalau tidak, yang dilaporkan kegagalannya, dan populasi turun jadi
+catatan. Divalidasi SEBELUM/SESUDAH dgn tiga kasus sintetis memakai kode ASLI
+dari berkasnya (registri & lantai diganti, logika vonis tidak): proses gagal
+`"POLA POPULASI HILANG"` → `"keluar dgn kode 1"`; populasi 5 < 270 dan populasi
+cukup **TAK BERUBAH**.
+
+Sekalian `maxBuffer` dinaikkan 1 MB → 64 MB. Bawaan Node memotong keluaran
+diam-diam lalu menjadikan `status` null — sapuan sehat terbaca gagal, dan
+penjaga populasi kembali menyalahkan "bentuk keluaran". **Diukur: keluaran
+vitest cuma 1.324 byte, jadi ini BUKAN sebab kasus di atas** — dipasang sbg
+pencegahan, dan dicatat begitu supaya tak dikira obat.
+
+**Kolom DURASI tak bisa dipercaya, dan sebabnya belum terbukti.** Dilaporkan
+`mati` 13.331 dtk (3,7 jam) & `kontras-nonteks` 5.097 dtk padahal seluruh
+jalannya jauh lebih pendek. Rumusnya SATU dan bersatuan detik untuk semua
+sapuan, jadi "sebagian melaporkan milidetik" mustahil secara struktural; yang
+tersisa mesin TIDUR di tengah rantai atau sapuan yang benar-benar menggantung.
+Diganti ke `performance.now()` (kebal koreksi NTP) **tanpa mengklaim itu
+menutup kasus tidur** — libuv pada macOS modern justru tetap menghitungnya.
+Vonis hijau/merah boleh dipercaya; kolom durasi petunjuk, bukan bukti.
+
+**GARIS DASAR SAPUAN — 6 Sep 2026 · main `62a9d7e`**
+
+Dijalankan di mesin dev lawan **DB HIDUP** (container CI/dev memakai `.env`
+dummy dan menstarve 13 sapuan — angkanya tak berlaku, lihat di bawah).
+
+    26 sapuan · 25 hijau · 1 TEMUAN TERBUKA
+
+  · `kontras` 1.236 sampel AA 0 · `kontras-deep` 2.546 sampel AA 0
+  · `fallback-sora` 40 permukaan / 1.032 teks / A 0 · B 0
+  · `sentuh` 421 kontrol · `nama` 533 kontrol · `sheet` 13 permukaan
+  · `lompat` 0 · `lebar` 0 · `gerak` 0 · `publik` 8 halaman 0
+  · `huruf` 27 layar-lebar · 6.558 daun teks · dimaafkan 39 · di bawah lantai 0
+  · produksi menyajikan `assets/index-DfwjGi6m.css`, cocok dgn build dari main
+
+**TERBUKA (bukan regresi, laten, baru terpapar data):** `jarak-teks` §1.4.12 —
+nama warga ber-`line-clamp-2` di **Talangan baris 368** kehilangan **23px ≈
+satu baris** saat line-height 1,5 dipasang, dan **tak punya jalan keluar
+visual**: `g.nama` cuma muncul sbg inisial `AvatarPeci`, di `aria-label` tombol
+WA (tak terlihat mata), di teks pesan WhatsApp, dan di filter pencarian —
+sedangkan baris yang DIPERLUAS hanya menampilkan `Tarikan #N`. Karena itu
+`data-ringkas` TIDAK boleh dipasang di sini: syarat keduanya (teks utuh terbaca
+di tujuannya) tak terpenuhi, dan memasangnya jadi pintu belakang. Odometer 0.
+
+**Kenapa merah di rantai TIDAK selalu berarti cacat.** `test` & `huruf` merah
+di dalam `sapu-semua` tapi **hijau saat dijalankan SENDIRIAN** — `huruf`
+sendirian cocok garis dasar di tiap sumbu (27 layar / 39 dimaafkan / 0 di bawah
+lantai). Rantai menyalakan 26 Chromium berturut-turut; itu keadaan yang berbeda
+dari sapuan tunggal. **Sapuan yang merah di rantai wajib diulang SENDIRIAN
+sebelum disebut temuan.**
+
+**Lingkungan tanpa DB nyata menghasilkan 13 merah yang SELURUHNYA palsu**
+(`.env` = `https://dummy.supabase.co`, HTTP 000). Bentuknya: 7 lantai populasi
+menyala pada 5–25% ambang sementara temuannya sendiri NOL, 5 sapuan crash
+`TimeoutError` pada pemicu yang butuh data, dan `lompat` berfluktuasi 0–2 di
+build LAMA maupun BARU (skor 0,549 vs 0,548 — cacat yang sama, bukan regresi).
+Sesi berikutnya di container bersih akan menemukan ini dan bisa saja
+"memperbaiki" regresi yang tak pernah ada. **Garis dasar hanya sah dari mesin
+ber-DB nyata.**
+
 ## gstack (REQUIRED — global install)
 
 **Before doing ANY work, verify gstack is installed:**
