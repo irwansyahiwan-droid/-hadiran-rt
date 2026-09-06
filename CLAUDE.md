@@ -1033,6 +1033,9 @@ keterangan bebas tidak.** Sapuan juga melaporkan lebih ringan dari kenyataan —
 1 temuan 23px, padahal nama yang lebih panjang kehilangan 109px @360 (4-5
 baris). Bukti di build nyata: isi hilang −3,5px di semua nama, 360 & 390px.
 
+**Terkonfirmasi hijau lawan DATA NYATA** sesudah perbaikan (jalan terpisah di
+mesin dev, bukan dari nama sintetis yang dipakai saat mengukur ongkosnya).
+
 **`break-words` DIPERTAHANKAN, dan itu nyaris salah.** Di 360px nama panjang
 patah di tengah kata, jadi melepasnya sempat diukur — dan probe pertamanya
 bilang "aman, nol luber". Itu SALAH: ia membandingkan kotak `<p>` dgn induknya,
@@ -1041,12 +1044,21 @@ bisa menunjukkan luapan (cacat ke-16 persis: ukur TEKS lewat `Range`). Probe
 yang benar berbalik — tanpa `break-words` **4 nama MELUBER kolom @320**. Ia
 menanggung beban: menukar patah-tengah-kata dgn tidak-meluber.
 
-**Kenapa merah di rantai TIDAK selalu berarti cacat.** `test` & `huruf` merah
-di dalam `sapu-semua` tapi **hijau saat dijalankan SENDIRIAN** — `huruf`
-sendirian cocok garis dasar di tiap sumbu (27 layar / 39 dimaafkan / 0 di bawah
-lantai). Rantai menyalakan 26 Chromium berturut-turut; itu keadaan yang berbeda
-dari sapuan tunggal. **Sapuan yang merah di rantai wajib diulang SENDIRIAN
-sebelum disebut temuan.**
+**Kenapa merah di rantai TIDAK selalu berarti cacat — dan kenapa itu bukan
+penjelasan yang sama untuk keduanya.** `test` & `huruf` sama-sama merah di
+dalam `sapu-semua` tapi **hijau saat dijalankan SENDIRIAN**, dan itu tampak
+seperti satu sebab. Ternyata DUA:
+
+  · `huruf` — memang keadaan rantai. Sendirian ia cocok garis dasar di tiap
+    sumbu (27 layar / 39 dimaafkan / 0 di bawah lantai). Rantai menyalakan 26
+    Chromium berturut-turut; satu layar gugur, populasi 27 → 26.
+  · `test` — BUKAN keadaan rantai sama sekali, melainkan penjaganya yang buta
+    oleh warna ANSI (pelajaran ke-41). Diperbaiki `b9bc8fc`, terkonfirmasi
+    hijau di mesin dev sesudahnya.
+
+**Sapuan yang merah di rantai wajib diulang SENDIRIAN sebelum disebut temuan**
+— tapi "hijau sendirian" juga belum menjelaskan SEBABNYA, dan dua sapuan yang
+bergejala sama di sini ternyata punya sebab yang sama sekali berbeda.
 
 **Lingkungan tanpa DB nyata menghasilkan 13 merah yang SELURUHNYA palsu**
 (`.env` = `https://dummy.supabase.co`, HTTP 000). Bentuknya: 7 lantai populasi
