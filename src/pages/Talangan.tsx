@@ -349,8 +349,10 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           <button
             onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
             aria-expanded={isExpanded}
-            /* `items-start`, BUKAN `items-center`: nama di sini `line-clamp-2`
-               dan captionnya ikut melipat, jadi dgn perataan tengah avatar &
+            /* `items-start`, BUKAN `items-center`: nama di sini MELIPAT (dulu
+               dibatasi `line-clamp-2`, kini tanpa batas — lihat komentar di
+               elemen namanya) dan captionnya ikut melipat, jadi dgn perataan
+               tengah avatar &
                nominal mengambang di tengah blok teks — dan seberapa jauh
                mengambangnya berubah-ubah mengikuti panjang nama (terukur: 8 /
                17 / 19 / 28px dari baris pertama nama, tergantung barisnya satu
@@ -364,8 +366,33 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 caption "N belum lunas" dua-duanya terpotong di semua lebar. */}
             <AvatarPeci nama={g.nama} ukuran={9} />
             <div className="flex-1 min-w-0">
-              {/* line-clamp-2 (bukan truncate): nama warga panjang melipat ke baris 2. */}
-              <p className="text-body font-semibold text-ink dark:text-gray-100 line-clamp-2 leading-snug break-words">{g.nama}</p>
+              {/* TANPA batas baris — dan itu keputusan yang DIUKUR, bukan kelalaian.
+                  Dulu `line-clamp-2`, dan `audit:jarak-teks` menangkapnya sbg
+                  pelanggaran §1.4.12 (AA, WAJIB): saat pengguna memasang
+                  line-height 1,5, nama yang muat 2 baris butuh 3 dan clamp
+                  memotongnya. Terukur pada nama sungguhan "Bayu Wiyasanyata"
+                  23px hilang; pada nama yang lebih panjang JAUH lebih parah —
+                  109px @360px, empat sampai lima baris, sehingga warga bernama
+                  panjang praktis tak punya nama di layar ini.
+
+                  `data-ringkas` TIDAK boleh dipakai di sini. Penanda itu
+                  menuntut teks utuhnya terbaca di TUJUANNYA, dan `g.nama` cuma
+                  muncul sbg inisial AvatarPeci, di `aria-label` tombol WA (tak
+                  terlihat mata), di teks pesan WhatsApp, dan di filter
+                  pencarian — sedangkan baris yang DIPERLUAS hanya menampilkan
+                  `Tarikan #N`. Tak ada jalan keluar, jadi memasangnya jadi
+                  pintu belakang.
+
+                  Ongkos melepas clamp diukur lebih dulu, dan asimetris: nama
+                  PENDEK tidak tumbuh sama sekali (Δ 0px), hanya nama panjang
+                  yang menambah baris (+22,5px untuk 16 karakter). Itu profil
+                  yang sangat berbeda dari keterangan Kas RT, tempat melepas
+                  clamp pernah DITOLAK karena 35 dari 36 baris membungkus >=3
+                  baris (terburuk 288px untuk SATU transaksi). Nama warga
+                  terbatas panjangnya; keterangan bebas tidak.
+
+                  `break-words` menahan nama tanpa spasi agar tak meluber. */}
+              <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{g.nama}</p>
               {g.countBelum > 0 ? (
                 /* Cukup jumlahnya — "N× Rp50.000" mengulang total di kolom kanan
                    (dan membocorkan nominal saat mode sembunyi-angka aktif).
