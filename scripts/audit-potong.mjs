@@ -60,12 +60,35 @@ mkdirSync(OUT, { recursive: true });
    dgn "probe mengambil dialog di belakang sheet" di CLAUDE.md. */
 const PUNGUT = () => {
   const out = [];
+  let ringkas = 0;
   const dialogs = document.querySelectorAll('[role="dialog"]');
   const akar = dialogs.length ? dialogs[dialogs.length - 1] : document;
   akar.querySelectorAll('*').forEach((el) => {
     if (el.children.length) return;
     const t = (el.textContent || '').trim();
     if (!t) return;
+    /* `data-ringkas` — penanda OPT-IN yang menyatakan "teks ini RINGKASAN dan
+       ada jalan ke teks utuhnya". Sampai 12 Sep 2026 sapuan ini tak mengenalnya,
+       sementara `audit:jarak-teks` sudah — jadi DUA sapuan menilai elemen yang
+       SAMA dgn aturan berbeda, dan yang satu melaporkan sbg cacat apa yang
+       satunya sudah putuskan sbg keputusan desain. Terlihat sbg `kurang 1,7px
+       "Iuaran Warga Di luar Anggota Hadiran Bulan S…"` di 320px, Kas RT.
+
+       Melepas clamp-nya sudah DIUKUR & DITOLAK dulu (keterangan Kas RT itu teks
+       bebas: tanpa clamp 35 dari 36 baris membungkus >=3 baris, terburuk 288px
+       — sepertiga layar untuk SATU transaksi).
+
+       PENANDANYA TIDAK DIPERCAYA BEGITU SAJA, dua syarat sama persis dgn
+       `audit:jarak-teks`:
+         (1) elemennya WAJIB duduk di dalam kontrol yang bisa diaktifkan — bukti
+             jalan keluarnya ADA. Baris "Saldo Awal" yang bukan tombol TIDAK
+             dimaafkan meski memakai kelas yang sama.
+         (2) sapuan ini WAJIB ikut MENGUKUR sheet tujuannya — lihat `bukaDetail`
+             di bawah, yang ditambahkan di commit yang sama. Tanpa itu ia
+             memaafkan atas dasar janji yang tak pernah diperiksa, dan penanda
+             berubah jadi pintu belakang.
+       Jumlah yang dimaafkan SELALU dicetak (`diringkas: N`). */
+    if (el.hasAttribute('data-ringkas') && el.closest('button,[role="button"],a[href]')) { ringkas++; return; }
     const cs = getComputedStyle(el);
     /* `text-overflow: ellipsis` TIDAK memotong apa pun selama overflow-nya
        `visible` — itu spec CSS: elipsis hanya berlaku pada isi yang benar-benar
@@ -83,7 +106,7 @@ const PUNGUT = () => {
     const kurang = rg.getBoundingClientRect().width - el.clientWidth;
     if (kurang > 0.5) out.push({ t: t.slice(0, 44), kurang: +kurang.toFixed(1) });
   });
-  return out;
+  return { item: out, ringkas, stempel: window.__mutStempel ?? null };
 };
 
 /* KENAPA `.potong-lentur` TIDAK ikut disasar MUTASI=1 — diselidiki 30 Agu 2026,
@@ -115,11 +138,58 @@ const PUNGUT = () => {
 const MUTASI_CSS = {
   1: '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}',
   2: '.potong-lentur{display:block!important;white-space:nowrap!important;text-overflow:ellipsis!important;-webkit-line-clamp:unset!important}',
+  /* MUTASI=4 memotong teks di DALAM sheet tujuan — meniru persis kegagalan yang
+     dulu ditemukan `audit:jarak-teks` waktu syarat (2) dipasang: "jalan keluar"
+     nama Sohibul Bait ternyata `truncate` juga. Kalau sheet tujuan benar-benar
+     ada di populasi, ia WAJIB merah di sini. */
+  4: '[role="dialog"] p{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;-webkit-line-clamp:unset!important}',
+};
+
+/* MUTASI=3 — penjaga PINTU BELAKANG `data-ringkas`, dan ia butuh JS bukan CSS
+   karena yang diuji ANCESTRY, bukan gaya. Ia menstempel `data-ringkas` ke
+   SETIAP teks terkurung, termasuk yang TIDAK duduk di dalam kontrol yang bisa
+   diaktifkan, lalu menyempitkan kolom persis seperti MUTASI=1.
+   Kalau penanda dipercaya buta, temuan akan runtuh ke ~0. Kalau syarat (1)
+   benar-benar ditegakkan, temuan di luar kontrol WAJIB tetap muncul. Angkanya
+   dibandingkan langsung dgn MUTASI=1. */
+const MUTASI_JS = {
+  3: () => {
+    /* HANYA yang di LUAR kontrol yang distempel. Percobaan pertama menstempel
+       SEMUA teks terkurung dan runtuh ke 0/0 — terbaca seperti "penanda
+       dipercaya buta", padahal ada penjelasan kedua yang sama masuk akal:
+       baris daftar app ini MEMANG tombol, jadi memaafkannya justru perilaku
+       yang BENAR. Mutasi yang tak bisa memisahkan dua penjelasan tidak
+       memvonis apa pun. Dgn menyasar khusus elemen TANPA leluhur kontrol,
+       hasilnya jadi tegas: temuan yang tersisa WAJIB tetap muncul. */
+    window.__mutStempel = 0;
+    const stempel = () => document.querySelectorAll('.truncate,.min-w-0,.potong-lentur,[class*="line-clamp"]')
+      .forEach((el) => {
+        if (el.closest('button,[role="button"],a[href]')) return;
+        if (el.hasAttribute('data-ringkas')) return;
+        el.setAttribute('data-ringkas', '');
+        window.__mutStempel++;
+      });
+    /* Init-script jalan SEBELUM DOM ada: `document.head` null, dan
+       `MutationObserver.observe(document.documentElement)` melempar. Percobaan
+       pertama melakukan keduanya di saat init, mati diam-diam, lalu mencetak
+       0/0 — angka yang IDENTIK dgn garis dasar, tanda tangan mutasi yang tak
+       pernah mendarat. Penjaga yang sama sudah dipakai jalur CSS di bawah. */
+    const siap = () => {
+      new MutationObserver(stempel).observe(document.documentElement, { childList: true, subtree: true });
+      stempel();
+      const s = document.createElement('style');
+      s.textContent = '.min-w-0,.truncate{max-width:calc(100% - 40px)!important}';
+      document.head.appendChild(s);
+    };
+    if (document.head) siap(); else document.addEventListener('DOMContentLoaded', siap);
+  },
 };
 const MUTASI = +(process.env.MUTASI || 0);
+let totalStempel = 0;
 
 function pasangMutasi(ctx) {
   if (!MUTASI) return;
+  if (MUTASI_JS[MUTASI]) return ctx.addInitScript(MUTASI_JS[MUTASI]);
   const css = MUTASI_CSS[MUTASI];
   if (!css) return;
   return ctx.addInitScript((css) => {
@@ -164,14 +234,40 @@ async function pungutLayar(page, bag, nama, hasil) {
   }
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(320);
-  const found = await page.evaluate(PUNGUT);
+  const { item: found, ringkas, stempel } = await page.evaluate(PUNGUT);
+  if (stempel !== null) totalStempel += stempel;
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(180);
   const uniq = new Map();
   for (const f of found) uniq.set(`${f.t}|${f.kurang}`, f);
   const item = [...uniq.values()].sort((a, b) => b.kurang - a.kurang);
-  hasil.push({ bag, layar: nama, n: item.length, item });
-  console.log(`  ${item.length ? '✗' : 'ok'}  [${bag}] ${nama.padEnd(20)} ${item.length}`);
+  hasil.push({ bag, layar: nama, n: item.length, item, ringkas });
+  console.log(`  ${item.length ? '✗' : 'ok'}  [${bag}] ${nama.padEnd(20)} ${item.length}${ringkas ? `  · diringkas ${ringkas}` : ''}`);
+}
+
+/* SHEET TUJUAN — syarat KEDUA `data-ringkas`, dan tanpanya penanda itu pintu
+   belakang. Memaafkan teks "karena ada jalan keluarnya" hanya sah kalau sapuan
+   ini IKUT mengukur jalan keluarnya. Waktu syarat yang sama dipasang di
+   `audit:jarak-teks`, ia langsung membayar dirinya sendiri: begitu sheet detail
+   masuk populasi, ketahuan jalan keluarnya `truncate` JUGA — jadi ringkasannya
+   dipotong DAN tujuannya dipotong.
+   Pemicunya BERBEDA bentuk per sheet, jadi tiap entri membawa pembukanya
+   sendiri; yang gagal dibuka dilewati tanpa mengaku-ngaku telah diukur. */
+async function bukaDetail(page, bag, hasil, awalan) {
+  for (const [tab, pemicu, nama] of [
+    ['Kas RT', () => page.locator('button[aria-label^="Lihat detail"], button[aria-label^="Aksi:"]').first(), 'sheet-detail-kasrt'],
+    ['Hadiran', () => page.locator('button', { hasText: 'Lihat detail' }).first(), 'sheet-detail-tarikan'],
+  ]) {
+    await gotoTab(page, tab);
+    const btn = pemicu();
+    if (!(await btn.count())) continue;
+    await btn.click({ timeout: 8000 }).catch(() => {});
+    await page.waitForTimeout(1100);
+    if (await page.locator('[role="dialog"]').count()) {
+      await pungutLayar(page, bag, `${awalan}-${nama}`, hasil);
+      await closeLayer(page);
+    }
+  }
 }
 
 async function jelajahWarga(page, bag, hasil) {
@@ -182,6 +278,7 @@ async function jelajahWarga(page, bag, hasil) {
   }
   const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
   for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, bag, `w-${tab}`, hasil); }
+  await bukaDetail(page, bag, hasil, 'w');
 }
 
 async function jelajahBendahara(page, bag, hasil, { dalam = true } = {}) {
@@ -192,6 +289,7 @@ async function jelajahBendahara(page, bag, hasil, { dalam = true } = {}) {
   const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
   for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, bag, `b-${tab}`, hasil); }
   if (!dalam) return;
+  await bukaDetail(page, bag, hasil, 'b');
 
   for (const [tab, aria, nama] of [
     ['Hadiran', 'Setor ke Kas RT', 'b-sheet-setor'],
@@ -265,6 +363,15 @@ writeFileSync(`${OUT}/hasil.json`, JSON.stringify(hasil, null, 1));
 
 const jml = (b) => hasil.filter((h) => h.bag === b).reduce((s, h) => s + h.n, 0);
 const layar = (b) => hasil.filter((h) => h.bag === b).length;
+/* Mutasi WAJIB membuktikan ia mendarat. Tanpa baris ini, MUTASI=3 yang mati
+   diam-diam mencetak 0/0 — angka yang IDENTIK dgn garis dasar hijau, jadi
+   "penjaga bekerja" & "mutasiku tak pernah terjadi" tak bisa dibedakan. */
+if (MUTASI === 3 && totalStempel === 0) {
+  console.log('PROBE CACAT: MUTASI=3 tak menstempel satu elemen pun — mutasi tak mendarat, angkanya tak memvonis apa pun');
+  process.exitCode = 2;
+}
+if (MUTASI === 3) console.log(`MUTASI=3 mendarat: ${totalStempel} elemen distempel data-ringkas (di LUAR kontrol)`);
+
 console.log(`\n=== TEKS TERPOTONG ===`);
 console.log(`  A. 390px  (acuan HP)        : ${jml('390')} temuan / ${layar('390')} layar`);
 console.log(`  B. 320px  (WAJIB §1.4.10)   : ${jml('320')} temuan / ${layar('320')} layar`);

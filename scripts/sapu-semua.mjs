@@ -189,7 +189,9 @@ const LANTAI = {
   mati:             [/(\d+) sampel, \d+ tombol unik/, 140],
   nama:             [/(\d+) kontrol di \d+ layar/, 500],
   huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],
-  potong:           [/A\. 390px[^:]*:\s*\d+ temuan \/ (\d+) layar/, 15],
+  /* 16 -> 20 layar (12 Sep 2026): sheet TUJUAN `data-ringkas` masuk populasi
+     — syarat kedua penanda itu. Lantai ~95%. */
+  potong:           [/A\. 390px[^:]*:\s*\d+ temuan \/ (\d+) layar/, 19],
   'jarak-teks':     [/populasi teks terukur\s*:\s*(\d+)/, 5700],
   lebar:            [/(\d+) konteks diperiksa/, 112],
   reflow:           [/(\d+) layar diperiksa/, 9],
