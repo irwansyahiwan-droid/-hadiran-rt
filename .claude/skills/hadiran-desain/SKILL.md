@@ -83,9 +83,20 @@ Kanvas punya **sepuluh titik sinkron** — berhenti di CSS berarti gagal:
 
 **AAA sekarang DIUKUR, bukan cuma dinyatakan.** `audit:kontras` & `-deep`
 mencetak seksi terpisah "AMBANG APP · AAA" — dilaporkan tapi TIDAK menggagalkan
-rantai (disiplin sama bagian 200% di `audit:potong`). Garis dasar (1 Sep 2026):
-**0 dari 1216** (warga) dan **0 dari 2256** (bendahara). Kalau angka GAGAL itu
+rantai (disiplin sama bagian 200% di `audit:potong`). Garis dasar **12 Sep 2026**:
+**0 dari 1247** (warga) dan **0 dari 2533** (bendahara). Kalau angka GAGAL itu
 naik dari nol, sesuatu baru saja mundur.
+
+**Garis dasar lama (1 Sep: 0/1216 · 0/2256) SEMPAT BASI selama seminggu, dan
+begitulah lubang ini terbuka.** 5 Sep `/warta` masuk populasi `kontras-deep`
+(`2a57d8e`) — +277 sampel — dan bersamanya **22 sampel di bawah AAA** yang
+tercetak tiap jalan tanpa pernah dibaca, karena angka pembandingnya ditulis
+EMPAT HARI sebelum populasinya tumbuh. Ditutup 12 Sep (`141329a`, dua tinta
+emas `/warta` naik ke 7:1). **Pelajarannya bukan "ada yang lupa membaca":
+garis dasar yang tak ikut disegarkan saat populasi tumbuh berhenti jadi
+pembanding, dan sesudah itu seksi AAA tetap tercetak tapi tak lagi berarti
+apa-apa.** Kalau populasi bergerak, angka di atas WAJIB ikut diperbarui di
+jalan yang sama.
 
 **Yang wajib nol PEMBILANGNYA, bukan penyebutnya.** Populasi memang bergerak
 tiap permukaan lahir atau berpindah peran, dan itu bukan regresi — 1 Sep 2026
