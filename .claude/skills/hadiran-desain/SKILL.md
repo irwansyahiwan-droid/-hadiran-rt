@@ -217,9 +217,31 @@ tanpa melihat) · `audit:gestur` · `audit:mundur` (tombol Back HP) ·
 
 **Yang tak dijalankan `sapu-semua`, dan wajib diingat:** 7 sapuan PERILAKU —
 `masuk` · `tulis` · `kembali` · `respon` · `gestur` · `mundur` · `papan-ketik`
-— plus `luring`, `luring-pertama` & `muat`. Rantai hijau TIDAK berarti mereka
-hijau; jalankan terpisah sebelum rilis besar. Di situlah cacat "terasa murah"
+— plus `luring` & `luring-pertama`. Rantai hijau TIDAK berarti mereka hijau;
+jalankan terpisah sebelum rilis besar. Di situlah cacat "terasa murah"
 bersembunyi, dan tak satu pun terlihat oleh review visual.
+
+**`muat` PINDAH ke dalam rantai (12 Sep 2026)** — ia dulu di daftar atas, dan
+memang pantas: sampai hari itu ia **meteran, bukan penjaga** (75 baris tanpa
+satu pun baris vonis, selalu exit 0). Sekarang ia memvonis **HARGA FONT di
+jalur kritis**, bukan waktu muat MUTLAK: angka mutlak machine-dependent (kode
+yang sama membaca 3291 ms di satu mesin & 3543 ms di mesin lain), sedangkan
+SELISIH dua lengan yang diukur di jalan yang sama — sekali dgn font, sekali dgn
+seluruh woff2 ditolak — tidak. Itu invarian "dokumen dibandingkan dgn DIRINYA
+SENDIRI" milik penjaga kertas, dipindah ke sumbu waktu, dan selisihnya bahkan
+punya ramalan fisik (`byteFont ÷ (KBPS ÷ 8)` = 725 ms; terukur 697–725).
+**Anggarannya JANGAN diturunkan dari ukuran font** — plafon yang ikut tumbuh
+bersama yang dijaganya cuma mencatat, bukan menjaga.
+
+Temuan PERTAMANYA datang di hari yang sama & masih TERBUKA: `main` merah
++1253 ms karena `ed8b1d6` mem-preload Sora demi menghentikan judul dicat Inter.
+Commit itu menulis "ongkos nol byte" — **benar untuk byte, salah untuk waktu**:
+di kabel yang jenuh, 25 kB yang pindah ke depan antrean membuat chunk entry &
+vendor-react menunggu di belakangnya (+530 ms siap-pakai). Ongkosnya diperiksa
+lawan anggaran BYTE (`audit:unduh` U, jawabannya benar: nol) dan tak pernah
+lawan waktu — karena alat yang mengukur waktu belum punya vonis. **Pelajaran
+yang lebih besar: "nol byte" bukan "nol ongkos"; antrean punya harganya
+sendiri.**
 
 ## Jebakan yang sudah mahal — jangan diulang
 
