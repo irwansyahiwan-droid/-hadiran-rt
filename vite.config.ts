@@ -206,9 +206,30 @@ function preloadFontBody(): Plugin {
            lama untuk membeli yang ini. Yang salah bukan kebijakan tukarnya,
            melainkan Sora tak pernah diberi kesempatan tiba tepat waktu.
 
-           URUTAN PENTING: Inter dulu. Ia badan teks ber-`swap` (dipakai SETIAP
-           layar, dan menukar kapan pun ia tiba), sedangkan Sora cuma judul dan
-           punya tenggat keras. Pipa 400 kbps melayani berurutan. */
+           URUTAN DI DAFTAR INI TIDAK MENENTUKAN APA-APA — dan kalimat di
+           tempat ini dulu menyatakan sebaliknya ("URUTAN PENTING: Inter dulu…
+           pipa 400 kbps melayani berurutan"). Itu KELIRU, dan diukur 12 Sep
+           2026 di KEDUA protokol, bukan disimpulkan:
+
+             lokal  HTTP/1.1   sora@3286..3374  →  inter@3750..3780
+             produksi HTTP/2   sora@2904..3253  →  inter@3430..3810
+
+           Sora SELALU selesai lebih dulu, padahal Inter ditulis di atasnya —
+           dan tetap begitu saat Sora sengaja diturunkan ke `fetchpriority=low`
+           (hint terbukti terpasang: `initialPriority: Low`). Pipanya DIBAGI,
+           bukan dilayani berurutan; yang menentukan siapa selesai duluan adalah
+           UKURAN (Sora 25 kB, Inter 37 kB), bukan urutan tag.
+
+           Jadi JANGAN menukar urutan dua baris di bawah lalu mengira dapat
+           sesuatu: diukur, memindahkan preload Sora ke belakang skrip modul
+           hemat 38 ms dan `fetchpriority=low` hemat 9 ms — keduanya di dalam
+           derau. Di 400 kbps yang mahal BYTE-nya, bukan antreannya. Lever
+           satu-satunya yang nyata adalah MENGECILKAN fontnya (subset karakter
+           hemat 231 ms) — ditolak user karena ia melemahkan penjaga "nol glyph
+           hilang" di `gen-font.mjs` secara permanen; lihat `audit:muat`.
+
+           Yang TETAP benar dari catatan lama: kedua font memang wajib ada di
+           sini, masing-masing menjaga satu tenggat. Itu tak berubah. */
         const wajib = [
           { pola: /inter-latin-[^/]*\.woff2$/, nama: 'inter-latin-*.woff2' },
           { pola: /sora-latin-[^/]*\.woff2$/, nama: 'sora-latin-*.woff2' },
