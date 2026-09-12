@@ -19,7 +19,18 @@
 // Pakai:  node scripts/audit-sheet-geometri.mjs
 //   CAP_URL=http://localhost:5199   (default 5174; verifikasi lawan `vite preview`)
 //   W=390                            (lebar viewport, default 360)
+//   H=390                            (TINGGI viewport, default 844)
 //   OUT_DIR=/tmp/sheet               (tempat screenshot)
+//
+// MUTASI (hijau tanpa mutasi tak membuktikan apa pun):
+//   MUTASI=1  kecilkan tiap kontrol di dalam panel jadi 20px -> aturan TARGET
+//             SENTUH wajib MERAH. Ia ada karena perbaikan `scrollIntoView`
+//             12 Sep 2026 bisa saja MENUMPULKAN aturan itu alih-alih
+//             membetulkannya; tanpa mutasi, keduanya mencetak hijau.
+//   MUTASI=2  cabut `overflow-y` tiap dialog -> aturan PANEL LEBIH TINGGI DARI
+//             LAYAR wajib MERAH. Aturan itu ditulis sejak awal tapi belum
+//             pernah menyala SEKALI PUN di geometri mana pun, termasuk
+//             844x390 — sampai mutasi ini ada, ia penalaran bukan penjaga.
 import { chromium } from 'playwright';
 import { readFileSync, mkdirSync } from 'node:fs';
 
@@ -31,6 +42,7 @@ const W = Number(process.env.W || 360);
    (320/360/390) & skala teks; TINGGI tak pernah sekali pun. Landscape HP
    (844x390) & HP pendek lawas (320x568) hidup di sisi lain tepi itu. */
 const H = Number(process.env.H || 844);
+const MUT = process.env.MUTASI || '';
 const OUT = process.env.OUT_DIR || `.audit-sheet-${W}x${H}`;
 mkdirSync(OUT, { recursive: true });
 
@@ -89,12 +101,37 @@ const PROBE = () => {
       lewat: Math.round(Math.max(box.left - b.left, b.right - box.right)),
     }));
 
-  // Hit-test nyata: perluas dari titik pusat sampai bukan elemen itu lagi.
+  /* Hit-test nyata: perluas dari titik pusat sampai bukan elemen itu lagi.
+
+     TIAP KONTROL DIGULIR KE TENGAH DULU (12 Sep 2026). Tanpa itu, kontrol yang
+     kebetulan separuh tertutup Header STICKY terukur separuh tingginya — dan
+     `elementFromPoint` dgn benar menjawab "itu header", jadi probe-nya
+     menyimpulkan tombol 44px sbg 23px. Terukur di 844×390: tiga tombol aksi
+     massal absensi (`min-h-[44px]` di kode) dilaporkan 80×23, sementara
+     permukaan yang SAMA dalam keadaan tergulir (`b9-absensi-gulir`) OK. `w:80`
+     itu sendiri petunjuk: ia persis batas loop di bawah (40+40), jadi saturasi,
+     bukan hasil ukur.
+
+     Ini BUKAN bug baru — `audit:sentuh` sudah memperbaikinya lebih dulu, dan
+     CLAUDE.md menuliskannya verbatim ("tiap kontrol WAJIB di-scrollIntoView
+     dulu … kalau tidak, kontrol yang kebetulan separuh di bawah Header sticky
+     terukur separuh tinggi"). Perbaikannya tak pernah ikut ke sapuan kembaran
+     ini. Pelajaran repo: kelas cacat yang diperbaiki di satu jalur WAJIB
+     diperiksa di jalur kembarannya. */
   const kecil = [];
+  const takTerukur = [];
+  const scroll0 = { x: scrollX, y: scrollY };
   for (const el of root.querySelectorAll('button,a[href],input,select,[role="button"]')) {
     if (!vis(el)) continue;
+    el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
     const b = el.getBoundingClientRect();
-    if (b.top < 0 || b.bottom > innerHeight) continue; // di luar layar → tak bisa di-hit-test
+    if (b.top < 0 || b.bottom > innerHeight) {
+      /* Masih tak muat SESUDAH digulir ke tengah = kontrolnya memang lebih
+         tinggi dari layar. Dihitung & DIAKUI, bukan dilewati diam-diam —
+         sapuan tak boleh menyempitkan populasinya sendiri tanpa mengaku. */
+      takTerukur.push((el.getAttribute('aria-label') || el.innerText || el.tagName).trim().slice(0, 24));
+      continue;
+    }
     const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
     const owns = (x, y) => {
       const h = document.elementFromPoint(x, y);
@@ -112,6 +149,8 @@ const PROBE = () => {
     }
   }
 
+  scrollTo(scroll0.x, scroll0.y);
+
   const cs = getComputedStyle(root);
   const uniq = (a) => [...new Map(a.map((x) => [JSON.stringify(x), x])).values()];
   return {
@@ -120,13 +159,25 @@ const PROBE = () => {
     tinggiLebihLayar: box.height > innerHeight + 1,
     bisaGulir: /auto|scroll/.test(cs.overflowY),
     halamanBocor: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-    clip: uniq(clip), bleed, kecil: uniq(kecil),
+    clip: uniq(clip), bleed, kecil: uniq(kecil), takTerukur: [...new Set(takTerukur)],
   };
 };
 
 let gagal = 0, diukur = 0;
 
 async function ukur(page, nama, { wajibDialog = true } = {}) {
+  if (MUT) await page.evaluate((m) => {
+    const semua = [...document.querySelectorAll('[role="dialog"], [role="menu"]')];
+    const root = semua.length ? semua[semua.length - 1] : document.querySelector('main');
+    if (!root) return;
+    if (m === '1') for (const el of root.querySelectorAll('button,a[href],input,select,[role="button"]')) {
+      el.style.setProperty('min-height', '20px', 'important');
+      el.style.setProperty('height', '20px', 'important');
+      el.style.setProperty('padding', '0', 'important');
+    }
+    if (m === '2') { root.style.setProperty('overflow-y', 'visible', 'important');
+                     root.style.setProperty('max-height', 'none', 'important'); }
+  }, MUT);
   const r = await page.evaluate(PROBE);
   if (wajibDialog && !r.dialog) { console.log(`\n### ${nama} — TAK TERBUKA (lewati)`); return; }
   diukur++;
@@ -142,7 +193,8 @@ async function ukur(page, nama, { wajibDialog = true } = {}) {
   // palsu. FP baru → betulkan ALATNYA, bukan kodenya.
   if (r.dialog && r.tinggiLebihLayar && !r.bisaGulir) masalah.push(`panel ${r.panel.h}px > layar TANPA overflow-y`);
   if (masalah.length) gagal++;
-  console.log(`\n### ${nama}  ${r.panel.w}×${r.panel.h}${masalah.length ? '' : '  OK'}`);
+  console.log(`\n### ${nama}  ${r.panel.w}×${r.panel.h}${masalah.length ? '' : '  OK'}${r.takTerukur.length ? `  · tak terukur: ${r.takTerukur.length}` : ''}`);
+  if (r.takTerukur.length) console.log('    (lebih tinggi dari layar walau sudah digulir ke tengah: ' + JSON.stringify(r.takTerukur) + ')');
   masalah.forEach((m) => console.log('  ⚠ ' + m));
   await page.screenshot({ path: `${OUT}/${nama}.png` });
 }
@@ -296,5 +348,5 @@ const browser = await chromium.launch();
 }
 
 await browser.close();
-console.log(`\n=== ${diukur} permukaan diukur @${W}\u00d7${H} · ${gagal} bermasalah ===`);
+console.log(`\n=== ${diukur} permukaan diukur @${W}\u00d7${H}${MUT ? ` [MUTASI=${MUT}]` : ''} · ${gagal} bermasalah ===`);
 process.exit(gagal ? 1 : 0);

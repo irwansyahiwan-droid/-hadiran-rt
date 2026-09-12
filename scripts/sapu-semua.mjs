@@ -104,6 +104,21 @@ const VISUAL = [
   ['sentuh', 'node scripts/audit-sentuh.mjs'],
   ['reflow', 'node scripts/audit-reflow.mjs'],
   ['sheet', 'node scripts/audit-sheet-geometri.mjs'],
+  /* TINGGI PENDEK, dan ini menutup aturan yang tak pernah bisa menggigit.
+     `audit:sheet` punya TIGA aturan; yang ketiga — "panel lebih tinggi dari
+     layar TANPA overflow-y, jadi tombol Simpan tak tergapai" — MUSTAHIL
+     menyala di tinggi bawaan 844. Itu diukur, bukan diduga: `MUTASI=2`
+     (mencabut `overflow-y` dari TIAP dialog, sengaja merusak) menghasilkan
+     0 temuan di 360x844, 2 di 360x568, 4 di 360x390. Jadi sejak aturan itu
+     ditulis, ia tak pernah sekali pun bisa menggigit di dalam rantai.
+
+     Seluruh repo memvariasikan LEBAR (320/360/390) dan tak satu pun sapuan
+     memvariasikan TINGGI — 16x hardcode 844, 9x 800. Baris ini satu-satunya
+     yang menyentuh sumbu itu. 360x568 dipilih karena PORTRAIT & nyata
+     (iPhone SE, Android lawas), jadi ia berlaku untuk semua warga; landscape
+     844x390 lebih tajam lagi tapi `manifest.orientation` = portrait, jadi ia
+     cuma mengenai pemakai browser — tersedia lewat knob `H`, tidak di rantai. */
+  ['sheet-pendek', 'node scripts/audit-sheet-geometri.mjs', { W: '360', H: '568' }],
   ['lompat', 'node scripts/audit-lompat.mjs'],
   ['gerak', 'node scripts/audit-gerak.mjs'],
   ['publik', 'node scripts/audit-publik.mjs'],
@@ -181,6 +196,7 @@ const LANTAI = {
   gerak:            [/(\d+) tab diperiksa/, 13],
   sentuh:           [/TARGET SENTUH @360px — (\d+) kontrol/, 390],
   sheet:            [/(\d+) permukaan diukur/, 12],
+  'sheet-pendek':   [/(\d+) permukaan diukur/, 12],
   lompat:           [/(\d+) layar diukur/, 8],
   publik:           [/(\d+) halaman diperiksa/, 7],
   /* Populasi = berkas yang benar-benar diminta di kunjungan pertama.
@@ -249,7 +265,7 @@ const hidup = () => {
   return r.stdout?.trim() === '200';
 };
 
-const jalan = (cmd) => {
+const jalan = (cmd, envTambahan = {}) => {
   const r = spawnSync('npx', ['--no-install', ...cmd.split(' ')], {
     /* MUTASI SENGAJA TIDAK diteruskan. Di sini `MUTASI=1` berarti SATU hal:
        naikkan tiap lantai populasi 10x. Tapi hampir tiap sapuan punya knob
@@ -261,7 +277,7 @@ const jalan = (cmd) => {
        Validasi lantai dulu terbukti 5/5 hanya di jalur STATIS, dan di sana
        kebetulan tak ada satu pun sapuan ber-MUTASI, jadi tabrakannya tak
        pernah terlihat. Mutasi sapuan dijalankan sendiri-sendiri, memang. */
-    encoding: 'utf8', env: { ...process.env, MUTASI: '', CAP_URL: URL, APP_URL: URL },
+    encoding: 'utf8', env: { ...process.env, MUTASI: '', CAP_URL: URL, APP_URL: URL, ...envTambahan },
     /* maxBuffer bawaan Node cuma 1 MB, dan kalau terlampaui keluarannya DIPOTONG
        lalu `status` jadi null — sapuan sehat akan terbaca gagal, dan penjaga
        populasi akan menyalahkan "bentuk keluaran" untuk sesuatu yang sebenarnya
@@ -290,7 +306,7 @@ const ringkas = (t) => {
 
 const hasil = [];
 const bagian = async (nama, daftar, lewati) => {
-  for (const [n, cmd] of daftar) {
+  for (const [n, cmd, envTambahan] of daftar) {
     if (lewati) { hasil.push({ n, status: 'dilewat', ket: 'preview mati' }); process.stdout.write('·'); continue; }
     /* Jam MONOTONIK, bukan `Date.now()` — kebal terhadap lompatan wall-clock
        (koreksi NTP, jam mesin diubah). Dilaporkan 6 Sep 2026 dari mesin dev:
@@ -307,7 +323,7 @@ const bagian = async (nama, daftar, lewati) => {
        dipercaya cuma vonis hijau/merahnya; kolom durasi adalah petunjuk,
        bukan bukti. */
     const t0 = performance.now();
-    const { kode, keluaran, sebab } = jalan(cmd);
+    const { kode, keluaran, sebab } = jalan(cmd, envTambahan);
     const dtk = Math.round((performance.now() - t0) / 1000);
     const pop = periksaPopulasi(n, keluaran);
     const merah = kode !== 0 || pop?.turun;
