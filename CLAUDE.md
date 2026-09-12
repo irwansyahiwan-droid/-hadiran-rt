@@ -1001,6 +1001,67 @@ skrip yang sudah termuat di memori node.** `git pull` di tengah jalan tidak
 mengubah vonis jalan itu — baris sapuan yang penjaganya baru diperbaiki akan
 tetap memakai penjaga LAMA sampai rantainya dijalankan ulang.
 
+Yang ke-42 (12 Sep 2026) — **`preload` cuma dipasang untuk SATU dari dua font,
+dan yang terlewat justru satu-satunya yang punya TENGGAT KERAS.**
+
+Keluhannya "kenapa jadi redup SEDIKIT" — dan kata "sedikit" itu yang memecahkan
+kasusnya. Tebakan pertamaku (mode gelap) gugur justru karena itu: mode gelap
+perubahan BESAR. Yang datang-hilang & tipis begitu bukan warna, karena warna
+tidak berubah sendiri — ia balapan.
+
+`preloadFontBody` memuat Inter (`swap`, badan teks) sejak awal. Sora tidak —
+padahal Sora yang memakai `font-display: optional`, yang memberi jendela blok
+~100 ms lalu, kalau belum tiba, **TIDAK PERNAH menukar sepanjang kunjungan itu**.
+Terukur `audit:unduh` (400 kbps · CPU 4x): Sora tiba **5369 ms**, layar dipakai
+**3541 ms**. Jadi SELURUH h1/h2 dirender Inter untuk seluruh kunjungan pertama.
+Akibatnya bukan geometri melainkan **BOBOT TINTA**: diukur pada string app
+sendiri, Inter menaruh **8,3-8,8% LEBIH SEDIKIT** tinta (`Hadiran RT` 800/28 ·
+`Kas Hadiran` 700/32 · `Riwayat Transaksi` 700/18). Persis "redup sedikit".
+**Nol token warna disentuh.**
+
+**`document.fonts.check()` MENJAWAB `true` DI KEDUA VARIAN — ia proksi yang
+tak berguna di sini, dan probe yang memercayainya akan melaporkan "Sora sehat"
+justru di layar yang mencetak Inter.** Yang membedakan cuma LEBAR TERCAT.
+
+Yang membongkarnya satu angka MUSTAHIL dalam laporanku sendiri (disiplin
+pelajaran ke-31): referensi "Sora" keluar **186,81px** di varian rusak tapi
+**204,61px** di varian sehat — font, teks & ukuran sama. Ditelusuri: 186,81px
+**PERSIS `serif`**. Fontnya SUDAH termuat, peramban MENOLAK memakainya. Itu
+`optional` bekerja sesuai spesifikasi, dan sekaligus bukti paling keras bahwa
+yang gagal balapan bukan unduhannya melainkan pemakaiannya.
+
+Vonisnya dari GEJALA, bukan waktu tiba (pelajaran ke-38 — 3260 ms sesudah
+perbaikan pun masih jauh dari tenggat 100 ms, jadi "tiba lebih awal" takkan
+membuktikan apa pun): lebar `<h1>` tercat dibanding referensi kedua keluarga,
+**3 dari 3 profil jaringan berbalik Inter → Sora** (400 kbps · 1,6 Mbps ·
+10 Mbps), dgn kontrol "kedua keluarga bisa dibedakan" (selisih 8,8px).
+
+**Ongkosnya NOL byte, dan itu bukan keberuntungan:** Sora SUDAH ada di 19 berkas
+kunjungan pertama sebelum perubahan — preload memindahkan ANTREAN, tidak
+menambah unduhan. `audit:unduh` 189,9 → **190,0 kB** / 200 (dua tag `<link>`),
+19 berkas tetap 19.
+
+**Dan warga TIDAK dapat toast "versi baru", berlawanan dgn yang kuperkirakan
+sebelum mengukur.** `VERSI` = sha256 dari daftar NAMA di `SHELL`; isi
+`index.html` berubah, namanya tidak → `e386ecbe` → `e386ecbe`, SW tak memasang
+ulang, nol aset diunduh ulang. Perbaikannya tetap sampai karena handler
+navigasi `sw.js` **network-first** (`fetch(request).catch(() => cache)`): tiap
+bukaan online mengambil `index.html` segar. **Perubahan yang hanya menyentuh
+`index.html` lolos dari VERSI — gratis untuk dikirim, tapi juga tak terlihat
+oleh penjaga versi mana pun.**
+
+Gerbang MELEDAK-nya dibuat **PER-FONT**, bukan per-daftar: daftar yang separuh
+terisi lolos diam-diam persis seperti daftar kosong. Divalidasi MUTASI (pola
+font KEDUA diarahkan ke nama yang tak ada → build keluar 1 dgn
+`preload-font-body: berkas sora-latin-*.woff2 tak ada di bundel`) — menguji
+font pertama saja takkan membuktikan gerbang keduanya hidup.
+
+**PELAJARAN: tiap font yang dipreload menjaga SATU tenggat; font ber-`optional`
+yang tak dipreload adalah font yang diputuskan untuk kalah.** Kalau `@font-face`
+baru ditambahkan, ia wajib ikut ke `preloadFontBody` — dan `audit:unduh`
+bagian F **tidak akan** menangkapnya, karena F sengaja mengeluarkan `optional`
+dari populasinya (ia memang tak pernah menukar, pelajaran ke-38).
+
 **GARIS DASAR SAPUAN — 6 Sep 2026 · app pada `1dbb865`**
 
 Dijalankan di mesin dev lawan **DB HIDUP** (container CI/dev memakai `.env`

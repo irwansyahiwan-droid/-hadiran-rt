@@ -183,15 +183,48 @@ function preloadFontBody(): Plugin {
     transformIndexHtml: {
       order: 'post',
       handler(html, ctx) {
-        const nama = Object.keys(ctx.bundle ?? {}).find((f) => /inter-latin-[^/]*\.woff2$/.test(f));
-        /* Kait yang hilang harus MELEDAK (pelajaran ke-24). `preload` yang
-           diam-diam tak tersuntik mengembalikan persis 843 ms kedip yang
-           plugin ini ada untuk menutupnya, dan tak ada yang akan tahu. */
-        if (!nama) throw new Error('preload-font-body: berkas inter-latin-*.woff2 tak ada di bundel');
-        return html.replace(
-          '</head>',
-          `  <link rel="preload" href="/${nama}" as="font" type="font/woff2" crossorigin>\n  </head>`,
-        );
+        /* KEDUA font dipreload, dan yang kedua baru ditambahkan 12 Sep 2026.
+           Inter (`swap`, badan teks) ada di sini sejak awal. Sora (`optional`,
+           SELURUH h1/h2 lewat `--font-display`) tidak — dan `optional` itulah
+           yang membuat kelalaian ini MAHAL: ia memberi jendela blok ~100 ms
+           lalu, kalau fontnya belum tiba, TIDAK PERNAH menukar sepanjang
+           kunjungan itu. Terukur di `audit:unduh` (400 kbps · CPU 4x) SEBELUM
+           perubahan ini: Sora tiba di 5369 ms sementara layar sudah dipakai di
+           3541 ms — telat ~5,3 dtk dari deadline-nya sendiri, jadi tiap judul
+           dirender Inter untuk SELURUH kunjungan pertama.
+
+           Akibatnya bukan geometri melainkan BOBOT TINTA: diukur pada string
+           app yang sebenarnya, Inter menaruh 8,3-8,8% LEBIH SEDIKIT tinta di
+           layar (`Hadiran RT` 800/28 · `Kas Hadiran` 700/32 · `Riwayat
+           Transaksi` 700/18). Itu sebabnya keluhannya berbunyi "redup SEDIKIT"
+           dan datang-hilang: ia bergantung pada siapa yang menang balapan,
+           bukan pada satu warna yang berubah. Nol token warna disentuh untuk
+           memperbaikinya.
+
+           `font-display: optional` SENGAJA tidak diubah — ia yang menutup kedip
+           1.898 ms (pelajaran ke-38), dan menukarnya ke `swap` membayar cacat
+           lama untuk membeli yang ini. Yang salah bukan kebijakan tukarnya,
+           melainkan Sora tak pernah diberi kesempatan tiba tepat waktu.
+
+           URUTAN PENTING: Inter dulu. Ia badan teks ber-`swap` (dipakai SETIAP
+           layar, dan menukar kapan pun ia tiba), sedangkan Sora cuma judul dan
+           punya tenggat keras. Pipa 400 kbps melayani berurutan. */
+        const wajib = [
+          { pola: /inter-latin-[^/]*\.woff2$/, nama: 'inter-latin-*.woff2' },
+          { pola: /sora-latin-[^/]*\.woff2$/, nama: 'sora-latin-*.woff2' },
+        ];
+        const berkas = Object.keys(ctx.bundle ?? {});
+        const tag = wajib.map(({ pola, nama }) => {
+          const f = berkas.find((b) => pola.test(b));
+          /* Kait yang hilang harus MELEDAK (pelajaran ke-24). `preload` yang
+             diam-diam tak tersuntik mengembalikan persis kedip/redup yang
+             plugin ini ada untuk menutupnya, dan tak ada yang akan tahu.
+             Digerbang PER-FONT: satu daftar yang separuh terisi lolos diam-diam
+             persis seperti daftar kosong. */
+          if (!f) throw new Error(`preload-font-body: berkas ${nama} tak ada di bundel`);
+          return `  <link rel="preload" href="/${f}" as="font" type="font/woff2" crossorigin>`;
+        });
+        return html.replace('</head>', `${tag.join('\n')}\n  </head>`);
       },
     },
   };
