@@ -68,8 +68,27 @@
     --green-deep: #123F28;   /* hijau tinta stempel & blok */
     --green: #1B5A38;        /* hijau aksen teks */
     --gold: #C8961E;         /* emas songket, HANYA dekoratif */
-    --gold-bright: #DFAF35;  /* emas terang, utk teks kecil di atas blok hijau */
-    --gold-ink: #77570C;     /* emas gelap, aman utk teks kecil di kertas */
+    /* Kedua tinta emas dinaikkan ke ambang AAA app (7:1) pada 12 Sep 2026.
+       Mereka SATU-SATUNYA sisa di seluruh app yang lolos AA tapi di bawah AAA
+       (22 sampel, semuanya di sini) — dan bukan regresi: /warta baru masuk
+       populasi `audit:kontras-deep` pada 5 Sep (2a57d8e), empat hari SESUDAH
+       garis dasar AAA "0 dari 2256" ditulis, jadi angkanya tak pernah terbaca.
+
+       RONA DIKUNCI di OKLab, KROMA yang mengalah — bukan sebaliknya. Percobaan
+       pertama mengunci rona DAN kroma lalu keduanya TERPOTONG gamut: rona
+       gold-bright melenceng 16,4° dan warnanya berhenti jadi emas (#FFF17E).
+       Pelajaran ke-32: sesudah OKLab→sRGB, periksa terpotong — kalau ya, rona
+       yang "dikunci" sebenarnya sudah lepas. Yang memegang identitas warna itu
+       RONA; kroma boleh turun.
+
+         --gold-bright  #DFAF35 → #F1C14B   ΔL +5,5pp  ΔC 0,0000  ΔH +0,30°
+         --gold-ink     #77570C → #614500   ΔL -6,8pp  ΔC -0,0093  ΔH -0,17°
+
+       Arah desain /warta sengaja TIDAK sinkron token app (ia punya bahasanya
+       sendiri) — dan itu tak berubah di sini: yang bergerak cuma TERANG tinta,
+       keluarga warnanya tetap. */
+    --gold-bright: #F1C14B;  /* emas terang, utk teks kecil di atas blok hijau */
+    --gold-ink: #614500;     /* emas gelap, aman utk teks kecil di kertas */
     --line: #C9BC9C;         /* garis rules koran di kertas */
     --cream: #F4EDDC;        /* teks terang di atas blok hijau */
     --maxw: 640px;
