@@ -185,6 +185,7 @@ const br = await chromium.launch();
 async function lengan({ blokirFont, label }) {
   const hasil = [];
   let ditolak = 0;
+  let terima = 0;
   let statusFont = 'tak-diukur';
 
   for (let run = 0; run < RUNS; run++) {
@@ -219,6 +220,14 @@ async function lengan({ blokirFont, label }) {
 
     const t0 = Date.now();
     let tSupa = null;
+    /* Bukti yang DETERMINISTIK bahwa fontnya benar-benar melintasi kabel.
+       Versi pertama memvonis dari `document.fonts` pada satu titik waktu, dan
+       itu BALAPAN, bukan properti: di produksi CSS (non-blocking, 86 kB) baru
+       terparse SESUDAH tombol muncul, jadi belum ada satu pun @font-face
+       terdaftar dan lengan kontrol terbaca `tak-ada` → PROBE CACAT palsu pada
+       produksi yang justru sedang mengandung temuan. Balasan yang diterima
+       tidak punya balapan itu. */
+    p.on('response', (r) => { if (/\.woff2(\?|$)/.test(r.url()) && r.status() < 400) terima++; });
     p.on('response', (r) => { if (/supabase\.co/.test(r.url()) && tSupa === null) tSupa = Date.now() - t0; });
 
     await p.goto(APP, { waitUntil: 'domcontentloaded' });
@@ -239,7 +248,7 @@ async function lengan({ blokirFont, label }) {
     hasil.push({ fcp, tSiap, tSupa });
     await ctx.close();
   }
-  return { label, hasil, ditolak, statusFont };
+  return { label, hasil, ditolak, terima, statusFont };
 }
 
 const med = (arr, k) => {
@@ -262,8 +271,8 @@ const dSiap = siapK - siapT;
 
 console.log(`${APP} · CPU ${CPU}× · ${KBPS} kbps · latensi ${LATENCY} ms · ${RUNS} run/lengan${MUT ? ` · MUTASI=${MUT}` : ''}`);
 console.log(`preload font : ${hrefPreload.length ? hrefPreload.join(', ') : '(tak ada)'} · ${byteFont} B`);
-console.log(`dgn font     FCP ${fcpK} ms · siap-pakai ${siapK} ms · face ${kontrol.statusFont}   ${JSON.stringify(kontrol.hasil)}`);
-console.log(`tanpa font   FCP ${fcpT} ms · siap-pakai ${siapT} ms · face ${tanpa.statusFont}   ${JSON.stringify(tanpa.hasil)} · ${tanpa.ditolak} permintaan ditolak`);
+console.log(`dgn font     FCP ${fcpK} ms · siap-pakai ${siapK} ms · ${kontrol.terima} woff2 diterima · face ${kontrol.statusFont}   ${JSON.stringify(kontrol.hasil)}`);
+console.log(`tanpa font   FCP ${fcpT} ms · siap-pakai ${siapT} ms · ${tanpa.terima} woff2 diterima · ${tanpa.ditolak} ditolak · face ${tanpa.statusFont}   ${JSON.stringify(tanpa.hasil)}`);
 console.log(`Supabase pertama ${med(kontrol.hasil, 'tSupa') ?? '—'} ms  (angka MUTLAK di atas dilaporkan saja — machine-dependent, bukan vonis)`);
 console.log('');
 
@@ -272,8 +281,9 @@ const cacat = [];
 if (hrefPreload.length === 0) cacat.push('HTML yang dilayani tak memuat <link rel=preload as=font> — tak ada harga untuk dijaga, dan selisih ~0 akan terbaca hijau');
 if (byteFont === 0) cacat.push('berkas font yang di-preload berukuran 0 B — tak terambil');
 if (tanpa.ditolak === 0) cacat.push('lengan "tanpa font" TIDAK menolak satu permintaan pun — probe tak menggigit');
+if (tanpa.terima > 0) cacat.push(`lengan "tanpa font" tetap MENERIMA ${tanpa.terima} woff2 — blokirnya tak berlaku`);
 if (tanpa.statusFont === 'loaded') cacat.push(`lengan "tanpa font" tetap memuat face ${KELUARGA_BODY} — blokirnya tak berlaku`);
-if (kontrol.statusFont !== 'loaded') cacat.push(`lengan kontrol TIDAK memuat face ${KELUARGA_BODY} (status ${kontrol.statusFont}) — yang diukur bukan keadaan yang dibeli`);
+if (kontrol.terima === 0) cacat.push('lengan kontrol TIDAK menerima satu woff2 pun — yang diukur bukan keadaan yang dibeli');
 /* Mutasi WAJIB membuktikan dirinya mendarat. Tanpa baris ini, MUTASI=1
    yang gagal menyisipkan apa pun akan mencetak angka normal & terbaca sbg
    "penjaganya lemah" — padahal yang tak terjadi mutasinya. */
