@@ -116,6 +116,20 @@ const VISUAL = [
      CACAT), jadi ia tak bisa hijau dari build kemarin. Sifat-sifat itu
      pula yang membuatnya paling tahan di EKOR — lihat sumbu (2). */
   ['unduh', 'node scripts/audit-unduh.mjs'],
+  /* `muat` masuk rantai 12 Sep 2026. Sampai hari itu ia **meteran, bukan
+     penjaga**: 75 baris tanpa satu pun baris vonis, selalu exit 0, dan tak
+     pernah terdaftar di sini — padahal app ini MEMBELI waktu muat sadar-sadar
+     (commit 900e80e memilih varian X seharga 531 ms untuk menutup kedip huruf
+     843 ms). Pelajaran ke-33 persis: ambang yang tak dijaga alat sama dengan
+     ambang yang tak ada.
+
+     Yang ia vonis adalah SELISIH dua lengan di jalan yang sama (dgn font vs
+     seluruh woff2 ditolak), bukan waktu muat MUTLAK — angka mutlak
+     machine-dependent dan akan merah karena mesinnya. Karena vonisnya selisih
+     se-jalan, ia tahan terhadap kontensi rantai: kedua lengan melambat
+     bersama. Terbukti di mutasinya sendiri — server statis Node membuat angka
+     mutlak melar 2779 → 7263 ms sementara selisihnya tetap menuding benar. */
+  ['muat', 'node scripts/audit-muat.mjs'],
 ];
 
 /* ── LANTAI POPULASI ────────────────────────────────────────────────────────
@@ -177,6 +191,11 @@ const LANTAI = {
      isi DB (69 warga hari ini, 300 KK yang dijanjikan), jadi lantai berbasis
      teks salah tiap kali datanya tumbuh. Jumlah permukaan properti APP. */
   'fallback-sora':  [/(\d+) permukaan diperiksa/, 38],
+  /* Populasi = jumlah MUAT yang benar-benar diukur (2 lengan × RUNS). Ia
+     properti KONFIGURASI, bukan data, jadi lantainya persis — bukan ~95%:
+     kalau satu lengan gagal separuh jalan, selisihnya dihitung dari median
+     yang lebih tipis dan vonisnya berdiri di atas lebih sedikit bukti. */
+  muat:             [/(\d+) muat diukur/, 6],
 };
 /* TANPA LANTAI — daftar ini KOSONG sejak 3 Sep 2026, dan mekanismenya sengaja
    dipertahankan. `lebar`, `reflow` & `gerak` dulu di sini karena keluarannya
