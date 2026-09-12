@@ -34,12 +34,12 @@
 //   "dokumen dibandingkan dgn DIRINYA SENDIRI" yang sudah dipakai penjaga
 //   kertas (`cetakIsi.test.ts`), dipindah ke sumbu waktu.
 //
-//   Selisihnya bahkan punya ramalan FISIK: 37.128 B ÷ (400 kbps ÷ 8) = 725 ms.
-//   Terukur 722 ms di `main` dan 735 ms di 900e80e — dua build berbeda, selisih
-//   2% dari ramalan. Itu sebabnya ia layak jadi ambang: ia hampir tak bergerak
-//   oleh mesin, dan bergerak TELAK begitu ada font kedua masuk jalur kritis
-//   (varian Y yang dulu ditolak = preload Sora juga, +494 ms) atau fontnya
-//   membesar.
+//   Selisihnya bahkan punya ramalan FISIK: byteFont ÷ (KBPS ÷ 8). Waktu app
+//   cuma mem-preload Inter: 37.128 B ÷ 50 kB/s = 725 ms ramalan, 722 & 735 ms
+//   terukur di dua build — selisih 2%. Sejak `ed8b1d6` kedua font di-preload
+//   (62.448 B) dan harganya 1253 ms lokal / 1094 ms produksi. Itu sebabnya
+//   selisih layak jadi ambang: ia hampir tak bergerak oleh mesin, dan bergerak
+//   TELAK begitu satu font lagi masuk jalur kritis atau fontnya membesar.
 //
 // YANG **TIDAK** DIJAGA DI SINI, dan jangan dikira begitu:
 //   · Waktu muat MUTLAK — dilaporkan, tak pernah jadi vonis (machine-dependent).
@@ -55,8 +55,14 @@
 //   APP_URL=https://hadiran-rt.vercel.app npm run audit:muat   (brotli nyata)
 //
 // MUTASI (wajib dipakai sebelum percaya pada hijau — pelajaran ke-5 cara kerja):
-//   MUTASI=1  lengan kontrol ikut mem-preload Sora → meniru varian Y yang dulu
-//             ditolak user. Harga WAJIB melewati anggaran → MERAH.
+//   MUTASI=1  lengan kontrol menyajikan SATU FONT LAGI di jalur kritis, lewat
+//             URL sintetis (`/assets/__mutasi-font-tambahan.woff2`) yang berisi
+//             byte woff2 sungguhan. Terukur 1253 → 1770 ms → MERAH.
+//             URL-nya WAJIB baru: versi pertama mem-preload ulang Sora, dan
+//             sejak `ed8b1d6` Sora sudah di-preload sehingga peramban
+//             men-DEDUPE-nya — mutasinya mencetak angka yang sama persis dgn
+//             jalan tanpa mutasi & cuma tampak merah karena garis dasarnya
+//             kebetulan sudah di atas anggaran. Mutasi yang tak menggigit.
 //   MUTASI=2  lengan "tanpa font" berhenti menolak apa pun (route diteruskan).
 //             Selisih jadi ~0 dan vonis A akan terbaca HIJAU — justru itu
 //             gunanya: uji KONTROL wajib menangkapnya sbg PROBE CACAT. Tanpa
@@ -74,17 +80,45 @@ const KBPS = +(process.env.KBPS || 400);
 const LATENCY = +(process.env.LATENCY || 400);
 const MUT = process.env.MUTASI || '';
 
-/* ANGGARAN. Bukan angka karangan: harga terukur hari ini 722 ms (`main`) &
-   735 ms (900e80e), ramalan fisik 725 ms. Plafon 900 ms menyisakan ~24%
-   kelonggaran untuk derau mesin — yang terukur cuma 13 ms — sambil tetap
-   MERAH telak kalau font kedua masuk jalur kritis (+494 ms untuk Sora) atau
-   Inter tumbuh lebih dari ~9 kB.
+/* ANGGARAN — 1400 ms, dan angka ini PEMBELIAN YANG DISETUJUI, bukan pelonggaran.
+   Riwayatnya ditulis lengkap supaya tak ada yang menurunkannya karena mengira
+   ia longgar, atau menaikkannya lagi tanpa mengulangi pekerjaan yang sama.
+
+   Lahir 900 ms (12 Sep pagi) waktu app cuma mem-preload Inter: harga terukur
+   722 ms (`main`) & 735 ms (900e80e), ramalan fisik 37.128 B ÷ 50 kB/s = 725.
+
+   Siang harinya `ed8b1d6` mem-preload Sora JUGA — sadar, diukur, untuk
+   menghentikan seluruh judul dicat Inter di kunjungan pertama (Inter menaruh
+   8,3-8,8% lebih sedikit tinta; terbaca "redup sedikit" & datang-hilang).
+   Harganya: **1253 ms lokal · 1094 ms produksi (brotli)**.
+
+   EMPAT JALAN TENGAH DIUKUR SEBELUM ANGKA INI DINAIKKAN, dan tiga buntu:
+     fetchpriority="low"        hemat    9 ms  (hint terbukti terpasang: Low)
+     preload sesudah <script>   hemat   38 ms
+     sumbu bobot 600:800        hemat 13,5 ms  + 6 elemen geser bobot
+     sumbu bobot 700:800        hemat   38 ms  + 113 elemen geser bobot
+     subset karakter ASCII      hemat  231 ms  + 223->108 glyph  <-- satu-satunya
+   Prioritas & urutan tak bisa menolong karena di 400 kbps yang mahal BYTE-nya,
+   bukan antreannya — pipanya DIBAGI, bukan berurutan (bukti: Sora 25 kB selesai
+   SEBELUM Inter 37 kB di ketiga varian, bahkan saat Sora diprioritaskan Low).
+   Subset karakter DITOLAK user: ia menukar 231 ms sekali-jalan dgn melemahkan
+   penjaga "nol glyph hilang" di `gen-font.mjs` secara permanen, plus risiko
+   berbentuk DATA (nama warga beraksen) yang tak bisa dibatasi pemindaian sumber.
+
+   Kenapa 1400 dan bukan 1300: bacaan lokal berkisar 1248-1282 ms antar-jalan,
+   jadi 1300 cuma menyisakan ~18 ms dan akan berkedip merah-hijau — sapuan yang
+   merah separuh waktu melatih pembacanya mengabaikan merah (pelajaran ke-34).
+   1400 tetap MERAH TELAK untuk regresi yang penjaga ini memang cari: satu font
+   lagi di jalur kritis = ~1770 ms (terukur, itu `MUTASI=1`).
+
+   **KALAU PRELOAD SORA SUATU SAAT DILEPAS, TURUNKAN ANGKA INI KEMBALI KE 900.**
+   Plafon yang tertinggal tinggi sesudah sebabnya hilang adalah plafon yang tak
+   menjaga apa pun.
 
    ANGGARAN INI **JANGAN** DITURUNKAN DARI UKURAN FONT. Penjaga yang plafonnya
    ikut tumbuh bersama benda yang dijaganya bukan penjaga — ia cuma mencatat
-   apa pun yang terjadi. Kalau fontnya memang perlu membesar, itu keputusan
-   user & angka di bawah ini yang diperbarui, sadar-sadar. */
-const ANGGARAN_SIAP = +(process.env.ANGGARAN_SIAP || 900);
+   apa pun yang terjadi. */
+const ANGGARAN_SIAP = +(process.env.ANGGARAN_SIAP || 1400);
 const ANGGARAN_FCP = +(process.env.ANGGARAN_FCP || 160);
 
 const KELUARGA_BODY = 'Inter';
@@ -103,6 +137,8 @@ const KELUARGA_BODY = 'Inter';
    sudah memuat preload kedua — byte sungguhan lewat tumpukan jaringan yang
    sungguhan, persis seperti varian Y yang dulu ditolak user. Preseden memegang
    port sendiri: `audit:unduh`. */
+const FONT_MUTASI = '/assets/__mutasi-font-tambahan.woff2';
+
 async function serverMutasi() {
   const DIST = 'dist';
   const asli = await readFile(join(DIST, 'index.html'), 'utf8').catch(() => null);
@@ -124,9 +160,17 @@ async function serverMutasi() {
     console.log('  PROBE CACAT: MUTASI=1 tak menemukan woff2 Sora di bundel — tak ada font kedua untuk disisipkan.');
     process.exit(2);
   }
-  const mutan = asli.replace('</head>', `  <link rel="preload" href="${sora}" as="font" type="font/woff2" crossorigin>\n  </head>`);
+  /* Font tambahannya disajikan di URL SINTETIS, bukan mem-preload ulang berkas
+     yang sudah ada. Sejak `ed8b1d6` `index.html` SUDAH mem-preload Sora, jadi
+     menyisipkan preload kedua untuk berkas yang sama di-DEDUPE peramban:
+     mutasinya mencetak +1252 ms — angka yang SAMA PERSIS dgn jalan tanpa
+     mutasi — dan hanya terlihat merah karena garis dasarnya kebetulan sudah di
+     atas anggaran. Itu mutasi yang tak menggigit, dan ia akan berubah hijau
+     diam-diam begitu anggarannya dinaikkan. URL berbeda = sumber daya berbeda =
+     byte sungguhan menyeberang, berapa pun jumlah preload yang sudah ada. */
+  const mutan = asli.replace('</head>', `  <link rel="preload" href="${FONT_MUTASI}" as="font" type="font/woff2" crossorigin>\n  </head>`);
   if (mutan === asli) {
-    console.log('  PROBE CACAT: MUTASI=1 gagal menyisipkan preload kedua ke index.html.');
+    console.log('  PROBE CACAT: MUTASI=1 gagal menyisipkan preload font tambahan ke index.html.');
     process.exit(2);
   }
   const MIME = {
@@ -135,6 +179,14 @@ async function serverMutasi() {
   };
   const srv = createServer(async (req, res) => {
     const p = decodeURIComponent(req.url.split('?')[0]);
+    if (p === FONT_MUTASI) {
+      /* Byte font SUNGGUHAN di URL baru — bukan padding, supaya yang diukur
+         tetap "satu font lagi masuk jalur kritis" dan bukan "peramban menolak
+         berkas rusak". */
+      const b = await readFile(join(DIST, sora.replace(/^\//, '')));
+      res.writeHead(200, { 'content-type': 'font/woff2', 'cache-control': 'no-cache' });
+      return res.end(b);
+    }
     if (p === '/' || p === '/index.html') {
       res.writeHead(200, { 'content-type': 'text/html', 'cache-control': 'no-cache' });
       return res.end(mutan);
@@ -287,7 +339,7 @@ if (kontrol.terima === 0) cacat.push('lengan kontrol TIDAK menerima satu woff2 p
 /* Mutasi WAJIB membuktikan dirinya mendarat. Tanpa baris ini, MUTASI=1
    yang gagal menyisipkan apa pun akan mencetak angka normal & terbaca sbg
    "penjaganya lemah" — padahal yang tak terjadi mutasinya. */
-if (MUT === '1' && hrefPreload.length < 2) cacat.push(`MUTASI=1 hanya menyajikan ${hrefPreload.length} preload font — font kedua tak pernah sampai ke kabel`);
+if (MUT === '1' && !hrefPreload.some((h) => h.includes('__mutasi-font-tambahan'))) cacat.push(`MUTASI=1 tak menyajikan font tambahannya (preload: ${hrefPreload.join(', ') || 'nol'}) — mutasi tak menggigit`);
 if (diukur < RUNS * 2) cacat.push(`populasi kurang: ${diukur} dari ${RUNS * 2} muat`);
 
 if (cacat.length) {

@@ -233,8 +233,14 @@ punya ramalan fisik (`byteFont ÷ (KBPS ÷ 8)` = 725 ms; terukur 697–725).
 **Anggarannya JANGAN diturunkan dari ukuran font** — plafon yang ikut tumbuh
 bersama yang dijaganya cuma mencatat, bukan menjaga.
 
-Temuan PERTAMANYA datang di hari yang sama & masih TERBUKA: `main` merah
+Temuan PERTAMANYA datang di hari yang sama, dan sudah DIPUTUSKAN: `main` merah
 +1253 ms karena `ed8b1d6` mem-preload Sora demi menghentikan judul dicat Inter.
+Empat jalan tengah diukur (prioritas, urutan, sumbu bobot, subset karakter);
+tiga buntu, dan yang keempat — subset karakter, hemat 231 ms — DITOLAK karena
+ia menukar penghematan sekali-jalan dgn penjaga yang dilemahkan permanen.
+Keputusannya: preload DIPERTAHANKAN, anggaran naik 900 → 1400 sadar-sadar,
+karena ongkosnya dibayar SEKALI (kunjungan 2 & 3 terukur 921 ms, judul tetap
+Sora). **Kalau preload itu dilepas lagi, anggarannya WAJIB turun ke 900.**
 Commit itu menulis "ongkos nol byte" — **benar untuk byte, salah untuk waktu**:
 di kabel yang jenuh, 25 kB yang pindah ke depan antrean membuat chunk entry &
 vendor-react menunggu di belakangnya (+530 ms siap-pakai). Ongkosnya diperiksa
