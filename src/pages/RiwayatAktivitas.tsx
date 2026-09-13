@@ -176,6 +176,8 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
+            name="cari-aktivitas"
+            autoComplete="off"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             /* Menyebut KETIGA sumbu yang benar-benar disaring di `grouped`:

@@ -147,8 +147,11 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           </button>
         </div>
 
+        {/* `autoComplete="off"` di nama & no. HP, BUKAN `name`/`tel`: kolom ini
+            berisi data warga LAIN, sedangkan token autofill menawarkan identitas
+            PEMILIK HP — bendahara yang mengetik "Ah…" disodori namanya sendiri. */}
         <label htmlFor="anggota-nama" className={label}>Nama Lengkap</label>
-        <input id="anggota-nama" name="nama" autoComplete="name" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama warga…" className={`${input} mb-4`} />
+        <input id="anggota-nama" name="nama" autoComplete="off" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama warga…" className={`${input} mb-4`} />
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
@@ -157,7 +160,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
           </div>
           <div>
             <label htmlFor="anggota-hp" className={label}>No. HP</label>
-            <input id="anggota-hp" name="no-hp" type="tel" autoComplete="tel" value={noHp} onChange={(e) => setNoHp(e.target.value)} placeholder="08xxxx…" inputMode="tel" className={input} />
+            <input id="anggota-hp" name="no-hp" type="tel" autoComplete="off" value={noHp} onChange={(e) => setNoHp(e.target.value)} placeholder="08xxxx…" inputMode="tel" className={input} />
           </div>
         </div>
 
@@ -377,6 +380,8 @@ export default function KelolaAnggota({ open, onClose }: Props) {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
+            name="cari-anggota"
+            autoComplete="off"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama / no. rumah…"
