@@ -127,6 +127,14 @@ function swManifest(): Plugin {
       this.info?.(`sw-manifest: shell ${Math.round(byte / 1024)} kB`);
     },
     closeBundle() {
+      /* Rollup memanggil `closeBundle` JUGA saat build GAGAL. Tanpa penjaga ini
+         plugin ini lalu meledak sendiri (`sw.js` belum disalin / masih versi
+         lama) dan galatnya MENIMPA sebab aslinya: terukur 13 Sep 2026, build
+         yang gagal karena kait `ikon-dekoratif` hilang dilaporkan sbg
+         "sw-manifest: kait VERSI tak ada" — orang diarahkan ke plugin yang
+         salah (pelajaran ke-40). `shell` selalu berisi 5 entri statis kalau
+         `generateBundle` sempat jalan, jadi kosong = build sudah gagal duluan. */
+      if (!shell.length) return;
       const p = resolve(outDir, 'sw.js');
       const src = readFileSync(p, 'utf8');
       const versi = createHash('sha256').update(shell.join('|')).digest('hex').slice(0, 8);
@@ -251,8 +259,54 @@ function preloadFontBody(): Plugin {
   };
 }
 
+/**
+ * Ikon lucide DEKORATIF secara bawaan: `aria-hidden="true"` dipasang kalau
+ * pemanggil tak memberinya nama (`aria-label`/`aria-labelledby`/`title`/`role`
+ * atau anak `<title>`).
+ *
+ * Kenapa ada (13 Sep 2026): lucide-react 0.344 tak memasang apa pun, dan Chrome
+ * mengekspos TIAP ikon polos sebagai `image` TANPA NAMA di pohon aksesibilitas —
+ * diukur lewat `Accessibility.getFullAXTree`: 76 di Hadiran, 64 di Kas RT, 22 di
+ * Beranda. TalkBack menyusurinya satu per satu sebagai "gambar" kosong. Hanya
+ * segelintir call-site yang memasang `aria-hidden` sendiri.
+ *
+ * Kenapa di SINI, bukan per call-site: semua ikon lahir dari satu fungsi
+ * (`createLucideIcon`). Ratusan `aria-hidden` manual di puluhan berkas akan
+ * bocor lagi di ikon berikutnya yang ditulis siapa pun.
+ *
+ * Nilai bawaan disisipkan SEBELUM `...rest`, jadi `aria-hidden={false}`
+ * eksplisit tetap menang. Kaitnya teks sumber lucide — kalau versi lucide
+ * berubah & kaitnya hilang, build MELEDAK (pelajaran ke-24: kait yang hilang
+ * harus meledak, jangan dilewati).
+ *
+ * AWAS untuk sapuan: `audit:kontras-nonteks` dulu memakai `svg.closest(
+ * '[aria-hidden]')` sbg tanda dekoratif, dan `closest` MENYERTAKAN elemen itu
+ * sendiri — plugin ini akan membuang tiap ikon tombol ikon-saja dari
+ * populasinya. Saringannya kini hanya melihat LELUHUR (lihat komentar di sana).
+ */
+function ikonDekoratif(): Plugin {
+  const KAIT = /(className: \["lucide", `lucide-\$\{toKebabCase\(iconName\)\}`, className\]\.join\(" "\),\n)(\s*)\.\.\.rest/;
+  let terpasang = false;
+  return {
+    name: 'ikon-dekoratif',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!/lucide-react[\\/]dist[\\/]esm[\\/]createLucideIcon\.js$/.test(id.split('?')[0])) return;
+      if (!KAIT.test(code)) {
+        throw new Error('ikon-dekoratif: kait `...rest` di lucide-react createLucideIcon.js tak ketemu — versi lucide berubah? Ikon kembali terbaca "gambar" tanpa nama.');
+      }
+      terpasang = true;
+      return code.replace(KAIT, (_m, cls: string, ind: string) =>
+        `${cls}${ind}...(rest["aria-label"] == null && rest["aria-labelledby"] == null && rest.title == null && rest.role == null && children == null ? { "aria-hidden": "true" } : {}),\n${ind}...rest`);
+    },
+    generateBundle() {
+      if (!terpasang) this.error('ikon-dekoratif: createLucideIcon.js tak pernah melewati transform — ikon lucide tak lagi dekoratif bawaan.');
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), cssNonBlocking(), preloadFontBody(), swManifest()],
+  plugins: [react(), cssNonBlocking(), preloadFontBody(), swManifest(), ikonDekoratif()],
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

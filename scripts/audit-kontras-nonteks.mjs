@@ -38,7 +38,7 @@
  * 1. JANGAN PERNAH menyampel piksel garis 1–2px. Itu sumber tunggal 33 FP di
  *    audit teks dulu. Di sini warna garis diambil dari CSS (computed), lalu
  *    di-blend ke atas piksel tetangga yang disampel di LUAR elemen.
- * 2. Ikon dekoratif dikecualikan: aria-hidden, atau kontrolnya sudah punya
+ * 2. Ikon dekoratif dikecualikan: aria-hidden di LELUHUR, atau kontrolnya sudah punya
  *    teks terlihat. §1.4.11 hanya menuntut grafis yang DIPERLUKAN untuk paham.
  *
  *    KATUP `data-penanda` (2 Sep 2026) — dan ini menutup lubang yang sudah
@@ -222,7 +222,18 @@ async function collectIcons(page) {
     for (const svg of document.querySelectorAll('svg')) {
       const el2 = svg;
       if (!vis(svg) || mati(svg)) continue;
-      if (svg.closest('[aria-hidden="true"]') && !svg.matches('[role="img"]')) continue;
+      /* LELUHUR saja, bukan svg.closest(...) — closest MENYERTAKAN elemen itu
+         sendiri. Sejak 13 Sep 2026 plugin ikonDekoratif (vite.config.ts)
+         memasang aria-hidden di TIAP ikon lucide tanpa nama, termasuk ikon di
+         tombol ikon-saja (X, Menu, chevron data-penanda). Itu benar untuk
+         pohon aksesibilitas — tombolnya sudah ber-aria-label — tapi bagi MATA
+         ikon itu satu-satunya label, jadi §1.4.11 tetap berlaku. Terukur: dgn
+         closest, populasi ikon 499 -> 0 sampel dan sapuan tetap keluar 0.
+         aria-hidden di svg SENDIRI tak lagi berarti dekoratif; klausa kontrol
+         & label-terlihat di bawah yang memutuskannya. aria-hidden di LELUHUR
+         (grafik, ornamen) tetap berarti sengaja disembunyikan & tetap di luar.
+         (Tanpa backtick: blok ini hidup di dalam template literal.) */
+      if (svg.parentElement?.closest('[aria-hidden="true"]') && !svg.matches('[role="img"]')) continue;
       const r = svg.getBoundingClientRect();
       if (r.width < 8 || r.height < 8) continue;
       const ctrl = svg.closest(CTRL_SEL);
