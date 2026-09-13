@@ -967,6 +967,38 @@ Diganti ke `performance.now()` (kebal koreksi NTP) **tanpa mengklaim itu
 menutup kasus tidur** — libuv pada macOS modern justru tetap menghitungnya.
 Vonis hijau/merah boleh dipercaya; kolom durasi petunjuk, bukan bukti.
 
+**DIKOREKSI 13 Sep 2026 — kalimat terakhir itu TERLALU MURAH HATI, dan
+koreksinya yang penting: mesin TIDUR tidak cuma mengotori kolom durasi, ia
+MENGARANG MERAH.** Tiga jalan rantai rusak oleh sebab yang sama dalam dua hari,
+dan gejalanya BERBEDA tiap kali — itu yang membuatnya sulit dikenali:
+
+    12 Sep  `sheet-pendek`  TimeoutError menunggu item menu
+                            (sendirian: EXIT=0, 13 permukaan, 0 bermasalah, <1 mnt)
+    13 Sep  `nama`          POPULASI TURUN 457 < lantai 500
+                            (sendirian: 540 kontrol, 0 bermasalah)
+
+Keduanya menyamar jadi temuan. Yang kedua lebih menipu: vonisnya sendiri
+berbunyi `0 bermasalah`, dan yang memerahkannya justru LANTAI POPULASI — yaitu
+penjaga itu bekerja PERSIS seperti mestinya (menolak mencetak hijau dari
+populasi yang diam-diam tinggal 85%), bukan penjaga yang rewel.
+
+Tandanya selalu ada di kolom yang sama yang dulu disebut "petunjuk, bukan
+bukti": tidurnya mendarat di sapuan-sapuan TEPAT SEBELUM yang merah —
+13 Sep `fallback-sora` 9.357 dtk · `kontras-deep` 7.669 dtk · `kontras`
+4.570 dtk, lalu `nama` mengukur app yang belum selesai merender. Sapuan
+sesudahnya berjalan normal lagi (`sheet` 61 dtk · `sheet-pendek` 57 dtk).
+
+**ATURAN YANG BISA DITINDAK: jalan rantai yang durasinya melar liar — satu
+sapuan lebih dari ~10x normalnya — wajib DIULANG, bukan DIBACA.** Merah di
+dalamnya tak memvonis apa pun sampai sapuan itu diulang SENDIRIAN. Dan
+sebaliknya yang sama pentingnya: **hijau di jalan seperti itu juga tak
+memvonis apa pun** — populasi yang menyusut di sapuan TANPA lantai tak
+meninggalkan satu tanda pun.
+
+Ini juga sebab praktis kenapa rantai penuh tak bisa diselesaikan dari sesi AI
+yang gilirannya tersebar: ia butuh ~25 menit mesin terjaga BERTURUT-TURUT.
+Jalankan sendiri sekali duduk sebelum rilis besar.
+
 Yang ke-41 (6 Sep 2026) — **penjaga yang membaca teks MENTAH bergantung pada
 apakah anak proses kebetulan mewarnai keluarannya, dan itu berbeda
 antar-mesin.**
