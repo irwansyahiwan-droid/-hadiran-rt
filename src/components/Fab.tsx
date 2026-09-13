@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Plus, type LucideIcon } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useScrollHide } from '../hooks/useScrollDirection';
+import { useCadanganGulir } from '../hooks/useCadanganGulir';
 
 interface FabProps {
   onClick: () => void;
@@ -71,6 +72,15 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
   const [fokus, setFokus] = useState(false);
   const compact = menyingkir && !fokus;
 
+  /* FAB mencadangkan ruangnya di `scroll-padding-bottom` wadah gulirnya, sama
+     seperti bar nav. Tanpa itu Tab maju meratakan baris ke tepi bawah dan FAB
+     menutupinya — terukur 13 Sep 2026: 63 baris Kelola Anggota tertutup 36%
+     (di overlay FAB tak pernah menyingkir: `useScrollHide` mendengar gulir
+     `window`, overlay menggulir wadahnya sendiri) dan "Hapus tarikan #20" di
+     Kas Hadiran tertutup 80%. */
+  const wadahRef = useRef<HTMLDivElement>(null);
+  useCadanganGulir(wadahRef, 'bawah');
+
   return (
     // Wrapper fixed TERPISAH dari tombol: translate3d + backface-hidden +
     // will-change PAKSA layer GPU stabil (pola sama dgn BottomNav/Header/
@@ -80,6 +90,7 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
     // bisa ditaruh inline di tombol: transform inline menimpa scale
     // .press:active sehingga efek tekan mati.
     <div
+      ref={wadahRef}
       className="fixed right-4 z-fab"
       style={{
         bottom: overNav

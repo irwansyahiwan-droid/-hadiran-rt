@@ -119,6 +119,14 @@ const VISUAL = [
      844x390 lebih tajam lagi tapi `manifest.orientation` = portrait, jadi ia
      cuma mengenai pemakai browser — tersedia lewat knob `H`, tidak di rantai. */
   ['sheet-pendek', 'node scripts/audit-sheet-geometri.mjs', { W: '360', H: '568' }],
+  /* §2.4.11 Focus Not Obscured (AA) + §2.4.12 (AAA, ambang app). Masuk rantai
+     13 Sep 2026 di hari lahirnya, bukan "nanti": `audit:papan-ketik` (yang
+     menguji jangkauan Tab) sengaja TIDAK di rantai ini, dan knob yang harus
+     diingat orang sama dgn knob yang tak ada. Garis dasar pertamanya 34
+     tertutup PENUH — Header sticky, bar nav, bar nav TUCKED yang tombolnya
+     tetap di urutan Tab, dan FAB — semuanya ditutup `useCadanganGulir`.
+     Sendirian ~5 menit (Tab maju + mundur, 32 layar, dua ukuran). */
+  ['fokus-tertutup', 'node scripts/audit-fokus-tertutup.mjs'],
   ['lompat', 'node scripts/audit-lompat.mjs'],
   ['gerak', 'node scripts/audit-gerak.mjs'],
   ['publik', 'node scripts/audit-publik.mjs'],
@@ -199,6 +207,10 @@ const LANTAI = {
   sentuh:           [/TARGET SENTUH @360px — (\d+) kontrol/, 390],
   sheet:            [/(\d+) permukaan diukur/, 12],
   'sheet-pendek':   [/(\d+) permukaan diukur/, 12],
+  /* Populasi = titik fokus UNIK yang dicapai Tab maju/mundur, dua ukuran.
+     Ia ikut DATA (Riwayat Aktivitas sendiri 209 titik), jadi lantai ~95% dari
+     garis dasar 2078 — kalau warga/transaksi bertambah, PERBARUI. */
+  'fokus-tertutup': [/(\d+) titik fokus diperiksa/, 1970],
   lompat:           [/(\d+) layar diukur/, 8],
   publik:           [/(\d+) halaman diperiksa/, 7],
   /* Populasi = berkas yang benar-benar diminta di kunjungan pertama.

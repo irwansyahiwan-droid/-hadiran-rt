@@ -7,6 +7,7 @@ import { useExitAnim } from '../../lib/hooks';
 import { useBasi } from '../../lib/basi';
 import { useBackDismiss } from '../../hooks/useBackDismiss';
 import { useScrolledPast } from '../../hooks/useScrollDirection';
+import { useCadanganGulir } from '../../hooks/useCadanganGulir';
 import { useOnline } from '../../hooks/useOnline';
 import Tag from '../Tag';
 import InfoTip from '../InfoTip';
@@ -40,6 +41,10 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   useBackDismiss(menuOpen, () => setMenuOpen(false));
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  /* Header sticky mencadangkan tingginya di `scroll-padding-top` viewport —
+     tanpa itu Shift+Tab menggulir elemen fokus tepat ke BAWAH header ini. */
+  const headerRef = useRef<HTMLElement>(null);
+  useCadanganGulir(headerRef, 'atas');
 
   /* Saat menu buka: fokus item pertama → pola menu WAI-ARIA (keyboard mulai di dalam).
      Dependensi WAJIB ikut `menuMounted`, bukan `menuOpen` saja. `useExitAnim`
@@ -101,6 +106,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
 
   return (
     <header
+      ref={headerRef}
       // Saat menu hidup: naik ke tier z-menu (45) di atas scrim portal z-scrim (42),
       // tetap di bawah overlay z-overlay — header ber-transform = stacking context
       // sendiri, jadi z-overlay milik dropdown tak bisa menembus keluar; tanpa bump

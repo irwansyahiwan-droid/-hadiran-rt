@@ -1,5 +1,7 @@
+import { useRef, useState } from 'react';
 import { haptic } from '../../lib/utils';
 import { useScrollHide } from '../../hooks/useScrollDirection';
+import { useCadanganGulir } from '../../hooks/useCadanganGulir';
 import { tabTerlihat, type TabName } from './tabs';
 
 /* Daftar tab & `labelTab` pindah ke `./tabs.ts` — berkas ini kini HANYA
@@ -23,10 +25,27 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
   // Auto-hide: scroll turun (masuk ke konten) → nav menyelinap turun keluar layar;
   // scroll naik → muncul lagi. Beri ruang baca list yg panjang. Dekat puncak (y<80)
   // selalu tampil. Listener scroll dibagi pakai (lihat hook).
-  const tucked = useScrollHide({ threshold: 80 });
+  const menyingkir = useScrollHide({ threshold: 80 });
+
+  /* FOKUS PAPAN KETIK MEMUNCULKANNYA — pola yang sama dgn Fab. Tab menggulir
+     halaman turun, gulir menyelipkan bar ini keluar layar, dan tombolnya TETAP
+     di urutan Tab: terukur 13 Sep 2026, tombol-tombol tab mendapat fokus di
+     y=852 pada layar 844px — 100% tak terlihat, di kedua peran (65 titik
+     `DI LUAR LAYAR` di `audit:fokus-tertutup`). Fokus yang mendarat di sini
+     harus menariknya kembali, bukan diantar ke tombol yang tak kelihatan. */
+  const [fokus, setFokus] = useState(false);
+  const tucked = menyingkir && !fokus;
+
+  /* Bar ini mencadangkan tingginya di `scroll-padding-bottom` viewport: Tab
+     maju meratakan elemen fokus ke tepi BAWAH, yang diduduki bar ini. */
+  const navRef = useRef<HTMLElement>(null);
+  useCadanganGulir(navRef, 'bawah');
 
   return (
     <nav
+      ref={navRef}
+      onFocus={() => setFokus(true)}
+      onBlur={() => setFokus(false)}
       // Bar DOK bawah — permintaan user (4 Agu 2026): "kembalikan seperti awal,
       // bukan kapsul, seperti di app Google". Kapsul melayang ala GitHub Mobile
       // (3 Agu) DIBATALKAN; ini kembali ke bentuk 2 Jul: bar penuh NEMPEL tepi

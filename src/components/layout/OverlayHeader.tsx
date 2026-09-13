@@ -1,7 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { haptic } from '../../lib/utils';
+import { useCadanganGulir } from '../../hooks/useCadanganGulir';
 
 /**
  * Header satu-baris untuk halaman OVERLAY (Riwayat Aktivitas, Kelola Anggota,
@@ -29,8 +30,13 @@ export default function OverlayHeader({
   onBack: () => void;
   actions?: ReactNode;
 }) {
+  /* Wadah gulirnya OVERLAY, bukan viewport — hook mencari scroller terdekat,
+     jadi overlay baru ikut aman tanpa satu baris pun di call-site-nya. */
+  const ref = useRef<HTMLElement>(null);
+  useCadanganGulir(ref, 'atas');
   return (
     <header
+      ref={ref}
       className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-line dark:border-gray-800"
       style={{
         paddingTop: 'env(safe-area-inset-top)',
