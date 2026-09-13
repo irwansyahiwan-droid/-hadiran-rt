@@ -23,6 +23,9 @@ import ExportMenu from '../components/ExportMenu';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useJagaIsian } from '../hooks/useJagaIsian';
+import { useGalatKolom } from '../hooks/useGalatKolom';
+import GalatKolom from '../components/GalatKolom';
 import { showToast, showUndo } from '../lib/toast';
 import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
@@ -51,12 +54,20 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const [tanggal, setTanggal] = useState(() => (initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
   const [kategori, setKategori] = useState<string>(initial?.kategori ?? kategoriDefault(initial?.tipe ?? 'masuk'));
   const [saving, setSaving, sedangSimpan] = useSaving();
-  const drag = useDragDismiss(onClose);
-  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() →
-  // sheet meluncur keluar, bukan lenyap. Back HP didaftarkan DI SINI (bukan
-  // parent) agar ikut jalur luncur yang sama.
-  useBackDismiss(true, drag.dismiss);
-  const dlg = useDialog(true, { onClose: drag.dismiss, label: isEdit ? 'Edit transaksi Kas RT' : 'Tambah transaksi Kas RT' });
+  const galat = useGalatKolom();
+  /* Isian yang sudah diubah tak boleh terbuang tanpa tanya — lihat useJagaIsian.
+     Pembandingnya potret SAAT DIBUKA, jadi mode edit yang belum disentuh tetap
+     tertutup langsung. */
+  const [awal] = useState(() => ({ tipe, nominal, keterangan, tanggal, kategori }));
+  const berubah = tipe !== awal.tipe || nominal !== awal.nominal || keterangan !== awal.keterangan
+    || tanggal !== awal.tanggal || kategori !== awal.kategori;
+  const jaga = useJagaIsian(berubah, () => drag.dismiss());
+  const drag = useDragDismiss(onClose, { cegahTutup: jaga.cegahTutup });
+  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat jaga.mintaTutup →
+  // bertanya dulu kalau isian berubah, lalu dismiss() → sheet meluncur keluar.
+  // Back HP didaftarkan DI SINI (bukan parent) agar ikut jalur yang sama.
+  useBackDismiss(jaga.backAktif, jaga.mintaTutup);
+  const dlg = useDialog(true, { onClose: jaga.mintaTutup, label: isEdit ? 'Edit transaksi Kas RT' : 'Tambah transaksi Kas RT' });
 
   // Ganti tipe → pastikan kategori tetap valid utk tipe baru (set default bila tidak).
   function pilihTipe(t: Tipe) {
@@ -70,7 +81,13 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
        berlaku SETELAH React me-render; dua ketukan di task yang sama masuk ke
        sini dua kali sebelum itu. Terukur 19 Agu: satu ketukan ganda mengirim
        DUA `POST kas_rt` — dua transaksi untuk satu niat. */
-    if (!nominal || sedangSimpan()) return;
+    /* Simpan tak lagi MATI saat kosong: tombol mati tak menjelaskan apa pun.
+       Urutan = urutan kolom di layar, supaya fokus mendarat di kolom kosong
+       PERTAMA yang dilihat mata. */
+    if (!keterangan.trim()) return galat.tampilkan('kasrt-keterangan', 'Isi keterangannya dulu — transaksi belum tersimpan.');
+    if (!nominal) return galat.tampilkan('kasrt-nominal', 'Isi nominalnya dulu — transaksi belum tersimpan.');
+    if (!tanggal) return galat.tampilkan('kasrt-tanggal', 'Isi tanggalnya dulu — transaksi belum tersimpan.');
+    if (sedangSimpan()) return;
     setSaving(true);
     try {
       await onSave({ tipe, nominal, keterangan, tanggal, kategori });
@@ -87,7 +104,8 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
     : tipe === 'masuk' ? saldoSekarang + nominal : saldoSekarang - nominal;
 
   return (
-    <div className="fixed inset-0 z-overlay flex items-end" onClick={drag.dismiss}>
+    <>
+    <div className="fixed inset-0 z-overlay flex items-end" onClick={jaga.mintaTutup}>
       <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div
         ref={dlg.panelRef}
@@ -101,7 +119,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
         </div>
         <h3 className="text-subtitle font-bold text-ink dark:text-gray-100">{isEdit ? 'Edit Transaksi Kas RT' : 'Tambah Transaksi Kas RT'}</h3>
 
-        <form onSubmit={submit} className="space-y-3">
+        <form onSubmit={submit} noValidate className="space-y-3">
           {/* Tipe toggle */}
           <div className="grid grid-cols-2 gap-2">
             {(['masuk', 'keluar'] as Tipe[]).map((t) => (
@@ -129,7 +147,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           {/* Kategori — untuk laporan pertanggungjawaban (opsi ikut tipe) */}
           <div>
             <label htmlFor="kasrt-kategori" className="label-field">Kategori</label>
-            <select id="kasrt-kategori" name="kategori" value={kategori} onChange={(e) => setKategori(e.target.value)} required
+            <select id="kasrt-kategori" name="kategori" value={kategori} onChange={(e) => setKategori(e.target.value)}
               className="field">
               {kategoriOpsi(tipe).map((o) => (
                 <option key={o.key} value={o.key}>{o.label}</option>
@@ -145,11 +163,12 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
               autoComplete="off"
               type="text"
               value={keterangan}
-              onChange={(e) => setKeterangan(e.target.value)}
-              required
+              onChange={(e) => { setKeterangan(e.target.value); galat.hapus('kasrt-keterangan'); }}
+              {...galat.aria('kasrt-keterangan')}
               placeholder="Contoh: Iuran warga bulan Juni…"
               className="field"
             />
+            <GalatKolom id="kasrt-keterangan-galat" pesan={galat.pesan('kasrt-keterangan')} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -164,11 +183,12 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                   type="text"
                   inputMode="numeric"
                   value={nominal ? nominal.toLocaleString('id-ID') : ''}
-                  onChange={(e) => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)}
-                  required
+                  onChange={(e) => { setNominal(Number(e.target.value.replace(/\D/g, '')) || 0); galat.hapus('kasrt-nominal'); }}
+                  {...galat.aria('kasrt-nominal')}
                   className="field pl-9 pr-3"
                 />
               </div>
+              <GalatKolom id="kasrt-nominal-galat" pesan={galat.pesan('kasrt-nominal')} />
             </div>
             <div>
               <label htmlFor="kasrt-tanggal" className="label-field">Tanggal</label>
@@ -177,10 +197,11 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 name="tanggal"
                 type="date"
                 value={tanggal}
-                onChange={(e) => setTanggal(e.target.value)}
-                required
+                onChange={(e) => { setTanggal(e.target.value); galat.hapus('kasrt-tanggal'); }}
+                {...galat.aria('kasrt-tanggal')}
                 className="field"
               />
+              <GalatKolom id="kasrt-tanggal-galat" pesan={galat.pesan('kasrt-tanggal')} />
             </div>
           </div>
 
@@ -220,14 +241,14 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
           <div className="flex gap-3 pt-1">
             <button
               type="button"
-              onClick={drag.dismiss}
+              onClick={jaga.mintaTutup}
               className="btn-secondary flex-1 py-3 rounded-xl"
             >
               Batal
             </button>
             <button
               type="submit"
-              disabled={saving || !nominal}
+              disabled={saving}
               className={`flex-1 py-3 text-white text-body font-semibold active:scale-[0.97] active:opacity-90 transition duration-ketuk flex items-center justify-center gap-2 ${
                 tipe === 'masuk' ? 'btn-brand' : 'btn-danger'
               }`}
@@ -239,6 +260,19 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
         </form>
       </div>
     </div>
+    {/* SAUDARA wadah sheet, bukan anaknya: klik di dalam dialog akan
+        menggelembung ke `onClick` wadah (jaga.mintaTutup) dan "Lanjut mengisi"
+        langsung membukanya lagi. */}
+    <ConfirmDestruktif
+      open={jaga.tanya}
+      title={isEdit ? 'Buang perubahan transaksi ini?' : 'Buang isian transaksi ini?'}
+      description={isEdit ? 'Transaksinya tetap seperti sebelum dibuka.' : 'Nominal dan keterangan yang sudah diketik belum tersimpan.'}
+      confirmLabel={isEdit ? 'Buang perubahan' : 'Buang isian'}
+      batalLabel="Lanjut mengisi"
+      onClose={jaga.lanjut}
+      onConfirm={jaga.buang}
+    />
+    </>
   );
 }
 

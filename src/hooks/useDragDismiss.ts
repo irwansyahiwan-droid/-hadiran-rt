@@ -21,13 +21,20 @@ const EXIT_MS = 300;     // ≈ transisi transform 0.32s — unmount SETELAH pan
  *   `dismiss()` diekspos agar tombol/backdrop/Escape memakai luncuran yang
  *   sama; `dismissing` untuk fade backdrop di call-site (.sheet-backdrop-out).
  */
-export function useDragDismiss(onClose: () => void) {
+export function useDragDismiss(onClose: () => void, opts?: {
+  /** Dipanggil saat seretan melewati ambang tutup. `true` = DITAHAN: panel
+   *  kembali ke tempatnya, bukan meluncur keluar (penjaga isian —
+   *  `useJagaIsian.cegahTutup`). Jalur `dismiss()` programatik tak ditanya. */
+  cegahTutup?: () => boolean;
+}) {
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [dismissing, setDismissing] = useState(false);
   const dismissingRef = useRef(false);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  const cegahRef = useRef(opts?.cegahTutup);
+  cegahRef.current = opts?.cegahTutup;
   const startY = useRef(0);
   const lastY = useRef(0);
   const lastT = useRef(0);
@@ -101,7 +108,7 @@ export function useDragDismiss(onClose: () => void) {
     armed.current = false;
 
     const flick = vel.current > VELOCITY; // bergerak ke bawah dgn cepat
-    if (offsetRef.current > DISMISS || (flick && offsetRef.current > 8)) {
+    if ((offsetRef.current > DISMISS || (flick && offsetRef.current > 8)) && !cegahRef.current?.()) {
       haptic(12);
       dismiss();                    // meneruskan luncuran dari posisi jari
       return;

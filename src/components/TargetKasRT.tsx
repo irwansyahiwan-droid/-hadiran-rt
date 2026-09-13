@@ -4,6 +4,10 @@ import { Target, Pencil, Trophy, CalendarClock, Plus, Trash2, PartyPopper } from
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useJagaIsian } from '../hooks/useJagaIsian';
+import { useGalatKolom } from '../hooks/useGalatKolom';
+import GalatKolom from './GalatKolom';
+import ConfirmDestruktif from './ConfirmDestruktif';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -224,18 +228,24 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
 
 // ── Sheet edit/set target ──────────────────────────────────
 function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: () => void; onSaved: () => void }) {
-  const drag = useDragDismiss(onClose);
-  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() → meluncur.
-  useBackDismiss(true, drag.dismiss);
-  const dlg = useDialog(true, { onClose: drag.dismiss, label: initial ? 'Ubah target Kas RT' : 'Tetapkan target Kas RT' });
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(initial?.tanggal ?? '');
   const [saving, setSaving, sedangSimpan] = useSaving();
+  const galat = useGalatKolom();
+  // Isian yang sudah diubah tak terbuang tanpa tanya — lihat useJagaIsian.
+  const [awal] = useState(() => ({ nominal, keterangan, tanggal }));
+  const berubah = nominal !== awal.nominal || keterangan !== awal.keterangan || tanggal !== awal.tanggal;
+  const jaga = useJagaIsian(berubah, () => drag.dismiss());
+  const drag = useDragDismiss(onClose, { cegahTutup: jaga.cegahTutup });
+  // Semua jalur tutup (backdrop, Escape, Back HP) lewat jaga.mintaTutup → tanya/meluncur.
+  useBackDismiss(jaga.backAktif, jaga.mintaTutup);
+  const dlg = useDialog(true, { onClose: jaga.mintaTutup, label: initial ? 'Ubah target Kas RT' : 'Tetapkan target Kas RT' });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nominal || sedangSimpan()) return;   // latch sinkron — lihat useSaving()
+    if (!nominal) return galat.tampilkan('target-nominal', 'Isi nominal targetnya dulu — target belum tersimpan.');
+    if (sedangSimpan()) return;   // latch sinkron — lihat useSaving()
     setSaving(true);
     const ok = await setTargetKasRT({ nominal, keterangan: keterangan.trim(), tanggal: tanggal || null });
     setSaving(false);
@@ -253,7 +263,8 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
   }
 
   return (
-    <div className="fixed inset-0 z-overlay flex items-end" onClick={drag.dismiss}>
+    <>
+    <div className="fixed inset-0 z-overlay flex items-end" onClick={jaga.mintaTutup}>
       <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div
         ref={dlg.panelRef}
@@ -267,7 +278,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
         </div>
         <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">{initial ? 'Ubah Target Kas RT' : 'Tetapkan Target Kas RT'}</h3>
 
-        <form onSubmit={submit} className="space-y-3">
+        <form onSubmit={submit} noValidate className="space-y-3">
           <div>
             <label htmlFor="target-nama" className="label-field">Nama Target</label>
             <input
@@ -293,11 +304,12 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
                   type="text"
                   inputMode="numeric"
                   value={nominal ? nominal.toLocaleString('id-ID') : ''}
-                  onChange={(e) => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)}
-                  required
+                  onChange={(e) => { setNominal(Number(e.target.value.replace(/\D/g, '')) || 0); galat.hapus('target-nominal'); }}
+                  {...galat.aria('target-nominal')}
                   className="field pl-9 pr-3"
                 />
               </div>
+              <GalatKolom id="target-nominal-galat" pesan={galat.pesan('target-nominal')} />
             </div>
             <div>
               <label htmlFor="target-tanggal" className="label-field">Batas Waktu</label>
@@ -325,7 +337,7 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
             )}
             <button
               type="submit"
-              disabled={saving || !nominal}
+              disabled={saving}
               className="btn-brand flex-1 py-3 text-body"
             >
               {saving ? 'Menyimpan…' : 'Simpan Target'}
@@ -334,5 +346,16 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
         </form>
       </div>
     </div>
+    {/* Saudara wadah, bukan anaknya — klik di dialog tak boleh menggelembung ke jaga.mintaTutup. */}
+    <ConfirmDestruktif
+      open={jaga.tanya}
+      title="Buang isian target ini?"
+      description="Nama, nominal, dan batas waktu target belum tersimpan."
+      confirmLabel="Buang isian"
+      batalLabel="Lanjut mengisi"
+      onClose={jaga.lanjut}
+      onConfirm={jaga.buang}
+    />
+    </>
   );
 }

@@ -13,6 +13,9 @@ interface Props {
   description: ReactNode;
   /** Label tombol merah, mis. "Batalkan" / "Hapus". */
   confirmLabel: string;
+  /** Label tombol pembatal. Bawaan "Batal"; penjaga isian memakai "Lanjut
+   *  mengisi" karena di sana "Batal" ambigu — membatalkan dialog, atau form? */
+  batalLabel?: string;
   /** Label saat proses berjalan, mis. "Membatalkan…". */
   loadingLabel?: string;
   icon?: LucideIcon;
@@ -44,6 +47,7 @@ export default function ConfirmDestruktif({
   title,
   description,
   confirmLabel,
+  batalLabel = 'Batal',
   loadingLabel = 'Memproses…',
   icon: Icon,
   typeToConfirm,
@@ -135,7 +139,7 @@ export default function ConfirmDestruktif({
 
         <div className="flex gap-3 mt-4">
           <button onClick={requestClose} disabled={loading} className="btn-secondary flex-1 py-3 rounded-xl disabled:opacity-60">
-            Batal
+            {batalLabel}
           </button>
           <button
             onClick={() => { haptic(20); onConfirm(); }}

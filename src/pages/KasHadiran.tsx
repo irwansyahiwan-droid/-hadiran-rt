@@ -7,6 +7,9 @@ import InfoTip from '../components/InfoTip';
 import SectionTitle from '../components/SectionTitle';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useJagaIsian } from '../hooks/useJagaIsian';
+import { useGalatKolom } from '../hooks/useGalatKolom';
+import GalatKolom from '../components/GalatKolom';
 import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
@@ -46,14 +49,25 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   // (kalau tidak, kolom SETOR di PDF alur kas kosong & total tak rekonsiliasi).
   const [tarikanId, setTarikanId] = useState<string>(() => tarikanOpsi[0]?.id ?? '');
   const [saving, setSaving, sedangSimpan] = useSaving();
-  const drag = useDragDismiss(onClose);
-  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat dismiss() → meluncur.
-  useBackDismiss(true, drag.dismiss);
-  const dlg = useDialog(true, { onClose: drag.dismiss, label: 'Setor ke Kas Besar RT' });
+  const galat = useGalatKolom();
+  // Isian yang sudah diubah tak terbuang tanpa tanya — lihat useJagaIsian.
+  const [awal] = useState(() => ({ nominal, keterangan, tanggal, tarikanId }));
+  const berubah = nominal !== awal.nominal || keterangan !== awal.keterangan
+    || tanggal !== awal.tanggal || tarikanId !== awal.tarikanId;
+  const jaga = useJagaIsian(berubah, () => drag.dismiss());
+  const drag = useDragDismiss(onClose, { cegahTutup: jaga.cegahTutup });
+  // Semua jalur tutup (backdrop, Batal, Escape, Back HP) lewat jaga.mintaTutup → tanya/meluncur.
+  useBackDismiss(jaga.backAktif, jaga.mintaTutup);
+  const dlg = useDialog(true, { onClose: jaga.mintaTutup, label: 'Setor ke Kas Besar RT' });
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nominal || sedangSimpan()) return;   // latch sinkron — lihat useSaving()
+    // Urutan = urutan kolom di layar (fokus ke kolom kosong PERTAMA).
+    if (!tarikanId) return galat.tampilkan('kashadiran-tarikan', 'Pilih tarikannya dulu — setoran belum tercatat.');
+    if (!keterangan.trim()) return galat.tampilkan('kashadiran-keterangan', 'Isi keterangannya dulu — setoran belum tercatat.');
+    if (!nominal) return galat.tampilkan('kashadiran-nominal', 'Isi nominalnya dulu — setoran belum tercatat.');
+    if (!tanggal) return galat.tampilkan('kashadiran-tanggal', 'Isi tanggalnya dulu — setoran belum tercatat.');
+    if (sedangSimpan()) return;   // latch sinkron — lihat useSaving()
     setSaving(true);
     try {
       await onSave({ nominal, keterangan, tanggal, tarikan_id: tarikanId || null });
@@ -63,7 +77,8 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   }
 
   return (
-    <div className="fixed inset-0 z-overlay flex items-end" onClick={drag.dismiss}>
+    <>
+    <div className="fixed inset-0 z-overlay flex items-end" onClick={jaga.mintaTutup}>
       <div className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} />
       <div ref={dlg.panelRef} {...dlg.panelProps} className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4 max-h-[90dvh] overflow-y-auto" onClick={e => e.stopPropagation()} style={drag.style}>
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
@@ -75,10 +90,11 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
             Saldo hadiran: <span className="font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{formatRupiahPlain(saldoHadiran)}</span>
           </p>
         </div>
-        <form onSubmit={submit} className="space-y-3">
+        <form onSubmit={submit} noValidate className="space-y-3">
           <div>
             <label htmlFor="kashadiran-tarikan" className="label-field">Dari tarikan</label>
-            <select id="kashadiran-tarikan" name="tarikan" value={tarikanId} onChange={e => setTarikanId(e.target.value)} required
+            <select id="kashadiran-tarikan" name="tarikan" value={tarikanId} onChange={e => { setTarikanId(e.target.value); galat.hapus('kashadiran-tarikan'); }}
+              {...galat.aria('kashadiran-tarikan')}
               className="field">
               {tarikanOpsi.length === 0 && <option value="">— belum ada tarikan selesai —</option>}
               {tarikanOpsi.map(t => (
@@ -87,12 +103,15 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
                 </option>
               ))}
             </select>
+            <GalatKolom id="kashadiran-tarikan-galat" pesan={galat.pesan('kashadiran-tarikan')} />
           </div>
           <div>
             <label htmlFor="kashadiran-keterangan" className="label-field">Keterangan</label>
-            <input id="kashadiran-keterangan" name="keterangan" autoComplete="off" type="text" value={keterangan} onChange={e => setKeterangan(e.target.value)} required
+            <input id="kashadiran-keterangan" name="keterangan" autoComplete="off" type="text" value={keterangan} onChange={e => { setKeterangan(e.target.value); galat.hapus('kashadiran-keterangan'); }}
+              {...galat.aria('kashadiran-keterangan')}
               placeholder="Contoh: Setoran bulan Mei 2026…"
               className="field" />
+            <GalatKolom id="kashadiran-keterangan-galat" pesan={galat.pesan('kashadiran-keterangan')} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -100,20 +119,24 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-500 dark:text-gray-400">Rp</span>
                 <input id="kashadiran-nominal" name="nominal" autoComplete="off" type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
-                  onChange={e => setNominal(Number(e.target.value.replace(/\D/g, '')) || 0)} required
+                  onChange={e => { setNominal(Number(e.target.value.replace(/\D/g, '')) || 0); galat.hapus('kashadiran-nominal'); }}
+                  {...galat.aria('kashadiran-nominal')}
                   className="field pl-9 pr-3" />
               </div>
+              <GalatKolom id="kashadiran-nominal-galat" pesan={galat.pesan('kashadiran-nominal')} />
             </div>
             <div>
               <label htmlFor="kashadiran-tanggal" className="label-field">Tanggal</label>
-              <input id="kashadiran-tanggal" name="tanggal" type="date" value={tanggal} onChange={e => setTanggal(e.target.value)} required
+              <input id="kashadiran-tanggal" name="tanggal" type="date" value={tanggal} onChange={e => { setTanggal(e.target.value); galat.hapus('kashadiran-tanggal'); }}
+                {...galat.aria('kashadiran-tanggal')}
                 className="field" />
+              <GalatKolom id="kashadiran-tanggal-galat" pesan={galat.pesan('kashadiran-tanggal')} />
             </div>
           </div>
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={drag.dismiss}
+            <button type="button" onClick={jaga.mintaTutup}
               className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
-            <button type="submit" disabled={saving || !nominal}
+            <button type="submit" disabled={saving}
               className="btn-brand flex-1 py-3 text-body active:scale-[0.97] transition flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
               {saving ? 'Menyimpan…' : 'Setor'}
@@ -122,6 +145,17 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
         </form>
       </div>
     </div>
+    {/* Saudara wadah, bukan anaknya — klik di dialog tak boleh menggelembung ke jaga.mintaTutup. */}
+    <ConfirmDestruktif
+      open={jaga.tanya}
+      title="Buang isian setoran ini?"
+      description="Setoran ke Kas RT belum tercatat."
+      confirmLabel="Buang isian"
+      batalLabel="Lanjut mengisi"
+      onClose={jaga.lanjut}
+      onConfirm={jaga.buang}
+    />
+    </>
   );
 }
 

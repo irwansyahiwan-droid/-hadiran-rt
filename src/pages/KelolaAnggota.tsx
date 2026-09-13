@@ -20,6 +20,10 @@ import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
+import { useJagaIsian } from '../hooks/useJagaIsian';
+import { useGalatKolom } from '../hooks/useGalatKolom';
+import GalatKolom from '../components/GalatKolom';
+import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import { useDragDismiss } from '../hooks/useDragDismiss';
 import { useClosePhase } from '../hooks/useClosePhase';
 import type { Warga, Tarikan } from '../lib/types';
@@ -51,11 +55,19 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   const [saving, setSaving, sedangSimpan] = useSaving();
   // Pengaman: anggota yang dinonaktifkan tapi masih punya jadwal tarikan ke depan
   const [jadwalNonaktif, setJadwalNonaktif] = useState<number[] | null>(null);
+  const galat = useGalatKolom();
+  /* Isian yang sudah diubah tak terbuang tanpa tanya — lihat useJagaIsian.
+     Pilihan tarikan susulan (`pilih`) cuma disimpan kalau `susulan` menyala,
+     jadi menyalakan `susulan` sendiri sudah dihitung berubah. */
+  const [awal] = useState(() => ({ nama, noRumah, noHp, role, aktif }));
+  const berubah = nama !== awal.nama || noRumah !== awal.noRumah || noHp !== awal.noHp
+    || role !== awal.role || aktif !== awal.aktif || susulan;
   // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
-  // lewat drag.dismiss (handlers tak disebar; panel form scrollable).
-  const drag = useDragDismiss(onClose);
-  useBackDismiss(true, drag.dismiss);
-  const dlg = useDialog(true, { onClose: drag.dismiss, label: mode === 'edit' ? 'Edit anggota' : 'Tambah anggota' });
+  // lewat jaga.mintaTutup → tanya dulu kalau berubah, lalu drag.dismiss.
+  const jaga = useJagaIsian(berubah, () => drag.dismiss());
+  const drag = useDragDismiss(onClose, { cegahTutup: jaga.cegahTutup });
+  useBackDismiss(jaga.backAktif, jaga.mintaTutup);
+  const dlg = useDialog(true, { onClose: jaga.mintaTutup, label: mode === 'edit' ? 'Edit anggota' : 'Tambah anggota' });
 
   const kasNaik = pilih.size * 5000;
 
@@ -69,7 +81,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   }
 
   async function simpan(forceNonaktif = false) {
-    if (!nama.trim()) { showToast('Nama anggota wajib diisi', 'error'); return; }
+    if (!nama.trim()) return galat.tampilkan('anggota-nama', 'Isi nama anggotanya dulu — anggota belum tersimpan.');
     if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     // Pengaman: menonaktifkan anggota yang masih jadi Sohibul di tarikan ke depan
     if (mode === 'edit' && initial && initial.status_aktif && !aktif && !forceNonaktif) {
@@ -122,8 +134,9 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   const label = 'label-field';
 
   return (
+    <>
     <div className="fixed inset-0 z-modal flex items-end sm:items-center justify-center">
-      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
+      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={jaga.mintaTutup} />
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
@@ -142,7 +155,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
               {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
             </p>
           </div>
-          <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -151,7 +164,8 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             berisi data warga LAIN, sedangkan token autofill menawarkan identitas
             PEMILIK HP — bendahara yang mengetik "Ah…" disodori namanya sendiri. */}
         <label htmlFor="anggota-nama" className={label}>Nama Lengkap</label>
-        <input id="anggota-nama" name="nama" autoComplete="off" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Nama warga…" className={`${input} mb-4`} />
+        <input id="anggota-nama" name="nama" autoComplete="off" value={nama} onChange={(e) => { setNama(e.target.value); galat.hapus('anggota-nama'); }} {...galat.aria('anggota-nama')} placeholder="Nama warga…" className={input} />
+        <div className="mb-4"><GalatKolom id="anggota-nama-galat" pesan={galat.pesan('anggota-nama')} /></div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
@@ -271,14 +285,14 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
         <div className="flex gap-3">
           <button
-            onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : drag.dismiss}
+            onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : jaga.mintaTutup}
             className="btn-secondary flex-1 py-3 rounded-full"
           >
             Batal
           </button>
           <button
             onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
-            disabled={saving || !nama.trim()}
+            disabled={saving}
             className={`flex-1 py-3 rounded-full text-white text-body font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
               /* btn-danger, bukan bg-rose-600 tangan: satu sumber CTA merah →
                  ikut state nonaktif ber-fill abu (label tetap terbaca). */
@@ -295,6 +309,16 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         </div>
       </div>
     </div>
+    <ConfirmDestruktif
+      open={jaga.tanya}
+      title={mode === 'edit' ? `Buang perubahan data ${initial?.nama ?? 'anggota'}?` : 'Buang isian anggota baru?'}
+      description={mode === 'edit' ? 'Datanya tetap seperti sebelum dibuka.' : 'Nama, no. rumah, dan no. HP yang sudah diketik belum tersimpan.'}
+      confirmLabel={mode === 'edit' ? 'Buang perubahan' : 'Buang isian'}
+      batalLabel="Lanjut mengisi"
+      onClose={jaga.lanjut}
+      onConfirm={jaga.buang}
+    />
+    </>
   );
 }
 

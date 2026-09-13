@@ -24,6 +24,9 @@ import { fetchAbsensiTersimpan } from '../lib/absensiTersimpan';
 import { hitungUlangNomorJadwal } from '../lib/jadwalNomor';
 import { openWa, pesanTarikan } from '../lib/waReminder';
 import { useBackDismiss } from '../hooks/useBackDismiss';
+import { useJagaIsian } from '../hooks/useJagaIsian';
+import { useGalatKolom } from '../hooks/useGalatKolom';
+import GalatKolom from '../components/GalatKolom';
 
 /* Lantai tinggi hero (px) — pola HERO_MIN_H KasHadiran/KasRT/Talangan/JadwalWarga.
    WAJIB diukur ulang tiap anatomi hero berubah: ia menahan tinggi saat isinya
@@ -118,7 +121,13 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   const [loadingAbsensi, setLoadingAbsensi] = useState(true);
   const [absensiError, setAbsensiError] = useState(false);
   const [muatUlang, setMuatUlang] = useState(0);
-  useBackDismiss(true, onBack); // tombol Back HP keluar dari editor absensi
+  /* Potret tandaan SAAT DIMUAT — pembanding penjaga isian. Taruhan tertinggi
+     di app: Back HP di tengah menandai puluhan anggota dulu membuang semuanya
+     tanpa tanya. `null` selama memuat/gagal = belum ada yang bisa hilang. */
+  const [mapAwal, setMapAwal] = useState<AbsensiMap | null>(null);
+  const berubah = mapAwal !== null && Object.keys(map).some((id) => map[id] !== mapAwal[id]);
+  const jaga = useJagaIsian(berubah, onBack);
+  useBackDismiss(jaga.backAktif, jaga.mintaTutup); // tombol Back HP keluar dari editor absensi
 
   useEffect(() => {
     async function loadExisting() {
@@ -146,11 +155,13 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         if (sohibulId) init[sohibulId] = 'hadir';
         setAbsensiError(false);
         setMap(init);
+        setMapAwal(init);
       } else {
         const init: AbsensiMap = {};
         wargaList.forEach(w => { init[w.id] = 'tidak_hadir'; });
         if (sohibulId) init[sohibulId] = 'hadir';
         setMap(init);
+        setMapAwal(init);
       }
       setLoadingAbsensi(false);
     }
@@ -258,7 +269,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       <div className="space-y-8 pb-2">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => { haptic(); onBack(); }}
+            onClick={() => { haptic(); jaga.mintaTutup(); }}
             aria-label="Kembali"
             className="press w-9 h-9 rounded-xl border border-line dark:border-gray-800/60 flex items-center justify-center shrink-0"
           >
@@ -314,7 +325,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
     <div className={`space-y-8 ${tarikan.status === 'selesai' ? 'pb-28' : 'pb-14'}`}>
       {/* Back header */}
       <div className="flex items-center gap-3">
-        <button onClick={onBack} aria-label="Kembali" className="press w-11 h-11 -ml-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <button onClick={jaga.mintaTutup} aria-label="Kembali" className="press w-11 h-11 -ml-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
           <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
         <div>
@@ -542,6 +553,15 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         onClose={() => setConfirmCancel(false)}
         onConfirm={batalkan}
       />
+      <ConfirmDestruktif
+        open={jaga.tanya}
+        title="Keluar tanpa menyimpan absensi?"
+        description={`Tanda hadir yang sudah diubah untuk tarikan #${tarikan.nomor} belum tersimpan.`}
+        confirmLabel="Keluar"
+        batalLabel="Lanjut mengisi"
+        onClose={jaga.lanjut}
+        onConfirm={jaga.buang}
+      />
     </div>
   );
 }
@@ -691,14 +711,20 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   const [tanggal, setTanggal] = useState((tarikan.tanggal ?? '').slice(0, 10));
   const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
   const [saving, setSaving, sedangSimpan] = useSaving();
+  const galat = useGalatKolom();
+  // Revisi yang sudah diubah tak terbuang tanpa tanya — lihat useJagaIsian.
+  const [awal] = useState(() => ({ tanggal, sohibulId }));
+  const berubah = tanggal !== awal.tanggal || sohibulId !== awal.sohibulId;
+  const jaga = useJagaIsian(berubah, () => drag.dismiss());
   // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
-  // lewat drag.dismiss. Handlers disebar HANYA di batang handle, bukan di panel:
+  // lewat jaga.mintaTutup → tanya dulu kalau berubah, lalu drag.dismiss.
+  // Handlers disebar HANYA di batang handle, bukan di panel:
   // panelnya form yang bisa di-scroll, dan itulah sebabnya sheet form KasRT &
   // KasHadiran juga memasang handle — batang itu satu-satunya tanda visual bahwa
   // lembar ini bisa disapu turun.
-  const drag = useDragDismiss(onClose);
-  useBackDismiss(true, drag.dismiss);
-  const dlg = useDialog(true, { onClose: drag.dismiss, label: `Revisi jadwal tarikan #${tarikan.nomor}` });
+  const drag = useDragDismiss(onClose, { cegahTutup: jaga.cegahTutup });
+  useBackDismiss(jaga.backAktif, jaga.mintaTutup);
+  const dlg = useDialog(true, { onClose: jaga.mintaTutup, label: `Revisi jadwal tarikan #${tarikan.nomor}` });
 
   // Pastikan sohibul saat ini tetap muncul di dropdown walau tidak aktif lagi
   const options = useMemo(() => {
@@ -710,6 +736,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   }, [wargaList, tarikan.sohibul_bait]);
 
   async function simpan() {
+    if (!tanggal) return galat.tampilkan('jadwal-edit-tanggal', 'Isi tanggal tarikannya dulu — jadwal belum tersimpan.');
     if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     setSaving(true);
     try {
@@ -738,8 +765,9 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   }
 
   return (
+    <>
     <div className="fixed inset-0 z-overlay flex items-end sm:items-center justify-center">
-      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
+      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={jaga.mintaTutup} />
       <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90dvh] overflow-y-auto">
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
@@ -749,7 +777,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
             <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
           </div>
-          <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -760,9 +788,11 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           name="tanggal-tarikan"
           type="date"
           value={tanggal}
-          onChange={e => setTanggal(e.target.value)}
-          className="field mb-4"
+          onChange={e => { setTanggal(e.target.value); galat.hapus('jadwal-edit-tanggal'); }}
+          {...galat.aria('jadwal-edit-tanggal')}
+          className="field"
         />
+        <div className="mb-4"><GalatKolom id="jadwal-edit-tanggal-galat" pesan={galat.pesan('jadwal-edit-tanggal')} /></div>
 
         <label htmlFor="jadwal-edit-sohibul" className="label-field">Sohibul Bait</label>
         <select
@@ -780,14 +810,14 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
 
         <div className="flex gap-3">
           <button
-            onClick={drag.dismiss}
+            onClick={jaga.mintaTutup}
             className="btn-secondary flex-1 py-3 rounded-xl"
           >
             Batal
           </button>
           <button
             onClick={() => { haptic(12); simpan(); }}
-            disabled={saving || !tanggal}
+            disabled={saving}
             className="btn-brand flex-1 py-3 text-body flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
@@ -796,6 +826,16 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         </div>
       </div>
     </div>
+    <ConfirmDestruktif
+      open={jaga.tanya}
+      title={`Buang revisi tarikan #${tarikan.nomor}?`}
+      description={`Jadwal tarikan #${tarikan.nomor} tetap seperti sebelum dibuka.`}
+      confirmLabel="Buang revisi"
+      batalLabel="Lanjut mengisi"
+      onClose={jaga.lanjut}
+      onConfirm={jaga.buang}
+    />
+    </>
   );
 }
 
@@ -809,15 +849,20 @@ interface TambahTarikanModalProps {
 }
 
 function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
-  // Exit meluncur — pola sama dgn EditTarikanModal di atas.
-  const drag = useDragDismiss(onClose);
-  const dlg = useDialog(true, { onClose: drag.dismiss, label: `Tambah jadwal tarikan #${nextNomor}` });
   const [tanggal, setTanggal] = useState(() => new Date().toISOString().slice(0, 10));
   const [sohibulId, setSohibulId] = useState('');
   const [saving, setSaving, sedangSimpan] = useSaving();
-  useBackDismiss(true, drag.dismiss);
+  const galat = useGalatKolom();
+  // Exit meluncur + penjaga isian — pola sama dgn EditTarikanModal di atas.
+  const [awal] = useState(() => ({ tanggal, sohibulId }));
+  const berubah = tanggal !== awal.tanggal || sohibulId !== awal.sohibulId;
+  const jaga = useJagaIsian(berubah, () => drag.dismiss());
+  const drag = useDragDismiss(onClose, { cegahTutup: jaga.cegahTutup });
+  const dlg = useDialog(true, { onClose: jaga.mintaTutup, label: `Tambah jadwal tarikan #${nextNomor}` });
+  useBackDismiss(jaga.backAktif, jaga.mintaTutup);
 
   async function simpan() {
+    if (!tanggal) return galat.tampilkan('jadwal-add-tanggal', 'Isi tanggal tarikannya dulu — jadwal belum tersimpan.');
     if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
     setSaving(true);
     try {
@@ -844,8 +889,9 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
   }
 
   return (
+    <>
     <div className="fixed inset-0 z-overlay flex items-end sm:items-center justify-center">
-      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={drag.dismiss} />
+      <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={jaga.mintaTutup} />
       <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90dvh] overflow-y-auto">
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
@@ -855,7 +901,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
             <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
           </div>
-          <button onClick={drag.dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+          <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -866,9 +912,11 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           name="tanggal-tarikan"
           type="date"
           value={tanggal}
-          onChange={e => setTanggal(e.target.value)}
-          className="field mb-4"
+          onChange={e => { setTanggal(e.target.value); galat.hapus('jadwal-add-tanggal'); }}
+          {...galat.aria('jadwal-add-tanggal')}
+          className="field"
         />
+        <div className="mb-4"><GalatKolom id="jadwal-add-tanggal-galat" pesan={galat.pesan('jadwal-add-tanggal')} /></div>
 
         <label htmlFor="jadwal-add-sohibul" className="label-field">Sohibul Bait</label>
         <select
@@ -886,14 +934,14 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
 
         <div className="flex gap-3">
           <button
-            onClick={drag.dismiss}
+            onClick={jaga.mintaTutup}
             className="btn-secondary flex-1 py-3 rounded-xl"
           >
             Batal
           </button>
           <button
             onClick={() => { haptic(12); simpan(); }}
-            disabled={saving || !tanggal}
+            disabled={saving}
             className="btn-brand flex-1 py-3 text-body flex items-center justify-center gap-2"
           >
             {saving && <RefreshCw className="w-4 h-4 animate-spin" />}
@@ -902,6 +950,16 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         </div>
       </div>
     </div>
+    <ConfirmDestruktif
+      open={jaga.tanya}
+      title="Buang jadwal tarikan baru?"
+      description="Tanggal dan Sohibul Bait yang sudah dipilih belum tersimpan."
+      confirmLabel="Buang isian"
+      batalLabel="Lanjut mengisi"
+      onClose={jaga.lanjut}
+      onConfirm={jaga.buang}
+    />
+    </>
   );
 }
 
