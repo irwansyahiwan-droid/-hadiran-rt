@@ -341,7 +341,14 @@ for (const peran of ['warga', 'bendahara']) {
 
   await page.evaluate(() => window.scrollTo(0, 1500));
   await page.waitForTimeout(700);
-  await uji('sheet-detail-transaksi', klik(page, () => page.locator('button').filter({ hasText: /[+-]Rp/ })));
+  /* `:not([aria-expanded])` (13 Sep 2026): baris LIPATAN Beranda ("Tarikan #19
+     Talangan · 4 warga +Rp200.000") juga tombol berteks `+Rp`, tapi mengetuknya
+     MEMBUKA LIPATAN, bukan sheet detail. Begitu data hari itu menaruh grup
+     sejenis di puncak daftar, `.first()` mendarat di sana dan kedua peran
+     melapor PROBE CACAT "lapisan tak terbuka" — pemicu yang mengandaikan BENTUK
+     data berbohong begitu datanya berubah bentuk (pelajaran uji kontrol
+     `audit:huruf`). Alatnya yang dibetulkan, bukan Beranda. */
+  await uji('sheet-detail-transaksi', klik(page, () => page.locator('button:not([aria-expanded])').filter({ hasText: /[+-]Rp/ })));
 
   tabSekarang = 'Kas RT'; await keTab(page, 'Kas RT');
   /* `popover-urutan` PINDAH dari Beranda ke sini (24 Agu 2026). Cari + filter +
