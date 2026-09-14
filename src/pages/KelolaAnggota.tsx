@@ -148,9 +148,9 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
               {mode === 'add' ? 'Tambah Anggota' : 'Edit Anggota'}
-            </p>
+            </h3>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
               {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
             </p>
@@ -372,7 +372,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto`}>
+    <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
       <OverlayHeader
         icon={Users}
         title="Kelola Anggota"

@@ -774,7 +774,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</p>
+            <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</h3>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
           </div>
           <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -898,7 +898,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         </div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</p>
+            <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</h3>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
           </div>
           <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
