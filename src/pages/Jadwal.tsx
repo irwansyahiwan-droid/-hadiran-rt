@@ -1448,9 +1448,9 @@ export default function JadwalPage() {
             <div className="-mt-2 mb-3 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...rowDrag.handlers}>
               <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
-            <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">
+            <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">
               Tarikan #{rowTarikan.nomor} · {rowTarikan.sohibul_bait?.nama ?? '—'}
-            </p>
+            </h3>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(rowTarikan.tanggal)}</p>
             <div className="space-y-2 mt-4">
               {rowTarikan.status !== 'selesai' && (

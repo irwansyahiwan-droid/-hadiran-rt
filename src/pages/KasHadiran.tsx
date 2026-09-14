@@ -1165,7 +1165,7 @@ export default function KasHadiranPage() {
               <div className="flex items-center gap-3">
                 <AvatarPeci nama={detailTarikan.sohibul_bait?.nama ?? '?'} ukuran={11} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</p>
+                  <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight">Tarikan #{detailTarikan.nomor}</h3>
                   {/* TANPA potongan apa pun — bukan `truncate`, bukan juga
                       `.potong-lentur` (2 Sep 2026). Baris ini satu-satunya
                       tempat nama Sohibul Bait tampil UTUH: nama di baris daftar

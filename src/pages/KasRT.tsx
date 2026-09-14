@@ -755,7 +755,7 @@ export default function KasRTPage() {
         {!loading && list.length > 1 && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2">
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
-              <p className="text-body font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</p>
+              <h2 className="[font-family:inherit] [letter-spacing:normal] text-body font-bold text-ink dark:text-gray-100 mb-2">Tren Saldo</h2>
               <AreaTrend points={saldoSeries} />
               {/* Kaki grafik — sebelumnya kartu ini cuma garis: tanpa sumbu, tanpa
                   periode, tanpa nilai, dan AreaTrend aria-hidden → pembaca layar
@@ -778,7 +778,7 @@ export default function KasRTPage() {
             {monthly.length > 0 && (
               <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
                 <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
-                  <p className="text-body font-bold text-ink dark:text-gray-100">Masuk vs Keluar</p>
+                  <h2 className="[font-family:inherit] [letter-spacing:normal] text-body font-bold text-ink dark:text-gray-100">Masuk vs Keluar</h2>
                   {/* `flex-wrap` di GRUP-nya, bukan cuma di induk: ketiga chip
                       `shrink-0`, jadi saat teks 200% grupnya sendiri melebar ke
                       369px (> viewport 360) dan induk yang sudah wrap tak bisa
@@ -849,7 +849,7 @@ export default function KasRTPage() {
         {/* Rekap per kategori — untuk pertanggungjawaban */}
         {!loading && list.length > 0 && (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 mt-4">
-            <p className="text-body font-bold text-ink dark:text-gray-100 mb-3">Rekap per Kategori</p>
+            <h2 className="[font-family:inherit] [letter-spacing:normal] text-body font-bold text-ink dark:text-gray-100 mb-3">Rekap per Kategori</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Penerimaan */}
               <div className="inset-soft rounded-xl p-3">
@@ -1092,7 +1092,7 @@ export default function KasRTPage() {
             <div className="-mt-2 mb-3 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...rowDrag.handlers}>
               <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
-            <p className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</p>
+            <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</h3>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
             <div className="inset-soft rounded-2xl p-4 space-y-3 mt-3">
               <div className="flex items-center justify-between">
