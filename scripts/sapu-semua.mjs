@@ -92,6 +92,10 @@ const VISUAL = [
   ['kontras-nonteks', 'node scripts/audit-kontras-nonteks.mjs'],
   ['mati', 'node scripts/audit-mati.mjs'],
   ['nama', 'node scripts/audit-nama.mjs'],
+  /* Satu-satunya sapuan yang memakai PENUNJUK (14 Sep 2026): 48 dari 208
+     kontrol tak menjawab kursor di app yang sisanya sudah ber-hover. Masuk
+     rantai di hari lahirnya — knob yang harus diingat = knob yang tak ada. */
+  ['hover', 'node scripts/audit-hover.mjs'],
   ['huruf', 'node scripts/audit-huruf.mjs'],
   ['potong', 'node scripts/audit-potong.mjs'],
   /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
@@ -196,6 +200,9 @@ const LANTAI = {
   'kontras-nonteks':[/TOTAL\s+(\d+) sampel/, 700],
   mati:             [/(\d+) sampel, \d+ tombol unik/, 140],
   nama:             [/(\d+) kontrol di \d+ layar/, 500],
+  /* Populasi = kontrol UNIK (nama ternormalisasi × tema). Garis dasar 272–274;
+     lantai ~95%. */
+  hover:            [/(\d+) kontrol unik di \d+ layar/, 258],
   huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],
   /* 16 -> 20 layar (12 Sep 2026): sheet TUJUAN `data-ringkas` masuk populasi
      — syarat kedua penanda itu. Lantai ~95%. */
