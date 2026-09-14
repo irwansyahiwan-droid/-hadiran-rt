@@ -554,6 +554,10 @@
   </div>
 </header>
 
+<!-- Landmark <main> (14 Sep 2026): tanpa ini pembaca layar cuma menemukan
+     HEADER & FOOTER dan tak bisa melompat ke isi. Tak ada selektor struktural
+     (body >, section +) di CSS/JS halaman ini, jadi pembungkusnya tak menggeser apa pun. -->
+<main>
 <!-- ══════════ SHOWCASE — TANGKAPAN LAYAR ASLI (overlap hero) ══════════ -->
 <section class="shots">
   <div class="ph-row" data-snap data-hero style="animation-delay:.36s" role="region" aria-label="Tangkapan layar aplikasi, geser untuk melihat" tabindex="0">
@@ -750,6 +754,8 @@
     </div>
   </div>
 </section>
+
+</main>
 
 <footer>
   <div class="fcoin"><svg aria-hidden="true" viewBox="0 0 640 640"><use href="#coin"/></svg></div>

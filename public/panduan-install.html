@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="light" />
+<!-- Sama dgn kanvas halaman (body) & theme-color statis app — titik sinkron kanvas. -->
+<meta name="theme-color" content="#CFE6D8" />
 <title>Panduan Pasang Hadiran RT</title>
 <style>
   :root { color-scheme: light; }
@@ -44,7 +46,13 @@
   .header img { width: 60px; height: 60px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
   .header h1 { font-size: 22px; font-weight: 800; line-height: 1.1; }
   .header p { font-size: 13px; opacity: .85; margin-top: 4px; }
+  /* TAUTAN sungguhan sejak 14 Sep 2026 — dulu `<div>`, padahal langkah 1
+     berbunyi "Buka link di atas" dan halaman ini dibuka warga DI HP (ditautkan
+     dari landing & Warta). `display:block` + tanpa garis bawah menjaga rupa
+     poster persis sama. */
   .link {
+    display: block;
+    text-decoration: none;
     margin: 16px 0 22px;
     background: #fff;
     border: 1px solid #D3E0D8;
@@ -96,14 +104,15 @@
 <body>
   <div class="poster">
     <div class="header">
-      <img src="logo-rt.jpg" alt="Logo RT" />
+      <!-- alt kosong: judul di sebelahnya sudah menyuarakan nama yang sama (pola Header app). -->
+      <img src="logo-rt.jpg" alt="" width="60" height="60" />
       <div>
         <h1>Hadiran RT 004/006</h1>
         <p>Panduan Pasang Aplikasi di HP</p>
       </div>
     </div>
 
-    <div class="link"><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> hadiran-rt.vercel.app</div>
+    <a class="link" href="/"><svg class="i" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> hadiran-rt.vercel.app</a>
 
     <div class="card">
       <div class="card-title"><svg class="i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg> HP Android <span class="tag">Chrome</span></div>
