@@ -16,6 +16,13 @@
  *         (trek terang, kenop gelap). Kenop putih di trek terang gelap-mode
  *         jatuh ke ~2,4:1, jadi kenopnya yang dibalik, bukan treknya digelapkan.
  * Terburuk (hitungan token, lawan KEDUA latar pemakai): 4,55 · kenop 4,76.
+ *
+ * ── `left-0` WAJIB ─────────────────────────────────────────────────────────
+ * Kenop `absolute` tanpa `left` mengambil POSISI STATIS, dan <button>
+ * mewariskan `text-align: center` — di baris tanpa `text-left` kenopnya mulai
+ * dari TENGAH trek: saat mati duduk di kanan (terbaca "nyala"), saat nyala
+ * keluar 14px dari trek. Terukur di "Anggota aktif", dijaga bagian F.
+ * Geser 18px = celah 2px di KEDUA sisi (36 − 16 − 2).
  */
 export default function Sakelar({ nyala }: { nyala: boolean }) {
   return (
@@ -26,7 +33,7 @@ export default function Sakelar({ nyala }: { nyala: boolean }) {
     >
       <span
         data-sakelar-kenop=""
-        className={`absolute top-0.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 transition-transform ${nyala ? 'translate-x-4' : 'translate-x-0.5'}`}
+        className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 transition-transform ${nyala ? 'translate-x-[18px]' : 'translate-x-0.5'}`}
       />
     </span>
   );

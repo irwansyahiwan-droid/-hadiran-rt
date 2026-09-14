@@ -390,6 +390,19 @@ async function collectSakelar(page) {
         nama,
         warna: getComputedStyle(trek).backgroundColor,
         kenop: getComputedStyle(kenop).backgroundColor,
+        /* Kenop yang melewati tepi treknya: rasio warnanya tetap lolos, jadi
+           tanpa ini sapuan kontras hijau untuk sakelar yang terlihat patah. */
+        kenopLuar: (() => {
+          const t = trek.getBoundingClientRect(), k = kenop.getBoundingClientRect();
+          return Math.max(0, t.left - k.left, k.right - t.right, t.top - k.top, k.bottom - t.bottom);
+        })(),
+        /* Sisi kenop HARUS cocok dgn aria-checked: kenop di kanan saat mati
+           terbaca "nyala" oleh mata — dan pembaca layar mengatakan sebaliknya. */
+        kenopSalahSisi: (() => {
+          const t = trek.getBoundingClientRect(), k = kenop.getBoundingClientRect();
+          const kanan = (k.left + k.width / 2) > (t.left + t.width / 2);
+          return kanan !== (el.getAttribute('aria-checked') === 'true');
+        })(),
         opacity: opacityEfektif(trek),
         rect: rectOf(trek),
         tag: jejak(trek),
@@ -650,6 +663,16 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
     });
     sakelar.forEach((e, j) => {
       if (!sezaman('sakelar', e.i, e)) return;
+      /* Geometri, bukan rasio — tapi hidup di sini karena populasinya sama. Lahir
+         14 Sep 2026: "Anggota aktif" [nyala] kenopnya 16px di LUAR trek, sebab
+         `text-align: center` bawaan <button> menggeser posisi statis kenop
+         `absolute` tanpa `left`. Warnanya lolos 5,92:1. */
+      if (e.kenopLuar > 0.5) {
+        push({ jenis: 'sakelar', ctx: ctxName, nama: `${e.nama} · kenop keluar trek`, tag: e.tag, asal: `melewati tepi trek ${e.kenopLuar.toFixed(1)}px`, fg: '-', bg: '-', ratio: 0, need: NEED, pass: false });
+      }
+      if (e.kenopSalahSisi) {
+        push({ jenis: 'sakelar', ctx: ctxName, nama: `${e.nama} · kenop salah sisi`, tag: e.tag, asal: 'posisi kenop berlawanan dgn aria-checked', fg: '-', bg: '-', ratio: 0, need: NEED, pass: false });
+      }
       const res = nilaiIkon(e, sSakelar[j]);
       if (!res) { goyah.push(`${ctxName} sakelar "${e.nama}" latar tak terbaca`); return; }
       push({ jenis: 'sakelar', ctx: ctxName, nama: `${e.nama} · trek`, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });

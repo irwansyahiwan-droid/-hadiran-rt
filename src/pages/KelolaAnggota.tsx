@@ -205,12 +205,8 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
             aria-checked={aktif}
             className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark mb-4"
           >
-            <span className="text-body font-semibold text-gray-700 dark:text-gray-200">Status keanggotaan</span>
-            <span className={`text-caption font-semibold px-3 py-1 rounded-full ${
-              aktif ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
-            }`}>
-              {aktif ? 'Aktif' : 'Nonaktif'}
-            </span>
+            <span className="text-body font-semibold text-gray-700 dark:text-gray-200">Anggota aktif</span>
+            <Sakelar nyala={aktif} />
           </button>
         )}
 
