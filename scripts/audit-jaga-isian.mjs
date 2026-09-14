@@ -27,9 +27,15 @@
 //   A9 invarian — Back sesudahnya menghasilkan perubahan terlihat, tetap di app
 // B. GALAT INLINE: kolom wajib dikosongkan → Simpan → pesan di bawah kolomnya,
 //    fokus di kolom itu, NOL permintaan tulis.
+// C. HAPUS TARGET (14 Sep 2026): tombol Hapus di sheet target dulu langsung
+//    menghapus. Kini WAJIB bertanya; Back menutup DIALOG saja (sheet tetap),
+//    Batal tak mengirim apa pun. Tombol merahnya SENGAJA tak pernah diketuk.
+//    Tinggal di sini, bukan di `audit:mundur`, karena sapuan itu dikunci
+//    read-only dan sheet-nya memang sheet yang sama.
 //
-// BATAS YANG DIAKUI: mode EDIT transaksi Kas RT & edit anggota tak dibuka —
-// komponennya sama dgn mode tambah (satu `useJagaIsian`, beda kata saja).
+// Mode EDIT transaksi Kas RT & edit anggota masuk populasi 14 Sep 2026 —
+// sebelumnya diakui sbg BATAS ("komponen sama, kata beda"). Kata yang beda itu
+// persis yang tak pernah terukur.
 //
 // VALIDASI (tanpa flag MUTASI — mutasi yang bermakna ada di KODE APP, bukan di
 // halaman): (1) build SEBELUM penjaga → A2 merah di semua form; (2) mutasi
@@ -37,6 +43,8 @@
 // → A4 merah dgn tab berpindah. Dicatat di CLAUDE.md.
 //
 // Pakai:  npm run audit:jaga-isian     (bendahara di-MOCK, tulis DIBLOKIR 403)
+//   HANYA=target   → cuma form yang namanya cocok (regex, tak peka huruf) —
+//                    untuk validasi; populasi yang disaring DICETAK di ringkasan
 import { chromium } from 'playwright';
 import { newCtx, gotoTab, openMenuItem } from './lib/audit-harness.mjs';
 
@@ -107,6 +115,7 @@ const FORM = [
     kotori: (p) => p.fill('#target-nama', 'uji penjaga isian'),
     nilai: (p) => p.inputValue('#target-nama'), harap: 'uji penjaga isian',
     judul: /Buang isian target ini\?/, merah: /^Buang isian$/,
+    hapus: { tombol: /^Hapus$/, judul: /^Hapus target .+\?$/ },
     galat: { kosongkan: (p) => p.fill('#target-nominal', ''), simpan: /^Simpan Target$/, kolom: 'target-nominal', teks: /Isi nominal targetnya dulu — target belum tersimpan\./ },
   },
   {
@@ -141,6 +150,35 @@ const FORM = [
     galat: { kosongkan: (p) => p.fill('#jadwal-edit-tanggal', ''), simpan: /^Simpan Revisi$/, kolom: 'jadwal-edit-tanggal', teks: /Isi tanggal tarikannya dulu — jadwal belum tersimpan\./ },
   },
   {
+    nama: 'Kas RT · edit transaksi', tab: 'Kas RT', sheet: true,
+    buka: async (p) => {
+      // Sisa sheet aksi baris dari putaran sebelumnya menutupi pemicunya.
+      for (let i = 0; i < 3 && (await p.locator('[role="dialog"]').count()); i++) { await p.keyboard.press('Escape'); await p.waitForTimeout(500); }
+      const baris = p.getByRole('button', { name: /^Aksi:/ }).first();
+      if (!(await baris.count())) return null;
+      await baris.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      await p.waitForTimeout(300);
+      await baris.click({ force: true });
+      await p.waitForTimeout(900);
+      return p.locator('[role="dialog"] button').filter({ hasText: /^\s*Edit\s*$/ }).first();
+    },
+    tanda: '#kasrt-keterangan',
+    kotori: async (p) => p.fill('#kasrt-keterangan', `${await p.inputValue('#kasrt-keterangan')} uji`),
+    nilai: (p) => p.inputValue('#kasrt-keterangan'), harap: null,
+    judul: /Buang perubahan transaksi ini\?/, merah: /^Buang perubahan$/,
+    galat: { kosongkan: (p) => p.fill('#kasrt-keterangan', ''), simpan: /^Simpan Perubahan$/, kolom: 'kasrt-keterangan', teks: /Isi keterangannya dulu — transaksi belum tersimpan\./ },
+  },
+  {
+    nama: 'Kelola Anggota · edit', tab: null, overlay: 'Kelola Anggota', sheet: true,
+    // Barisnya sendiri tombol; penanda "bisa diubah" = ikon pensil di dalamnya.
+    buka: (p) => p.locator('[role="dialog"] button').filter({ has: p.locator('svg.lucide-pencil') }).first(),
+    tanda: '#anggota-nama',
+    kotori: async (p) => p.fill('#anggota-nama', `${await p.inputValue('#anggota-nama')} Uji`),
+    nilai: (p) => p.inputValue('#anggota-nama'), harap: null,
+    judul: /Buang perubahan data .+\?/, merah: /^Buang perubahan$/,
+    galat: { kosongkan: (p) => p.fill('#anggota-nama', ''), simpan: /^Simpan Perubahan$/, kolom: 'anggota-nama', teks: /Isi nama anggotanya dulu — anggota belum tersimpan\./ },
+  },
+  {
     nama: 'Kelola Anggota · tambah', tab: null, overlay: 'Kelola Anggota', sheet: true,
     buka: (p) => p.getByRole('button', { name: /Tambah anggota/i }).first(),
     tanda: '#anggota-nama',
@@ -170,7 +208,10 @@ const catat = (f, kode, ok, rinci) => { periksa++; if (!ok) temuan.push(`[${f.na
    populasi. Galatnya dicatat sbg PROBE CACAT bernama, bukan jejak tumpukan
    (pelajaran ke-20: sapuan yang berhenti di tengah = laporan yang tak mengaku). */
 let ctxAktif = null;
-for (const f of FORM) {
+const HANYA = process.env.HANYA ? new RegExp(process.env.HANYA, 'i') : null;
+const DIUJI = HANYA ? FORM.filter((f) => HANYA.test(f.nama)) : FORM;
+if (HANYA && !DIUJI.length) { console.log(`PROBE CACAT: HANYA=${process.env.HANYA} tak cocok dgn satu form pun`); process.exit(2); }
+for (const f of DIUJI) {
   try { await ujiForm(f); } catch (e) {
     await ctxAktif?.close().catch(() => {});
     temuan.push(`[${f.nama}] PROBE CACAT: ${String(e.message).split('\n')[0]}`);
@@ -340,6 +381,37 @@ async function ujiForm(f) {
     }
   }
 
+  // C — aksi merusak di dalam sheet WAJIB bertanya (tombol merah tak pernah diketuk).
+  if (f.hapus) {
+    const bukaUlang = (await keLayar()) && (await bukaForm());
+    const tombol = page.locator('[role="dialog"]').last().getByRole('button', { name: f.hapus.tombol });
+    if (!bukaUlang || !(await tombol.count())) {
+      // Tombol Hapus hanya ada kalau target SUDAH ada — ketiadaannya dicurigai, bukan diluluskan.
+      temuan.push(`[${f.nama}] PROBE CACAT: tombol Hapus tak ada (target belum ditetapkan di data?) — C tak diuji`); cacat++;
+    } else {
+      const dialogHapus = () => page.getByRole('dialog', { name: f.hapus.judul });
+      const tulisSebelum = tulis;
+      await tombol.click();
+      await page.waitForTimeout(JEDA);
+      const c1 = catat(f, 'C1', (await ada(dialogHapus())) && (await formAda()) && tulis === tulisSebelum,
+        `Hapus tak bertanya dulu (dialog: ${await dialogHapus().count()}, tulis: ${tulis - tulisSebelum})`);
+      // Tanpa dialog, C2–C3 cuma riak berantai dari C1 (terukur di validasi sebelum-perbaikan).
+      if (c1) {
+      await back(page);
+      catat(f, 'C2', !(await ada(dialogHapus())) && (await formAda()),
+        'Back pada dialog Hapus tak menutup dialognya saja (sheet ikut hilang / dialog bertahan)');
+      if (await formAda()) {
+        await page.locator('[role="dialog"]').last().getByRole('button', { name: f.hapus.tombol }).click();
+        await page.waitForTimeout(JEDA);
+        await page.getByRole('dialog', { name: f.hapus.judul }).getByRole('button', { name: /^Batal$/ }).click();
+        await page.waitForTimeout(JEDA);
+        catat(f, 'C3', !(await ada(dialogHapus())) && (await formAda()) && tulis === tulisSebelum,
+          `Batal pada dialog Hapus tak kembali ke sheet utuh (tulis: ${tulis - tulisSebelum})`);
+      }
+      }
+    }
+  }
+
   const milik = temuan.filter((t) => t.startsWith(`[${f.nama}]`));
   console.log(`\n### ${f.nama}${milik.length ? '' : '  OK'}`);
   milik.forEach((t) => console.log('  ⚠ ' + t.slice(f.nama.length + 3)));
@@ -348,5 +420,6 @@ async function ujiForm(f) {
 
 await browser.close();
 console.log(`\n=== JAGA ISIAN: ${form} form diperiksa · ${periksa} pemeriksaan · ${temuan.length} bermasalah · ${cacat} probe cacat ===`);
+if (HANYA) console.log(`  (DISARING HANYA=${process.env.HANYA}: ${DIUJI.length} dari ${FORM.length} form — bukan jalan penuh)`);
 if (cacat) process.exit(2);
 process.exit(temuan.length ? 1 : 0);
