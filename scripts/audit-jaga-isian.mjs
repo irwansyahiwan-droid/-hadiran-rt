@@ -26,7 +26,12 @@
 //   A8 Buang   — tombol merah → form tertutup
 //   A9 invarian — Back sesudahnya menghasilkan perubahan terlihat, tetap di app
 // B. GALAT INLINE: kolom wajib dikosongkan → Simpan → pesan di bawah kolomnya,
-//    fokus di kolom itu, NOL permintaan tulis.
+//    fokus di kolom itu, NOL permintaan tulis. B5 (14 Sep 2026): saat fokus
+//    MENDARAT, kolomnya sudah membawa `aria-describedby` & `aria-invalid` —
+//    pembaca layar membaca kolom pada peristiwa fokus, jadi atribut yang
+//    menyusul satu render kemudian tak pernah dibacakan. B6: Enter di kolom
+//    kosong yang SUDAH difokus (form ber-<form>) — tak ada peristiwa fokus sama
+//    sekali, jadi pesannya WAJIB masuk region live `polite` Toaster.
 // C. HAPUS TARGET (14 Sep 2026): tombol Hapus di sheet target dulu langsung
 //    menghapus. Kini WAJIB bertanya; Back menutup DIALOG saja (sheet tetap),
 //    Batal tak mengirim apa pun. Tombol merahnya SENGAJA tak pernah diketuk.
@@ -90,7 +95,7 @@ async function seret(page) {
 
 const FORM = [
   {
-    nama: 'Kas RT · tambah transaksi', tab: 'Kas RT', sheet: true,
+    nama: 'Kas RT · tambah transaksi', enterKirim: true, tab: 'Kas RT', sheet: true,
     buka: (p) => p.getByRole('button', { name: /Tambah transaksi Kas RT/i }).first(),
     tanda: '#kasrt-keterangan',
     kotori: (p) => p.fill('#kasrt-keterangan', 'uji penjaga isian'),
@@ -99,7 +104,7 @@ const FORM = [
     galat: { kosongkan: async () => {}, simpan: /^Simpan$/, kolom: 'kasrt-keterangan', teks: /Isi keterangannya dulu — transaksi belum tersimpan\./ },
   },
   {
-    nama: 'Kas Hadiran · setor', tab: 'Hadiran', sheet: true,
+    nama: 'Kas Hadiran · setor', enterKirim: true, tab: 'Hadiran', sheet: true,
     buka: (p) => p.getByRole('button', { name: /Setor ke Kas RT/i }).first(),
     tanda: '#kashadiran-keterangan',
     kotori: (p) => p.fill('#kashadiran-keterangan', 'uji penjaga isian'),
@@ -108,7 +113,7 @@ const FORM = [
     galat: { kosongkan: async () => {}, simpan: /^Setor$/, kolom: 'kashadiran-keterangan', teks: /Isi keterangannya dulu — setoran belum tercatat\./ },
   },
   {
-    nama: 'Kas RT · target', tab: 'Kas RT', sheet: true,
+    nama: 'Kas RT · target', enterKirim: true, tab: 'Kas RT', sheet: true,
     // Satu aksi, DUA wujud tergantung data (pelajaran ke-13).
     buka: (p) => p.getByRole('button', { name: /Ubah target|Tetapkan Target/i }).first(),
     tanda: '#target-nama',
@@ -150,7 +155,7 @@ const FORM = [
     galat: { kosongkan: (p) => p.fill('#jadwal-edit-tanggal', ''), simpan: /^Simpan Revisi$/, kolom: 'jadwal-edit-tanggal', teks: /Isi tanggal tarikannya dulu — jadwal belum tersimpan\./ },
   },
   {
-    nama: 'Kas RT · edit transaksi', tab: 'Kas RT', sheet: true,
+    nama: 'Kas RT · edit transaksi', enterKirim: true, tab: 'Kas RT', sheet: true,
     buka: async (p) => {
       // Sisa sheet aksi baris dari putaran sebelumnya menutupi pemicunya.
       for (let i = 0; i < 3 && (await p.locator('[role="dialog"]').count()); i++) { await p.keyboard.press('Escape'); await p.waitForTimeout(500); }
@@ -368,6 +373,12 @@ async function ujiForm(f) {
       await f.galat.kosongkan(page);
       await page.waitForTimeout(200);
       const tulisSebelum = tulis;
+      await page.evaluate(() => {
+        window.__fokusGalat = [];
+        document.addEventListener('focusin', (e) => {
+          window.__fokusGalat.push({ id: e.target.id, desc: e.target.getAttribute('aria-describedby'), invalid: e.target.getAttribute('aria-invalid') });
+        }, true);
+      });
       await page.locator('[role="dialog"]').last().getByRole('button', { name: f.galat.simpan }).click();
       await page.waitForTimeout(JEDA);
       const pesan = page.locator(`#${f.galat.kolom}-galat`);
@@ -378,6 +389,27 @@ async function ujiForm(f) {
       catat(f, 'B2', fokus === f.galat.kolom, `fokus tak pindah ke kolom kosong (fokus: ${fokus})`);
       catat(f, 'B3', aria === `${f.galat.kolom}-galat`, `aria-describedby kolom tak menunjuk pesannya (${aria})`);
       catat(f, 'B4', tulis === tulisSebelum, `form kosong tetap MENGIRIM ${tulis - tulisSebelum} permintaan tulis`);
+      const saatFokus = await page.evaluate((k) => window.__fokusGalat.filter((x) => x.id === k).pop() ?? null, f.galat.kolom);
+      catat(f, 'B5', saatFokus?.desc === `${f.galat.kolom}-galat` && saatFokus?.invalid === 'true',
+        `saat fokus MENDARAT kolom belum membawa pesannya (describedby: ${saatFokus?.desc ?? '—'}, invalid: ${saatFokus?.invalid ?? '—'}) — pembaca layar membaca kolom tanpa galat`);
+
+      if (f.enterKirim) {
+        // Galat dihapus lewat ketikan, kolom dikosongkan lagi, fokus TETAP di kolom, lalu Enter.
+        await page.fill(`#${f.galat.kolom}`, '1');
+        await page.fill(`#${f.galat.kolom}`, '');
+        await page.focus(`#${f.galat.kolom}`);
+        await page.waitForTimeout(200);
+        await page.evaluate(() => { window.__fokusGalat = []; });
+        await page.keyboard.press('Enter');
+        await page.waitForTimeout(JEDA);
+        const b6 = await page.evaluate((k) => ({
+          fokusBaru: window.__fokusGalat.length,
+          terlihat: document.getElementById(`${k}-galat`)?.innerText ?? '',
+          sopan: [...document.querySelectorAll('.sr-only[aria-live="polite"]')].map((n) => n.textContent).join(' | '),
+        }), f.galat.kolom);
+        catat(f, 'B6', f.galat.teks.test(b6.terlihat) && f.galat.teks.test(b6.sopan),
+          `Enter di kolom kosong yg sudah difokus: galat ${b6.terlihat ? 'tampil' : 'TAK tampil'} tapi region polite berbunyi "${b6.sopan}" (peristiwa fokus: ${b6.fokusBaru}) — tak dibacakan`);
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Check, AlertCircle, Info } from 'lucide-react';
-import { subscribeToast, type ToastItem } from '../lib/toast';
+import { subscribeToast, subscribeUmum, type ToastItem } from '../lib/toast';
 import { haptic } from '../lib/utils';
 
 const STYLES = {
@@ -58,6 +58,9 @@ export default function Toaster() {
       setTimeout(() => dismiss(t.id, () => t.onExpire?.()), t.duration ?? 2600);
     });
   }, []);
+
+  // Pengumuman tanpa toast terlihat (`umumkanSaja`) memakai region yang SAMA.
+  useEffect(() => subscribeUmum((pesan, penting) => umumkan(pesan, penting)), []);
 
   const handleAction = (t: ToastItem) => {
     haptic(12);

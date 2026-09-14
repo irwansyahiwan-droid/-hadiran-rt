@@ -46,6 +46,27 @@ export function showUndo(
   listeners.forEach((l) => l(item));
 }
 
+/* ── Pengumuman TANPA toast ────────────────────────────────────────────────
+   Untuk perubahan yang sudah TERLIHAT di layar tapi tak punya peristiwa yang
+   dibacakan pembaca layar. Kasusnya (14 Sep 2026): Enter di kolom kosong yang
+   SUDAH difokus memunculkan galat inline, dan karena fokusnya tak berpindah,
+   TalkBack tak membacakan apa pun. Toast terlihat di sana akan jadi pesan kedua
+   yang dobel dgn galat di bawah kolom — yang dibutuhkan cuma suaranya.
+   Diteruskan ke region live PERMANEN milik Toaster (lihat catatan di sana). */
+type PendengarUmum = (pesan: string, penting: boolean) => void;
+let pendengarUmum: PendengarUmum[] = [];
+
+export function umumkanSaja(pesan: string, penting = false): void {
+  pendengarUmum.forEach((l) => l(pesan, penting));
+}
+
+export function subscribeUmum(l: PendengarUmum): () => void {
+  pendengarUmum.push(l);
+  return () => {
+    pendengarUmum = pendengarUmum.filter((x) => x !== l);
+  };
+}
+
 export function subscribeToast(l: Listener): () => void {
   listeners.push(l);
   return () => {
