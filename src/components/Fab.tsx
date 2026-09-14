@@ -114,22 +114,19 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
       onClick={() => { haptic(); onClick(); }}
       aria-label={ariaLabel ?? label}
       disabled={disabled}
-      title={disabled ? 'Data belum termuat — tekan "Coba lagi" dulu' : undefined}
+      title={disabled ? 'Data belum termuat — tekan “Coba lagi” dulu' : undefined}
       className="btn-brand press inline-flex items-center justify-center h-14 px-4 rounded-full text-body overflow-hidden"
       style={{ transition: 'box-shadow 0.2s ease, transform 0.15s var(--ease-spring)' }}
     >
       <Icon className="w-5 h-5 shrink-0" />
-      <span
-        className="whitespace-nowrap overflow-hidden"
-        style={{
-          maxWidth: compact ? 0 : '140px',
-          opacity: compact ? 0 : 1,
-          marginLeft: compact ? 0 : '0.5rem',
-          transition: 'max-width 0.3s var(--ease-out-expo), opacity 0.25s ease, margin-left 0.3s var(--ease-out-expo)',
-        }}
-      >
-        {label}
-      </span>
+      {/* Label TETAP utuh (14 Sep 2026, disetujui user). Dulu ia menyusut lewat
+          `max-width` + `margin-left` — properti tata letak yang memaksa reflow
+          tiap frame — warisan masa FAB cuma MENGKERUT jadi bulat. Sejak FAB
+          menyingkir PENUH, susutnya berjalan SAAT tombolnya sudah memudar
+          (opacity → 0 dlm 0,2 dtk, geser keluar 0,28 dtk, label 0,3 dtk): biaya
+          layout untuk gerak yang nyaris tak terlihat. Kini yang bergerak cuma
+          `transform` + `opacity` wadahnya. */}
+      <span className="whitespace-nowrap ml-2">{label}</span>
     </button>
     </div>
   );
