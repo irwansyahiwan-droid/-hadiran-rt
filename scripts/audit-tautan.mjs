@@ -34,6 +34,12 @@ const URL = (process.env.CAP_URL || 'http://localhost:5199').replace(/\/$/, '');
 const MUTASI = process.env.MUTASI === '1';
 const SENTINEL = `${URL}/landing.html`;
 const ASAL = new globalThis.URL(URL).origin;
+/* Produksi tak pernah `networkidle` (analytics + koneksi Supabase hidup) — ia
+   yang membunuh jalan produksi pertama sapuan ini dgn timeout 30 dtk. Tunggu
+   DOKUMEN, lalu tunggu app benar-benar siap (`siapApp`). Sasaran jauh dapat
+   jeda lebih panjang (preseden `audit:mundur` NAV_MS, cacat alat ke-20). */
+const JAUH = !/localhost|127\.0\.0\.1/.test(URL);
+const NAV = { waitUntil: 'domcontentloaded', timeout: JAUH ? 90000 : 30000 };
 const TAB = [
   ['beranda', '/', 'Beranda'],
   ['jadwal', '/jadwal', 'Jadwal'],
@@ -60,12 +66,12 @@ const keadaan = (p) => p.evaluate(() => ({
 }));
 const tunggu = (p, ms = 900) => p.waitForTimeout(ms);
 async function buka(page, path) {
-  await page.goto(SENTINEL);
-  await page.goto(`${URL}${path}`, { waitUntil: 'networkidle' });
+  await page.goto(SENTINEL, NAV);
+  await page.goto(`${URL}${path}`, NAV);
 }
 async function siapApp(page) {
-  await page.locator('nav button', { hasText: 'Beranda' }).waitFor({ timeout: 30000 });
-  await tunggu(page, 1500);
+  await page.locator('nav button', { hasText: 'Beranda' }).waitFor({ timeout: JAUH ? 90000 : 30000 });
+  await tunggu(page, JAUH ? 3000 : 1500);
 }
 
 const browser = await chromium.launch();
@@ -83,7 +89,7 @@ try {
   for (const [, path, label] of TAB.filter(([id]) => id === 'jadwal' || id === 'talangan')) {
     const { ctx, page } = await konteks();
     await buka(page, path);
-    await page.locator('#masuk-warga').waitFor({ timeout: 15000 });
+    await page.locator('#masuk-warga').waitFor({ timeout: JAUH ? 90000 : 15000 });
     const diLogin = await keadaan(page);
     cek('T2', diLogin.path === path, `Login menghapus niat tautan: alamat ${diLogin.path}, semestinya ${path}`);
     await loginWarga(page); await tunggu(page, 2000);
@@ -141,13 +147,13 @@ try {
   // ── T11 · reload ─────────────────────────────────────────────────────────
   await buka(page, '/'); await siapApp(page);
   await page.locator('nav button', { hasText: 'Kas RT' }).click(); await tunggu(page);
-  await page.reload({ waitUntil: 'networkidle' }); await siapApp(page);
+  await page.reload(NAV); await siapApp(page);
   k = await keadaan(page);
   cek('T11', k.tab === 'Kas RT' && k.path === '/kas-rt', `nav Kas RT lalu reload → tab ${k.tab} · alamat ${k.path}`);
   const fab2 = page.getByRole('button', { name: 'Tambah transaksi Kas RT' });
   if (await fab2.count()) {
     await fab2.click(); await tunggu(page, 1000);
-    await page.reload({ waitUntil: 'networkidle' }); await siapApp(page);
+    await page.reload(NAV); await siapApp(page);
     k = await keadaan(page);
     cek('T11', k.tab === 'Kas RT' && k.path === '/kas-rt', `reload dgn sheet terbuka → tab ${k.tab} · alamat ${k.path}`);
     await page.goBack(); await tunggu(page, 1200);
@@ -192,11 +198,11 @@ try {
   {
     const { ctx: c, page: p } = await konteks();
     await buka(p, '/hadiran');
-    await p.locator('#masuk-warga').waitFor({ timeout: 15000 });
+    await p.locator('#masuk-warga').waitFor({ timeout: JAUH ? 90000 : 15000 });
     await p.goBack(); await tunggu(p, 1500);
     cek('T6', p.url() === SENTINEL, `Back pertama di Login (tautan /hadiran) mendarat di ${p.url()} — ketukan hangus`);
     // T9 · keluar mode warga → "/"
-    await p.goto(`${URL}/kas-rt`, { waitUntil: 'networkidle' });
+    await p.goto(`${URL}/kas-rt`, NAV);
     await loginWarga(p); await tunggu(p, 2000);
     await p.getByRole('button', { name: 'Menu' }).click(); await tunggu(p, 600);
     await p.getByRole('menuitem', { name: 'Keluar' }).click(); await tunggu(p, 1500);
