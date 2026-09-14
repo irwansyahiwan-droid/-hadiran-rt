@@ -12,6 +12,23 @@
  *   D. TANDA GRAFIK   — garis tren, bar, dot legenda (opt-in `data-grafik`).
  *   E. GLYPH NATIVE   — ikon yang digambar BROWSER di dalam kontrol native
  *                       (panah `select`, tombol picker `input[type=date]`).
+ *   F. SAKELAR        — trek lawan latarnya & kenop lawan treknya, di KEDUA
+ *                       keadaan (mati & nyala).
+ *
+ * ── Kenapa F ada (14 Sep 2026) ────────────────────────────────────────────
+ * B memang memungut `[role="switch"]`, tapi yang ia ukur batas & fill TOMBOL
+ * pembungkusnya — dan sakelar app ini tombol satu baris penuh yang transparan,
+ * sehingga `nilaiField` tak punya apa pun untuk dinilai dan barisnya lenyap
+ * dari populasi tanpa jejak. Yang menyatakan keadaannya justru TREK di dalamnya.
+ * Audit Web Interface Guidelines ke-4 menemukannya lewat hitungan token: trek
+ * "Anggota susulan" saat MATI `#CCD8D1` di atas amber-50 = 1,44:1 (terang) &
+ * `#48594E` = 1,94:1 (gelap). Permukaannya juga tak pernah dibuka sapuan mana
+ * pun: sheet tambah/ubah anggota hidup di balik overlay Kelola Anggota.
+ *
+ * Populasinya OPT-IN lewat `data-sakelar-trek`/`-kenop` (komponen `Sakelar`),
+ * tapi TIDAK dipercaya begitu saja: `role="switch"` yang TAK memuat penanda
+ * dihitung GAGAL (`tanpa penanda`), bukan dilewati — kalau tidak, sakelar
+ * buatan tangan berikutnya lolos persis seperti yang satu ini.
  *
  * ── Kenapa E ada (24 Agu 2026) ────────────────────────────────────────────
  * A–D semuanya memungut populasinya lewat `querySelectorAll`. Glyph kontrol
@@ -327,7 +344,11 @@ async function collectFields(page) {
        'data-nt-field="3"' menunjuk elemen tampilan SEBELUMNYA — penjaga
        sezaman lalu membandingkan dua elemen berbeda. */
     for (const n of document.querySelectorAll('[data-nt-field]')) n.removeAttribute('data-nt-field');
-    const sel = 'input:not([type="hidden"]):not([type="file"]):not([type="range"]),select,textarea,[role="switch"],[role="checkbox"]';
+    /* '[role="switch"]' DIKELUARKAN 14 Sep 2026: batas sakelar adalah TREK-nya,
+       bukan tombol baris transparan pembungkusnya. Diukur di sini ia terbaca
+       "fill 1,02:1" — temuan palsu begitu sheet anggota mulai dibuka. Sakelar
+       kini milik bagian F (trek + kenop, tanpa penanda = gagal). */
+    const sel = 'input:not([type="hidden"]):not([type="file"]):not([type="range"]),select,textarea,[role="checkbox"]';
     for (const el of document.querySelectorAll(sel)) {
       const el2 = el;
       if (!vis(el) || mati(el)) continue;
@@ -345,6 +366,33 @@ async function collectFields(page) {
         isi: cs.backgroundColor,
         rect: rectOf(el),
         tag: jejak(el),
+      });
+    }
+    return out;
+  })()`);
+}
+
+/** Sakelar: trek (lawan latar) & kenop (lawan trek). Tanpa penanda = gagal. */
+async function collectSakelar(page) {
+  return page.evaluate(`(() => {
+    ${PAGE_HELPERS}
+    const out = [];
+    for (const n of document.querySelectorAll('[data-nt-sakelar]')) n.removeAttribute('data-nt-sakelar');
+    for (const el of document.querySelectorAll('[role="switch"]')) {
+      if (!vis(el) || mati(el)) continue;
+      const nama = (labelTerlihat(el) || el.getAttribute('aria-label') || jejak(el)).slice(0, 40) +
+        (el.getAttribute('aria-checked') === 'true' ? ' [nyala]' : ' [mati]');
+      const trek = el.querySelector('[data-sakelar-trek]');
+      const kenop = trek && trek.querySelector('[data-sakelar-kenop]');
+      if (!trek || !kenop) { out.push({ nama, tanpaPenanda: true, tag: jejak(el) }); continue; }
+      trek.setAttribute('data-nt-sakelar', String(out.length));
+      out.push({
+        nama,
+        warna: getComputedStyle(trek).backgroundColor,
+        kenop: getComputedStyle(kenop).backgroundColor,
+        opacity: opacityEfektif(trek),
+        rect: rectOf(trek),
+        tag: jejak(trek),
       });
     }
     return out;
@@ -510,9 +558,15 @@ function nilaiFokus(st, bg) {
 
 // ── sapuan satu tampilan ──────────────────────────────────────────────────
 async function auditView(page, ctxName, { fokus = false } = {}) {
-  const [ikon, field, grafik, glyph] = await Promise.all([collectIcons(page), collectFields(page), collectGrafik(page), collectGlyphNative(page)]);
+  const [ikon, field, grafik, glyph, sakelarSemua] = await Promise.all([collectIcons(page), collectFields(page), collectGrafik(page), collectGlyphNative(page), collectSakelar(page)]);
+  for (const s of sakelarSemua.filter((x) => x.tanpaPenanda)) {
+    push({ jenis: 'sakelar', ctx: ctxName, nama: s.nama, tag: s.tag, asal: 'TANPA PENANDA data-sakelar-trek/-kenop (tak terukur = gagal)', fg: '-', bg: '-', ratio: 0, need: NEED, pass: false });
+  }
+  /* Indeks `data-nt-sakelar` = posisi di `sakelarSemua`, jadi yang tanpa penanda
+     tetap memegang slotnya — jangan disaring sebelum dipasangkan dgn rect. */
+  const sakelar = sakelarSemua.map((s, i) => ({ ...s, i })).filter((s) => !s.tanpaPenanda);
 
-  if (ikon.length || field.length || grafik.length || glyph.length) {
+  if (ikon.length || field.length || grafik.length || glyph.length || sakelar.length) {
     const shot = (await page.screenshot()).toString('base64');
     /* SEZAMAN: rect dibaca SEBELUM screenshot; kalau elemennya bergerak atau
        menghilang di antara keduanya, titik sampel menunjuk tempat yang sudah
@@ -532,7 +586,7 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
         }
         return out;
       };
-      return { ikon: baca('data-nt-ikon'), field: baca('data-nt-field'), grafik: baca('data-nt-grafik'), glyph: baca('data-nt-glyph') };
+      return { ikon: baca('data-nt-ikon'), field: baca('data-nt-field'), grafik: baca('data-nt-grafik'), glyph: baca('data-nt-glyph'), sakelar: baca('data-nt-sakelar') };
     });
     const sezaman = (jenis, i, e) => {
       const k = rectKini[jenis] && rectKini[jenis][String(i)];
@@ -548,7 +602,10 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
     const ptsDalam = field.map((e) => clamp(insidePoints(e.rect, 6)));
     const ptsGrafik = grafik.map((e) => clamp(chartBgPoints(e.rect, 6)));
     const ptsGlyph = glyph.map((e) => clamp(glyphPoints(e.rect)));
-    const flat = [...ptsIkon.flat(), ...ptsLuar.flat(), ...ptsDalam.flat(), ...ptsGrafik.flat(), ...ptsGlyph.flat()];
+    /* Latar trek: atas & bawah saja (di dalam baris tombol). Kiri-kanan trek
+       duduk label & tepi baris — bukan permukaan yang ditimpa trek. */
+    const ptsSakelar = sakelar.map((e) => clamp(chartBgPoints(e.rect, 4)));
+    const flat = [...ptsIkon.flat(), ...ptsLuar.flat(), ...ptsDalam.flat(), ...ptsGrafik.flat(), ...ptsGlyph.flat(), ...ptsSakelar.flat()];
     const px = await samplePixels(page, shot, flat);
 
     /* Pemotong blok eksplisit — aritmetika offset manual sudah pernah bikin
@@ -565,6 +622,7 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
     const sDalam = potong(ptsDalam, nIkon + nLuar);
     const sGrafik = potong(ptsGrafik, nIkon + nLuar + nDalam);
     const sGlyph = potong(ptsGlyph, nIkon + nLuar + nDalam + ptsGrafik.flat().length);
+    const sSakelar = potong(ptsSakelar, nIkon + nLuar + nDalam + ptsGrafik.flat().length + ptsGlyph.flat().length);
 
     ikon.forEach((e, i) => {
       if (!sezaman('ikon', i, e)) return;
@@ -589,6 +647,20 @@ async function auditView(page, ctxName, { fokus = false } = {}) {
       const res = nilaiGlyph(sGlyph[i]);
       if (!res) { glyphButa.push(`[${ctxName}] ${e.jenisKontrol} "${e.nama}"`); return; }
       push({ jenis: 'glyph-native', ctx: ctxName, nama: `${e.nama} (${e.jenisKontrol})`, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
+    });
+    sakelar.forEach((e, j) => {
+      if (!sezaman('sakelar', e.i, e)) return;
+      const res = nilaiIkon(e, sSakelar[j]);
+      if (!res) { goyah.push(`${ctxName} sakelar "${e.nama}" latar tak terbaca`); return; }
+      push({ jenis: 'sakelar', ctx: ctxName, nama: `${e.nama} · trek`, tag: e.tag, fg: res.fg.join(), bg: res.bg.join(), ratio: +res.ratio.toFixed(2), need: NEED, pass: res.ratio >= NEED });
+      /* Kenop lawan trek: posisi kenop SATU-SATUNYA penanda mati/nyala selain
+         warna, jadi ia wajib terbedakan dari treknya sendiri. */
+      const t = parseColor(e.warna), k = parseColor(e.kenop);
+      if (!t || !k) return;
+      const trekRgb = blend(t.rgb, t.a, res.bg);
+      const kenopRgb = blend(k.rgb, k.a, trekRgb);
+      const rk = ratio(kenopRgb, trekRgb);
+      push({ jenis: 'sakelar', ctx: ctxName, nama: `${e.nama} · kenop`, tag: e.tag, fg: kenopRgb.map(Math.round).join(), bg: trekRgb.map(Math.round).join(), ratio: +rk.toFixed(2), need: NEED, pass: rk >= NEED });
     });
   }
 
@@ -755,6 +827,37 @@ for (const theme of ['light', 'dark']) {
         await page.waitForTimeout(700);
         await auditView(page, `${theme}/${name}`, { fokus: true });
         await page.screenshot({ path: `${OUT}/${theme}_${name}.png` });
+        /* F. Sheet tambah & ubah anggota — satu-satunya tempat app memasang
+           sakelar. Tiap sakelar diukur di KEDUA keadaan, lalu dikembalikan ke
+           keadaan awal supaya `useJagaIsian` menutup sheet tanpa bertanya.
+           Tak ada yang disimpan (tulis bendahara diblokir mock 403). */
+        if (name === 'b-anggota') {
+          for (const [sheet, buka] of [
+            ['b-sheet-anggota-tambah', () => page.getByRole('button', { name: /Tambah anggota/i }).first()],
+            ['b-sheet-anggota-ubah', () => page.locator('[role="dialog"] button').filter({ has: page.locator('svg.lucide-pencil') }).first()],
+          ]) {
+            const pemicu = buka();
+            if (!(await pemicu.count())) { console.log(`  [${theme}] DILEWAT ${sheet} — pemicunya tak ada`); continue; }
+            await pemicu.click();
+            await page.waitForTimeout(1000);
+            const sw = page.locator('[role="dialog"] [role="switch"]');
+            const n = await sw.count();
+            if (!n) console.log(`  [${theme}] DILEWAT ${sheet} — tak ada sakelar di data hari ini`);
+            await auditView(page, `${theme}/${sheet}`);
+            for (let i = 0; i < n; i++) {
+              await sw.nth(i).click();
+              await page.waitForTimeout(500);
+              await auditView(page, `${theme}/${sheet}`);
+              await sw.nth(i).click();
+              await page.waitForTimeout(500);
+            }
+            /* Escape saja — `closeLayer` menambah Back kalau masih ada dialog,
+               dan overlay Kelola Anggota SENDIRI dialog: Back ikut menutupnya,
+               lalu sheet ubah tak pernah terbuka ("pemicunya tak ada"). */
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(900);
+          }
+        }
         await page.goBack();
         await page.waitForTimeout(900);
       }
@@ -777,7 +880,7 @@ writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const per = (j) => results.filter((r) => r.jenis === j);
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log('\n=== KONTRAS NON-TEKS (ambang 3:1) ===');
-for (const j of ['ikon', 'batas-kontrol', 'ring-fokus', 'grafik', 'glyph-native']) {
+for (const j of ['ikon', 'batas-kontrol', 'ring-fokus', 'grafik', 'glyph-native', 'sakelar']) {
   const s = per(j);
   console.log(`  ${j.padEnd(14)} ${String(s.length).padStart(4)} sampel, ${s.filter((r) => !r.pass).length} gagal`);
 }
@@ -793,5 +896,11 @@ if (goyah.length) {
 console.log('');
 for (const f of fails) {
   console.log(`${String(f.ratio).padStart(5)} [${f.jenis}] [${f.ctx}] "${f.nama}" ${f.asal || f.lewat || ''} fg(${f.fg}) bg(${f.bg}) <${f.tag}>`);
+}
+/* F tanpa satu pun sakelar terukur = alatnya yang gagal membuka sheet, bukan
+   app yang lulus (hanya berlaku kalau peran bendahara memang dijalankan). */
+if ((!ONLY || ONLY === 'bendahara') && !per('sakelar').length) {
+  console.log('PROBE CACAT: bagian F tak mengukur satu sakelar pun');
+  process.exit(2);
 }
 process.exit(fails.length ? 1 : 0);

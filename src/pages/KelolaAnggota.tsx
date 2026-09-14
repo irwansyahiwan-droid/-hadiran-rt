@@ -11,6 +11,7 @@ import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import Tag from '../components/Tag';
 import AvatarPeci from '../components/AvatarPeci';
+import Sakelar from '../components/Sakelar';
 import { supabase } from '../lib/supabase';
 import {
   fetchAnggota, tambahAnggota, updateAnggota, backfillAnggotaSusulan,
@@ -226,9 +227,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                 <History className="w-4 h-4 shrink-0" />
                 Anggota susulan — sudah lunas tarikan lama
               </span>
-              <span className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${susulan ? 'bg-brand-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
-                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${susulan ? 'translate-x-4' : 'translate-x-0.5'}`} />
-              </span>
+              <Sakelar nyala={susulan} />
             </button>
 
             {susulan && (
