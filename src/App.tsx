@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
-import { useBackDismiss } from './hooks/useBackDismiss';
+import { useBackDismiss, gantiPath, alamatSaatBoot } from './hooks/useBackDismiss';
+import { pathTab, tabDariPath } from './lib/tautanTab';
+import { bagikanHalaman } from './lib/bagikanTautan';
 import { useSwipeNavigate } from './hooks/useSwipeNavigate';
 import { AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
@@ -48,42 +50,38 @@ function PageFallback() {
   );
 }
 
-/** Keadaan yang bertahan selama SESI TAB ini. Satu tempat untuk keduanya —
- *  kalau tersebar, gampang ada transisi yang menulis satu kunci dan lupa yang
- *  lain, lalu sesi memulihkan setengah keadaan. */
+/** Gate warga bertahan selama SESI TAB ini (lihat catatan di `wargaMode`). */
 const KUNCI_WARGA = 'hadiran-warga-sesi';
-const KUNCI_TAB = 'hadiran-tab-sesi';
 function simpanWarga(aktif: boolean) {
   try {
     if (aktif) sessionStorage.setItem(KUNCI_WARGA, '1');
     else sessionStorage.removeItem(KUNCI_WARGA);
   } catch { /* mode privat / storage penuh → gate cuma tak bertahan reload */ }
 }
-function simpanTab(tab: TabName | null) {
-  try {
-    if (tab) sessionStorage.setItem(KUNCI_TAB, tab);
-    else sessionStorage.removeItem(KUNCI_TAB);
-  } catch { /* abaikan — reload cuma kembali ke Beranda spt sebelumnya */ }
+/** Tab dari ALAMAT (`/jadwal`, `/kas-rt`, …). Path asing → Beranda, dan efek
+ *  URL di bawah merapikan alamatnya ke "/". Sudah TERVALIDASI lawan
+ *  `urutanTab` di `tabDariPath` — nilai asing tak pernah jadi `activeTab` yang
+ *  tak cocok satu cabang render pun (layar kosong). */
+function tabDariAlamat(): TabName {
+  try { return tabDariPath(window.location.pathname) ?? 'beranda'; } catch { return 'beranda'; }
 }
-/** Baca tab tersimpan, TERVALIDASI lawan `urutanTab` (sumber tunggal daftar
- *  tab). Tanpa validasi, satu nilai basi/asing dari sesi lama akan lolos jadi
- *  `activeTab` yang tak cocok satu cabang render pun → layar kosong. */
-function bacaTab(): TabName {
-  try {
-    const t = sessionStorage.getItem(KUNCI_TAB);
-    return t && (urutanTab as string[]).includes(t) ? (t as TabName) : 'beranda';
-  } catch { return 'beranda'; }
+/** Tab AWAL dari alamat saat BOOT, bukan alamat kini: penyapu entri yatim
+ *  (`useBackDismiss`) bisa sudah mundur satu entri sebelum App pertama dirender,
+ *  dan entri tempatnya mendarat masih beralamat "/". */
+function tabAwal(): TabName {
+  try { return tabDariPath(new URL(alamatSaatBoot() || '/', 'http://x').pathname) ?? 'beranda'; } catch { return 'beranda'; }
 }
 
 export default function App() {
   const auth = useAuth();
   const { isDark, toggle: toggleTheme } = useTheme();
-  /* Tab aktif ikut bertahan melewati reload (19 Agu 2026). Sebelumnya ia selalu
-     kembali ke Beranda — kecil, tapi digabung dgn reload "Muat ulang" milik
-     PwaUpdatePrompt efeknya persis kebalikan yang diharapkan: warga sudah
-     berada di Kas RT, menerima toast versi baru, lalu mendarat di layar lain.
-     Sesi, bukan localStorage — sama alasannya dgn gate warga di bawah. */
-  const [activeTab, setActiveTab] = useState<TabName>(bacaTab);
+  /* Tab aktif lahir dari ALAMAT (14 Sep 2026) — tautan `/jadwal` yang dibagikan
+     ke grup WA membuka Jadwal, bukan Beranda. Alamat juga yang membuat tab
+     bertahan melewati reload (19 Agu 2026: dulu lewat kunci sessionStorage
+     `hadiran-tab-sesi`, kini dilepas — dua sumber untuk satu keadaan persis
+     cara sesi memulihkan setengah keadaan). Reload "Muat ulang" milik
+     PwaUpdatePrompt tetap mendarat di tab yang sama karena alamatnya sama. */
+  const [activeTab, setActiveTab] = useState<TabName>(tabAwal);
   /* Gate warga bertahan selama SESI TAB ini — `sessionStorage`, bukan
      `localStorage` dan bukan state murni.
      Sampai 19 Agu 2026 ini `useState(false)` polos: setiap reload melempar
@@ -120,7 +118,6 @@ export default function App() {
     scrollPos.current[activeTab] = window.scrollY; // ingat posisi scroll tab sekarang
     setDir(TAB_ORDER.indexOf(tab) >= TAB_ORDER.indexOf(activeTab) ? 1 : -1);
     setActiveTab(tab);
-    simpanTab(tab);
   };
 
   // Swipe kiri = tab berikutnya, kanan = tab sebelumnya (pakai urutan tab yang terlihat)
@@ -147,13 +144,32 @@ export default function App() {
   /* `lapisan: false` — entri ini cuma membuat Back kembali ke Beranda; ia tak
      menutupi layar. Menghitungnya sebagai lapisan mematikan swipe ganti-tab &
      pull-to-refresh di SEMUA tab selain Beranda (lihat `adaLapisanTerbuka`). */
-  useBackDismiss(activeTab !== 'beranda', () => changeTab('beranda'), { lapisan: false });
+  /* Digerbang `cangkangTampil` (14 Sep 2026): tautan `/jadwal` yang dibuka dari
+     WA di tab baru menampilkan LOGIN dulu, sementara `activeTab` sudah Jadwal.
+     Tanpa gerbang, entri Back tab terdaftar di bawah layar Login, dan ketukan
+     Back pertama warga di sana diam-diam "kembali ke Beranda" yang tak terlihat
+     — ketukan yang terbakar percuma, kelas bagian D `audit:mundur`. */
+  const cangkangTampil = !!auth.user || wargaMode;
+  useBackDismiss(cangkangTampil && activeTab !== 'beranda', () => changeTab('beranda'), { lapisan: false });
+
+  /* Alamat ikut tab aktif — lewat antrean back-stack (`gantiPath`), BUKAN
+     `replaceState` langsung; alasannya di sana. Selama Login tampil alamat
+     SENGAJA tak disentuh: ia membawa niat tautan sampai warga masuk. */
+  const alamatKeAkar = useRef(false);
+  useEffect(() => {
+    if (cangkangTampil) gantiPath(pathTab(activeTab));
+    /* Keluar mode warga → "/". WAJIB dari efek, bukan dari handler keluar:
+       dipanggil di handler, `gantiPath` jalan SEBELUM cleanup entri tab sempat
+       mengantrekan `history.back()`, jadi yang diganti entri tab yang sebentar
+       lagi ditinggalkan dan Login mendarat di alamat tab lama (`audit:tautan`
+       T9 menangkapnya). Di sini cleanup sudah jalan lebih dulu → antre rapi. */
+    else if (alamatKeAkar.current) { alamatKeAkar.current = false; gantiPath('/'); }
+  }, [activeTab, cangkangTampil]);
 
   /* Judul dokumen ikut tab aktif. App satu-halaman tak pernah mengganti judul
      sendiri: sebelumnya kelima layar sama-sama "Hadiran RT 004/006", padahal
      judul inilah yang diumumkan pembaca layar tiap pindah layar dan yang muncul
      di riwayat/pengalih tab HP. Layar Login sengaja memakai judul dasar. */
-  const cangkangTampil = !!auth.user || wargaMode;
   useEffect(() => {
     const dasar = 'Hadiran RT 004/006';
     const nama = cangkangTampil ? labelTab(activeTab) : '';
@@ -262,7 +278,9 @@ export default function App() {
     return (
       <Login
         onLogin={auth.signIn}
-        onWargaMode={() => { simpanWarga(true); simpanTab(null); setWargaMode(true); setActiveTab('beranda'); }}
+        /* Tab tujuan = ALAMAT saat tombol ditekan, bukan Beranda paksa: warga
+           yang membuka tautan `/jadwal` dari WA mendarat di Jadwal sesudah masuk. */
+        onWargaMode={() => { simpanWarga(true); setWargaMode(true); setActiveTab(tabDariAlamat()); }}
       />
     );
   }
@@ -278,8 +296,10 @@ export default function App() {
        kunci yang tertinggal di sesi = mode warga diam-diam hidup lagi sesudah
        logout. Murah, dan menutup kelasnya sekarang daripada menunggu ada rute
        baru yang membukanya. */
-    signOut: async () => { simpanWarga(false); simpanTab(null); await auth.signOut(); },
-    exitWargaMode: () => { simpanWarga(false); simpanTab(null); setWargaMode(false); setActiveTab('beranda'); },
+    signOut: async () => { simpanWarga(false); await auth.signOut(); },
+    /* Keluar = kembali ke "/" juga: tanpa itu Login berikutnya membawa alamat
+       tab terakhir sbg "niat tautan" yang tak pernah diminta siapa pun. */
+    exitWargaMode: () => { simpanWarga(false); alamatKeAkar.current = true; setWargaMode(false); setActiveTab('beranda'); },
   };
 
   return (
@@ -295,6 +315,7 @@ export default function App() {
           onOpenBackup={ctxValue.isBendahara ? () => setBackupOpen(true) : undefined}
           onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
+          onBagikan={() => bagikanHalaman(labelTab(activeTab), pathTab(activeTab))}
         />
         {/* Nav = bar DOK bawah (h-[70px] + safe-area di dalam bar) → beri ruang
             agar konten tak ngumpet di belakangnya: 4.5rem bar + 1.75rem napas.

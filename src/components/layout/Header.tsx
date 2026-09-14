@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, AlertTriangle, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, AlertTriangle, Share2, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
@@ -23,10 +23,12 @@ interface HeaderProps {
   onOpenBackup?: () => void;
   onOpenAnggota?: () => void;
   onOpenTentang?: () => void;
+  /** Bagikan tautan tab yang sedang dibuka (lihat `bagikanTautan.ts`). */
+  onBagikan?: () => void;
 }
 
 /** Header menyusut + shadow/blur menguat saat halaman di-scroll (ala app fintech). */
-export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan, onOpenBackup, onOpenAnggota, onOpenTentang }: HeaderProps) {
+export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRiwayat, onOpenLaporan, onOpenBackup, onOpenAnggota, onOpenTentang, onBagikan }: HeaderProps) {
   const isBendahara = role === 'bendahara';
   // Header menyusut + shadow/blur menguat saat halaman tergeser >6px dari puncak.
   // Listener scroll dibagi pakai (lihat hook).
@@ -272,6 +274,11 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                   {/* Terbuka utk WARGA juga (transparansi kas — siapa bendahara
                       yg input/ubah data): dipindah keluar dari blok admin di
                       atas, sejajar "Tentang Aplikasi" yg juga milik semua peran. */}
+                  {/* Milik SEMUA peran: tautan ke tab yang sedang dibuka, untuk
+                      dikirim ke grup WA (14 Sep 2026). */}
+                  {onBagikan && (
+                    <MenuItem icon={Share2} label="Bagikan halaman ini" onClick={onBagikan} />
+                  )}
                   {onOpenRiwayat && (
                     <MenuItem icon={History} label="Riwayat Aktivitas" onClick={onOpenRiwayat} />
                   )}

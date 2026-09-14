@@ -49,6 +49,21 @@ const opQueue: Array<() => void> = [];
    bekerja (lihat bagian D `npm run audit:mundur`). */
 let menyapuYatim = false;
 let jaringSapu: number | undefined;
+/* Alamat yang DIMUAT pengguna, direkam sebelum penyapu bergerak (14 Sep 2026).
+   Sejak tab hidup di alamat (`/kas-rt`), entri tab membawa path-nya sendiri
+   sedangkan entri di BAWAHNYA — tempat penyapu mendarat — masih "/". Tanpa
+   pemulihan ini reload "Muat ulang" milik PwaUpdatePrompt melempar warga dari
+   Kas RT ke Beranda: tertangkap `audit:masuk` ("reload tak memulihkan tab
+   aktif") begitu kunci sessionStorage tab dilepas. Penyapu membuang ENTRI
+   yatim, bukan alamat yang sedang dibuka. */
+const alamatBoot = typeof window === 'undefined'
+  ? ''
+  : window.location.pathname + window.location.search + window.location.hash;
+
+/** Alamat saat halaman dimuat — sumber tab awal App, kebal terhadap penyapu. */
+export function alamatSaatBoot(): string {
+  return alamatBoot;
+}
 
 const sibuk = () => pendingBack > 0 || menyapuYatim;
 
@@ -64,6 +79,9 @@ function flushQueue() {
 function selesaiSapu() {
   menyapuYatim = false;
   window.clearTimeout(jaringSapu);
+  const kini = window.location.pathname + window.location.search + window.location.hash;
+  // SEBELUM antrean dilepas: push lapisan/tab sesudahnya mewarisi alamat ini.
+  if (alamatBoot && kini !== alamatBoot) window.history.replaceState(window.history.state, '', alamatBoot);
   flushQueue();
 }
 
@@ -106,6 +124,28 @@ function registerBack(close: () => void, lapisan: boolean): () => void {
     stack.splice(i, 1);
     runOrQueue(() => { pendingBack += 1; window.history.back(); });
   };
+}
+
+/**
+ * Ganti PATH entri history yang sedang aktif (tautan per tab) TANPA menambah
+ * entri — dan lewat antrean yang SAMA dgn push/back di atas.
+ *
+ * Kenapa wajib antre (14 Sep 2026): pindah dari tab ke Beranda menjalankan
+ * cleanup entri tab (`history.back()`, ASINKRON) lalu efek URL di commit yang
+ * sama. `replaceState` langsung akan mengganti entri TAB yang sebentar lagi
+ * ditinggalkan, lalu traversal mendarat di entri di bawahnya yang masih
+ * membawa path lama — Beranda tampil dgn alamat `/jadwal`, dan tautan yang
+ * disalin dari sana membuka tab yang salah. Diantrikan, penggantian baru jalan
+ * sesudah traversal-nya tiba, pada entri yang benar-benar aktif.
+ * `history.state` dipertahankan: `backId` di dalamnya milik back-stack.
+ */
+export function gantiPath(path: string): void {
+  if (typeof window === 'undefined') return;
+  init();
+  runOrQueue(() => {
+    if (window.location.pathname === path) return;
+    window.history.replaceState(window.history.state, '', path + window.location.search + window.location.hash);
+  });
 }
 
 /**

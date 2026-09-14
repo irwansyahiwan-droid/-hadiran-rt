@@ -99,6 +99,9 @@ const VISUAL = [
   /* §4.1.3 Status Messages (AA): hasil cari & chip filter diumumkan. Lahir &
      masuk rantai 14 Sep 2026 — sampai hari itu tujuh daftar berubah tanpa suara. */
   ['umumkan', 'node scripts/audit-umumkan.mjs'],
+  /* Tautan per tab (`/jadwal`) — menempel di back-stack & gate Login, dua mesin
+     yang pernah membuat app blank. Masuk rantai di hari lahirnya (14 Sep 2026). */
+  ['tautan', 'node scripts/audit-tautan.mjs'],
   ['huruf', 'node scripts/audit-huruf.mjs'],
   ['potong', 'node scripts/audit-potong.mjs'],
   /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
@@ -208,6 +211,8 @@ const LANTAI = {
   hover:            [/(\d+) kontrol unik di \d+ layar/, 258],
   /* Populasi = PERMUKAAN berdaftar (properti app, bukan data) — lantai persis. */
   umumkan:          [/(\d+) permukaan diperiksa · \d+ bermasalah/, 7],
+  /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis. */
+  tautan:           [/TAUTAN TAB: (\d+) pemeriksaan/, 28],
   huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],
   /* 16 -> 20 layar (12 Sep 2026): sheet TUJUAN `data-ringkas` masuk populasi
      — syarat kedua penanda itu. Lantai ~95%. */
