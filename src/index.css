@@ -66,6 +66,12 @@
    terasa lebih solid). Body & teks kecil TETAP Inter (di-set di `body`). */
 @layer base {
   h1, h2 { font-family: var(--font-display); letter-spacing: -0.018em; text-wrap: balance; }
+  /* h3 = judul SHEET (dulu `<p>`, jadi heading di audit Web Interface
+     Guidelines kedua). Ikut `balance` supaya judul yang melipat tak menyisakan
+     satu kata yatim — tapi TIDAK ikut Sora & tracking: judul sheet sejak awal
+     Inter, dan memindahkannya ke Sora itu perubahan rupa, bukan perapian.
+     `balance` tak mengubah jumlah baris, hanya membaginya. */
+  h3 { text-wrap: balance; }
 }
 
 /* ── Bobot garis IKON = 1,75, bukan 2 (default lucide) ──────────────────
