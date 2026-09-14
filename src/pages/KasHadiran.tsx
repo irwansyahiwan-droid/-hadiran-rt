@@ -13,6 +13,11 @@ import GalatKolom from '../components/GalatKolom';
 import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
 import AvatarPeci from '../components/AvatarPeci';
 import EmptyState from '../components/EmptyState';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
+
+/* Kalimat layar kosong rekap tarikan — SATU sumber untuk `EmptyState` dan
+   pengumuman pembaca layar `useUmumkanHasil` ("judul. keterangan"). */
+const KOSONG_FILTER = ['Tidak ada hasil', 'Tidak ada tarikan pada filter ini.'] as const;
 import ErrorState from '../components/ErrorState';
 import Odometer from '../components/Odometer';
 import Tag from '../components/Tag';
@@ -355,6 +360,8 @@ export default function KasHadiranPage() {
     else if (hadiranFilter === 'lunas') arr = arr.filter((t) => (talanganMap[t.id]?.count ?? 0) === 0);
     return arr;
   }, [tarikanSelesai, talanganMap, hadiranFilter, hadiranSort]);
+  /* Urutan SENGAJA bukan pemicu: ia tak mengubah jumlah yang tampil. */
+  useUmumkanHasil(displayTarikan.length, 'tarikan', [hadiranFilter], KOSONG_FILTER.join('. '));
 
 
   // Setor per tarikan — untuk kolom SETOR di PDF (hanya berubah saat transaksi berubah)
@@ -873,8 +880,8 @@ export default function KasHadiranPage() {
                 /* Hasil filter kosong */
                 <EmptyState
                   icon={TrendingUp}
-                  title="Tidak ada hasil"
-                  subtitle="Tidak ada tarikan pada filter ini."
+                  title={KOSONG_FILTER[0]}
+                  subtitle={KOSONG_FILTER[1]}
                   action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => setHadiranFilter('semua') }}
                 />
               ) : (

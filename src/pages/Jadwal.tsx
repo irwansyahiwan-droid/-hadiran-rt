@@ -6,6 +6,7 @@ import {
   Play, RefreshCw, RotateCcw, Search, UserCheck, X, AlertTriangle, MessageCircle, FileText, Share2, Loader2 } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
 import ErrorState from '../components/ErrorState';
 import FilterChips from '../components/FilterChips';
 import StatRow from '../components/StatRow';
@@ -50,6 +51,10 @@ import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast, showUndo } from '../lib/toast';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
+
+/* Kalimat layar kosong daftar editor Absensi — SATU sumber untuk `EmptyState`
+   dan pengumuman pembaca layar `useUmumkanHasil`. Kanon Jadwal warga. */
+const KOSONG_CARI = ['Tidak ada hasil', 'Coba kata kunci lain.'] as const;
 
 type AbsensiMap = Record<string, AbsensiStatus>;
 type AbsensiFilter = 'semua' | 'hadir' | 'titip' | 'belum';
@@ -213,6 +218,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
     if (filter === 'belum')  list = list.filter(w => map[w.id] === 'tidak_hadir');
     return list;
   }, [pembayarList, search, filter, map]);
+  /* Pemicu = kata kunci & chip saja. Mengetuk status seorang anggota ikut
+     mengubah `filtered` (lewat `map`), tapi itu bukan pencarian — tombolnya
+     sendiri sudah membacakan status barunya lewat aria-label. */
+  useUmumkanHasil(filtered.length, 'anggota', [search, filter], KOSONG_CARI.join('. '));
 
   async function simpan() {
     if (sedangSimpan()) return;               // latch sinkron — lihat useSaving()
@@ -448,6 +457,17 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               <Lock className="w-3 h-3" /> Penerima
             </Tag>
           </div>
+        )}
+        {/* Pencarian/filter tanpa hasil dulu meninggalkan kartu KOSONG tanpa
+            sepatah kata (14 Sep 2026) — satu-satunya daftar bercari di app tanpa
+            layar kosong. Kata & aksinya kanon yang sudah ada di Jadwal warga. */}
+        {filtered.length === 0 && (search || filter !== 'semua') && (
+          <EmptyState
+            icon={Search}
+            title={KOSONG_CARI[0]}
+            subtitle={KOSONG_CARI[1]}
+            action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setFilter('semua'); } }}
+          />
         )}
         {filtered.map((w, idx) => {
           const st = map[w.id] ?? 'tidak_hadir';

@@ -13,6 +13,11 @@ import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, maskRp,
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import EmptyState from '../components/EmptyState';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
+
+/* Kalimat layar kosong daftar mutasi — SATU sumber untuk `EmptyState` dan
+   pengumuman pembaca layar `useUmumkanHasil` ("judul. keterangan"). */
+const KOSONG_FILTER = ['Tidak ada hasil', 'Tidak ada transaksi pada filter ini.'] as const;
 import ErrorState from '../components/ErrorState';
 import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import Odometer from '../components/Odometer';
@@ -436,6 +441,8 @@ export default function KasRTPage() {
     if (q) arr = arr.filter((k) => (k.keterangan ?? '').toLowerCase().includes(q));
     return arr;
   }, [list, filter, sort, search]);
+  /* Urutan (`sort`) SENGAJA bukan pemicu: ia tak mengubah jumlah yang tampil. */
+  useUmumkanHasil(displayList.length, 'transaksi', [filter, search], KOSONG_FILTER.join('. '));
 
   // Agregasi bulanan (masuk vs keluar) — 6 bulan terakhir.
   const monthly = useMemo(() => {
@@ -969,8 +976,8 @@ export default function KasRTPage() {
           {displayList.length === 0 ? (
             <EmptyState
               icon={Landmark}
-              title="Tidak ada hasil"
-              subtitle="Tidak ada transaksi pada filter ini."
+              title={KOSONG_FILTER[0]}
+              subtitle={KOSONG_FILTER[1]}
               action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setFilter('semua'); setSearch(''); } }}
             />
           ) : (

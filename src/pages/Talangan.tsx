@@ -19,6 +19,7 @@ import ConfirmDestruktif from '../components/ConfirmDestruktif';
 import Tag from '../components/Tag';
 import FilterChips from '../components/FilterChips';
 import CrossFade from '../components/CrossFade';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
 import { showToast, showUndo } from '../lib/toast';
 import type { Talangan } from '../lib/types';
 
@@ -296,6 +297,18 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const showLunas = statusFilter !== 'belum';
   const visibleCount =
     (showBelum ? berganda.length + single.length : 0) + (showLunas ? lunas.length : 0);
+  /* Kalimat layar kosong SATU sumber: dipakai `EmptyState` DAN dibacakan
+     `useUmumkanHasil` — pembaca layar mendengar persis yang tampil. */
+  const kosongJudul = search || statusFilter !== 'semua' ? 'Tidak ada hasil' : 'Belum ada talangan';
+  const kosongSub = search
+    ? 'Coba kata kunci lain.'
+    : statusFilter === 'lunas'
+      ? 'Belum ada talangan yang lunas.'
+      : statusFilter === 'belum'
+        ? 'Tidak ada talangan yang belum lunas.'
+        : 'Semua warga sudah memenuhi kehadiran.';
+  // Satu baris = satu WARGA (bisa memuat beberapa talangan) — bendanya warga.
+  useUmumkanHasil(visibleCount, 'warga', [search, statusFilter], `${kosongJudul}. ${kosongSub}`);
   const talSortLabel = talSort === 'tunggakan' ? 'Tunggakan' : 'Nama';
 
   const totalBelumLunas = list.filter(t => !t.status_lunas).reduce((s, t) => s + t.nominal, 0);
@@ -677,14 +690,8 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {visibleCount === 0 && (
             <EmptyState
               icon={search ? Search : CheckCircle2}
-              title={search || statusFilter !== 'semua' ? 'Tidak ada hasil' : 'Belum ada talangan'}
-              subtitle={search
-                ? 'Coba kata kunci lain.'
-                : statusFilter === 'lunas'
-                  ? 'Belum ada talangan yang lunas.'
-                  : statusFilter === 'belum'
-                    ? 'Tidak ada talangan yang belum lunas.'
-                    : 'Semua warga sudah memenuhi kehadiran.'}
+              title={kosongJudul}
+              subtitle={kosongSub}
               action={search || statusFilter !== 'semua'
                 ? { label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setStatusFilter('semua'); } }
                 : undefined}

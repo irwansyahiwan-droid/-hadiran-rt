@@ -12,6 +12,7 @@ import ErrorState from '../components/ErrorState';
 import Tag from '../components/Tag';
 import AvatarPeci from '../components/AvatarPeci';
 import Sakelar from '../components/Sakelar';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
 import { supabase } from '../lib/supabase';
 import {
   fetchAnggota, tambahAnggota, updateAnggota, backfillAnggotaSusulan,
@@ -363,6 +364,10 @@ export default function KelolaAnggota({ open, onClose }: Props) {
     if (!q) return list;
     return list.filter((w) => w.nama.toLowerCase().includes(q) || w.no_rumah.toLowerCase().includes(q));
   }, [list, search]);
+  /* Kalimat layar kosong SATU sumber: `EmptyState` + pengumuman pembaca layar. */
+  const kosongJudul = list.length === 0 ? 'Belum ada anggota' : 'Tidak ada hasil';
+  const kosongSub = list.length === 0 ? 'Tambahkan anggota RT lewat tombol di bawah.' : 'Coba kata kunci lain.';
+  useUmumkanHasil(filtered.length, 'anggota', [search], `${kosongJudul}. ${kosongSub}`);
 
   if (!open) return null;
 
@@ -438,8 +443,8 @@ export default function KelolaAnggota({ open, onClose }: Props) {
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
             <EmptyState
               icon={Users}
-              title={list.length === 0 ? 'Belum ada anggota' : 'Tidak ada hasil'}
-              subtitle={list.length === 0 ? 'Tambahkan anggota RT lewat tombol di bawah.' : 'Coba kata kunci lain.'}
+              title={kosongJudul}
+              subtitle={kosongSub}
               action={list.length > 0
                 ? { label: 'Hapus pencarian', icon: RotateCcw, onClick: () => setSearch('') }
                 : undefined}

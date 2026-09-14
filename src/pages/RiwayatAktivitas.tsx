@@ -6,6 +6,7 @@ import {
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
 import ErrorState from '../components/ErrorState';
 import FilterChips from '../components/FilterChips';
 import { useRealtime } from '../hooks/useRealtime';
@@ -135,6 +136,15 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
        "Saiful" tak menemukan baris talangan sampai filter/ketikan lain
        kebetulan memicu hitung ulang. */
   }, [rows, filter, search, kamus]);
+  /* Kalimat layar kosong SATU sumber: `EmptyState` + pengumuman pembaca layar. */
+  const kosongJudul = rows.length === 0 ? 'Belum ada aktivitas' : 'Tidak ada hasil';
+  const kosongSub = rows.length === 0
+    ? 'Setiap perubahan kas, tarikan, & talangan akan tercatat di sini secara otomatis.'
+    : 'Coba ubah filter atau kata kunci pencarian.';
+  useUmumkanHasil(
+    grouped.reduce((n, g) => n + g.items.length, 0), 'aktivitas', [filter, search],
+    `${kosongJudul}. ${kosongSub}`,
+  );
 
   /* Sampai 20 Agu 2026 jalur ini TANPA `catch` sama sekali: chunk gagal (mis.
      chunk basi sesudah deploy, yang dibalas HTML 200 oleh rewrite Vercel) cuma
@@ -232,10 +242,8 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
             <EmptyState
               icon={History}
-              title={rows.length === 0 ? 'Belum ada aktivitas' : 'Tidak ada hasil'}
-              subtitle={rows.length === 0
-                ? 'Setiap perubahan kas, tarikan, & talangan akan tercatat di sini secara otomatis.'
-                : 'Coba ubah filter atau kata kunci pencarian.'}
+              title={kosongJudul}
+              subtitle={kosongSub}
               action={rows.length > 0
                 ? { label: 'Reset filter', icon: RotateCcw, onClick: () => { setFilter('semua'); setSearch(''); } }
                 : undefined}

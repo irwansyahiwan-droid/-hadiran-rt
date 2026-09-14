@@ -23,11 +23,17 @@ import ClearButton from '../components/ClearButton';
 import InfoTip from '../components/InfoTip';
 import ErrorState from '../components/ErrorState';
 import EmptyState from '../components/EmptyState';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
 import SectionTitle from '../components/SectionTitle';
 
 type SubTab = 'anggota' | 'jadwal';
 
 /** Dua sub-tab + ikonnya — dipakai tombol tablist DAN navigasi panah. */
+/* Kalimat layar kosong daftar anggota — SATU sumber untuk `EmptyState` dan
+   pengumuman pembaca layar `useUmumkanHasil` ("judul. keterangan"). */
+const KOSONG_BELUM = ['Belum ada anggota', 'Daftar anggota muncul setelah bendahara menambahkan warga.'] as const;
+const KOSONG_CARI = ['Tidak ada hasil', 'Coba kata kunci lain.'] as const;
+
 const SUB_TABS = [
   ['anggota', 'Daftar Anggota', Users],
   ['jadwal', 'Jadwal Hadiran', CalendarDays],
@@ -214,6 +220,22 @@ export default function JadwalWargaPage() {
     />
   );
 
+  /* Dihitung SEBELUM early-return memuat/galat: `useUmumkanHasil` di bawahnya
+     hook, dan hook tak boleh duduk sesudah `return` bersyarat. */
+  const filteredWarga = wargaList.filter(w => {
+    if (search && !w.nama.toLowerCase().includes(search.toLowerCase())) return false;
+    if (wargaFilter === 'semua') return true;
+    const st = absensiMap[w.id];
+    if (wargaFilter === 'hadir') return st === 'hadir';
+    if (wargaFilter === 'titip') return st === 'titip';
+    return st === 'tidak_hadir'; // 'tidak'
+  });
+
+  useUmumkanHasil(
+    filteredWarga.length, 'anggota', [search, wargaFilter],
+    (wargaList.length === 0 ? KOSONG_BELUM : KOSONG_CARI).join('. '), // "judul. keterangan."
+  );
+
   if (loading) {
     return (
       <div className="space-y-8 pb-2">
@@ -352,15 +374,6 @@ export default function JadwalWargaPage() {
     const statusAbsensi = absensiMap[w.id];
     return statusAbsensi === 'hadir' || statusAbsensi === 'titip' || talanganLunasSet.has(w.id);
   }).length;
-
-  const filteredWarga = wargaList.filter(w => {
-    if (search && !w.nama.toLowerCase().includes(search.toLowerCase())) return false;
-    if (wargaFilter === 'semua') return true;
-    const st = absensiMap[w.id];
-    if (wargaFilter === 'hadir') return st === 'hadir';
-    if (wargaFilter === 'titip') return st === 'titip';
-    return st === 'tidak_hadir'; // 'tidak'
-  });
 
   return (
     <div className="space-y-8 pb-2">
@@ -557,14 +570,14 @@ export default function JadwalWargaPage() {
               wargaList.length === 0 ? (
                 <EmptyState
                   icon={Users}
-                  title="Belum ada anggota"
-                  subtitle="Daftar anggota muncul setelah bendahara menambahkan warga."
+                  title={KOSONG_BELUM[0]}
+                  subtitle={KOSONG_BELUM[1]}
                 />
               ) : (
                 <EmptyState
                   icon={Search}
-                  title="Tidak ada hasil"
-                  subtitle="Coba kata kunci lain."
+                  title={KOSONG_CARI[0]}
+                  subtitle={KOSONG_CARI[1]}
                   action={{ label: 'Reset filter', icon: RotateCcw, onClick: () => { setSearch(''); setWargaFilter('semua'); } }}
                 />
               )
