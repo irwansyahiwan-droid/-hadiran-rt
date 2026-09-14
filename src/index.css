@@ -1564,6 +1564,32 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   }
   .btn-secondary:active { transform: scale(0.97); }
 
+  /* ── Hover PILIHAN — chip filter, periode grafik, Pemasukan/Pengeluaran,
+     sub-tab (14 Sep 2026) ───────────────────────────────────────────────
+     `audit:hover` menemukan 48 dari 208 kontrol TAK berubah saat kursor di
+     atasnya, dan kelompok terbesar justru kosakata "pilih 1 dari N" ini — di
+     app yang tombol-tombol lainnya sudah punya hover. SATU resep, bukan
+     disalin per call-site (kosakata chip memang sudah kanonik, hovernya yang
+     tertinggal).
+
+     Yang MATI: tinta & tepi MENGUAT, latar TIDAK disentuh. Menggelapkan latar
+     chip putih ke gray-50 nyaris tak terlihat, dan di gelap menaikkan fill
+     gray-800 ke gray-700 menjatuhkan label gray-400 mendekati 4,5:1 — hover
+     wajib MENAIKKAN kontras, bukan menurunkannya.
+     Yang TERPILIH (fill brand/pos/neg): `brightness`, bahasa yang sama dgn
+     `.btn-brand:hover` — tapi 1.15, bukan 1.07: di fill datar hijau tua 1.07
+     tak terlihat sama sekali (dipotret), sedangkan `.btn-brand` bergradien.
+     Label putih tetap AAA: brand 8,57 · pos 7,52 · neg 7,29.
+     Utilitas `hover:` digerbang `hoverOnlyWhenSupported` (tailwind.config),
+     resep filter digerbang media yang sama — di HP :hover nyangkut sesudah
+     diketuk, jadi layar sentuh tak pernah membayarnya. */
+  .pilihan-hover {
+    @apply hover:text-ink hover:border-ink-faint dark:hover:text-gray-200 dark:hover:border-gray-400;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pilihan-isi-hover:hover { filter: brightness(1.15); }
+  }
+
   /* ── Field recipes ───────────────────────────────────────────────────
      SATU sumber tinggi/warna/fokus field. `.field` = input form (bg-gray-50,
      py-3); `.field-search` = bilah cari di halaman list (bg-white, py-3).

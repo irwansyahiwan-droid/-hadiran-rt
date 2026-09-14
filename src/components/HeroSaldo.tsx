@@ -141,7 +141,7 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
             key={s.label}
             data-kaki-kolom=""
             onClick={(e) => { e.stopPropagation(); s.onClick?.(); }}
-            className={`press ${box} active:opacity-80`}
+            className={`press ${box} relative isolate before:absolute before:inset-y-0 before:inset-x-1 before:-z-10 before:rounded-xl before:transition-colors hover:before:bg-white/10 active:opacity-80`}
           >
             {inner}
           </button>

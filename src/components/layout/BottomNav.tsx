@@ -126,14 +126,14 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
             <button
               key={id}
               onClick={() => { if (!isActive) haptic(); onChange(id); }}
-              className="press relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
+              className="press group relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
               aria-current={isActive ? 'page' : undefined}
             >
               {/* Ala Google/M3: ikon DIAM di tempat (tanpa scale/lift) — yang
                   berpindah hanya pil tonal di belakangnya. Ikon 24px duduk di
                   blok h-8 yg sejajar persis dgn pil. Aktif tetap DIISI (fill
                   tint) → outline→solid, active terbaca "padat" bukan cuma warna. */}
-              <span className="flex items-center justify-center w-16 h-8">
+              <span className="flex items-center justify-center w-16 h-8 rounded-full transition-colors duration-ketuk group-hover:bg-ink/[0.06] dark:group-hover:bg-white/10">
                 {/* Warna 150ms (bukan 300): nav ditekan puluhan kali sehari →
                     respons harus crisp; gerak "hidup" cukup dari pil spring. */}
                 <Icon

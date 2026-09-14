@@ -489,7 +489,7 @@ export default function JadwalWargaPage() {
                Ikon `shrink-0` supaya yang mengalah adalah labelnya, bukan ikon
                yang lalu gepeng. */
             className={`press relative z-10 flex-1 min-w-0 min-h-[44px] py-3 rounded-xl text-body font-semibold transition-colors inline-flex items-center justify-center gap-2 ${
-              subTab === id ? 'text-white' : 'text-gray-500 dark:text-gray-400'
+              subTab === id ? 'text-white hover:bg-white/10' : 'text-gray-500 dark:text-gray-400 pilihan-hover'
             }`}
           >
             <Icon className="w-4 h-4 shrink-0" /> <span className="potong-lentur">{label}</span>

@@ -1355,7 +1355,7 @@ export default function JadwalPage() {
                             disabled={navigatingId === t.id}
                             title="Proses tarikan"
                             aria-label={`Proses tarikan #${t.nomor}`}
-                            className="w-11 h-11 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 text-brand dark:text-emerald-300 inline-flex items-center justify-center active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
+                            className="w-11 h-11 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 hover:border-emerald-300 dark:hover:border-emerald-700 text-brand dark:text-emerald-300 inline-flex items-center justify-center active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
                           >
                             {navigatingId === t.id
                               ? <RefreshCw className="w-5 h-5 animate-spin" />

@@ -325,7 +325,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       key={trx.id}
       onClick={() => { haptic(); setSelectedTrx(trx); }}
       style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-      className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
+      className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
     >
       <div className={`icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
         {trx.tipe === 'setor'
@@ -386,7 +386,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           }}
           aria-expanded={open}
           style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
-          className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
+          className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
         >
           <div className="icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
             <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
@@ -717,7 +717,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           onClick={() => onNavigate('talangan')}
           className="press w-full flex items-center gap-3 min-h-[56px] px-4 py-3 rounded-2xl
                      bg-amber-50/90 dark:bg-amber-900/20
-                     border border-amber-200/60 dark:border-amber-800/40"
+                     border border-amber-200/60 dark:border-amber-800/40
+                     transition-colors hover:border-amber-400 dark:hover:border-amber-600"
         >
           <AlertTriangle className="w-5 h-5 shrink-0 text-amber-600 dark:text-amber-400" />
           <div className="flex-1 min-w-0 text-left">
@@ -747,9 +748,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 melihat); yang ditambah cuma nama untuk yang tidak melihat.
                 Nama barunya MEMUAT teks terlihat, jadi §2.5.3 "Label in Name"
                 tetap terpenuhi & perintah suara "lihat semua" tetap cocok. */
-            <button onClick={() => onNavigate('jadwal')} aria-label="Lihat semua jadwal" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
+            <button onClick={() => onNavigate('jadwal')} aria-label="Lihat semua jadwal" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold hover:underline underline-offset-4">
               Lihat semua
-              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" />
+              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-hover:translate-x-0.5 group-active:translate-x-0.5" />
             </button>
           }
         >
@@ -840,9 +841,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={trxItems.length}
           action={
-            <button onClick={() => onNavigate('kas')} aria-label="Lihat semua transaksi" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold">
+            <button onClick={() => onNavigate('kas')} aria-label="Lihat semua transaksi" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold hover:underline underline-offset-4">
               Lihat semua
-              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-active:translate-x-0.5" />
+              <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-hover:translate-x-0.5 group-active:translate-x-0.5" />
             </button>
           }
         >

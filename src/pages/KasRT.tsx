@@ -131,9 +131,9 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                 className={`press inline-flex items-center justify-center gap-2 min-h-[44px] py-3 rounded-xl text-body font-semibold border transition ${
                   tipe === t
                     ? t === 'masuk'
-                      ? 'bg-pos text-white border-pos'
-                      : 'bg-neg text-white border-neg'
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-control-dark'
+                      ? 'bg-pos text-white border-pos pilihan-isi-hover'
+                      : 'bg-neg text-white border-neg pilihan-isi-hover'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-control dark:border-control-dark pilihan-hover'
                 }`}
               >
                 {/* Ikon lucide (bukan panah unicode) — rima dgn ikon tile mutasi */}
@@ -790,8 +790,8 @@ export default function KasRTPage() {
                            padahal pekerjaannya sama: memfilter data. */
                         className={`press shrink-0 min-h-[44px] px-3 inline-flex items-center justify-center rounded-full text-caption font-semibold whitespace-nowrap transition-colors ${
                           chartPeriod === p
-                            ? 'bg-brand text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-control-dark'
+                            ? 'bg-brand text-white pilihan-isi-hover'
+                            : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-control-dark pilihan-hover'
                         }`}
                       >
                         {/* "3 bln", bukan "3B" — singkatan sandi utk pembaca lansia;

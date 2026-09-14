@@ -89,14 +89,14 @@ export default function FilterChips<T extends string, S extends string = string>
               aria-pressed={active}
               className={`press shrink-0 inline-flex items-center justify-center min-h-[44px] px-4 rounded-full text-caption font-semibold transition-colors ${
                 active
-                  ? 'bg-brand text-white' /* fill brand DATAR (MATERIAL-FLAT) — gradient+inset+glow era pra-flat dihapus, selaras filter absensi & pill nav */
+                  ? 'bg-brand text-white pilihan-isi-hover' /* fill brand DATAR (MATERIAL-FLAT) — gradient+inset+glow era pra-flat dihapus, selaras filter absensi & pill nav */
                   /* dark:text-gray-400 (5.74:1 di fill gray-800) SENGAJA — bukan gray-300.
                      gray-300 (~10:1) pernah dicoba 18 Jul & DITOLAK: terang-di-atas-gelap
                      menimbulkan halation (silau) DAN membuat chip inaktif bersaing dgn chip
                      aktif → hierarki rancu. Simetri kontras light↔dark itu keliru: gelap-di-
                      atas-terang tak silau, kebalikannya silau. Audit akan lapor 4.06 utk chip
                      ini — itu FP sampel BORDER gray-700, bukan fill. Jangan "perbaiki" lagi. */
-                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-control-dark'
+                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-control dark:border-control-dark pilihan-hover'
               }`}
             >
               {f.label}
@@ -112,7 +112,7 @@ export default function FilterChips<T extends string, S extends string = string>
             aria-haspopup="listbox"
             aria-expanded={sortOpen}
             aria-label={`Urutkan: ${sortLabel}`}
-            className="press inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark"
+            className="press inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors"
           >
             <ArrowDownUp className="w-3.5 h-3.5" />
             {sortLabel}
@@ -163,7 +163,7 @@ export default function FilterChips<T extends string, S extends string = string>
           type="button"
           onClick={() => { haptic(); sort.onCycle(); }}
           aria-label={`Urutkan: ${sort.label}`}
-          className="press shrink-0 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark"
+          className="press shrink-0 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors"
         >
           <ArrowDownUp className="w-3.5 h-3.5" />
           {sort.label}

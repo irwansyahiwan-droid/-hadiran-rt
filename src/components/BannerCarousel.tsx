@@ -762,7 +762,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                 onClick={() => goTo(i)}
                 aria-label={`Ke slide ${i + 1}`}
                 aria-current={isActive}
-                className="press grid place-items-center"
+                className="press group grid place-items-center"
                 // padding-x 8.5 + gap 0 di baris → kotak sentuh 24px persis dan
                 // BERSINGGUNGAN, tidak bertumpuk (WCAG 2.5.8 AA). Dulu lebar
                 // tombol = lebar dot (7px) → praktis tak bisa diketuk (audit
@@ -797,7 +797,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                     Nilainya token yang sama dgn batas kolom isian, bukan hex baru.
                     Rel abu ini juga bikin bar progress autoplay akhirnya terbaca. */}
                 <span
-                  className="block h-1 overflow-hidden rounded-full bg-control dark:bg-control-dark"
+                  className="block h-1 overflow-hidden rounded-full bg-control dark:bg-control-dark transition-colors group-hover:bg-ink-faint dark:group-hover:bg-gray-400"
                   style={{ width: isActive ? 26 : 7, transition: reduced ? 'none' : `width 0.42s ${EASE}` }}
                 >
                   {isActive && !reduced && !stopped && (
