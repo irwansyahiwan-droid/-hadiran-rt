@@ -3,13 +3,16 @@ import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import FitAmount from './FitAmount';
 import { ukuranMuat } from '../lib/utils';
+import { klikTautanSpa } from '../lib/tautanTab';
 
-/** Satu kolom statistik di kaki hero. `onClick` menjadikannya tombol navigasi. */
+/** Satu kolom statistik di kaki hero. `href` + `onClick` menjadikannya TAUTAN ke
+ *  tab itu (`<a>`, tekan-lama/Ctrl-klik bekerja); `onClick` saja = tombol. */
 export interface HeroStat {
   icon?: LucideIcon;
   label: string;
   value: ReactNode;
   onClick?: () => void;
+  href?: string;
 }
 
 /**
@@ -136,12 +139,26 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
           </>
         );
         const box = `flex w-full min-w-0 flex-col items-center gap-1 px-0.5 ${sep}`;
-        return s.onClick ? (
+        const kelasAksi = `press ${box} relative isolate before:absolute before:inset-y-0 before:inset-x-1 before:-z-10 before:rounded-xl before:transition-colors hover:before:bg-white/10 active:opacity-80`;
+        return s.href && s.onClick ? (
+          /* `draggable={false}`: kaki ini duduk di kartu carousel yang diseret
+             pointer — tautan yang bisa diseret peramban merebut seretan itu. */
+          <a
+            key={s.label}
+            href={s.href}
+            draggable={false}
+            data-kaki-kolom=""
+            onClick={(e) => { e.stopPropagation(); klikTautanSpa(e, () => s.onClick?.()); }}
+            className={kelasAksi}
+          >
+            {inner}
+          </a>
+        ) : s.onClick ? (
           <button
             key={s.label}
             data-kaki-kolom=""
             onClick={(e) => { e.stopPropagation(); s.onClick?.(); }}
-            className={`press ${box} relative isolate before:absolute before:inset-y-0 before:inset-x-1 before:-z-10 before:rounded-xl before:transition-colors hover:before:bg-white/10 active:opacity-80`}
+            className={kelasAksi}
           >
             {inner}
           </button>

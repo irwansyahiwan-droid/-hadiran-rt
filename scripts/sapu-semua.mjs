@@ -212,7 +212,7 @@ const LANTAI = {
   /* Populasi = PERMUKAAN berdaftar (properti app, bukan data) — lantai persis. */
   umumkan:          [/(\d+) permukaan diperiksa · \d+ bermasalah/, 7],
   /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis. */
-  tautan:           [/TAUTAN TAB: (\d+) pemeriksaan/, 28],
+  tautan:           [/TAUTAN TAB: (\d+) pemeriksaan/, 37],
   huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],
   /* 16 -> 20 layar (12 Sep 2026): sheet TUJUAN `data-ringkas` masuk populasi
      — syarat kedua penanda itu. Lantai ~95%. */

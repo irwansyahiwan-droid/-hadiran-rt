@@ -20,6 +20,7 @@ import { useAuthContext } from '../context/AuthContext';
 import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
 import SectionTitle from '../components/SectionTitle';
+import { pathTab, klikTautanSpa } from '../lib/tautanTab';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 
 
@@ -682,9 +683,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                    perubahan di sini tidak merembet ke sana. */
                 className="pt-5"
                 items={[
-                  { icon: Wallet, label: 'Terkumpul', value: maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas') },
-                  { icon: ArrowLeftRight, label: 'Talangan', value: maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('talangan') },
-                  { icon: ArrowUpRight, label: 'Setor Kas RT', value: maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4), onClick: () => onNavigate('kas-rt') },
+                  { icon: Wallet, label: 'Terkumpul', value: maskRp(`Rp${Math.abs(animatedKasHadiran).toLocaleString('id-ID')}`, hidden, 4), href: pathTab('kas'), onClick: () => onNavigate('kas') },
+                  { icon: ArrowLeftRight, label: 'Talangan', value: maskRp(`Rp${Math.abs(animatedTalangan).toLocaleString('id-ID')}`, hidden, 4), href: pathTab('talangan'), onClick: () => onNavigate('talangan') },
+                  { icon: ArrowUpRight, label: 'Setor Kas RT', value: maskRp(`Rp${Math.abs(animatedSetor).toLocaleString('id-ID')}`, hidden, 4), href: pathTab('kas-rt'), onClick: () => onNavigate('kas-rt') },
                 ]}
               />
             )}
@@ -713,8 +714,9 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           dalam kartu yang toh cuma punya satu tujuan itu perabot; barisnya
           sendiri sudah 56px, jauh di atas ambang sentuh 44px. */}
       {talangan > 0 && (
-        <button
-          onClick={() => onNavigate('talangan')}
+        <a
+          href={pathTab('talangan')}
+          onClick={(e) => klikTautanSpa(e, () => onNavigate('talangan'))}
           className="press w-full flex items-center gap-3 min-h-[56px] px-4 py-3 rounded-2xl
                      bg-amber-50/90 dark:bg-amber-900/20
                      border border-amber-200/60 dark:border-amber-800/40
@@ -733,7 +735,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             </p>
           </div>
           <ChevronRight className="w-4 h-4 shrink-0 text-amber-700 dark:text-amber-400" />
-        </button>
+        </a>
       )}
 
       {/* Jadwal Berikutnya */}
@@ -748,10 +750,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                 melihat); yang ditambah cuma nama untuk yang tidak melihat.
                 Nama barunya MEMUAT teks terlihat, jadi §2.5.3 "Label in Name"
                 tetap terpenuhi & perintah suara "lihat semua" tetap cocok. */
-            <button onClick={() => onNavigate('jadwal')} aria-label="Lihat semua jadwal" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold hover:underline underline-offset-4">
+            <a href={pathTab('jadwal')} onClick={(e) => klikTautanSpa(e, () => onNavigate('jadwal'))} aria-label="Lihat semua jadwal" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold hover:underline underline-offset-4">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-hover:translate-x-0.5 group-active:translate-x-0.5" />
-            </button>
+            </a>
           }
         >
           Jadwal Berikutnya
@@ -841,10 +843,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <SectionTitle
           count={trxItems.length}
           action={
-            <button onClick={() => onNavigate('kas')} aria-label="Lihat semua transaksi" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold hover:underline underline-offset-4">
+            <a href={pathTab('kas')} onClick={(e) => klikTautanSpa(e, () => onNavigate('kas'))} aria-label="Lihat semua transaksi" className="press group inline-flex items-center gap-0.5 min-h-[44px] -my-1 pl-2 pr-1 text-body text-brand-link dark:text-brand-linkDark font-semibold hover:underline underline-offset-4">
               Lihat semua
               <ChevronRight className="w-4 h-4 transition-transform duration-ketuk group-hover:translate-x-0.5 group-active:translate-x-0.5" />
-            </button>
+            </a>
           }
         >
           {/* "Transaksi", bukan "Transaksi Terakhir": diukur di 360px, judul +
@@ -865,13 +867,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               yang terdengar pasti padahal tidak. App kas tak boleh menyebut
               hitungan yang tak ia ketahui. */}
           {trxItems.length > TRX_LIMIT && (
-            <button
-              onClick={() => onNavigate('kas')}
+            <a
+              href={pathTab('kas')}
+              onClick={(e) => klikTautanSpa(e, () => onNavigate('kas'))}
               className="press w-full flex items-center justify-center gap-1 px-4 py-4 text-body font-semibold text-brand-link dark:text-brand-linkDark border-t border-line dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
             >
               Lihat semua transaksi
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </a>
           )}
         </div>
       </div>

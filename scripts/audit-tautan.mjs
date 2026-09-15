@@ -19,6 +19,10 @@
 // T8 path asing → Beranda "/" · T9 keluar mode warga → "/"
 // T10 bagikan: lembar bagikan menerima teks+URL yang benar; tanpa lembar →
 //     URL tersalin + toast; batal (AbortError) → diam
+// T12 navigasi di KONTEN Beranda = <a href> sungguhan (15 Sep 2026): href benar,
+//     klik biasa pindah tab TANPA memuat ulang halaman, Ctrl-klik membuka tab
+//     peramban baru & halaman ini tak ikut pindah. Bar nav bawah SENGAJA tetap
+//     <button> (31 sapuan memilihnya lewat `nav button`, 14 dikunci read-only).
 // T11 RELOAD sesudah pindah tab lewat nav (entri di bawah masih "/") & reload
 //     dgn sheet terbuka → tab & alamat pulih, Back pertama → Beranda "/".
 //     Lahir dari regresi nyata: penyapu entri yatim mendarat di entri "/" dan
@@ -160,6 +164,44 @@ try {
     k = await keadaan(page);
     cek('T11', k.tab === 'Beranda' && k.path === '/', `Back pertama sesudah reload → tab ${k.tab} · alamat ${k.path}`);
   } else cacat.push('T11 FAB Kas RT tak ada');
+
+  // ── T12 · tautan di konten Beranda ─────────────────────────────────────────
+  await buka(page, '/'); await siapApp(page);
+  const tautan = await page.evaluate(() => [...document.querySelectorAll('main a[href]')].map((a) => ({
+    nama: (a.getAttribute('aria-label') || a.innerText).trim().replace(/\s+/g, ' ').slice(0, 40),
+    href: a.getAttribute('href'),
+  })));
+  const harap = [
+    [/^Lihat semua jadwal$/, '/jadwal'],
+    [/^Lihat semua transaksi$/, '/hadiran'],
+    [/^Terkumpul/, '/hadiran'],
+    [/^Talangan Rp/, '/talangan'],
+    [/^Setor Kas RT/, '/kas-rt'],
+    /* Banner hanya ada saat talangan > 0 — data DB hidup hari ini memuatnya. */
+    [/^Talangan belum lunas/, '/talangan'],
+    [/^Lihat Kas RT$/, '/kas-rt'],
+  ];
+  for (const [pola, href] of harap) {
+    const t = tautan.filter((x) => pola.test(x.nama));
+    cek('T12', t.length > 0 && t.every((x) => x.href === href), `"${pola.source}" → ${t.length ? JSON.stringify(t) : 'BUKAN <a href> (tak ada tautan)'}`);
+  }
+  const jadwalA = page.locator('main a[href="/jadwal"]').first();
+  if (await jadwalA.count()) {
+    await page.evaluate(() => { window.__halamanSama = true; });
+    await jadwalA.click(); await tunggu(page, 1200);
+    k = await keadaan(page);
+    const sama = await page.evaluate(() => window.__halamanSama === true);
+    cek('T12', k.tab === 'Jadwal' && k.path === '/jadwal' && sama, `klik biasa "Lihat semua jadwal" → tab ${k.tab} · alamat ${k.path} · tanpa muat ulang ${sama}`);
+    await buka(page, '/'); await siapApp(page);
+    const [baru] = await Promise.all([
+      ctx.waitForEvent('page', { timeout: 15000 }).catch(() => null),
+      page.locator('main a[href="/jadwal"]').first().click({ modifiers: [process.platform === 'darwin' ? 'Meta' : 'Control'] }),
+    ]);
+    await tunggu(page, 1000);
+    k = await keadaan(page);
+    cek('T12', !!baru && k.tab === 'Beranda' && k.path === '/', `Ctrl/⌘-klik → tab peramban baru ${!!baru} · halaman ini tetap tab ${k.tab} · alamat ${k.path}`);
+    if (baru) await baru.close();
+  }
 
   // ── T8 · path asing ──────────────────────────────────────────────────────
   await buka(page, '/tidak-ada-halaman-ini'); await siapApp(page);

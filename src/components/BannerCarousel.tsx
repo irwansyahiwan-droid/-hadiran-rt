@@ -5,6 +5,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { haptic } from '../lib/utils';
+import { pathTab, klikTautanSpa } from '../lib/tautanTab';
+import type { TabName } from './layout/tabs';
 import { heroRingkas, useUkuranLayar } from '../lib/hooks';
 import rtBendahara from '../assets/rt-bendahara.jpg';
 import dashboardPhone from '../assets/dashboard-phone.jpg';
@@ -178,7 +180,7 @@ interface PromoSlide {
   icon: LucideIcon;
   grad: string;
   glow: string;
-  cta?: { label: string; tab: string };
+  cta?: { label: string; tab: TabName };
 }
 
 /* ------------------------------------------------------------------ */
@@ -675,14 +677,16 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                 <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW, opacity: contentOpacity, transition: dragging ? 'none' : `opacity 0.42s ${EASE}` }}>
                   {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
                   {promo!.cta && onNavigate && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); haptic(); onNavigate(promo!.cta!.tab); }}
+                    <a
+                      href={pathTab(promo!.cta.tab)}
+                      draggable={false}
+                      onClick={(e) => { e.stopPropagation(); klikTautanSpa(e, () => { haptic(); onNavigate(promo!.cta!.tab); }); }}
                       aria-label={promo!.cta.label}
                       tabIndex={active ? 0 : -1}
                       className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
                     >
                       <ChevronRight className="h-5 w-5" strokeWidth={2.2} />
-                    </button>
+                    </a>
                   )}
 
                   {/* Eyebrow: tile ikon + label. */}
