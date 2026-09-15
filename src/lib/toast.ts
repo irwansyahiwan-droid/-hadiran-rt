@@ -6,10 +6,36 @@ export interface ToastItem {
   id: number;
   message: string;
   type: ToastType;
-  duration?: number;          // ms tampil (default 2600)
+  duration?: number;          // ms tampil MINIMUM — dipanjangkan kalau pesannya butuh (lihat `durasiTampil`)
   actionLabel?: string;       // mis. "Urungkan"
   onAction?: () => void;      // dipanggil saat tombol aksi diklik
   onExpire?: () => void;      // dipanggil saat toast habis waktu tanpa aksi
+}
+
+/* ── Berapa lama toast hidup ───────────────────────────────────────────────
+   Dulu SEMUA toast 2,6 dtk. Aturan kata app (akibat · jalan keluar · sebut
+   bendanya) membuat galat memanjang sampai 15 kata, durasinya tidak ikut —
+   19 dari 38 pesan tak sempat terbaca pada 200 kata/menit, dan yang hilang
+   justru ujungnya: jalan keluarnya ("Muat ulang lalu coba lagi").
+   Waktu baca = 500 ms untuk melihat toast muncul + 300 ms/kata (200 kpm, laju
+   orang dewasa rata-rata — warga lansia lebih lambat, karena itu toast juga
+   BERHENTI selama dipegang, lihat Toaster). Galat punya lantai lebih tinggi:
+   ia yang membawa jalan keluar. Waktu baca dipagari 10 dtk supaya pesan yang
+   kebablasan panjang tak menutupi Header terlalu lama; `duration` eksplisit
+   (mis. jendela Urungkan) tetap dihormati sbg MINIMUM. Dijaga `toast.test.ts`
+   & `audit:toast` bagian T4. */
+export const DURASI_DASAR_MS = 2600;
+export const DURASI_GALAT_MS = 4000;
+export const DURASI_BACA_MAKS_MS = 10_000;
+
+export function jumlahKata(teks: string): number {
+  return teks.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
+}
+
+export function durasiTampil(t: Pick<ToastItem, 'message' | 'type' | 'duration' | 'actionLabel'>): number {
+  const lantai = t.duration ?? (t.type === 'error' ? DURASI_GALAT_MS : DURASI_DASAR_MS);
+  const baca = 500 + (jumlahKata(t.message) + jumlahKata(t.actionLabel ?? '')) * 300;
+  return Math.max(lantai, Math.min(baca, DURASI_BACA_MAKS_MS));
 }
 
 type Listener = (t: ToastItem) => void;

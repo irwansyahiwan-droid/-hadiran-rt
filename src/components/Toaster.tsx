@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import { Check, AlertCircle, Info } from 'lucide-react';
-import { subscribeToast, subscribeUmum, type ToastItem } from '../lib/toast';
+import { durasiTampil, subscribeToast, subscribeUmum, type ToastItem } from '../lib/toast';
 import { haptic } from '../lib/utils';
 
 const STYLES = {
@@ -10,6 +10,23 @@ const STYLES = {
 } as const;
 
 const EXIT_MS = 200; // selaras durasi .toast-out
+
+/* Jam per toast yang bisa DIJEDA. `mulai` null = sedang dijeda. */
+type Jam = {
+  sisa: number;
+  mulai: number | null;
+  pewaktu: ReturnType<typeof setTimeout> | null;
+  pemicu: Element | null;
+  onExpire?: () => void;
+};
+
+/* Tujuan fokus yang sah: masih di dokumen, terlihat, aktif, dan tak berada di
+   balik lapisan `inert`/`aria-hidden` yang terbuka sesudahnya. */
+function bisaDifokus(el: Element | null): el is HTMLElement {
+  return el instanceof HTMLElement && el !== document.body && el.isConnected
+    && el.getClientRects().length > 0 && !el.closest('[inert],[aria-hidden="true"]')
+    && !(el as HTMLButtonElement).disabled;
+}
 
 export default function Toaster() {
   const [items, setItems] = useState<ToastItem[]>([]);
@@ -27,13 +44,71 @@ export default function Toaster() {
   // id = number (counter di lib/toast) — Set<number> selaras dgn ToastItem.id.
   const [leaving, setLeaving] = useState<Set<number>>(new Set());
 
+  /* ── Toast BERHENTI selama dipegang (WCAG §2.2.1) ────────────────────────
+     Dulu hitung mundur jalan terus saat kursor di atas toast atau fokus di
+     tombol "Urungkan": habis waktu, aksi yang mau dibatalkan justru DIJALANKAN
+     di bawah jari pengguna, dan tombol yang difokus lenyap → fokus jatuh ke
+     <body>. Semua toast dijeda bersama selama kursor ATAU fokus ada di
+     tumpukan, dan jalan lagi dgn SISA waktunya saat keduanya pergi (pola
+     Gmail/Sonner). Kursor sentuh sengaja tak dihitung: di HP ketukan langsung
+     beraksi, dan `:hover` iOS yang nyangkut akan menahan toast selamanya.
+     Dijaga `audit:toast` T1 & T2. */
+  const jam = useRef(new Map<number, Jam>());
+  const dipegang = useRef({ kursor: false, fokus: false });
+  const tumpukan = useRef<HTMLDivElement>(null);
+  /* Fokus TERAKHIR di luar tumpukan — cadangan kalau pemicu toast sudah hilang
+     (mis. tombol konfirmasi hapus yang ikut tertutup bersama dialognya). */
+  const fokusLuar = useRef<Element | null>(null);
+
+  const ditahan = () => dipegang.current.kursor || dipegang.current.fokus;
+
+  const jalankan = (id: number, j: Jam) => {
+    j.mulai = Date.now();
+    j.pewaktu = setTimeout(() => dismiss(id, j.onExpire), j.sisa);
+  };
+
+  const pegang = (sumber: 'kursor' | 'fokus', nilai: boolean) => {
+    if (dipegang.current[sumber] === nilai) return;
+    dipegang.current[sumber] = nilai;
+    const tahan = ditahan();
+    for (const [id, j] of jam.current) {
+      if (tahan && j.mulai !== null) {
+        if (j.pewaktu) clearTimeout(j.pewaktu);
+        j.sisa = Math.max(0, j.sisa - (Date.now() - j.mulai));
+        j.mulai = null;
+        j.pewaktu = null;
+      } else if (!tahan && j.mulai === null) {
+        jalankan(id, j);
+      }
+    }
+  };
+
   // Tandai keluar → mainkan .toast-out → lepas dari DOM setelah animasi selesai.
   const dismiss = (id: number, after?: () => void) => {
+    const j = jam.current.get(id);
+    if (j?.pewaktu) clearTimeout(j.pewaktu);
+    jam.current.delete(id);
+    /* Fokus PULANG sebelum tombolnya lenyap (§2.4.3): ke pemicu toast kalau
+       masih ada, ke fokus terakhir di luar tumpukan kalau tidak. Tanpa ini
+       "Urungkan" yang ditekan papan ketik meninggalkan pengguna di <body>.
+       Memindah fokus memicu `focusout` tumpukan → `pegang('fokus', false)`. */
+    const aktif = document.activeElement;
+    if (aktif?.closest(`[data-toast="${id}"]`)) {
+      const tujuan = [j?.pemicu ?? null, fokusLuar.current].find(bisaDifokus);
+      if (tujuan) tujuan.focus();
+      else (aktif as HTMLElement).blur();
+    }
     setLeaving((prev) => new Set(prev).add(id));
     setTimeout(() => {
       setItems((prev) => prev.filter((x) => x.id !== id));
       setLeaving((prev) => { const n = new Set(prev); n.delete(id); return n; });
       after?.();
+      /* Toast yang DICABUT di bawah kursor tak pernah mengirim `pointerleave`,
+         jadi "kursor memegang" bisa nyangkut dan menahan toast berikutnya
+         selamanya. Periksa ulang dari keadaan nyata sesudah DOM diperbarui. */
+      requestAnimationFrame(() => {
+        if (dipegang.current.kursor && !tumpukan.current?.matches(':hover')) pegang('kursor', false);
+      });
     }, EXIT_MS);
   };
 
@@ -46,17 +121,32 @@ export default function Toaster() {
   };
 
   useEffect(() => {
-    return subscribeToast((t) => {
+    const catat = (e: FocusEvent) => {
+      const t = e.target as Element | null;
+      if (t && !t.closest?.('[data-toast-tumpuk]')) fokusLuar.current = t;
+    };
+    document.addEventListener('focusin', catat);
+    const semua = jam.current;
+    const lepas = subscribeToast((t) => {
       haptic(8);
       setItems((prev) => [...prev, t]);
-      /* Toast beraksi (mis. "Urungkan") menutup diri dalam ~2,6 detik. Pemakai
-         pembaca layar tak melihatnya, jadi keberadaan tombol itu harus ikut
-         diucapkan — kalau tidak, jalan untuk membatalkan absensi massal lewat
-         begitu saja tanpa pernah diketahui. */
+      /* Toast beraksi (mis. "Urungkan") menutup diri sendiri. Pemakai pembaca
+         layar tak melihatnya, jadi keberadaan tombol itu harus ikut diucapkan —
+         kalau tidak, jalan untuk membatalkan absensi massal lewat begitu saja
+         tanpa pernah diketahui. */
       umumkan(t.actionLabel ? `${t.message}. Tombol ${t.actionLabel} tersedia.` : t.message, t.type === 'error');
-      // commit ditunda (guard mencegah jalan bila sudah di-undo)
-      setTimeout(() => dismiss(t.id, () => t.onExpire?.()), t.duration ?? 2600);
+      // commit ditunda (guard di lib/toast mencegah jalan bila sudah di-undo)
+      const j: Jam = { sisa: durasiTampil(t), mulai: null, pewaktu: null, pemicu: document.activeElement, onExpire: t.onExpire };
+      semua.set(t.id, j);
+      if (!ditahan()) jalankan(t.id, j);
     });
+    return () => {
+      lepas();
+      document.removeEventListener('focusin', catat);
+      for (const j of semua.values()) if (j.pewaktu) clearTimeout(j.pewaktu);
+      semua.clear();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- berlangganan SEKALI; fungsi di atas hanya membaca ref & setter stabil
   }, []);
 
   // Pengumuman tanpa toast terlihat (`umumkanSaja`) memakai region yang SAMA.
@@ -73,20 +163,43 @@ export default function Toaster() {
           Jangan gabungkan lagi ke wadah toast di bawah. */}
       <p className="sr-only" role="status" aria-live="polite">{umumSopan}</p>
       <p className="sr-only" role="alert" aria-live="assertive">{umumPenting}</p>
-      {items.length > 0 && <ToastStack items={items} leaving={leaving} onAction={handleAction} />}
+      {items.length > 0 && (
+        <ToastStack
+          items={items}
+          leaving={leaving}
+          onAction={handleAction}
+          tumpukanRef={tumpukan}
+          onPegang={pegang}
+        />
+      )}
     </>
   );
 }
 
 function ToastStack({
-  items, leaving, onAction,
+  items, leaving, onAction, tumpukanRef, onPegang,
 }: {
   items: ToastItem[];
   leaving: Set<number>;
   onAction: (t: ToastItem) => void;
+  tumpukanRef: RefObject<HTMLDivElement>;
+  onPegang: (sumber: 'kursor' | 'fokus', nilai: boolean) => void;
 }) {
+  /* Tumpukan dilepas = tak ada lagi yang bisa dipegang (kursor tak sempat
+     `leave`). Deps KOSONG disengaja: `onPegang` lahir ulang tiap render, dan
+     efek ber-dep akan menjalankan cleanup-nya — melepas pegangan — setiap kali
+     toast baru datang. Versi pertama melakukan persis itu. `onPegang` hanya
+     membaca ref, jadi salinan dari render pertama tetap benar. */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => () => { onPegang('kursor', false); onPegang('fokus', false); }, []);
   return (
     <div
+      ref={tumpukanRef}
+      data-toast-tumpuk=""
+      onPointerEnter={(e) => { if (e.pointerType !== 'touch') onPegang('kursor', true); }}
+      onPointerLeave={(e) => { if (e.pointerType !== 'touch') onPegang('kursor', false); }}
+      onFocus={() => onPegang('fokus', true)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) onPegang('fokus', false); }}
       /* Sengaja TANPA role/aria-live: pengumuman sudah ditangani region live
          permanen di atas. Wadah ini konten biasa, jadi tak diumumkan otomatis
          (tak ada pembacaan dobel) tapi tombol aksinya tetap bisa dijelajahi. */
@@ -108,6 +221,7 @@ function ToastStack({
         return (
           <div
             key={t.id}
+            data-toast={t.id}
             className={`${leaving.has(t.id) ? 'toast-out' : 'toast-in'} pointer-events-auto flex items-center gap-3 w-full px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ${s.ring}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >

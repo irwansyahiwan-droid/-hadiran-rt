@@ -99,6 +99,10 @@ const VISUAL = [
   /* §4.1.3 Status Messages (AA): hasil cari & chip filter diumumkan. Lahir &
      masuk rantai 14 Sep 2026 — sampai hari itu tujuh daftar berubah tanpa suara. */
   ['umumkan', 'node scripts/audit-umumkan.mjs'],
+  /* Toast bisa DIBACA & aksinya bisa DIPAKAI sebelum pergi (§2.2.1 · §2.4.3).
+     Lahir & masuk rantai 15 Sep 2026 — sampai hari itu "Urungkan" menghitung
+     mundur di bawah fokus dan galat 11 kata hidup 2,6 dtk. */
+  ['toast', 'node scripts/audit-toast.mjs'],
   /* Tautan per tab (`/jadwal`) — menempel di back-stack & gate Login, dua mesin
      yang pernah membuat app blank. Masuk rantai di hari lahirnya (14 Sep 2026). */
   ['tautan', 'node scripts/audit-tautan.mjs'],
@@ -211,6 +215,10 @@ const LANTAI = {
   hover:            [/(\d+) kontrol unik di \d+ layar/, 258],
   /* Populasi = PERMUKAAN berdaftar (properti app, bukan data) — lantai persis. */
   umumkan:          [/(\d+) permukaan diperiksa · \d+ bermasalah/, 7],
+  /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis, garis
+     dasar hijau 8. Jalan merah mencetak lebih sedikit (T1/T2 berhenti sesudah
+     vonis pertamanya gagal); rantai tetap merah lewat kode keluar. */
+  toast:            [/TOAST: (\d+) pemeriksaan/, 8],
   /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis. */
   tautan:           [/TAUTAN TAB: (\d+) pemeriksaan/, 37],
   huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],

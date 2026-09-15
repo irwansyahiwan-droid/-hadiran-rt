@@ -367,7 +367,8 @@ sendiri.**
   berkas bisa tetap 23 sementara isinya menyusut); hanya `typecheck` & `lint`
   yang memang tak punya populasi terhitung.
 - **Angka yang mungkin basi WAJIB mengaku SELAMA ia masih basi.** Toast tidak
-  cukup — ia hidup ~2,6 dtk sementara basinya permanen. App punya DUA strip
+  cukup — ia hidup 2,6–10 dtk (ikut panjang pesan, `durasiTampil`) sementara
+  basinya permanen. App punya DUA strip
   kembar di Header: LURING (sinyal hilang) & BASI (sinyal ada, server menolak).
   Keduanya tak bisa ditutup dan hilang sendiri saat keadaannya pulih. Jalur
   muat BARU wajib memanggil `tandaiBasi()`/`tandaiSegar()` (`src/lib/basi.ts`).

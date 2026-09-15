@@ -29,6 +29,7 @@
     "audit:nama": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-nama.mjs",
     "audit:hover": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-hover.mjs",
     "audit:umumkan": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-umumkan.mjs",
+    "audit:toast": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-toast.mjs",
     "audit:tautan": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-tautan.mjs",
     "audit:potong": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-potong.mjs",
     "audit:jarak-teks": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-jarak-teks.mjs",

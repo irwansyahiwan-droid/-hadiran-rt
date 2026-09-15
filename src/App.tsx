@@ -305,6 +305,11 @@ export default function App() {
   return (
     <AuthContext.Provider value={ctxValue}>
       <div className="app-bg min-h-dvh">
+        {/* Toast tercat PALING ATAS layar, jadi di DOM ia juga PERTAMA — urutan
+            fokus = urutan visual. Dulu ia di ekor (sesudah BottomNav): tombol
+            "Urungkan" berjarak 83 Tab dari "Semua Hadir", mustahil dicapai dalam
+            umurnya. Kini satu Shift+Tab melewati Header. Dijaga `audit:toast` T5. */}
+        <Toaster />
         <Header
           role={isWargaMode ? 'warga' : auth.role}
           onLogout={isWargaMode ? ctxValue.exitWargaMode : auth.signOut}
@@ -340,7 +345,6 @@ export default function App() {
         <PwaUpdatePrompt />
         {/* Banner pasang app (Android prompt / panduan iOS) */}
         <InstallPrompt />
-        <Toaster />
         {/* Sambutan orientasi sekali-lihat (warga baru) — self-gate via localStorage */}
         <WelcomeSheet />
         {/* Overlay bendahara/umum — chunk dimuat saat pertama dibuka (gate by state).
