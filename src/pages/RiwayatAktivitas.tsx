@@ -271,7 +271,77 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{v.title}</p>
+                        {/* Rail KANAN hanya sejajar JUDUL (15 Sep 2026). Dulu rail
+                            (nominal + chevron) jadi kolom saudara setinggi SELURUH baris,
+                            jadi keterangan & nama pencatat ikut terjepit di kolom ~140px
+                            dari layar 390px: "Donasi Rawat Inap Bpk Pramono Budi (" pecah
+                            3–4 baris sementara ruang di bawah nominal kosong melompong.
+                            Kini hanya judul yang berbagi baris dgn rail; keterangan, meta
+                            & isi yang dibuka memakai lebar kolom penuh. Nominal tetap rata
+                            KANAN di kolomnya sendiri (kolom uang sejajar antar baris), dan
+                            posisinya tetap 0px dari tepi atas isi — catatan chevron
+                            zigzag di bawah tetap berlaku. */}
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="flex-1 min-w-0 text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{v.title}</p>
+                          {/* Rail KANAN mendatar, bukan `flex-col` (2 Sep 2026). Waktu ia
+                              kolom, chevron ditumpuk DI BAWAH nominal — jadi letaknya
+                              ditentukan ADA/TIDAKNYA nominal: terukur 0px dari tepi atas
+                              baris saat baris tak bernominal, 30,1px saat bernominal
+                              (tinggi nominal + `gap-2`). Karena jenis baris di daftar ini
+                              berselang-seling ("Pelunasan talangan" bernominal, "Tandai
+                              talangan lunas" tidak), hasilnya chevron zigzag sepanjang
+                              daftar. Mendatar, keduanya duduk di 0px.
+
+                              `items-center`, bukan `items-start`: kotak chevron 16px lebih
+                              pendek dari kotak baris nominal, jadi rata-atas membuatnya
+                              terbaca menggantung. Sisa selisihnya 3px — di bawah ambang
+                              mata, dan tetap KONSTAN antar baris; itu yang dikejar.
+
+                              NOMINAL TIDAK BERGESER: ia sudah di 0px sebelum & sesudah.
+
+                              Catatan probe, karena ini nyaris salah didiagnosis: mengukur
+                              dari titik-TENGAH JUDUL memberi TIGA posisi semu (-2 / +17,8 /
+                              +28,1) — judul yang membungkus dua baris menggeser acuannya
+                              sendiri. Acuan yang sah tepi atas isi baris. */}
+                          <div className="flex items-center gap-2 shrink-0">
+                            {v.amount != null && v.amount !== 0 && (
+                              <span className={`font-display text-amount font-semibold tabular-nums ${
+                                v.accent === 'rose' ? 'text-neg dark:text-rose-400' : v.accent === 'emerald' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'
+                              }`}>
+                                {formatRupiahPlain(v.amount)}
+                              </span>
+                            )}
+                            {/* `text-gray-400`, BUKAN `text-gray-300` (2 Sep 2026). Chevron ini
+                                SATU-SATUNYA penanda bahwa baris bisa dibuka — jadi kontrol
+                                non-teks yang dituntut 3:1 (§1.4.11), bukan hiasan. Nilai lama
+                                terukur 1,47:1 di kartu putih & 2,04:1 di `gray-900`; halaman
+                                sampai perlu kalimat bantu "Ketuk satu aktivitas…" untuk
+                                menambalnya, dan kalimat itu gejalanya.
+
+                                Ia juga menyimpang sendirian: dari 45 pemakaian `text-gray-300`,
+                                44 adalah `dark:` — gray-300 itu tinta TERANG untuk permukaan
+                                GELAP (10,37:1). Baris ini satu-satunya yang memakainya sbg tinta
+                                terang di permukaan terang, sekaligus satu-satunya
+                                `dark:text-gray-600` di app.
+
+                                Varian `dark:` TIDAK dipasang: `html.dark .text-gray-400`
+                                (index.css:557) sengaja ikut menangkap kelas POLOS, jadi satu
+                                kelas sudah membawa #3E4F44 / #B4C9BB → 8,73 & 8,71:1.
+                                `gray-400` adalah anak tangga TERTERANG yang lolos 3:1 — di sisi
+                                terang tangga melompat 1,47 (300) → 8,73 (400), tak ada nilai di
+                                rentang 3–5. Kalau kelak terasa terlalu tebal, obatnya token
+                                affordance tersendiri, BUKAN kembali ke gray-300.
+
+                                LOLOS `audit:kontras-nonteks` (676 sampel, 0 gagal) karena
+                                populasinya membuang ikon yang kontrolnya punya label teks
+                                (audit-kontras-nonteks.mjs:211) — sah untuk ikon yang MENGULANG
+                                labelnya, meleset untuk chevron yang membawa info yang tak ada
+                                di label mana pun. */}
+                            {hasDetail && (
+                              <ChevronDown data-penanda className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isOpen ? 'rotate-180' : ''}`} />
+                            )}
+                          </div>
+                        </div>
                         {v.detail && (
                           <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5 break-words">{v.detail}</p>
                         )}
@@ -305,64 +375,6 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                             )}
                             <p className="text-micro text-ink-faint dark:text-gray-400 pl-0.5">{formatWaktu(row.created_at)}</p>
                           </div>
-                        )}
-                      </div>
-                      {/* Rail KANAN mendatar, bukan `flex-col` (2 Sep 2026). Waktu ia
-                          kolom, chevron ditumpuk DI BAWAH nominal — jadi letaknya
-                          ditentukan ADA/TIDAKNYA nominal: terukur 0px dari tepi atas
-                          baris saat baris tak bernominal, 30,1px saat bernominal
-                          (tinggi nominal + `gap-2`). Karena jenis baris di daftar ini
-                          berselang-seling ("Pelunasan talangan" bernominal, "Tandai
-                          talangan lunas" tidak), hasilnya chevron zigzag sepanjang
-                          daftar. Mendatar, keduanya duduk di 0px.
-
-                          `items-center`, bukan `items-start`: kotak chevron 16px lebih
-                          pendek dari kotak baris nominal, jadi rata-atas membuatnya
-                          terbaca menggantung. Sisa selisihnya 3px — di bawah ambang
-                          mata, dan tetap KONSTAN antar baris; itu yang dikejar.
-
-                          NOMINAL TIDAK BERGESER: ia sudah di 0px sebelum & sesudah.
-
-                          Catatan probe, karena ini nyaris salah didiagnosis: mengukur
-                          dari titik-TENGAH JUDUL memberi TIGA posisi semu (-2 / +17,8 /
-                          +28,1) — judul yang membungkus dua baris menggeser acuannya
-                          sendiri. Acuan yang sah tepi atas isi baris. */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        {v.amount != null && v.amount !== 0 && (
-                          <span className={`font-display text-amount font-semibold tabular-nums ${
-                            v.accent === 'rose' ? 'text-neg dark:text-rose-400' : v.accent === 'emerald' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'
-                          }`}>
-                            {formatRupiahPlain(v.amount)}
-                          </span>
-                        )}
-                        {/* `text-gray-400`, BUKAN `text-gray-300` (2 Sep 2026). Chevron ini
-                            SATU-SATUNYA penanda bahwa baris bisa dibuka — jadi kontrol
-                            non-teks yang dituntut 3:1 (§1.4.11), bukan hiasan. Nilai lama
-                            terukur 1,47:1 di kartu putih & 2,04:1 di `gray-900`; halaman
-                            sampai perlu kalimat bantu "Ketuk satu aktivitas…" untuk
-                            menambalnya, dan kalimat itu gejalanya.
-
-                            Ia juga menyimpang sendirian: dari 45 pemakaian `text-gray-300`,
-                            44 adalah `dark:` — gray-300 itu tinta TERANG untuk permukaan
-                            GELAP (10,37:1). Baris ini satu-satunya yang memakainya sbg tinta
-                            terang di permukaan terang, sekaligus satu-satunya
-                            `dark:text-gray-600` di app.
-
-                            Varian `dark:` TIDAK dipasang: `html.dark .text-gray-400`
-                            (index.css:557) sengaja ikut menangkap kelas POLOS, jadi satu
-                            kelas sudah membawa #3E4F44 / #B4C9BB → 8,73 & 8,71:1.
-                            `gray-400` adalah anak tangga TERTERANG yang lolos 3:1 — di sisi
-                            terang tangga melompat 1,47 (300) → 8,73 (400), tak ada nilai di
-                            rentang 3–5. Kalau kelak terasa terlalu tebal, obatnya token
-                            affordance tersendiri, BUKAN kembali ke gray-300.
-
-                            LOLOS `audit:kontras-nonteks` (676 sampel, 0 gagal) karena
-                            populasinya membuang ikon yang kontrolnya punya label teks
-                            (audit-kontras-nonteks.mjs:211) — sah untuk ikon yang MENGULANG
-                            labelnya, meleset untuk chevron yang membawa info yang tak ada
-                            di label mana pun. */}
-                        {hasDetail && (
-                          <ChevronDown data-penanda className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isOpen ? 'rotate-180' : ''}`} />
                         )}
                       </div>
                     </button>
