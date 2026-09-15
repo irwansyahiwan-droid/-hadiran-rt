@@ -52,12 +52,22 @@ const TANGGA = ['normal', 'medium', 'semibold', 'bold', 'extrabold'];
 const RESEP = ['btn-brand', 'btn-danger', 'btn-secondary'];
 const KOMPONEN = ['Tag', 'SectionTitle'];
 
-/* ── IZIN — dgn alasan, satu per satu ──────────────────────────────────── */
+/* ── IZIN — dgn alasan, satu per satu ──────────────────────────────────────
+   Dikunci ke POTONGAN ISI baris yang unik, BUKAN nomor baris (15 Sep 2026).
+   Versi nomor-baris memerahkan sapuan untuk teks yang tak berubah sama sekali:
+   dua `import` baru di BannerCarousel menggeser nota talangan 306 → 308 dan
+   izinnya lepas. `audit:spasi`/`audit:bentuk` sudah lama mengunci ke (berkas,
+   kelas); di sini kelasnya terlalu umum (`font-extrabold` sebarkas akan ikut
+   bebas), jadi kuncinya potongan className yang cukup panjang untuk unik.
+   Dua syarat keras supaya izin tak jadi pintu belakang diam-diam: kunci yang
+   tak cocok baris MANA PUN = "izin basi" (MERAH — elemennya sudah berubah,
+   alasannya wajib ditinjau ulang), cocok LEBIH DARI SATU baris = "terlalu
+   longgar" (MERAH — izin membebaskan call-site yang tak pernah ditimbang). */
 const IZIN = [
-  ['components/SuccessOverlay.tsx', 104, 'pil ber-`rounded-full` tapi isinya KALIMAT di atas scrim, bukan badge — prosa tetap medium'],
-  ['components/BannerCarousel.tsx', 308, 'GAMBAR — teks di dalam ilustrasi "nota talangan", bukan teks app (disiplin izin `audit:spasi`)'],
+  ['components/SuccessOverlay.tsx', 'text-white/95 font-medium text-caption bg-black/35', 'pil ber-`rounded-full` tapi isinya KALIMAT di atas scrim, bukan badge — prosa tetap medium'],
+  ['components/BannerCarousel.tsx', 'text-[9px] font-extrabold uppercase tracking-[0.12em]', 'GAMBAR — teks di dalam ilustrasi "nota talangan", bukan teks app (disiplin izin `audit:spasi`)'],
 ];
-const berizin = (nama, baris) => IZIN.some(([b, l]) => nama.endsWith(b) && l === baris);
+const berizin = (nama, baris) => IZIN.some(([b, kunci]) => nama.endsWith(b) && baris.includes(kunci));
 
 const berkas = [];
 (function walk(dir) {
@@ -105,7 +115,7 @@ for (const p of berkas) {
     if (resep) temuan.push({ nama, baris: no, apa: `font-${tebal}`, sebab: `resep .${resep} sudah memiliki tebalnya — call-site menimpanya` });
 
     // 3. extrabold hanya bersama font-display
-    if (tebal === 'extrabold' && !baris.includes('font-display') && !berizin(nama, no)) {
+    if (tebal === 'extrabold' && !baris.includes('font-display') && !berizin(nama, baris)) {
       temuan.push({ nama, baris: no, apa: 'font-extrabold', sebab: 'extrabold hanya untuk angka besar & wordmark di `font-display` (Sora)' });
     }
 
@@ -126,11 +136,19 @@ for (const p of berkas) {
          bukan baris IZIN, supaya badge 11px BERIKUTNYA ikut terjaga — izin
          hanya menutup satu call-site & membiarkan kelasnya terbuka. */
       const wajib = peran === 'micro' ? 'bold' : 'semibold';
-      if ((jenis === 'tombol' || jenis === 'badge') && tebal !== wajib && !berizin(nama, no)) {
+      if ((jenis === 'tombol' || jenis === 'badge') && tebal !== wajib && !berizin(nama, baris)) {
         temuan.push({ nama, baris: no, apa: `font-${tebal}`, sebab: `${jenis} text-${peran} = anak tangga KONTROL → wajib font-${wajib}` });
       }
     }
   });
+
+  // 0. izin wajib cocok TEPAT satu baris di berkasnya
+  for (const [b, kunci] of IZIN) {
+    if (!nama.endsWith(b)) continue;
+    const cocok = isi.map((baris, i) => (baris.includes(kunci) ? i + 1 : 0)).filter(Boolean);
+    if (cocok.length === 0) temuan.push({ nama, baris: 0, apa: 'IZIN BASI', sebab: `kunci "${kunci}" tak cocok baris mana pun — elemennya berubah, tinjau ulang alasannya` });
+    if (cocok.length > 1) temuan.push({ nama, baris: cocok[1], apa: 'IZIN TERLALU LONGGAR', sebab: `kunci "${kunci}" cocok ${cocok.length} baris (${cocok.join(', ')}) — perpanjang kuncinya` });
+  }
 
   // 2. komponen tak boleh dikirimi tebal
   const teks = readFileSync(p, 'utf8').replace(/\{?\/\*[\s\S]*?\*\/\}?/g, (m) => m.replace(/[^\n]/g, ' '));
