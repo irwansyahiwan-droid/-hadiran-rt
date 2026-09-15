@@ -55,7 +55,7 @@ const KOMPONEN = ['Tag', 'SectionTitle'];
 /* ── IZIN — dgn alasan, satu per satu ──────────────────────────────────── */
 const IZIN = [
   ['components/SuccessOverlay.tsx', 104, 'pil ber-`rounded-full` tapi isinya KALIMAT di atas scrim, bukan badge — prosa tetap medium'],
-  ['components/BannerCarousel.tsx', 306, 'GAMBAR — teks di dalam ilustrasi "nota talangan", bukan teks app (disiplin izin `audit:spasi`)'],
+  ['components/BannerCarousel.tsx', 308, 'GAMBAR — teks di dalam ilustrasi "nota talangan", bukan teks app (disiplin izin `audit:spasi`)'],
 ];
 const berizin = (nama, baris) => IZIN.some(([b, l]) => nama.endsWith(b) && l === baris);
 
