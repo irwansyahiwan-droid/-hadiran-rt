@@ -568,8 +568,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
 
       {/* Hero saldo + promo digabung jadi SATU carousel mewah: saldo = slide
-          "rumah" (ditahan lebih lama lalu balik), promo numpang lewat di
-          permukaan yang sama. Container bawa --hero-shadow → semua slide naik kelas. */}
+          "rumah", promo numpang lewat di permukaan yang sama. Saldo TIDAK
+          berputar sendiri — autoplay baru hidup setelah carousel disentuh sekali
+          (lihat BannerCarousel), supaya pembaca pasif tak kehilangan nominalnya.
+          Container bawa --hero-shadow → semua slide naik kelas. */}
       <BannerCarousel
         onNavigate={onNavigate}
         heroSweep={firstHero}

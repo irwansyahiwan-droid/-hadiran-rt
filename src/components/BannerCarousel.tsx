@@ -371,9 +371,18 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
   const [drag, setDrag] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [pressed, setPressed] = useState(false);
-  // Autoplay berhenti permanen setelah user navigasi manual (swipe / tap indikator):
-  // di HP tak ada hover/fokus utk menjeda, jadi "ambil kendali" = mekanisme stop
-  // yang disyaratkan WCAG 2.2.2 (Pause, Stop, Hide). Sekali berhenti, tetap berhenti.
+  /* Autoplay BARU mulai setelah warga menyentuh carousel sekali (`engaged`).
+     Di HP tak ada hover untuk menjeda, jadi tanpa gerbang ini kartu SALDO —
+     satu-satunya angka yang ingin dibaca warga saat membuka app — berputar
+     pergi sendiri tiap ~11 dtk di tengah dibaca (terutama lansia, di bawah
+     matahari). Pembaca pasif kini tak pernah kehilangan saldo; peek tetangga +
+     dot indikator tetap memberi tahu ada slide lain. Sekali terlibat, carousel
+     "bangun" dan berputar seperti semula. */
+  const [engaged, setEngaged] = useState(false);
+  // Autoplay berhenti permanen setelah user navigasi manual KEDUA (swipe / tap
+  // indikator): sentuhan pertama membangunkan, sentuhan berikutnya = "aku yang
+  // pegang kendali" → mekanisme stop yang disyaratkan WCAG 2.2.2 (Pause, Stop,
+  // Hide). Sekali berhenti, tetap berhenti.
   const [stopped, setStopped] = useState(false);
   /* `onScreen` + IntersectionObserver-nya DIBUANG bersama shimmer (6 Agu):
      keduanya ada HANYA untuk menggerbang kilau kaca agar tak berputar di luar
@@ -435,9 +444,10 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
   }, [index, count]);
 
   // Autoplay ping-pong + isi bar progress indikator aktif. Berhenti saat
-  // reduced-motion, disentuh, atau tab tersembunyi.
+  // reduced-motion, tab tersembunyi, belum disentuh (`engaged`), atau sudah
+  // dihentikan manual (`stopped`).
   useEffect(() => {
-    if (reduced || count <= 1 || stopped) return;
+    if (reduced || count <= 1 || stopped || !engaged) return;
     let raf = 0;
     let last = performance.now();
     const tick = (t: number) => {
@@ -463,12 +473,14 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [count, reduced, hasHero, stopped]);
+  }, [count, reduced, hasHero, stopped, engaged]);
 
   if (count === 0) return null;
 
   function goTo(i: number) {
-    setStopped(true); // navigasi manual → hentikan autoplay (WCAG 2.2.2)
+    // Sentuhan pertama = bangunkan autoplay; sentuhan berikutnya = ambil alih
+    // → hentikan permanen (WCAG 2.2.2).
+    if (engaged) setStopped(true); else setEngaged(true);
     const ni = Math.max(0, Math.min(count - 1, i));
     if (ni !== index) haptic();
     setIndex(ni);
@@ -511,7 +523,8 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
     setDrag(0);
     setDragging(false); draggingRef.current = false;
     setPressed(false); pressedRef.current = false;
-    if (didDrag) setStopped(true); // swipe = ambil kendali → hentikan autoplay (WCAG 2.2.2)
+    // Swipe pertama membangunkan autoplay; swipe berikutnya = ambil alih → stop.
+    if (didDrag) { if (engaged) setStopped(true); else setEngaged(true); }
     if (ni !== index) { haptic(); setIndex(ni); }
   }
 
@@ -804,10 +817,10 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   className="block h-1 overflow-hidden rounded-full bg-control dark:bg-control-dark transition-colors group-hover:bg-ink-faint dark:group-hover:bg-gray-400"
                   style={{ width: isActive ? 26 : 7, transition: reduced ? 'none' : `width 0.42s ${EASE}` }}
                 >
-                  {isActive && !reduced && !stopped && (
+                  {isActive && !reduced && !stopped && engaged && (
                     <span ref={progressBarRef} className="block h-full w-full origin-left rounded-full bg-brand dark:bg-brand-linkDark" style={{ transform: 'scaleX(0)' }} />
                   )}
-                  {(past || (isActive && (reduced || stopped))) && (
+                  {(past || (isActive && (reduced || stopped || !engaged))) && (
                     <span className="block h-full w-full rounded-full bg-brand dark:bg-brand-linkDark" />
                   )}
                 </span>
