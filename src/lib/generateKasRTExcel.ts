@@ -72,7 +72,7 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
 
   list.forEach((k, i) => {
     const r = ws.addRow([
-      formatTanggal(k.tanggal),
+      formatTanggal(k.tanggal, { polos: true }),
       k.tipe === 'masuk' ? 'Masuk' : 'Keluar',
       labelKategori(k.tipe, k.kategori),
       k.keterangan ?? '',

@@ -831,7 +831,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                         dan tak satu nama pun terpotong karenanya. */}
                     {!next && <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>}
                   </div>
-                  <p className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-0.5">Tarikan ke-{j.nomor} · {formatTanggal(j.tanggal)}</p>
+                  <p className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-0.5">Tarikan ke-{j.nomor} · <span className="whitespace-nowrap">{formatTanggal(j.tanggal)}</span></p>
                 </div>
               </div>
               );

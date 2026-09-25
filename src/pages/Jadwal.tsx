@@ -1206,7 +1206,7 @@ export default function JadwalPage() {
             {loading || error
               ? '—'
               : nextDijadwal
-                ? `Tarikan ke-${nextDijadwal.nomor} · ${formatTanggal(nextDijadwal.tanggal)}`
+                ? <>Tarikan ke-{nextDijadwal.nomor} · <span className="whitespace-nowrap">{formatTanggal(nextDijadwal.tanggal)}</span></>
                 : 'Belum ada tarikan terjadwal'}
           </p>
           <p className="mt-1 text-caption angka-prosa text-white/90">

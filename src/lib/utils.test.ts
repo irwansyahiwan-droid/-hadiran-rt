@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   formatRupiah, formatRupiahPlain, maskRp, hitungSaldoHadiran, pesanError,
-  formatTanggalRingkas, ukuranMuat } from './utils';
+  formatTanggalRingkas, ukuranMuat, tanggalUtuh, formatTanggal } from './utils';
 
 /**
  * Formatter uang & penerjemah error — dipakai hampir di setiap layar, dan
@@ -159,5 +159,35 @@ describe('ukuranMuat — nominal kaki hero yang menyusut seperlunya', () => {
   it('lebar belum terukur (0) → jangan menebak, pakai ukuran penuh', () => {
     expect(ukuranMuat(0, 90, 12.48, 9.6)).toBe(12.48);
     expect(ukuranMuat(75, 0, 12.48, 9.6)).toBe(12.48);
+  });
+});
+
+/**
+ * Tanggal tak boleh terbelah di ujung baris ("…13 Sep" lalu "2026" sendirian —
+ * terukur di hero Jadwal @360px sebelum `tanggalUtuh` ada). Yang dikunci:
+ * tanggal-bulan-tahun TERIKAT, nama hari TETAP boleh lepas (kepala kartu Kas
+ * Hadiran @320px tak muat tanggal utuh), dan BERKAS mendapat spasi biasa.
+ */
+describe('tanggalUtuh — tanggal satu kesatuan, nama hari boleh lepas', () => {
+  const NBSP = '\u00A0';
+  it('mengikat "26 Sep 2026" dgn spasi tak-putus', () => {
+    expect(tanggalUtuh('Sab, 26 Sep 2026')).toBe(`Sab, 26${NBSP}Sep${NBSP}2026`);
+  });
+  it('bulan panjang juga', () => {
+    expect(tanggalUtuh('Per 26 September 2026')).toBe(`Per 26${NBSP}September${NBSP}2026`);
+  });
+  it('nama hari & kata di depan tetap boleh patah', () => {
+    const hasil = tanggalUtuh('Sab, 26 Sep 2026');
+    expect(hasil.startsWith('Sab, ')).toBe(true);
+  });
+  it('teks tanpa tanggal tak disentuh', () => {
+    expect(tanggalUtuh('Tarikan ke-21 · Carduki')).toBe('Tarikan ke-21 · Carduki');
+  });
+  it('formatTanggal layar TERIKAT, versi berkas POLOS', () => {
+    const layar = formatTanggal('2026-09-26T00:00:00');
+    const berkas = formatTanggal('2026-09-26T00:00:00', { polos: true });
+    expect(layar).toContain(`26${NBSP}Sep${NBSP}2026`);
+    expect(berkas).not.toContain(NBSP);
+    expect(berkas.replace(/ /g, NBSP)).toContain(`26${NBSP}Sep${NBSP}2026`);
   });
 });

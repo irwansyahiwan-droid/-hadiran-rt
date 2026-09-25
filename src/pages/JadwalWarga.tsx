@@ -407,7 +407,10 @@ export default function JadwalWargaPage() {
             </p>
             <div>
               <p className="text-white text-subtitle font-bold leading-tight angka-prosa">
-                Tarikan ke-{lastTarikan.nomor} · {formatTanggal(lastTarikan.tanggal)}
+                {/* Tanggal UTUH (nama hari ikut): kalau judul melipat, patahnya
+                    jatuh di " · ", bukan di dalam tanggal — di 360px dulu
+                    berbunyi "…Min, 13 Sep" lalu "2026" sendirian. */}
+                Tarikan ke-{lastTarikan.nomor} · <span className="whitespace-nowrap">{formatTanggal(lastTarikan.tanggal)}</span>
               </p>
               <p className="text-white/90 text-body mt-0.5">
                 Sohibul Bait

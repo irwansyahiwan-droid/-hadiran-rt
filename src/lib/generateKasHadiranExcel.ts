@@ -67,7 +67,7 @@ export function buildKasHadiranExcel(
     const info = talanganMap[t.id] ?? { count: 0, total: 0 };
     const r = ws.addRow([
       t.nomor,
-      formatTanggal(t.tanggal),
+      formatTanggal(t.tanggal, { polos: true }),
       t.sohibul_bait?.nama ?? '-',
       t.total_hadir,
       t.total_warga,

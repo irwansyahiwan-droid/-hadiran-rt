@@ -60,14 +60,39 @@ export function haptic(pattern: number | number[] = 8): void {
   }
 }
 
-export function formatTanggal(dateStr: string): string {
+/** Spasi tak-putus. */
+const NBSP = ' ';
+
+/**
+ * "26 Sep 2026" → "26 Sep 2026" dgn spasi TAK-PUTUS di antara tanggal, bulan,
+ * tahun, supaya satu tanggal tak pernah terbelah di ujung baris.
+ *
+ * Terukur 26 Sep 2026 sebelum ini ada: judul hero Jadwal (warga & bendahara)
+ * di 360px — lebar ACUAN app — berbunyi "Tarikan ke-20 · Min, 13 Sep" lalu
+ * "2026" sendirian di baris kedua; di 320px hal yang sama terjadi di baris
+ * jadwal Beranda, Jadwal bendahara (37 baris), dan kepala kartu Kas Hadiran.
+ * Nama HARI sengaja masih boleh lepas ("Min," / "13 Sep 2026"): di kepala
+ * kartu Kas Hadiran @320 tanggal utuhnya (101px) lebih lebar dari ruangnya
+ * (92px), jadi mengunci seluruhnya membuat teks meluber ke Tag di sebelahnya.
+ */
+export function tanggalUtuh(teks: string): string {
+  return teks.replace(/(\d{1,2}) (\p{L}+) (\d{4})/gu, `$1${NBSP}$2${NBSP}$3`);
+}
+
+/**
+ * Tanggal penuh untuk LAYAR: "Sab, 26 Sep 2026" (tanggal tak terbelah, lihat
+ * `tanggalUtuh`). BERKAS (Excel) memakai `{ polos: true }` — sel berisi spasi
+ * tak-putus tak ketemu saat bendahara mengetik "26 Sep" di kotak cari Excel.
+ */
+export function formatTanggal(dateStr: string, { polos = false }: { polos?: boolean } = {}): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('id-ID', {
+  const teks = date.toLocaleDateString('id-ID', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   });
+  return polos ? teks : tanggalUtuh(teks);
 }
 
 /**
