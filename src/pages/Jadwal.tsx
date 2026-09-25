@@ -831,7 +831,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         <div className="flex gap-3">
           <button
             onClick={jaga.mintaTutup}
-            className="btn-secondary flex-1 py-3 rounded-xl"
+            className="btn-secondary flex-1 py-3"
           >
             Batal
           </button>
@@ -955,7 +955,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         <div className="flex gap-3">
           <button
             onClick={jaga.mintaTutup}
-            className="btn-secondary flex-1 py-3 rounded-xl"
+            className="btn-secondary flex-1 py-3"
           >
             Batal
           </button>

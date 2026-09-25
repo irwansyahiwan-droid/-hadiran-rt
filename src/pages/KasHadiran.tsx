@@ -140,7 +140,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
           </div>
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={jaga.mintaTutup}
-              className="btn-secondary flex-1 py-3 rounded-xl">Batal</button>
+              className="btn-secondary flex-1 py-3">Batal</button>
             <button type="submit" disabled={saving}
               className="btn-brand flex-1 py-3 text-body active:scale-[0.97] transition flex items-center justify-center gap-2">
               {saving && <RefreshCw className="w-4 h-4 animate-spin" />}

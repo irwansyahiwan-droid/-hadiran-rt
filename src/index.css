@@ -1570,11 +1570,19 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   /* ── Secondary button (aksi netral: Batal/Tutup di footer modal) ───────
      SATU sumber untuk tombol sekunder berbingkai yang sebelumnya disalin
      manual di tiap sheet (warna/hover kadang luput — mis. tombol Batal tanpa
-     hover). Sengaja NETRAL radius & lebar: call-site tetap pegang `flex-1`/
-     `w-full` + `rounded-xl`/`rounded-full` → adopsi = refactor murni tanpa
-     ubah bentuk, hanya menambah hover + spring-press (paritas tactile dgn
-     .btn-brand). Pasangan visual btn-brand di footer dua-tombol. */
+     hover). Lebar tetap milik call-site (`flex-1`/`w-full`).
+
+     RADIUS kini milik RESEP (26 Sep 2026), kembar `.btn-brand` (0.75rem).
+     Dulu "sengaja netral radius" — call-site wajib menulis `rounded-xl`
+     sendiri — dan tombol "Tutup" di sheet detail Kas RT (satu-satunya
+     `.btn-secondary` yang dilihat WARGA) lupa menulisnya: ia tampil BERSUDUT
+     TAJAM, satu-satunya kontrol bersudut 0 di seluruh app (terukur: probe
+     radius <2px pada kontrol berbingkai/berlatar, 9 layar + sheet → 1).
+     Pelajaran AvatarPeci lagi: keputusan yang boleh diambil di call-site akan
+     terlewat di call-site. `rounded-full`/`rounded-2xl` di call-site tetap
+     menang (lapisan utilities di atas components). */
   .btn-secondary {
+    border-radius: 0.75rem;   /* = rounded-xl, kembar .btn-brand */
     @apply border border-control dark:border-control-dark
            text-body font-semibold text-gray-600 dark:text-gray-300
            hover:bg-gray-50 dark:hover:bg-gray-800;

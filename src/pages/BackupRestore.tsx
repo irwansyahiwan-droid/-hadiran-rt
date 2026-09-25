@@ -166,7 +166,7 @@ export default function BackupRestore({ open, onClose }: Props) {
                 <button
                   onClick={() => { setPending(null); setKonfirmasi(''); }}
                   disabled={restoring}
-                  className="btn-secondary press px-4 py-3 rounded-xl disabled:opacity-60"
+                  className="btn-secondary press px-4 py-3 disabled:opacity-60"
                 >
                   Batal
                 </button>

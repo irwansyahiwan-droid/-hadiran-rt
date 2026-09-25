@@ -247,7 +247,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <button
               type="button"
               onClick={jaga.mintaTutup}
-              className="btn-secondary flex-1 py-3 rounded-xl"
+              className="btn-secondary flex-1 py-3"
             >
               Batal
             </button>

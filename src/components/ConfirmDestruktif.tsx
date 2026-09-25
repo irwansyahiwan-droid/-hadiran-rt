@@ -138,7 +138,7 @@ export default function ConfirmDestruktif({
         )}
 
         <div className="flex gap-3 mt-4">
-          <button onClick={requestClose} disabled={loading} className="btn-secondary flex-1 py-3 rounded-xl disabled:opacity-60">
+          <button onClick={requestClose} disabled={loading} className="btn-secondary flex-1 py-3 disabled:opacity-60">
             {batalLabel}
           </button>
           <button
