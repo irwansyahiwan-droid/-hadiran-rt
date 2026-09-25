@@ -13,7 +13,13 @@ import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { getTargetKasRT, setTargetKasRT, clearTargetKasRT, type TargetKasRT as Target_ } from '../lib/pengaturan';
 
-export default function TargetKasRT({ saldo }: { saldo: number }) {
+/** `saldo` = `null` selama saldo halaman TAK DIKETAHUI (masih memuat tanpa
+ *  cache). Dulu kartu ini hanya menjaga fetch-nya SENDIRI: kalau mutasi Kas RT
+ *  gagal dimuat sementara target berhasil, ia menyatakan "0% terkumpul ·
+ *  Rp0 / Rp25.000.000 · Kurang Rp25.000.000" — nol yang lahir dari list kosong,
+ *  terbaca sbg fakta (terukur 25 Sep 2026). Saat gagal tanpa cache, KasRT tak
+ *  merender kartu ini sama sekali, sama dgn hero. */
+export default function TargetKasRT({ saldo }: { saldo: number | null }) {
   const { isBendahara } = useAuthContext();
   const [target, setTarget] = useState<Target_ | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -47,7 +53,7 @@ export default function TargetKasRT({ saldo }: { saldo: number }) {
 
      Tombol ubah ikut `isBendahara` persis seperti kartu asli: kalau tidak,
      warga dapat skeleton 36px lebih lebar dari isi yang menggantikannya. */
-  if (!loaded) {
+  if (!loaded || saldo === null) {
     return (
       <div aria-hidden="true" className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-4">
         <div className="flex items-center justify-between mb-3">

@@ -692,8 +692,9 @@ export default function KasRTPage() {
         </CrossFade>
         )}
 
-        {/* Target & progres Kas RT */}
-        <TargetKasRT saldo={saldo} />
+        {/* Target & progres Kas RT — syaratnya CERMIN hero: gagal tanpa cache =
+            tak dirender; masih memuat = kerangka (saldo `null`), bukan "0%". */}
+        {!(error && list.length === 0) && <TargetKasRT saldo={loading ? null : saldo} />}
 
         {/* Insight ringkas: kas masuk bulan ini vs bulan lalu.
             Syaratnya dihitung dari `list`, yang saat memuat masih kosong → dua
