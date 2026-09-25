@@ -79,11 +79,23 @@ export default function SectionTitle({ children, count, action, tone = 'default'
              komponen ini menulis `font-bold` sementara `Tag.tsx` — pil kecil
              yang pekerjaannya sama persis — menulis `font-semibold`. Dua
              komponen BERSAMA, dua keputusan berbeda: bukti paling telak bahwa
-             tebal dulu dipilih dari kebiasaan, bukan dari peran. */
+             tebal dulu dipilih dari kebiasaan, bukan dari peran.
+
+             RING BERALFA, bukan `ring-line` padat (26 Sep 2026). `line`
+             #D3E0D8 ditimbang lawan KARTU putih (1,36:1), tapi judul seksi
+             duduk di KANVAS — dan sejak kanvas pindah ke #CFE6D8, hairline itu
+             praktis SEWARNA kanvas: 1,035:1. Terukur di seluruh tab terang:
+             Beranda, Kas Hadiran, Kas RT, Talangan — chipnya tak pernah
+             terlihat, "Transaksi 104" terbaca angka telanjang, sementara di
+             gelap ring yang sama jelas. `gray-500/25` = bahasa pil `Tag`
+             netral (tinta beralfa), dan karena alfa ia MENGIKUTI permukaannya:
+             1,31:1 di kanvas, 1,37:1 di kartu — bobot whisper yang sama dgn
+             `line` di atas kartu, di mana pun judulnya jatuh. Pelajaran ke-25
+             terbalik: warna PADAT yang pindah permukaan wajib diukur ulang. */
           <span className={`font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center ${
             tone === 'warn'
               ? 'text-warn dark:text-amber-300 ring-amber-600/30 dark:ring-amber-400/30'
-              : 'text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700'
+              : 'text-ink-faint dark:text-gray-400 ring-gray-500/25 dark:ring-gray-700'
           }`}>{count}</span>
         )}
       </h2>

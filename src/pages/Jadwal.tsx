@@ -381,7 +381,9 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       {/* Title + count (jumlah PEMBAYAR — Sohibul Bait tidak termasuk) */}
       <div className="flex items-center justify-between">
         <p className="text-body font-semibold text-gray-700 dark:text-gray-300">Daftar Hadir <span className="font-normal text-ink-faint dark:text-gray-400">(pembayar)</span></p>
-        <span className="font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center text-ink-faint dark:text-gray-400 ring-line dark:ring-gray-700">
+        {/* Ring beralfa, kembar chip `SectionTitle` — `ring-line` padat lebur
+            ke kanvas terang (1,035:1), lihat catatan di sana. */}
+        <span className="font-display text-micro font-bold tabular-nums rounded-full ring-1 ring-inset min-w-[1.375rem] px-2 py-0.5 text-center text-ink-faint dark:text-gray-400 ring-gray-500/25 dark:ring-gray-700">
           {pembayarList.length}
         </span>
       </div>
