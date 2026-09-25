@@ -48,6 +48,7 @@ mkdirSync(OUT, { recursive: true });
 const AA_KECIL = 4.5;
 const AA_BESAR = 3.0;   // ≥24px, atau ≥18.66px bold
 const hasil = [];
+let takTerlihat = 0; // kontrol dilewati karena opacity efektif ~0 — SELALU dicetak
 
 /** Kumpulkan tombol + kotak teksnya, SESUDAH semua dipaksa nonaktif.
  *
@@ -83,6 +84,19 @@ async function kumpulkan(page) {
         Math.min(innerHeight - 1, Math.max(0, r.y + r.height / 2)),
       );
       if (!hit || (!b.contains(hit) && !hit.contains(b))) continue;
+      /* Tombol yang TAK TERLIHAT bukan sampel. Pass gulir membuat FAB menyingkir
+         PENUH: wadahnya `opacity: 0` + geser 150% + `pointer-events: none`,
+         sedangkan `op=` di laporan cuma opacity TOMBOL. Hit-test di atas tak
+         menahannya — tanpa pointer-events, `elementFromPoint` menjawab wadah
+         halaman di belakangnya, dan wadah itu LELUHUR tombol sehingga cabang
+         `hit.contains(b)` menerimanya. Kisinya lalu mendarat di kanvas →
+         "Tambah 1,07:1" (25 Sep 2026; terukur saat sampel: wadah opacity 0,
+         translateY 84px), padahal tombol yang SAMA terukur 8,76 saat tampil.
+         Yang dinilai opacity EFEKTIF (hasil kali leluhur), dan yang dilewati
+         DIHITUNG — populasi tak boleh menyempit tanpa mengaku. */
+      let opEfektif = 1;
+      for (let el = b; el; el = el.parentElement) opEfektif *= +getComputedStyle(el).opacity;
+      if (opEfektif < 0.05) { window.__matiTakTerlihat = (window.__matiTakTerlihat || 0) + 1; continue; }
 
       // elemen terdalam yang memuat text node langsung = kotak glyph
       let teks = null;
@@ -149,6 +163,7 @@ async function ukurView(page, ctxName) {
   await page.waitForTimeout(600);
 
   const items = await kumpulkan(page);
+  takTerlihat += await page.evaluate(() => { const n = window.__matiTakTerlihat || 0; window.__matiTakTerlihat = 0; return n; });
   if (items.length) {
     const shot = (await page.screenshot({ type: 'png' })).toString('base64');
     const pts = [];
@@ -273,5 +288,6 @@ const gagal = uniq.filter((h) => h.gagal).sort((a, b) => a.cr - b.cr);
 console.log(`\n=== LABEL TOMBOL SAAT NONAKTIF @360px — ${hasil.length} sampel, ${uniq.length} tombol unik ===`);
 console.log(`  Ambang APP (WCAG 1.4.3 mengecualikan kontrol nonaktif): 4,5:1 / 3:1 teks besar`);
 console.log(`  di bawah ambang: ${gagal.length}`);
+console.log(`  dilewati (tak terlihat — opacity efektif ~0, mis. FAB menyingkir): ${takTerlihat}`);
 for (const h of gagal) console.log(`  ✗ ${h.cr}:1 (amb ${h.amb}) op=${h.opacity} [${h.ctx}] "${h.nama}" <${h.tag}>`);
 process.exit(gagal.length ? 1 : 0);
