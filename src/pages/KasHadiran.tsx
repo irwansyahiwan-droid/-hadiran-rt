@@ -767,7 +767,16 @@ export default function KasHadiranPage() {
                 ber-ikon 44px, jadi hairline-nya mulai 20px SETELAH huruf
                 pertama label — tepi kanan sudah sejajar nominal sejak dulu,
                 tepi kirinya yang tak pernah ikut diukur. */}
-            <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
+            {/* Nominal keempat baris `shrink-0 whitespace-nowrap` (26 Sep 2026).
+                Tanpa itu nominal ikut MENYUSUT bersama label, dan tanda minus
+                ASCII adalah titik patah: di 320px (lebar WAJIB §1.4.10) panel
+                ini mencetak "-" sendirian di satu baris dan "Rp6.195.000" di
+                baris bawahnya — uang yang terbaca tanpa tandanya. Dgn data
+                ×100 (`EKSTREM=1`) patahnya sudah terjadi di 360px. Yang kini
+                mengalah LABELNYA ("Setoran ke Kas / Besar"), bukan angkanya —
+                aturan yang sama dgn `truncate` nominal: angka yang membungkus
+                lebih buruk daripada kata yang membungkus. */}
+            <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between gap-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
                 {/* Ikon baris = token yang SAMA dgn nominalnya (4 Agu 2026).
                     Dulu ketiganya `-500` mentah: emerald-500/amber-500/blue-500
@@ -781,16 +790,16 @@ export default function KasHadiranPage() {
                 <TrendingUp className="w-3.5 h-3.5 text-pos dark:text-pos-dark" />
                 <span className="text-body text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="text-body font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
+              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
-            <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between py-2">
+            <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between gap-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" />
                 <span className="text-body text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
-              <span className="text-body font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
+              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
-            <div className="flex items-center justify-between py-2">
+            <div className="flex items-center justify-between gap-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
                 {/* Biru DIPERTAHANKAN sbg penanda kategori "transfer" (lihat
                     catatan nominal di bawah — Setor Blue tak boleh menyentuh
@@ -806,7 +815,7 @@ export default function KasHadiranPage() {
                   menyentuh nilai uang, kalau tidak panel ini punya 4 keluarga
                   warna (hijau/amber/biru/rose) dan biru diam-diam jadi aksen
                   kedua. Ikon biru dipertahankan sbg penanda kategori "transfer". */}
-              <span className="text-body font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
+              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
             </div>
             {/* `-mx-3` mengimbangi `p-3`: panel melebar 12px ke kiri & kanan
                 supaya ISInya kembali sejajar tepi isi kartu. Tanpa itu bantalan
@@ -816,9 +825,9 @@ export default function KasHadiranPage() {
                 341). Digeser PANELNYA, bukan tiga baris di atasnya: judul kartu,
                 pil hitungan, dan ketiga baris semuanya duduk di tepi isi kartu —
                 panel inilah yang menyimpang. */}
-            <div className={`-mx-3 flex items-center justify-between rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
+            <div className={`-mx-3 flex items-center justify-between gap-3 rounded-2xl p-3 mt-1 ${saldo < 0 ? 'bg-rose-50 dark:bg-rose-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}`}>
               <p className="text-body font-bold text-gray-800 dark:text-gray-200">Total Bersih</p>
-              <span className={`text-amount font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
+              <span className={`shrink-0 whitespace-nowrap text-amount font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>
                 {maskRp(`${saldo < 0 ? '-' : ''}Rp${Math.abs(saldo).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
