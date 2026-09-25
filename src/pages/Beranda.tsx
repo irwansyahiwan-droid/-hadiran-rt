@@ -902,18 +902,26 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               : <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
           </div>
-          <p className="text-body font-medium text-ink dark:text-gray-100 mb-1">{selectedTrx.keterangan}</p>
-          <p className="text-caption text-ink-faint dark:text-gray-400 mb-4">{formatTanggal(selectedTrx.tanggal)}</p>
-          <div className="inset-soft rounded-2xl p-4 space-y-3">
+          {/* SATU anatomi dgn sheet detail Kas RT (26 Sep 2026) — KATA juga:
+              "Nominal" & "Saldo setelah" (dulu "Jumlah" & "Saldo Setelah";
+              kata disetujui user). Judul
+              `h3 text-subtitle font-bold`, tanggal di bawahnya, panel
+              `.inset-soft`, lalu tombol Tutup. Dulu di sini judulnya `<p>`
+              15px medium — seberat keterangan baris daftar yg baru diketuk —
+              sementara sheet Kas RT untuk pekerjaan yang SAMA memakai judul
+              18px bold; dua sheet "detail transaksi", dua kostum. */}
+          <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug text-balance">{selectedTrx.keterangan}</h3>
+          <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedTrx.tanggal)}</p>
+          <div className="inset-soft rounded-2xl p-4 space-y-3 mt-3">
             <div className="flex items-center justify-between">
-              <span className="text-body text-ink-faint dark:text-gray-400">Jumlah</span>
+              <span className="text-body text-ink-faint dark:text-gray-400">Nominal</span>
               <span className={`font-display text-amount font-semibold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
                 {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
               </span>
             </div>
             {selectedTrx.saldoSetelah !== null && (
               <div className="flex items-center justify-between">
-                <span className="text-body text-ink-faint dark:text-gray-400">Saldo Setelah</span>
+                <span className="text-body text-ink-faint dark:text-gray-400">Saldo setelah</span>
                 <span className={`font-display text-body font-semibold tabular-nums ${selectedTrx.saldoSetelah < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-sub dark:text-gray-300'}`}>
                   {maskRp(`${selectedTrx.saldoSetelah < 0 ? '-' : ''}Rp${Math.abs(selectedTrx.saldoSetelah).toLocaleString('id-ID')}`, hidden, 4)}
                 </span>
@@ -926,6 +934,12 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               </span>
             </div>
           </div>
+          {/* Sheet baca tak boleh berakhir BUNTU (kanon sheet detail Kas RT):
+              warga lansia yang tak tahu gestur seret/ketuk-latar butuh satu
+              jalan keluar yang terlihat. */}
+          <button onClick={trxDrag.dismiss} className="btn-secondary w-full py-3 mt-4 text-body">
+            Tutup
+          </button>
         </div>
       </div>
     )}
