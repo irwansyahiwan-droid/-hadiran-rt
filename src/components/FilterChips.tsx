@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowDownUp, Check } from 'lucide-react';
 import { haptic } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
@@ -59,6 +59,58 @@ export default function FilterChips<T extends string, S extends string = string>
       : sort.label
     : '';
 
+  /* SORT RINGKAS — ikon saja, HANYA saat tombol berlabel akan jatuh SENDIRIAN
+     ke baris kedua (26 Sep 2026). Terukur: di 390px Kas Hadiran ("Terbaru")
+     & Talangan ("Tunggakan"), dan di 360px Kas RT, ketiga chip muat sebaris
+     tapi tombol urutan tidak — ia turun ke baris kedua dan berdiri sendirian,
+     52px tinggi untuk satu kontrol sekunder. Dua obat lama sudah dibuang di
+     atas (geser-mendatar menyembunyikan chip; `ml-auto` terbaca jebol).
+     Yang ini tak menyembunyikan satu chip pun: yang mengalah hanya LABEL
+     urutan, dan labelnya tetap ada di `aria-label` + di popover (dgn tanda
+     centang) begitu diketuk. Karena itu ringkas HANYA berlaku untuk bentuk
+     `options` — tombol SIKLUS yang kehilangan labelnya menyembunyikan
+     keadaannya sama sekali.
+
+     Diukur, bukan ditebak lewat breakpoint: lebar label bergantung KATA
+     ("Terbaru" 106px, "Tunggakan" 127px), jadi keputusannya lahir dari lebar
+     nyata chip + label urutan (`measureText` dgn huruf chip itu sendiri —
+     tanpa elemen pengukur tersembunyi yang bisa ikut terpungut sapuan).
+     Kalau chip sendiri sudah melipat, urutan memang menyambung di baris
+     kedua (bukan yatim) → tetap berlabel. */
+  const wadahRef = useRef<HTMLDivElement>(null);
+  const [ringkas, setRingkas] = useState(false);
+  const bisaRingkas = !!sort && 'options' in sort;
+  const kunciChip = options.map((o) => o.label).join('|');
+  useLayoutEffect(() => {
+    const wadah = wadahRef.current;
+    if (!bisaRingkas || !wadah) { setRingkas(false); return; }
+    const kanvas = document.createElement('canvas').getContext('2d');
+    const hitung = () => {
+      const chips = [...wadah.querySelectorAll<HTMLElement>('[data-chip]')];
+      if (!chips.length || !kanvas) return;
+      const gap = parseFloat(getComputedStyle(wadah).columnGap) || 0;
+      const lebar = wadah.clientWidth;
+      const lebarChip = chips.reduce((a, c) => a + c.getBoundingClientRect().width, 0) + gap * (chips.length - 1);
+      const gaya = getComputedStyle(chips[0]);
+      kanvas.font = gaya.font;
+      /* Setelan jarak teks pengguna (§1.4.12) melebarkan huruf; tanpa ini
+         label diukur terlalu sempit dan urutan kembali jatuh sendirian. */
+      if ('letterSpacing' in kanvas) (kanvas as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = gaya.letterSpacing === 'normal' ? '0px' : gaya.letterSpacing;
+      /* Anatomi tombol berlabel: px-4 ×2 + ikon 14 + gap-2 + border 1 ×2. */
+      const penuh = kanvas.measureText(sortLabel).width + 32 + 14 + 8 + 2;
+      const IKON = 44;
+      const yatim = lebarChip <= lebar && lebarChip + gap + penuh > lebar;
+      setRingkas(yatim && lebarChip + gap + IKON <= lebar);
+    };
+    hitung();
+    const ro = new ResizeObserver(hitung);
+    ro.observe(wadah);
+    wadah.querySelectorAll('[data-chip]').forEach((c) => ro.observe(c));
+    /* Font web tiba sesudah ukur pertama → lebar chip berubah. */
+    document.fonts?.ready.then(hitung).catch(() => {});
+    return () => ro.disconnect();
+  }, [bisaRingkas, sortLabel, kunciChip]);
+
   return (
     /* SATU baris flex yang MEMBUNGKUS — chip & tombol urutan bersaudara langsung
        (30 Jul). Dua perubahan sekaligus, dan keduanya saling bergantung:
@@ -78,13 +130,14 @@ export default function FilterChips<T extends string, S extends string = string>
        belakang chip terakhir, jadi barisan kedua terbaca sebagai sambungan.
        Yang TIDAK dipakai: kembali ke geser-mendatar. Itu justru pola yang dibuang
        30 Jul di atas, dan menghidupkannya berarti menyembunyikan chip lagi. */
-    <div className={`flex flex-wrap items-center gap-x-2 gap-y-2 ${className}`}>
+    <div ref={wadahRef} className={`flex flex-wrap items-center gap-x-2 gap-y-2 ${className}`}>
       {options.map((f) => {
           const active = value === f.id;
           return (
             <button
               key={f.id}
               type="button"
+              data-chip
               onClick={() => { if (!active) haptic(); onChange(f.id); }}
               aria-pressed={active}
               className={`press shrink-0 inline-flex items-center justify-center min-h-[44px] px-4 rounded-full text-caption font-semibold transition-colors ${
@@ -112,10 +165,14 @@ export default function FilterChips<T extends string, S extends string = string>
             aria-haspopup="listbox"
             aria-expanded={sortOpen}
             aria-label={`Urutkan: ${sortLabel}`}
-            className="press inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors"
+            title={ringkas ? `Urutkan: ${sortLabel}` : undefined}
+            className={`press inline-flex items-center justify-center gap-2 min-h-[44px] rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors ${ringkas ? 'w-11' : 'px-4'}`}
           >
-            <ArrowDownUp className="w-3.5 h-3.5" />
-            {sortLabel}
+            {/* Dua cabang statis, bukan kelas bersyarat — `audit:ikon` membaca
+                ukuran dari kelas LITERAL. Ringkas = ikon mandiri 16px
+                (tangga ikon), berlabel = 14px pasangan `text-caption`. */}
+            {ringkas ? <ArrowDownUp className="w-4 h-4" /> : <ArrowDownUp className="w-3.5 h-3.5" />}
+            {!ringkas && sortLabel}
           </button>
 
           {sortOpen && (

@@ -309,7 +309,6 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         : 'Semua warga sudah memenuhi kehadiran.';
   // Satu baris = satu WARGA (bisa memuat beberapa talangan) — bendanya warga.
   useUmumkanHasil(visibleCount, 'warga', [search, statusFilter], `${kosongJudul}. ${kosongSub}`);
-  const talSortLabel = talSort === 'tunggakan' ? 'Tunggakan' : 'Nama';
 
   const totalBelumLunas = list.filter(t => !t.status_lunas).reduce((s, t) => s + t.nominal, 0);
   const countBelum = list.filter(t => !t.status_lunas).length;
@@ -616,7 +615,18 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         ] as const}
         value={statusFilter}
         onChange={setStatusFilter}
-        sort={{ label: talSortLabel, onCycle: () => setTalSort((s) => (s === 'tunggakan' ? 'nama' : 'tunggakan')) }}
+        /* Popover, bukan tombol siklus (26 Sep 2026): di 390px tombol urutan
+           tak muat sebaris dgn ketiga chip, dan `FilterChips` hanya boleh
+           meringkasnya jadi ikon kalau keadaannya tetap terbaca di popover —
+           siklus berikon-saja menyembunyikan urutan yang sedang berlaku. */
+        sort={{
+          value: talSort,
+          options: [
+            { id: 'tunggakan', label: 'Tunggakan' },
+            { id: 'nama', label: 'Nama' },
+          ] as const,
+          onChange: setTalSort,
+        }}
       />
 
       <CrossFade loading={loading} skeleton={(
