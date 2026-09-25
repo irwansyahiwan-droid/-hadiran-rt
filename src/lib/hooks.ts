@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useReducer, useCallback} from 'react';
 import { showToast } from './toast';
 import { useOnline } from '../hooks/useOnline';
+import { tanggalUtuh } from './utils';
 
 /* ── Tinggi layar & hero ringkas ─────────────────────────────────
  * Dipakai BERSAMA oleh kartu saldo (Beranda), skeleton-nya, dan rumus tinggi
@@ -452,5 +453,11 @@ export function usePerTanggal(loading: boolean, error: boolean): string {
      Spasi tak-putus menahan tingginya tanpa menyatakan apa pun — pembaca layar
      tak membacakannya, dan layar tak berpindah. */
   if (loading || error || !online) return '\u00A0';
-  return `Per ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+  /* Bulan SINGKAT + tanggal utuh (26 Sep 2026). Dgn bulan panjang, di 360px —
+     lebar ACUAN — kolom judul Kas Hadiran & Kas RT cuma 145,7px sedangkan
+     "Per 26 September 2026" butuh 148,6px: subjudulnya patah jadi
+     "Per 26 September" + "2026" sendirian. Bulan singkat juga yang dipakai
+     SETIAP tanggal lain di layar app ("Sab, 26 Sep 2026"); ini satu-satunya
+     yang menulisnya panjang. */
+  return `Per ${tanggalUtuh(new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }))}`;
 }
