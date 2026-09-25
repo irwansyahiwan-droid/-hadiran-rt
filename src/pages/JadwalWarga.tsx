@@ -412,12 +412,17 @@ export default function JadwalWargaPage() {
                     berbunyi "…Min, 13 Sep" lalu "2026" sendirian. */}
                 Tarikan ke-{lastTarikan.nomor} · <span className="whitespace-nowrap">{formatTanggal(lastTarikan.tanggal)}</span>
               </p>
+              {/* TANPA titik dua (26 Sep 2026, kata disetujui user). Dulu
+                  "Sohibul Bait ⓘ : Nisan" — titik dua melayang SESUDAH ikon,
+                  berjarak dari kata yang ia tutup. Kini ikon info yang jadi
+                  pemisah, dan NAMA (nilainya) dibedakan lewat tebal, bukan
+                  tanda baca. */}
               <p className="text-white/90 text-body mt-0.5">
                 Sohibul Bait
                 <InfoTip label="Sohibul Bait" tone="onDark" className="mx-1">
                   Anggota yang menerima seluruh hasil tarikan pada giliran ini (penerima arisan).
                 </InfoTip>
-                : {lastTarikan.sohibul_bait?.nama ?? '—'}
+                <span className="font-semibold text-white">{lastTarikan.sohibul_bait?.nama ?? '—'}</span>
               </p>
             </div>
 
