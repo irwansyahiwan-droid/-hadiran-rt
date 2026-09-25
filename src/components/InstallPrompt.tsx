@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { X, Download, Share, Plus } from 'lucide-react';
+import { X, Download, Share, Plus, ExternalLink } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 import { useDialog } from '../hooks/useDialog';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -27,12 +27,20 @@ export default function InstallPrompt() {
     (window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as unknown as { standalone?: boolean }).standalone === true);
   const isIos = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent);
+  /* Samsung Internet MENEMBAKKAN `beforeinstallprompt`, tapi APK yang dibuat
+     server-nya ber-`targetSdkVersion` lama → Play Protect (Android 14+)
+     memblokirnya: "Aplikasi yang tidak aman diblokir" (dilaporkan warga
+     25 Sep 2026). Tak ada isi manifest yang bisa mengubahnya — server Chrome
+     tak kena. Jadi di sini spanduk tak menawarkan pasang, melainkan membuka
+     alamat yang SAMA di Chrome lewat `intent://` (cadangan: halaman ini). */
+  const isSamsung = typeof navigator !== 'undefined'
+    && /SamsungBrowser/i.test(navigator.userAgent) && /android/i.test(navigator.userAgent);
 
   useEffect(() => {
     if (isStandalone || localStorage.getItem(DISMISS_KEY) === '1') return;
 
-    if (isIos) {
-      setHidden(false); // iPhone tak punya beforeinstallprompt → tampilkan panduan
+    if (isIos || isSamsung) {
+      setHidden(false); // iPhone: tak ada beforeinstallprompt · Samsung: jangan pakai prompt-nya
       return;
     }
 
@@ -48,7 +56,7 @@ export default function InstallPrompt() {
       window.removeEventListener('beforeinstallprompt', onPrompt);
       window.removeEventListener('appinstalled', onInstalled);
     };
-  }, [isStandalone, isIos]);
+  }, [isStandalone, isIos, isSamsung]);
 
   const dismiss = () => {
     setHidden(true);
@@ -65,6 +73,10 @@ export default function InstallPrompt() {
 
   if (hidden || isStandalone) return null;
 
+  const keChrome = typeof window === 'undefined' ? '#'
+    : `intent://${location.host}${location.pathname}${location.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(location.href)};end`;
+  const kelasAksi = 'press shrink-0 inline-flex min-h-[44px] items-center gap-2 bg-brand text-white text-caption font-bold px-4 py-2 rounded-xl';
+
   const steps = [
     { icon: Share, text: 'Ketuk ikon Bagikan di bar Safari' },
     { icon: Plus, text: 'Pilih “Tambahkan ke Layar Utama”' },
@@ -78,23 +90,32 @@ export default function InstallPrompt() {
         style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
       >
         <div
-          className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800"
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl${isSamsung ? ' flex-wrap' : ''} bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800`}
           style={{ boxShadow: 'var(--shadow-float)' }}
         >
           <img src={logoRt} alt="" width={40} height={40} className="w-10 h-10 rounded-xl object-cover shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-body font-bold text-gray-900 dark:text-gray-100 leading-tight">Pasang Hadiran RT</p>
-            <p className="text-micro text-gray-500 dark:text-gray-400">Akses cepat dari layar utama HP</p>
+            <p className="text-body font-bold text-gray-900 dark:text-gray-100 leading-tight">{isSamsung ? 'Pasang lewat Chrome' : 'Pasang Hadiran RT'}</p>
+            <p className="text-micro text-gray-500 dark:text-gray-400">{isSamsung ? 'Samsung Internet diblokir saat memasang' : 'Akses cepat dari layar utama HP'}</p>
           </div>
+          {isSamsung ? (
+            /* Baris SENDIRI, selebar spanduk: sebaris dgn teks ia menggencet
+               kolom judul jadi satu kata per baris & menimpanya @360px. */
+            <a href={keChrome} className={`${kelasAksi} order-last w-full justify-center`}>
+              <ExternalLink className="w-3.5 h-3.5" />
+              Buka di Chrome
+            </a>
+          ) : (
           <button
             onClick={isIos ? () => setShowGuide(true) : install}
             /* min-h 44: aksi UTAMA banner ini sempat 32px tinggi — di bawah
                kontrak 44px yang dipatuhi seluruh app (lihat FilterChips). */
-            className="press shrink-0 inline-flex min-h-[44px] items-center gap-2 bg-brand text-white text-caption font-bold px-4 py-2 rounded-xl"
+            className={kelasAksi}
           >
             <Download className="w-3.5 h-3.5" />
             Pasang
           </button>
+          )}
           <button onClick={dismiss} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center text-gray-400 shrink-0">
             <X className="w-4 h-4" />
           </button>
