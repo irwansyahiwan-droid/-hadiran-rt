@@ -91,8 +91,15 @@ export default function Fab({ onClick, label, icon: Icon = Plus, ariaLabel, over
     // .press:active sehingga efek tekan mati.
     <div
       ref={wadahRef}
-      className="fixed right-4 z-fab"
+      className="fixed z-fab"
       style={{
+        /* Sejajar tepi kanan KOLOM isi (`max-w-lg` + `px-4`), bukan tepi
+           jendela. Di HP keduanya sama (16px); di laptop bendahara FAB dulu
+           menempel di tepi layar — terukur 26 Sep 2026 @1280px: 265px dari
+           kolom yang berakhir di x=880, aksi-buat utama melayang di kanvas
+           kosong. `100%` (bukan `100vw`) = lebar containing block TANPA
+           scrollbar, jadi di Windows pun jatuh tepat di garis kolom. */
+        right: 'max(1rem, calc((100% - 32rem) / 2 + 1rem))',
         bottom: overNav
           ? 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)'
           : 'calc(env(safe-area-inset-bottom) + 1.25rem)',
