@@ -82,30 +82,74 @@ export default function FilterChips<T extends string, S extends string = string>
      tanpa elemen pengukur tersembunyi yang bisa ikut terpungut sapuan).
      Kalau chip sendiri sudah melipat, urutan memang menyambung di baris
      kedua (bukan yatim) → tetap berlabel. */
+  /* MODE PADAT (26 Sep 2026) — anak tangga kedua sebelum melipat: bantalan
+     chip & tombol urutan 16 → 12px (tinggi TETAP 44px). Sesudah ringkas di
+     atas dipasang, probe baris-yatim masih menemukan tombol urutan jatuh
+     sendirian di 360px — lebar ACUAN — di Kas Hadiran & Talangan: ikon 44px
+     pun tak muat di samping tiga chip berbantalan penuh (Kas Hadiran butuh
+     336px dari 328px). Padat membebaskan 8px per kontrol. Chip TANPA urutan
+     ikut memakainya (editor Absensi @320px: "Tidak" jatuh sendirian, kurang
+     5px).
+
+     Urutan pilihan — yang pertama MUAT menang: normal berlabel → padat
+     berlabel → ringkas (ikon) → padat + ikon. Label dipertahankan selama
+     mungkin; ikon baru dipakai kalau padat pun tak cukup. Kalau tak satu pun
+     muat (chip sendiri melipat), baris dibiarkan melipat seperti biasa. */
   const wadahRef = useRef<HTMLDivElement>(null);
-  const [ringkas, setRingkas] = useState(false);
+  const [tata, setTata] = useState({ padat: false, ringkas: false });
+  const { padat, ringkas } = tata;
+  const adaSort = !!sort;
   const bisaRingkas = !!sort && 'options' in sort;
   const kunciChip = options.map((o) => o.label).join('|');
   useLayoutEffect(() => {
     const wadah = wadahRef.current;
-    if (!bisaRingkas || !wadah) { setRingkas(false); return; }
+    if (!wadah) return;
     const kanvas = document.createElement('canvas').getContext('2d');
     const hitung = () => {
       const chips = [...wadah.querySelectorAll<HTMLElement>('[data-chip]')];
       if (!chips.length || !kanvas) return;
+      const n = chips.length;
       const gap = parseFloat(getComputedStyle(wadah).columnGap) || 0;
       const lebar = wadah.clientWidth;
-      const lebarChip = chips.reduce((a, c) => a + c.getBoundingClientRect().width, 0) + gap * (chips.length - 1);
       const gaya = getComputedStyle(chips[0]);
-      kanvas.font = gaya.font;
-      /* Setelan jarak teks pengguna (§1.4.12) melebarkan huruf; tanpa ini
-         label diukur terlalu sempit dan urutan kembali jatuh sendirian. */
-      if ('letterSpacing' in kanvas) (kanvas as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = gaya.letterSpacing === 'normal' ? '0px' : gaya.letterSpacing;
-      /* Anatomi tombol berlabel: px-4 ×2 + ikon 14 + gap-2 + border 1 ×2. */
-      const penuh = kanvas.measureText(sortLabel).width + 32 + 14 + 8 + 2;
+      /* Lebar ALAMI (bantalan penuh) dihitung balik dari bantalan yang sedang
+         terpasang — tanpa ref ke keadaan sebelumnya. */
+      const SUSUT = 8;
+      const koreksi = (16 - (parseFloat(gaya.paddingLeft) || 16)) * 2 * n;
+      const chipNormal = chips.reduce((a, c) => a + c.getBoundingClientRect().width, 0) + koreksi + gap * (n - 1);
+      const chipPadat = chipNormal - SUSUT * n;
+      let label = 0;
+      if (adaSort) {
+        /* Dirakit dari LONGHAND, bukan `gaya.font`: Chrome mengembalikan
+           shorthand KOSONG begitu ada longhand yang tak bisa diwakilinya
+           (terukur 26 Sep 2026: `font: ""`), dan kanvas lalu diam-diam memakai
+           `10px sans-serif` — label "Terbaru" terukur 33,9px padahal ~50px.
+           Kesalahan itu sudah ada sejak ringkas pertama dipasang dan kebetulan
+           tak berakibat; begitu mode padat ditambah, ia memilih "padat
+           berlabel" yang tak muat. */
+        kanvas.font = `${gaya.fontStyle} ${gaya.fontWeight} ${gaya.fontSize} ${gaya.fontFamily}`;
+        /* Setelan jarak teks pengguna (§1.4.12) melebarkan huruf; tanpa ini
+           label diukur terlalu sempit dan urutan kembali jatuh sendirian. */
+        if ('letterSpacing' in kanvas) (kanvas as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = gaya.letterSpacing === 'normal' ? '0px' : gaya.letterSpacing;
+        /* Anatomi tombol berlabel tanpa bantalan: ikon 14 + gap-2 + border 1 ×2. */
+        label = kanvas.measureText(sortLabel).width + 14 + 8 + 2;
+      }
       const IKON = 44;
-      const yatim = lebarChip <= lebar && lebarChip + gap + penuh > lebar;
-      setRingkas(yatim && lebarChip + gap + IKON <= lebar);
+      const opsi = !adaSort
+        ? [
+            { padat: false, ringkas: false, w: chipNormal },
+            { padat: true, ringkas: false, w: chipPadat },
+          ]
+        : [
+            { padat: false, ringkas: false, w: chipNormal + gap + label + 32 },
+            { padat: true, ringkas: false, w: chipPadat + gap + label + 24 },
+            ...(bisaRingkas ? [
+              { padat: false, ringkas: true, w: chipNormal + gap + IKON },
+              { padat: true, ringkas: true, w: chipPadat + gap + IKON },
+            ] : []),
+          ];
+      const pilih = opsi.find((o) => o.w <= lebar) ?? { padat: false, ringkas: false };
+      setTata((t) => (t.padat === pilih.padat && t.ringkas === pilih.ringkas ? t : { padat: pilih.padat, ringkas: pilih.ringkas }));
     };
     hitung();
     const ro = new ResizeObserver(hitung);
@@ -114,7 +158,7 @@ export default function FilterChips<T extends string, S extends string = string>
     /* Font web tiba sesudah ukur pertama → lebar chip berubah. */
     document.fonts?.ready.then(hitung).catch(() => {});
     return () => ro.disconnect();
-  }, [bisaRingkas, sortLabel, kunciChip]);
+  }, [adaSort, bisaRingkas, sortLabel, kunciChip]);
 
   return (
     /* SATU baris flex yang MEMBUNGKUS — chip & tombol urutan bersaudara langsung
@@ -145,7 +189,7 @@ export default function FilterChips<T extends string, S extends string = string>
               data-chip
               onClick={() => { if (!active) haptic(); onChange(f.id); }}
               aria-pressed={active}
-              className={`press shrink-0 inline-flex items-center justify-center min-h-[44px] px-4 rounded-full text-caption font-semibold transition-colors ${
+              className={`press shrink-0 inline-flex items-center justify-center min-h-[44px] ${padat ? 'px-3' : 'px-4'} rounded-full text-caption font-semibold transition-colors ${
                 active
                   ? 'bg-brand text-white pilihan-isi-hover' /* fill brand DATAR (MATERIAL-FLAT) — gradient+inset+glow era pra-flat dihapus, selaras filter absensi & pill nav */
                   /* dark:text-gray-400 (5.74:1 di fill gray-800) SENGAJA — bukan gray-300.
@@ -176,7 +220,7 @@ export default function FilterChips<T extends string, S extends string = string>
             aria-expanded={sortOpen}
             aria-label={`Urutkan: ${sortLabel}`}
             title={ringkas ? `Urutkan: ${sortLabel}` : undefined}
-            className={`press inline-flex items-center justify-center gap-2 min-h-[44px] rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors ${ringkas ? 'w-11' : 'px-4'}`}
+            className={`press inline-flex items-center justify-center gap-2 min-h-[44px] rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors ${ringkas ? 'w-11' : padat ? 'px-3' : 'px-4'}`}
           >
             {/* Dua cabang statis, bukan kelas bersyarat — `audit:ikon` membaca
                 ukuran dari kelas LITERAL. Ringkas = ikon mandiri 16px
@@ -230,7 +274,7 @@ export default function FilterChips<T extends string, S extends string = string>
           type="button"
           onClick={() => { haptic(); sort.onCycle(); }}
           aria-label={`Urutkan: ${sort.label}`}
-          className="press shrink-0 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors"
+          className={`press shrink-0 inline-flex items-center gap-2 min-h-[44px] ${padat ? 'px-3' : 'px-4'} rounded-full text-caption font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-control dark:border-control-dark pilihan-hover transition-colors`}
         >
           <ArrowDownUp className="w-3.5 h-3.5" />
           {sort.label}
