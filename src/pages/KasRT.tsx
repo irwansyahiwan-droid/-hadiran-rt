@@ -573,8 +573,8 @@ export default function KasRTPage() {
             </button>
             {/* Ekspor (PDF/Excel) disatukan ke satu menu → aksi utama "Tambah"
                 tak tersaingi di toolbar; kini hadir sebagai FAB di zona jempol.
-                align kiri: tombol berada di kiri toolbar (HP) → dropdown buka ke
-                kanan agar tidak terpotong tepi layar. */}
+                Sisi buka dropdown dihitung ExportMenu sendiri dari letak
+                tombolnya (lihat `sisiPopover`). */}
             <ExportMenu
               /* Muat gagal → ekspor dimatikan. Halaman memang sudah
                  menampilkan ErrorState tanpa angka, tapi tombol ini duduk
@@ -584,7 +584,6 @@ export default function KasRTPage() {
               disabled={error}
               disabledReason="Data gagal dimuat — muat ulang dulu sebelum mengekspor."
               busy={eksporSibuk}
-              align="left"
               items={[
                 {
                   label: 'Cetak PDF',

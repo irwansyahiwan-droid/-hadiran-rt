@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Download, ChevronDown, Loader2, type LucideIcon } from 'lucide-react';
-import { haptic } from '../lib/utils';
+import { haptic, sisiPopover } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 
@@ -14,10 +14,6 @@ export interface ExportItem {
 
 interface ExportMenuProps {
   items: ExportItem[];
-  /** Arah buka dropdown relatif tombol. 'right' (default) = tepi kanan dropdown
-   *  sejajar tombol → cocok saat tombol di kanan layar (Kas RT). 'left' = buka
-   *  ke kanan → cocok saat tombol di kiri (Kas Hadiran), agar tak terpotong. */
-  align?: 'left' | 'right';
   /** Matikan ekspor saat data TIDAK bisa dipercaya (mis. muat gagal).
    *
    *  Aturan "app kas dilarang menyatakan nominal saat gagal muat" selama ini
@@ -46,8 +42,12 @@ interface ExportMenuProps {
  *  (PDF / Excel) ke satu menu, agar aksi utama (FAB) tak tersaingi di toolbar.
  *  Satu aksi primer per layar. Popover ringan (bukan sheet) selaras menu Header:
  *  tutup via Escape / klik luar. */
-export default function ExportMenu({ items, align = 'right', disabled = false, disabledReason, busy = false }: ExportMenuProps) {
+export default function ExportMenu({ items, disabled = false, disabledReason, busy = false }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
+  /* Sisi buka DIHITUNG dari letak tombol saat dibuka (`sisiPopover`), bukan
+     prop `align` dari call-site — prop itu tertinggal di "left" sesudah tombol
+     pindah ke kanan kepala halaman, dan menu meluber 54px keluar layar. */
+  const [sisi, setSisi] = useState<'kiri' | 'kanan'>('kanan');
   /* Tombol Back HP menutup menu ini — bukan meninggalkan app. Warga app ini
      tak punya tombol Escape; `audit:papan-ketik` menguji Escape dan melaporkan
      menu ini sehat, dan justru itu titik butanya. Lihat `npm run audit:mundur`. */
@@ -119,7 +119,12 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
   return (
     <div className="relative" ref={ref}>
       <button
-        onClick={() => { haptic(); setOpen((o) => !o); }}
+        onClick={() => {
+          haptic();
+          const r = ref.current?.getBoundingClientRect();
+          if (r && !open) setSisi(sisiPopover(r, 192 /* w-48 */, window.innerWidth));
+          setOpen((o) => !o);
+        }}
         disabled={disabled || busy}
         aria-busy={busy || undefined}
         title={disabled ? disabledReason : undefined}
@@ -159,7 +164,7 @@ export default function ExportMenu({ items, align = 'right', disabled = false, d
             role="menu"
             aria-label="Ekspor"
             onKeyDown={onMenuKeyDown}
-            className={`${open ? 'pop-menu' : 'pop-menu-out'} absolute top-[calc(100%+8px)] z-overlay w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-2 ${align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
+            className={`${open ? 'pop-menu' : 'pop-menu-out'} absolute top-[calc(100%+8px)] z-overlay w-48 rounded-2xl bg-white dark:bg-gray-900 ring-1 ring-black/5 dark:ring-white/10 overflow-hidden py-2 ${sisi === 'kanan' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'}`}
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             {items.map(({ label, icon: Icon, onClick, tone }) => (

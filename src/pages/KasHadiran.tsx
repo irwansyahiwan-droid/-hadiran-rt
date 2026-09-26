@@ -583,7 +583,6 @@ export default function KasHadiranPage() {
               disabled={error}
               disabledReason="Data gagal dimuat — muat ulang dulu sebelum mengekspor."
               busy={eksporSibuk}
-              align="left"
               items={[
                 {
                   label: 'Cetak PDF',

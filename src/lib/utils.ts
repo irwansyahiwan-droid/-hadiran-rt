@@ -60,6 +60,37 @@ export function haptic(pattern: number | number[] = 8): void {
   }
 }
 
+/**
+ * Sisi JANGKAR popover yang muat di layar, dipilih dari posisi PEMICU saat
+ * dibuka — bukan keputusan call-site (26 Sep 2026).
+ *   'kanan' = tepi kanan popover sejajar tepi kanan pemicu (terbuka ke kiri)
+ *   'kiri'  = tepi kiri popover sejajar tepi kiri pemicu (terbuka ke kanan)
+ *
+ * Kenapa diturunkan, bukan dipilih: menu Ekspor memakai `align="left"` yang
+ * diputuskan saat tombolnya masih di KIRI toolbar (29888ef). Kepala halaman
+ * lalu memindahkannya ke kanan, keputusan itu tertinggal, dan menunya meluber
+ * 54px keluar layar di SEMUA lebar ("Ekspor Exce…"). Popover urutan
+ * FilterChips kena kebalikannya: ia dipaku rata kanan, dan di 320/360px
+ * tombolnya turun ke KIRI baris kedua → popover keluar 38px ke kiri.
+ * Posisi pemicu berubah menurut lebar layar & isi, jadi sisinya wajib
+ * dihitung saat itu juga.
+ *
+ * Utamakan sisi yang searah letak pemicu (pemicu di paruh kanan → buka ke
+ * kiri); kalau sisi itu tak muat, pakai sisi lawannya.
+ */
+export function sisiPopover(
+  pemicu: { left: number; right: number },
+  lebarPopover: number,
+  lebarLayar: number,
+  tepi = 8,
+): 'kiri' | 'kanan' {
+  const muatKanan = pemicu.right - lebarPopover >= tepi;
+  const muatKiri = pemicu.left + lebarPopover <= lebarLayar - tepi;
+  const diParuhKanan = (pemicu.left + pemicu.right) / 2 > lebarLayar / 2;
+  if (diParuhKanan) return muatKanan ? 'kanan' : 'kiri';
+  return muatKiri ? 'kiri' : 'kanan';
+}
+
 /** Spasi tak-putus. */
 const NBSP = ' ';
 

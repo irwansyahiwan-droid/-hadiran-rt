@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   formatRupiah, formatRupiahPlain, maskRp, hitungSaldoHadiran, pesanError,
-  formatTanggalRingkas, ukuranMuat, tanggalUtuh, formatTanggal } from './utils';
+  formatTanggalRingkas, ukuranMuat, tanggalUtuh, formatTanggal, sisiPopover } from './utils';
 
 /**
  * Formatter uang & penerjemah error — dipakai hampir di setiap layar, dan
@@ -189,5 +189,33 @@ describe('tanggalUtuh — tanggal satu kesatuan, nama hari boleh lepas', () => {
     expect(layar).toContain(`26${NBSP}Sep${NBSP}2026`);
     expect(berkas).not.toContain(NBSP);
     expect(berkas.replace(/ /g, NBSP)).toContain(`26${NBSP}Sep${NBSP}2026`);
+  });
+});
+
+/**
+ * Popover memilih sisi dari letak pemicunya. Angka diambil dari pengukuran
+ * nyata 26 Sep 2026: tombol Ekspor [252..~375] di layar 390 (menu 192px), dan
+ * tombol urutan [16..122] di layar 360 (popover 160px).
+ */
+describe('sisiPopover — popover tak pernah keluar layar', () => {
+  it('tombol Ekspor di kanan → buka ke kiri (jangkar kanan)', () => {
+    expect(sisiPopover({ left: 252, right: 374 }, 192, 390)).toBe('kanan');
+  });
+  it('tombol urutan di kiri baris kedua → buka ke kanan (jangkar kiri)', () => {
+    expect(sisiPopover({ left: 16, right: 122 }, 160, 360)).toBe('kiri');
+  });
+  it('pemicu yang sama memilih sisi menurut lebar layar', () => {
+    // layar 520: tengah 250 di paruh kiri, 200+192=392 muat → buka ke kanan.
+    expect(sisiPopover({ left: 200, right: 300 }, 192, 520)).toBe('kiri');
+    // layar 390: tengah 250 di paruh kanan, 300-192=108 muat → buka ke kiri.
+    expect(sisiPopover({ left: 200, right: 300 }, 192, 390)).toBe('kanan');
+  });
+  it('hasilnya memang muat di dalam layar', () => {
+    for (const [l, r, w, vw] of [[252, 374, 192, 390], [16, 122, 160, 360], [182, 304, 192, 320], [230, 274, 160, 320]]) {
+      const sisi = sisiPopover({ left: l, right: r }, w, vw);
+      const [a, b] = sisi === 'kanan' ? [r - w, r] : [l, l + w];
+      expect(a).toBeGreaterThanOrEqual(0);
+      expect(b).toBeLessThanOrEqual(vw);
+    }
   });
 });

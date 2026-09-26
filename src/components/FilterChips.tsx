@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowDownUp, Check } from 'lucide-react';
-import { haptic } from '../lib/utils';
+import { haptic, sisiPopover } from '../lib/utils';
 import { useExitAnim } from '../lib/hooks';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 
@@ -41,6 +41,11 @@ export default function FilterChips<T extends string, S extends string = string>
   className = '',
 }: FilterChipsProps<T, S>) {
   const [sortOpen, setSortOpen] = useState(false);
+  /* Sisi buka popover urutan dihitung saat dibuka (`sisiPopover`). Dulu dipaku
+     rata KANAN — benar selama tombolnya di ujung kanan baris, tapi di 320/360px
+     tombol itu turun ke KIRI baris kedua dan popover keluar 38px dari layar. */
+  const [sisiSort, setSisiSort] = useState<'kiri' | 'kanan'>('kanan');
+  const sortRef = useRef<HTMLDivElement>(null);
   const sortMounted = useExitAnim(sortOpen);
 
   /* Back HP menutup popover urutan (paritas dgn Escape di bawah). */
@@ -158,10 +163,15 @@ export default function FilterChips<T extends string, S extends string = string>
       })}
 
       {sort && 'options' in sort && (
-        <div className="relative shrink-0">
+        <div ref={sortRef} className="relative shrink-0">
           <button
             type="button"
-            onClick={() => { haptic(); setSortOpen((o) => !o); }}
+            onClick={() => {
+              haptic();
+              const r = sortRef.current?.getBoundingClientRect();
+              if (r && !sortOpen) setSisiSort(sisiPopover(r, 160 /* min-w-[10rem] */, window.innerWidth));
+              setSortOpen((o) => !o);
+            }}
             aria-haspopup="listbox"
             aria-expanded={sortOpen}
             aria-label={`Urutkan: ${sortLabel}`}
@@ -187,7 +197,7 @@ export default function FilterChips<T extends string, S extends string = string>
               <div
                 role="listbox"
                 aria-label="Pilihan urutan"
-                className={`${sortOpen ? 'pop-menu' : 'pop-menu-out'} absolute right-0 top-full mt-2 z-overlay min-w-[10rem] py-2 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float origin-top-right`}
+                className={`${sortOpen ? 'pop-menu' : 'pop-menu-out'} absolute ${sisiSort === 'kanan' ? 'right-0 origin-top-right' : 'left-0 origin-top-left'} top-full mt-2 z-overlay min-w-[10rem] py-2 rounded-2xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800 float`}
               >
                 {sort.options.map((o) => {
                   const selected = o.id === sort.value;
