@@ -1361,10 +1361,16 @@ export default function JadwalPage() {
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
-                            className="btn-brand flex items-center gap-2 min-h-[44px] px-4 rounded-full text-caption active:scale-[0.97] active:opacity-90 transition duration-ketuk"
+                            /* Di bawah 360px pil ini jadi bulat 44px & labelnya
+                               `sr-only` (26 Sep 2026): pil berlabel + tombol menu
+                               menyisakan 53px untuk nama @320, dan "Carduki"
+                               terbelah jadi "Carduk / i". Nama aksesibelnya tetap
+                               "Proses" (sr-only tetap di pohon aksesibilitas) dan
+                               fill brand tetap menandai giliran berikutnya. */
+                            className="btn-brand flex items-center justify-center gap-2 min-h-[44px] px-4 max-[359px]:w-11 max-[359px]:px-0 rounded-full text-caption active:scale-[0.97] active:opacity-90 transition duration-ketuk"
                           >
-                            <RefreshCw className={`w-3 h-3 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
-                            {navigatingId === t.id ? 'Memproses…' : 'Proses'}
+                            <RefreshCw className={`w-3 h-3 max-[359px]:w-4 max-[359px]:h-4 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
+                            <span className="max-[359px]:sr-only">{navigatingId === t.id ? 'Memproses…' : 'Proses'}</span>
                           </button>
                         ) : (
                           /* Tarikan terjadwal lain: tombol ikon saja. Pil berlabel di

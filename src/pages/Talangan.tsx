@@ -413,6 +413,20 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                    jujur daripada elipsis pada caption sependek ini. */
                 <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5 leading-snug">
                   {g.countBelum} belum lunas
+                  {/* Di bawah 380px nominal kelompok PINDAH ke sini (26 Sep
+                      2026). Di kanan ia memakan ~85px + chevron + tombol WA,
+                      dan kolom nama tinggal ~40px @320 / ~79px @360: nama
+                      terbelah per SUKU KATA ("Ust / ad / Saif / ul / Had / i",
+                      12 nama @320, "Syarifu / din" @360) — tak terpotong, tak
+                      meluber, jadi tak satu sapuan pun melihatnya. Di baris
+                      keterangan ia tak menambah tinggi, dan nama dapat lebar
+                      kolom penuh. */}
+                  <span className="hidden max-[379px]:inline">
+                    {' · '}
+                    <span className="font-display font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
+                      {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
+                    </span>
+                  </span>
                 </p>
               ) : (
                 <p className="text-caption text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
@@ -422,7 +436,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
               {g.countBelum > 0 && (
                 /* text-body, bukan text-amount: ini total kelompok (ringkasan),
                    nominal per talangan tetap tampil di baris detail saat dibuka. */
-                <span className="font-display text-body font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
+                <span className="max-[379px]:hidden font-display text-body font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
                   {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                 </span>
               )}

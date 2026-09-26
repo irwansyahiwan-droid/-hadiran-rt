@@ -955,12 +955,22 @@ export default function KasHadiranPage() {
                           <p data-ringkas className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
+                          {/* Di bawah 360px nominal PINDAH ke bawah nama (26 Sep
+                              2026): kolom kanan (~115px) menyisakan ~73px untuk
+                              nama 18px bold, dan 9 nama terbelah di TENGAH kata
+                              ("Basukia / nto", "Syarifu / din") di 320px — lebar
+                              WAJIB §1.4.10. Di 360px ke atas tak ada yang
+                              berubah. */}
+                          <p className="hidden max-[359px]:block mt-1 text-caption text-ink-faint dark:text-gray-400">
+                            <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100">{formatRupiahPlain(sohibulTerima)}</span>
+                            {' · Dapat Arisan'}
+                          </p>
                           <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">
                             Lihat detail
                             <ChevronRight className="w-3 h-3" />
                           </span>
                         </div>
-                        <div className="text-right shrink-0">
+                        <div className="max-[359px]:hidden text-right shrink-0">
                           {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
                           <p className="font-display text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
                             {formatRupiahPlain(sohibulTerima)}
