@@ -221,7 +221,11 @@ const LANTAI = {
   toast:            [/TOAST: (\d+) pemeriksaan/, 8],
   /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis. */
   tautan:           [/TAUTAN TAB: (\d+) pemeriksaan/, 37],
-  huruf:            [/populasi daun teks\s*:\s*(\d+)/, 6300],
+  /* 6300 → 5880 (26 Sep 2026): populasi 6195, IDENTIK di build lama & baru
+     yang diukur berdampingan pada saat yang sama — jadi yang turun DATA
+     produksi (satu tarikan baru diproses hari itu), bukan app. Garis dasar
+     ini ikut data; lantai ~95%. */
+  huruf:            [/populasi daun teks\s*:\s*(\d+)/, 5880],
   /* 16 -> 20 layar (12 Sep 2026): sheet TUJUAN `data-ringkas` masuk populasi
      — syarat kedua penanda itu. Lantai ~95%. */
   potong:           [/A\. 390px[^:]*:\s*\d+ temuan \/ (\d+) layar/, 19],
