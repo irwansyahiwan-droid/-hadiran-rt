@@ -417,6 +417,15 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
   const { vh, vw: lebarLayar } = useUkuranLayar();
   const cardH = cardHeight(vh, lebarLayar);
   const viewportH = cardH + CARD_GAP;
+  /* Kartu PROMO di mode ringkas (26 Sep 2026): tinggi kartu turun ke 184px
+     (dihitung untuk isi slide SALDO), padahal promo butuh ~226px — eyebrow
+     44 + judul `text-title` 4 baris (lebarnya dijepit `tw` agar tak tertimpa
+     chevron) + keterangan 2 baris. Di 320px (lebar WAJIB §1.4.10) judulnya
+     terpotong di dasar kartu ("…untuk / warga" terpangkas) dan keterangannya
+     hilang. Tak ada sapuan yang melihatnya: teksnya tidak `truncate`, ia
+     terklip WADAH. Di mode ringkas judul turun satu anak tangga & keterangan
+     dilepas — tujuannya tetap tergapai lewat chevron. */
+  const promoRingkas = heroRingkas(vh, lebarLayar);
 
   // Refs untuk loop autoplay tanpa stale closure.
   const idxRef = useRef(0);
@@ -714,8 +723,8 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
-                  <div className={`mt-4 text-balance text-title font-bold ${tw}`}>{promo!.judul}</div>
-                  {promo!.desc && (
+                  <div className={`mt-4 text-balance font-bold ${promoRingkas ? 'text-subtitle' : 'text-title'} ${tw}`}>{promo!.judul}</div>
+                  {promo!.desc && !promoRingkas && (
                     <div className={`mt-3 text-pretty text-body font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
 

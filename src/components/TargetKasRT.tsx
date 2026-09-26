@@ -9,7 +9,7 @@ import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from './GalatKolom';
 import ConfirmDestruktif from './ConfirmDestruktif';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, haptic } from '../lib/utils';
+import { formatRupiahPlain, haptic, tanggalUtuh } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { getTargetKasRT, setTargetKasRT, clearTargetKasRT, type TargetKasRT as Target_ } from '../lib/pengaturan';
 
@@ -112,9 +112,11 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
   if (target.tanggal) {
     const d = new Date(target.tanggal);
     const hari = Math.ceil((d.getTime() - Date.now()) / 86400000);
-    const tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    const tgl = tanggalUtuh(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }));
     deadlineLewat = hari < 0 && !tercapai;
-    deadline = hari >= 0 ? `${tgl} · ${hari} hari lagi` : `${tgl} · lewat`;
+    /* Tanggal & "N hari lagi" masing-masing satu kesatuan (spasi tak-putus):
+       di 320px baris ini dulu patah jadi "…96 hari" + "lagi" sendirian. */
+    deadline = hari >= 0 ? `${tgl} · ${hari}\u00A0hari\u00A0lagi` : `${tgl} · lewat`;
   }
 
   return (

@@ -9,7 +9,7 @@ import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, ikatFrasa, maskRp, pesanError } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, ikatFrasa, maskRp, pesanError, tanggalUtuh } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import EmptyState from '../components/EmptyState';
@@ -664,7 +664,7 @@ export default function KasRTPage() {
             <>
               Saldo Awal
               {' \u00b7 '}
-              {new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+              {tanggalUtuh(new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }))}
               {' \u00b7 '}
               <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}</span>
             </>
