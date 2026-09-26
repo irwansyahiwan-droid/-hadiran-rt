@@ -34,6 +34,7 @@ import CrossFade from '../components/CrossFade';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import type { AbsensiStatus, Tarikan, TransaksiKas, Warga } from '../lib/types';
+import { useKolomNominal } from '../lib/kolomNominal';
 
 // ── Setor Modal ────────────────────────────────────────────
 
@@ -48,6 +49,8 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   // Tarikan terbaru dulu — setoran umumnya dari tarikan terakhir.
   const tarikanOpsi = useMemo(() => [...tarikanList].sort((a, b) => b.nomor - a.nomor), [tarikanList]);
   const [nominal, setNominal] = useState(0);
+  // Kursor tak melompat ke ujung saat digit di tengah dikoreksi (lihat kolomNominal).
+  const kolomNominal = useKolomNominal(nominal, setNominal);
   const [keterangan, setKeterangan] = useState('');
   const [tanggal, setTanggal] = useState(() => new Date().toISOString().split('T')[0]);
   // Default = tarikan paling baru. WAJIB diisi → setoran selalu ter-link ke tarikan
@@ -123,8 +126,8 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
               <label htmlFor="kashadiran-nominal" className="label-field">Nominal</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-body text-gray-500 dark:text-gray-400">Rp</span>
-                <input id="kashadiran-nominal" name="nominal" autoComplete="off" type="text" inputMode="numeric" value={nominal ? nominal.toLocaleString('id-ID') : ''}
-                  onChange={e => { setNominal(Number(e.target.value.replace(/\D/g, '')) || 0); galat.hapus('kashadiran-nominal'); }}
+                <input id="kashadiran-nominal" name="nominal" autoComplete="off" type="text" inputMode="numeric" value={kolomNominal.value}
+                  onChange={e => { kolomNominal.onChange(e); galat.hapus('kashadiran-nominal'); }}
                   {...galat.aria('kashadiran-nominal')}
                   className="field pl-9 pr-3" />
               </div>

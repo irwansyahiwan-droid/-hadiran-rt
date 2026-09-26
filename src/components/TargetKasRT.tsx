@@ -12,6 +12,7 @@ import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, haptic, ikatFrasa, tanggalUtuh } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { getTargetKasRT, setTargetKasRT, clearTargetKasRT, type TargetKasRT as Target_ } from '../lib/pengaturan';
+import { useKolomNominal } from '../lib/kolomNominal';
 
 /** `saldo` = `null` selama saldo halaman TAK DIKETAHUI (masih memuat tanpa
  *  cache). Dulu kartu ini hanya menjaga fetch-nya SENDIRI: kalau mutasi Kas RT
@@ -237,6 +238,8 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
 // ── Sheet edit/set target ──────────────────────────────────
 function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: () => void; onSaved: () => void }) {
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
+  // Kursor tak melompat ke ujung saat digit di tengah dikoreksi (lihat kolomNominal).
+  const kolomNominal = useKolomNominal(nominal, setNominal);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(initial?.tanggal ?? '');
   const [saving, setSaving, sedangSimpan] = useSaving();
@@ -318,8 +321,8 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
                   autoComplete="off"
                   type="text"
                   inputMode="numeric"
-                  value={nominal ? nominal.toLocaleString('id-ID') : ''}
-                  onChange={(e) => { setNominal(Number(e.target.value.replace(/\D/g, '')) || 0); galat.hapus('target-nominal'); }}
+                  value={kolomNominal.value}
+                  onChange={(e) => { kolomNominal.onChange(e); galat.hapus('target-nominal'); }}
                   {...galat.aria('target-nominal')}
                   className="field pl-9 pr-3"
                 />

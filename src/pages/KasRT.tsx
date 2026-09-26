@@ -39,6 +39,7 @@ import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { kategoriOpsi, kategoriDefault, labelKategori, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
 import type { ReceiptRow } from '../lib/shareReceipt';
 import type { KasRT } from '../lib/types';
+import { useKolomNominal } from '../lib/kolomNominal';
 
 type Tipe = 'masuk' | 'keluar';
 
@@ -55,6 +56,8 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   const isEdit = !!initial;
   const [tipe, setTipe] = useState<Tipe>(initial?.tipe ?? 'masuk');
   const [nominal, setNominal] = useState(initial?.nominal ?? 0);
+  // Kursor tak melompat ke ujung saat digit di tengah dikoreksi (lihat kolomNominal).
+  const kolomNominal = useKolomNominal(nominal, setNominal);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
   const [tanggal, setTanggal] = useState(() => (initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
   const [kategori, setKategori] = useState<string>(initial?.kategori ?? kategoriDefault(initial?.tipe ?? 'masuk'));
@@ -187,8 +190,8 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
                   autoComplete="off"
                   type="text"
                   inputMode="numeric"
-                  value={nominal ? nominal.toLocaleString('id-ID') : ''}
-                  onChange={(e) => { setNominal(Number(e.target.value.replace(/\D/g, '')) || 0); galat.hapus('kasrt-nominal'); }}
+                  value={kolomNominal.value}
+                  onChange={(e) => { kolomNominal.onChange(e); galat.hapus('kasrt-nominal'); }}
                   {...galat.aria('kasrt-nominal')}
                   className="field pl-9 pr-3"
                 />
