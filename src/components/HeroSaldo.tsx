@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import FitAmount from './FitAmount';
-import { ukuranMuat } from '../lib/utils';
+import { ikatFrasa, ukuranMuat } from '../lib/utils';
 import { klikTautanSpa } from '../lib/tautanTab';
 
 /** Satu kolom statistik di kaki hero. `href` + `onClick` menjadikannya TAUTAN ke
@@ -116,7 +116,14 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
         const inner = (
           <>
             {Icon && <Icon className="h-[17px] w-[17px] text-white/80" />}
-            <span className="mt-0.5 text-micro font-medium text-white/95">{s.label}</span>
+            {/* Label boleh memakai bantalan `px-0.5` kolomnya (`-mx-0.5`): di
+                360px "Setor Kas RT" 76px lawan isi kolom 75px — kurang SATU
+                piksel, lalu patah jadi "Setor Kas / RT". Bantalan itu ada untuk
+                menjauhkan NOMINAL dari garis pemisah; label yang terpusat cuma
+                memakainya 0,5px tiap sisi. `ikatFrasa` mengikat "Kas RT" supaya
+                kalau suatu label memang harus melipat, yang terpisah bukan
+                singkatannya. */}
+            <span className="-mx-0.5 mt-0.5 self-stretch text-balance text-center text-micro font-medium text-white/95">{ikatFrasa(s.label)}</span>
             {/* `data-susut` = pengakuan bahwa nilai ini BOLEH turun di bawah anak
                 tangga terkecil (11px), dibaca `audit:huruf`. Bukan kelonggaran
                 bebas: sapuan itu tetap menegakkan LANTAI KERAS `MIN_KAKI_PX`,
@@ -129,9 +136,12 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
                 Kalau kaki ini nanti tinggal DUA kolom atau kartunya melebar,
                 ukur ulang: lantai 11px mungkin sudah muat, dan penanda ini
                 harus dicabut, bukan diwariskan. */}
+            {/* `mt-auto`: nominal duduk di DASAR kolom, jadi ketiganya selalu
+                sebaris walau satu label melipat — terukur 26 Sep 2026 @360px,
+                "Rp6.195.000" 14,8px lebih rendah dari dua tetangganya. */}
             <span
               data-susut=""
-              className="whitespace-nowrap font-display font-extrabold tabular-nums text-white"
+              className="mt-auto whitespace-nowrap font-display font-extrabold tabular-nums text-white"
               style={{ fontSize: px }}
             >
               {s.value}

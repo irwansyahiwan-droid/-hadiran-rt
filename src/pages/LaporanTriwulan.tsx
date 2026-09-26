@@ -221,12 +221,15 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
             <div className="relative grid grid-cols-2 gap-2 mb-4">
               {/* Panel di ATAS gradient harus RECESSED (black/10), bukan diterangkan
                   (white/10): white/10 menaikkan latar ke #2C8758 → putih SOLID pun cuma
-                  4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1. */}
-              <div className="rounded-2xl bg-black/10 px-3 py-2">
+                  4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1.
+                  `flex-col justify-between`: label di puncak, nominal di DASAR —
+                  "Hadiran · belum disetor" melipat dua baris dan dulu mendorong
+                  nominalnya 14,8px di bawah tetangganya (360 & 390px). */}
+              <div className="flex flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
                 <p className="text-micro text-white uppercase tracking-wide text-balance">Kas RT (final)</p>
                 <p className="text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
-              <div className="rounded-2xl bg-black/10 px-3 py-2">
+              <div className="flex flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
                 <p className="text-micro text-white uppercase tracking-wide text-balance">Hadiran · belum disetor</p>
                 <p className="text-caption font-display font-semibold text-white tabular-nums">{rpBertanda(snap.hadiranBelumSetor)}</p>
               </div>
