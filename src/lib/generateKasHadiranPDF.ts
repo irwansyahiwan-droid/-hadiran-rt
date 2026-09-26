@@ -189,8 +189,9 @@ export function buildKasHadiranPDF(
     didParseCell(data) {
       alignHeadFoot(data, KAS_COL);
       if (data.section === 'foot') {
-        if (data.column.index === 4 && totalTal > 0) data.cell.styles.textColor = C.neg;
-        if (data.column.index === 5 && totalSetor > 0) data.cell.styles.textColor = C.warn;
+        /* Talangan = `warn`, setoran = tinta biasa — sama dgn ringkasan di
+           bawah & dgn layar (lihat catatan `ringkasan`). Dulu tertukar. */
+        if (data.column.index === 4 && totalTal > 0) data.cell.styles.textColor = C.warn;
         if (data.column.index === 6) {
           data.cell.styles.textColor = totalNet < 0 ? C.neg : C.pos;
         }
@@ -202,11 +203,10 @@ export function buildKasHadiranPDF(
       const tal = talanganMap[row.id] ?? { count: 0, total: 0 };
       const setor = setorMap[row.id] ?? 0;
       if (data.column.index === 4 && tal.total > 0) {
-        data.cell.styles.textColor = C.neg;
+        data.cell.styles.textColor = C.warn;
         data.cell.styles.fontStyle = 'bold';
       }
       if (data.column.index === 5 && setor > 0) {
-        data.cell.styles.textColor = C.warn;
         data.cell.styles.fontStyle = 'bold';
       }
       if (data.column.index === 6) {
@@ -223,8 +223,13 @@ export function buildKasHadiranPDF(
 
   const ringkasan: Parameters<typeof drawSummary>[2] = [
     { label: 'Total Kas Terkumpul',        value: rp(stats.totalKasTerkumpul) },
-    { label: 'Total Talangan Belum Lunas', value: `-${rp(stats.totalTalanganBelum)}`, tone: 'neg' },
-    { label: 'Total Setor ke Kas RT',      value: `-${rp(stats.totalSetor)}`, tone: 'warn' },
+    /* Warna SAMA dgn layar & kartu PNG yang dibagikan dari halaman yang sama
+       (26 Sep 2026): talangan = `warn` (amber, perhatian), setoran = netral
+       (pindahan ke Kas RT, bukan kerugian). Dulu keduanya TERTUKAR di sini —
+       talangan merah, setoran amber — sementara PDF triwulan, panel Alur Kas
+       Hadiran & kartu PNG memakai aturan di atas. */
+    { label: 'Total Talangan Belum Lunas', value: `-${rp(stats.totalTalanganBelum)}`, tone: 'warn' },
+    { label: 'Total Setor ke Kas RT',      value: `-${rp(stats.totalSetor)}` },
   ];
   const saldoBersih = {
     label: 'Saldo Bersih Kas', value: saldoText,
