@@ -324,7 +324,7 @@ export function formatAktivitas(row: AktivitasLog, kamus?: KamusNama): Aktivitas
         actionLabel, tableLabel,
         penjelasan: lunas
           ? 'Anggota melunasi talangan Rp50.000. Dana panitia yang sempat menalangi terganti — dicatat agar utang anggota nol.'
-          : 'Pelunasan talangan dibatalkan. Status anggota kembali "belum lunas".',
+          : 'Pelunasan talangan dibatalkan. Status anggota kembali “belum lunas”.',
       };
     }
     default:
