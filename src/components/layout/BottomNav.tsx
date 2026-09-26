@@ -125,7 +125,24 @@ export default function BottomNav({ active, onChange, isWargaMode }: BottomNavPr
           return (
             <button
               key={id}
-              onClick={() => { if (!isActive) haptic(); onChange(id); }}
+              /* Mengetuk tab yang SUDAH aktif = kembali ke puncak — konvensi
+                 bar nav Android & iOS (WhatsApp, Instagram, Material). Dulu
+                 ketukan itu diam: terukur 26 Sep 2026, Kas RT digulir 1.192px
+                 tetap 1.192px sesudah tab aktifnya diketuk, jadi warga harus
+                 menggeser belasan kali untuk kembali ke saldo. Halus, kecuali
+                 pengguna minta kurangi gerak. */
+              onClick={() => {
+                if (isActive) {
+                  if (window.scrollY > 0) {
+                    haptic();
+                    const diam = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+                    window.scrollTo({ top: 0, behavior: diam ? 'auto' : 'smooth' });
+                  }
+                  return;
+                }
+                haptic();
+                onChange(id);
+              }}
               className="press group relative flex flex-col items-center justify-center flex-1 w-full h-full py-2 select-none"
               aria-current={isActive ? 'page' : undefined}
             >
