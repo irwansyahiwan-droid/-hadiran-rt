@@ -282,14 +282,18 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         <div className="flex gap-3">
           <button
             onClick={jadwalNonaktif ? () => setJadwalNonaktif(null) : jaga.mintaTutup}
-            className="btn-secondary flex-1 py-3 rounded-full"
+            /* Bentuk ikut RESEP (`rounded-xl`, 26 Sep 2026) — `rounded-full` di
+               sini satu-satunya footer sheet form berbentuk pil. Di bawah 360px
+               "Batal" memakai lebar alaminya: dibagi dua sama rata, label
+               "Simpan Perubahan" patah dua baris & kedua tombol membengkak. */
+            className="btn-secondary flex-1 py-3 max-[359px]:flex-none max-[359px]:px-5"
           >
             Batal
           </button>
           <button
             onClick={() => { haptic(12); simpan(!!jadwalNonaktif); }}
             disabled={saving}
-            className={`flex-1 py-3 rounded-full text-white text-body font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
+            className={`flex-1 py-3 whitespace-nowrap text-white text-body font-semibold active:scale-[0.97] transition flex items-center justify-center gap-2 ${
               /* btn-danger, bukan bg-rose-600 tangan: satu sumber CTA merah →
                  ikut state nonaktif ber-fill abu (label tetap terbaca). */
               jadwalNonaktif ? 'btn-danger' : 'btn-brand'

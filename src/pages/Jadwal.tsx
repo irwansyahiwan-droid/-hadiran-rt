@@ -389,24 +389,28 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       </div>
 
       {/* Bulk actions */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* "Reset" memakai lebar ALAMINYA (26 Sep 2026): dibagi tiga sama rata,
+          "Semua Hadir" patah dua baris di 360px (lebar ACUAN) & keduanya di
+          320px. Di bawah 360px ikon kedua tombol "Semua …" ikut dilepas — label
+          katanya yang membawa makna, ikonnya pengulang. */}
+      <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
         <button
           onClick={() => setAll('hadir')}
           className="press flex items-center justify-center gap-2 min-h-[44px] py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-caption font-semibold hover:bg-emerald-100 active:bg-emerald-100 dark:hover:bg-emerald-900/40 dark:active:bg-emerald-900/40 transition-colors"
         >
-          <UserCheck className="w-3.5 h-3.5" />
+          <UserCheck className="w-3.5 h-3.5 max-[359px]:hidden" />
           Semua Hadir
         </button>
         <button
           onClick={() => setAll('titip')}
           className="press flex items-center justify-center gap-2 min-h-[44px] py-2 rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 text-caption font-semibold hover:bg-blue-100 active:bg-blue-100 dark:hover:bg-blue-900/40 dark:active:bg-blue-900/40 transition-colors"
         >
-          <Coins className="w-3.5 h-3.5" />
+          <Coins className="w-3.5 h-3.5 max-[359px]:hidden" />
           Semua Titip
         </button>
         <button
           onClick={() => setAll('tidak_hadir')}
-          className="press flex items-center justify-center gap-2 min-h-[44px] py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-gray-600 dark:text-gray-300 text-caption font-semibold hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700 transition-colors"
+          className="press flex items-center justify-center gap-2 min-h-[44px] px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-gray-600 dark:text-gray-300 text-caption font-semibold hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700 dark:active:bg-gray-700 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Reset
