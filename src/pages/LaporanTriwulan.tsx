@@ -223,11 +223,11 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   (white/10): white/10 menaikkan latar ke #2C8758 → putih SOLID pun cuma
                   4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1. */}
               <div className="rounded-2xl bg-black/10 px-3 py-2">
-                <p className="text-micro text-white uppercase tracking-wide">Kas RT (final)</p>
+                <p className="text-micro text-white uppercase tracking-wide text-balance">Kas RT (final)</p>
                 <p className="text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="rounded-2xl bg-black/10 px-3 py-2">
-                <p className="text-micro text-white uppercase tracking-wide">Hadiran · belum disetor</p>
+                <p className="text-micro text-white uppercase tracking-wide text-balance">Hadiran · belum disetor</p>
                 <p className="text-caption font-display font-semibold text-white tabular-nums">{rpBertanda(snap.hadiranBelumSetor)}</p>
               </div>
             </div>

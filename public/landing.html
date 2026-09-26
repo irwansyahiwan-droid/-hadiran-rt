@@ -132,7 +132,17 @@
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    /* Diwarisi SEMUA teks halaman (26 Sep 2026). Sampai hari ini `pretty`/
+       `balance` cuma dipasang di hero, judul seksi & paragraf pembuka, dan
+       probe kata yatim menemukan puluhan baris lain berakhir dgn SATU kata
+       ("…untuk" / "warga.") di 320/360/390px — kartu fitur, keterangan
+       tangkapan layar, footer. Satu aturan di akar menutup semuanya. */
+    text-wrap: pretty;
   }
+  h2, h3 { text-wrap: balance; }
+  /* Deskripsi kartu (2–3 baris pendek): `pretty` di Chrome tak selalu
+     memindahkan kata untuk teks sependek ini, jadi dipakai `balance`. */
+  .bn-card p, .fcell p, .plus p { text-wrap: balance; }
   .display { font-family: 'Sora', 'Inter', sans-serif; letter-spacing: -0.02em; }
   .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
 

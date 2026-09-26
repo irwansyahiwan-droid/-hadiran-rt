@@ -88,7 +88,7 @@ export default function TentangApp({ open, onClose }: Props) {
             {IURAN.map((i) => (
               <li key={i.b} className="flex gap-3">
                 <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{i.b}:</b> {i.t}
                 </p>
               </li>
@@ -117,7 +117,7 @@ export default function TentangApp({ open, onClose }: Props) {
             {SUMBER.map((s) => (
               <li key={s.b} className="flex gap-3">
                 <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{s.b}:</b> {s.t}
                 </p>
               </li>
@@ -134,7 +134,7 @@ export default function TentangApp({ open, onClose }: Props) {
             {KEAMANAN.map((k) => (
               <li key={k.b} className="flex gap-3">
                 <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">
+                <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
                   <b className="text-gray-900 dark:text-gray-100">{k.b}:</b> {k.t}
                 </p>
               </li>
@@ -144,7 +144,7 @@ export default function TentangApp({ open, onClose }: Props) {
 
         {/* Footer */}
         <div className="text-center pt-2 pb-1 space-y-2">
-          <p className="text-micro text-ink-faint dark:text-gray-400">© 2026 RT&nbsp;004/006 Tanah Baru, Beji, Kota Depok</p>
+          <p className="text-balance text-micro text-ink-faint dark:text-gray-400">© 2026 RT&nbsp;004/006 Tanah Baru, Beji, Kota&nbsp;Depok</p>
           <p className="text-caption text-gray-500 dark:text-gray-400 inline-flex items-center justify-center gap-1">
             Dibuat oleh <b className="text-gray-700 dark:text-gray-200">Irwansyah (Bendahara)</b>, untuk warga
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
