@@ -247,7 +247,9 @@ export default function HeroSaldo({
               tanpa clamp, kata terakhir hilang ditelan ellipsis. */}
           <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
             {Icon && <Icon className="h-4 w-4 shrink-0 text-white/80" />}
-            <span className="potong-lentur">{label}</span>
+            {/* `text-balance`: saat label melipat (320px), dua baris sama rata —
+                bukan "TOTAL TALANGAN BELUM" + "LUNAS" sendirian (26 Sep 2026). */}
+            <span className="potong-lentur text-balance">{label}</span>
             {info}
           </p>
           {actions && <div className="-mr-2 flex shrink-0 items-center">{actions}</div>}

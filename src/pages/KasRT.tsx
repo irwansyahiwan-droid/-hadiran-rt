@@ -873,7 +873,7 @@ export default function KasRTPage() {
                 <div className="space-y-2">
                   {KATEGORI_MASUK.filter((o) => (rekapKategori.masuk[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
-                      <span className="min-w-0 flex-1 angka-prosa text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                      <span className="min-w-0 flex-1 angka-prosa text-balance text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(rekapKategori.masuk[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}
@@ -889,7 +889,7 @@ export default function KasRTPage() {
                 <div className="space-y-2">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (
                     <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
-                      <span className="min-w-0 flex-1 angka-prosa text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
+                      <span className="min-w-0 flex-1 angka-prosa text-balance text-ink-sub dark:text-gray-300 leading-snug">{o.label}</span>
                       <span className="font-display font-semibold text-ink dark:text-gray-100 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(rekapKategori.keluar[o.key])}`, hidden, 4)}</span>
                     </div>
                   ))}

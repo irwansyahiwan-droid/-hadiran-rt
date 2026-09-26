@@ -181,7 +181,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           // "Talangan lunas · Tarikan #N" tak muat di kolom teks (terpotong justru di
           // nomor tarikan — bagian yang paling berguna). Kata "lunas" sudah dibawa
           // ikon panah-masuk + nominal hijau bertanda plus, jadi ia yang dilepas.
-          sub: `Talangan · Tarikan #${nomor}`,
+          /* Spasi TAK-PUTUS di "Tarikan #N" (26 Sep 2026): di 360px baris ini
+             melipat jadi "Talangan · Tarikan" + "#18" sendirian — nomor, bagian
+             paling berguna, terlepas dari katanya. */
+          sub: `Talangan · Tarikan\u00A0#${nomor}`,
           tanggal: t.tanggal_lunas as string,
           nominal: t.nominal as number,
         };

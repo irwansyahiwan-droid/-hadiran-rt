@@ -787,14 +787,14 @@ export default function KasHadiranPage() {
                     juga menyembunyikan warna grafik. Ikon + label + nominal
                     kini satu pernyataan, bukan tiga suara. */}
                 <TrendingUp className="w-3.5 h-3.5 text-pos dark:text-pos-dark" />
-                <span className="text-body text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
+                <span className="text-body text-balance text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
               <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
             </div>
             <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between gap-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" />
-                <span className="text-body text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
+                <span className="text-body text-balance text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
               <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
             </div>
@@ -807,7 +807,7 @@ export default function KasHadiranPage() {
                     dipakai pil "WARGA") + pasangan blue-400 di gelap, supaya ia
                     tak lagi jadi titik paling menyala di panel. */}
                 <ArrowUpRight className="w-3.5 h-3.5 text-blue-700 dark:text-blue-400" />
-                <span className="text-body text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
+                <span className="text-body text-balance text-ink-sub dark:text-gray-400">Setoran ke Kas Besar</span>
               </div>
               {/* Nominal NETRAL, bukan biru: DESIGN.stitch §2 mengunci Setor Blue
                   sebagai sinyal STATUS (hero Kas Hadiran) — biru tak boleh

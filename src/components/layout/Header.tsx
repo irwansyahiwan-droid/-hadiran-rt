@@ -309,7 +309,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           role="status"
           className="border-t border-amber-200/70 bg-amber-50 px-5 py-2 dark:border-amber-800/40 dark:bg-amber-900/25"
         >
-          <p className="mx-auto flex max-w-lg items-center justify-center gap-2 text-center text-micro font-semibold text-warn dark:text-amber-300">
+          <p className="mx-auto flex max-w-lg items-center justify-center gap-2 text-center text-balance text-micro font-semibold text-warn dark:text-amber-300">
             <WifiOff className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             Tanpa sinyal — angka yang tampil salinan terakhir
           </p>
@@ -337,7 +337,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           role="status"
           className="border-t border-amber-200/70 bg-amber-50 px-5 py-2 dark:border-amber-800/40 dark:bg-amber-900/25"
         >
-          <p className="mx-auto flex max-w-lg items-center justify-center gap-2 text-center text-micro font-semibold text-warn dark:text-amber-300">
+          <p className="mx-auto flex max-w-lg items-center justify-center gap-2 text-center text-balance text-micro font-semibold text-warn dark:text-amber-300">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             Gagal memperbarui — angka yang tampil salinan terakhir
           </p>
