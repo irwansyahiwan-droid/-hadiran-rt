@@ -31,8 +31,12 @@ interface Props {
  *  hero `KasRT.tsx` (`saldoAwal > 0 && …`). Ditampilkan di ATAS "Masuk" &
  *  BUKAN pengurang: `masuk` di sini sudah pemasukan NYATA saja (Saldo Awal
  *  dikecualikan sebelum sampai ke komponen ini, lihat `laporan.ts`). */
-function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', saldo, saldoLabel = 'Saldo akhir', talangan }: {
-  judul: string; saldoAwal?: number; masuk: number; keluar: number; keluarLabel?: string; saldo: number; saldoLabel?: string; talangan?: number;
+function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', keluarTransfer = false, saldo, saldoLabel = 'Saldo akhir', talangan }: {
+  judul: string; saldoAwal?: number; masuk: number; keluar: number; keluarLabel?: string;
+  /** Baris keluar = PINDAHAN antar-kas (Setor ke Kas RT), bukan uang hilang →
+      tinta netral + ikon biru, persis panel "Alur Kas Hadiran" & kartu PNG. */
+  keluarTransfer?: boolean;
+  saldo: number; saldoLabel?: string; talangan?: number;
 }) {
   return (
     <div className="rounded-2xl inset-soft p-3">
@@ -57,9 +61,16 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', saldo
         </div>
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
-            <ArrowUpRight className="w-3.5 h-3.5 text-neg dark:text-neg-dark" /> {keluarLabel}
+            {/* Satu pernyataan dgn DOKUMEN yang layar ini hasilkan (26 Sep
+                2026). Kartu PNG (`shareLaporanKas`) & PDF triwulan menulis
+                keluar BERTANDA minus, dan "Setor ke Kas RT" dgn tinta NETRAL —
+                setoran itu pindahan ke Kas RT, bukan kerugian (aturan yang
+                sama dgn panel Alur Kas Hadiran). Layarnya dulu merah tanpa
+                tanda: warga yang membandingkan layar dgn kartu di grup WA
+                melihat dua versi fakta yang sama. */}
+            <ArrowUpRight className={`w-3.5 h-3.5 ${keluarTransfer ? 'text-blue-700 dark:text-blue-400' : 'text-neg dark:text-neg-dark'}`} /> {keluarLabel}
           </span>
-          <span className="font-display font-semibold text-neg dark:text-rose-400 tabular-nums">{formatRupiahPlain(keluar)}</span>
+          <span className={`font-display font-semibold tabular-nums ${keluarTransfer ? 'text-gray-900 dark:text-gray-100' : 'text-neg dark:text-rose-400'}`}>-{formatRupiahPlain(keluar)}</span>
         </div>
         <div className="flex items-center justify-between text-caption pt-2 border-t border-control dark:border-control-dark">
           <span className="font-semibold text-gray-700 dark:text-gray-300">{saldoLabel}</span>
@@ -280,7 +291,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   7 digit + label "Keluar" tak muat → angka terpotong. Pola sama
                   "Rekap per Kategori" Kas RT: grid-cols-1 sm:grid-cols-2. */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Ledger judul="Kas Hadiran" masuk={r.hadiranMasuk} keluar={r.hadiranSetor} keluarLabel="Setor ke Kas RT" saldo={r.hadiranBelumSetor} saldoLabel="Belum disetor" talangan={r.hadiranTalangan} />
+                <Ledger judul="Kas Hadiran" masuk={r.hadiranMasuk} keluar={r.hadiranSetor} keluarLabel="Setor ke Kas RT" keluarTransfer saldo={r.hadiranBelumSetor} saldoLabel="Belum disetor" talangan={r.hadiranTalangan} />
                 <Ledger judul="Kas RT" saldoAwal={r.rtSaldoAwal} masuk={r.rtMasuk} keluar={r.rtKeluar} saldo={r.rtSaldoAkhir} />
               </div>
 
