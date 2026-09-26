@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Search, History, Plus, Pencil, Trash2,
-  CheckCircle2, RotateCcw, ArrowRight, RefreshCw, Download,
+  CheckCircle2, RotateCcw, ArrowRight, RefreshCw, FileText,
   ChevronDown, Route, Lightbulb, Loader2 } from 'lucide-react';
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import ClearButton from '../components/ClearButton';
@@ -169,7 +169,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         title="Riwayat Aktivitas"
         onBack={exit.requestClose}
         actions={<>
-          <OverlayAction icon={pdfSibuk ? Loader2 : Download} label="Ekspor PDF" onClick={exportPDF} spinning={pdfSibuk} />
+          <OverlayAction icon={pdfSibuk ? Loader2 : FileText} label="Ekspor PDF" onClick={exportPDF} spinning={pdfSibuk} />
           <OverlayAction icon={RefreshCw} label="Muat ulang" onClick={() => { setLoading(true); load(); }} spinning={loading} />
         </>}
       />

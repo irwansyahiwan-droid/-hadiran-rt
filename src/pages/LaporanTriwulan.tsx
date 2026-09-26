@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FileText, Download, RefreshCw, ArrowDownLeft, ArrowUpRight, AlertTriangle, Share2, CalendarCheck, Loader2 } from 'lucide-react';
+import { FileText, RefreshCw, ArrowDownLeft, ArrowUpRight, AlertTriangle, Share2, CalendarCheck, Loader2 } from 'lucide-react';
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import EmptyState from '../components/EmptyState';
 import Tag from '../components/Tag';
@@ -322,7 +322,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                   aria-label={`Unduh PDF ${r.label}`}
                   aria-busy={(cetakSibuk && cetakKey === r.key) || undefined}
                 >
-                  {cetakSibuk && cetakKey === r.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} PDF
+                  {cetakSibuk && cetakKey === r.key ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF
                 </button>
               </div>
             </div>

@@ -1373,7 +1373,13 @@ export default function JadwalPage() {
                                fill brand tetap menandai giliran berikutnya. */
                             className="btn-brand flex items-center justify-center gap-2 min-h-[44px] px-4 max-[359px]:w-11 max-[359px]:px-0 rounded-full text-caption active:scale-[0.97] active:opacity-90 transition duration-ketuk"
                           >
-                            <RefreshCw className={`w-3 h-3 max-[359px]:w-4 max-[359px]:h-4 ${navigatingId === t.id ? 'animate-spin' : ''}`} />
+                            {/* ▶, bukan ⟳: ⟳ milik "Hitung ulang" (tarikan selesai)
+                                dan pil ini dulu memakainya — satu-satunya tempat
+                                aturan "Play ≠ ⟳" di bawah dilanggar. ⟳ tetap muncul
+                                BERPUTAR selagi memproses, sama dgn tombol ikon. */}
+                            {navigatingId === t.id
+                              ? <RefreshCw className="w-3 h-3 max-[359px]:w-4 max-[359px]:h-4 animate-spin" />
+                              : <Play className="w-3 h-3 max-[359px]:w-4 max-[359px]:h-4" />}
                             <span className="max-[359px]:sr-only">{navigatingId === t.id ? 'Memproses…' : 'Proses'}</span>
                           </button>
                         ) : (
