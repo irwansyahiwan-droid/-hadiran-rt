@@ -164,9 +164,12 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
 
         {/* `autoComplete="off"` di nama & no. HP, BUKAN `name`/`tel`: kolom ini
             berisi data warga LAIN, sedangkan token autofill menawarkan identitas
-            PEMILIK HP — bendahara yang mengetik "Ah…" disodori namanya sendiri. */}
+            PEMILIK HP — bendahara yang mengetik "Ah…" disodori namanya sendiri.
+            `autoCapitalize="words"` + `spellCheck={false}`: keyboard HP
+            mengapitalkan tiap kata nama dan TIDAK mengoreksi nama warga ke kata
+            kamus (Chrome Android meneruskan `spellcheck=false` ke keyboard). */}
         <label htmlFor="anggota-nama" className={label}>Nama Lengkap</label>
-        <input id="anggota-nama" name="nama" autoComplete="off" value={nama} onChange={(e) => { setNama(e.target.value); galat.hapus('anggota-nama'); }} {...galat.aria('anggota-nama')} placeholder="Nama warga…" className={input} />
+        <input id="anggota-nama" name="nama" autoComplete="off" autoCapitalize="words" spellCheck={false} value={nama} onChange={(e) => { setNama(e.target.value); galat.hapus('anggota-nama'); }} {...galat.aria('anggota-nama')} placeholder="Nama warga…" className={input} />
         <div className="mb-4"><GalatKolom id="anggota-nama-galat" pesan={galat.pesan('anggota-nama')} /></div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
