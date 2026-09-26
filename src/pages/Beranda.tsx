@@ -321,6 +321,25 @@ export default function Beranda({ onNavigate }: BerandaProps) {
    * sudah ada di sheet detail (satu ketuk), dan di daftar ia hanya menambah
    * kolom angka ketiga yang bersaing dengan nominal.
    */
+  /* SATU sumber ubin & warna nominal transaksi — baris biasa, baris LIPATAN,
+     dan sheet detail (26 Sep 2026). Lipatan dulu memaku ubin hijau ↙, tanda
+     "+" dan warna `pos`, mengandaikan isinya selalu talangan lunas; begitu ≥3
+     setoran jatuh di hari yang sama (bendahara mengejar setoran dua bulan
+     sekaligus) ia mencetak "+Rp-6.195.000" hijau — tanda ganda di app kas.
+     Setoran = pindahan ke Kas RT: ubin biru ↗, tinta NETRAL bertanda minus
+     (aturan panel Alur Kas Hadiran, Tutup Buku, kartu PNG & PDF). */
+  const ubinTrx = (tipe: TrxItem['tipe']) => (
+    <div className={`icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 ${tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
+      {tipe === 'setor'
+        ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        : <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
+    </div>
+  );
+  const warnaNominal = (tipe: TrxItem['tipe'], nominal: number) =>
+    tipe === 'setor' ? 'text-ink dark:text-gray-100' : nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400';
+  const teksNominal = (nominal: number) =>
+    maskRp(`${nominal < 0 ? '-' : '+'}Rp${Math.abs(nominal).toLocaleString('id-ID')}`, hidden, 4);
+
   const trxRow = (trx: TrxItem, idx: number, lastInGroup: boolean, showDate: boolean, hideSub = false) => (
     <button
       key={trx.id}
@@ -328,12 +347,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
       className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup ? '' : 'divide-inset'}`}
     >
-      <div className={`icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 ${trx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
-        {trx.tipe === 'setor'
-          ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          : <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-        }
-      </div>
+      {ubinTrx(trx.tipe)}
       <div className="flex-1 min-w-0">
         {/* clamp 2 baris (bukan truncate 1 baris): nominal panjang spt
             "-Rp1.380.000" memakan kolom kanan → judul kepotong jadi
@@ -353,8 +367,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           </p>
         )}
       </div>
-      <span className={`font-display text-amount font-semibold shrink-0 tabular-nums ${trx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
-        {maskRp(`${trx.nominal < 0 ? '-' : '+'}Rp${Math.abs(trx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
+      {/* Setoran dulu MERAH di samping ubin biru ↗ — satu baris, dua
+          pernyataan. Warna kini dari `warnaNominal`. */}
+      <span className={`font-display text-amount font-semibold shrink-0 tabular-nums ${warnaNominal(trx.tipe, trx.nominal)}`}>
+        {teksNominal(trx.nominal)}
       </span>
     </button>
   );
@@ -389,9 +405,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           style={{ animationDelay: `${Math.min(idx, 8) * 0.04}s` }}
           className={`press rise w-full flex items-center gap-2 px-4 py-4 text-left cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 ${lastInGroup && !open ? '' : 'divide-inset'}`}
         >
-          <div className="icon-tile w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 bg-emerald-100 dark:bg-emerald-900/30">
-            <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-          </div>
+          {ubinTrx(run.items[0].tipe)}
           {/* Hierarki dibalik dari `sub` aslinya: NOMOR TARIKAN jadi judul, jenis
               + jumlah jadi sub. Baris ini menanggung 4 kolom (tile, teks, nominal,
               chevron); judul "Talangan · Tarikan #12" selalu terpotong justru di
@@ -403,8 +417,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               {[jenis, `${run.items.length} ${satuan}`].filter(Boolean).join(' · ')}
             </p>
           </div>
-          <span className="font-display text-amount font-semibold shrink-0 tabular-nums text-pos dark:text-emerald-400">
-            {maskRp(`+Rp${run.total.toLocaleString('id-ID')}`, hidden, 4)}
+          <span className={`font-display text-amount font-semibold shrink-0 tabular-nums ${warnaNominal(run.items[0].tipe, run.total)}`}>
+            {teksNominal(run.total)}
           </span>
           {/* `-mr-4` (bukan `-mr-1`): chevron duduk DI DALAM bantalan kanan baris
               sehingga tak memakan lebar isi sama sekali — nominal baris lipatan
@@ -494,7 +508,11 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             menolak `px-1`. Satu kartu = satu tepi. */}
         <div className={`flex items-baseline justify-between gap-3 px-4 pt-5 pb-3 ${gi > 0 ? 'border-t border-line dark:border-gray-800' : ''}`}>
           <span className="text-micro font-semibold uppercase tracking-wide angka-prosa text-ink-faint dark:text-gray-400">{g.label}</span>
-          <span className={`font-display text-micro font-semibold tabular-nums ${g.net < 0 ? 'text-neg dark:text-rose-400' : 'text-ink-faint dark:text-gray-400'}`}>
+          {/* Tanpa merah (26 Sep 2026): di Beranda SATU-SATUNYA arus negatif
+              adalah setoran ke Kas RT (baris talangan selalu masuk), jadi net
+              merah di sini selalu berarti "hari ada setoran" — pindahan, bukan
+              kerugian. Tandanya tetap tercetak. */}
+          <span className="font-display text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400">
             {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
           </span>
         </div>
@@ -897,11 +915,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           {...trxDrag.handlers}
         >
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4" />
-          <div className={`icon-tile w-11 h-11 rounded-xl flex items-center justify-center mb-3 ${selectedTrx.tipe === 'setor' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}`}>
-            {selectedTrx.tipe === 'setor'
-              ? <ArrowUpRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              : <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
-          </div>
+          <div className="mb-3">{ubinTrx(selectedTrx.tipe)}</div>
           {/* SATU anatomi dgn sheet detail Kas RT (26 Sep 2026) — KATA juga:
               "Nominal" & "Saldo setelah" (dulu "Jumlah" & "Saldo Setelah";
               kata disetujui user). Judul
@@ -915,8 +929,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <div className="inset-soft rounded-2xl p-4 space-y-3 mt-3">
             <div className="flex items-center justify-between">
               <span className="text-body text-ink-faint dark:text-gray-400">Nominal</span>
-              <span className={`font-display text-amount font-semibold tabular-nums ${selectedTrx.nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400'}`}>
-                {maskRp(`${selectedTrx.nominal < 0 ? '-' : '+'}Rp${Math.abs(selectedTrx.nominal).toLocaleString('id-ID')}`, hidden, 4)}
+              <span className={`font-display text-amount font-semibold tabular-nums ${warnaNominal(selectedTrx.tipe, selectedTrx.nominal)}`}>
+                {teksNominal(selectedTrx.nominal)}
               </span>
             </div>
             {selectedTrx.saldoSetelah !== null && (
