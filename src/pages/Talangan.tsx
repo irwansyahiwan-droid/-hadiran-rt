@@ -453,9 +453,15 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 }`}>
                   #{t.tarikan?.nomor}
                 </div>
+                {/* Satu baris: TANGGAL tarikannya, bukan "Tarikan #N" (26 Sep 2026).
+                    Ubin di kirinya sudah memuat nomornya, dan di bendahara
+                    ≤390px kolom ini cuma ~64px (Rp + Bayar + Hapus di kanan):
+                    judul lama terpotong jadi "Tarikan …" — kata yang MENGULANG
+                    ubin, sementara nomornya sendiri hilang. Tanggal ("28 Agu")
+                    muat, dan ia satu-satunya fakta baris ini yang belum
+                    dinyatakan di tempat lain. */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-body font-semibold text-ink dark:text-gray-100 truncate">Tarikan #{t.tarikan?.nomor}</p>
-                  <p className="text-caption text-ink-faint dark:text-gray-400 truncate">
+                  <p className="text-body font-semibold text-ink dark:text-gray-100 truncate">
                     {t.tarikan?.tanggal ? formatTanggalShort(t.tarikan.tanggal) : '—'}
                   </p>
                 </div>
@@ -469,6 +475,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBayarClick(t)}
                     disabled={processingId === t.id}
+                    /* Bernama per-item (kanon "Proses tarikan #N"): satu warga bisa
+                       punya 3 baris "Bayar" dalam satu lipatan. */
+                    aria-label={processingId === t.id ? undefined : `${confirmId === t.id ? 'Yakin? ' : ''}Bayar talangan tarikan #${t.tarikan?.nomor ?? ''}`}
                     className={`inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-white text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-ketuk shrink-0 whitespace-nowrap ${
                       confirmId === t.id ? 'bg-brand' : 'btn-brand'
                     }`}
@@ -482,6 +491,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={() => handleBatalClick(t)}
                     disabled={processingId === t.id}
+                    aria-label={processingId === t.id ? undefined : `Batalkan pelunasan talangan tarikan #${t.tarikan?.nomor ?? ''}`}
                     className="inline-flex items-center justify-center gap-1 min-h-[44px] px-4 rounded-xl text-caption font-semibold active:scale-[0.97] active:opacity-90 transition duration-ketuk disabled:opacity-70 shrink-0 whitespace-nowrap bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                   >
                     {processingId === t.id ? (
@@ -494,7 +504,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                     onClick={() => handleHapusClick(t)}
                     disabled={processingId === t.id}
                     title="Hapus data talangan"
-                    aria-label="Hapus data talangan"
+                    aria-label={`Hapus data talangan tarikan #${t.tarikan?.nomor ?? ''}`}
                     className="press inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-3 rounded-lg text-micro font-bold transition-colors disabled:opacity-70 shrink-0 text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-50 active:bg-rose-50 dark:hover:bg-rose-900/20 dark:active:bg-rose-900/20"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
