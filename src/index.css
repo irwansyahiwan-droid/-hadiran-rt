@@ -367,6 +367,23 @@ select.field {
 }
 input, textarea  { caret-color: #1B7249; }
 .dark input, .dark textarea { caret-color: #1A9B86; }
+/* Isi-otomatis peramban TIDAK boleh mengecat ulang kolom. Chrome memasang
+   `background-color: #E8F0FE !important; color: fieldtext !important` dari
+   stylesheet UA — `!important` UA menang atas `!important` author, jadi tak
+   bisa ditimpa. Terukur 26 Sep 2026 di Chrome sungguhan (`Autofill.trigger`):
+   kolom email Login bendahara yang berkaca gelap jadi slab BIRU PUCAT berteks
+   hitam, dan ikon amplop putihnya lenyap di atasnya. Bendahara justru yang
+   paling mungkin menyimpan sandinya di peramban.
+   Satu-satunya lapisan kaskade di atas `!important` UA adalah TRANSISI, jadi
+   perubahannya ditunda selama-lamanya: warna & latar milik kolom bertahan
+   persis (kaca Login tetap tembus pandang — `box-shadow inset` akan
+   menutupnya dgn warna rata). `filter: none` untuk Firefox, yang menandai
+   isi-otomatis lewat filter sepia, bukan lewat latar. */
+input:-webkit-autofill,
+textarea:-webkit-autofill {
+  transition: background-color 600000s 0s, color 600000s 0s;
+  filter: none;
+}
 /* Fokus keyboard terlihat (syarat a11y/store). Hanya elemen interaktif non-input
    (input sudah punya focus:ring sendiri). :is(...) → specificity rendah, tak
    menabrak utility Tailwind. Hanya muncul saat navigasi keyboard, bukan tap. */
