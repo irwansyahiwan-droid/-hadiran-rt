@@ -259,7 +259,7 @@ export default function HeroSaldo({
             {Icon && <Icon className="h-4 w-4 shrink-0 text-white/80" />}
             {/* `text-balance`: saat label melipat (320px), dua baris sama rata —
                 bukan "TOTAL TALANGAN BELUM" + "LUNAS" sendirian (26 Sep 2026). */}
-            <span className="potong-lentur text-balance">{label}</span>
+            <span className="potong-lentur text-balance">{ikatFrasa(label)}</span>
             {info}
           </p>
           {actions && <div className="-mr-2 flex shrink-0 items-center">{actions}</div>}

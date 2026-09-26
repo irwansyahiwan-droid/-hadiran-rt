@@ -9,7 +9,7 @@ import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from './GalatKolom';
 import ConfirmDestruktif from './ConfirmDestruktif';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, haptic, tanggalUtuh } from '../lib/utils';
+import { formatRupiahPlain, haptic, ikatFrasa, tanggalUtuh } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { getTargetKasRT, setTargetKasRT, clearTargetKasRT, type TargetKasRT as Target_ } from '../lib/pengaturan';
 
@@ -135,7 +135,7 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
                   sudah kurang 3px di 360px → kata terakhir hilang jadi "…Tahu…".
                   Judul = identitas kartu; biarkan melipat (pola sama judul
                   transaksi Beranda). */}
-              <p className="text-body font-bold text-balance text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug">{target.keterangan || 'Target Kas RT'}</p>
+              <p className="text-body font-bold text-balance text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug">{ikatFrasa(target.keterangan || 'Target Kas RT')}</p>
               <p className="text-micro text-gray-500 dark:text-gray-400">Target <span className="font-display tabular-nums">{formatRupiahPlain(target.nominal)}</span></p>
             </div>
           </div>

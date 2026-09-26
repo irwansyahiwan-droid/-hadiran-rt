@@ -229,6 +229,11 @@ describe('ikatFrasa — frasa tak terbelah di teks bebas layar', () => {
     expect(ikatFrasa('Ubah pengeluaran Kas RT')).toBe(`Ubah pengeluaran Kas${NBSP}RT`);
     expect(ikatFrasa('Kas RTX')).toBe('Kas RTX');
   });
+  it('"Kas Hadiran" menempel, huruf besar-kecil apa adanya', () => {
+    expect(ikatFrasa('Saldo Kas Hadiran')).toBe(`Saldo Kas${NBSP}Hadiran`);
+    expect(ikatFrasa('Setoran kas hadiran Ke Kas RT')).toBe(`Setoran kas${NBSP}hadiran Ke Kas${NBSP}RT`);
+    expect(ikatFrasa('Kas Hadirannya')).toBe('Kas Hadirannya');
+  });
   it('tanggal ikut terikat', () => {
     expect(ikatFrasa('Setoran 28 Agu 2026')).toBe(`Setoran 28${NBSP}Agu${NBSP}2026`);
   });

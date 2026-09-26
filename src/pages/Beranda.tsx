@@ -610,8 +610,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     label butuh 148px pada 11px/0.16em → kata "SALDO" akan hilang
                     ditelan ellipsis. clamp menyusutkan huruf ~2px di HP tersempit
                     (dan tracking sedikit dirapatkan) supaya TIGA katanya utuh, lalu
-                    kembali ke 11px begitu ada ruang. truncate = jaring pengaman. */}
-                <span className="potong-lentur text-micro font-bold uppercase tracking-[0.12em] text-white">Saldo Kas Hadiran</span>
+                    kembali ke 11px begitu ada ruang. truncate = jaring pengaman.
+                    `ikatFrasa`: kalau melipat (360px), yang turun "KAS HADIRAN"
+                    utuh — dulu "SALDO KAS / HADIRAN" memisah nama kasnya. */}
+                <span className="potong-lentur text-balance text-micro font-bold uppercase tracking-[0.12em] text-white">{ikatFrasa('Saldo Kas Hadiran')}</span>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 {/* Ikon POLOS, tanpa chip lingkaran. Dua kapsul `bg-white/15

@@ -1031,7 +1031,7 @@ export default function KasRTPage() {
                         jadi baris "Saldo Awal" yang bukan tombol TIDAK ikut
                         dimaafkan — dan sapuan itu ikut MENGUKUR sheet tujuannya. */}
                     <p data-ringkas className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2">
-                      {k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran')}
+                      {ikatFrasa(k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran'))}
                     </p>
                     {/* Meta = dialek baris KANONIK Beranda: satu <p>, bagian
                         digabung " · ", `truncate` (satu baris, tak pernah
@@ -1041,7 +1041,7 @@ export default function KasRTPage() {
                         tanggal+chip tak muat di kolom 120px ia selalu jatuh ke
                         baris kedua, membuat chip menggantung sendirian. */}
                     <p className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
-                      {[formatTanggalRingkas(k.tanggal), k.kategori && labelKategoriSingkat(k.tipe, k.kategori)].filter(Boolean).join(' · ')}
+                      {ikatFrasa([formatTanggalRingkas(k.tanggal), k.kategori && labelKategoriSingkat(k.tipe, k.kategori)].filter(Boolean).join(' · '))}
                     </p>
                   </div>
 

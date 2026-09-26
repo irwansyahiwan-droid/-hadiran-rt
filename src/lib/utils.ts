@@ -120,11 +120,16 @@ export function tanggalUtuh(teks: string): string {
  * yang ditulis app sendiri saat talangan dilunasi ("Talangan lunas — Nama
  * (Tarikan #20)"), dan 5 "RT" terlepas dari "Kas". Hanya untuk LAYAR: data yang
  * disimpan, dicari, atau diekspor tetap memakai teks aslinya.
+ *
+ * "Kas Hadiran" ikut sejak 26 Sep 2026 (@360px: "SALDO KAS / HADIRAN" di hero
+ * Beranda, "28 Agu · Kas / Hadiran" di baris Kas RT). Kedua nama kas dicocokkan
+ * TANPA peduli huruf besar-kecil — keterangan bebas ditulis campur ("Setoran
+ * kas hadiran Ke Kas RT") — dan hurufnya dipertahankan apa adanya.
  */
 export function ikatFrasa(teks: string): string {
   return tanggalUtuh(teks)
     .replace(/Tarikan #/g, `Tarikan${NBSP}#`)
-    .replace(/Kas RT\b/g, `Kas${NBSP}RT`);
+    .replace(/\b(kas) (rt|hadiran)\b/gi, `$1${NBSP}$2`);
 }
 
 /**
