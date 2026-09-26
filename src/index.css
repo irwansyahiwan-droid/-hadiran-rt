@@ -2129,6 +2129,17 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
 }
 
 /* Respect users who prefer less motion */
+/* Ganti tema — pasangan `useTheme`. `tema-berganti` hidup SATU frame saja:
+   semua transisi mati supaya Header & bar nav tak tertinggal berwarna lama
+   di atas halaman yang sudah berganti. Pudar-silangnya (View Transitions)
+   anak tangga MASUK, bukan LAPISAN: ini tombol yang ditekan, bukan konten
+   yang datang, dan 0,4 dtk terasa menunda. */
+html.tema-berganti *,
+html.tema-berganti *::before,
+html.tema-berganti *::after { transition: none !important; }
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: var(--dur-masuk); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 export function useTheme() {
   // Belum pernah toggle → TERANG, apa pun preferensi OS. Warga yang mampir dari
@@ -10,8 +11,20 @@ export function useTheme() {
     return localStorage.getItem('hadiran-theme') === 'dark';
   });
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
+  /* `useLayoutEffect`, bukan `useEffect`: kelas `.dark` WAJIB terpasang di
+     commit yang SAMA dgn perubahan state, supaya `startViewTransition` di
+     `toggle` memotret keadaan baru — efek pasif bisa jatuh sesudah potretnya.
+
+     `tema-berganti` mematikan SEMUA transisi CSS selama satu frame. Tanpa itu
+     tema tak berganti serentak: terukur 26 Sep 2026, 311 dari 321 elemen
+     langsung berganti tapi Header memudar 0,3 dtk & label bar nav 0,16 dtk —
+     pita putih yang tertinggal di atas halaman yang sudah gelap. */
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.classList.add('tema-berganti');
+    root.classList.toggle('dark', isDark);
+    void root.offsetHeight; // paksa gaya baru dihitung SELAGI transisi mati
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('tema-berganti')));
     localStorage.setItem('hadiran-theme', isDark ? 'dark' : 'light');
 
     // Status bar HP ikut tema aktif (override meta theme-color statis).
@@ -31,5 +44,15 @@ export function useTheme() {
       .forEach((m) => m.setAttribute('content', color));
   }, [isDark]);
 
-  return { isDark, toggle: () => setIsDark(d => !d) };
+  /* Pudar-silang satu halaman (View Transitions) di peramban yang punya —
+     Chrome/Android & Safari 18. Tanpa itu, atau bila pengguna minta kurangi
+     gerak, tema tetap berganti serentak (lihat `tema-berganti`). */
+  const toggle = () => {
+    const ganti = () => flushSync(() => setIsDark(d => !d));
+    const diam = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (!diam && typeof document.startViewTransition === 'function') document.startViewTransition(ganti);
+    else ganti();
+  };
+
+  return { isDark, toggle };
 }
