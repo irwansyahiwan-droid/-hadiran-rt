@@ -99,6 +99,14 @@ const PUNGUT = () => {
        teks yang justru sudah bisa dibaca penuh. Aturan alat repo ini: temuan
        palsu → betulkan ALATNYA. */
     if (cs.overflowX === 'visible') return;
+    /* Teks yang SENGAJA tak dicat — pola `sr-only` (clip nol, 1×1px) — bukan
+       teks terpotong: ia tak punya satu piksel pun untuk dipotong, ia hanya
+       dibacakan. Disaring dari GAYA TERHITUNG, bukan nama kelas, karena
+       variannya responsif: pil "Proses" Jadwal memakai `max-[359px]:sr-only`
+       (label disembunyikan di 320px, nama aksesibel tetap), dan sapuan ini
+       melaporkannya "kurang 42,5px" (26 Sep 2026) — temuan palsu, jadi yang
+       dibetulkan alatnya. */
+    if (cs.position === 'absolute' && /rect\(0(px)?,? 0(px)?,? 0(px)?,? 0(px)?\)/.test(cs.clip)) return;
     if (cs.textOverflow !== 'ellipsis' && cs.overflow !== 'hidden') return;
     if (el.clientWidth <= 0 || cs.visibility === 'hidden') return;
     const rg = document.createRange();
