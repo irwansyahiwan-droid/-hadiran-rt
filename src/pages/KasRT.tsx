@@ -9,7 +9,7 @@ import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, maskRp, pesanError } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, ikatFrasa, maskRp, pesanError } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import EmptyState from '../components/EmptyState';
@@ -1102,7 +1102,7 @@ export default function KasRTPage() {
                 ? <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 : <ArrowUpRight className="w-5 h-5 text-neg dark:text-rose-400" />}
             </div>
-            <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug text-balance">{selectedRow.keterangan || (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</h3>
+            <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug text-balance">{selectedRow.keterangan ? ikatFrasa(selectedRow.keterangan) : (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</h3>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
             <div className="inset-soft rounded-2xl p-4 space-y-3 mt-3">
               <div className="flex items-center justify-between">

@@ -111,6 +111,23 @@ export function tanggalUtuh(teks: string): string {
 }
 
 /**
+ * Ikat frasa yang tak boleh terbelah di ujung baris — untuk teks BEBAS yang
+ * dirender di layar (keterangan, judul aktivitas): "Tarikan #N", "Kas RT", dan
+ * tanggal ("26 Sep 2026", lewat `tanggalUtuh`).
+ *
+ * Terukur 26 Sep 2026 di Riwayat Aktivitas @390px: 81 baris berakhir dgn SATU
+ * kata sendirian, 50 di antaranya "#20)" terlepas dari "(Tarikan" — keterangan
+ * yang ditulis app sendiri saat talangan dilunasi ("Talangan lunas — Nama
+ * (Tarikan #20)"), dan 5 "RT" terlepas dari "Kas". Hanya untuk LAYAR: data yang
+ * disimpan, dicari, atau diekspor tetap memakai teks aslinya.
+ */
+export function ikatFrasa(teks: string): string {
+  return tanggalUtuh(teks)
+    .replace(/Tarikan #/g, `Tarikan${NBSP}#`)
+    .replace(/Kas RT\b/g, `Kas${NBSP}RT`);
+}
+
+/**
  * Tanggal penuh untuk LAYAR: "Sab, 26 Sep 2026" (tanggal tak terbelah, lihat
  * `tanggalUtuh`). BERKAS (Excel) memakai `{ polos: true }` — sel berisi spasi
  * tak-putus tak ketemu saat bendahara mengetik "26 Sep" di kotak cari Excel.

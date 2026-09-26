@@ -15,7 +15,7 @@ import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
 import { fetchAktivitas, fetchKamus, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
 import type { KamusNama } from '../lib/aktivitas';
-import { formatRupiahPlain, haptic } from '../lib/utils';
+import { formatRupiahPlain, haptic, ikatFrasa, labelTanggalRelatif } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat } from '../lib/hooks';
 import type { AktivitasLog } from '../lib/types';
@@ -50,16 +50,6 @@ function iconFor(row: AktivitasLog) {
   return Pencil;
 }
 
-/** Label grup tanggal: Hari ini / Kemarin / tanggal lengkap. */
-function labelHari(dateStr: string): string {
-  const d = new Date(dateStr);
-  const now = new Date();
-  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
-  const beda = Math.round((startOf(now) - startOf(d)) / 86400000);
-  if (beda === 0) return 'Hari ini';
-  if (beda === 1) return 'Kemarin';
-  return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-}
 
 export default function RiwayatAktivitas({ open, onClose }: Props) {
   /* Ekspor PDF = aksi berat (chunk diunduh saat diketuk). Lihat `useAksiBerat`. */
@@ -125,7 +115,11 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
     });
     const out: { hari: string; items: AktivitasLog[] }[] = [];
     for (const r of filtered) {
-      const hari = labelHari(r.created_at);
+      /* Label grup = `labelTanggalRelatif`, helper YANG SAMA dgn kepala grup
+         transaksi Beranda (26 Sep 2026). Dulu halaman ini punya salinannya
+         sendiri dgn format PANJANG ("KAMIS, 24 SEPTEMBER 2026") sementara
+         Beranda — pola buku besar yang sama — menulis "KAM, 24 SEP 2026". */
+      const hari = labelTanggalRelatif(r.created_at);
       const last = out[out.length - 1];
       if (last && last.hari === hari) last.items.push(r);
       else out.push({ hari, items: [r] });
@@ -282,7 +276,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                             posisinya tetap 0px dari tepi atas isi — catatan chevron
                             zigzag di bawah tetap berlaku. */}
                         <div className="flex items-start justify-between gap-3">
-                          <p className="flex-1 min-w-0 text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{v.title}</p>
+                          <p className="flex-1 min-w-0 text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{ikatFrasa(v.title)}</p>
                           {/* Rail KANAN mendatar, bukan `flex-col` (2 Sep 2026). Waktu ia
                               kolom, chevron ditumpuk DI BAWAH nominal — jadi letaknya
                               ditentukan ADA/TIDAKNYA nominal: terukur 0px dari tepi atas
@@ -342,8 +336,13 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                             )}
                           </div>
                         </div>
+                        {/* `ikatFrasa` (26 Sep 2026): 50 dari 81 baris di sini berakhir dgn
+                            "#20)" sendirian, lepas dari "(Tarikan". TANPA `text-pretty`: ia
+                            ikut menarik kata sebelumnya ke bawah dan membelah NAMA orang
+                            ("Ahmad / Iqbal (Tarikan #20)"); tanpa itu frasa terikat pindah
+                            utuh ke baris sendiri. */}
                         {v.detail && (
-                          <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5 break-words">{v.detail}</p>
+                          <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5 break-words">{ikatFrasa(v.detail)}</p>
                         )}
                         <p className="text-micro text-ink-faint dark:text-gray-400 mt-1">
                           {v.actor} · {formatWaktuRelatif(row.created_at)}
@@ -357,7 +356,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                                 <Route className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                 <div className="min-w-0">
                                   <p className="text-micro font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 mb-0.5">Alur &amp; pencatatan</p>
-                                  <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300">{v.penjelasan}</p>
+                                  <p className="text-caption leading-relaxed text-gray-600 dark:text-gray-300 text-pretty">{ikatFrasa(v.penjelasan)}</p>
                                 </div>
                               </div>
                             )}

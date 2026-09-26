@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   formatRupiah, formatRupiahPlain, maskRp, hitungSaldoHadiran, pesanError,
-  formatTanggalRingkas, ukuranMuat, tanggalUtuh, formatTanggal, sisiPopover } from './utils';
+  formatTanggalRingkas, ukuranMuat, tanggalUtuh, formatTanggal, sisiPopover, ikatFrasa } from './utils';
 
 /**
  * Formatter uang & penerjemah error — dipakai hampir di setiap layar, dan
@@ -217,5 +217,22 @@ describe('sisiPopover — popover tak pernah keluar layar', () => {
       expect(a).toBeGreaterThanOrEqual(0);
       expect(b).toBeLessThanOrEqual(vw);
     }
+  });
+});
+
+describe('ikatFrasa — frasa tak terbelah di teks bebas layar', () => {
+  const NBSP = '\u00A0';
+  it('"Tarikan #N" menempel', () => {
+    expect(ikatFrasa('Talangan lunas — Ahmad Iqbal (Tarikan #20)')).toBe(`Talangan lunas — Ahmad Iqbal (Tarikan${NBSP}#20)`);
+  });
+  it('"Kas RT" menempel, tapi "Kas RTx" tak disentuh', () => {
+    expect(ikatFrasa('Ubah pengeluaran Kas RT')).toBe(`Ubah pengeluaran Kas${NBSP}RT`);
+    expect(ikatFrasa('Kas RTX')).toBe('Kas RTX');
+  });
+  it('tanggal ikut terikat', () => {
+    expect(ikatFrasa('Setoran 28 Agu 2026')).toBe(`Setoran 28${NBSP}Agu${NBSP}2026`);
+  });
+  it('teks lain tak berubah', () => {
+    expect(ikatFrasa('Donasi Rawat Inap')).toBe('Donasi Rawat Inap');
   });
 });

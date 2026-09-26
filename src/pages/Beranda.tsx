@@ -13,7 +13,7 @@ import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay, heroRingkas, useUkuranLayar, useKembaliDariLatar } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
-import { formatRupiahPlain, formatTanggal, haptic, labelTanggalRelatif, maskRp } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, ikatFrasa, labelTanggalRelatif, maskRp } from '../lib/utils';
 import { fetchDashboardSummary } from '../lib/dashboard';
 import BannerCarousel, { BannerSkeleton } from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
@@ -927,7 +927,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               15px medium — seberat keterangan baris daftar yg baru diketuk —
               sementara sheet Kas RT untuk pekerjaan yang SAMA memakai judul
               18px bold; dua sheet "detail transaksi", dua kostum. */}
-          <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug text-balance">{selectedTrx.keterangan}</h3>
+          <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug text-balance">{ikatFrasa(selectedTrx.keterangan)}</h3>
           <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedTrx.tanggal)}</p>
           <div className="inset-soft rounded-2xl p-4 space-y-3 mt-3">
             <div className="flex items-center justify-between">
