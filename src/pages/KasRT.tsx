@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { tandaiBasi, tandaiSegar } from '../lib/basi';
-import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2 } from 'lucide-react';
+import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, Flag, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2 } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
@@ -1017,10 +1017,16 @@ export default function KasRTPage() {
                      judul, sama seperti kolom angka Rekap per Kategori. */
                   className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_76px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-ketuk ${!isLast ? 'divide-inset' : ''}`}
                 >
-                  <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
-                    {isMasuk
-                      ? <ArrowDownLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      : <ArrowUpRight  className="w-4 h-4 text-neg dark:text-rose-400" />}
+                  {/* Saldo Awal NETRAL (27 Sep 2026): ia titik mulai, bukan
+                      pemasukan — tak ikut Penerimaan di rekap, dan hero, rekap &
+                      kartu PNG menulisnya tanpa tanda. Dulu barisnya dicat persis
+                      seperti uang masuk (ubin panah hijau, "+Rp8.134.000"). */}
+                  <div className={`icon-tile w-9 h-9 rounded-xl inline-flex items-center justify-center shrink-0 ${isSaldoAwal ? 'bg-gray-100 dark:bg-gray-800' : isMasuk ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'}`}>
+                    {isSaldoAwal
+                      ? <Flag className="w-4 h-4 text-ink-sub dark:text-gray-300" />
+                      : isMasuk
+                        ? <ArrowDownLeft className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        : <ArrowUpRight  className="w-4 h-4 text-neg dark:text-rose-400" />}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -1059,8 +1065,8 @@ export default function KasRTPage() {
                       konten utama baris kalah lebar dari angka pendampingnya.
                       Kolom kanan kini satu tingkat, sama seperti baris Beranda. */}
                   <div className="text-right shrink-0">
-                    <p className={`font-display text-amount font-semibold tabular-nums ${isMasuk ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
-                      {maskRp(`${isMasuk ? '+' : '-'}${formatRupiahPlain(k.nominal)}`, hidden, 4)}
+                    <p className={`font-display text-amount font-semibold tabular-nums ${isSaldoAwal ? 'text-ink dark:text-gray-100' : isMasuk ? 'text-pos dark:text-emerald-400' : 'text-neg dark:text-rose-400'}`}>
+                      {maskRp(`${isSaldoAwal ? '' : isMasuk ? '+' : '-'}${formatRupiahPlain(k.nominal)}`, hidden, 4)}
                     </p>
                   </div>
                 </Row>
