@@ -437,7 +437,7 @@ export default function KasHadiranPage() {
       });
       hadir.sort((a, b) => a.nama.localeCompare(b.nama));
       titip.sort((a, b) => a.nama.localeCompare(b.nama));
-      tidak.sort((a, b) => Number(a.lunas) - Number(b.lunas) || a.nama.localeCompare(b.nama)); // belum bayar di atas
+      tidak.sort((a, b) => Number(a.lunas) - Number(b.lunas) || a.nama.localeCompare(b.nama)); // belum lunas di atas
       setDetailHadir(hadir);
       setDetailTitip(titip);
       setDetailTidak(tidak);
@@ -916,7 +916,7 @@ export default function KasHadiranPage() {
                           {/* Nomor tarikan = IDENTITAS, bukan status. Dulu ia
                               diwarnai emerald/amber menurut ada-tidaknya talangan
                               — padahal chip di ujung baris yang sama sudah
-                              mengatakannya dengan KATA ("11 belum bayar" /
+                              mengatakannya dengan KATA ("11 belum lunas" /
                               "Lunas semua"). Satu fakta dua sandi: warna jadi
                               tebakan, dan ambernya bukan token `warn` mana pun.
                               Kini netral (abu = penanda, sesuai sistem warna). */}
@@ -927,7 +927,7 @@ export default function KasHadiranPage() {
                           <span className="text-micro angka-prosa text-ink-faint dark:text-gray-400">{formatTanggal(t.tanggal)}</span>
                         </div>
                         {talanganInfo.count > 0 ? (
-                          <Tag tone="danger" className="angka-prosa">{talanganInfo.count} belum bayar</Tag>
+                          <Tag tone="danger" className="angka-prosa">{talanganInfo.count} belum lunas</Tag>
                         ) : (
                           <Tag tone="success"><Check className="w-3 h-3" /> Lunas semua</Tag>
                         )}
@@ -1218,7 +1218,7 @@ export default function KasHadiranPage() {
               <div className="flex flex-wrap gap-2 mt-3">
                 <Tag tone="success">Hadir {detailHadir.length}</Tag>
                 {detailTitip.length > 0 && <Tag tone="info">Titip {detailTitip.length}</Tag>}
-                <Tag tone="danger">Belum bayar {detailTidak.filter((x) => !x.lunas).length}</Tag>
+                <Tag tone="danger">Belum lunas {detailTidak.filter((x) => !x.lunas).length}</Tag>
                 <Tag tone="neutral">Lunas {detailTidak.filter((x) => x.lunas).length}</Tag>
               </div>
             </div>
@@ -1314,7 +1314,7 @@ export default function KasHadiranPage() {
                             {p.lunas ? (
                               <Tag tone="success"><Check className="w-3 h-3" />Lunas</Tag>
                             ) : (
-                              <Tag tone="danger"><AlertTriangle className="w-3 h-3" />Belum bayar</Tag>
+                              <Tag tone="danger"><AlertTriangle className="w-3 h-3" />Belum lunas</Tag>
                             )}
                           </div>
                         ))}

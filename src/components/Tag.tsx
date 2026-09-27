@@ -13,7 +13,7 @@ type Tone = 'neutral' | 'success' | 'danger' | 'warning' | 'info';
 const TONES: Record<Tone, string> = {
   /* TINTA GELAP `-300` → `-200` (30 Agu 2026). Diukur oleh seksi AAA yang baru
      dipasang: KELIMA sampel app yang tersisa di bawah ambang AAA 7:1 berasal
-     dari komponen INI — `danger` 6,55 ("belum bayar", di kartu), `success` 6,91
+     dari komponen INI — `danger` 6,55 ("belum lunas", di kartu), `success` 6,91
      & `neutral` 6,94 (pil peran BENDAHARA/WARGA, di Header). Ketiganya lolos AA
      dgn nyaman, jadi tak satu pun sapuan lama pernah menyebutnya.
 
