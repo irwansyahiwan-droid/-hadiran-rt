@@ -266,7 +266,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const setorKasRT = summary?.total_setor_kas_rt ?? 0;
 
   const hour = new Date().getHours();
-  const greeting = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
+  // Dini hari (00.00–03.59) masih "malam", bukan "pagi" — keputusan user 27 Sep 2026.
+  const greeting = hour < 4 ? 'Selamat malam' : hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
   const roleLabel = isWargaMode ? 'Warga' : isBendahara ? 'Bendahara' : 'Pengguna';
   // Chip status = SATU suara ringkas. Saat ada tunggakan, banner "Talangan
   // Belum Lunas" di bawah sudah membawa pesannya → chip TIDAK mengulang
