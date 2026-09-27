@@ -38,6 +38,29 @@ const build = () => teksPdf(buildAbsensiPDF(TARIKAN, HADIR, TIDAK, TITIP).doc);
 /** Berapa kali sebuah status muncul sbg sel STATUS di tabel. */
 const hitungStatus = (t: string[], status: string) => t.filter((x) => x === status).length;
 
+describe('PDF Daftar Hadir — Sohibul Bait bukan "Hadir"', () => {
+  /* Keputusan user 26 Sep 2026: SB tak dihitung Hadir (aturan `ringkasAbsensi`,
+     kartu "56/69 hadir", sheet detail). Ia tetap di daftar — baris pertama,
+     status "Sohibul Bait" — dan kaki menjelaskan selisih satunya. */
+  const SB = { id: 'w0', nama: 'Karta Saleh' };
+  const t = () => teksPdf(buildAbsensiPDF(TARIKAN, [...HADIR, SB], TIDAK, TITIP).doc);
+  const angkaSesudah = (x: string[], label: string) => Number(x[x.indexOf(label) + 1]);
+
+  it('SB tercatat SEKALI berstatus "Sohibul Bait", tak ikut hitungan Hadir', () => {
+    const x = t();
+    expect(hitungStatus(x, 'Sohibul Bait'), 'baris berstatus Sohibul Bait').toBe(1);
+    expect(hitungStatus(x, 'Hadir'), 'SB ikut dihitung Hadir').toBe(HADIR.length);
+    expect(angkaSesudah(x, 'HADIR'), 'strip HADIR ikut menghitung SB').toBe(HADIR.length);
+  });
+
+  it('REKONSILIASI: strip = pembayar, kaki menyebut selisih SB', () => {
+    const x = t();
+    const total = 1 + HADIR.length + TITIP.length + TIDAK.length;
+    expect(angkaSesudah(x, 'HADIR') + angkaSesudah(x, 'TITIP') + angkaSesudah(x, 'TIDAK HADIR')).toBe(total - 1);
+    expect(x, 'kaki tak menjelaskan selisih SB').toContain(`Total Anggota Tercatat: ${total} (${total - 1} pembayar + Sohibul Bait)`);
+  });
+});
+
 describe('PDF Daftar Hadir — isi dokumen', () => {
   it('mencetak setiap nama beserta statusnya', () => {
     const t = build();

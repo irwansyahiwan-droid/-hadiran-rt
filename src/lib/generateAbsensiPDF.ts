@@ -8,7 +8,9 @@ import {
 } from './pdfTheme';
 import type { Tarikan } from './types';
 
-interface Hadir { nama: string }
+/* `id` opsional: dipakai hanya untuk mengenali Sohibul Bait (lihat di bawah).
+   Pemanggil yang cuma mengirim nama tetap berperilaku seperti dulu. */
+interface Hadir { nama: string; id?: string }
 interface Tidak { nama: string; lunas: boolean }
 
 /** Daftar hadir (absensi) satu tarikan → unduh PDF. */
@@ -22,11 +24,18 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const docCode = `ABS-${String(tarikan.nomor).padStart(3, '0')}-${now.getFullYear()}`;
 
-  const hadirS = [...hadir].sort((a, b) => a.nama.localeCompare(b.nama));
+  /* Sohibul Bait BUKAN "Hadir" (keputusan user 26 Sep 2026) — aturan yang sama
+     dgn `ringkasAbsensi` ("SB dikecualikan dari SEMUA hitungan"), kartu tarikan
+     ("56/69 hadir") & sheet detail tarikan. Ia tetap tercatat di daftar hadir
+     resmi ini — baris PERTAMA, berstatus "Sohibul Bait" — dan ikut Total
+     Anggota Tercatat; yang berubah hanya hitungan Hadir-nya. */
+  const sbId = tarikan.sohibul_bait_id ?? '';
+  const sohibul = sbId ? hadir.find((h) => h.id === sbId) : undefined;
+  const hadirS = hadir.filter((h) => h !== sohibul).sort((a, b) => a.nama.localeCompare(b.nama));
   const titipS = [...titip].sort((a, b) => a.nama.localeCompare(b.nama));
   const tidakS = [...tidak].sort((a, b) => a.nama.localeCompare(b.nama));
   const lunasCount = tidakS.filter((t) => t.lunas).length;
-  const total = hadirS.length + titipS.length + tidakS.length;
+  const total = (sohibul ? 1 : 0) + hadirS.length + titipS.length + tidakS.length;
 
   const tglTarikan = tarikan.tanggal
     ? new Date(tarikan.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -63,6 +72,7 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
   type Row = [string, string, string];
   const rows: Row[] = [];
   let n = 1;
+  if (sohibul) rows.push([String(n++), sohibul.nama, 'Sohibul Bait']);
   hadirS.forEach((h) => rows.push([String(n++), h.nama, 'Hadir']));
   titipS.forEach((t) => rows.push([String(n++), t.nama, 'Titip']));
   tidakS.forEach((t) => rows.push([String(n++), t.nama, t.lunas ? 'Talangan Lunas' : 'Talangan']));
@@ -84,7 +94,7 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
       if (data.section !== 'body' || data.column.index !== 2) return;
       const s = rows[data.row.index]?.[2] ?? '';
       if (s === 'Hadir') { data.cell.styles.textColor = C.pos; data.cell.styles.fontStyle = 'bold'; }
-      else if (s === 'Titip') { data.cell.styles.fontStyle = 'bold'; }
+      else if (s === 'Titip' || s === 'Sohibul Bait') { data.cell.styles.fontStyle = 'bold'; }
       else if (s === 'Talangan Lunas') { data.cell.styles.textColor = C.pos; }
       else if (s === 'Talangan') { data.cell.styles.textColor = C.neg; data.cell.styles.fontStyle = 'bold'; }
     },
@@ -94,7 +104,12 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
   // Guard: baris total + blok ttd (dgn dateline) jangan tergambar lewat batas halaman
   const afterY = ensureSpace(doc, (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8, 52);
   doc.setFontSize(8.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(C.ink[0], C.ink[1], C.ink[2]);
-  doc.text(`Total Anggota Tercatat: ${total}`, M, afterY);
+  /* Strip (Hadir + Titip + Tidak Hadir) menjumlah ke PEMBAYAR; kalau Sohibul
+     Bait tercatat, selisih satunya disebut di sini — pembaca yang
+     merekonsiliasi tak boleh menemukan satu nama tanpa penjelasan. */
+  doc.text(sohibul
+    ? `Total Anggota Tercatat: ${total} (${total - 1} pembayar + Sohibul Bait)`
+    : `Total Anggota Tercatat: ${total}`, M, afterY);
 
   drawSignatures(doc, afterY + 16, W, M, { dateline: `Depok, ${tanggalCetak}` });
 
