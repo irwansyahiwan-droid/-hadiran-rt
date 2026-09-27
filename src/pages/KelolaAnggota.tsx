@@ -1,7 +1,7 @@
 import { useSaving } from '../lib/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Users, Search, X, RefreshCw, RotateCcw, UserPlus, Pencil,
+  Users, Search, RefreshCw, RotateCcw, UserPlus, Pencil,
   CheckCircle2, Phone, Home, History, AlertTriangle,
 } from 'lucide-react';
 import Fab from '../components/Fab';
@@ -64,7 +64,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
   const [awal] = useState(() => ({ nama, noRumah, noHp, role, aktif }));
   const berubah = nama !== awal.nama || noRumah !== awal.noRumah || noHp !== awal.noHp
     || role !== awal.role || aktif !== awal.aktif || susulan;
-  // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
+  // Exit meluncur: semua jalur tutup (backdrop, Batal, Escape, Back HP)
   // lewat jaga.mintaTutup → tanya dulu kalau berubah, lalu drag.dismiss.
   const jaga = useJagaIsian(berubah, () => drag.dismiss());
   const drag = useDragDismiss(onClose, { cegahTutup: jaga.cegahTutup });
@@ -148,18 +148,15 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
-              {mode === 'add' ? 'Tambah Anggota' : 'Edit Anggota'}
-            </h3>
-            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
-              {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
-            </p>
-          </div>
-          <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
-          </button>
+        {/* Tanpa ✕: Batal di kaki + pegangan seret sudah menutup — sama dgn
+            form Kas RT, setor & target (26 Sep 2026). */}
+        <div className="mb-4">
+          <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
+            {mode === 'add' ? 'Tambah Anggota' : 'Edit Anggota'}
+          </h3>
+          <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
+            {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
+          </p>
         </div>
 
         {/* `autoComplete="off"` di nama & no. HP, BUKAN `name`/`tel`: kolom ini

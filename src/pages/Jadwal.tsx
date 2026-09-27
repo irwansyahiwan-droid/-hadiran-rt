@@ -742,7 +742,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
   const [awal] = useState(() => ({ tanggal, sohibulId }));
   const berubah = tanggal !== awal.tanggal || sohibulId !== awal.sohibulId;
   const jaga = useJagaIsian(berubah, () => drag.dismiss());
-  // Exit meluncur: semua jalur tutup (backdrop, X, Batal, Escape, Back HP)
+  // Exit meluncur: semua jalur tutup (backdrop, Batal, Escape, Back HP)
   // lewat jaga.mintaTutup → tanya dulu kalau berubah, lalu drag.dismiss.
   // Handlers disebar HANYA di batang handle, bukan di panel:
   // panelnya form yang bisa di-scroll, dan itulah sebabnya sheet form KasRT &
@@ -798,14 +798,11 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</h3>
-            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
-          </div>
-          <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
-          </button>
+        {/* Tanpa ✕: form ini sudah punya Batal di kaki + pegangan seret —
+            sama dgn form Kas RT, setor & target (26 Sep 2026). */}
+        <div className="mb-4">
+          <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</h3>
+          <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
         </div>
 
         <label htmlFor="jadwal-edit-tanggal" className="label-field">Tanggal Tarikan</label>
@@ -922,14 +919,11 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</h3>
-            <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
-          </div>
-          <button onClick={jaga.mintaTutup} aria-label="Tutup" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <X className="w-5 h-5 text-gray-400" />
-          </button>
+        {/* Tanpa ✕: form ini sudah punya Batal di kaki + pegangan seret —
+            sama dgn form Kas RT, setor & target (26 Sep 2026). */}
+        <div className="mb-4">
+          <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</h3>
+          <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
         </div>
 
         <label htmlFor="jadwal-add-tanggal" className="label-field">Tanggal Tarikan</label>
