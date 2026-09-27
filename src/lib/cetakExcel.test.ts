@@ -188,8 +188,10 @@ describe('Excel — satuan & arah uang', () => {
     expect(tinta(mut, 5, 5), 'kolom Masuk = pos').toBe('05543E');
     expect(tinta(mut, 5, 6), 'kolom Keluar = neg').toBe('941136');
     const sum = hd.getWorksheet('Ringkasan')!;
-    expect(tinta(sum, 6, 2), 'Talangan Belum Lunas = neg').toBe('941136');
-    expect(tinta(sum, 7, 2), 'Setoran ke Kas Besar RT = warn').toBe('75320B');
+    /* Sama dgn PDF & layar: talangan amber (`warn`), setoran NETRAL (`ink`).
+       Uji ini dulu mengunci kebalikannya — ikut tertinggal saat PDF diperbaiki. */
+    expect(tinta(sum, 6, 2), 'Talangan Belum Lunas = warn').toBe('75320B');
+    expect(tinta(sum, 7, 2), 'Setoran ke Kas Besar RT = netral').toBe('07160D');
   });
 
   it('KONTROL: kolom bukan-uang TIDAK diwarnai', () => {

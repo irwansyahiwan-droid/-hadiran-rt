@@ -30,16 +30,19 @@ export function buildKasHadiranExcel(
   sum.columns = [{ width: 28 }, { width: 20 }];
   titleBlock(sum, 'Kas Hadiran RT 004/006', `Ringkasan · ${tgl}`, 2);
   headerRow(sum, 4, ['Keterangan', 'Nominal (Rp)']);
-  /* Nada mencermin PDF-nya baris demi baris: talangan `neg`, setoran `warn`,
-     saldo pos/neg menurut tandanya. Lihat didParseCell generateKasHadiranPDF. */
+  /* Nada mencermin PDF-nya baris demi baris: talangan `warn` (amber, perhatian),
+     setoran NETRAL (pindahan ke Kas RT, bukan kerugian), saldo pos/neg menurut
+     tandanya. PDF & layar pindah ke aturan ini 26 Sep 2026 dan berkas ini
+     tertinggal — ia masih mencetak talangan merah & setoran amber, persis
+     pertukaran yang sudah diperbaiki di sana. Lihat generateKasHadiranPDF. */
   /* NILAI BERTANDA — alasan sama dgn `generateKasRTExcel`. Talangan & setoran
      KEDUANYA pengurang: `hitungSaldoHadiran` = kas − talangan − setor, dan
      PDF-nya sudah mencetak `-Rp250.000` / `-Rp13.600.000`. Dgn tanda, =SUM()
      atas keempat baris menghasilkan Saldo Kas Hadiran. */
   const ringkasan: [string, number, 'pos' | 'neg' | 'warn' | 'ink'][] = [
     ['Kas Hadiran Terkumpul', stats.totalKasTerkumpul, 'ink'],
-    ['Talangan Belum Lunas', -stats.totalTalanganBelum || 0, 'neg'],
-    ['Setoran ke Kas Besar RT', -stats.totalSetor || 0, 'warn'],
+    ['Talangan Belum Lunas', -stats.totalTalanganBelum || 0, 'warn'],
+    ['Setoran ke Kas Besar RT', -stats.totalSetor || 0, 'ink'],
     ['Saldo Kas Hadiran', stats.saldo, stats.saldo < 0 ? 'neg' : 'pos'],
   ];
   ringkasan.forEach(([label, val, tone], i) => {
@@ -81,10 +84,10 @@ export function buildKasHadiranExcel(
       r.getCell(ci).alignment = { horizontal: 'right' };
     });
     [1, 4, 5, 8].forEach((ci) => (r.getCell(ci).alignment = { horizontal: 'center' }));
-    /* Talangan yang BELUM lunas itu uang yang ditalangi kas — di PDF ia `neg`
-       (didParseCell kolom 4). Nol dibiarkan netral: memerahkan nol membuat
+    /* Talangan yang BELUM lunas itu uang yang ditalangi kas — di PDF ia `warn`
+       (didParseCell kolom 4). Nol dibiarkan netral: mewarnai nol membuat
        tarikan yang justru bersih terbaca bermasalah. */
-    if (info.total > 0) warnaiUang(r.getCell(9), 'neg');
+    if (info.total > 0) warnaiUang(r.getCell(9), 'warn');
     if (i % 2 === 1) r.eachCell((c) => (c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ZEBRA } }));
     r.eachCell((c) => (c.border = border));
   });
