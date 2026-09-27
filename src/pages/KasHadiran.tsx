@@ -1213,18 +1213,12 @@ export default function KasHadiranPage() {
                       satu nama. */}
                   <p className="text-caption text-ink-faint dark:text-gray-400 break-words">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
                 </div>
-                {isBendahara && !detailLoading && (
-                  <button
-                    onClick={handleAbsensiPDF}
-                    aria-label="Cetak daftar hadir PDF"
-                    /* Ikon → pemintal saat berkas disiapkan; LABELNYA tetap supaya
-                       lebar tombol tak berubah di tengah sheet (`audit:potong`). */
-                    aria-busy={absensiSibuk || undefined}
-                    className="press shrink-0 inline-flex items-center gap-2 bg-white dark:bg-gray-800 border border-control dark:border-control-dark text-ink-sub dark:text-gray-300 text-caption font-semibold px-3 py-2 rounded-xl rest"
-                  >
-                    {absensiSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Absensi
-                  </button>
-                )}
+                {/* Ruang untuk ✕ (`absolute` di pojok). "PDF Absensi" dulu duduk
+                    DI SINI dan kotak sentuhnya bertumpuk 32×16px dgn ✕ (terukur
+                    27 Sep 2026) — ketukan di pojok kanan-atasnya bisa menutup
+                    sheet; subjudul juga patah jadi "…2026 ·" / "Carduki". Kini
+                    ia di kaki sheet, dan kepala bendahara = kepala warga. */}
+                <div className="w-8 shrink-0" aria-hidden="true" />
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
                 <Tag tone="success">Hadir {hadirTampil.length}</Tag>
@@ -1358,6 +1352,23 @@ export default function KasHadiranPage() {
                 </>
               )}
             </div>
+
+            {/* Aksi di KAKI (zona jempol), pola sheet lain (Edit/Hapus Kas RT,
+                Batal/Simpan form). Nama aksesibel tetap "Cetak daftar hadir PDF". */}
+            {isBendahara && !detailLoading && (
+              <div className="shrink-0 border-t border-line dark:border-gray-800 px-5 pt-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}>
+                <button
+                  onClick={handleAbsensiPDF}
+                  aria-label="Cetak daftar hadir PDF"
+                  /* Ikon → pemintal saat berkas disiapkan; LABELNYA tetap supaya
+                     lebar tombol tak berubah di tengah sheet (`audit:potong`). */
+                  aria-busy={absensiSibuk || undefined}
+                  className="btn-secondary w-full py-3 inline-flex items-center justify-center gap-2"
+                >
+                  {absensiSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Absensi
+                </button>
+              </div>
+            )}
 
             <button
               onClick={detailDrag.dismiss}
