@@ -56,7 +56,9 @@ export function buildPendapatanPDF(
   Y = drawStatStrip(doc, Y, [
     { label: 'Total Anggota',       value: String(wargaList.length) },
     { label: 'Pendapatan Kotor SB', value: rp(pendapatanKotor), tone: 'pos' },
-    { label: 'Kas Hadiran',         value: rp(kasHadiran), tone: 'warn' },
+    // Netral, bukan `warn`: amber milik talangan & peringatan, ini uang MASUK
+    // kas. Sama dgn baris "Kas Hadiran tarikan ini" di sheet detail tarikan.
+    { label: 'Kas Hadiran',         value: rp(kasHadiran) },
   ], W, M);
 
   // ── Table rows ────────────────────────────────────────────

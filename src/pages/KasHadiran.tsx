@@ -1272,7 +1272,11 @@ export default function KasHadiranPage() {
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-ink-sub dark:text-gray-400">Kas Hadiran tarikan ini</span>
-                          <span className="font-display font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
+                          {/* NETRAL, bukan amber: amber di app ini milik talangan &
+                              peringatan, sedangkan ini uang MASUK kas — info
+                              sampingan kartu pendapatan SB, setara "Kotor" di atas.
+                              Pasangannya di PDF Pendapatan ikut netral. */}
+                          <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(detailTarikan.total_terkumpul ?? 0), hidden, 4)}</span>
                         </div>
                       </div>
                     </div>
