@@ -420,12 +420,13 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                       12 nama @320, "Syarifu / din" @360) — tak terpotong, tak
                       meluber, jadi tak satu sapuan pun melihatnya. Di baris
                       keterangan ia tak menambah tinggi, dan nama dapat lebar
-                      kolom penuh. */}
-                  <span className="hidden max-[379px]:inline">
-                    {' · '}
-                    <span className="font-display font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
-                      {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
-                    </span>
+                      kolom penuh.
+                      BARIS SENDIRI, tanpa " · " (28 Sep 2026): kolom ini tak
+                      pernah memuat "3 belum lunas · Rp150.000" dalam satu baris
+                      di bawah 380px, jadi ia SELALU patah dgn "·" menggantung di
+                      ujung baris pertama — di tiap baris daftar. Tingginya sama. */}
+                  <span className="hidden max-[379px]:block font-display font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
+                    {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                   </span>
                 </p>
               ) : (
