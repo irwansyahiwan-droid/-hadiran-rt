@@ -1259,7 +1259,13 @@ export default function KasHadiranPage() {
                       <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-3">Pendapatan Sohibul Bait</p>
                       <div className="space-y-2 text-body">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="text-ink-sub dark:text-gray-400">Kotor · {payingCount} pembayar × <span className="font-display tabular-nums">{formatRupiahPlain(SOHIBUL_PER)}</span></span>
+                          {/* Label + RUMUS di bawahnya, bukan satu kalimat: "Kotor ·
+                              69 pembayar × Rp45.000" patah di tengah rumusnya
+                              ("… × / Rp45.000") di 390px (26 Sep 2026). */}
+                          <span className="min-w-0">
+                            <span className="block text-ink-sub dark:text-gray-400">Kotor</span>
+                            <span className="block text-caption text-ink-faint dark:text-gray-400">{payingCount} pembayar × <span className="font-display tabular-nums">{formatRupiahPlain(SOHIBUL_PER)}</span></span>
+                          </span>
                           <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">
