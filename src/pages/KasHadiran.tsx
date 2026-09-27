@@ -554,6 +554,17 @@ export default function KasHadiranPage() {
   // Rincian pendapatan tarikan yang sedang dibuka — rumus WAJIB sinkron dgn
   // generatePendapatanPDF.ts (Rp45.000/pembayar → Sohibul, potongan admin Rp60.000;
   // pembayar = semua anggota kecuali Sohibul Bait, termasuk talangan belum lunas).
+  /* Sheet detail TIDAK menghitung & tidak mendaftar Sohibul Bait (keputusan
+     user 26 Sep 2026) — aturan yang sama dgn `ringkasAbsensi` ("SB
+     dikecualikan dari SEMUA hitungan") dan dgn kartu tarikan ("56/69
+     hadir"). Dulu sheet menulis "Hadir 57" untuk tarikan yang kartunya 56.
+     SB sudah tampil di kepala sheet. Disaring saat RENDER, bukan di sumber:
+     daftar yang sama dipakai PDF Absensi, dan daftar hadir resmi itu tetap
+     mencatat SB. */
+  const sbId = detailTarikan?.sohibul_bait_id ?? '';
+  const hadirTampil = detailHadir.filter((p) => p.id !== sbId);
+  const titipTampil = detailTitip.filter((p) => p.id !== sbId);
+  const tidakTampil = detailTidak.filter((p) => p.id !== sbId);
   const SOHIBUL_PER = 45000;
   const POTONGAN_ADMIN = 60000;
   const payingCount = detailTarikan
@@ -1216,10 +1227,10 @@ export default function KasHadiranPage() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
-                <Tag tone="success">Hadir {detailHadir.length}</Tag>
-                {detailTitip.length > 0 && <Tag tone="info">Titip {detailTitip.length}</Tag>}
-                <Tag tone="danger">Belum lunas {detailTidak.filter((x) => !x.lunas).length}</Tag>
-                <Tag tone="neutral">Lunas {detailTidak.filter((x) => x.lunas).length}</Tag>
+                <Tag tone="success">Hadir {hadirTampil.length}</Tag>
+                {titipTampil.length > 0 && <Tag tone="info">Titip {titipTampil.length}</Tag>}
+                <Tag tone="danger">Belum lunas {tidakTampil.filter((x) => !x.lunas).length}</Tag>
+                <Tag tone="neutral">Lunas {tidakTampil.filter((x) => x.lunas).length}</Tag>
               </div>
             </div>
 
@@ -1254,7 +1265,7 @@ export default function KasHadiranPage() {
                 <>
                   {/* Rincian pendapatan real-time — angka sama dgn PDF pendapatan
                       yang diunduh dari tombol "PDF" di strip aksi kartu tarikan */}
-                  {(detailHadir.length > 0 || detailTitip.length > 0 || detailTidak.length > 0) && (
+                  {(hadirTampil.length > 0 || titipTampil.length > 0 || tidakTampil.length > 0) && (
                     <div className="inset-soft rounded-2xl px-4 py-4">
                       <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-3">Pendapatan Sohibul Bait</p>
                       <div className="space-y-2 text-body">
@@ -1287,11 +1298,11 @@ export default function KasHadiranPage() {
                       </div>
                     </div>
                   )}
-                  {detailTitip.length > 0 && (
+                  {titipTampil.length > 0 && (
                     <div>
-                      <p className="text-micro font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">Titip · iuran masuk ({detailTitip.length})</p>
+                      <p className="text-micro font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">Titip · iuran masuk ({titipTampil.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
-                        {detailTitip.map((p, i) => (
+                        {titipTampil.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
@@ -1302,11 +1313,11 @@ export default function KasHadiranPage() {
                       </div>
                     </div>
                   )}
-                  {detailTidak.length > 0 && (
+                  {tidakTampil.length > 0 && (
                     <div>
-                      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Tidak Hadir / Talangan ({detailTidak.length})</p>
+                      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Tidak Hadir / Talangan ({tidakTampil.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
-                        {detailTidak.map((p, i) => (
+                        {tidakTampil.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
@@ -1321,11 +1332,11 @@ export default function KasHadiranPage() {
                       </div>
                     </div>
                   )}
-                  {detailHadir.length > 0 && (
+                  {hadirTampil.length > 0 && (
                     <div>
-                      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Hadir ({detailHadir.length})</p>
+                      <p className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400 mb-2">Hadir ({hadirTampil.length})</p>
                       <div className="list-inset [--di-l:4.5rem] [--di-r:0rem]">
-                        {detailHadir.map((p, i) => (
+                        {hadirTampil.map((p, i) => (
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
@@ -1341,7 +1352,7 @@ export default function KasHadiranPage() {
                       </div>
                     </div>
                   )}
-                  {detailHadir.length === 0 && detailTitip.length === 0 && detailTidak.length === 0 && (
+                  {hadirTampil.length === 0 && titipTampil.length === 0 && tidakTampil.length === 0 && (
                     <p className="text-center text-body text-ink-faint dark:text-gray-400 py-8">Belum ada data absensi untuk tarikan ini.</p>
                   )}
                 </>
