@@ -342,17 +342,20 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
             </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-1">
-            {initial && (
-              <button
-                type="button"
-                onClick={() => { haptic(8); setTanyaHapus(true); }}
-                disabled={saving}
-                className="press inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-body font-semibold text-neg dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 disabled:opacity-60 transition-colors"
-              >
-                <Trash2 className="w-4 h-4" /> Hapus
-              </button>
-            )}
+          {/* Kaki KANONIK form (Batal + simpan, sama dgn Kas RT, setor,
+              jadwal & anggota). Dulu "Hapus" duduk di kiri — posisi yang di
+              tiap form lain milik Batal, jadi jempol yang mencari "batal"
+              mendarat di aksi merusak. Hapus kini baris sendiri di bawah,
+              tenang & berjarak; `ConfirmDestruktif` tetap menjaganya. Nama
+              aksesibelnya tetap persis "Hapus" (`audit:jaga-isian` bagian C). */}
+          <div className="flex gap-3 pt-1">
+            <button
+              type="button"
+              onClick={jaga.mintaTutup}
+              className="btn-secondary flex-1 py-3"
+            >
+              Batal
+            </button>
             <button
               type="submit"
               disabled={saving}
@@ -361,6 +364,16 @@ function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: 
               {saving ? 'Menyimpan…' : 'Simpan Target'}
             </button>
           </div>
+          {initial && (
+            <button
+              type="button"
+              onClick={() => { haptic(8); setTanyaHapus(true); }}
+              disabled={saving}
+              className="press mx-auto flex w-fit min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 text-body font-semibold text-neg dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 disabled:opacity-60 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" /> Hapus
+            </button>
+          )}
         </form>
       </div>
     </div>
