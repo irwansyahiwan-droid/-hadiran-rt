@@ -1223,7 +1223,10 @@ export default function JadwalPage() {
             {loading || error
               ? 'Sohibul Bait —'
               : nextDijadwal
-                ? `Sohibul Bait: ${nextDijadwal.sohibul_bait?.nama ?? '—'}`
+                /* Tanpa titik dua, nama dibedakan lewat tebal — sama dgn hero
+                   Jadwal warga (keputusan user 26 Sep 2026). WA & PDF tetap
+                   memakai titik dua: di teks polos & kertas itulah pemisahnya. */
+                ? <>Sohibul Bait <span className="font-semibold text-white">{nextDijadwal.sohibul_bait?.nama ?? '—'}</span></>
                 : 'Tambahkan tarikan lewat tombol di atas.'}
           </p>
           <HeroStats
