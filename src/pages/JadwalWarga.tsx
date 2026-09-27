@@ -222,9 +222,15 @@ export default function JadwalWargaPage() {
 
   /* Dihitung SEBELUM early-return memuat/galat: `useUmumkanHasil` di bawahnya
      hook, dan hook tak boleh duduk sesudah `return` bersyarat. */
+  /* Sohibul Bait BUKAN "Hadir" (keputusan user 26 Sep 2026) — aturan
+     `ringkasAbsensi` ("SB dikecualikan dari SEMUA hitungan"), sama dgn kartu &
+     sheet detail tarikan di Kas Hadiran dan PDF Daftar Hadir. Ia tetap di
+     daftar "Semua" dgn tag "Sohibul Bait", tapi tak ikut filter & statistik. */
+  const sbId = lastTarikan?.sohibul_bait_id ?? '';
   const filteredWarga = wargaList.filter(w => {
     if (search && !w.nama.toLowerCase().includes(search.toLowerCase())) return false;
     if (wargaFilter === 'semua') return true;
+    if (w.id === sbId) return false;
     const st = absensiMap[w.id];
     if (wargaFilter === 'hadir') return st === 'hadir';
     if (wargaFilter === 'titip') return st === 'titip';
@@ -359,14 +365,15 @@ export default function JadwalWargaPage() {
     );
   }
 
+  const statusPembayar = Object.entries(absensiMap).filter(([id]) => id !== sbId).map(([, v]) => v);
   const hadirCount = lastTarikan
-    ? Object.values(absensiMap).filter(v => v === 'hadir').length
+    ? statusPembayar.filter(v => v === 'hadir').length
     : 0;
   const titipCount = lastTarikan
-    ? Object.values(absensiMap).filter(v => v === 'titip').length
+    ? statusPembayar.filter(v => v === 'titip').length
     : 0;
   const tidakHadirCount = lastTarikan
-    ? Object.values(absensiMap).filter(v => v === 'tidak_hadir').length
+    ? statusPembayar.filter(v => v === 'tidak_hadir').length
     : 0;
   const iuranTerkumpul = lastTarikan?.total_terkumpul ?? 0;
 
@@ -375,6 +382,7 @@ export default function JadwalWargaPage() {
 
   // Stat "Selesai" di sub-tab anggota = hadir + titip + talanganLunas (sudah menyelesaikan kewajiban)
   const selesaiAnggotaCount = wargaList.filter(w => {
+    if (w.id === sbId) return false;
     const statusAbsensi = absensiMap[w.id];
     return statusAbsensi === 'hadir' || statusAbsensi === 'titip' || talanganLunasSet.has(w.id);
   }).length;
@@ -603,8 +611,10 @@ export default function JadwalWargaPage() {
             ) : (
               filteredWarga.map((w, idx) => {
                 const st = absensiMap[w.id];
+                const isSb = w.id === sbId;
                 const ava =
-                  st === 'hadir' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                  isSb ? 'bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300'
+                  : st === 'hadir' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
                   : st === 'titip' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                   : 'bg-rose-50 dark:bg-rose-900/25 text-rose-700 dark:text-rose-400';
                 return (
@@ -642,6 +652,8 @@ export default function JadwalWargaPage() {
                     {/* Badge — hadir / titip (iuran masuk) / tidak hadir */}
                     {!lastTarikan ? (
                       <Tag tone="neutral" className="shrink-0">—</Tag>
+                    ) : isSb ? (
+                      <Tag tone="neutral" className="shrink-0">Sohibul Bait</Tag>
                     ) : st === 'hadir' ? (
                       <Tag tone="success" className="shrink-0"><Check className="w-3 h-3" />Hadir</Tag>
                     ) : st === 'titip' ? (
