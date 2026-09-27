@@ -299,9 +299,13 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               sendiri. Acuan yang sah tepi atas isi baris. */}
                           <div className="flex items-center gap-2 shrink-0">
                             {v.amount != null && v.amount !== 0 && (
-                              <span className={`font-display text-amount font-semibold tabular-nums ${
-                                v.accent === 'rose' ? 'text-neg dark:text-rose-400' : v.accent === 'emerald' ? 'text-pos dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'
-                              }`}>
+                              /* Nominal NETRAL (27 Sep 2026). Warnanya dulu diturunkan dari
+                                 JENIS AKSI (tambah = hijau, hapus = merah), padahal di seluruh
+                                 app hijau/merah berarti ARAH UANG — jadi "Pengeluaran Kas RT
+                                 Rp350.000" yang baru ditambahkan tampil hijau, dan menghapus
+                                 pemasukan tampil merah. Jenis aksi sudah dibawa ubin ikon,
+                                 arah uang sudah dibawa judul ("Pengeluaran…"/"Pemasukan…"). */
+                              <span className="font-display text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
                                 {formatRupiahPlain(v.amount)}
                               </span>
                             )}
