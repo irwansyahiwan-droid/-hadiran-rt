@@ -22,6 +22,7 @@ import Tag from '../components/Tag';
 import SectionTitle from '../components/SectionTitle';
 import { pathTab, klikTautanSpa } from '../lib/tautanTab';
 import type { DashboardSummary, Tarikan } from '../lib/types';
+import MetaPisah from '../components/MetaPisah';
 
 
 interface TrxItem {
@@ -366,9 +367,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             ("Talangan · Tarikan #12") sudah tercetak di baris induk persis di
             atasnya, jadi mengulangnya di 9 baris berturut-turut hanya derau. */}
         {!(hideSub && !showDate) && (
-          <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
-            {[trx.sub, showDate ? formatTanggal(trx.tanggal) : null].filter(Boolean).join(' · ')}
-          </p>
+          <MetaPisah
+            className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1"
+            bagian={[...(trx.sub ? trx.sub.split(' · ') : []), showDate ? formatTanggal(trx.tanggal) : null]}
+          />
         )}
       </div>
       {/* Setoran dulu MERAH di samping ubin biru ↗ — satu baris, dua
@@ -417,9 +419,10 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               dan tetap identitas yang benar untuk sebuah lipatan. */}
           <div className="flex-1 min-w-0">
             <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug potong-lentur">{judul}</p>
-            <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
-              {[jenis, `${run.items.length} ${satuan}`].filter(Boolean).join(' · ')}
-            </p>
+            <MetaPisah
+              className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1"
+              bagian={[...(jenis ? jenis.split(' · ') : []), `${run.items.length} ${satuan}`]}
+            />
           </div>
           <span className={`font-display text-amount font-semibold shrink-0 tabular-nums ${warnaNominal(run.items[0].tipe, run.total)}`}>
             {teksNominal(run.total)}

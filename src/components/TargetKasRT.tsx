@@ -13,6 +13,7 @@ import { formatRupiahPlain, haptic, ikatFrasa, tanggalUtuh } from '../lib/utils'
 import { showToast } from '../lib/toast';
 import { getTargetKasRT, setTargetKasRT, clearTargetKasRT, type TargetKasRT as Target_ } from '../lib/pengaturan';
 import { useKolomNominal } from '../lib/kolomNominal';
+import MetaPisah from './MetaPisah';
 
 /** `saldo` = `null` selama saldo halaman TAK DIKETAHUI (masih memuat tanpa
  *  cache). Dulu kartu ini hanya menjaga fetch-nya SENDIRI: kalau mutasi Kas RT
@@ -108,7 +109,7 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
   const pct = target.nominal > 0 ? Math.min(100, Math.max(0, (saldo / target.nominal) * 100)) : 0;
   const sisa = Math.max(0, target.nominal - saldo);
 
-  let deadline: string | null = null;
+  let deadline: string[] | null = null;
   let deadlineLewat = false;
   if (target.tanggal) {
     const d = new Date(target.tanggal);
@@ -117,7 +118,7 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
     deadlineLewat = hari < 0 && !tercapai;
     /* Tanggal & "N hari lagi" masing-masing satu kesatuan (spasi tak-putus):
        di 320px baris ini dulu patah jadi "…96 hari" + "lagi" sendirian. */
-    deadline = hari >= 0 ? `${tgl} · ${hari}\u00A0hari\u00A0lagi` : `${tgl} · lewat`;
+    deadline = [tgl, hari >= 0 ? `${hari}\u00A0hari\u00A0lagi` : 'lewat'];
   }
 
   return (
@@ -219,7 +220,7 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
             </span>
           </span>
           {deadline && (
-            <span className={`inline-flex items-center gap-1 ${deadlineLewat ? 'text-warn dark:text-amber-400 font-semibold' : ''}`}><CalendarClock className="w-3 h-3" />{deadline}</span>
+            <span className={`inline-flex items-center gap-1 ${deadlineLewat ? 'text-warn dark:text-amber-400 font-semibold' : ''}`}><CalendarClock className="w-3 h-3 shrink-0" /><MetaPisah as="span" bagian={deadline} /></span>
           )}
         </div>
       </div>

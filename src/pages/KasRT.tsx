@@ -40,6 +40,7 @@ import { kategoriOpsi, kategoriDefault, labelKategori, labelKategoriSingkat, KAT
 import type { ReceiptRow } from '../lib/shareReceipt';
 import type { KasRT } from '../lib/types';
 import { useKolomNominal } from '../lib/kolomNominal';
+import MetaPisah from '../components/MetaPisah';
 
 type Tipe = 'masuk' | 'keluar';
 
@@ -1053,9 +1054,10 @@ export default function KasRTPage() {
                         dialek liar (bukan komponen Tag bersama), dan karena
                         tanggal+chip tak muat di kolom 120px ia selalu jatuh ke
                         baris kedua, membuat chip menggantung sendirian. */}
-                    <p className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-1 potong-lentur">
-                      {ikatFrasa([formatTanggalRingkas(k.tanggal), k.kategori && labelKategoriSingkat(k.tipe, k.kategori)].filter(Boolean).join(' · '))}
-                    </p>
+                    <MetaPisah
+                      className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-1"
+                      bagian={[ikatFrasa(formatTanggalRingkas(k.tanggal)), k.kategori ? ikatFrasa(labelKategoriSingkat(k.tipe, k.kategori)) : null]}
+                    />
                   </div>
 
                   {/* Saldo berjalan TURUN ke sheet detail. Ia dulu duduk di sini

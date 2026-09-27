@@ -1321,6 +1321,24 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    (HeroSaldo, PageHeader, Jadwal ×2, JadwalWarga, Beranda), sisanya `<p>`/`<h1>`
    yang memang blok. Kalau nanti ada call-site `<span>` di dalam induk NON-flex,
    ia akan turun ke barisnya sendiri — periksa induknya sebelum menambah. */
+/* ── Baris meta berpemisah "·" — komponen `MetaPisah` ────────────────────
+   Pemisah di DEPAN tiap bagian, baris digeser kiri selebar satu pemisah di
+   dalam wadah `overflow: hidden`: pemisah bagian pertama di TIAP baris
+   (termasuk baris lipatan) terpotong di tepi kiri, jadi titik tak pernah
+   menggantung di ujung maupun di awal baris. Lebar pemisah 0,8em ≈ lebar
+   " · " yang dulu (spasi–titik–spasi). `content: "·" / ""` = teks alternatif
+   kosong: pembaca layar mendengar pemisah `.sr-only` saja, bukan dua kali. */
+.meta-pisah { display: block; overflow: hidden; }
+.meta-pisah > span { display: flex; flex-wrap: wrap; margin-left: -0.8em; }
+.meta-pisah > span > span { min-width: 0; overflow-wrap: anywhere; }
+.meta-pisah > span > span::before {
+  content: "·";
+  content: "·" / "";
+  display: inline-block;
+  width: 0.8em;
+  text-align: center;
+}
+
 .potong-lentur {
   display: -webkit-box;
   -webkit-box-orient: vertical;
