@@ -275,10 +275,12 @@ export default function JadwalWargaPage() {
             melaporkan lompatan yang tak pernah dilihat siapa pun. */}
         <div
           style={{ minHeight: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }}
-          className="relative overflow-hidden rounded-3xl hero-emerald"
+          className="relative flex flex-col overflow-hidden rounded-3xl hero-emerald"
         >
           <div className="hero-sheen pointer-events-none absolute inset-0" />
-          <div className="relative p-6 space-y-3">
+          {/* Pohon SAMA dgn hero asli (flex-col + pembungkus `mt-auto`) — lihat
+              catatan geseran hantu di atas. */}
+          <div className="relative flex flex-1 flex-col gap-3 p-6">
           {/* Tinggi tiap blok = tinggi KOTAK BARIS aslinya (diukur 360px: eyebrow
               20, judul 68, progres 28). Batang skeleton sengaja lebih tipis dari
               huruf, jadi kalau blok pembungkusnya tak dipatok, skeleton berakhir
@@ -290,6 +292,7 @@ export default function JadwalWargaPage() {
               bukan tebakan: 390 persis titik chip berhenti melipat juga, dan
               tinggi hero terukur 253 vs 198 di dua sisi ambang itu. */}
           <div className="skeleton skeleton-hero h-5 w-32 rounded-full" />
+          <div className="mt-auto flex flex-col gap-3">
           <div className="h-[46px] max-[389px]:h-[75px] space-y-2">
             <div className="skeleton skeleton-hero h-4 w-3/4 rounded-full" />
             <div className="skeleton skeleton-hero h-3 w-2/3 rounded-full" />
@@ -303,6 +306,7 @@ export default function JadwalWargaPage() {
               cuma menyisakan aturan yang tak bisa dibuktikan lagi. */}
           <div className="flex gap-2">
             <div className="skeleton skeleton-hero h-[23px] w-[109px] rounded-full" />
+          </div>
           </div>
           </div>
         </div>
@@ -394,17 +398,23 @@ export default function JadwalWargaPage() {
           `tracking-[0.12em]`, clamp ukuran) supaya ini tak jadi dialek ketiga. */}
       {lastTarikan ? (
         <div
-          className="relative overflow-hidden rounded-3xl hero-emerald"
+          className="relative flex flex-col overflow-hidden rounded-3xl hero-emerald"
           style={{ minHeight: HERO_MIN_H, boxShadow: 'var(--hero-shadow)' }}
         >
           <div className="hero-sheen pointer-events-none absolute inset-0" />
-          <div className="relative p-6 space-y-3">
+          {/* Label di puncak, badan menempel ke dasar (`mt-auto`) — aturan hero
+              yang sama dgn `HeroSaldo`. Lantai 190px = settle 320/360px, jadi
+              di 390/430 ada sisa ±23px yang dulu menggenang di bawah pil
+              (terukur atas 31 lawan bawah 52px). `gap-3`, bukan `space-y-3`:
+              margin `space-y` mengalahkan `mt-auto`. */}
+          <div className="relative flex flex-1 flex-col gap-3 p-6">
             <p className="inline-flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
               Tarikan Terakhir
               <InfoTip label="Tarikan" tone="onDark">
                 Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima total iuran anggota.
               </InfoTip>
             </p>
+            <div className="mt-auto flex flex-col gap-3">
             <div>
               <p className="text-white text-subtitle font-bold leading-tight angka-prosa">
                 {/* Tanggal UTUH (nama hari ikut): kalau judul melipat, patahnya
@@ -447,6 +457,7 @@ export default function JadwalWargaPage() {
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/15 text-white text-micro font-bold">
                 <Coins className="w-3 h-3" /> <span className="font-display tabular-nums">{formatRupiahPlain(iuranTerkumpul)}</span>
               </span>
+            </div>
             </div>
           </div>
         </div>

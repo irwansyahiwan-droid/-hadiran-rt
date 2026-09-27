@@ -241,12 +241,17 @@ export default function HeroSaldo({
 }: HeroSaldoProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl hero-emerald ${className}`}
+      className={`relative flex flex-col overflow-hidden rounded-3xl hero-emerald ${className}`}
       style={{ boxShadow: 'var(--hero-shadow)', minHeight }}
     >
       <div className="hero-sheen pointer-events-none absolute inset-0" />
 
-      <div className="relative p-6">
+      {/* Sisa tinggi lantai `minHeight` TIDAK menggenang di bawah baris
+          terakhir: label tetap di puncak, badan (nominal → kaki) menempel ke
+          DASAR (`mt-auto`), jadi bantalan atas & bawah sama — pola kartu bank,
+          sama dgn kartu Beranda. Terukur 26 Sep 2026: Kas Hadiran @360/390
+          atas 38 lawan bawah 63px. Tanpa sisa tinggi, tak ada yang bergeser. */}
+      <div className="relative flex flex-1 flex-col p-6">
         {/* Label & aksi satu baris: label `min-w-0` mengalah, tombol `shrink-0`
             → di 360px tak bisa saling timpa (cacat yang pernah nyata di hero
             Beranda). */}
@@ -328,6 +333,7 @@ export default function HeroSaldo({
             menyusut jadi max-content, dan FitAmount membaca `clientWidth`
             untuk menghitung skalanya — ia akan mengukur kotak yang sudah
             terlanjur mengecil. */}
+        <div className="mt-auto">
         <div className="mt-1 flex items-end gap-x-3 max-[390px]:flex-col max-[390px]:items-stretch max-[390px]:gap-y-2">
           <FitAmount
             measure={measure}
@@ -351,6 +357,7 @@ export default function HeroSaldo({
         {caption && <p className="mt-1 text-caption angka-prosa text-white/90">{caption}</p>}
         {children}
         {stats && stats.length > 0 && <HeroStats items={stats} className="mt-4 pt-5" />}
+        </div>
       </div>
     </div>
   );

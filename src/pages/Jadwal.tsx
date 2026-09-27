@@ -1191,15 +1191,19 @@ export default function JadwalPage() {
           disembunyikan: blok yang muncul dari NOL persis yang diburu
           `audit:lompat`, dan lantai `HERO_MIN_H` menahan sisanya. */}
       <div
-        className="relative overflow-hidden rounded-3xl hero-emerald"
+        className="relative flex flex-col overflow-hidden rounded-3xl hero-emerald"
         style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}
       >
         <div className="hero-sheen pointer-events-none absolute inset-0" />
-        <div className="relative p-6">
+        {/* Label di puncak, badan menempel ke dasar (`mt-auto`) — aturan hero
+            yang sama dgn `HeroSaldo`: sisa lantai tak menggenang di bawah kaki
+            statistik (terukur atas 24 lawan bawah 49px di semua lebar). */}
+        <div className="relative flex flex-1 flex-col p-6">
           <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
             <Calendar className="h-4 w-4 shrink-0 text-white/80" />
             <span className="potong-lentur">{nextDijadwal ? 'Tarikan Berikutnya' : 'Jadwal Tarikan'}</span>
           </p>
+          <div className="mt-auto">
           {/* Dua baris DICADANGKAN di bawah 360px, dan angkanya diukur bukan
               ditebak: judul "Tarikan ke-19 · Min, 6 Sep 2026" muat satu baris di
               390/360 (hero 193/192px) tapi MELIPAT di 320px (214px). Tanpa
@@ -1230,6 +1234,7 @@ export default function JadwalPage() {
               { label: 'Total', value: loading || error ? '—' : tarikanList.length },
             ]}
           />
+          </div>
         </div>
       </div>
 
