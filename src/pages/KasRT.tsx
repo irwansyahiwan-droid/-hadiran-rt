@@ -411,14 +411,18 @@ export default function KasRTPage() {
         { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
         { label: 'Penerimaan', value: '+' + formatRupiahPlain(totalMasuk), kind: 'section', tone: 'pos' },
       ];
+      /* Baris kategori TANPA nada (tinta biasa), warna hanya di judul kelompok
+         — sama dgn rekap kategori in-app (26 Sep 2026). Dulu tiap baris ikut
+         hijau/merah, jadi kartu yang dibagikan ke grup WA terbaca "dinding
+         merah" sementara layar yang sama tenang. Tanda +/− tetap membawa arah. */
       for (const o of KATEGORI_MASUK) {
         const n = rekapKategori.masuk[o.key] ?? 0;
-        if (n > 0) rows.push({ label: o.short, value: '+' + formatRupiahPlain(n), tone: 'pos' });
+        if (n > 0) rows.push({ label: o.short, value: '+' + formatRupiahPlain(n) });
       }
       rows.push({ label: 'Pengeluaran', value: '-' + formatRupiahPlain(totalKeluar), kind: 'section', tone: 'neg' });
       for (const o of KATEGORI_KELUAR) {
         const n = rekapKategori.keluar[o.key] ?? 0;
-        if (n > 0) rows.push({ label: o.short, value: '-' + formatRupiahPlain(n), tone: 'neg' });
+        if (n > 0) rows.push({ label: o.short, value: '-' + formatRupiahPlain(n) });
       }
       rows.push({ label: 'Saldo Bersih', value: fmtSaldo, kind: 'total' });
 

@@ -173,7 +173,9 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
     return {
       title: 'Total Kas RT',
       periodeLabel: `Per ${s.tanggal}`,
-      rentang: s.rentang,
+      /* Kosong: rentang snapshot ("s/d 27 Sep 2026") mengulang tanggal "Per …"
+         persis, jadi subjudul kartu PNG berbunyi tanggal yang sama dua kali. */
+      rentang: '',
       hadiranMasuk: s.hadiranMasuk, hadiranSetor: s.hadiranSetor, hadiranBelumSetor: s.hadiranBelumSetor, hadiranTalangan: s.hadiranTalangan,
       rtSaldoAwal: s.rtSaldoAwal, rtMasuk: s.rtMasuk, rtKeluar: s.rtKeluar, rtSaldoAkhir: s.rtSaldoAkhir,
       tarikanSelesai: s.tarikanSelesai, talanganLunas: s.talanganLunas, jumlahTransaksi: s.jumlahTransaksi,

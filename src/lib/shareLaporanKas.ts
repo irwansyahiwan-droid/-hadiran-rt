@@ -10,7 +10,7 @@ import { formatRupiahPlain } from './utils';
 export interface LaporanKasCard {
   title: string;        // mis. 'Tutup Buku · Posisi Kas'
   periodeLabel: string; // mis. 'Per 10 Juni 2026' / 'Triwulan II 2026'
-  rentang: string;      // mis. 's/d 10 Jun 2026' / 'Apr–Jun 2026'
+  rentang: string;      // mis. 'Apr–Jun 2026'; kosong = tak dicetak (snapshot)
   hadiranMasuk: number;      // "Kas Terkumpul"
   hadiranSetor: number;      // "Setor ke Kas RT" (sudah disetor)
   hadiranBelumSetor: number; // masuk − setor — "Belum Disetor", boleh minus
@@ -242,7 +242,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
 
   ctx.fillStyle = 'rgba(255,255,255,0.62)';
   ctx.font = `500 11.5px ${FONT}`;
-  ctx.fillText(`${d.periodeLabel} · ${d.rentang}`, hx + 20, hy + 162);
+  ctx.fillText(d.rentang ? `${d.periodeLabel} · ${d.rentang}` : d.periodeLabel, hx + 20, hy + 162);
 
   // ── Panel ledger ────────────────────────────────────────────
   function warnaTone(r: PanelRow): string {
