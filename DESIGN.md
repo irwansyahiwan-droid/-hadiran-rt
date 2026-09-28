@@ -15,10 +15,10 @@ colors:
   hero-mid: "#08492B"
   hero-bottom: "#032A17"
   pos: "#05543E"
-  pos-dark: "#34D399"
+  pos-dark: "#41DCA1"
   pos-dark-fill: "#10B981"
   neg: "#941136"
-  neg-dark: "#FDA4AF"
+  neg-dark: "#FFAEB8"
   neg-dark-fill: "#F43F5E"
   btn-danger-top: "#E11D48"
   btn-danger-mid: "#C01340"
@@ -292,14 +292,14 @@ Seluruh skala `gray-*` ikut rona Hutan (`gray-50 #F9FAF9` … `gray-950 #010A04`
 - **Canvas Dark** (#001709) · **Kartu gelap** (#192920, gray-900) · **Sheet gelap** (#26362D, gray-800).
 
 ### Semantik Uang
-- **Positif/Masuk** (`pos` #05543E; gelap #34D399; tanda grafik gelap #10B981).
-- **Negatif/Keluar** (`neg` #941136; gelap #FDA4AF; tanda grafik gelap #F43F5E).
+- **Positif/Masuk** (`pos` #05543E; gelap #41DCA1; tanda grafik gelap #10B981).
+- **Negatif/Keluar** (`neg` #941136; gelap #FFAEB8; tanda grafik gelap #F43F5E).
 - **Perhatian/Tunggakan** (`warn` #75320B; gelap #FBBF24).
 
 Ketiganya diturunkan sampai **≥7:1 (AAA, ambang app)** di permukaan terburuknya, bukan
-di putih. Di mode gelap sebagian besar nominal memakai remap `dark:text-emerald-400` →
-#41DCA1 dan `dark:text-rose-400` → #FFAEB8 (dinaikkan 26 Agu 2026 untuk sheet #26362D);
-token `pos.dark`/`neg.dark` di tailwind masih memegang nilai sebelum kenaikan itu. Cerminnya untuk kertas & berkas (PDF, PNG, Excel) hidup di `warnaCetak.ts`
+di putih. Di mode gelap token `pos.dark`/`neg.dark` SAMA dengan remap
+`dark:text-emerald-400` → #41DCA1 dan `dark:text-rose-400` → #FFAEB8 (dinaikkan 26 Agu
+2026 untuk sheet #26362D; token menyusul 28 Sep) — satu hijau & satu merah gelap. Cerminnya untuk kertas & berkas (PDF, PNG, Excel) hidup di `warnaCetak.ts`
 dan dikunci `warnaCetak.test.ts`.
 
 **The Warna-Adalah-Arah Rule.** Warna uang menyatakan **ARAH**, bukan jenis transaksi:

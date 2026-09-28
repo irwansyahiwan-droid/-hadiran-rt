@@ -265,12 +265,18 @@ export default {
            teks/tautan/ring tetap pakai `dark`. */
         pos: {            // uang masuk / positif  (emerald-800/900) — #047857 cuma 5,48:1 putih / 4,83:1 kanvas; #065F46 masih 6,59 di atas panel .inset-soft; kini 8,96 putih / 7,69 inset-soft
           DEFAULT: '#05543E',
-          dark: '#34D399',  // = emerald-400 yg sudah dipakai `dark:text-emerald-400`; 9,04:1 di kartu gelap
+          /* = remap `dark:text-emerald-400` di index.css (#41DCA1). Dulu #34D399 —
+             nilai emerald-400 SEBELUM remap itu dinaikkan (26 Agu), jadi token ini
+             diam-diam jadi hijau KEDUA: Alur Kas Kas Hadiran #34D399 sementara
+             nominal Beranda/Kas RT #41DCA1 (28 Sep 2026). 8,68 kartu · 7,27 sheet. */
+          dark: '#41DCA1',
           'dark-fill': '#10B981', // tanda grafik mode gelap (emerald-500) — 6,99:1
         },
         neg: {            // uang keluar / negatif (rose-800) — SATU merah: rose-600 gagal AA di rose-50/kanvas, rose-700 #BE123C lolos AA tapi 6,29/5,54; diukur 6,75 di kanvas → turun lagi ke #941136: 8,78 / 7,29
           DEFAULT: '#941136',
-          dark: '#FDA4AF',  // = hasil remap `dark:text-rose-400` di index.css (rose-300); 9,42:1 di kartu gelap
+          /* = remap `dark:text-rose-400` di index.css (#FFAEB8); dulu #FDA4AF, nilai
+             remap SEBELUM 26 Agu — kembaran kasus `pos.dark` di atas. 8,70 kartu · 7,28 sheet. */
+          dark: '#FFAEB8',
           'dark-fill': '#F43F5E', // tanda grafik mode gelap (rose-500) — 4,83:1
         },
         warn: {           // tunggakan / perhatian (amber-900) — amber-700 gagal AA di kanvas/banner, amber-800 #92400E 7,10/6,26; kini 9,07 / 8,00
