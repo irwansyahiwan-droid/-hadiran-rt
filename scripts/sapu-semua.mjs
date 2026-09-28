@@ -209,7 +209,10 @@ const LANTAI = {
   'kontras-deep':   [/TOTAL sampel:\s*(\d+)/, 2386],
   'kontras-nonteks':[/TOTAL\s+(\d+) sampel/, 700],
   mati:             [/(\d+) sampel, \d+ tombol unik/, 140],
-  nama:             [/(\d+) kontrol di \d+ layar/, 500],
+  /* 500 → 455 (28 Sep 2026): putaran 32 membuang tombol "PDF" di tiap kartu Kas
+     Hadiran (21 × 2 peran) & melipat 31 baris "Sudah Lunas" Talangan (+1 tombol
+     lipat) — terukur build lama/baru 550 → 478, selisih PERSIS 42 + 30. */
+  nama:             [/(\d+) kontrol di \d+ layar/, 455],
   /* Populasi = kontrol UNIK (nama ternormalisasi × tema). Garis dasar 272–274;
      lantai ~95%. */
   hover:            [/(\d+) kontrol unik di \d+ layar/, 258],
@@ -233,13 +236,17 @@ const LANTAI = {
   lebar:            [/(\d+) konteks diperiksa/, 112],
   reflow:           [/(\d+) layar diperiksa/, 9],
   gerak:            [/(\d+) tab diperiksa/, 13],
-  sentuh:           [/TARGET SENTUH @360px — (\d+) kontrol/, 390],
+  /* 390 → 365 (28 Sep 2026): putaran 32, build lama/baru 392 → 384. */
+  sentuh:           [/TARGET SENTUH @360px — (\d+) kontrol/, 365],
   sheet:            [/(\d+) permukaan diukur/, 12],
   'sheet-pendek':   [/(\d+) permukaan diukur/, 12],
   /* Populasi = titik fokus UNIK yang dicapai Tab maju/mundur, dua ukuran.
      Ia ikut DATA (Riwayat Aktivitas sendiri 209 titik), jadi lantai ~95% dari
-     garis dasar 2078 — kalau warga/transaksi bertambah, PERBARUI. */
-  'fokus-tertutup': [/(\d+) titik fokus diperiksa/, 1970],
+     garis dasar 2078 — kalau warga/transaksi bertambah, PERBARUI.
+     1970 → 1860 (28 Sep 2026): putaran 32, build lama/baru 2098 → 1954; selisih
+     per layar PERSIS −21 Hadiran warga, −21 Hadiran bendahara, −30 Talangan,
+     × 2 ukuran. (Rantai yang sama sempat membaca 1684 — flake, sendirian 1954.) */
+  'fokus-tertutup': [/(\d+) titik fokus diperiksa/, 1860],
   lompat:           [/(\d+) layar diukur/, 8],
   publik:           [/(\d+) halaman diperiksa/, 7],
   /* Populasi = berkas yang benar-benar diminta di kunjungan pertama.
