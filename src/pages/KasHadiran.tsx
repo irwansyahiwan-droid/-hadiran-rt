@@ -1045,27 +1045,16 @@ export default function KasHadiranPage() {
                           konteks kartu tarikan sudah membawa sisa maknanya; kalimat
                           penuh pindah ke aria-label supaya pembaca layar tak ikut
                           kehilangan) → butuh turun ke 245px: muat, sisa 41px. */}
-                      {/* Pita aksi dirapatkan pt/pb 12px→6px (18 Agu 2026). Diukur di tab WARGA:
-                          pita 341×69px hanya berisi satu tombol 59×44px — 83% kosong,
-                          dan memakan 27% tinggi kartu, sehingga daftar terbaca belum
-                          selesai. Pita ini SENGAJA TIDAK dihapus meski sempat diusulkan:
-                          kosongnya cuma terjadi pada warga. Di bendahara pita yang sama
-                          memuat TIGA tombol (PDF, Batalkan, Hapus), dan `handlePendapatanPDF`
-                          hanya punya SATU call-site — di sini. Layar detail memang punya
-                          tombol PDF, tapi itu PDF absensi, dokumen yang berbeda. Menghapus
-                          pita = menghapus PDF pendapatan sekaligus dua kontrol aksi merusak
-                          milik bendahara; itu regresi fungsi, bukan pemolesan.
-                          Tinggi tombol tetap 44px (§2.5.8) — yang menyusut hanya napasnya. */}
+                      {/* Pita aksi kartu — kini HANYA bendahara (Batalkan + Hapus).
+                          "PDF" pendapatan pindah ke kaki sheet detail tarikan
+                          (28 Sep 2026, keputusan user dari laporan kritik 21 Sep):
+                          di tab warga pita ini dulu cuma berisi SATU tombol "PDF",
+                          jadi daftar berjejer ±20 tombol identik — derau & salah
+                          ketuk. Sheet detail memang sudah memuat kartu "Pendapatan
+                          Sohibul Bait", jadi di sanalah PDF-nya berkumpul. Tinggi
+                          tombol tetap 44px (§2.5.8). */}
+                      {isBendahara && (
                       <div className="flex items-center gap-x-3 px-5 pb-2 pt-2 border-t border-line dark:border-gray-800">
-                        <button
-                          onClick={() => { haptic(); handlePendapatanPDF(t); }}
-                          disabled={pdfLoading === t.id}
-                          aria-label={`Unduh PDF pendapatan tarikan #${t.nomor}`}
-                          className="press flex items-center gap-2 min-h-[44px] -mx-2 px-2 rounded-lg text-caption font-semibold whitespace-nowrap text-brand-link dark:text-brand-linkDark hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors mati-teks"
-                        >
-                          <FileText className={`w-4 h-4 ${pdfLoading === t.id ? 'animate-pulse' : ''}`} />
-                          {pdfLoading === t.id ? 'Memuat…' : 'PDF'}
-                        </button>
                         {isBendahara && (
                           <button
                             onClick={() => { haptic(); handleBatalkanClick(t); }}
@@ -1083,7 +1072,7 @@ export default function KasHadiranPage() {
                                hasil Tarikan #N". Teks terlihat tak berubah, dan
                                nama barunya MEMUAT teks itu → §2.5.3 aman. */
                             aria-label={`Batalkan hasil tarikan #${t.nomor}`}
-                            className="press flex items-center gap-2 min-h-[44px] px-2 rounded-lg text-caption font-semibold whitespace-nowrap transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
+                            className="press flex items-center gap-2 min-h-[44px] -ml-2 px-2 rounded-lg text-caption font-semibold whitespace-nowrap transition-colors mati-teks text-ink-sub dark:text-gray-400 hover:bg-gray-50 hover:text-warn dark:hover:bg-gray-800/60"
                           >
                             <RotateCcw className={`w-4 h-4 ${processingId === t.id ? 'animate-spin' : ''}`} />
                             Batalkan
@@ -1104,6 +1093,7 @@ export default function KasHadiranPage() {
                           </button>
                         )}
                       </div>
+                      )}
                     </div>
                   );
                 })
@@ -1355,17 +1345,32 @@ export default function KasHadiranPage() {
 
             {/* Aksi di KAKI (zona jempol), pola sheet lain (Edit/Hapus Kas RT,
                 Batal/Simpan form). Nama aksesibel tetap "Cetak daftar hadir PDF". */}
-            {isBendahara && !detailLoading && (
-              <div className="shrink-0 border-t border-line dark:border-gray-800 px-5 pt-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}>
+            {/* Kaki sheet = tempat SEMUA PDF tarikan ini (28 Sep 2026): PDF
+                pendapatan dulu tombol "PDF" di tiap kartu daftar (±20 tombol
+                identik); kini di sini, bersebelahan dgn kartu Pendapatan Sohibul
+                Bait yang ia cetak. Bendahara juga mendapat PDF Absensi. */}
+            {!detailLoading && (
+              <div className="shrink-0 border-t border-line dark:border-gray-800 px-5 pt-3 flex gap-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}>
+                {isBendahara && (
+                  <button
+                    onClick={handleAbsensiPDF}
+                    aria-label="Cetak daftar hadir PDF"
+                    /* Ikon → pemintal saat berkas disiapkan; LABELNYA tetap supaya
+                       lebar tombol tak berubah di tengah sheet (`audit:potong`). */
+                    aria-busy={absensiSibuk || undefined}
+                    className="btn-secondary flex-1 py-3 inline-flex items-center justify-center gap-2"
+                  >
+                    {absensiSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Absensi
+                  </button>
+                )}
                 <button
-                  onClick={handleAbsensiPDF}
-                  aria-label="Cetak daftar hadir PDF"
-                  /* Ikon → pemintal saat berkas disiapkan; LABELNYA tetap supaya
-                     lebar tombol tak berubah di tengah sheet (`audit:potong`). */
-                  aria-busy={absensiSibuk || undefined}
-                  className="btn-secondary w-full py-3 inline-flex items-center justify-center gap-2"
+                  onClick={() => { haptic(); handlePendapatanPDF(detailTarikan); }}
+                  disabled={pdfLoading === detailTarikan.id}
+                  aria-label={`Unduh PDF pendapatan tarikan #${detailTarikan.nomor}`}
+                  aria-busy={pdfLoading === detailTarikan.id || undefined}
+                  className="btn-secondary flex-1 py-3 inline-flex items-center justify-center gap-2"
                 >
-                  {absensiSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Absensi
+                  {pdfLoading === detailTarikan.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF Pendapatan
                 </button>
               </div>
             )}
