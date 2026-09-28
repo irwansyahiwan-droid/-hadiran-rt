@@ -51,6 +51,7 @@ import { useDragDismiss } from '../hooks/useDragDismiss';
 import { showToast, showUndo } from '../lib/toast';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
+import MetaPisah from '../components/MetaPisah';
 
 /* Kalimat layar kosong daftar editor Absensi — SATU sumber untuk `EmptyState`
    dan pengumuman pembaca layar `useUmumkanHasil`. Kanon Jadwal warga. */
@@ -1210,7 +1211,7 @@ export default function JadwalPage() {
             {loading || error
               ? '—'
               : nextDijadwal
-                ? <>Tarikan ke-{nextDijadwal.nomor} · <span className="whitespace-nowrap">{formatTanggal(nextDijadwal.tanggal)}</span></>
+                ? <MetaPisah as="span" bagian={[`Tarikan ke-${nextDijadwal.nomor}`, formatTanggal(nextDijadwal.tanggal)]} />
                 : 'Belum ada tarikan terjadwal'}
           </p>
           <p className="mt-1 text-caption angka-prosa text-white/90">

@@ -25,6 +25,7 @@ import ErrorState from '../components/ErrorState';
 import EmptyState from '../components/EmptyState';
 import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
 import SectionTitle from '../components/SectionTitle';
+import MetaPisah from '../components/MetaPisah';
 
 type SubTab = 'anggota' | 'jadwal';
 
@@ -428,7 +429,9 @@ export default function JadwalWargaPage() {
                 {/* Tanggal UTUH (nama hari ikut): kalau judul melipat, patahnya
                     jatuh di " · ", bukan di dalam tanggal — di 360px dulu
                     berbunyi "…Min, 13 Sep" lalu "2026" sendirian. */}
-                Tarikan ke-{lastTarikan.nomor} · <span className="whitespace-nowrap">{formatTanggal(lastTarikan.tanggal)}</span>
+                {/* `MetaPisah`: kalau melipat (360px), "·" tak menggantung di
+                    ujung baris pertama (28 Sep 2026). */}
+                <MetaPisah as="span" bagian={[`Tarikan ke-${lastTarikan.nomor}`, formatTanggal(lastTarikan.tanggal)]} />
               </p>
               {/* TANPA titik dua (26 Sep 2026, kata disetujui user). Dulu
                   "Sohibul Bait ⓘ : Nisan" — titik dua melayang SESUDAH ikon,

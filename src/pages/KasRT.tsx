@@ -669,13 +669,14 @@ export default function KasRTPage() {
             </span>
           ) : undefined}
           caption={saldoAwal > 0 && saldoAwalEntry ? (
-            <>
-              Saldo Awal
-              {' \u00b7 '}
-              {tanggalUtuh(new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }))}
-              {' \u00b7 '}
-              <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}</span>
-            </>
+            <MetaPisah
+              as="span"
+              bagian={[
+                'Saldo Awal',
+                tanggalUtuh(new Date(saldoAwalEntry.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })),
+                <span className="font-display tabular-nums">{maskRp(formatRupiahPlain(saldoAwal), hidden, 4)}</span>,
+              ]}
+            />
           ) : undefined}
           actions={
             <>

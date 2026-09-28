@@ -14,6 +14,7 @@ import { useAksiBerat } from '../lib/hooks';
 import { shareLaporanKas, rpBertanda } from '../lib/shareLaporanKas';
 import type { LaporanKasCard } from '../lib/shareLaporanKas';
 import type { RekapTriwulan, SnapshotKas } from '../lib/laporan';
+import MetaPisah from '../components/MetaPisah';
 
 interface Props {
   open: boolean;
@@ -232,7 +233,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
                 <p className="text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
               <div className="flex flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
-                <p className="text-micro text-white uppercase tracking-wide text-balance">Hadiran · belum disetor</p>
+                <MetaPisah className="text-micro text-white uppercase tracking-wide" bagian={['Hadiran', 'belum disetor']} />
                 <p className="text-caption font-display font-semibold text-white tabular-nums">{rpBertanda(snap.hadiranBelumSetor)}</p>
               </div>
             </div>

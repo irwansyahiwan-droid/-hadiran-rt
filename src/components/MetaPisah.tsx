@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 /**
  * Baris meta berpemisah "·" ("28 Agu · Kas Hadiran", "Talangan · Tarikan #18")
  * yang boleh MELIPAT tanpa titik menggantung.
@@ -22,11 +24,11 @@ export default function MetaPisah({
   className = '',
   as: Tag = 'p',
 }: {
-  bagian: ReadonlyArray<string | null | undefined | false>;
+  bagian: ReadonlyArray<ReactNode>;
   className?: string;
   as?: 'p' | 'span';
 }) {
-  const isi = bagian.filter((b): b is string => typeof b === 'string' && b.trim().length > 0);
+  const isi = bagian.filter((b) => b !== null && b !== undefined && b !== false && !(typeof b === 'string' && b.trim() === ''));
   return (
     <Tag className={`meta-pisah ${className}`}>
       <span>
