@@ -223,7 +223,7 @@ describe('sisiPopover — popover tak pernah keluar layar', () => {
 describe('ikatFrasa — frasa tak terbelah di teks bebas layar', () => {
   const NBSP = '\u00A0';
   it('"Tarikan #N" menempel', () => {
-    expect(ikatFrasa('Talangan lunas — Ahmad Iqbal (Tarikan #20)')).toBe(`Talangan lunas — Ahmad Iqbal (Tarikan${NBSP}#20)`);
+    expect(ikatFrasa('Talangan lunas — Ahmad Iqbal (Tarikan #20)')).toBe(`Talangan lunas${NBSP}— Ahmad Iqbal (Tarikan${NBSP}#20)`);
   });
   it('"Kas RT" menempel, tapi "Kas RTx" tak disentuh', () => {
     expect(ikatFrasa('Ubah pengeluaran Kas RT')).toBe(`Ubah pengeluaran Kas${NBSP}RT`);
@@ -233,6 +233,9 @@ describe('ikatFrasa — frasa tak terbelah di teks bebas layar', () => {
     expect(ikatFrasa('Saldo Kas Hadiran')).toBe(`Saldo Kas${NBSP}Hadiran`);
     expect(ikatFrasa('Setoran kas hadiran Ke Kas RT')).toBe(`Setoran kas${NBSP}hadiran Ke Kas${NBSP}RT`);
     expect(ikatFrasa('Kas Hadirannya')).toBe('Kas Hadirannya');
+  });
+  it('tanda pisah terikat ke kata SEBELUMNYA, tak pernah membuka baris', () => {
+    expect(ikatFrasa('Bendahara terverifikasi — warga tidak bisa')).toBe(`Bendahara terverifikasi${NBSP}— warga tidak bisa`);
   });
   it('tanggal ikut terikat', () => {
     expect(ikatFrasa('Setoran 28 Agu 2026')).toBe(`Setoran 28${NBSP}Agu${NBSP}2026`);

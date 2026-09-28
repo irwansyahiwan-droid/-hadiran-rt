@@ -3,7 +3,7 @@ import OverlayHeader from '../components/layout/OverlayHeader';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
-import { haptic } from '../lib/utils';
+import { haptic, ikatFrasa } from '../lib/utils';
 import AvatarPeci from '../components/AvatarPeci';
 import logoRt from '../assets/logo-rt.svg';
 
@@ -35,7 +35,7 @@ const SUMBER = [
 
 const KEAMANAN = [
   { b: 'Hanya Bendahara yang bisa mengubah data', t: 'penambahan, perubahan & penghapusan dikunci di level database (Supabase RLS) untuk akun Bendahara terverifikasi — warga tidak bisa mengubah apa pun' },
-  { b: 'Warga hanya bisa melihat (read-only)', t: 'mode warga dibuat untuk transparansi: lihat saldo, jadwal & talangan, tanpa akses ubah' },
+  { b: 'Warga hanya bisa melihat (read\u2011only)', t: 'mode warga dibuat untuk transparansi: lihat saldo, jadwal & talangan, tanpa akses ubah' },
   { b: 'Setiap perubahan tercatat', t: 'fitur Riwayat Aktivitas menyimpan jejak siapa mengubah apa & kapan, sehingga setiap tindakan dapat ditelusuri' },
   { b: 'Transparan secara sengaja', t: 'kas RT memang terbuka untuk seluruh warga — keterbukaan ini tujuan, bukan kebocoran' },
 ];
@@ -89,7 +89,7 @@ export default function TentangApp({ open, onClose }: Props) {
               <li key={i.b} className="flex gap-3">
                 <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
-                  <b className="text-gray-900 dark:text-gray-100">{i.b}:</b> {i.t}
+                  <b className="text-gray-900 dark:text-gray-100">{i.b}:</b> {ikatFrasa(i.t)}
                 </p>
               </li>
             ))}
@@ -118,7 +118,7 @@ export default function TentangApp({ open, onClose }: Props) {
               <li key={s.b} className="flex gap-3">
                 <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
-                  <b className="text-gray-900 dark:text-gray-100">{s.b}:</b> {s.t}
+                  <b className="text-gray-900 dark:text-gray-100">{s.b}:</b> {ikatFrasa(s.t)}
                 </p>
               </li>
             ))}
@@ -135,7 +135,7 @@ export default function TentangApp({ open, onClose }: Props) {
               <li key={k.b} className="flex gap-3">
                 <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
-                  <b className="text-gray-900 dark:text-gray-100">{k.b}:</b> {k.t}
+                  <b className="text-gray-900 dark:text-gray-100">{k.b}:</b> {ikatFrasa(k.t)}
                 </p>
               </li>
             ))}

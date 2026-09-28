@@ -129,7 +129,10 @@ export function tanggalUtuh(teks: string): string {
 export function ikatFrasa(teks: string): string {
   return tanggalUtuh(teks)
     .replace(/Tarikan #/g, `Tarikan${NBSP}#`)
-    .replace(/\b(kas) (rt|hadiran)\b/gi, `$1${NBSP}$2`);
+    .replace(/\b(kas) (rt|hadiran)\b/gi, `$1${NBSP}$2`)
+    // Tanda pisah tak pernah MEMBUKA baris (28 Sep 2026: "… terverifikasi" /
+    // "— warga tidak bisa…" di Tentang @320) — ia terikat ke kata sebelumnya.
+    .replace(/ — /g, `${NBSP}— `);
 }
 
 /**
