@@ -18,6 +18,17 @@ import dashboardPhone from '../assets/dashboard-phone.jpg';
 const CARD_H = 300;     // tinggi kartu maksimum (px)
 const TOP = 8;          // offset atas kartu di dalam viewport
 const CARD_GAP = 18;    // sisa tinggi viewport di luar kartu (TOP + napas bawah)
+/* Ruang PUDAR bayangan di bawah kartu aktif. `--hero-shadow` menjangkau
+   18 − 22 + 40 = 36px di bawah kartu, sedangkan viewport (overflow-hidden,
+   dan mask-nya ikut memotong di border-box) cuma menyisakan CARD_GAP − TOP =
+   10px — bayangan kartu TERPENTING di app terpenggal lurus, terukur 28 Sep
+   2026 `BCD3C6 → CFE6D8` dalam 2px selebar kolom. Hero di halaman lain
+   memudar sampai habis; kerangkanya pun (tanpa overflow) memudar, jadi tiap
+   muat bayangannya TERPOTONG begitu data tiba. Viewport diperpanjang ke
+   bawah lalu ditarik balik lewat margin negatif → tinggi BLOK tak berubah
+   (kerangka & `audit:lompat` tetap sah), baris indikator tetap di tempatnya
+   dan tetap di ATAS viewport untuk ketukan (z-10). */
+const NAPAS_BAYANG = 28;
 
 /** Tinggi kartu efektif menurut tinggi viewport. ≥740px → 300 persis (HP modern).
  *  700–739 → skala ~41% tinggi layar. <700 → mode ringkas: kaki stat sudah lepas
@@ -554,7 +565,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
         ref={viewportRef}
         className="relative w-full overflow-hidden"
         style={{
-          height: viewportH, perspective: '1500px', perspectiveOrigin: '50% 42%', touchAction: 'pan-y',
+          height: viewportH + NAPAS_BAYANG, marginBottom: -NAPAS_BAYANG, perspective: '1500px', perspectiveOrigin: `50% ${(viewportH * 0.42).toFixed(1)}px` /* 42% tinggi LAMA — NAPAS_BAYANG tak boleh menggeser kemiringan tetangga */, touchAction: 'pan-y',
           // Fade halus di tepi kiri/kanan → kartu tetangga yang mengintip MELEBUR
           // di tepi layar, bukan terpotong garis keras (teks tak lagi "kepotong").
           //
@@ -774,7 +785,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
       {/* Indikator "story" tersegmen — aktif melebar + bar progress mengisi;
           yang sudah lewat terisi penuh. */}
       {count > 1 && (
-        <div className="flex items-center justify-center pt-0.5">
+        <div className="relative z-10 flex items-center justify-center pt-0.5">
           {/* Dot inaktif 7px + 2×19 = 45px (lolos ambang app 44). Di atas 3
               slide, deretannya jadi terlalu lebar → balik ke 9px & pengecualian
               §2.5.8-nya yang lama (lihat catatan panjang di bawah). */}
