@@ -254,10 +254,25 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                   const isOpen = expanded === row.id;
                   const hasMore = v.changes.length > 0;
                   const hasDetail = v.penjelasan != null || hasMore;
+                  const punyaNominal = v.amount != null && v.amount !== 0;
                   return (
                     <button
                       key={row.id}
                       onClick={() => { if (hasDetail) { haptic(); setExpanded(isOpen ? null : row.id); } }}
+                      /* Nama dirangkai EKSPLISIT (28 Sep 2026): rail nominal kini
+                         mendahului judul di DOM supaya bisa mengapung (lihat di bawah),
+                         dan tanpa ini pembaca layar mendengar "Rp350.000, Ubah
+                         pengeluaran…". Urutan dengar tetap judul → nominal → keterangan
+                         → pencatat, plus isi yang dibuka — isi tombol itu anak
+                         PRESENTASIONAL, jadi yang tak disebut di sini tak terdengar. */
+                      aria-labelledby={[
+                        `riw-${row.id}-judul`,
+                        punyaNominal && `riw-${row.id}-nominal`,
+                        v.detail && `riw-${row.id}-ket`,
+                        `riw-${row.id}-meta`,
+                        isOpen && hasDetail && `riw-${row.id}-isi`,
+                      ].filter(Boolean).join(' ')}
+                      aria-expanded={hasDetail ? isOpen : undefined}
                       style={{ animationDelay: `${Math.min(idx, 8) * 0.03}s` }}
                       className={`rise w-full flex items-start gap-3 px-4 py-4 text-left [--di-l:4.25rem] [--di-r:1rem] ${hasDetail ? 'cursor-pointer active:bg-gray-50 dark:active:bg-gray-800/60' : 'cursor-default'} transition-colors ${idx < grp.items.length - 1 ? 'divide-inset' : ''}`}
                     >
@@ -274,9 +289,20 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                             & isi yang dibuka memakai lebar kolom penuh. Nominal tetap rata
                             KANAN di kolomnya sendiri (kolom uang sejajar antar baris), dan
                             posisinya tetap 0px dari tepi atas isi — catatan chevron
-                            zigzag di bawah tetap berlaku. */}
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="flex-1 min-w-0 text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{ikatFrasa(v.title)}</p>
+                            zigzag di bawah tetap berlaku.
+
+                            Rail kini MENGAPUNG (28 Sep 2026). Sebagai saudara flex ia tetap
+                            memotong SELURUH tinggi judul, jadi di 360px judul cuma kebagian
+                            ±100px: "Ubah / pengeluaran / Kas RT" pecah 3 baris (18 baris
+                            @360, 24 @320 sampai 5 baris). `float-right` membuat judul hanya
+                            mengalah di baris PERTAMA; baris berikutnya memakai lebar penuh →
+                            0 judul >=3 baris di 320/360/390, tepi kanan nominal tak bergeser.
+                            `-mb-2` WAJIB: rail (baris nominal 17px ≈ 22px) lebih tinggi dari
+                            satu baris judul (15px snug ≈ 20,6px), dan tanpa itu baris KEDUA
+                            ikut terjepit di sampingnya — terukur: nol perbaikan di 360px.
+                            Rail harus mendahului judul di DOM (syarat float), maka urutan
+                            dengar dikunci lewat `aria-labelledby` di tombol. */}
+                        <div className="flow-root">
                           {/* Rail KANAN mendatar, bukan `flex-col` (2 Sep 2026). Waktu ia
                               kolom, chevron ditumpuk DI BAWAH nominal — jadi letaknya
                               ditentukan ADA/TIDAKNYA nominal: terukur 0px dari tepi atas
@@ -297,16 +323,16 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               dari titik-TENGAH JUDUL memberi TIGA posisi semu (-2 / +17,8 /
                               +28,1) — judul yang membungkus dua baris menggeser acuannya
                               sendiri. Acuan yang sah tepi atas isi baris. */}
-                          <div className="flex items-center gap-2 shrink-0">
-                            {v.amount != null && v.amount !== 0 && (
+                          <div className="float-right ml-3 -mb-2 flex items-center gap-2">
+                            {punyaNominal && (
                               /* Nominal NETRAL (27 Sep 2026). Warnanya dulu diturunkan dari
                                  JENIS AKSI (tambah = hijau, hapus = merah), padahal di seluruh
                                  app hijau/merah berarti ARAH UANG — jadi "Pengeluaran Kas RT
                                  Rp350.000" yang baru ditambahkan tampil hijau, dan menghapus
                                  pemasukan tampil merah. Jenis aksi sudah dibawa ubin ikon,
                                  arah uang sudah dibawa judul ("Pengeluaran…"/"Pemasukan…"). */
-                              <span className="font-display text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
-                                {formatRupiahPlain(v.amount)}
+                              <span id={`riw-${row.id}-nominal`} className="font-display text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
+                                {formatRupiahPlain(v.amount!)}
                               </span>
                             )}
                             {/* `text-gray-400`, BUKAN `text-gray-300` (2 Sep 2026). Chevron ini
@@ -339,6 +365,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               <ChevronDown data-penanda className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isOpen ? 'rotate-180' : ''}`} />
                             )}
                           </div>
+                          <p id={`riw-${row.id}-judul`} className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{ikatFrasa(v.title)}</p>
                         </div>
                         {/* `ikatFrasa` (26 Sep 2026): 50 dari 81 baris di sini berakhir dgn
                             "#20)" sendirian, lepas dari "(Tarikan". TANPA `text-pretty`: ia
@@ -346,15 +373,15 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                             ("Ahmad / Iqbal (Tarikan #20)"); tanpa itu frasa terikat pindah
                             utuh ke baris sendiri. */}
                         {v.detail && (
-                          <p className="text-caption text-gray-500 dark:text-gray-400 mt-0.5 break-words">{ikatFrasa(v.detail)}</p>
+                          <p id={`riw-${row.id}-ket`} className="text-caption text-gray-500 dark:text-gray-400 mt-0.5 break-words">{ikatFrasa(v.detail)}</p>
                         )}
-                        <p className="text-micro text-ink-faint dark:text-gray-400 mt-1">
+                        <p id={`riw-${row.id}-meta`} className="text-micro text-ink-faint dark:text-gray-400 mt-1">
                           {v.actor} · {formatWaktuRelatif(row.created_at)}
                         </p>
 
                         {/* Expand: penjelasan alur + diff */}
                         {isOpen && hasDetail && (
-                          <div className="reveal mt-2 space-y-2">
+                          <div id={`riw-${row.id}-isi`} className="reveal mt-2 space-y-2">
                             {v.penjelasan && (
                               <div className="flex items-start gap-2 bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 rounded-xl p-3">
                                 <Route className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
