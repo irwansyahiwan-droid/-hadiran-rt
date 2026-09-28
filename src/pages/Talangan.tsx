@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { AlertTriangle, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search, Trash2, MessageCircle, Eye, EyeOff } from 'lucide-react';
 import ClearButton from '../components/ClearButton';
@@ -65,6 +65,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
   const [batalRow, setBatalRow] = useState<Talangan | null>(null);
   const [hapusRow, setHapusRow] = useState<Talangan | null>(null);
   const [search, setSearch] = useState('');
+  // "Sudah Lunas" dilipat di filter Semua (lihat LUNAS_PRATINJAU di bawah).
+  const [lunasTerbuka, setLunasTerbuka] = useState(false);
+  const lunasRef = useRef<HTMLDivElement>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'semua' | 'belum' | 'lunas'>('semua');
   const [talSort, setTalSort] = useState<'tunggakan' | 'nama'>('tunggakan');
@@ -295,8 +298,17 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
 
   const showBelum = statusFilter !== 'lunas';
   const showLunas = statusFilter !== 'belum';
+  /* "Sudah Lunas" DILIPAT di filter Semua tanpa pencarian (28 Sep 2026,
+     keputusan user dari laporan kritik 21 Sep): halaman ini dulu memuntahkan
+     SEMUA baris sekaligus — ±34 warga yang sudah lunas di bawah daftar yang
+     justru perlu ditindaklanjuti. Yang belum lunas tetap tampil penuh.
+     Tak pernah dilipat saat warga MENCARI nama atau memilih chip "Lunas":
+     hasil yang dicari tak boleh tersembunyi di balik tombol. */
+  const LUNAS_PRATINJAU = 3;
+  const lunasDilipat = statusFilter === 'semua' && !search && !lunasTerbuka && lunas.length > LUNAS_PRATINJAU;
+  const lunasTampil = lunasDilipat ? lunas.slice(0, LUNAS_PRATINJAU) : lunas;
   const visibleCount =
-    (showBelum ? berganda.length + single.length : 0) + (showLunas ? lunas.length : 0);
+    (showBelum ? berganda.length + single.length : 0) + (showLunas ? lunasTampil.length : 0);
   /* Kalimat layar kosong SATU sumber: dipakai `EmptyState` DAN dibacakan
      `useUmumkanHasil` — pembaca layar mendengar persis yang tampil. */
   const kosongJudul = search || statusFilter !== 'semua' ? 'Tidak ada hasil' : 'Belum ada talangan';
@@ -704,8 +716,24 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           {showLunas && lunas.length > 0 && (
             <div>
               <SectionTitle className="mt-6" tone="muted" count={lunas.length}>Sudah Lunas</SectionTitle>
-              <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
-                {lunas.map((g, i) => renderGroup(g, true, i))}
+              <div ref={lunasRef} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset">
+                {lunasTampil.map((g, i) => renderGroup(g, true, i))}
+                {lunasDilipat && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      haptic();
+                      setLunasTerbuka(true);
+                      /* Tombol ini lenyap begitu ditekan — fokus dipindah ke baris
+                         PERTAMA yang baru muncul, bukan jatuh ke <body>. */
+                      requestAnimationFrame(() => lunasRef.current?.children[LUNAS_PRATINJAU]?.querySelector<HTMLElement>('button')?.focus());
+                    }}
+                    className="press w-full min-h-[48px] flex items-center justify-center gap-1 text-body font-semibold text-brand-link dark:text-brand-linkDark hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                  >
+                    Tampilkan {lunas.length - LUNAS_PRATINJAU} lainnya
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
           )}
