@@ -432,7 +432,12 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     items.forEach((nama, i) => {
       ctx.fillStyle = CETAK.muted; // nomor — dulu gray-400 (di bawah standar kontras)
       ctx.font = `600 12px ${rupiahFont}`;
-      ctx.fillText(`${i + 1}.`, 40, ly);
+      /* Nomor RATA KANAN di satu tepi (x=58, 6px sebelum nama) — paritas daftar
+         yang sama in-app (`w-5 text-right tabular-nums`, Jadwal). Rata kiri
+         membuat "9." & "10." berakhir di tempat berbeda (29 Sep 2026). */
+      ctx.textAlign = 'right';
+      ctx.fillText(`${i + 1}.`, 58, ly);
+      ctx.textAlign = 'left';
       ctx.fillStyle = CETAK.ink;
       ctx.font = `500 13px ${rupiahFont}`;
       ctx.fillText(fitText(ctx, nama, W - 40 - 64), 64, ly);

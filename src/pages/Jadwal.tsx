@@ -628,7 +628,9 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           { label: 'Hadir', value: `${result.hadirCount} warga` },
           ...(result.titipCount > 0 ? [{ label: 'Titip (iuran masuk)', value: `${result.titipCount} warga` }] : []),
           { label: 'Tidak Hadir', value: `${result.tidakCount} warga` },
-          ...(hasTalangan ? [{ label: 'Talangan Keluar', value: formatRupiahPlain(result.talanganTotal) }] : []),
+          /* `warn` — paritas pita amber "Talangan keluar" di kartu hasil in-app &
+             baris talangan struk Kas Hadiran di grup WA yang sama (29 Sep 2026). */
+          ...(hasTalangan ? [{ label: 'Talangan Keluar', value: formatRupiahPlain(result.talanganTotal), tone: 'warn' as const }] : []),
           { label: 'Sohibul Bait Terima', value: formatRupiahPlain(result.sohibulBaitTerima) },
         ],
         list: result.tidakHadirNama.length
