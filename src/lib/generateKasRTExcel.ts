@@ -3,6 +3,7 @@ import type { KasRT } from './types';
 import { formatTanggal } from './utils';
 import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA } from './excelStyle';
 import { labelKategori } from './kategoriKasRt';
+import { SALDO_AWAL_KETERANGAN } from './laporan';
 
 interface Stats {
   saldo: number;
@@ -71,13 +72,19 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
   ws.autoFilter = { from: { row: 4, column: 1 }, to: { row: 4, column: 7 } };
 
   list.forEach((k, i) => {
+    /* Saldo Awal = saldo PEMBUKA, bukan pemasukan periode ini (29 Sep 2026) —
+       sama dgn Ringkasan, PDF (seksi "SALDO AWAL" sendiri) & app. Dulu ditulis
+       sbg "Masuk · Belum dikategorikan", jadi Σ kolom Masuk (30.155.000) ≠ Total
+       Masuk di sheet Ringkasan (22.021.000). Kini hanya kolom Saldo yang terisi,
+       pola baris pembuka buku kas. */
+    const awal = k.keterangan === SALDO_AWAL_KETERANGAN;
     const r = ws.addRow([
       formatTanggal(k.tanggal, { polos: true }),
-      k.tipe === 'masuk' ? 'Masuk' : 'Keluar',
-      labelKategori(k.tipe, k.kategori),
+      awal ? 'Saldo Awal' : k.tipe === 'masuk' ? 'Masuk' : 'Keluar',
+      awal ? 'Saldo Awal' : labelKategori(k.tipe, k.kategori),
       k.keterangan ?? '',
-      k.tipe === 'masuk' ? k.nominal : null,
-      k.tipe === 'keluar' ? k.nominal : null,
+      !awal && k.tipe === 'masuk' ? k.nominal : null,
+      !awal && k.tipe === 'keluar' ? k.nominal : null,
       k.saldo_setelah,
     ]);
     [5, 6, 7].forEach((ci) => {

@@ -67,7 +67,7 @@ const HADIRAN_SETOR = new Set(['setor_kas_rt']);
 // nyata, jadi menyaring lewat NULL berisiko ikut menelan pemasukan asli yang
 // cuma lupa dikategorikan. Pola & literalnya PERSIS `KasRT.tsx` &
 // `generateKasRTPDF.ts` (sudah lebih dulu benar di sana) — supaya tak drift.
-const SALDO_AWAL_KETERANGAN = 'Saldo Awal Kas RT';
+export const SALDO_AWAL_KETERANGAN = 'Saldo Awal Kas RT';
 
 interface TalanganRow {
   nominal: number | null;

@@ -94,6 +94,23 @@ describe('Excel Kas RT — isi workbook', () => {
     expect(jumlahKolom(mut, H, kolom(mut, H, 'Keluar (Rp)')), 'Σ kolom Keluar ≠ |Total Keluar| di Ringkasan').toBe(-angka(sum, 7, 2));
     expect(mut.rowCount - H, 'jumlah baris mutasi ≠ jumlah transaksi').toBe(LIST.length);
   });
+
+  /* 29 Sep 2026: fixture di atas TAK PERNAH memuat baris "Saldo Awal Kas RT",
+     padahal data nyata memuatnya — dan baris itu dulu ditulis sbg MASUK
+     berkategori "Belum dikategorikan", jadi Σ kolom Masuk (30.155.000) ≠ Total
+     Masuk Ringkasan (22.021.000). Saldo awal = saldo PEMBUKA, bukan pemasukan
+     periode ini (sama dgn Ringkasan, PDF & app). */
+  it('SALDO AWAL: baris pembuka tak ikut kolom Masuk, Mutasi tetap = Ringkasan', () => {
+    const AWAL = 8_000_000;
+    const awal = { ...b(0, 'masuk', AWAL, 'lainnya', 'Saldo Awal Kas RT'), saldo_setelah: AWAL };
+    const wb = buildKasRTExcel([...LIST, awal], { saldo: AWAL + MASUK - KELUAR, totalMasuk: MASUK, totalKeluar: KELUAR, saldoAwal: AWAL }).wb;
+    const sum = wb.getWorksheet('Ringkasan')!, mut = wb.getWorksheet('Mutasi')!;
+    const H = 4;
+    expect(jumlahKolom(mut, H, kolom(mut, H, 'Masuk (Rp)')), 'Σ kolom Masuk ikut menghitung Saldo Awal').toBe(angka(sum, 6, 2));
+    const baris = mut.getRow(mut.rowCount);
+    expect(String(baris.getCell(kolom(mut, H, 'Tipe')).value), 'Saldo Awal tertulis sbg transaksi masuk').toBe('Saldo Awal');
+    expect(angka(mut, mut.rowCount, kolom(mut, H, 'Saldo (Rp)')), 'saldo pembuka hilang dari kolom Saldo').toBe(AWAL);
+  });
 });
 
 describe('Excel Kas Hadiran — isi workbook', () => {
