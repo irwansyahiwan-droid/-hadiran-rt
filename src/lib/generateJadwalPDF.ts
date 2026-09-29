@@ -9,7 +9,7 @@ import {
 import type { Tarikan } from './types';
 
 const STATUS: Record<string, string> = {
-  dijadwalkan: 'Dijadwalkan',
+  dijadwalkan: 'Terjadwal',   // = kata layar & subjudul dokumen ini ("50 terjadwal")
   berlangsung: 'Berlangsung',
   selesai: 'Selesai',
 };
@@ -66,7 +66,8 @@ export function buildJadwalPDF(list: Tarikan[]): { doc: jsPDF; filename: string 
       if (data.column.index === 3) {
         const s = rows[data.row.index]?.[3] ?? '';
         if (s === 'Selesai') { data.cell.styles.textColor = C.pos; data.cell.styles.fontStyle = 'bold'; }
-        else if (s === 'Dijadwalkan') { data.cell.styles.textColor = C.warn; }
+        /* Terjadwal NETRAL (29 Sep 2026): dulu amber, warna yang app sisakan
+           untuk talangan & peringatan — tarikan terjadwal bukan peringatan. */
       }
     },
   });
