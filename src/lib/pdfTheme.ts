@@ -228,6 +228,18 @@ export function drawStatStrip(doc: jsPDF, y: number, stats: Stat[], W: number, M
 /** Tinggi blok label seksi: teks di y+5, hairline di y+7,5, isi mulai di y+SEKSI_H. */
 export const SEKSI_H = 8.5;
 
+/** Teks ber-`charSpace` yang RATA KANAN ke `xKanan`.
+ *
+ *  JANGAN pakai `{ align: 'right', charSpace }` bawaan jsPDF: ia menghitung
+ *  lebar TANPA charSpace, jadi teks bertracking meluber ke kanan sebesar
+ *  charSpace × (n − 1). Terukur dari piksel (29 Sep 2026): judul "RINCIAN
+ *  PENDAPATAN SOHIBUL BAIT" tercetak ±12mm melewati margin, ±1,6mm dari tepi
+ *  kertas. Di sini lebar tracking dihitung sendiri lalu digambar rata kiri. */
+export function teksKananBerspasi(doc: jsPDF, teks: string, xKanan: number, y: number, charSpace: number): void {
+  const lebar = doc.getTextWidth(teks) + charSpace * Math.max(0, teks.length - 1);
+  doc.text(teks, xKanan - lebar, y, { charSpace });
+}
+
 export function sectionLabel(
   doc: jsPDF, y: number, label: string, W: number, M: number,
   extra?: { text: string; tone?: keyof typeof C }, sk: SkalaTeks = RAPAT,

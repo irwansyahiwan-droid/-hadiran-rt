@@ -49,8 +49,8 @@ export function angkaSesudah(t: string[], label: string): number {
 
    Garis, kotak & gambar TIDAK di sini — populasinya `nonTeksPdf` di bawah
    (ditambahkan 5 Sep 2026, menutup batas yang baris ini dulu akui). Lebar
-   dihitung dgn model yang SAMA dgn jsPDF (tanpa charSpace) — lihat catatan di
-   badan fungsi; itu satu-satunya batas yang masih berdiri. */
+   dihitung TERMASUK charSpace (`Tc`) — batas lama "model jsPDF tanpa
+   charSpace" ditutup 29 Sep 2026, lihat catatan di badan fungsi. */
 export interface TeksGeo { hal: number; x: number; y: number; size: number; bold: boolean; teks: string; w: number; kanan: number }
 
 export function geometriPdf(doc: unknown, jsPDFCtor: new (o?: object) => { setFont(f: string, s: string): void; setFontSize(n: number): void; getTextWidth(t: string): number }): { W: number; H: number; runs: TeksGeo[] } {
@@ -84,16 +84,17 @@ export function geometriPdf(doc: unknown, jsPDFCtor: new (o?: object) => { setFo
       const teks = tj[1].replace(/\\([()\\])/g, '$1');
       ukur.setFont('helvetica', bold ? 'bold' : 'normal');
       ukur.setFontSize(size);
-      /* Lebar TANPA menambahkan `Tc`, dan itu bukan kelalaian: jsPDF sendiri
-         tak memperhitungkan charSpace saat menghitung penempatan `align`.
-         Terbukti — "RINCIAN PENDAPATAN SOHIBUL BAIT" (31 huruf, Tc 1,13pt)
-         ditempatkan jsPDF di x=433,8, artinya ia menganggap lebarnya 121,8pt
-         (= tepat batas margin), bukan 155pt. Menambahkan Tc membuat probe
-         melaporkan luber 33pt untuk teks yang menurut model jsPDF pas.
-         BATAS YANG DIAKUI: kalau jsPDF salah dan teks ber-charSpace memang
-         terender lebih lebar, selisih itu TIDAK terlihat di sini. Ia tetap di
-         dalam halaman (tak ada isi yang hilang) — yang termakan cuma margin. */
-      const w = ukur.getTextWidth(teks);
+      /* Lebar INK = lebar glyph + `Tc` (charSpace) × (n − 1). Dulu `Tc`
+         SENGAJA diabaikan dgn alasan "jsPDF sendiri tak memperhitungkannya saat
+         `align`", dan batasnya diakui di sini: kalau jsPDF salah, selisihnya
+         tak terlihat. Render PIKSEL (29 Sep 2026, pdftoppm) membuktikan jsPDF
+         memang SALAH: "RINCIAN PENDAPATAN SOHIBUL BAIT" (31 huruf, Tc 1,13pt)
+         tercetak ±33pt melewati margin kanan, ±1,6mm dari tepi kertas — area
+         yang dipotong kebanyakan printer. Model jsPDF bukan kebenaran; kertas
+         yang tercetak yang benar. */
+      const tc = blok.match(/([-\d.]+)\s+Tc/);
+      const spasi = tc ? parseFloat(tc[1]) * Math.max(0, teks.length - 1) : 0;
+      const w = ukur.getTextWidth(teks) + spasi;
       const x = parseFloat(td[1]);
       runs.push({ hal, x, y: parseFloat(td[2]), size, bold, teks, w, kanan: x + w });
     }

@@ -4,7 +4,7 @@ import autoTable from 'jspdf-autotable';
 import { outputPdf } from './pdfOut';
 import {
   TABLE, drawMasthead, drawStatStrip, drawSummary, drawSignatures, drawFooter, ensureSpace, SIGN_H, C, fmtNum, alignHeadFoot,
-  drawContinuationHeaders, LANJUT_TOP,
+  drawContinuationHeaders, LANJUT_TOP, teksKananBerspasi,
 } from './pdfTheme';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
 
@@ -148,7 +148,7 @@ export function buildPendapatanPDF(
 
   doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
   doc.setTextColor(C.faint[0], C.faint[1], C.faint[2]);
-  doc.text('RINCIAN PENDAPATAN SOHIBUL BAIT', W - M, afterY + 1, { align: 'right', charSpace: 0.4 });
+  teksKananBerspasi(doc, 'RINCIAN PENDAPATAN SOHIBUL BAIT', W - M, afterY + 1, 0.4);
 
   const sumY = drawSummary(doc, afterY + 2, [
     { label: 'Pendapatan Kotor', value: rp(pendapatanKotor), tone: 'pos' },
