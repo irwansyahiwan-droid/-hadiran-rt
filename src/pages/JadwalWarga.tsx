@@ -317,9 +317,18 @@ export default function JadwalWargaPage() {
           </div>
           </div>
         </div>
-        {/* Sub-tab switcher (2 tombol, min-h 44) */}
-        <div className="flex gap-2">
-          {[0, 1].map((i) => <div key={i} className="skeleton flex-1 min-h-[44px] rounded-xl" />)}
+        {/* Sub-tab switcher — cermin SEGMENTED CONTROL asli (30 Sep 2026): satu
+            lintasan putih ber-tepi `control` + `p-1`, dua segmen yang tingginya
+            LAHIR dari satu baris `text-body` + `py-3` (47,25px), bukan `min-h`
+            44. Kerangka lama masih dua pil abu terpisah dari zaman "dua tombol"
+            — 13px lebih pendek, dan seluruh isi di bawahnya (StatRow, cari,
+            chip, daftar) turun 12–16px saat data datang. */}
+        <div className="flex rounded-2xl border border-control dark:border-control-dark bg-white dark:bg-gray-900 p-1">
+          {[0, 1].map((i) => (
+            <div key={i} className="flex-1 min-h-[44px] py-3 text-center text-body">
+              <span className="inline-block h-3.5 w-28 max-w-[80%] align-middle rounded-lg skeleton" />
+            </div>
+          ))}
         </div>
         <div className="space-y-3">
         {/* StatRow 4 kolom — cermin markup StatRow (tight: px-3 py-4) */}

@@ -678,18 +678,32 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
            gap-3, --di-l 3.875rem). Versi lama memakai px-5/w-11/gap-3 →
            begitu data datang, avatar mengecil 8px dan tiap hairline bergeser
            14px ke kiri: daftar "melompat" tepat di detik pertama warga
-           melihatnya. */
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset [--di-l:4rem] [--di-r:1rem]">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 py-4">
-              <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 skeleton rounded-lg w-2/3" />
-                <div className="h-3 skeleton rounded-lg w-1/2" />
+           melihatnya.
+
+           Baris JUDUL SEKSI ikut diwakili (30 Sep 2026): tiap seksi daftar asli
+           (Tunggakan Berganda / Daftar Talangan / Sudah Lunas) dibuka
+           SectionTitle, jadi blok pertama sesudah chip SELALU judul, apa pun
+           datanya. Tanpa wakilnya kartu kerangka duduk di tempat judul dan
+           daftar turun 36px saat data datang (597 → 633 @390px) — tak
+           terlihat `audit:lompat` karena CrossFade menukar dua elemen berbeda.
+           Tingginya lahir dari kotak baris `text-subtitle` + `mb-3`, sama dgn
+           SectionTitle. */
+        <div>
+          <div className="mb-3 text-subtitle">
+            <span className="inline-block h-4 w-44 align-middle rounded-lg skeleton" />
+          </div>
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden list-inset [--di-l:4rem] [--di-r:1rem]">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 py-4">
+                <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 skeleton rounded-lg w-2/3" />
+                  <div className="h-3 skeleton rounded-lg w-1/2" />
+                </div>
+                <div className="h-5 w-20 skeleton rounded-lg shrink-0" />
               </div>
-              <div className="h-5 w-20 skeleton rounded-lg shrink-0" />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}>
         {error ? (
