@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import { amankanPdf } from './pdfTeks';
 import { outputPdf } from './pdfOut';
-import { C, RAPAT, drawMasthead, sectionLabel, drawSignatures, drawFooter, signH, ensureSpace } from './pdfTheme';
+import { C, LANSIA, drawMasthead, sectionLabel, drawSignatures, drawFooter, signH, ensureSpace } from './pdfTheme';
 import type { RekapTriwulan } from './laporan';
 
 function rp(n: number) {
@@ -39,9 +39,22 @@ function rp(n: number) {
    sudah dikerjakan lebih baik di sebelahnya, dgn ongkos pekerjaan yang cuma
    DIA yang punya: dicetak, ditandatangani, diarsipkan. */
 export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filename: string } {
-  const SK = RAPAT;
+  /* LANSIA (29 Sep 2026, keputusan user): dokumen ini dicetak & ditandatangani
+     tiga pengurus — kertas yang dibaca warga, alasan yang sama dgn Laporan Kas
+     RT. Isinya cuma separuh halaman di RAPAT, jadi LANSIA tetap SATU halaman. */
+  const SK = LANSIA;
   const M = 14;            // margin — sama dgn enam laporan lain
-  const ROW = 7;           // tinggi baris data
+  /* Geometri baris DITURUNKAN dari ukuran huruf, bukan dipaku. Dulu 7mm & garis
+     saldo 4,6mm di atas baseline — benar untuk 8/9,5pt, tapi pada 11/13,5pt
+     huruf total tinggal 1,1mm dari garisnya. Rumusnya dikalibrasi supaya RAPAT
+     menghasilkan PERSIS nilai lama (7 · 4,6 · 3) — dibuktikan per piksel. */
+  const PT = 0.3528;       // mm per pt
+  const TINGGI_KAP = 0.718; // tinggi huruf kapital Helvetica, per em
+  const kap = (pt: number) => pt * PT * TINGGI_KAP;
+  /* nilai lama + pertumbuhan huruf terhadap RAPAT (baris 8pt, total 9,5pt) */
+  const ROW = 7 + (SK.ringkasBaris - 8) * PT * 1.24;                // RAPAT 7 · LANSIA 8,3
+  const GARIS_SALDO = 4.6 + kap(SK.ringkasTotal - 9.5);             // RAPAT 4,6 · LANSIA 5,6
+  const BARIS_PERTAMA = 3 + kap(SK.ringkasBaris - 8);               // RAPAT 3 · LANSIA 3,8
   const SEC_GAP = 7;       // jarak antar seksi
 
   // Kas Hadiran: "hasil akhir" yg dilaporkan = sudah/belum disetor SAJA.
@@ -107,12 +120,12 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
   // ── Seksi ─────────────────────────────────────────────────
   for (const s of seksi) {
     y = sectionLabel(doc, y + 4, s.judul, W, M, undefined, SK);
-    y += 3;
+    y += BARIS_PERTAMA;
     s.rows.forEach((b) => {
       if (b.saldo) {
         // rule tegas di atas saldo akhir — gaya tutup buku, bukan blok fill
         draw(C.ink); doc.setLineWidth(0.35);
-        doc.line(M, y - 4.6, W - M, y - 4.6);
+        doc.line(M, y - GARIS_SALDO, W - M, y - GARIS_SALDO);
       }
       doc.setFontSize(b.saldo ? SK.ringkasTotal : SK.ringkasBaris);
       doc.setFont('helvetica', b.saldo ? 'bold' : 'normal');

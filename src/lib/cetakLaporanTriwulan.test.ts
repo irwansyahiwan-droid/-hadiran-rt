@@ -74,4 +74,19 @@ describe('PDF Laporan Triwulan — isi dokumen', () => {
     expect(dengan, 'Saldo Awal hilang padahal nilainya > 0').toContain('Saldo Awal');
     expect(punya(teksPdf(buildLaporanTriwulanPDF({ ...REKAP, rtSaldoAwal: 8_000_000 }).doc), rp(8_000_000))).toBe(true);
   });
+
+  /* Skala LANSIA sejak 29 Sep 2026 (keputusan user): dokumen bertanda tangan
+     tiga pengurus yang dibaca di atas kertas. Dua janji yang dijaga — ukurannya
+     benar-benar naik, dan kenaikan itu TIDAK melempar tanda tangan ke lembar
+     kedua (huruf besar memperbanyak page-break; lihat catatan pdfTheme). */
+  it('SKALA LANSIA: baris ringkasan tercetak 11pt, bukan 8pt RAPAT', () => {
+    const mentah = buildLaporanTriwulanPDF(REKAP).doc.output();
+    expect(mentah, 'baris ringkasan tak lagi 11pt — skala turun ke RAPAT?').toMatch(/\b11 Tf\b/);
+  });
+
+  it('SATU HALAMAN: tanda tangan tak terlempar ke lembar kedua', () => {
+    expect(buildLaporanTriwulanPDF(REKAP).doc.getNumberOfPages()).toBe(1);
+    /* varian terpanjang: baris Saldo Awal ikut tercetak */
+    expect(buildLaporanTriwulanPDF({ ...REKAP, rtSaldoAwal: 8_000_000 }).doc.getNumberOfPages()).toBe(1);
+  });
 });
