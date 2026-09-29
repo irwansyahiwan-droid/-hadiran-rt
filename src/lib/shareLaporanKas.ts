@@ -190,6 +190,19 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   ctx.fillStyle = grad;
   roundRect(ctx, hx, hy, hw, hh, 24);
   ctx.fill();
+  /* Scrim pojok kiri-atas — paritas struk (`shareReceipt.ts`) & `.hero-emerald`
+     in-app (29 Sep 2026). Kartu ini satu-satunya hero tanpa scrim, jadi label &
+     keterangannya duduk di stop gradien TERANG: terukur dari piksel PNG 6,20:1
+     & 5,06:1, sementara struk di grup WA yang sama 8,84 & 7,99 (ambang app 7). */
+  const scrim = ctx.createRadialGradient(hx, hy, 0, hx, hy, 250);
+  scrim.addColorStop(0, CETAK.heroScrim);
+  scrim.addColorStop(0.55, 'rgba(4, 38, 24, 0)');
+  ctx.save();
+  roundRect(ctx, hx, hy, hw, hh, 24);
+  ctx.clip();
+  ctx.fillStyle = scrim;
+  ctx.fillRect(hx, hy, hw, hh);
+  ctx.restore();
 
   // Logo + brand
   try {
@@ -209,9 +222,12 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   ctx.fillText('RT 004 / RW 006', hx + 64, hy + 50);
 
   // Label + saldo besar (auto-shrink agar tak melebihi kartu)
-  ctx.fillStyle = 'rgba(255,255,255,0.72)';
+  // Eyebrow ber-tracking, putih 0,90 — paritas label struk & HeroSaldo in-app.
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
   ctx.font = `700 11px ${FONT}`;
+  try { ctx.letterSpacing = '1.5px'; } catch { /* browser lama: tanpa tracking */ }
   ctx.fillText(d.title.toUpperCase(), hx + 20, hy + 96);
+  try { ctx.letterSpacing = '0px'; } catch { /* noop */ }
 
   const amountStr = rpBertanda(heroAmount);
   let fs = 40;
@@ -240,7 +256,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
     ctx.fillText('DEFISIT', hx + 28, hy + 155);
   }
 
-  ctx.fillStyle = 'rgba(255,255,255,0.62)';
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
   ctx.font = `500 11.5px ${FONT}`;
   ctx.fillText(d.rentang ? `${d.periodeLabel} · ${d.rentang}` : d.periodeLabel, hx + 20, hy + 162);
 

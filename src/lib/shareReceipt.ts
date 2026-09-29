@@ -329,8 +329,13 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
     // total 17): kartu ini dibaca warga (banyak lansia) di grup WA, bukan
     // dipindai bendahara. Warna nilai = token uang app lewat CETAK.
     let ry = y + 12;
+    /* Baris detail SEBELUM kepala kelompok pertama ("Saldo Awal") bukan anak
+       kelompok mana pun, jadi ia duduk di kolom kiri yang sama dgn kepala &
+       total — dulu ikut menjorok 12px dan terbaca seperti rincian yatim (29 Sep 2026). */
+    let sudahBerkelompok = false;
     data.rows.forEach((row, i) => {
       const h = rowH(row);
+      if (row.kind === 'section') sudahBerkelompok = true;
       const cy = ry + h / 2;
 
       if (row.kind === 'section') {
@@ -354,23 +359,28 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
         ctx.font = `700 14px ${rupiahFont}`;
         ctx.fillText(row.value, W - 40, cy);
       } else if (row.kind === 'total') {
+        /* Pita MELEBAR 8px keluar kolom, teks TETAP di kolom (x=40 / W−40) —
+           paritas kartu laporan (`shareLaporanKas.ts`). Dulu teksnya yang masuk
+           ke 44 / W−44, jadi nominal kesimpulan berhenti 4px sebelum kolom uang
+           yang dipakai semua baris di atasnya. */
         ctx.fillStyle = CETAK.posTint;
         roundRect(ctx, 32, ry + 4, W - 64, h - 10, 12);
         ctx.fill();
         ctx.textAlign = 'left';
         ctx.fillStyle = CETAK.pos;
         ctx.font = `700 15px ${rupiahFont}`;
-        ctx.fillText(row.label, 44, cy);
+        ctx.fillText(row.label, 40, cy);
         ctx.textAlign = 'right';
         ctx.fillStyle = row.value.trim().startsWith('-') ? CETAK.neg : CETAK.pos;
         ctx.font = `800 17px ${displayFont}`;
-        ctx.fillText(row.value, W - 44, cy);
+        ctx.fillText(row.value, W - 40, cy);
       } else {
         // Detail kategori — diindent 12px supaya jelas "milik" kelompok di atasnya.
+        const xLabel = sudahBerkelompok ? 52 : 40;
         ctx.textAlign = 'left';
         ctx.fillStyle = CETAK.faint;
         ctx.font = `500 14px ${rupiahFont}`;
-        ctx.fillText(fitText(ctx, row.label, W - 80 - 128), 52, cy);
+        ctx.fillText(fitText(ctx, row.label, W - 156 - xLabel), xLabel, cy); // tepi kanan label tetap W−156
         ctx.textAlign = 'right';
         ctx.fillStyle = warnaTone(row);
         ctx.font = `700 14px ${rupiahFont}`;
