@@ -96,7 +96,7 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
       if (s === 'Hadir') { data.cell.styles.textColor = C.pos; data.cell.styles.fontStyle = 'bold'; }
       else if (s === 'Titip' || s === 'Sohibul Bait') { data.cell.styles.fontStyle = 'bold'; }
       else if (s === 'Talangan Lunas') { data.cell.styles.textColor = C.pos; }
-      else if (s === 'Talangan') { data.cell.styles.textColor = C.neg; data.cell.styles.fontStyle = 'bold'; }
+      else if (s === 'Talangan') { data.cell.styles.textColor = C.warn; data.cell.styles.fontStyle = 'bold'; } // amber = talangan se-app (29 Sep 2026)
     },
   });
 

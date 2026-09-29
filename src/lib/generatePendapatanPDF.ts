@@ -128,16 +128,19 @@ export function buildPendapatanPDF(
           data.cell.styles.textColor = C.pos;
           data.cell.styles.fontStyle = 'bold';
         } else if (status === 'Talangan') {
-          data.cell.styles.textColor = C.neg;
+          /* AMBER, bukan merah (29 Sep 2026): merah = uang KELUAR, sedangkan ini
+             iuran yang DITALANGI kas — amber = talangan di seluruh app (tag
+             "Belum lunas" di sheet yang sama, halaman Talangan, struk WA). */
+          data.cell.styles.textColor = C.warn;
           data.cell.styles.fontStyle = 'bold';
         } else if (status === 'Titip') {
           // Iuran masuk (bukan talangan) — tandai bold, warna default.
           data.cell.styles.fontStyle = 'bold';
         }
       }
-      // Nominal baris talangan ikut merah (belum disetor tunai)
+      // Nominal baris talangan ikut amber (belum disetor tunai)
       if (status === 'Talangan' && data.column.index >= 3) {
-        data.cell.styles.textColor = C.neg;
+        data.cell.styles.textColor = C.warn;
       }
     },
   });
