@@ -1151,10 +1151,23 @@ export default function JadwalPage() {
               {pdfSibuk ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
             </button>
           )}
+          {/* NONAKTIF selama daftar belum termuat (29 Sep 2026). Nomor tarikan baru
+              = nomor terbesar di `tarikanList` + 1, dan `total_warga` = jumlah
+              `wargaList` — saat muat GAGAL (atau kunjungan pertama yang masih
+              memuat) keduanya kosong, jadi formulir menawarkan "Tambah Tarikan #1"
+              dan menyimpan `total_warga: 0` padahal RT sudah punya puluhan
+              tarikan. Tabel `tarikan` tak punya batasan nomor unik, jadi tak ada
+              yang menolaknya. Aturan yang sama dgn FAB Kas RT & Kas Hadiran
+              (`disabled={error}`), plus `loading` karena di sini angkanya
+              diturunkan dari daftar itu sendiri. */}
           {isBendahara && (
             <button
               onClick={() => { haptic(); setCreatingTarikan(true); }}
               aria-label="Tambah jadwal tarikan"
+              disabled={loading || error}
+              /* Kalimat yang sama dgn FAB Kas — hanya saat GAGAL: selagi memuat
+                 tombol "Coba lagi" belum ada di layar. */
+              title={error ? 'Data belum termuat — tekan “Coba lagi” dulu' : undefined}
               className="press flex items-center gap-2 btn-brand text-body min-h-[44px] px-3 py-2 rounded-xl"
             >
               {/* "Tarikan", bukan "Jadwal": toast sesudahnya berbunyi "Tarikan #N
