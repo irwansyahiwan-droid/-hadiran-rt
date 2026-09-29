@@ -484,6 +484,46 @@
     .cta-row { flex-direction: row; max-width: none; justify-content: center; }
     .cta-row .btn { flex: 0 1 220px; }
   }
+
+  /* ─────────── LAYAR LEBAR (29 Sep 2026) ───────────
+     Halaman ini dirancang untuk HP dan di bawah 720px TIDAK berubah satu
+     piksel pun. Di atasnya dua cacat terukur: (1) strip tangkapan layar
+     menyembunyikan scrollbar & mengunci diri ke 560px, jadi tangkapan KETIGA
+     (Kas RT) 0% terlihat di SETIAP lebar sampai 1440px — dan tanpa sentuh,
+     tak ada cara menggesernya selain Shift+roda; (2) isi cuma 39–44% layar
+     laptop, halaman 6–7 layar panjangnya. Tiga HP kini berjajar; di >=960px
+     kolom isi melebar dan tiap bagian memakai ruangnya. */
+  @media (min-width: 720px) {
+    /* `position`+`z-index` WAJIB: di HP `mask-image` diam-diam membuat
+       lapisan sendiri sehingga HP tercat di atas hero; begitu mask dilepas,
+       hero (berposisi) menutup kepala ketiga HP. */
+    .ph-row {
+      position: relative; z-index: 1;
+      max-width: 800px; justify-content: center;
+      overflow: visible; scroll-snap-type: none;
+      -webkit-mask-image: none; mask-image: none;
+    }
+    .ph { flex: 1 1 0; max-width: 240px; }
+    .shots .bn-dots { display: none; }
+  }
+  @media (min-width: 960px) {
+    :root { --maxw: 1000px; }
+    section { padding: 72px 0; }
+    .sec-lead { margin-bottom: 44px; }
+    .flow { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); max-width: 880px; margin: 0 auto; }
+    .flow-top { grid-row: 1 / span 4; padding: 32px; border-bottom: 0; border-right: 1px solid var(--row); align-self: stretch; }
+    .flow-top .fa { font-size: 44px; }
+    .flow .plus { padding: 18px 24px; }
+    .fgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .flead { padding: 28px; }
+    .fcell { padding: 20px; }
+    .roles { grid-template-columns: 1fr 1fr; max-width: 880px; margin: 0 auto; }
+    .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+    .step { flex-direction: column; gap: 14px; }
+    .step:not(:last-child)::before { left: 52px; right: -12px; top: 19.5px; bottom: auto; width: auto; height: 1px; }
+    .faq { max-width: 760px; margin: 0 auto; }
+    .final { max-width: 760px; margin: 0 auto; padding: 56px 40px; }
+  }
 </style>
 </head>
 <body>
@@ -745,6 +785,16 @@
 
   // Dots mengikuti kartu yang paling dekat ke tengah strip (rAF-throttled).
   // Berlaku untuk semua strip [data-snap] yang punya sibling .bn-dots.
+  /* Strip yang tak bisa digeser (layar lebar: tiga HP berjajar) bukan wilayah
+     gulir lagi, jadi ia tak boleh jadi perhentian Tab yang kosong. */
+  document.querySelectorAll('[data-snap]').forEach((row) => {
+    const perhentian = () => {
+      if (row.scrollWidth > row.clientWidth + 1) row.setAttribute('tabindex', '0');
+      else row.removeAttribute('tabindex');
+    };
+    perhentian();
+    addEventListener('resize', perhentian, { passive: true });
+  });
   document.querySelectorAll('[data-snap]').forEach((row) => {
     const wrap = row.parentElement.querySelector('.bn-dots');
     if (!wrap) return;
