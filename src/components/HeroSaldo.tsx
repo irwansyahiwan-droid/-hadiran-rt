@@ -93,12 +93,29 @@ export function HeroStats({ items, className = '' }: { items: HeroStat[]; classN
     return () => ro.disconnect();
   }, [terpanjang]);
 
+  /* TIGA kolom melebar ke bantalan kartu (`-mx-3`), garis atasnya TIDAK.
+     Terukur 29 Sep 2026 di Beranda bendahara: nominal cuma berjarak 3–4px
+     dari garis pemisah di SEMUA lebar 320–430px (kolom 88,7px, teks 81,4px @390)
+     — tiga angka terbaca menempel jadi satu baris padat, dan di 360px hurufnya
+     sudah menyusut ke 10,6px. Masalahnya ruang, bukan huruf: bantalan kartu
+     24px di sisi luar kolom tepi tak dipakai siapa pun. Meminjam 12px tiap
+     sisi memberi +8px per kolom — celah ke pemisah jadi ~7,5px @390 dan huruf
+     360px kembali ke ukuran penuhnya. Garis atas tetap sejajar isi kartu
+     (garis selebar kaki akan keluar dari tepi kiri eyebrow & nominal).
+     `border-transparent` menjaga tinggi 1px-nya: lantai HERO_MIN_H diukur
+     dengan border itu. Dua kolom (Kas RT, Talangan) punya ruang lega → tak
+     disentuh; kalau kaki itu suatu saat jadi tiga kolom, ia ikut sendiri. */
+  const pinjamBantalan = items.length >= 3;
+
   return (
     <div
       ref={rowRef}
-      className={`relative grid border-t border-white/15 ${className}`}
+      className={`relative grid border-t ${pinjamBantalan ? '-mx-3 border-transparent' : 'border-white/15'} ${className}`}
       style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
     >
+      {pinjamBantalan && (
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-3 -top-px h-px bg-white/15" />
+      )}
       {/* Probe pengukur: nilai TERPANJANG pada ukuran maksimum, di luar alur &
           tak terlihat. `aria-hidden` + `visibility:hidden` supaya sapuan
           geometri tak salah menghitungnya sebagai teks yang meluber. */}
