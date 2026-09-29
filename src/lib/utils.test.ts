@@ -183,12 +183,8 @@ describe('tanggalUtuh — tanggal satu kesatuan, nama hari boleh lepas', () => {
   it('teks tanpa tanggal tak disentuh', () => {
     expect(tanggalUtuh('Tarikan ke-21 · Carduki')).toBe('Tarikan ke-21 · Carduki');
   });
-  it('formatTanggal layar TERIKAT, versi berkas POLOS', () => {
-    const layar = formatTanggal('2026-09-26T00:00:00');
-    const berkas = formatTanggal('2026-09-26T00:00:00', { polos: true });
-    expect(layar).toContain(`26${NBSP}Sep${NBSP}2026`);
-    expect(berkas).not.toContain(NBSP);
-    expect(berkas.replace(/ /g, NBSP)).toContain(`26${NBSP}Sep${NBSP}2026`);
+  it('formatTanggal layar TERIKAT', () => {
+    expect(formatTanggal('2026-09-26T00:00:00')).toContain(`26${NBSP}Sep${NBSP}2026`);
   });
 });
 

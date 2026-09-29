@@ -137,18 +137,18 @@ export function ikatFrasa(teks: string): string {
 
 /**
  * Tanggal penuh untuk LAYAR: "Sab, 26 Sep 2026" (tanggal tak terbelah, lihat
- * `tanggalUtuh`). BERKAS (Excel) memakai `{ polos: true }` — sel berisi spasi
- * tak-putus tak ketemu saat bendahara mengetik "26 Sep" di kotak cari Excel.
+ * `tanggalUtuh`). Excel tak lagi memakai teks ini sejak 29 Sep 2026 — selnya
+ * tanggal sungguhan (`selTanggal` di `excelStyle.ts`), jadi opsi `polos`
+ * (teks tanpa spasi tak-putus, khusus sel Excel) dibuang bersama pemakainya.
  */
-export function formatTanggal(dateStr: string, { polos = false }: { polos?: boolean } = {}): string {
+export function formatTanggal(dateStr: string): string {
   const date = new Date(dateStr);
-  const teks = date.toLocaleDateString('id-ID', {
+  return tanggalUtuh(date.toLocaleDateString('id-ID', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-  });
-  return polos ? teks : tanggalUtuh(teks);
+  }));
 }
 
 /**

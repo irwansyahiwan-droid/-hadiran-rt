@@ -1,7 +1,6 @@
 import ExcelJS from 'exceljs';
 import type { Tarikan } from './types';
-import { formatTanggal } from './utils';
-import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA, siapCetak } from './excelStyle';
+import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA, FMT_TANGGAL, selTanggal, siapCetak } from './excelStyle';
 
 interface TalanganInfo { count: number; total: number }
 interface Stats {
@@ -72,7 +71,7 @@ export function buildKasHadiranExcel(
     const info = talanganMap[t.id] ?? { count: 0, total: 0 };
     const r = ws.addRow([
       t.nomor,
-      formatTanggal(t.tanggal, { polos: true }),
+      selTanggal(t.tanggal),
       t.sohibul_bait?.nama ?? '-',
       t.total_hadir,
       t.total_warga,
@@ -81,6 +80,8 @@ export function buildKasHadiranExcel(
       info.count,
       info.total,
     ]);
+    r.getCell(2).numFmt = FMT_TANGGAL;
+    r.getCell(2).alignment = { horizontal: 'left' };
     [6, 7, 9].forEach((ci) => {
       r.getCell(ci).numFmt = CUR;
       r.getCell(ci).alignment = { horizontal: 'right' };

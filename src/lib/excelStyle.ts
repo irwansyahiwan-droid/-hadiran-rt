@@ -87,6 +87,25 @@ export function headerRow(ws: Worksheet, rowIndex: number, headers: string[]): v
 }
 
 /**
+ * TANGGAL SUNGGUHAN, bukan teks (29 Sep 2026). Sel tanggal dulu berisi teks
+ * "Sab, 26 Sep 2026", jadi mengurutkan kolom Tanggal di Excel menyusunnya
+ * menurut NAMA HARI ("Jum…", "Kam…", "Min…") dan filter tak bisa memilih
+ * bulan — padahal lembar ini justru tempat bendahara menyortir & mem-pivot.
+ *
+ * TANPA nama hari (keputusan user): nama hari di sel tanggal ditulis oleh
+ * tabel lokal Excel, bukan oleh app — Excel Mac menulis Minggu "Mgg" sedangkan
+ * app & PDF "Min", dan peramban lembar lain punya tabelnya sendiri. Bulan
+ * lewat `[$-421]` (Indonesia): "Mei", "Agu" — terverifikasi di Excel.
+ * Dibangun di UTC supaya nomor seri Excel-nya bulat (exceljs mengonversi
+ * lewat UTC) — tengah malam WIB akan jatuh ke tanggal kemarin.
+ */
+export const FMT_TANGGAL = '[$-421]d mmm yyyy';
+export function selTanggal(iso: string): Date {
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
+/**
  * SIAP CETAK (29 Sep 2026). Tak satu sheet pun dulu punya `pageSetup`, jadi
  * Excel memakai bawaannya: kertas Letter, skala 100%, kepala tabel tak
  * diulang. Dicetak dari Excel sungguhan, Mutasi Kas RT pecah ke TIGA halaman

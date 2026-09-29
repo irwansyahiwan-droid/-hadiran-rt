@@ -219,11 +219,12 @@ describe('Excel — satuan & arah uang', () => {
 });
 
 /* ── SIAP DIPAKAI DI EXCEL (29 Sep 2026) ───────────────────────────────────
-   Dua cacat yang hanya terlihat begitu berkasnya dibuka/dicetak di Excel
+   Tiga cacat yang hanya terlihat begitu berkasnya dibuka/dicetak di Excel
    sungguhan — nilai selnya selama ini benar, jadi uji isi di atas hijau:
-   (1) tanpa `pageSetup` → Mutasi tercetak 3 halaman MENYAMPING di kertas
+   (1) tanggal berupa TEKS → urut kolom Tanggal menyusun menurut nama hari;
+   (2) tanpa `pageSetup` → Mutasi tercetak 3 halaman MENYAMPING di kertas
        Letter, kolom Saldo sendirian; kepala tabel tak diulang;
-   (2) sel kosong (Masuk/Keluar) tanpa garis & zebra, kepala kolom terpotong. */
+   (3) sel kosong (Masuk/Keluar) tanpa garis & zebra, kepala kolom terpotong. */
 describe('Excel — siap dipakai & dicetak', () => {
   const LIST: KasRT[] = [
     { ...b(1, 'masuk', 900_000, 'hadiran', 'Setoran'), tanggal: '2026-09-27' },
@@ -233,6 +234,24 @@ describe('Excel — siap dipakai & dicetak', () => {
   const rt = buildKasRTExcel(LIST, { saldo: 780_000, totalMasuk: 900_000, totalKeluar: 120_000, saldoAwal: 0 }).wb;
   const hd = buildKasHadiranExcel([tk(1, 3_000_000), tk(2, 3_000_000)], {},
     { totalKasTerkumpul: 6_000_000, totalTalanganBelum: 0, totalSetor: 0, saldo: 6_000_000 }).wb;
+
+  it('TANGGAL disimpan sbg tanggal Excel, urut menurut WAKTU — bukan nama hari', () => {
+    const mut = rt.getWorksheet('Mutasi')!;
+    const sel = [5, 6, 7].map((r) => mut.getCell(r, 1));
+    for (const c of sel) {
+      expect(c.value, 'sel tanggal berupa teks — urut & filter bulan di Excel patah').toBeInstanceOf(Date);
+      expect(c.numFmt, 'format tanggal hilang — Excel menampilkan nomor seri').toMatch(/d mmm yyyy/);
+      /* Nama hari ditulis tabel lokal Excel ("Mgg"), bukan app ("Min") —
+         keputusan user 29 Sep 2026: tanpa nama hari. */
+      expect(c.numFmt, 'nama hari kembali ke sel tanggal').not.toMatch(/ddd/);
+    }
+    /* Tengah malam UTC → nomor seri BULAT; tengah malam WIB akan jatuh ke
+       hari sebelumnya di Excel. */
+    const iso = sel.map((c) => (c.value as Date).toISOString().slice(0, 10));
+    expect(iso).toEqual(['2026-09-27', '2026-08-28', '2026-01-31']);
+    const rek = hd.getWorksheet('Rekap Tarikan')!;
+    expect(rek.getCell(5, kolom(rek, 4, 'Tanggal')).value).toBeInstanceOf(Date);
+  });
 
   it('tiap sheet A4, selebar kertas, tinggi bebas; tabel lebar LANSKAP & kepala diulang', () => {
     const lebar = new Set(['Mutasi', 'Rekap Tarikan']);

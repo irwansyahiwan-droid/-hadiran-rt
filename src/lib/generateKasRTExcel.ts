@@ -1,7 +1,6 @@
 import ExcelJS from 'exceljs';
 import type { KasRT } from './types';
-import { formatTanggal } from './utils';
-import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA, siapCetak } from './excelStyle';
+import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA, FMT_TANGGAL, selTanggal, siapCetak } from './excelStyle';
 import { labelKategori } from './kategoriKasRt';
 import { SALDO_AWAL_KETERANGAN } from './laporan';
 
@@ -84,7 +83,7 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
        pola baris pembuka buku kas. */
     const awal = k.keterangan === SALDO_AWAL_KETERANGAN;
     const r = ws.addRow([
-      formatTanggal(k.tanggal, { polos: true }),
+      selTanggal(k.tanggal),
       awal ? 'Saldo Awal' : k.tipe === 'masuk' ? 'Masuk' : 'Keluar',
       awal ? 'Saldo Awal' : labelKategori(k.tipe, k.kategori),
       k.keterangan ?? '',
@@ -92,6 +91,8 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
       !awal && k.tipe === 'keluar' ? k.nominal : null,
       k.saldo_setelah,
     ]);
+    r.getCell(1).numFmt = FMT_TANGGAL;
+    r.getCell(1).alignment = { horizontal: 'left' };
     [5, 6, 7].forEach((ci) => {
       r.getCell(ci).numFmt = CUR;
       r.getCell(ci).alignment = { horizontal: 'right' };
