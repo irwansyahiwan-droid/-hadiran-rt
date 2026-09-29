@@ -664,15 +664,20 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
         {/* Dua nominal utama bersisian. `flex-col justify-between` + label
             `text-balance`: "PENDAPATAN KOTOR SB" (142px) melipat di 320/360px
             (ruang 111/131px) — tanpa ini "SB" yatim di baris kedua & nominal
-            kolom kanan turun satu baris dari tetangganya (29 Sep 2026). */}
+            kolom kanan turun satu baris dari tetangganya (29 Sep 2026).
+            Katup `max-[359px]:` (bantalan px-3 + nominal text-body): di 320px
+            kolom cuma 111px sedangkan "Rp3.450.000" 112,8px — kedua nominal
+            TERPOTONG jadi "Rp3.450.0…", dan 8 digit (skala 300 KK) 124px.
+            Kartu ini hanya lahir sesudah menulis ke DB, jadi tak pernah
+            terlihat `audit:lebar`. */}
         <div className="grid grid-cols-2 divide-x divide-line dark:divide-gray-800 border-t border-line dark:border-gray-800">
-          <div className="px-4 py-3 min-w-0 flex flex-col justify-between">
+          <div className="px-4 max-[359px]:px-3 py-3 min-w-0 flex flex-col justify-between">
             <p className="text-balance text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Kas Terkumpul</p>
-            <p className="font-display text-amount font-semibold text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
+            <p className="font-display text-amount max-[359px]:text-body font-semibold text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
           </div>
-          <div className="px-4 py-3 min-w-0 flex flex-col justify-between">
+          <div className="px-4 max-[359px]:px-3 py-3 min-w-0 flex flex-col justify-between">
             <p className="text-balance text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Pendapatan Kotor SB</p>
-            <p className="font-display text-amount font-semibold text-pos dark:text-pos-dark tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
+            <p className="font-display text-amount max-[359px]:text-body font-semibold text-pos dark:text-pos-dark tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
           </div>
         </div>
 
