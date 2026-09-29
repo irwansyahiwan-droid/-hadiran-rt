@@ -224,20 +224,31 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
               {`${snap.rtSaldoAkhir < 0 ? '-' : ''}${formatRupiahPlain(snap.rtSaldoAkhir)}`}
             </span>
 
-            <div className="relative grid grid-cols-2 gap-2 mb-4">
+            {/* Dua panel SEBARIS selama nominalnya muat, BERTUMPUK begitu tidak.
+                Dulu `grid-cols-2`: kolom 96px @320px, sedangkan "Rp1.984.200.000"
+                butuh 117,8px — nominal kiri meluber 22px menabrak panel kanan
+                (dan kanan 9px keluar panelnya sendiri), terukur `EKSTREM=1`.
+                Menyusutkan huruf tak cukup: di lantai 11px pun masih ~100px.
+                Mekanismenya: tiap panel `basis-0 grow` (sebaris = dua kolom SAMA
+                lebar, persis seperti grid) + `min-w-max` (tak pernah lebih sempit
+                dari nominalnya), jadi baris baru lahir HANYA saat kedua nominal
+                tak lagi muat berdampingan. Label `w-0 min-w-full` supaya lebar
+                satu-barisnya tak ikut menentukan kapan panel menumpuk; ia tetap
+                melipat di dalam lebar panel seperti dulu. */}
+            <div className="relative flex flex-wrap gap-2 mb-4">
               {/* Panel di ATAS gradient harus RECESSED (black/10), bukan diterangkan
                   (white/10): white/10 menaikkan latar ke #2C8758 → putih SOLID pun cuma
                   4.46:1. black/10 = #136E3E → label white/90 aman di 5.43:1.
                   `flex-col justify-between`: label di puncak, nominal di DASAR —
                   "Hadiran · belum disetor" melipat dua baris dan dulu mendorong
                   nominalnya 14,8px di bawah tetangganya (360 & 390px). */}
-              <div className="flex flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
-                <p className="text-micro text-white uppercase tracking-wide text-balance">Kas RT (final)</p>
-                <p className="text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
+              <div className="flex min-w-max grow basis-0 flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
+                <p className="w-0 min-w-full text-micro text-white uppercase tracking-wide text-balance">Kas RT (final)</p>
+                <p className="whitespace-nowrap text-caption font-display font-semibold text-white tabular-nums">{formatRupiahPlain(snap.rtSaldoAkhir)}</p>
               </div>
-              <div className="flex flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
-                <MetaPisah className="text-micro text-white uppercase tracking-wide" bagian={['Hadiran', 'belum disetor']} />
-                <p className="text-caption font-display font-semibold text-white tabular-nums">{rpBertanda(snap.hadiranBelumSetor)}</p>
+              <div className="flex min-w-max grow basis-0 flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
+                <MetaPisah className="w-0 min-w-full text-micro text-white uppercase tracking-wide" bagian={['Hadiran', 'belum disetor']} />
+                <p className="whitespace-nowrap text-caption font-display font-semibold text-white tabular-nums">{rpBertanda(snap.hadiranBelumSetor)}</p>
               </div>
             </div>
 
