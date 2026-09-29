@@ -67,7 +67,9 @@ describe('PDF Rincian Pendapatan — isi dokumen', () => {
        dan barisnya sendiri sudah dipastikan ada lewat nama di uji pertama. */
     const hadir = pembayar - (titip + lunas + belum);
 
-    expect(berapa('SOHIBUL BAIT'), 'Sohibul Bait harus muncul TEPAT sekali').toBe(1);
+    /* Ejaan = PDF Absensi ("Sohibul Bait", bukan kapital) sejak 29 Sep 2026 —
+       kedua dokumen tarikan kini bersebelahan di sheet detail. */
+    expect(berapa('Sohibul Bait'), 'Sohibul Bait harus muncul TEPAT sekali').toBe(1);
     expect(titip, 'baris Titip di kertas ≠ data').toBe(WARGA.filter((p) => ABSENSI[p.id] === 'titip').length);
     expect(lunas, 'baris Lunas di kertas ≠ data').toBe(WARGA.filter((p) => ABSENSI[p.id] === 'tidak_hadir' && LUNAS.has(p.id)).length);
     expect(belum, 'baris Talangan di kertas ≠ data').toBe(WARGA.filter((p) => ABSENSI[p.id] === 'tidak_hadir' && !LUNAS.has(p.id)).length);

@@ -67,7 +67,7 @@ export function buildPendapatanPDF(
 
   // Row 1: Sohibul Bait
   if (sohibul) {
-    tableRows.push(['1', sohibul.nama, 'SOHIBUL BAIT', DASH, DASH, DASH]);
+    tableRows.push(['1', sohibul.nama, 'Sohibul Bait', DASH, DASH, DASH]); // ejaan = PDF Absensi (29 Sep 2026)
   }
 
   let rowNum = sohibul ? 2 : 1;
@@ -118,9 +118,10 @@ export function buildPendapatanPDF(
       const status = tableRows[data.row.index]?.[2] ?? '';
 
       // Row 0 (Sohibul Bait) — ditebalkan, tanpa blok fill
+      /* Tebal, tinta netral — paritas baris Sohibul Bait di PDF Absensi, dua
+         dokumen yang tombolnya bersebelahan di sheet detail tarikan. */
       if (data.row.index === 0 && sohibul) {
         data.cell.styles.fontStyle = 'bold';
-        if (data.column.index === 2) data.cell.styles.textColor = C.pos;
       }
       // STATUS badge colors
       if (data.column.index === 2) {
