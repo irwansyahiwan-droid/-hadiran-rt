@@ -533,37 +533,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     ));
   };
 
-  const skeleton = (
-      <div className="space-y-8 pb-2">
-        {/* Geometri + anatomi kartu asli, satu sumber di BannerCarousel → tanpa
-            layout jump saat skeleton → konten. (Versi lama: slab polos setinggi
-            bannerViewportHeight saja — kurang 46px krn indikator tak dihitung,
-            dan 44px lebih lebar dari kartu asli, jadi konten melompat & menyempit.) */}
-        <BannerSkeleton vh={vh} vw={vw} />
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-5 py-5">
-          <div className="grid grid-cols-3 divide-x divide-line dark:divide-gray-800">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex flex-col items-center gap-2 px-3">
-                <div className="h-7 w-12 skeleton rounded-lg" />
-                <div className="h-3 w-10 skeleton rounded-lg" />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className={`flex items-center gap-2 px-4 py-4 ${i < 3 ? 'divide-inset' : ''}`}>
-              <div className="w-11 h-11 rounded-xl skeleton shrink-0" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 skeleton rounded-lg w-3/5" />
-                <div className="h-3 skeleton rounded-lg w-2/5" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-
   /* Sapaan.
      Pil status kas ("Perlu Perhatian" / "Sehat") DIBUANG 24 Agu 2026.
      Bukan karena salah, tapi karena ia peringatan KETIGA di satu layar:
@@ -574,7 +543,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
      (rose / crimson / amber) juga membuat warga tak tahu mana yang
      harus dibaca duluan. App yang mahal bicara sekali.
 
-     Satu nilai untuk DUA cabang (29 Sep 2026): saat muat gagal Beranda dulu
+     Satu nilai untuk KETIGA cabang — memuat, gagal, termuat (29 Sep 2026;
+     lihat catatan kerangka di bawah untuk cabang memuat). Saat muat gagal Beranda dulu
      cuma berisi "Gagal memuat data" yang menempel di bawah header (y=85
      @390px), satu-satunya tab tanpa kepala. Sapaan tak bergantung data
      apa pun, jadi tak ada alasan ikut hilang. */
@@ -591,6 +561,67 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
       </div>
   );
+
+  /* Kerangka WAJIB mencermin susunan isi asli, blok demi blok (29 Sep 2026).
+     Terukur sebelum ini, di warga & bendahara, 360 & 390px: kartu saldo di
+     kerangka duduk di y=93 lalu isi aslinya di y=171 — MELOMPAT 78px ke bawah
+     tepat saat data datang, di layar yang paling sering dibuka. Sebabnya
+     kerangka ketinggalan TIGA perubahan isi: sapaan tak pernah ada di sini,
+     StatRow 3 kolom (Anggota/Tarikan/Terjadwal) masih digambar padahal sudah
+     DIBUANG 24 Agu, dan judul seksi "Jadwal Berikutnya" tak punya wakil.
+     `audit:lompat` tak bisa melihatnya: CrossFade menukar DUA elemen berbeda,
+     jadi tak ada satu node pun yang "bergeser" menurut Layout Instability API.
+
+     Sapaan dipakai ASLI (nilai yang sama), bukan tiruannya — ia tak bergantung
+     data, jadi tiruan cuma menambah titik sinkron (preseden `kepalaHalaman`
+     JadwalWarga).
+
+     Banner Talangan DIWAKILI walau bersyarat (`talangan > 0`), karena di RT ini
+     itu keadaan TETAP, bukan kebetulan: tiap tarikan melahirkan talangan baru
+     (tarikan terakhir 13 tidak hadir) dan per 29 Sep ada 21 yang belum lunas.
+     Tanpa wakilnya daftar "Jadwal Berikutnya" turun 102px (70 banner + 32 jarak)
+     saat data datang. Tinggi wakilnya LAHIR dari kotak baris yang sama dgn
+     banner asli (`text-body` + `text-caption mt-0.5`), bukan angka piksel —
+     jadi ikut kalau tangga huruf atau setelan jarak teks berubah. Permukaannya
+     amber seperti tujuannya (paritas permukaan). Kalau suatu hari semua lunas,
+     wakil ini hilang sekali saat data datang — ongkos yang sama dgn yang dibayar
+     setiap hari sebelum ini. */
+  const skeleton = (
+      <div className="space-y-8 pb-2">
+        {sapaan}
+        {/* Geometri + anatomi kartu asli, satu sumber di BannerCarousel → tanpa
+            layout jump saat skeleton → konten. (Versi lama: slab polos setinggi
+            bannerViewportHeight saja — kurang 46px krn indikator tak dihitung,
+            dan 44px lebih lebar dari kartu asli, jadi konten melompat & menyempit.) */}
+        <BannerSkeleton vh={vh} vw={vw} />
+        {/* Wakil banner Talangan — anatomi & kotak baris PERSIS banner asli. */}
+        <div className="flex min-h-[56px] items-center gap-3 rounded-2xl border border-amber-200/60 bg-amber-50/90 px-4 py-3 dark:border-amber-800/40 dark:bg-amber-900/20">
+          <div className="h-5 w-5 shrink-0 rounded-lg skeleton" />
+          <div className="min-w-0 flex-1">
+            <p className="text-body"><span className="inline-block h-3.5 w-40 align-middle rounded-lg skeleton" /></p>
+            <p className="text-caption mt-0.5"><span className="inline-block h-3 w-24 align-middle rounded-lg skeleton" /></p>
+          </div>
+        </div>
+        <div>
+          {/* Baris SectionTitle: tautan "Lihat semua" 44px ber-`-my-1` = 36px, + mb-3. */}
+          <div className="flex h-9 items-center justify-between gap-2 mb-3">
+            <div className="h-5 w-40 skeleton rounded-lg" />
+            <div className="h-4 w-24 skeleton rounded-lg" />
+          </div>
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className={`flex items-center gap-2 px-4 py-4 ${i < 3 ? 'divide-inset' : ''}`}>
+                <div className="w-11 h-11 rounded-xl skeleton shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 skeleton rounded-lg w-3/5" />
+                  <div className="h-3 skeleton rounded-lg w-2/5" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <>

@@ -112,7 +112,13 @@ export function BannerSkeleton({ vh, vw }: { vh: number; vw: number }) {
      praktis tak terlihat; nadanya tetap `.skeleton-bar` seperti semula. */
   const barKanvas = 'rounded-full skeleton-bar';
   return (
-    <div style={{ height: bannerBlockHeight(vh, vw) }}>
+    /* `flow-root` WAJIB (29 Sep 2026): kartu di bawah memakai `marginTop: TOP`,
+       dan tanpa konteks format blok margin itu MERUNTUH keluar pembungkus ini.
+       Selama kerangka ini anak pertama Beranda, runtuhannya tak terlihat; begitu
+       sapaan ikut dirender di atasnya, 8px itu tertelan `space-y-8` (32px) dan
+       kartu kerangka duduk 8px lebih tinggi dari kartu aslinya — terukur 163
+       lawan 171. */
+    <div className="flow-root" style={{ height: bannerBlockHeight(vh, vw) }}>
       <div
         /* Permukaannya = permukaan kartu saldo yang sedang dimuat, bukan slab
            abu. Komponen ini sudah menyamakan SEGALANYA dgn kartu asli —
@@ -164,12 +170,17 @@ export function BannerSkeleton({ vh, vw }: { vh: number; vw: number }) {
           </div>
         )}
       </div>
-      {/* baris indikator story: satu pill aktif + dot sisanya */}
-      {/* mx-[9px] + gap 0 = geometri PERSIS indikator asli (kotak sentuh 24px). */}
+      {/* baris indikator story: satu pill aktif + dot sisanya. Jumlah & ruang
+          samping dari sumber yang SAMA dgn carousel (`PROMOS` + kartu saldo,
+          `padIndikator`) — dulu dipaku 7 titik/9px dan tertinggal saat promo
+          dipangkas. Beranda selalu memasang kartu saldo, jadi +1. */}
       <div className="flex items-center justify-center" style={{ height: INDICATOR_H }}>
-        <span className={`h-1 w-[26px] mx-[9px] ${barKanvas}`} />
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <span key={i} className={`h-1 w-[7px] mx-[9px] ${barKanvas}`} />
+        {Array.from({ length: PROMOS.length + 1 }).map((_, i) => (
+          <span
+            key={i}
+            className={`h-1 ${i === 0 ? 'w-[26px]' : 'w-[7px]'} ${barKanvas}`}
+            style={{ marginInline: padIndikator(PROMOS.length + 1) }}
+          />
         ))}
       </div>
     </div>
@@ -350,8 +361,13 @@ interface Props {
   heroSweep?: boolean;
 }
 
-export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Props) {
-  const promos: PromoSlide[] = [
+/* Di tingkat MODUL (29 Sep 2026), bukan di dalam komponen: `BannerSkeleton`
+   perlu jumlahnya untuk menggambar indikator. Sebelumnya kerangka memaku
+   7 titik (1 pil + 6) berjarak 9px — sisa masa 7 slide — lima minggu sesudah
+   carousel aslinya tinggal 2 titik berjarak 19px. Isinya statis (tak membaca
+   props), jadi memindahkannya tak mengubah apa pun selain siapa yang bisa
+   membacanya. */
+const PROMOS: PromoSlide[] = [
     {
       /* Judul TANPA nominal. "Bersama menuju Rp25 juta" mengulang angka target
          yang aslinya hidup di DB & bisa diubah bendahara lewat widget Target —
@@ -370,8 +386,15 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
        yang SEDANG membuka app itu.
        Yang tersisa satu, dan ia satu-satunya yang membawa keadaan HIDUP
        (progres target kas RT), bukan penjelasan yang tak pernah berubah. */
-  ];
+];
 
+/** Ruang samping tiap tombol indikator — satu aturan untuk carousel & kerangkanya.
+ *  Lihat catatan panjang di tombol indikator: 19px (kotak 45px, lolos 44) selama
+ *  deretannya ringkas, kembali ke 9px di atas 3 slide. */
+const padIndikator = (count: number) => (count <= 3 ? 19 : 9);
+
+export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Props) {
+  const promos = PROMOS;
   const hasHero = heroSlide != null;
   const count = promos.length + (hasHero ? 1 : 0);
   const reduced =
@@ -790,7 +813,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
               slide, deretannya jadi terlalu lebar → balik ke 9px & pengecualian
               §2.5.8-nya yang lama (lihat catatan panjang di bawah). */}
           {Array.from({ length: count }).map((_, i) => {
-            const padX = count <= 3 ? 19 : 9;
+            const padX = padIndikator(count);
             const isActive = i === index;
             const past = i < index;
             return (
