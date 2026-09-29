@@ -157,7 +157,7 @@ export function buildPendapatanPDF(
   const sumY = drawSummary(doc, afterY + 2, [
     { label: 'Pendapatan Kotor', value: rp(pendapatanKotor), tone: 'pos' },
     { label: 'Potongan Admin',   value: `-${rp(potonganAdmin)}`, tone: 'neg' },
-  ], { label: 'Pendapatan Bersih', value: rp(pendapatanBersih) }, W, M);
+  ], { label: 'Diterima Bersih', value: rp(pendapatanBersih) }, W, M); // label = sheet detail (29 Sep 2026)
 
   drawSignatures(doc, ensureSpace(doc, sumY + 14, SIGN_H), W, M, { dateline: `Depok, ${tanggalCetak}` });
 

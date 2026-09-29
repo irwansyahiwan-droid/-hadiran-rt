@@ -64,7 +64,7 @@ export function buildKasHadiranExcel(
   /* `Talangan` (cacah) sengaja TANPA satuan — begitu tetangganya menyebut
      (Rp), kolom tanpa satuan terbaca sbg cacah dgn sendirinya, sama seperti
      `Hadir` & `Total Warga`. */
-  headerRow(ws, 4, ['No', 'Tanggal', 'Sohibul Bait', 'Hadir', 'Total Warga', 'Kas Terkumpul (Rp)', 'Sohibul Terima (Rp)', 'Talangan', 'Talangan (Rp)']);
+  headerRow(ws, 4, ['No', 'Tanggal', 'Sohibul Bait', 'Hadir', 'Total Warga', 'Kas Terkumpul (Rp)', 'Pendapatan Kotor SB (Rp)', 'Talangan', 'Talangan (Rp)']);
 
   tarikan.forEach((t, i) => {
     const info = talanganMap[t.id] ?? { count: 0, total: 0 };

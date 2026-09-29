@@ -1259,7 +1259,7 @@ export default function KasHadiranPage() {
                               69 pembayar × Rp45.000" patah di tengah rumusnya
                               ("… × / Rp45.000") di 390px (26 Sep 2026). */}
                           <span className="min-w-0">
-                            <span className="block text-ink-sub dark:text-gray-400">Kotor</span>
+                            <span className="block text-ink-sub dark:text-gray-400">Pendapatan kotor</span>
                             <span className="block text-caption text-ink-faint dark:text-gray-400">{payingCount} pembayar × <span className="font-display tabular-nums">{formatRupiahPlain(SOHIBUL_PER)}</span></span>
                           </span>
                           <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanKotor), hidden, 4)}</span>
@@ -1269,7 +1269,7 @@ export default function KasHadiranPage() {
                           <span className="font-display font-semibold tabular-nums text-neg dark:text-rose-400 whitespace-nowrap">{maskRp(`-${formatRupiahPlain(POTONGAN_ADMIN)}`, hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3 pt-2 border-t border-line dark:border-gray-800">
-                          <span className="font-bold text-ink dark:text-gray-100">Bersih diterima SB</span>
+                          <span className="font-bold text-ink dark:text-gray-100">Diterima bersih</span>
                           <span className="font-display font-semibold tabular-nums text-pos dark:text-emerald-400 whitespace-nowrap">{maskRp(formatRupiahPlain(pendapatanBersih), hidden, 4)}</span>
                         </div>
                         <div className="flex items-center justify-between gap-3">

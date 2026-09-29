@@ -184,7 +184,7 @@ describe('Excel — satuan & arah uang', () => {
       ['Kas RT/Mutasi', hdr(rt.getWorksheet('Mutasi')!, 4), ['Masuk (Rp)', 'Keluar (Rp)', 'Saldo (Rp)']],
       ['Hadiran/Ringkasan', hdr(hd.getWorksheet('Ringkasan')!, 4), ['Nominal (Rp)']],
       ['Hadiran/Rekap', hdr(hd.getWorksheet('Rekap Tarikan')!, 4),
-        ['Kas Terkumpul (Rp)', 'Sohibul Terima (Rp)', 'Talangan (Rp)']],
+        ['Kas Terkumpul (Rp)', 'Pendapatan Kotor SB (Rp)', 'Talangan (Rp)']],
     ] as const;
     const telanjang: string[] = [];
     for (const [sheet, head, wajib] of uang) {

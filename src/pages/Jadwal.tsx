@@ -631,12 +631,14 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           /* `warn` — paritas pita amber "Talangan keluar" di kartu hasil in-app &
              baris talangan struk Kas Hadiran di grup WA yang sama (29 Sep 2026). */
           ...(hasTalangan ? [{ label: 'Talangan Keluar', value: formatRupiahPlain(result.talanganTotal), tone: 'warn' as const }] : []),
-          { label: 'Sohibul Bait Terima', value: formatRupiahPlain(result.sohibulBaitTerima) },
+          /* "Pendapatan kotor" = hak SB sebelum potongan admin; yang dibawa pulang
+             disebut "Diterima bersih" (sheet detail & PDF) — keputusan user 29 Sep 2026. */
+          { label: 'Pendapatan Kotor Sohibul Bait', value: formatRupiahPlain(result.sohibulBaitTerima) },
         ],
         list: result.tidakHadirNama.length
           ? { heading: `Tidak Hadir (${result.tidakHadirNama.length})`, items: result.tidakHadirNama }
           : undefined,
-        shareText: `Hasil Tarikan #${result.tarikanNomor} RT 004/006\nKas terkumpul: ${formatRupiahPlain(result.kasTotal)} · Sohibul terima: ${formatRupiahPlain(result.sohibulBaitTerima)}\n— Hadiran RT`,
+        shareText: `Hasil Tarikan #${result.tarikanNomor} RT 004/006\nKas terkumpul: ${formatRupiahPlain(result.kasTotal)} · Pendapatan kotor Sohibul Bait: ${formatRupiahPlain(result.sohibulBaitTerima)}\n— Hadiran RT`,
         namaBerkas: `Hasil Tarikan ${result.tarikanNomor}`,
       });
     }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
@@ -659,14 +661,17 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           </button>
         </div>
 
-        {/* Dua nominal utama bersisian */}
+        {/* Dua nominal utama bersisian. `flex-col justify-between` + label
+            `text-balance`: "PENDAPATAN KOTOR SB" (142px) melipat di 320/360px
+            (ruang 111/131px) — tanpa ini "SB" yatim di baris kedua & nominal
+            kolom kanan turun satu baris dari tetangganya (29 Sep 2026). */}
         <div className="grid grid-cols-2 divide-x divide-line dark:divide-gray-800 border-t border-line dark:border-gray-800">
-          <div className="px-4 py-3 min-w-0">
-            <p className="text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Kas Terkumpul</p>
+          <div className="px-4 py-3 min-w-0 flex flex-col justify-between">
+            <p className="text-balance text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Kas Terkumpul</p>
             <p className="font-display text-amount font-semibold text-gray-900 dark:text-gray-100 tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.kasTotal)}</p>
           </div>
-          <div className="px-4 py-3 min-w-0">
-            <p className="text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Sohibul Terima</p>
+          <div className="px-4 py-3 min-w-0 flex flex-col justify-between">
+            <p className="text-balance text-micro font-semibold uppercase tracking-wider text-ink-faint dark:text-gray-400">Pendapatan Kotor SB</p>
             <p className="font-display text-amount font-semibold text-pos dark:text-pos-dark tabular-nums mt-0.5 truncate">{formatRupiahPlain(result.sohibulBaitTerima)}</p>
           </div>
         </div>
@@ -1103,7 +1108,7 @@ export default function JadwalPage() {
         variant="honor"
         duration={2100}
         message={lastResult ? `Tarikan #${lastResult.tarikanNomor} selesai` : 'Iuran tersimpan & dihitung'}
-        submessage={lastResult ? `Sohibul Bait terima ${formatRupiahPlain(lastResult.sohibulBaitTerima)}` : undefined}
+        submessage={lastResult ? `Pendapatan kotor Sohibul Bait ${formatRupiahPlain(lastResult.sohibulBaitTerima)}` : undefined}
         onDone={() => setShowSuccess(false)}
       />
       {lastResult && (

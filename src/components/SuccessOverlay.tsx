@@ -11,7 +11,7 @@ const COLORS_HONOR = ['#E8B651', '#10B981', '#0F6039', '#6EE7B7', '#FFFFFF', '#1
 interface SuccessOverlayProps {
   show: boolean;
   message?: string;
-  /** Baris kedua opsional di bawah pesan utama (mis. "Sohibul Bait terima RpX"). */
+  /** Baris kedua opsional di bawah pesan utama (mis. "Pendapatan kotor Sohibul Bait RpX"). */
   submessage?: string;
   onDone: () => void;
   duration?: number;
