@@ -402,7 +402,7 @@ export default function KasRTPage() {
     // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
     const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
     await jalankanBagi(async () => {
-      const { shareReceipt } = await import('../lib/shareReceipt');
+      const { shareReceipt, tanggalBerkas } = await import('../lib/shareReceipt');
       // Kartu warga dulu hanya memuat TOTAL (masuk/keluar/saldo) → pertanyaan
       // paling sering di grup WA, "uang RT dipakai untuk apa?", tak terjawab;
       // jawabannya cuma ada di PDF A4 yang justru payah dibaca di HP. Kini
@@ -433,6 +433,7 @@ export default function KasRTPage() {
         amount: fmtSaldo,
         rows,
         shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${fmtSaldo}\n— Hadiran RT`,
+        namaBerkas: `Ringkasan Kas RT ${tanggalBerkas()}`,
       });
     }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
   }

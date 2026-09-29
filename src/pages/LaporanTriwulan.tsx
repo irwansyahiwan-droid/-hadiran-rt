@@ -12,6 +12,7 @@ import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat } from '../lib/hooks';
 import { shareLaporanKas, rpBertanda } from '../lib/shareLaporanKas';
+import { tanggalBerkas } from '../lib/shareReceipt';
 import type { LaporanKasCard } from '../lib/shareLaporanKas';
 import type { RekapTriwulan, SnapshotKas } from '../lib/laporan';
 import MetaPisah from '../components/MetaPisah';
@@ -167,6 +168,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       rtSaldoAwal: r.rtSaldoAwal, rtMasuk: r.rtMasuk, rtKeluar: r.rtKeluar, rtSaldoAkhir: r.rtSaldoAkhir,
       tarikanSelesai: r.tarikanSelesai, talanganLunas: r.talanganLunas, jumlahTransaksi: r.jumlahTransaksi,
       shareText: `*Tutup Buku ${r.label}* (${r.rentang})\n*Total Kas RT: ${formatRupiahPlain(r.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(r.hadiranBelumSetor)}\n— Hadiran RT 004/006`,
+      namaBerkas: `Laporan Kas ${r.label}`,
     };
   }
 
@@ -181,6 +183,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       rtSaldoAwal: s.rtSaldoAwal, rtMasuk: s.rtMasuk, rtKeluar: s.rtKeluar, rtSaldoAkhir: s.rtSaldoAkhir,
       tarikanSelesai: s.tarikanSelesai, talanganLunas: s.talanganLunas, jumlahTransaksi: s.jumlahTransaksi,
       shareText: `*Tutup Buku — Kas RT 004/006*\n${s.tanggal}\n*Total Kas RT: ${formatRupiahPlain(s.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(s.hadiranBelumSetor)}\n— Hadiran RT`,
+      namaBerkas: `Tutup Buku ${tanggalBerkas()}`,
     };
   }
 

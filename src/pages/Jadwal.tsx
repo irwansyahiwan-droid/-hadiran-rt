@@ -635,6 +635,7 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
           ? { heading: `Tidak Hadir (${result.tidakHadirNama.length})`, items: result.tidakHadirNama }
           : undefined,
         shareText: `Hasil Tarikan #${result.tarikanNomor} RT 004/006\nKas terkumpul: ${formatRupiahPlain(result.kasTotal)} · Sohibul terima: ${formatRupiahPlain(result.sohibulBaitTerima)}\n— Hadiran RT`,
+        namaBerkas: `Hasil Tarikan ${result.tarikanNomor}`,
       });
     }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
   }

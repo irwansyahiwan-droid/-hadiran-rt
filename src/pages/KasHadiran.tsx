@@ -331,7 +331,7 @@ export default function KasHadiranPage() {
     // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
     const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
     await jalankanBagi(async () => {
-      const { shareReceipt } = await import('../lib/shareReceipt');
+      const { shareReceipt, tanggalBerkas } = await import('../lib/shareReceipt');
       await shareReceipt({
         title: 'Ringkasan Kas Hadiran RT 004 / RW 006',
         amountLabel: 'Saldo Kas Hadiran',
@@ -349,6 +349,7 @@ export default function KasHadiranPage() {
           { label: 'Saldo Bersih', value: fmtSaldo, tone: saldo < 0 ? ('neg' as const) : ('pos' as const) },
         ],
         shareText: `Ringkasan Kas Hadiran RT 004/006\nSaldo: ${fmtSaldo} · ${tarikanSelesai.length} tarikan\n— Hadiran RT`,
+        namaBerkas: `Ringkasan Kas Hadiran ${tanggalBerkas()}`,
       });
     }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
   }

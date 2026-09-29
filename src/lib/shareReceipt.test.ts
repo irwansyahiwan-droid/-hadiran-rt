@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { hitungGeometriStruk, bagikanFileGambar, warnaTone, perluChipDefisit, STRUK, type ReceiptRow } from './shareReceipt';
+import { hitungGeometriStruk, bagikanFileGambar, warnaTone, perluChipDefisit, namaBerkasPng, tanggalBerkas, STRUK, type ReceiptRow } from './shareReceipt';
 import { CETAK } from './warnaCetak';
 
 /**
@@ -162,5 +162,33 @@ describe('perluChipDefisit — satu-satunya penanda saldo minus di kartu', () =>
 
   it('angka yang KEBETULAN memuat minus di tengah bukan defisit', () => {
     expect(perluChipDefisit('Rp1.000-2.000')).toBe(false);
+  });
+});
+
+describe('namaBerkasPng — nama kartu yang disimpan/diunduh warga', () => {
+  /* 29 Sep 2026: tiga struk berbeda sama-sama `hadiran-rt.png`, laporan
+     "sekarang" & tiap triwulan sama-sama `laporan-kas-hadiran-rt.png`. Kelima
+     nama di bawah disetujui user, polanya = berkas PDF/Excel app. */
+  const tgl = tanggalBerkas(new Date(2026, 8, 29));
+  it('tanggal singkat id-ID', () => {
+    expect(tgl).toBe('29 Sep 2026');
+    expect(tanggalBerkas(new Date(2026, 7, 5))).toBe('5 Agu 2026');
+  });
+  it.each([
+    [`Ringkasan Kas RT ${tgl}`, 'Ringkasan-Kas-RT-29-Sep-2026.png'],
+    [`Ringkasan Kas Hadiran ${tgl}`, 'Ringkasan-Kas-Hadiran-29-Sep-2026.png'],
+    ['Hasil Tarikan 21', 'Hasil-Tarikan-21.png'],
+    [`Tutup Buku ${tgl}`, 'Tutup-Buku-29-Sep-2026.png'],
+    ['Laporan Kas Triwulan III 2026', 'Laporan-Kas-Triwulan-III-2026.png'],
+  ])('%s → %s', (teks, nama) => {
+    expect(namaBerkasPng(teks)).toBe(nama);
+  });
+  it('tanda baca & aksen jadi strip tunggal, tak ada strip di ujung', () => {
+    expect(namaBerkasPng('  Hasil Tarikan #21 — RT 004 / RW 006  ')).toBe('Hasil-Tarikan-21-RT-004-RW-006.png');
+    expect(namaBerkasPng('Kas Désa')).toBe('Kas-Desa.png');
+  });
+  it('teks kosong tak menghasilkan ".png" telanjang', () => {
+    expect(namaBerkasPng('')).toBe('Hadiran-RT.png');
+    expect(namaBerkasPng(' — ')).toBe('Hadiran-RT.png');
   });
 });

@@ -30,6 +30,28 @@ export interface ReceiptData {
   rows: ReceiptRow[];
   list?: ReceiptList;   // opsional: daftar nama bernomor (mis. nama tidak hadir)
   shareText: string;    // teks pendamping saat share
+  /** Isi NAMA BERKAS dalam kata biasa, mis. `Ringkasan Kas RT 29 Sep 2026`;
+   *  polanya (Title-Case berstrip + .png) dimiliki `namaBerkasPng`. */
+  namaBerkas: string;
+}
+
+/** Tanggal untuk nama berkas: "29 Sep 2026" (bulan singkat id-ID). */
+export function tanggalBerkas(d: Date = new Date()): string {
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/** Nama berkas PNG — pola yang SAMA dgn berkas PDF & Excel app
+ *  (`Rincian-Pendapatan-Tarikan-21-2026.pdf`). Sampai 29 Sep 2026 tiga struk
+ *  berbeda sama-sama bernama `hadiran-rt.png` dan laporan "sekarang" & tiap
+ *  triwulan sama-sama `laporan-kas-hadiran-rt.png`: di HP yang jatuh ke jalur
+ *  unduh, unduhan kedua jadi "hadiran-rt (1).png" tanpa petunjuk isinya. */
+export function namaBerkasPng(teks: string): string {
+  const inti = teks
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return `${inti || 'Hadiran-RT'}.png`;
 }
 
 /** Geometri kartu struk — MURNI (tanpa canvas/DOM) supaya bisa diuji.
@@ -429,6 +451,6 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   const blob: Blob = await new Promise((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob gagal'))), 'image/png')
   );
-  const file = new File([blob], 'hadiran-rt.png', { type: 'image/png' });
+  const file = new File([blob], namaBerkasPng(data.namaBerkas), { type: 'image/png' });
   await bagikanFileGambar(file, data.shareText);
 }

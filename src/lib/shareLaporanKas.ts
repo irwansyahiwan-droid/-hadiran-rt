@@ -1,5 +1,5 @@
 import { LOGO_DATA_URL } from './logoBase64';
-import { bagikanFileGambar } from './shareReceipt';
+import { bagikanFileGambar, namaBerkasPng } from './shareReceipt';
 import { CETAK } from './warnaCetak';
 import { formatRupiahPlain } from './utils';
 
@@ -23,6 +23,7 @@ export interface LaporanKasCard {
   talanganLunas: number;
   jumlahTransaksi: number;
   shareText: string;    // teks pendamping saat share ke WA
+  namaBerkas: string;   // mis. 'Laporan Kas Triwulan III 2026' → lihat `namaBerkasPng`
 }
 
 /* DUA font, paritas `shareReceipt.ts` (5 Sep 2026).
@@ -333,7 +334,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   const blob: Blob = await new Promise((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob gagal'))), 'image/png'),
   );
-  const file = new File([blob], 'laporan-kas-hadiran-rt.png', { type: 'image/png' });
+  const file = new File([blob], namaBerkasPng(d.namaBerkas), { type: 'image/png' });
   // Satu jalur share utk semua kartu PNG (files-only — lihat bagikanFileGambar).
   await bagikanFileGambar(file, d.shareText);
 }
