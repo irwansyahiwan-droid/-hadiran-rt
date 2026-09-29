@@ -117,4 +117,22 @@ describe('PDF Kas Hadiran — isi dokumen', () => {
     expect(t).toContain('Rp77.000.000');   // ringkasan (pemanggil)
     expect(t).toContain(rp(KAS));          // kaki tabel (generator) — DUA angka, satu halaman
   });
+
+  /* SALDO BERJALAN (29 Sep 2026, keputusan user). Kolom terakhir dulu "NET
+     KAS" = masuk − talangan − setor PER BARIS, dan terbaca sbg saldo: di data
+     nyata baris #21 mencetak "-305.000" merah padahal saldo Kas Hadiran
+     sesudahnya Rp0. Kini kumulatif, dan baris terakhirnya WAJIB = saldo
+     Ringkasan (rumus `hitungSaldoHadiran` yang sama dgn app). */
+  it('SALDO BERJALAN: kolom terakhir kumulatif, baris terakhir = saldo Ringkasan', () => {
+    const t = teksPdf(buildKasHadiranPDF(LIST, TALANGAN, SETOR, konsisten).doc);
+    let jalan = 0;
+    const saldo = LIST.map((x) => (jalan += x.total_terkumpul - ((TALANGAN as Record<string, { total: number }>)[x.id]?.total ?? 0) - ((SETOR as Record<string, number>)[x.id] ?? 0)));
+    expect(saldo[saldo.length - 1], 'fixture: saldo akhir ≠ rumus app').toBe(NET);
+    for (const [i, v] of saldo.entries()) expect(t, `saldo berjalan baris ${i + 1} (${rp(v)}) tak tercetak`).toContain(rp(v));
+    /* Net PER BARIS baris 2 & 3 (1.950.000 · 2.850.000) tak boleh tercetak —
+       itu tanda kolomnya kembali ke net per tarikan. */
+    expect(t, 'net PER BARIS masih tercetak — kolom bukan saldo berjalan').not.toContain(rp(3_450_000 - 1_500_000));
+    expect(t, 'net PER BARIS masih tercetak — kolom bukan saldo berjalan').not.toContain(rp(2_900_000 - 50_000));
+    expect(t, 'kepala kolom').toContain('SALDO (Rp)');
+  });
 });

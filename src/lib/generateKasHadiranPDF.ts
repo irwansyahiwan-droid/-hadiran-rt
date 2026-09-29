@@ -155,11 +155,20 @@ export function buildKasHadiranPDF(
   const totalSetor = Object.values(setorMap).reduce((s, v) => s + v, 0);
   const totalNet  = hitungSaldoHadiran(totalKas, totalTal, totalSetor);
 
+  /* Kolom terakhir = SALDO BERJALAN (29 Sep 2026, keputusan user). Dulu "NET
+     KAS" = masuk − talangan − setor PER BARIS, dan terbaca sbg saldo: di data
+     nyata baris #21 mencetak "-305.000" merah padahal saldo Kas Hadiran
+     sesudahnya Rp0. Kini kumulatif (urut nomor tarikan), jadi baris terakhir
+     = saldo di Ringkasan & di app. Kaki kolom tetap `totalNet` (rumus yang
+     sama, `hitungSaldoHadiran`) — dua jalan hitung, satu angka. */
+  let saldoBerjalan = 0;
+  const saldoBaris: number[] = [];
   const rows = sorted.map((t, i) => {
     const tal = talanganMap[t.id] ?? { count: 0, total: 0 };
     const kasIn = t.total_terkumpul ?? 0;
     const setor = setorMap[t.id] ?? 0;
-    const net   = kasIn - tal.total - setor;
+    saldoBerjalan += kasIn - tal.total - setor;
+    saldoBaris.push(saldoBerjalan);
     return [
       String(i + 1),
       `#${t.nomor} · ${new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}`,
@@ -167,14 +176,14 @@ export function buildKasHadiranPDF(
       fmtNum(kasIn),
       tal.total > 0 ? `-${fmtNum(tal.total)}` : NIHIL,
       setor > 0 ? `-${fmtNum(setor)}` : NIHIL,
-      net < 0 ? `-${fmtNum(Math.abs(net))}` : fmtNum(net),
+      saldoBerjalan < 0 ? `-${fmtNum(Math.abs(saldoBerjalan))}` : fmtNum(saldoBerjalan),
     ];
   });
 
   autoTable(doc, {
     ...TABEL,
     startY: Y + 7,
-    head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'KAS MASUK (Rp)', 'TALANGAN (Rp)', 'SETOR KAS RT (Rp)', 'NET KAS (Rp)']],
+    head: [['NO', 'TARIKAN', 'SOHIBUL BAIT', 'KAS MASUK (Rp)', 'TALANGAN (Rp)', 'SETOR KAS RT (Rp)', 'SALDO (Rp)']],
     body: rows,
     foot: [[
       { content: 'TOTAL', colSpan: 3, styles: { halign: 'right' } },
@@ -209,9 +218,11 @@ export function buildKasHadiranPDF(
       if (data.column.index === 5 && setor > 0) {
         data.cell.styles.fontStyle = 'bold';
       }
+      /* Saldo berjalan NETRAL kecuali MINUS — pola kolom Saldo Excel & app
+         (saldo minus itu keadaan sah, jadi dilaporkan merah, bukan disembunyikan). */
       if (data.column.index === 6) {
-        const net = (row.total_terkumpul ?? 0) - tal.total - setor;
-        data.cell.styles.textColor = net < 0 ? C.neg : C.pos;
+        const saldo = saldoBaris[data.row.index] ?? 0;
+        data.cell.styles.textColor = saldo < 0 ? C.neg : C.ink;
         data.cell.styles.fontStyle = 'bold';
       }
     },
