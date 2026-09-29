@@ -69,6 +69,26 @@ const HADIRAN_SETOR = new Set(['setor_kas_rt']);
 // `generateKasRTPDF.ts` (sudah lebih dulu benar di sana) — supaya tak drift.
 export const SALDO_AWAL_KETERANGAN = 'Saldo Awal Kas RT';
 
+/** Urutan kronologis Kas RT — SATU aturan untuk hitung ulang saldo berjalan,
+ *  daftar Kas RT, PDF & Excel: tanggal → Saldo Awal DULUAN pada tanggalnya →
+ *  `created_at` → `id`.
+ *
+ *  Kenapa Saldo Awal perlu tempat khusus (29 Sep 2026): ia kini bertanggal
+ *  31 Jan 2026 (penutupan Hadiran lama, keputusan user) — SAMA dgn setoran
+ *  "Kas Anggota Hadiran Tgl 31/01/2026". Di produksi kedua baris seed itu
+ *  ber-`created_at` IDENTIK dan `id` setoran lebih kecil, jadi tanpa aturan ini
+ *  saldo berjalan dibuka dgn 936.000, bukan 8.134.000. Pembanding biasa (`<`),
+ *  bukan `localeCompare` — urutan `id` harus sama dgn `ORDER BY id` Postgres. */
+export function urutKasRT<T extends { id: string; tanggal: string; keterangan?: string | null; created_at?: string | null }>(rows: readonly T[]): T[] {
+  const banding = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+  const awal = (r: T) => (r.keterangan === SALDO_AWAL_KETERANGAN ? 0 : 1);
+  return [...rows].sort((a, b) =>
+    banding(a.tanggal, b.tanggal)
+    || awal(a) - awal(b)
+    || banding(a.created_at ?? '', b.created_at ?? '')
+    || banding(a.id, b.id));
+}
+
 interface TalanganRow {
   nominal: number | null;
   status_lunas: boolean;

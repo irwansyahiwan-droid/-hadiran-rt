@@ -40,7 +40,7 @@ vi.mock('./supabase', () => ({
   supabase: { from: (t: string) => builder(t) },
 }));
 
-const { fetchRekapTriwulan, fetchSnapshotKas } = await import('./laporan');
+const { fetchRekapTriwulan, fetchSnapshotKas, urutKasRT } = await import('./laporan');
 
 const ok = (data: unknown): Res => ({ data, error: null });
 const kosong = () => { jawab = {}; };
@@ -315,5 +315,28 @@ describe('hitungSaldoHadiran — sumber tunggal rumus saldo', () => {
   });
   it('talangan yang sudah lunas tidak lagi mengurangi (dilewatkan sbg 0)', () => {
     expect(hitungSaldoHadiran(1_000_000, 0, 0)).toBe(1_000_000);
+  });
+});
+
+/* Saldo Awal Kas RT kini bertanggal 31 Jan 2026 (keputusan user 29 Sep 2026:
+   penutupan Hadiran lama per 31 Jan) — SAMA dgn tanggal setoran "Kas Anggota
+   Hadiran Tgl 31/01/2026". Di produksi kedua baris ber-`created_at` IDENTIK
+   dan `id` setoran lebih kecil, jadi urutan tanggal→created_at→id menaruh
+   setoran DULUAN: saldo berjalan dibuka dgn 936.000, bukan 8.134.000. */
+describe('urutKasRT — Saldo Awal selalu membuka buku', () => {
+  const baris = (id: string, tanggal: string, keterangan: string) => ({ id, tanggal, keterangan, created_at: '2026-06-02T10:47:29.994289+00:00' });
+  it('pada tanggal yang sama, Saldo Awal di depan walau id-nya lebih besar', () => {
+    const hasil = urutKasRT([
+      baris('4e926a88-816b-47ef-9de9-6224d0a615e8', '2026-01-31', 'Seteroan Bang Dedi Kas Anggota Hadiran Tgl 31/01/2026'),
+      baris('9b667bbe-08d8-4dca-8c10-cdb3087746da', '2026-02-04', 'Setoran Acara Syawalan'),
+      baris('9142e5b0-aa34-415d-8780-222f39f0a848', '2026-01-31', 'Saldo Awal Kas RT'),
+    ]);
+    expect(hasil.map((r) => r.keterangan.slice(0, 10))).toEqual(['Saldo Awal', 'Seteroan B', 'Setoran Ac']);
+  });
+  it('selain itu: tanggal, created_at, lalu id — dan tak mengubah array asal', () => {
+    const asal = [baris('b', '2026-03-01', 'x'), baris('a', '2026-03-01', 'y'), baris('c', '2026-02-01', 'z')];
+    const salinan = [...asal];
+    expect(urutKasRT(asal).map((r) => r.id)).toEqual(['c', 'a', 'b']);
+    expect(asal).toEqual(salinan);
   });
 });

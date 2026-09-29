@@ -36,6 +36,7 @@ import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
 import TargetKasRT from '../components/TargetKasRT';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
+import { urutKasRT } from '../lib/laporan';
 import { kategoriOpsi, kategoriDefault, labelKategori, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
 import type { ReceiptRow } from '../lib/shareReceipt';
 import type { KasRT } from '../lib/types';
@@ -335,8 +336,9 @@ export default function KasRTPage() {
       // Supabase tak melempar — tanpa cek ini fetch gagal jadi mutasi kosong
       // palsu + cache tertimpa.
       if (eLoad) throw eLoad;
-      setList((data as KasRT[]) ?? []);
-      setPageCache('kas-rt', (data as KasRT[]) ?? []);
+      const urut = urutKasRT((data as KasRT[]) ?? []); // Saldo Awal membuka buku walau seri tanggal
+      setList(urut);
+      setPageCache('kas-rt', urut);
       tandaiSegar();   // penyegaran berhasil → strip basi hilang
     } catch {
       if (silent) {

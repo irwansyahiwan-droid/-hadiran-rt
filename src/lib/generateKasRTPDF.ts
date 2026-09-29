@@ -8,6 +8,7 @@ import {
 } from './pdfTheme';
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
+import { urutKasRT } from './laporan';
 
 interface KasRTStats {
   saldo: number;
@@ -71,7 +72,7 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
   const docCode  = `KASRT-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const sorted = [...list].sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime());
+  const sorted = urutKasRT(list); // satu aturan urut Kas RT (Saldo Awal membuka buku)
   const fmtLong = (d: string) =>
     new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
   const periode = sorted.length

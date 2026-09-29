@@ -1,11 +1,15 @@
 import { supabase } from './supabase';
 import { wajibBerubah } from './tulisAman';
+import { urutKasRT } from './laporan';
 
 interface Row {
   id: string;
   tipe: 'masuk' | 'keluar';
   nominal: number;
   saldo_setelah: number;
+  tanggal: string;
+  keterangan: string | null;
+  created_at: string | null;
 }
 
 /**
@@ -16,7 +20,7 @@ interface Row {
 export async function recomputeKasRTSaldo(): Promise<void> {
   const { data, error } = await supabase
     .from('kas_rt')
-    .select('id, tipe, nominal, saldo_setelah')
+    .select('id, tipe, nominal, saldo_setelah, tanggal, keterangan, created_at')
     .order('tanggal', { ascending: true })
     .order('created_at', { ascending: true })
     /* Pemecah SERI wajib, dan `id` dipilih karena selalu ada & unik.
@@ -40,7 +44,8 @@ export async function recomputeKasRTSaldo(): Promise<void> {
   if (error) throw error;
 
   let running = 0;
-  for (const row of (data ?? []) as Row[]) {
+  /* Urutan akhir dari `urutKasRT` (Saldo Awal membuka buku walau seri tanggal). */
+  for (const row of urutKasRT((data ?? []) as Row[])) {
     running += row.tipe === 'masuk' ? row.nominal : -row.nominal;
     if (row.saldo_setelah !== running) {
       // Alasan sama untuk jalur TULIS: UPDATE yang ditolak (mis. policy RLS
