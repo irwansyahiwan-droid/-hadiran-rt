@@ -208,7 +208,14 @@ const LANTAI = {
      TERUKUR sama sekali. Garis dasar baru 2512; lantai ~95%. */
   'kontras-deep':   [/TOTAL sampel:\s*(\d+)/, 2386],
   'kontras-nonteks':[/TOTAL\s+(\d+) sampel/, 700],
-  mati:             [/(\d+) sampel, \d+ tombol unik/, 140],
+  /* 140 → 82 (30 Sep 2026): putaran 32 (0865f5e) memindahkan "PDF" dari tiap
+     kartu Kas Hadiran ke kaki sheet detail. Build lama (3461835) & HEAD diukur
+     berdampingan lawan DB yang sama: 166 → 86; per nama PERSIS "PDF" 82 → 0,
+     sisanya ±1. Kaki sheet sengaja TAK ditambahkan: di sana ia `.btn-secondary`
+     yang tak punya gaya `:disabled`, jadi terukur TAK-BERUBAH di 2 tema × 2
+     peran = 0 sampel. (Asimetri terang/gelap "Batalkan"/"Hapus" 54 vs 0 juga
+     sah & lebih tua: `.dark .mati-teks:disabled` = warna aktifnya.) */
+  mati:             [/(\d+) sampel, \d+ tombol unik/, 82],
   /* 500 → 455 (28 Sep 2026): putaran 32 membuang tombol "PDF" di tiap kartu Kas
      Hadiran (21 × 2 peran) & melipat 31 baris "Sudah Lunas" Talangan (+1 tombol
      lipat) — terukur build lama/baru 550 → 478, selisih PERSIS 42 + 30. */
