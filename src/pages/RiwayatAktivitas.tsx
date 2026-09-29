@@ -158,6 +158,15 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
   if (!open) return null;
 
+  /* Satu nilai untuk kerangka & daftar termuat — teks statis, tinggi keduanya
+     lahir dari elemen yang sama. */
+  const petunjuk = (
+    <div className="flex items-center gap-2 text-micro text-ink-faint dark:text-gray-400">
+      <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+      <span>Ketuk satu aktivitas untuk lihat penjelasan alur &amp; pencatatannya.</span>
+    </div>
+  );
+
   // overscroll-contain: overlay ini scroll sendiri & menutupi penuh layar — tanpa
   // ini scroll yang mentok di ujung daftar diteruskan ke halaman di belakangnya
   // (halaman induk ikut bergeser / pull-to-refresh terpicu). `.sheet-panel` sudah
@@ -215,22 +224,39 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         </>)}
 
         {/* Hint: tiap baris bisa diketuk untuk penjelasan alur */}
-        {!loading && rows.length > 0 && (
-          <div className="flex items-center gap-2 text-micro text-ink-faint dark:text-gray-400">
-            <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            <span>Ketuk satu aktivitas untuk lihat penjelasan alur &amp; pencatatannya.</span>
-          </div>
-        )}
+        {!loading && rows.length > 0 && petunjuk}
 
         {/* List */}
         {loading ? (
-          <div className="space-y-2">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift px-4 py-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl skeleton shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 skeleton rounded-lg w-3/5" />
-                  <div className="h-3 skeleton rounded-lg w-2/5" />
+          /* Kerangka mencermin SUSUNAN asli (30 Sep 2026): petunjuk → label hari
+             → SATU kartu per hari berisi baris-baris. Dulu enam kartu terpisah
+             mulai y=195 @390px, sedangkan kartu pertama asli di y=267 — turun
+             72px saat data datang, dan bentuknya pun lain (kartu lepas → kartu
+             berkelompok). Petunjuknya teks statis, jadi dipakai ASLI. Tiap baris
+             kerangka memakai kotak baris yang sama dgn baris asli (judul
+             `text-body leading-snug` DUA baris — rel nominal mengapung membuat
+             judul hampir selalu melipat di HP — lalu keterangan & meta), jadi
+             tingginya lahir dari tangga huruf, bukan angka piksel. Jumlah baris
+             per hari tak bisa diketahui sebelum data; yang dijaga kartu PERTAMA. */
+          <div className="space-y-4">
+            {petunjuk}
+            {[2, 3].map((n, g) => (
+              <div key={g} className="space-y-2">
+                <p className="text-micro pt-1"><span className="inline-block h-2.5 w-24 align-middle rounded-full skeleton" /></p>
+                <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+                  {Array.from({ length: n }).map((_, i) => (
+                    <div key={i} className={`flex items-start gap-3 px-4 py-4 [--di-l:4.25rem] [--di-r:1rem] ${i < n - 1 ? 'divide-inset' : ''}`}>
+                      <div className="w-10 h-10 rounded-xl skeleton shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-body leading-snug">
+                          <span className="inline-block h-3.5 w-3/5 align-middle rounded-lg skeleton" /><br />
+                          <span className="inline-block h-3.5 w-2/5 align-middle rounded-lg skeleton" />
+                        </p>
+                        <p className="text-caption mt-0.5"><span className="inline-block h-3 w-4/5 align-middle rounded-lg skeleton" /></p>
+                        <p className="text-micro mt-1"><span className="inline-block h-2.5 w-1/3 align-middle rounded-full skeleton" /></p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}

@@ -93,6 +93,104 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
   );
 }
 
+/* ── Kerangka memuat — cermin anatomi hero & kartu triwulan di bawah ──────
+   Bar dipasang `inline-block` DI DALAM baris teks berkelas huruf yang sama dgn
+   aslinya, jadi tinggi tiap baris lahir dari line-height tangga huruf, bukan
+   dari `h-[Npx]` yang harus ditebak ulang tiap tangga bergeser. */
+const barHero = 'inline-block align-middle rounded-full skeleton skeleton-hero';
+const bar = 'inline-block align-middle rounded-full skeleton';
+/* Di atas `inset-soft` (#EAEFEC) `.skeleton` (#E8EDEA) praktis SEWARNA — bar
+   lenyap dan panel ledger terbaca kosong. `.skeleton-bar` (#D2DDD6 / gelap
+   #34453B) nada yang lahir untuk permukaan redup — SENDIRIAN, tanpa `.skeleton`:
+   digabung, `.dark .skeleton` (ditulis sesudahnya) menimpa nada gelapnya dan bar
+   lenyap lagi di mode gelap. Preseden: indikator `BannerSkeleton`. */
+const barRedup = 'inline-block align-middle rounded-full skeleton-bar';
+
+function HeroKerangka() {
+  return (
+    <div className="relative overflow-hidden rounded-3xl hero-emerald" style={{ padding: '18px 20px 16px', boxShadow: 'var(--hero-shadow)' }}>
+      <div className="relative flex items-center gap-2 mb-3">
+        <span className="h-4 w-4 shrink-0 rounded-lg skeleton skeleton-hero" />
+        <p className="text-micro"><span className={`${barHero} h-2.5 w-36`} /></p>
+      </div>
+      <p className="relative text-micro mb-1"><span className={`${barHero} h-2.5 w-48`} /></p>
+      <span className="relative block text-[clamp(1.625rem,8.4vw,2.375rem)] leading-none mb-3">
+        <span className="inline-block h-[1em] w-3/5 align-top rounded-xl skeleton skeleton-hero" />
+      </span>
+      {/* Panel kiri berlabel SATU baris, kanan DUA ("HADIRAN / BELUM DISETOR")
+          — baris flex meregangkan keduanya setinggi yang kanan, sama dgn aslinya. */}
+      <div className="relative flex flex-wrap gap-2 mb-4">
+        {[1, 2].map((n) => (
+          <div key={n} className="flex min-w-max grow basis-0 flex-col justify-between rounded-2xl bg-black/10 px-3 py-2">
+            <div>
+              {Array.from({ length: n }).map((_, i) => (
+                <p key={i} className="text-micro"><span className={`${barHero} h-2 w-20`} /></p>
+              ))}
+            </div>
+            <p className="text-caption"><span className={`${barHero} h-3 w-24`} /></p>
+          </div>
+        ))}
+      </div>
+      {/* Tombol asli PUTIH di kedua tema, jadi barnya pun satu nada di kedua tema:
+          brand tipis (label aslinya bertinta brand), bukan `.skeleton` yang di
+          mode gelap jadi garis hitam pekat di atas putih. */}
+      <div className="relative min-h-[44px] rounded-2xl bg-white py-3 text-center text-body">
+        <span className="inline-block h-3.5 w-48 max-w-[70%] align-middle rounded-full bg-brand/15" />
+      </div>
+    </div>
+  );
+}
+
+function BarisKerangka({ kiri = 'w-24', kanan = 'w-20', className = '' }: { kiri?: string; kanan?: string; className?: string }) {
+  /* `<span>` pembungkus WAJIB: sebagai anak flex ia jadi blok berisi SATU kotak
+     baris `text-caption`, jadi tingginya = line-height, bukan tinggi bar 12px. */
+  return (
+    <div className={`flex items-center justify-between text-caption ${className}`}>
+      <span><span className={`${barRedup} h-3 ${kiri}`} /></span>
+      <span><span className={`${barRedup} h-3 ${kanan}`} /></span>
+    </div>
+  );
+}
+
+/** Cermin `Ledger`: `atas` baris biasa, lalu baris bergaris (saldo), lalu `bawah` baris. */
+function LedgerKerangka({ atas, bawah }: { atas: number; bawah: number }) {
+  return (
+    <div className="rounded-2xl inset-soft p-3">
+      <p className="text-micro mb-2"><span className={`${barRedup} h-2.5 w-24`} /></p>
+      <div className="space-y-2">
+        {Array.from({ length: atas }).map((_, i) => <BarisKerangka key={`a${i}`} />)}
+        <BarisKerangka className="pt-2 border-t border-control dark:border-control-dark" kiri="w-20" kanan="w-24" />
+        {Array.from({ length: bawah }).map((_, i) => <BarisKerangka key={`b${i}`} kiri="w-32" />)}
+      </div>
+    </div>
+  );
+}
+
+function TriwulanKerangka() {
+  return (
+    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-4 space-y-3">
+      <div>
+        <p className="text-body"><span className={`${bar} h-4 w-36`} /></p>
+        <p className="text-caption mt-0.5"><span className={`${bar} h-3 w-24`} /></p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* Kas Hadiran: Masuk, Setor → Belum disetor → Talangan. Kas RT: Masuk, Keluar → Saldo akhir. */}
+        <LedgerKerangka atas={2} bawah={1} />
+        <LedgerKerangka atas={2} bawah={0} />
+      </div>
+      <div className="flex items-center gap-2 text-micro">
+        {['w-14', 'w-24', 'w-20'].map((w) => (
+          <span key={w} className="px-2 py-1 rounded-lg inset-soft"><span className={`${barRedup} h-2 ${w}`} /></span>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <div className="flex-1 min-h-[44px] rounded-2xl py-3 text-body skeleton" aria-hidden><span className="invisible">·</span></div>
+        <div className="w-24 min-h-[44px] rounded-2xl py-3 text-body skeleton" aria-hidden><span className="invisible">·</span></div>
+      </div>
+    </div>
+  );
+}
+
 export default function LaporanTriwulan({ open, onClose }: Props) {
   const [rows, setRows] = useState<RekapTriwulan[]>([]);
   const [snap, setSnap] = useState<SnapshotKas | null>(null);
@@ -267,16 +365,18 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
         )}
 
         {loading ? (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-4">
-                <div className="h-5 w-40 skeleton rounded-lg mb-3" />
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="h-28 skeleton rounded-2xl" />
-                  <div className="h-28 skeleton rounded-2xl" />
-                </div>
-              </div>
-            ))}
+          /* Kerangka mencermin SUSUNAN asli (30 Sep 2026). Yang lama tiga kartu
+             putih 178px ber-DUA kolom — padahal (a) layar termuat dibuka hero
+             HIJAU "Tutup Buku Sekarang" (253px @390), jadi kartu putih pertama
+             duduk di tempat hero lalu bertukar warna; (b) ledger asli BERTUMPUK
+             di HP (`grid-cols-1 sm:grid-cols-2`) dan kartunya 478px, jadi kartu
+             kedua turun 79px dan ketiga 383px saat data datang. Jaraknya
+             `space-y-4`, sama dgn anak-anak `main` di layar termuat (dulu 3).
+             Hero hanya tampil bila ada transaksi/tarikan — di RT yang berjalan
+             itu selalu. Tinggi tiap blok LAHIR dari kotak baris yang sama. */
+          <div className="space-y-4">
+            <HeroKerangka />
+            {[0, 1].map((i) => <TriwulanKerangka key={i} />)}
           </div>
         ) : error ? (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
