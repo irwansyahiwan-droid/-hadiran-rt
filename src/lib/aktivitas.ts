@@ -200,7 +200,7 @@ export function formatAktivitas(row: AktivitasLog, kamus?: KamusNama): Aktivitas
       else if (tipeRaw === 'setor_kas_rt') penjelasan = 'Setoran dari Kas Hadiran ke Kas RT. Dicatat ganda: saldo Kas Hadiran berkurang, Kas RT bertambah dengan nilai sama.';
       else if (tipeRaw === 'kas_masuk') penjelasan = 'Iuran satu tarikan tercatat sebagai pemasukan Kas Hadiran (Rp5.000 per pembayar). Otomatis dibuat saat tarikan ditutup.';
       else if (tipeRaw === 'kas_keluar') penjelasan = 'Pengeluaran langsung dari Kas Hadiran — saldo berkurang.';
-      else if (tipeRaw === 'talangan_masuk') penjelasan = 'Pelunasan talangan tercatat. Ini mengganti dana yang sempat ditalangi panitia, bukan pendapatan kas baru.';
+      else if (tipeRaw === 'talangan_masuk') penjelasan = 'Pelunasan talangan tercatat. Ini mengganti dana Kas Hadiran yang sempat ditalangi bendahara, bukan pendapatan kas baru.';
       else penjelasan = 'Transaksi Kas Hadiran tercatat.';
       return {
         title: judulPeristiwa(row.action, p),
@@ -239,7 +239,7 @@ export function formatAktivitas(row: AktivitasLog, kamus?: KamusNama): Aktivitas
             detail: null, amount: num(baru.total_terkumpul),
             changes, actor, accent, actionLabel, tableLabel,
             penjelasan: keSelesai
-              ? 'Tarikan ditutup. Iuran Rp5.000/pembayar masuk Kas Hadiran; anggota yang tidak hadir otomatis ditalangi panitia Rp50.000; Sohibul Bait menerima jatah dari para pembayar.'
+              ? 'Tarikan ditutup. Iuran Rp5.000/pembayar masuk Kas Hadiran; anggota yang tidak hadir otomatis ditalangi bendahara Rp50.000 dari Kas Hadiran; Sohibul Bait menerima jatah dari para pembayar.'
               : 'Tarikan dikembalikan ke status terjadwal. Absensi, talangan, & kas masuk yang terkait tarikan ini ikut dihapus.',
           };
         }
@@ -323,7 +323,7 @@ export function formatAktivitas(row: AktivitasLog, kamus?: KamusNama): Aktivitas
         accent: lunas ? 'emerald' : 'amber',
         actionLabel, tableLabel,
         penjelasan: lunas
-          ? 'Anggota melunasi talangan Rp50.000. Dana panitia yang sempat menalangi terganti — dicatat agar utang anggota nol.'
+          ? 'Anggota melunasi talangan Rp50.000. Dana Kas Hadiran yang sempat ditalangi bendahara terganti — dicatat agar utang anggota nol.'
           : 'Pelunasan talangan dibatalkan. Status anggota kembali “belum lunas”.',
       };
     }

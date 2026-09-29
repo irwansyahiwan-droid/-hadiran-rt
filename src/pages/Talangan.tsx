@@ -560,7 +560,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
            benar adalah di sebelah nama halamannya. */
         info={
           <InfoTip label="Talangan">
-            Dana talang yang ditanggung kas untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
+            Dana yang ditalangi bendahara dari Kas Hadiran untuk anggota yang tidak hadir di tarikan. Harus dilunasi sebelum tarikan berikutnya.
           </InfoTip>
         }
       />

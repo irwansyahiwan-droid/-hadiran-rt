@@ -420,7 +420,7 @@ export default function JadwalWargaPage() {
             <p className="inline-flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
               Tarikan Terakhir
               <InfoTip label="Tarikan" tone="onDark">
-                Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima total iuran anggota.
+                Satu putaran arisan. Tiap tarikan ada satu Sohibul Bait (penerima) yang menerima Rp45.000 dari tiap anggota lain, dipotong admin Rp60.000.
               </InfoTip>
             </p>
             <div className="mt-auto flex flex-col gap-3">
@@ -441,7 +441,7 @@ export default function JadwalWargaPage() {
               <p className="text-white/90 text-body mt-0.5">
                 Sohibul Bait
                 <InfoTip label="Sohibul Bait" tone="onDark" className="mx-1">
-                  Anggota yang menerima seluruh hasil tarikan pada giliran ini (penerima arisan).
+                  Anggota penerima arisan pada giliran ini: Rp45.000 dari tiap anggota lain (pendapatan kotor), dipotong admin Rp60.000 (diterima bersih).
                 </InfoTip>
                 <span className="font-semibold text-white">{lastTarikan.sohibul_bait?.nama ?? '—'}</span>
               </p>

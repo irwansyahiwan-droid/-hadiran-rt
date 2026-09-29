@@ -575,7 +575,7 @@ export default function KasRTPage() {
           subtitle={perTanggal}
           info={
             <InfoTip label="Kas RT">
-              Kas besar RT&nbsp;004/006. Sebagian iuran tiap tarikan (Rp5.000/anggota) disetor ke sini untuk kebutuhan RT — terpisah dari Kas Hadiran.
+              Kas besar RT&nbsp;004/006, terpisah dari Kas Hadiran. Diisi setoran berkala dari Kas Hadiran (bagian Rp5.000/anggota tiap tarikan) dan iuran warga di luar anggota Hadiran.
             </InfoTip>
           }
           actions={<>

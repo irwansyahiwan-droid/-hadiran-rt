@@ -14,8 +14,8 @@ interface Props {
 
 const IURAN = [
   { b: 'Anggota non-Sohibul Bait', t: 'bayar Rp50.000 per tarikan = Rp45.000 (untuk Sohibul Bait) + Rp5.000 (untuk Kas)' },
-  { b: 'Sohibul Bait', t: 'tidak bayar, menerima total = (N−1) × Rp45.000' },
-  { b: 'Tidak hadir / belum bayar', t: 'ditalangi panitia Rp50.000, dicatat di Talangan Anggota' },
+  { b: 'Sohibul Bait', t: 'tidak bayar; pendapatan kotor = (N−1) × Rp45.000, diterima bersih setelah potongan admin Rp60.000' },
+  { b: 'Tidak hadir / belum bayar', t: 'ditalangi bendahara Rp50.000 dari Kas Hadiran, dicatat di Talangan Anggota' },
   { b: 'Titip', t: 'dianggap bayar (tidak ditalangi)' },
 ];
 
