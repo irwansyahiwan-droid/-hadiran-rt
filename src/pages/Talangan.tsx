@@ -624,6 +624,12 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
       </CrossFade>
       )}
 
+      {/* Cari + saring + urutkan ikut gerbang gagal-total hero di atas (29 Sep
+          2026). Saat muat gagal ketiganya tak punya apa pun untuk disaring —
+          lima kontrol yang bisa diketuk tanpa hasil, berdiri di atas "Gagal
+          memuat data". Kas Hadiran & Kas RT sudah menyembunyikan saringannya
+          di keadaan yang sama; halaman ini satu-satunya tab yang tidak. */}
+      {!(error && list.length === 0) && (<>
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -665,6 +671,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
           onChange: setTalSort,
         }}
       />
+      </>)}
 
       <CrossFade loading={loading} skeleton={(
         /* Geometri WAJIB sama dgn baris asli di renderGroup (px-4, avatar w-9,

@@ -564,22 +564,21 @@ export default function Beranda({ onNavigate }: BerandaProps) {
       </div>
     );
 
-  return (
-    <>
-    <CrossFade loading={loading} skeleton={skeleton}>
-    {error ? (
-    <ErrorState className="pt-10" onRetry={() => load()} retrying={loading} />
-    ) : (
-    <div className="space-y-8 pb-2">
-      {/* Sapaan.
-          Pil status kas ("Perlu Perhatian" / "Sehat") DIBUANG 24 Agu 2026.
-          Bukan karena salah, tapi karena ia peringatan KETIGA di satu layar:
-          chip "Defisit" di hero menamai keadaan angkanya, banner Talangan di
-          bawahnya menamai sebabnya DAN membawa tindakan. Pil ini merangkum
-          keduanya tanpa menambah satu fakta pun dan tanpa bisa diketuk —
-          alarm yang tak menunjuk ke mana-mana. Tiga bahasa warna sekaligus
-          (rose / crimson / amber) juga membuat warga tak tahu mana yang
-          harus dibaca duluan. App yang mahal bicara sekali. */}
+  /* Sapaan.
+     Pil status kas ("Perlu Perhatian" / "Sehat") DIBUANG 24 Agu 2026.
+     Bukan karena salah, tapi karena ia peringatan KETIGA di satu layar:
+     chip "Defisit" di hero menamai keadaan angkanya, banner Talangan di
+     bawahnya menamai sebabnya DAN membawa tindakan. Pil ini merangkum
+     keduanya tanpa menambah satu fakta pun dan tanpa bisa diketuk —
+     alarm yang tak menunjuk ke mana-mana. Tiga bahasa warna sekaligus
+     (rose / crimson / amber) juga membuat warga tak tahu mana yang
+     harus dibaca duluan. App yang mahal bicara sekali.
+
+     Satu nilai untuk DUA cabang (29 Sep 2026): saat muat gagal Beranda dulu
+     cuma berisi "Gagal memuat data" yang menempel di bawah header (y=85
+     @390px), satu-satunya tab tanpa kepala. Sapaan tak bergantung data
+     apa pun, jadi tak ada alasan ikut hilang. */
+  const sapaan = (
       <div>
         <div>
           <p className="text-caption text-ink-faint dark:text-gray-400">{greeting},</p>
@@ -591,6 +590,19 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           <h1 className="text-title font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
         </div>
       </div>
+  );
+
+  return (
+    <>
+    <CrossFade loading={loading} skeleton={skeleton}>
+    {error ? (
+    <div className="space-y-8 pb-2">
+      {sapaan}
+      <ErrorState onRetry={() => load()} retrying={loading} />
+    </div>
+    ) : (
+    <div className="space-y-8 pb-2">
+      {sapaan}
 
       {/* Hero saldo + promo digabung jadi SATU carousel mewah: saldo = slide
           "rumah", promo numpang lewat di permukaan yang sama. Saldo TIDAK

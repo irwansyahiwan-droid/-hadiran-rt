@@ -358,9 +358,16 @@ export default function JadwalWargaPage() {
     );
   }
 
+  /* Kepala halaman IKUT di cabang gagal (29 Sep 2026). Tanpa itu tab Jadwal
+     satu-satunya tab warga yang kehilangan judulnya saat muat gagal — "Gagal
+     memuat data" menempel di bawah header app (y=125 @390px) tanpa menyebut
+     halaman mana yang gagal, sementara Kas Hadiran & Kas RT tetap berjudul.
+     Tombol muat-ulangnya ikut hidup, jadi ada dua jalan mencoba lagi, sama
+     seperti tab lain. */
   if (error) {
     return (
-      <div className="pt-10">
+      <div className="space-y-8 pb-2">
+        {kepalaHalaman}
         <ErrorState onRetry={() => load()} retrying={loading} />
       </div>
     );

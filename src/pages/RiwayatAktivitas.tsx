@@ -175,6 +175,12 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
       />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
+        {/* Cari + chip DISEMBUNYIKAN saat muat gagal (29 Sep 2026): enam kontrol
+            yang tak punya apa pun untuk disaring berdiri di atas kartu "Gagal
+            memuat data". Kanon tab Kas Hadiran & Kas RT — saringan hanya hadir
+            kalau ada yang bisa disaring. Saat `error`, seluruh daftar memang
+            diganti ErrorState di bawah, jadi saringannya tak menyaring apa pun. */}
+        {!error && (<>
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -206,6 +212,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
         {/* Filter chips */}
         <FilterChips options={FILTERS} value={filter} onChange={setFilter} />
+        </>)}
 
         {/* Hint: tiap baris bisa diketuk untuk penjelasan alur */}
         {!loading && rows.length > 0 && (

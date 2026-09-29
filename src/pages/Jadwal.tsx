@@ -1208,9 +1208,17 @@ export default function JadwalPage() {
           tak menangkapnya sendiri karena ia memburu nominal ber-"Rp" sedangkan
           angka telanjang lewat begitu saja.
 
-          Judul & keterangan SELALU dirender (isi "—" saat belum tahu), bukan
-          disembunyikan: blok yang muncul dari NOL persis yang diburu
-          `audit:lompat`, dan lantai `HERO_MIN_H` menahan sisanya. */}
+          Judul & keterangan SELALU dirender SAAT MEMUAT (isi "—" saat belum tahu),
+          bukan disembunyikan: blok yang muncul dari NOL persis yang diburu
+          `audit:lompat`, dan lantai `HERO_MIN_H` menahan sisanya.
+
+          Saat muat GAGAL hero DISEMBUNYIKAN (29 Sep 2026) — kanon Kas Hadiran,
+          Kas RT & Talangan yang sudah lebih dulu begitu. Hero berisi lima "—"
+          tak menyatakan apa pun tapi mendorong "Gagal memuat data" ke y=410 @390px,
+          separuh layar, sementara di keempat tab lain pesannya duduk di bawah
+          judul. `error` di sini hanya menyala saat BELUM ada data (muat senyap
+          yang gagal cuma menoast), jadi hero yang sudah berisi tak pernah hilang. */}
+      {!error && (
       <div
         className="relative flex flex-col overflow-hidden rounded-3xl hero-emerald"
         style={{ boxShadow: 'var(--hero-shadow)', minHeight: HERO_MIN_H }}
@@ -1261,6 +1269,7 @@ export default function JadwalPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* List — cross-fade skeleton → konten */}
       <CrossFade loading={loading} skeleton={(

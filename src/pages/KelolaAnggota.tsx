@@ -403,7 +403,11 @@ export default function KelolaAnggota({ open, onClose }: Props) {
           {loading || error ? '—' : aktifCount} aktif · {loading || error ? '—' : list.length} total
         </p>
 
-        {/* Search */}
+        {/* Search — DISEMBUNYIKAN saat muat gagal (29 Sep 2026): daftar diganti
+            ErrorState, jadi kolom cari tak punya apa pun untuk dicari. Kanon
+            yang sama dgn Talangan & Riwayat Aktivitas. Baris "— aktif" di atasnya
+            SENGAJA tetap (lihat catatannya) — ia ruang kepala, bukan kontrol. */}
+        {!error && (
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -420,6 +424,7 @@ export default function KelolaAnggota({ open, onClose }: Props) {
           />
           {search && <ClearButton onClick={() => setSearch('')} />}
         </div>
+        )}
 
         {/* List */}
         {loading ? (

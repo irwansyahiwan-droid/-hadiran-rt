@@ -912,8 +912,14 @@ export default function KasRTPage() {
           </div>
         )}
 
-        {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten) */}
-        <SectionTitle className="mt-6" count={list.length}>Mutasi Kas Besar RT</SectionTitle>
+        {/* Mutasi list — terbaru di atas (cross-fade skeleton → konten).
+            Judul seksi ikut gerbang gagal-total yang sama dgn hero & target
+            (29 Sep 2026): tanpa itu "Mutasi Kas Besar RT" jadi satu-satunya
+            judul seksi di app yang berdiri di atas "Gagal memuat data", seolah
+            yang gagal cuma daftarnya — padahal seluruh halaman kosong. */}
+        {!(error && list.length === 0) && (
+          <SectionTitle className="mt-6" count={list.length}>Mutasi Kas Besar RT</SectionTitle>
+        )}
 
         <CrossFade loading={loading} skeleton={(
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
