@@ -87,6 +87,7 @@
     --canvas: #CFE6D8;
     --surface: #FFFFFF;
     --line: #B8C4D3;
+    --control: #66786D; /* = token `control` app, isian bilah alur uang */
     --row: #D1DAE5;
     --ink: #0B1220;
     --ink-sub: #1F2937;
@@ -142,7 +143,7 @@
   h2, h3 { text-wrap: balance; }
   /* Deskripsi kartu (2–3 baris pendek): `pretty` di Chrome tak selalu
      memindahkan kata untuk teks sependek ini, jadi dipakai `balance`. */
-  .bn-card p, .fcell p, .plus p { text-wrap: balance; }
+  .fcell p, .plus p, .faq p { text-wrap: balance; }
   .display { font-family: 'Sora', 'Inter', sans-serif; letter-spacing: -0.02em; }
   .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
 
@@ -224,80 +225,14 @@
   }
   .btn svg { width: 19px; height: 19px; }
 
-  /* ─────────── BANNER SHOWCASE ─────────── */
-  /* Mirror kartu carousel app — bahasa flat & tegas yang sama:
-     gradient pekat + hairline ring + teks near-putih (sumber: BannerCarousel.tsx).
-     Strip geser horizontal (scroll-snap); kartu tetangga sengaja "peek" sebagai
-     penanda bisa digeser. Posisi: di bawah showcase HP (slot overlap hero
-     kini milik .shots); barisan dikunci ke kolom konten (--maxw) supaya tidak
-     full-bleed melenceng di layar lebar; fade mask tepi kiri-kanan sama
-     seperti carousel app. */
-  .banners { padding: 24px 0 8px; }
-  .bn-row {
-    display: flex; gap: 14px;
-    max-width: var(--maxw); margin: 0 auto;
-    overflow-x: auto; scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scroll-padding-inline: 20px;
-    padding: 6px 20px 16px;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
-  }
-  .bn-row::-webkit-scrollbar { display: none; }
-  /* Indikator posisi — miniatur bahasa indikator story carousel app:
-     titik netral, yang aktif memanjang jadi pill emerald. Dekoratif murni. */
+  /* Indikator posisi strip tangkapan layar — miniatur bahasa indikator story
+     carousel app: titik netral, yang aktif memanjang jadi pill emerald. */
   .bn-dots { display: flex; justify-content: center; gap: 6px; padding-top: 2px; }
   .bn-dots i {
     width: 6px; height: 6px; border-radius: 999px; background: #C4CFDC;
     transition: width .3s var(--ease-out-expo), background .3s var(--ease-out-expo);
   }
   .bn-dots i.on { width: 18px; background: var(--brand); }
-  .bn-card {
-    scroll-snap-align: center;
-    flex: 0 0 86%; max-width: 340px;
-    position: relative; overflow: hidden;
-    border-radius: 24px; padding: 22px; min-height: 172px;
-    color: #fff; display: flex; flex-direction: column;
-    box-shadow: 0 16px 38px -22px rgba(15,40,30,.45);
-  }
-  .bn-card::before {
-    content: ""; position: absolute; inset: 0; border-radius: 24px;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.20), inset 0 1px 0 rgba(255,255,255,.26);
-    /* Scrim atas+bawah — mirror BannerCarousel app: stop terang gradient (mis.
-       teal #2cb8a5) < 4.5:1 utk teks putih; scrim menarik eyebrow/judul/desc
-       ke >=4.5:1 tanpa mengubah warna brand.
-       Pass KONTRAS MAKSIMAL (4 Agu): scrim saja ternyata cuma menolong bagian
-       ATAS kartu — judul h3 duduk ~55% ke bawah, tempat scrim sudah habis, dan
-       di sana putih cuma 3,87:1. Kelima stop AWAL diturunkan ke versi pekatnya
-       (hue tiap kartu tetap) → putih >=7,8:1 di SELURUH bidang, bukan cuma di
-       balik scrim. */
-    background:
-      linear-gradient(to bottom, rgba(0,0,0,.42), rgba(0,0,0,0) 56%),
-      linear-gradient(to top, rgba(0,0,0,.28), rgba(0,0,0,0) 46%);
-    pointer-events: none;
-  }
-  .bn-card > * { position: relative; z-index: 1; }
-  .bn-card .be { font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #fff; }
-  /* Terbaca pembaca layar, tak memakan ruang visual sedikit pun. */
-  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
-  .bn-card h3 { font-family: 'Sora', sans-serif; font-size: 21px; font-weight: 800; line-height: 1.18; letter-spacing: -.02em; margin-top: 13px; max-width: 78%; }
-  .bn-card p { font-size: 13.5px; font-weight: 500; color: #fff; opacity: .95; margin-top: 8px; max-width: 80%; line-height: 1.46; }
-  .bn-ic {
-    position: absolute; top: 20px; right: 20px; z-index: 1;
-    width: 44px; height: 44px; border-radius: 12px;
-    background: rgba(255,255,255,.15);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
-    display: grid; place-items: center;
-  }
-  .bn-ic svg { width: 22px; height: 22px; }
-  /* Gradient sinkron dgn slide carousel app saat ini (BannerCarousel.tsx). */
-  .bn-target   { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#0A5D51 0%,#063934 100%); }
-  .bn-absensi  { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#1E46B0 0%,#122C77 100%); }
-  .bn-tarikan  { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#5B2BA6 0%,#33176B 100%); }
-  .bn-talangan { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#7A400A 0%,#4E2905 100%); }
-  .bn-kasrt    { background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.12), transparent 55%), linear-gradient(150deg,#0B5F33 0%,#053B25 100%); }
-
   /* ─────────── SECTIONS ─────────── */
   section { padding: 52px 0; }
   #fitur { scroll-margin-top: 12px; }
@@ -351,7 +286,6 @@
     border-radius: 16px; padding: 16px;
     box-shadow: var(--shadow-card);
   }
-  .fcell.tint { background: var(--cell-tint); }
   .fcell .fi {
     width: 38px; height: 38px; border-radius: 12px;
     display: grid; place-items: center;
@@ -363,10 +297,9 @@
   .fcell p { font-size: 12.8px; color: var(--ink-faint); line-height: 1.45; }
 
   /* ─────────── SHOWCASE — tangkapan layar asli app ───────────
-     Frame HP bezel ink (#0B1220) + strip scroll-snap yang sama dengan banner
-     (peek, mask fade, dots). Mengambil slot overlap ke tepi bawah hero
-     (margin-top negatif) sebagai bukti visual pertama; banner turun ke bawahnya.
-     Gambar = WebP 780px (turunan public/screenshots,
+     Frame HP bezel ink (#0B1220) + strip scroll-snap (peek, mask fade, dots).
+     Mengambil slot overlap ke tepi bawah hero (margin-top negatif) sebagai
+     bukti visual pertama. Gambar = WebP 780px (turunan public/screenshots,
      regen: scripts/capture-screenshots.mjs lalu scripts/gen-shots-webp.mjs). */
   .shots { padding: 0 0 8px; margin-top: -64px; }
   .shots-note {
@@ -400,15 +333,8 @@
   .ph figcaption b { display: block; font-family: 'Sora', sans-serif; font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); }
   .ph figcaption span { font-size: 12.8px; color: var(--ink-faint); }
 
-  /* Keunggulan — satu kartu list dgn pembatas baris inset (bahasa list app) */
+  /* Baris aturan di kartu alur uang — pembatas baris inset (bahasa list app) */
   .alt { background: var(--alt-bg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .plus-card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    box-shadow: var(--shadow-card);
-    padding: 6px 0;
-  }
   .plus { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; position: relative; }
   .plus + .plus::before {
     content: ""; position: absolute; top: 0; left: 70px; right: 18px; height: 1px;
@@ -459,18 +385,66 @@
   }
   .step h3 { font-size: 16px; font-weight: 700; font-family: 'Sora', sans-serif; margin-bottom: 3px; }
   .step p { font-size: 14px; color: var(--ink-faint); }
+  .step a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (hover: hover) { .step a:hover { text-decoration: underline; } }
 
-  /* Security note */
-  .secnote {
+  /* ALUR UANG (29 Sep 2026). Halaman ini dulu menyebut "Sohibul Bait",
+     "talangan", dan "Kas Hadiran" tanpa sekali pun menjelaskan uangnya —
+     padahal itu pertanyaan pertama warga baru. Kalimatnya dari teks app yang
+     sudah disetujui (Tentang, InfoTip Jadwal/Kas RT/Talangan). Bilah 45:5
+     dekoratif (`aria-hidden`); angkanya dibacakan lewat legenda di bawahnya. */
+  .flow {
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: 24px; padding: 22px;
-    display: flex; gap: 15px; align-items: flex-start;
-    box-shadow: var(--shadow-card);
+    border-radius: 24px; box-shadow: var(--shadow-card); overflow: hidden;
   }
-  .secnote .si { flex: 0 0 46px; width: 46px; height: 46px; border-radius: 12px; background: var(--tile-bg); color: var(--tile-ink); display: grid; place-items: center; }
-  .secnote .si svg { width: 24px; height: 24px; }
-  .secnote h3 { font-family: 'Sora', sans-serif; font-size: 16.5px; font-weight: 700; margin-bottom: 5px; }
-  .secnote p { font-size: 13.8px; color: var(--ink-faint); line-height: 1.5; }
+  .flow-top { padding: 22px 22px 20px; border-bottom: 1px solid var(--row); }
+  .flow-top .fl { font-size: 13.5px; font-weight: 600; color: var(--ink-faint); }
+  .flow-top .fa {
+    font-family: 'Sora', sans-serif; font-size: 34px; font-weight: 800;
+    letter-spacing: -.02em; line-height: 1.15; margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .split { display: flex; gap: 3px; height: 12px; margin: 16px 0 14px; }
+  .split i { border-radius: 999px; }
+  .split i:first-child { flex: 9; background: var(--brand); }
+  .split i:last-child { flex: 1; background: var(--control); }
+  .legend { display: grid; gap: 8px; }
+  .legend div { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-sub); }
+  .legend .sw { flex: 0 0 10px; width: 10px; height: 10px; border-radius: 3px; background: var(--brand); }
+  .legend div + div .sw { background: var(--control); }
+  .legend b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; min-width: 76px; }
+
+  /* TANYA JAWAB — <details> bawaan: tanpa JS, terbaca pembaca layar, Tab &
+     Enter/Spasi bekerja dgn sendirinya. Satu kartu, pembatas baris inset
+     (bahasa list app, sama dgn .plus). */
+  .faq {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 24px; box-shadow: var(--shadow-card); padding: 4px 0;
+  }
+  .faq details { position: relative; }
+  .faq details + details::before {
+    content: ""; position: absolute; top: 0; left: 18px; right: 18px; height: 1px;
+    background: var(--row);
+  }
+  .faq summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    min-height: 56px; padding: 14px 18px;
+    font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary svg {
+    flex: 0 0 18px; width: 18px; height: 18px; color: var(--ink-faint);
+    transition: transform .24s var(--ease-out-expo);
+  }
+  .faq details[open] summary svg { transform: rotate(180deg); }
+  .faq details p { padding: 0 18px 18px; margin-top: -4px; font-size: 14px; color: var(--ink-faint); line-height: 1.55; }
+  .faq a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  @media (hover: hover) {
+    .faq summary:hover { color: var(--accent); }
+    .faq a:hover { text-decoration: underline; }
+  }
+  @media (prefers-reduced-motion: reduce) { .faq summary svg { transition: none; } }
 
   /* Final CTA */
   .final {
@@ -588,45 +562,39 @@
   <p class="shots-note" data-hero style="animation-delay:.44s">Tangkapan layar asli mode Warga. Datanya tampil apa adanya.</p>
 </section>
 
-<!-- ══════════ BANNER SHOWCASE (mirror kartu carousel di app) ══════════ -->
-<section class="banners">
-  <!-- Judul seksi khusus pembaca layar: kartunya memakai h3, jadi tanpa h2 ini
-       kerangka halaman melompat h1 → h3 (terukur 31 Jul). Tak memakan ruang
-       visual, tapi membuat daftar heading bisa dipakai melompat antar-bagian. -->
-  <h2 class="sr-only">Sorotan fitur</h2>
-  <div class="bn-row rv" data-snap role="region" aria-label="Sorotan fitur, geser untuk melihat" tabindex="0">
-    <div class="bn-card bn-target">
-      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
-      <span class="be">Target Kas RT</span>
-      <h3>Bersama menuju Rp25 juta</h3>
-      <p>Pantau progres kas RT menuju target bersama warga.</p>
-    </div>
-    <div class="bn-card bn-absensi">
-      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></div>
-      <span class="be">Panduan · Absensi</span>
-      <h3>Hadir dicatat setiap tarikan</h3>
-      <p>Yang tidak hadir otomatis tercatat kena talangan.</p>
-    </div>
-    <div class="bn-card bn-tarikan">
-      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4M16.71 13.88l.7.71-2.82 2.82"/></svg></div>
-      <span class="be">Panduan · Tarikan</span>
-      <h3>Satu Sohibul Bait per tarikan</h3>
-      <p>Iuran semua anggota yang hadir terkumpul untuknya.</p>
-    </div>
-    <div class="bn-card bn-talangan">
-      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-      <span class="be">Panduan · Talangan</span>
-      <h3>Tidak hadir kena talangan</h3>
-      <p>Wajib dilunasi sebelum tarikan berikutnya agar kas sehat.</p>
-    </div>
-    <div class="bn-card bn-kasrt">
-      <div class="bn-ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
-      <span class="be">Panduan · Kas RT</span>
-      <h3>Kas besar RT yang terpisah</h3>
-      <p>Sebagian setoran masuk ke Kas RT untuk kebutuhan warga.</p>
+<!-- ══════════ ALUR UANG ══════════ -->
+<section id="cara">
+  <div class="wrap">
+    <h2 class="sec-title display rv">Begini uangnya mengalir</h2>
+    <p class="sec-lead rv" style="--d:50ms">Tiap tarikan punya satu Sohibul Bait, yaitu anggota yang mendapat giliran menerima.</p>
+    <div class="flow rv" style="--d:100ms">
+      <div class="flow-top">
+        <div class="fl">Iuran tiap anggota, per tarikan</div>
+        <div class="fa">Rp50.000</div>
+        <div class="split" aria-hidden="true"><i></i><i></i></div>
+        <div class="legend">
+          <div><span class="sw" aria-hidden="true"></span><b>Rp45.000</b>untuk Sohibul Bait</div>
+          <div><span class="sw" aria-hidden="true"></span><b>Rp5.000</b>masuk Kas Hadiran</div>
+        </div>
+      </div>
+      <div class="plus">
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4M16.71 13.88l.7.71-2.82 2.82"/></svg></div>
+        <div><h3>Sohibul Bait tidak membayar</h3><p>Ia menerima Rp45.000 dari tiap anggota lain, dipotong admin Rp60.000.</p></div>
+      </div>
+      <div class="plus">
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div><h3>Tidak hadir, ditalangi</h3><p>Iurannya ditalangi bendahara Rp50.000 dari Kas Hadiran, dan dilunasi sebelum tarikan berikutnya.</p></div>
+      </div>
+      <div class="plus">
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg></div>
+        <div><h3>Titip iuran</h3><p>Tidak hadir tapi menitipkan iuran dianggap membayar, jadi tidak ditalangi.</p></div>
+      </div>
+      <div class="plus">
+        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
+        <div><h3>Kas Hadiran ke Kas RT</h3><p>Kas Hadiran disetor berkala ke Kas Besar RT, yang juga diisi iuran warga di luar anggota Hadiran.</p></div>
+      </div>
     </div>
   </div>
-  <div class="bn-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
 </section>
 
 <!-- ══════════ FITUR ══════════ -->
@@ -658,7 +626,7 @@
         <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="7" cy="15" r="1.2"/></svg></div>
         <h3>Kas Hadiran</h3><p>Rekap iuran terkumpul dan hak Sohibul Bait tiap tarikan.</p>
       </div>
-      <div class="fcell tint rv" style="--d:220ms">
+      <div class="fcell rv" style="--d:220ms">
         <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
         <h3>Kas RT</h3><p>Kas besar lingkungan, terpisah dari kas hadiran dan terbuka.</p>
       </div>
@@ -670,32 +638,6 @@
   </div>
 </section>
 
-
-<!-- ══════════ KEUNGGULAN ══════════ -->
-<section class="alt">
-  <div class="wrap">
-    <h2 class="sec-title display rv">Terasa seperti aplikasi,<br/>tanpa ribet</h2>
-    <p class="sec-lead rv" style="--d:50ms">Bukan sekadar halaman web. Dibuat senyaman aplikasi di HP Anda.</p>
-    <div class="plus-card rv" style="--d:100ms">
-      <div class="plus">
-        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
-        <div><h3>Mode Warga</h3><p>Cukup sandi bersama warga untuk masuk. Aman, hanya bisa melihat, tidak bisa mengubah.</p></div>
-      </div>
-      <div class="plus">
-        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M12 18h.01"/></svg></div>
-        <div><h3>Pasang Seperti App</h3><p>Tambahkan ke layar utama HP, Android maupun iPhone. <a href="/panduan-install.html">Lihat panduan</a></p></div>
-      </div>
-      <div class="plus">
-        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
-        <div><h3>Mode Gelap</h3><p>Tampilan terang dipakai secara bawaan. Ingin gelap? Ganti sendiri lewat menu di dalam aplikasi.</p></div>
-      </div>
-      <div class="plus">
-        <div class="pi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="M21 4v5h-5"/></svg></div>
-        <div><h3>Selalu Terbaru</h3><p>Data tersimpan aman di cloud dan diperbarui real-time untuk semua warga.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ══════════ UNTUK SIAPA ══════════ -->
 <section>
@@ -709,6 +651,7 @@
           <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Catat tarikan, absensi &amp; talangan</li>
           <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Kelola kas hadiran &amp; kas RT</li>
           <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Tandai lunas &amp; cetak laporan PDF</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Tiap perubahan tercatat di Riwayat Aktivitas</li>
         </ul>
       </div>
       <div class="role warga rv" style="--d:170ms">
@@ -717,6 +660,7 @@
           <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Pantau saldo &amp; transparansi kas</li>
           <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cek jadwal tarikan &amp; giliran</li>
           <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Lihat status talangan sendiri, kapan saja</li>
+          <li><svg class="check" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Hanya melihat, tidak bisa mengubah data</li>
         </ul>
       </div>
     </div>
@@ -731,21 +675,24 @@
     <p class="sec-lead rv" style="margin-bottom:32px;--d:100ms">Tidak perlu install dari Play Store. Buka link, langsung pakai.</p>
     <div class="steps">
       <div class="step rv" style="--d:140ms"><div class="sn">1</div><div><h3>Buka tautan aplikasi</h3><p>Klik link yang dibagikan di grup, terbuka langsung di browser HP.</p></div></div>
-      <div class="step rv" style="--d:200ms"><div class="sn">2</div><div><h3>Masuk sebagai Warga</h3><p>Pilih mode Warga untuk melihat-lihat. Pengurus login sebagai bendahara untuk mengelola data.</p></div></div>
-      <div class="step rv" style="--d:260ms"><div class="sn">3</div><div><h3>Pantau kapan saja</h3><p>Cek kas, jadwal, dan talangan dari mana saja. Tambahkan ke layar utama agar cepat dibuka lagi.</p></div></div>
+      <div class="step rv" style="--d:200ms"><div class="sn">2</div><div><h3>Masuk sebagai Warga</h3><p>Masukkan sandi warga. Pengurus masuk sebagai bendahara untuk mengelola data.</p></div></div>
+      <div class="step rv" style="--d:260ms"><div class="sn">3</div><div><h3>Pasang di layar utama</h3><p>Supaya cepat dibuka lagi, seperti aplikasi biasa. <a href="/panduan-install.html">Lihat panduan</a></p></div></div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ KEAMANAN ══════════ -->
+<!-- ══════════ TANYA JAWAB ══════════ -->
 <section>
   <div class="wrap">
-    <div class="secnote rv">
-      <div class="si"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6Z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 0 1 4 0v2"/></svg></div>
-      <div>
-        <h3>Data warga aman &amp; privat</h3>
-        <p>Aplikasi ini khusus internal RT 004/006, tidak terindeks Google dan tidak terbuka untuk umum. Hanya pengurus yang dapat mengubah data; setiap perubahan tercatat otomatis.</p>
-      </div>
+    <h2 class="sec-title display rv">Yang sering ditanyakan</h2>
+    <p class="sec-lead rv" style="--d:50ms">Ketuk pertanyaan untuk melihat jawabannya.</p>
+    <div class="faq rv" style="--d:100ms">
+      <details><summary>Sandi warga apa?<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><p>Tanyakan ke pengurus RT. Sandinya sama untuk semua warga dan hanya membuka tampilan lihat.</p></details>
+      <details><summary>Apakah warga bisa mengubah data?<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><p>Tidak. Hanya bendahara yang mencatat, dan tiap perubahan tercatat di Riwayat Aktivitas yang juga bisa dilihat warga.</p></details>
+      <details><summary>Apakah angkanya selalu terbaru?<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><p>Angka dimuat ulang tiap aplikasi dibuka, atau tarik layar ke bawah untuk menyegarkan. Tanpa sinyal, aplikasi tetap terbuka dengan angka terakhir dan diberi tanda.</p></details>
+      <details><summary>Perlu install dari Play Store?<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><p>Tidak. Aplikasi terbuka di browser HP dan bisa dipasang di layar utama, Android maupun iPhone. <a href="/panduan-install.html">Lihat panduan</a></p></details>
+      <details><summary>Apakah data warga aman?<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><p>Aplikasi ini khusus warga RT 004/006 dan tidak terindeks Google. Hanya pengurus yang bisa mengubah data.</p></details>
+      <details><summary>Bisa pakai tampilan gelap?<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary><p>Bisa. Tampilan terang dipakai secara bawaan; ganti sendiri lewat menu di dalam aplikasi.</p></details>
     </div>
   </div>
 </section>
