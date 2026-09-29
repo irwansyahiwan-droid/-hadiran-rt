@@ -217,3 +217,53 @@ describe('Excel — satuan & arah uang', () => {
     for (const c of [1, 2, 3, 4]) expect(tinta(mut, 5, c), `kolom ${c} tak boleh berwarna`).toBe('');
   });
 });
+
+/* ── SIAP DIPAKAI DI EXCEL (29 Sep 2026) ───────────────────────────────────
+   Dua cacat yang hanya terlihat begitu berkasnya dibuka/dicetak di Excel
+   sungguhan — nilai selnya selama ini benar, jadi uji isi di atas hijau:
+   (1) tanpa `pageSetup` → Mutasi tercetak 3 halaman MENYAMPING di kertas
+       Letter, kolom Saldo sendirian; kepala tabel tak diulang;
+   (2) sel kosong (Masuk/Keluar) tanpa garis & zebra, kepala kolom terpotong. */
+describe('Excel — siap dipakai & dicetak', () => {
+  const LIST: KasRT[] = [
+    { ...b(1, 'masuk', 900_000, 'hadiran', 'Setoran'), tanggal: '2026-09-27' },
+    { ...b(2, 'keluar', 50_000, 'sosial', 'Santunan'), tanggal: '2026-08-28' },
+    { ...b(3, 'keluar', 70_000, 'sosial', 'Santunan'), tanggal: '2026-01-31' },
+  ];
+  const rt = buildKasRTExcel(LIST, { saldo: 780_000, totalMasuk: 900_000, totalKeluar: 120_000, saldoAwal: 0 }).wb;
+  const hd = buildKasHadiranExcel([tk(1, 3_000_000), tk(2, 3_000_000)], {},
+    { totalKasTerkumpul: 6_000_000, totalTalanganBelum: 0, totalSetor: 0, saldo: 6_000_000 }).wb;
+
+  it('tiap sheet A4, selebar kertas, tinggi bebas; tabel lebar LANSKAP & kepala diulang', () => {
+    const lebar = new Set(['Mutasi', 'Rekap Tarikan']);
+    for (const wb of [rt, hd]) {
+      for (const ws of wb.worksheets) {
+        const ps = ws.pageSetup;
+        expect([ws.name, ps.paperSize, ps.fitToPage, ps.fitToWidth, ps.fitToHeight])
+          .toEqual([ws.name, 9, true, 1, 0]);
+        if (lebar.has(ws.name)) {
+          expect(ps.orientation, `${ws.name} tegak — 7–9 kolom menyusut ke ±7pt`).toBe('landscape');
+          expect(ps.printTitlesRow, `${ws.name}: kepala tabel tak diulang di halaman 2`).toBe('4:4');
+        }
+      }
+    }
+  });
+
+  it('sel KOSONG di Mutasi tetap bergaris & berzebra', () => {
+    const mut = rt.getWorksheet('Mutasi')!;
+    /* Baris 6 = indeks 1 (zebra), transaksi KELUAR → sel Masuk (5) kosong. */
+    const kosong = mut.getCell(6, kolom(mut, 4, 'Masuk (Rp)'));
+    expect(kosong.value ?? null).toBeNull();
+    expect(kosong.border?.top, 'sel kosong tanpa garis').toBeTruthy();
+    expect((kosong.fill as { fgColor?: { argb?: string } } | undefined)?.fgColor?.argb, 'sel kosong memutus zebra').toBeTruthy();
+  });
+
+  it('kepala kolom yang lebih lebar dari kolomnya MELIPAT, bukan terpotong', () => {
+    const rek = hd.getWorksheet('Rekap Tarikan')!;
+    const c = rek.getCell(4, kolom(rek, 4, 'Pendapatan Kotor SB (Rp)'));
+    expect(c.alignment?.wrapText).toBe(true);
+    expect(rek.getRow(4).height, 'baris kepala dipaku 1 baris — kepala 2 baris terpotong').toBeGreaterThan(18);
+    /* KONTROL: sheet yang kepalanya muat tetap setinggi satu baris. */
+    expect(rt.getWorksheet('Mutasi')!.getRow(4).height).toBe(18);
+  });
+});

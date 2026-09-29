@@ -61,18 +61,53 @@ export function titleBlock(ws: Worksheet, title: string, subtitle: string, cols:
   ws.getRow(2).height = 16;
 }
 
-/** Header tabel berwarna brand di baris `rowIndex`. */
+/**
+ * Header tabel berwarna brand di baris `rowIndex`.
+ *
+ * MELIPAT, bukan terpotong (29 Sep 2026). Tingginya dulu dipaku 18 tanpa
+ * `wrapText`, jadi kepala yang lebih lebar dari kolomnya terpotong di KEDUA
+ * sisi (rata tengah) — Excel sungguhan mencetak "Kas Terkumpul (Rp)Pendapatan
+ * Kotor SB (Rp)" berdempet tanpa satu huruf pun jarak. Tinggi baris kini
+ * lahir dari jumlah baris kepala terpanjang; huruf tebal ±10% lebih lebar
+ * daripada satuan lebar kolom Excel (lebar satu "0" huruf biasa).
+ */
 export function headerRow(ws: Worksheet, rowIndex: number, headers: string[]): void {
   const r = ws.getRow(rowIndex);
+  let baris = 1;
   headers.forEach((h, i) => {
     const c = r.getCell(i + 1);
     c.value = h;
     c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
     c.font = { bold: true, color: { argb: argb(CETAK.surface) }, size: 11 };
-    c.alignment = { horizontal: 'center', vertical: 'middle' };
+    c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
     c.border = border;
+    baris = Math.max(baris, Math.ceil((h.length * 1.1) / (ws.getColumn(i + 1).width ?? 10)));
   });
-  r.height = 18;
+  r.height = baris === 1 ? 18 : 15 * baris + 4;
+}
+
+/**
+ * SIAP CETAK (29 Sep 2026). Tak satu sheet pun dulu punya `pageSetup`, jadi
+ * Excel memakai bawaannya: kertas Letter, skala 100%, kepala tabel tak
+ * diulang. Dicetak dari Excel sungguhan, Mutasi Kas RT pecah ke TIGA halaman
+ * MENYAMPING — Tanggal/Tipe/Kategori di satu lembar, Keterangan & nominal di
+ * lembar kedua, kolom Saldo sendirian di lembar ketiga — dan Rekap Tarikan ke
+ * dua. Kini A4, selebar kertas (`fitToHeight: 0` = tinggi bebas, jadi daftar
+ * panjang tetap mengalir ke halaman berikut alih-alih diperas jadi satu), dan
+ * baris kepala diulang di tiap halaman. Kaki mencermin `drawFooter` PDF.
+ */
+export function siapCetak(ws: Worksheet, { lanskap = false, barisKepala }: { lanskap?: boolean; barisKepala?: number } = {}): void {
+  ws.pageSetup = {
+    paperSize: 9,
+    orientation: lanskap ? 'landscape' : 'portrait',
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 0,
+    horizontalCentered: true,
+    margins: { left: 0.5, right: 0.5, top: 0.6, bottom: 0.7, header: 0.3, footer: 0.3 },
+    ...(barisKepala ? { printTitlesRow: `${barisKepala}:${barisKepala}` } : {}),
+  };
+  ws.headerFooter = { oddFooter: '&C&8Hadiran RT Digital System&R&8Hal. &P/&N' };
 }
 
 /** Tulis workbook ke file .xlsx dan picu unduhan. */

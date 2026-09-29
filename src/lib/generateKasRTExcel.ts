@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import type { KasRT } from './types';
 import { formatTanggal } from './utils';
-import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA } from './excelStyle';
+import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA, siapCetak } from './excelStyle';
 import { labelKategori } from './kategoriKasRt';
 import { SALDO_AWAL_KETERANGAN } from './laporan';
 
@@ -25,6 +25,7 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
   // ── Sheet 1: Ringkasan ──
   const sum = wb.addWorksheet('Ringkasan');
   sum.columns = [{ width: 24 }, { width: 20 }];
+  siapCetak(sum);
   titleBlock(sum, 'Kas Besar RT 004/006', `Ringkasan · ${tgl}`, 2);
   /* Satuan di HEADER kolom, angkanya polos — aturan app sejak 11 Jun 2026,
      yang sampai 5 Sep cuma ditegakkan di PDF. Di Excel `Talangan` (cacah) dan
@@ -64,6 +65,10 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
      memfilter — "Belum dikategorikan" pun berguna: itu justru filter untuk
      mencari transaksi yang masih perlu dirapikan. */
   ws.columns = [{ width: 18 }, { width: 10 }, { width: 30 }, { width: 42 }, { width: 16 }, { width: 16 }, { width: 18 }];
+  /* Lanskap: tujuh kolom = ±1.085 px, sedangkan A4 tegak cuma memuat ±700 px
+     — dipaksa tegak hurufnya menyusut ke ±64% (7pt), di bawah tangga LANSIA
+     yang dipakai PDF Kas RT. Lanskap memuatnya di ±95%. */
+  siapCetak(ws, { lanskap: true, barisKepala: 4 });
   titleBlock(ws, 'Kas Besar RT 004/006', `Mutasi · ${tgl}`, 7);
   headerRow(ws, 4, ['Tanggal', 'Tipe', 'Kategori', 'Keterangan', 'Masuk (Rp)', 'Keluar (Rp)', 'Saldo (Rp)']);
   /* Baris kepala jadi filter — kolom kategori tak ada gunanya kalau harus
@@ -91,14 +96,27 @@ export function buildKasRTExcel(list: KasRT[], stats: Stats): { wb: ExcelJS.Work
       r.getCell(ci).numFmt = CUR;
       r.getCell(ci).alignment = { horizontal: 'right' };
     });
+    /* Kategori & Keterangan MELIPAT. Teks yang lebih panjang dari kolomnya dulu
+       berperilaku dua cara dlm satu sheet: di baris KELUAR ia meluber ke sel
+       Masuk yang kosong (menutupi kolom uang), di baris MASUK ia terpotong
+       diam-diam. Semua sel rata ATAS supaya baris dua-lapis tetap terbaca
+       sebaris dgn nominalnya. */
+    [3, 4].forEach((ci) => (r.getCell(ci).alignment = { wrapText: true }));
+    r.eachCell((c) => (c.alignment = { ...c.alignment, vertical: 'top' }));
     /* Arah uang, cermin PDF: kolom masuk hijau, keluar merah. Saldo berjalan
        netral kecuali ia MINUS — di app kas saldo minus itu keadaan sah
        (lihat `hitungSaldoHadiran`), jadi ia dilaporkan, bukan disembunyikan. */
     warnaiUang(r.getCell(5), 'pos');
     warnaiUang(r.getCell(6), 'neg');
     warnaiUang(r.getCell(7), (k.saldo_setelah ?? 0) < 0 ? 'neg' : 'ink');
-    if (i % 2 === 1) r.eachCell((c) => (c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ZEBRA } }));
-    r.eachCell((c) => (c.border = border));
+    /* `includeEmpty`: `eachCell` bawaan MELEWATI sel kosong, dan tiap baris
+       Mutasi punya satu sel kosong (Masuk ATAU Keluar). Sel itu dulu tanpa
+       garis & tanpa zebra — kolom Masuk tercetak sbg lubang putih yang
+       memutus tiap baris hijau. */
+    r.eachCell({ includeEmpty: true }, (c) => {
+      if (i % 2 === 1) c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ZEBRA } };
+      c.border = border;
+    });
   });
 
   return { wb, filename: `Kas-RT-${stamp()}.xlsx` };

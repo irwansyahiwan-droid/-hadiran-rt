@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import type { Tarikan } from './types';
 import { formatTanggal } from './utils';
-import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA } from './excelStyle';
+import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA, siapCetak } from './excelStyle';
 
 interface TalanganInfo { count: number; total: number }
 interface Stats {
@@ -28,6 +28,7 @@ export function buildKasHadiranExcel(
   // ── Sheet 1: Ringkasan ──
   const sum = wb.addWorksheet('Ringkasan');
   sum.columns = [{ width: 28 }, { width: 20 }];
+  siapCetak(sum);
   titleBlock(sum, 'Kas Hadiran RT 004/006', `Ringkasan · ${tgl}`, 2);
   headerRow(sum, 4, ['Keterangan', 'Nominal (Rp)']);
   /* Nada mencermin PDF-nya baris demi baris: talangan `warn` (amber, perhatian),
@@ -60,6 +61,7 @@ export function buildKasHadiranExcel(
     { width: 8 }, { width: 18 }, { width: 26 }, { width: 8 }, { width: 12 },
     { width: 16 }, { width: 16 }, { width: 12 }, { width: 16 },
   ];
+  siapCetak(ws, { lanskap: true, barisKepala: 4 });
   titleBlock(ws, 'Kas Hadiran RT 004/006', `Rekap per Tarikan · ${tgl}`, 9);
   /* `Talangan` (cacah) sengaja TANPA satuan — begitu tetangganya menyebut
      (Rp), kolom tanpa satuan terbaca sbg cacah dgn sendirinya, sama seperti
