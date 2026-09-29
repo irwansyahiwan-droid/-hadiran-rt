@@ -70,9 +70,15 @@
 
   /* Token disinkron dari app (tailwind.config.js + src/index.css):
      hero = --hero-gradient/--hero-glow, kartu saldo = .hero-emerald,
-     line #B8C4D3 / row #D1DAE5 (pass KONTRAS MAKSIMAL 4 Agu),
-     ink #0B1220/#1F2937/#334155 (pass kontras-terbaca 8 Jul),
      shadow kartu = satu contact whisper (MATERIAL-FLAT 2 Jul).
+     NETRAL DI RONA HUTAN (29 Sep 2026). Tinta, garis, pembatas baris, titik
+     strip & tinta bayangan masih keluarga BIRU (rona 212–222°) — sisa sebelum
+     app pindah ke rona Hutan 24 Agu — di halaman bernada hijau (~150°).
+     Kini = token app: ink #07160D / sub #1D2D23 / faint #34453B, garis =
+     `CETAK.line` #B7C8BD (kekuatan hairline lama, rona hutan; token layar
+     #D3E0D8 hilang di kanvas tanpa langkah nada app), pembatas = `CETAK.divider`,
+     bayangan = tinta rgba(8,30,19) app. Rasio teks tetap AAA (faint di kanvas
+     7,87 → 7,75).
      Radius: kartu besar 24 / tile 16 / ikon & tombol 12 / pill full. */
   :root {
     /* Terang saja, mengikuti app: app default terang apa pun tema HP (gelap hanya
@@ -86,17 +92,17 @@
     --accent: #0F4C2E;
     --canvas: #CFE6D8;
     --surface: #FFFFFF;
-    --line: #B8C4D3;
+    --line: #B7C8BD;
     --control: #66786D; /* = token `control` app, isian bilah alur uang */
-    --row: #D1DAE5;
-    --ink: #0B1220;
-    --ink-sub: #1F2937;
-    --ink-faint: #334155;
+    --row: #D2DCD5;
+    --ink: #07160D;
+    --ink-sub: #1D2D23;
+    --ink-faint: #34453B;
     --tile-bg: linear-gradient(150deg, #EAF7F0 0%, #DCF1E6 100%);
     --tile-ink: #0F4C2E;
     --cell-tint: #EAF7F0;
     --alt-bg: linear-gradient(180deg, #FFFFFF 0%, #CFE6D8 100%);
-    --shadow-card: 0 2px 4px -1px rgba(15, 23, 42, 0.09);
+    --shadow-card: 0 2px 4px -1px rgba(8, 30, 19, 0.09);
     --hero-shadow: 0 6px 16px -12px rgba(0, 0, 0, 0.28), 0 18px 40px -22px rgba(15, 40, 30, 0.40);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* token easing app (src/index.css) */
     --maxw: 560px;
@@ -229,7 +235,7 @@
      carousel app: titik netral, yang aktif memanjang jadi pill emerald. */
   .bn-dots { display: flex; justify-content: center; gap: 6px; padding-top: 2px; }
   .bn-dots i {
-    width: 6px; height: 6px; border-radius: 999px; background: #C4CFDC;
+    width: 6px; height: 6px; border-radius: 999px; background: #C2D2C9;
     transition: width .3s var(--ease-out-expo), background .3s var(--ease-out-expo);
   }
   .bn-dots i.on { width: 18px; background: var(--brand); }
@@ -297,7 +303,7 @@
   .fcell p { font-size: 12.8px; color: var(--ink-faint); line-height: 1.45; }
 
   /* ─────────── SHOWCASE — tangkapan layar asli app ───────────
-     Frame HP bezel ink (#0B1220) + strip scroll-snap (peek, mask fade, dots).
+     Frame HP bezel `--ink` + strip scroll-snap (peek, mask fade, dots).
      Mengambil slot overlap ke tepi bawah hero (margin-top negatif) sebagai
      bukti visual pertama. Gambar = WebP 780px (turunan public/screenshots,
      regen: scripts/capture-screenshots.mjs lalu scripts/gen-shots-webp.mjs). */
@@ -321,7 +327,7 @@
   .ph { scroll-snap-align: center; flex: 0 0 66%; max-width: 270px; }
   .ph-frame {
     border-radius: 34px; padding: 8px;
-    background: #0B1220;
+    background: var(--ink);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.09), 0 16px 38px -22px rgba(15,40,30,.45);
   }
   .ph-frame img {
