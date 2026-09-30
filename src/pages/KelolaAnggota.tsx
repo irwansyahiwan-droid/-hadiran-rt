@@ -151,9 +151,9 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
         {/* Tanpa ✕: Batal di kaki + pegangan seret sudah menutup — sama dgn
             form Kas RT, setor & target (26 Sep 2026). */}
         <div className="mb-4">
-          <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
+          <h2 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
             {mode === 'add' ? 'Tambah Anggota' : 'Edit Anggota'}
-          </h3>
+          </h2>
           <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
             {mode === 'add' ? 'Data warga baru RT' : initial?.nama}
           </p>

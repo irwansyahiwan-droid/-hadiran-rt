@@ -127,7 +127,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
-        <h3 className="text-subtitle font-bold text-ink dark:text-gray-100">{isEdit ? 'Edit Transaksi Kas RT' : 'Tambah Transaksi Kas RT'}</h3>
+        <h2 className="text-subtitle font-bold text-ink dark:text-gray-100">{isEdit ? 'Edit Transaksi Kas RT' : 'Tambah Transaksi Kas RT'}</h2>
 
         <form onSubmit={submit} noValidate className="space-y-3">
           {/* Tipe toggle */}
@@ -1127,7 +1127,7 @@ export default function KasRTPage() {
                 ? <ArrowDownLeft className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 : <ArrowUpRight className="w-5 h-5 text-neg dark:text-rose-400" />}
             </div>
-            <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug text-balance">{selectedRow.keterangan ? ikatFrasa(selectedRow.keterangan) : (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</h3>
+            <h2 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug text-balance">{selectedRow.keterangan ? ikatFrasa(selectedRow.keterangan) : (selectedRow.tipe === 'masuk' ? 'Pemasukan' : 'Pengeluaran')}</h2>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(selectedRow.tanggal)}</p>
             <div className="inset-soft rounded-2xl p-4 space-y-3 mt-3">
               <div className="flex items-center justify-between">

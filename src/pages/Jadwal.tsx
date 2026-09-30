@@ -815,7 +815,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
         {/* Tanpa ✕: form ini sudah punya Batal di kaki + pegangan seret —
             sama dgn form Kas RT, setor & target (26 Sep 2026). */}
         <div className="mb-4">
-          <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</h3>
+          <h2 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Revisi Jadwal #{tarikan.nomor}</h2>
           <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Ubah tanggal atau Sohibul Bait</p>
         </div>
 
@@ -936,7 +936,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
         {/* Tanpa ✕: form ini sudah punya Batal di kaki + pegangan seret —
             sama dgn form Kas RT, setor & target (26 Sep 2026). */}
         <div className="mb-4">
-          <h3 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</h3>
+          <h2 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">Tambah Tarikan #{nextNomor}</h2>
           <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">Jadwalkan putaran tarikan berikutnya</p>
         </div>
 
@@ -1504,9 +1504,9 @@ export default function JadwalPage() {
             <div className="-mt-2 mb-3 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...rowDrag.handlers}>
               <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
-            <h3 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">
+            <h2 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">
               Tarikan #{rowTarikan.nomor} · {rowTarikan.sohibul_bait?.nama ?? '—'}
-            </h3>
+            </h2>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(rowTarikan.tanggal)}</p>
             <div className="space-y-2 mt-4">
               {rowTarikan.status !== 'selesai' && (
