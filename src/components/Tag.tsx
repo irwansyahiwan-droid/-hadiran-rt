@@ -51,12 +51,15 @@ const TONES: Record<Tone, string> = {
    WARGA: 8,6:1 saat diam di atas kanvas, 6,19:1 begitu kartu saldo hijau tua
    digulir ke belakang header (80%), terburuk ~6,0 — di bawah ambang AAA app.
    Sapuan kontras mana pun hanya melihatnya kalau kebetulan memotret dalam
-   posisi gulir itu. `gray-200` padat = 8,26:1 di mana pun, dan saat diam
-   nyaris sama dgn tint lamanya (232,237,234 → 226,233,229).
+   posisi gulir itu. `gray-100` padat = 9,28:1 di mana pun — LEBIH tinggi dari
+   tint lama saat diam (8,55) maupun tergulir (6,17), diukur dari piksel.
+   `gray-200` sempat dipasang lebih dulu (8,26 tetap) dan user melihatnya
+   "turun": benar, saat diam ia 0,3 di bawah tint lamanya. Obat kontras tak
+   boleh membeli keadaan tergulir dgn menurunkan keadaan diam.
    Hanya `neutral`: `success` (BENDAHARA) terburuk 7,49 — sudah lolos. Sisi
    GELAP tetap ber-alpha: tak ada sampel gelap di bawah ambang. */
 const TONES_KACA: Partial<Record<Tone, string>> = {
-  neutral: 'bg-gray-200 text-gray-600 ring-gray-500/20 dark:bg-gray-400/15 dark:text-gray-200 dark:ring-gray-400/25',
+  neutral: 'bg-gray-100 text-gray-600 ring-gray-500/20 dark:bg-gray-400/15 dark:text-gray-200 dark:ring-gray-400/25',
 };
 
 interface TagProps {
