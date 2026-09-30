@@ -224,6 +224,7 @@ body {
      baris ini menunjuk `import '@fontsource-variable/inter'` di main.tsx —
      mekanisme yang sudah tidak ada. */
   font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  font-weight: 500; /* prosa = medium (tangga tebal). Dulu 400 "redup" membuat teks tanpa kelas tampak pucat — 43 teks di Hadiran & Kas RT. 30 Sep 2026 */
   /* Tabular figures app-wide: tiap digit selebar sama → angka rupiah tidak
      "goyang/loncat" saat count-up atau saat disusun kolom (terasa seperti
      running text bank).
