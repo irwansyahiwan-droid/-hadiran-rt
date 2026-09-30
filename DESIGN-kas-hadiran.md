@@ -137,7 +137,8 @@ jumlah tarikan solid `bg-emerald-700` + teks putih.
    `text-amount` **ink netral** rata kanan diikuti chevron › (affordance; kata
    "Lihat detail" tinggal `sr-only`). Sejak 30 Sep 2026 — dulu nominal di
    kolom kanan (16 dari 21 nama terlipat di 360px) dan "Lihat detail ›" baris
-   ketiga; kartu kini 172px di semua lebar.
+   ketiga. Garis tipis menjorok (`mx-5`) memisahkan blok ini dari progress
+   kehadiran; kartu 197px di semua lebar ≥360.
 3. **Progress kehadiran:** teks "Kas Hadiran {Rp}" + "{hadir}/{total} hadir";
    bar 6px track `bg-gray-100`, fill emerald animasi `scaleX` 700ms,
    `role="progressbar"` + aria lengkap.

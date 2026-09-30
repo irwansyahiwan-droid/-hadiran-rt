@@ -931,7 +931,7 @@ export default function KasHadiranPage() {
                     >
 
                       {/* ── Timeline mini-header ─────────────────────── */}
-                      <div className="flex items-center justify-between px-5 pt-4 pb-2">
+                      <div className="flex items-center justify-between px-5 pt-4 pb-3">
                         <div className="flex items-center gap-2">
                           {/* Nomor tarikan = IDENTITAS, bukan status. Dulu ia
                               diwarnai emerald/amber menurut ada-tidaknya talangan
@@ -998,7 +998,7 @@ export default function KasHadiranPage() {
                               (daftar 3.612px, sebelum 3.592 @390 · 3.922 @360).
                               Kalimatnya tetap ada untuk pembaca layar (`sr-only`),
                               jadi nama tombol masih menyebut apa yang dibukanya. */}
-                          <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
+                          <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-2">
                             <span className="text-caption text-ink-faint dark:text-gray-400">Dapat Arisan</span>
                             <span className="inline-flex items-center gap-1 whitespace-nowrap">
                               {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
@@ -1013,7 +1013,15 @@ export default function KasHadiranPage() {
                       </button>
 
                       {/* ── Progress bar + kas info ───────────────────── */}
-                      <div className="px-5 pb-4">
+                      {/* Garis tipis MENJOROK (`mx-5`, bukan selebar kartu) memisahkan
+                          "siapa & berapa" dari "kas & kehadiran" (30 Sep 2026, varian
+                          D pilihan user). Begitu "Lihat detail" dilebur ke chevron,
+                          kartu 172px terbaca PADAT di HP nyata: nama 18px & nominal
+                          17px berjarak 4px lalu langsung disusul baris Kas Hadiran.
+                          Kini kepala `pb-3`, nama → nominal `mt-2`, lalu garis ini —
+                          kartu 197px. Garis strip aksi bendahara di bawah sengaja
+                          tetap selebar kartu: itu memisahkan TOMBOL, bukan isi. */}
+                      <div className="mx-5 pt-4 pb-4 border-t border-line dark:border-gray-800">
                         <div className="flex items-center justify-between text-body text-ink-sub dark:text-gray-400 mb-2">
                           <span>
                             Kas Hadiran{' '}
