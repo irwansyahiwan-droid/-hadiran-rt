@@ -51,12 +51,15 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
      yang sama dgn skeleton hero JadwalWarga: tinggi tetap akan salah begitu
      judul melipat (`line-clamp-2`) atau kaki kartu membungkus di teks 200%.
      Dengan struktur yang sama ia melipat di titik yang SAMA. Diukur ulang
-     30 Sep 2026 sesudah subjudul "Target Rp…" dibuang: kerangka 142 lawan
-     143,7px (warga) · 146 lawan 147,7px (bendahara) di 360–430px.
-     MASIH TERBUKA di 320px: kaki kartu membungkus jadi 190,6px sementara batang
-     kerangka lebarnya tetap & tak ikut membungkus — selisih ±45px (sebelum
-     subjudul dibuang pun sudah 54,5px, jadi bukan lahir dari perubahan itu).
-     `audit:lompat` hanya mengukur 390px, jadi tak melihatnya.
+     30 Sep 2026 sesudah subjudul dibuang & kaki disusun ulang di <380px
+     (fetch `pengaturan` ditahan, kerangka lawan kartu asli):
+       380–430px  142 / 146 lawan 143,7 / 147,7   (+1,7)
+       360–375px  165 / 169 lawan 166,5 / 170,5   (+1,5)
+     Dulu 320px meleset 54,5px (kaki membungkus, batang kerangka tidak).
+     SISA +6,8…+10,8px hanya saat JUDUL melipat dua baris (320–340px, dan
+     360px bendahara karena tombol ubah): judulnya teks bebas bendahara yang
+     belum diketahui selagi memuat, jadi kerangka tak bisa tahu panjangnya.
+     `audit:lompat` hanya mengukur 390px, jadi angka di atas diukur manual.
 
      Tombol ubah ikut `isBendahara` persis seperti kartu asli: kalau tidak,
      warga dapat skeleton 36px lebih lebar dari isi yang menggantikannya. */
@@ -73,13 +76,19 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
           {isBendahara && <div className="skeleton w-9 h-9 -mr-1 rounded-xl shrink-0" />}
         </div>
         <div className="skeleton h-3 rounded-full" />
-        <div className="flex items-center justify-between gap-2 mt-3">
-          <div className="skeleton h-[17px] w-28 rounded-full" />
-          <div className="skeleton h-[15px] w-32 rounded-full" />
-        </div>
-        <div className="flex items-center justify-between mt-2">
-          <div className="skeleton h-[15px] w-24 rounded-full" />
-          <div className="skeleton h-[15px] w-28 rounded-full" />
+        {/* Kaki: struktur & kelas susun-sempit yang SAMA dgn kartu asli
+            (`contents` + `order` di <380px), supaya kerangka melipat di titik
+            yang sama. Batang yang pindah baris dibungkus span `basis-full`
+            agar lebarnya sendiri tetap lebar teks, bukan selebar kartu. */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="basis-full flex items-center justify-between gap-2 max-[379px]:contents">
+            <div className="skeleton h-[17px] w-28 rounded-full max-[379px]:order-1" />
+            <span className="max-[379px]:order-3 max-[379px]:basis-full"><span className="skeleton block h-[15px] w-32 rounded-full" /></span>
+          </div>
+          <div className="basis-full flex items-center justify-between max-[379px]:contents">
+            <div className="skeleton h-[15px] w-24 rounded-full max-[379px]:order-2" />
+            <span className="max-[379px]:order-4 max-[379px]:basis-full"><span className="skeleton block h-[15px] w-28 rounded-full" /></span>
+          </div>
         </div>
       </div>
     );
@@ -211,26 +220,44 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
             JANGAN tambahkan `whitespace-nowrap` di sini: dicoba 17 Agu dan
             memang merapikan 360px, tapi saat teks dasar browser 200% baris ini
             kehilangan satu-satunya jalan melipatnya → geser samping Kas RT
-            melonjak 117px menjadi 258px. Membungkus adalah katup pengamannya. */}
-        <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
-          <span className="inline-flex items-center gap-1 text-caption font-bold angka-prosa text-emerald-700 dark:text-emerald-400">
-            {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
-          </span>
-          <span className="font-display text-micro text-gray-500 dark:text-gray-400 tabular-nums">
-            {formatRupiahPlain(Math.max(0, saldo))} / {formatRupiahPlain(target.nominal)}
-          </span>
-        </div>
+            melonjak 117px menjadi 258px. Membungkus adalah katup pengamannya.
 
-        <div className="flex items-center justify-between mt-2 text-micro text-gray-500 dark:text-gray-400">
-          <span>
-            {tercapai ? 'Lebih ' : 'Kurang '}
-            <span className="font-display tabular-nums">
-              {formatRupiahPlain(tercapai ? saldo - target.nominal : sisa)}
+            SUSUNAN SEMPIT (<380px, 30 Sep 2026, varian R dipilih user). Baris
+            pertama butuh 294px (98 + 8 + 188) dan membungkus di bawah ±358px;
+            baris kedua TAK membungkus, jadi ia dipencet — "Kurang" terbelah
+            dari nominalnya & tanggal patah jadi dua baris, kartu 191px. Di
+            360px (lebar acuan) ia belum membungkus tapi sudah MENEMPEL: sisa
+            ±4px, "Rp6.094.000" langsung disusul ikon kalender. Batas 379px =
+            batas sempit yang sudah dipakai Talangan; di 375px susunan dua baris
+            masih lega, tapi 360–371px tidak. Di bawah batas itu kedua baris
+            jadi `display: contents` dan keempat potongannya
+            diurut ulang di satu wadah flex-wrap: persen + "Kurang" sebaris
+            (98 + 125 muat di 256px), lalu pecahan, lalu tanggal → tiga baris
+            utuh, kartu 176px. Urutan DOM (= urutan pembaca layar) tak
+            berubah; yang diurut ulang cuma tampilan. Tak ada `nowrap` —
+            katup pengaman di atas tetap berlaku. Kerangka di atas mencermin
+            struktur yang SAMA. */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="basis-full flex flex-wrap items-center justify-between gap-2 max-[379px]:contents">
+            <span className="inline-flex items-center gap-1 text-caption font-bold angka-prosa text-emerald-700 dark:text-emerald-400 max-[379px]:order-1">
+              {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
             </span>
-          </span>
-          {deadline && (
-            <span className={`inline-flex items-center gap-1 ${deadlineLewat ? 'text-warn dark:text-amber-400 font-semibold' : ''}`}><CalendarClock className="w-3 h-3 shrink-0" /><MetaPisah as="span" bagian={deadline} /></span>
-          )}
+            <span className="font-display text-micro text-gray-500 dark:text-gray-400 tabular-nums max-[379px]:order-3 max-[379px]:basis-full">
+              {formatRupiahPlain(Math.max(0, saldo))} / {formatRupiahPlain(target.nominal)}
+            </span>
+          </div>
+
+          <div className="basis-full flex items-center justify-between text-micro text-gray-500 dark:text-gray-400 max-[379px]:contents">
+            <span className="max-[379px]:order-2">
+              {tercapai ? 'Lebih ' : 'Kurang '}
+              <span className="font-display tabular-nums">
+                {formatRupiahPlain(tercapai ? saldo - target.nominal : sisa)}
+              </span>
+            </span>
+            {deadline && (
+              <span className={`inline-flex items-center gap-1 max-[379px]:order-4 max-[379px]:basis-full ${deadlineLewat ? 'text-warn dark:text-amber-400 font-semibold' : ''}`}><CalendarClock className="w-3 h-3 shrink-0" /><MetaPisah as="span" bagian={deadline} /></span>
+            )}
+          </div>
         </div>
       </div>
 
