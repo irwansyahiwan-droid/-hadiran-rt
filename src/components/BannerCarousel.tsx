@@ -84,11 +84,24 @@ function bannerViewportHeight(vh: number, vw: number): number {
 /** Tinggi baris indikator story: tombol minHeight 44 + pt-0.5 (2). */
 const INDICATOR_H = 46;
 
+/* Area sentuh indikator (44px, untuk titik setinggi 4px) MENUMPANG ruang
+   kosong di sekitarnya, bukan menambah ruang (30 Sep 2026). Dulu baris 46px
+   itu duduk utuh di antara napas bawah kartu (10px) dan jarak seksi (32px):
+   kartu saldo → banner Beranda 88px, padahal hero → blok berikutnya di
+   halaman lain ~32px. Kini baris naik 12px ke napas bawah dan 24px area
+   sentuh bawahnya menumpang jarak seksi: kartu → titik 20px, titik →
+   banner 28px, total 52px (varian B dari tiga yang dirender & dipilih
+   user). Area sentuhnya tetap 44px, tepat bersentuhan dgn tepi kartu dan
+   sisa 8px ke banner. */
+const INDICATOR_NAIK = 12;
+const INDICATOR_TURUN = 24;
+
 /** Tinggi TOTAL blok (viewport kartu + baris indikator). `bannerViewportHeight`
  *  saja TIDAK cukup untuk skeleton — indikator ada di luar viewport, jadi memakai
- *  viewport-height bikin lompatan 46px saat skeleton → konten (terukur 18 Jul). */
+ *  viewport-height bikin lompatan 46px saat skeleton → konten (terukur 18 Jul).
+ *  NAIK & TURUN dikurangkan karena baris aslinya menumpang ruang sekitarnya. */
 function bannerBlockHeight(vh: number, vw: number): number {
-  return bannerViewportHeight(vh, vw) + INDICATOR_H;
+  return bannerViewportHeight(vh, vw) + INDICATOR_H - INDICATOR_NAIK - INDICATOR_TURUN;
 }
 
 /**
@@ -174,7 +187,11 @@ export function BannerSkeleton({ vh, vw }: { vh: number; vw: number }) {
           samping dari sumber yang SAMA dgn carousel (`PROMOS` + kartu saldo,
           `padIndikator`) — dulu dipaku 7 titik/9px dan tertinggal saat promo
           dipangkas. Beranda selalu memasang kartu saldo, jadi +1. */}
-      <div className="flex items-center justify-center" style={{ height: INDICATOR_H }}>
+      {/* `marginTop`: di kerangka baris ini langsung menyusul kartu (tanpa
+          viewport ber-napas), jadi ia dimundurkan sebanyak napas bawah kartu
+          aslinya lalu dinaikkan INDICATOR_NAIK — titik kerangka duduk tepat
+          di tempat titik asli (kartu + 20px). */}
+      <div className="flex items-center justify-center pt-0.5" style={{ height: INDICATOR_H, marginTop: CARD_GAP - TOP - INDICATOR_NAIK }}>
         {Array.from({ length: PROMOS.length + 1 }).map((_, i) => (
           <span
             key={i}
@@ -588,7 +605,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
         ref={viewportRef}
         className="relative w-full overflow-hidden"
         style={{
-          height: viewportH + NAPAS_BAYANG, marginBottom: -NAPAS_BAYANG, perspective: '1500px', perspectiveOrigin: `50% ${(viewportH * 0.42).toFixed(1)}px` /* 42% tinggi LAMA — NAPAS_BAYANG tak boleh menggeser kemiringan tetangga */, touchAction: 'pan-y',
+          height: viewportH + NAPAS_BAYANG, marginBottom: -(NAPAS_BAYANG + INDICATOR_NAIK), perspective: '1500px', perspectiveOrigin: `50% ${(viewportH * 0.42).toFixed(1)}px` /* 42% tinggi LAMA — NAPAS_BAYANG tak boleh menggeser kemiringan tetangga */, touchAction: 'pan-y',
           // Fade halus di tepi kiri/kanan → kartu tetangga yang mengintip MELEBUR
           // di tepi layar, bukan terpotong garis keras (teks tak lagi "kepotong").
           //
@@ -808,7 +825,10 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
       {/* Indikator "story" tersegmen — aktif melebar + bar progress mengisi;
           yang sudah lewat terisi penuh. */}
       {count > 1 && (
-        <div className="relative z-10 flex items-center justify-center pt-0.5">
+        /* `pointer-events-none` di baris, `-auto` di tombol: baris ini naik 12px
+           (INDICATOR_NAIK) sehingga strip `pt-0.5`-nya menumpuk 2px di tepi
+           bawah kartu — tanpa ini strip kosong itu menelan ketukan kartu. */
+        <div className="pointer-events-none relative z-10 flex items-center justify-center pt-0.5" style={{ marginBottom: -INDICATOR_TURUN }}>
           {/* Dot inaktif 7px + 2×19 = 45px (lolos ambang app 44). Di atas 3
               slide, deretannya jadi terlalu lebar → balik ke 9px & pengecualian
               §2.5.8-nya yang lama (lihat catatan panjang di bawah). */}
@@ -822,7 +842,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                 onClick={() => goTo(i)}
                 aria-label={`Ke slide ${i + 1}`}
                 aria-current={isActive}
-                className="press group grid place-items-center"
+                className="press group pointer-events-auto grid place-items-center"
                 // padding-x 8.5 + gap 0 di baris → kotak sentuh 24px persis dan
                 // BERSINGGUNGAN, tidak bertumpuk (WCAG 2.5.8 AA). Dulu lebar
                 // tombol = lebar dot (7px) → praktis tak bisa diketuk (audit
