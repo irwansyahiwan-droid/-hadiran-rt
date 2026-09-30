@@ -132,9 +132,11 @@ jumlah tarikan solid `bg-emerald-700` + teks putih.
 1. **Mini-header timeline:** badge nomor 28px tint semantik (lunas=emerald /
    ada talangan=amber), titik pemisah, tanggal micro, `Tag` status kanan
    ("Lunas semua" / "N belum bayar").
-2. **Focal row (tappable → sheet detail):** `AvatarPeci` 48px `rounded-2xl`,
-   nama Sohibul bold ink, affordance "Lihat detail ›" micro; kanan nominal
-   `text-amount` **ink netral** + label "Dapat Arisan".
+2. **Focal row (tappable → sheet detail):** `AvatarPeci` 44px, nama Sohibul
+   bold ink selebar kolom; baris kedua label "Dapat Arisan" kiri + nominal
+   `text-amount` **ink netral** rata kanan (sejak 30 Sep 2026 — dulu kolom
+   kanan, dan 16 dari 21 nama terlipat di 360px); affordance "Lihat detail ›"
+   micro.
 3. **Progress kehadiran:** teks "Kas Hadiran {Rp}" + "{hadir}/{total} hadir";
    bar 6px track `bg-gray-100`, fill emerald animasi `scaleX` 700ms,
    `role="progressbar"` + aria lengkap.

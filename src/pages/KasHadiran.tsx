@@ -892,11 +892,14 @@ export default function KasHadiranPage() {
                     <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-line dark:border-gray-800/60 p-4 space-y-3">
                       <div className="flex items-center gap-3">
                         <div className="skeleton w-12 h-12 rounded-2xl" />
+                        {/* Nominal di baris kedua rata kanan, seperti kartu aslinya. */}
                         <div className="flex-1 space-y-2">
                           <div className="skeleton h-3.5 w-2/5 rounded-full" />
-                          <div className="skeleton h-2.5 w-1/4 rounded-full" />
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="skeleton h-2.5 w-1/4 rounded-full" />
+                            <div className="skeleton h-4 w-20 rounded-full" />
+                          </div>
                         </div>
-                        <div className="skeleton h-4 w-20 rounded-full" />
                       </div>
                       <div className="skeleton h-1.5 w-full rounded-full" />
                     </div>
@@ -975,28 +978,30 @@ export default function KasHadiranPage() {
                           <p data-ringkas className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
                             {t.sohibul_bait?.nama ?? '—'}
                           </p>
-                          {/* Di bawah 360px nominal PINDAH ke bawah nama (26 Sep
-                              2026): kolom kanan (~115px) menyisakan ~73px untuk
-                              nama 18px bold, dan 9 nama terbelah di TENGAH kata
-                              ("Basukia / nto", "Syarifu / din") di 320px — lebar
-                              WAJIB §1.4.10. Di 360px ke atas tak ada yang
-                              berubah. */}
-                          <p className="hidden max-[359px]:block mt-1 text-caption text-ink-faint dark:text-gray-400">
-                            <span className="font-display font-semibold tabular-nums text-ink dark:text-gray-100">{formatRupiahPlain(sohibulTerima)}</span>
-                            {' · Dapat Arisan'}
-                          </p>
+                          {/* Nominal di baris KEDUA, rata kanan, di SEMUA lebar
+                              (30 Sep 2026) — pola yang sama dgn baris Talangan.
+                              Dulu ia kolom kanan di ≥360px & baris keterangan di
+                              <360px. Kolom kanan (~115px) menyisakan 113px untuk
+                              nama 18px bold TEPAT di 360px (lebar Android umum):
+                              16 dari 21 nama terlipat, kartu 170/192px berseling;
+                              di 320px dulu 9 nama terbelah di tengah kata. Kini
+                              nama dapat 238px @360 (0 terlipat, kartu rata 196px).
+                              Di <360px nominal turun satu anak tangga (amount 17px
+                              → body 15px): di 320px label + nominal butuh 203px
+                              sedangkan kolomnya 198px, jadi 17px mematahkan SEMUA
+                              21 kartu: nominal jadi baris sendiri (kartu 240px).
+                              `flex-wrap` tetap jaring: nominal yang tetap tak muat
+                              turun ke baris sendiri, bukan elipsis. */}
+                          <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
+                            <span className="text-caption text-ink-faint dark:text-gray-400">Dapat Arisan</span>
+                            {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
+                            <span className="font-display text-amount max-[359px]:text-body font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">
+                              {formatRupiahPlain(sohibulTerima)}
+                            </span>
+                          </div>
                           <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">
                             Lihat detail
                             <ChevronRight className="w-3 h-3" />
-                          </span>
-                        </div>
-                        <div className="max-[359px]:hidden text-right shrink-0">
-                          {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
-                          <p className="font-display text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
-                            {formatRupiahPlain(sohibulTerima)}
-                          </p>
-                          <span className="block mt-0.5 text-micro font-medium text-ink-faint dark:text-gray-400">
-                            Dapat Arisan
                           </span>
                         </div>
                       </button>
