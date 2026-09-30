@@ -179,8 +179,13 @@ function perimeterPoints(r, fontSize) {
     [r.x + inX, my], [r.x + inX + 1, my], [r.x + r.w - inX, my], [r.x + r.w - inX - 1, my],
     [r.x + inX, my - 3], [r.x + r.w - inX, my - 3], [r.x + inX, my + 3], [r.x + r.w - inX, my + 3],
   ];
-  // elemen pendek (± satu baris): tepi atas/bawah masih di zona teks
-  if (r.h < fontSize * 2.2) {
+  /* Baris ATAS & BAWAH kotak = leading/padding, satu-satunya tempat yang
+     DIJAMIN bukan glyph. Ambang 2,2 → 7em (30 Sep 2026) supaya SAMA dgn
+     audit-kontras-deep.mjs — kedua berkas wajib bergeometri sampel sama.
+     Di sana paragraf 3 baris (4,9em) lolos syarat lama, cuma 8 titik tepi
+     dipakai, dan piksel antialias menang seri jadi "latar" (1,88:1 palsu
+     untuk teks ~14:1). Di atas 7em elemen memang wadah. */
+  if (r.h < fontSize * 7) {
     const n = 6;
     for (let i = 0; i <= n; i++) {
       const x = r.x + inX + (i * (r.w - 2 * inX)) / n;
