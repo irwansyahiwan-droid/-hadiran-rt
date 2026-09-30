@@ -50,8 +50,13 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
      Skeletonnya BERBENTUK anatomi aslinya, bukan slab setinggi tetap — pelajaran
      yang sama dgn skeleton hero JadwalWarga: tinggi tetap akan salah begitu
      judul melipat (`line-clamp-2`) atau kaki kartu membungkus di teks 200%.
-     Dengan struktur yang sama ia melipat di titik yang SAMA. Terukur 145px
-     lawan 147px kartu asli.
+     Dengan struktur yang sama ia melipat di titik yang SAMA. Diukur ulang
+     30 Sep 2026 sesudah subjudul "Target Rp…" dibuang: kerangka 142 lawan
+     143,7px (warga) · 146 lawan 147,7px (bendahara) di 360–430px.
+     MASIH TERBUKA di 320px: kaki kartu membungkus jadi 190,6px sementara batang
+     kerangka lebarnya tetap & tak ikut membungkus — selisih ±45px (sebelum
+     subjudul dibuang pun sudah 54,5px, jadi bukan lahir dari perubahan itu).
+     `audit:lompat` hanya mengukur 390px, jadi tak melihatnya.
 
      Tombol ubah ikut `isBendahara` persis seperti kartu asli: kalau tidak,
      warga dapat skeleton 36px lebih lebar dari isi yang menggantikannya. */
@@ -61,9 +66,8 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="skeleton w-8 h-8 rounded-xl shrink-0" />
-            <div className="min-w-0 flex-1 space-y-1">
+            <div className="min-w-0 flex-1">
               <div className="skeleton h-[22px] w-3/5 rounded-full" />
-              <div className="skeleton h-[15px] w-2/5 rounded-full" />
             </div>
           </div>
           {isBendahara && <div className="skeleton w-9 h-9 -mr-1 rounded-xl shrink-0" />}
@@ -138,7 +142,12 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
                   Judul = identitas kartu; biarkan melipat (pola sama judul
                   transaksi Beranda). */}
               <p className="text-body font-bold text-balance text-gray-900 dark:text-gray-100 line-clamp-2 leading-snug">{ikatFrasa(target.keterangan || 'Target Kas RT')}</p>
-              <p className="text-micro text-gray-500 dark:text-gray-400">Target <span className="font-display tabular-nums">{formatRupiahPlain(target.nominal)}</span></p>
+              {/* Subjudul "Target Rp…" DIBUANG (30 Sep 2026, varian B dipilih
+                  user dari render terang & gelap). Nominal target sudah
+                  tertulis di pecahan kaki bar ("Rp18.906.000 / Rp25.000.000"),
+                  jadi kartu ini menyebutnya DUA kali dalam 60px. Kini kepala
+                  kartu satu judul sejajar ikon, dan target disebut sekali — di
+                  tempat ia dibandingkan dgn saldo. */}
             </div>
           </div>
           {isBendahara && (
