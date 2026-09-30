@@ -55,7 +55,14 @@ function Odometer({ value, prefix = 'Rp', className = '', duration = 220 }: Odom
       role="text"
       aria-label={spoken}
     >
-      <span aria-hidden="true">
+      {/* `pointer-events-none` (30 Sep 2026): kotak baris pita ini LEBIH tinggi
+          dari baris nominalnya (60px lawan 49px @360, kolom `inline-block`
+          ber-overflow mengangkat kotak barisnya) sehingga ia menjorok 6px ke
+          atas — di hero Kas Hadiran menimpa 2px terbawah tombol "Sembunyikan
+          nominal" & "Bagikan", yang karenanya terukur 44×42 di `audit:sentuh`.
+          Pita ini murni visual (nilainya dibacakan `aria-label` pembungkus),
+          jadi ia tak pernah berhak menangkap ketukan. */}
+      <span aria-hidden="true" className="pointer-events-none">
       {negative && <span style={cell}>-</span>}
       {prefix && <span style={cell}>{prefix}</span>}
       {grouped.split('').map((c, i) => {
