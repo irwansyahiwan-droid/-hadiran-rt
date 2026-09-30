@@ -419,29 +419,29 @@ export default function Beranda({ onNavigate }: BerandaProps) {
               dan tetap identitas yang benar untuk sebuah lipatan. */}
           <div className="flex-1 min-w-0">
             <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug potong-lentur">{judul}</p>
+            {/* Chevron di UJUNG baris keterangan, bukan di sebelah nominal.
+                Di sebelah nominal ia memakan kolom uang: tanpa kompensasi,
+                nominal lipatan berhenti 16px lebih kiri dari baris polos
+                (341 lawan 357); memesan slot kosong di baris polos memerahkan
+                `audit:potong` di 320px; dan menggantungnya ke bantalan kanan
+                (`-mr-5`) membuatnya menembus tepi kartu — 3px terpotong
+                `overflow-hidden` kartu `rounded-3xl`, terang & gelap (terukur
+                30 Sep 2026). Di sini ia tak menyentuh kolom uang sama sekali,
+                dan tetap menempel pada "N warga" — hal yang memang dibuka. */}
             <MetaPisah
               className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-1"
-              bagian={[...(jenis ? jenis.split(' · ') : []), `${run.items.length} ${satuan}`]}
+              bagian={[
+                ...(jenis ? jenis.split(' · ') : []),
+                <span key="jumlah" className="inline-flex items-center gap-1">
+                  {run.items.length} {satuan}
+                  <ChevronDown className={`w-3.5 h-3.5 shrink-0 text-gray-400 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} />
+                </span>,
+              ]}
             />
           </div>
           <span className={`font-display text-amount font-semibold shrink-0 tabular-nums ${warnaNominal(run.items[0].tipe, run.total)}`}>
             {teksNominal(run.total)}
           </span>
-          {/* `-mr-4` (bukan `-mr-1`): chevron duduk DI DALAM bantalan kanan baris
-              sehingga tak memakan lebar isi sama sekali — nominal baris lipatan
-              lalu berhenti di kolom yang sama dgn baris polos (terukur: dulu
-              341 lawan 357).
-
-              Percobaan pertama memesan slot kosong selebar chevron di baris
-              POLOS. Itu menyejajarkan kolomnya, tapi memakan 16px lebar isi
-              tiap baris dan `audit:potong` langsung merah di 320px — lebar
-              WAJIB §1.4.10 — dgn "Agustus 2026" kurang 3,2px. Menyejajarkan
-              kolom uang tak boleh dibayar dgn teks terpotong di lebar wajib.
-
-              Angkanya dari aritmetika kotak, bukan coba-coba: pergeseran =
-              lebar 16 + ml(-4) + mr + gap(8). Nol → mr = -20px = `-mr-5`.
-              (`-mr-4` menyisakan 4px, terukur.) */}
-          <ChevronDown className={`w-4 h-4 -ml-1 -mr-5 shrink-0 text-gray-400 transition-transform duration-ketuk ${open ? 'rotate-180' : ''}`} />
         </button>
         {open && run.items.map((trx, ii) => trxRow(trx, idx, lastInGroup && ii === run.items.length - 1, false, true))}
       </div>
