@@ -348,7 +348,7 @@ export default {
         ink: {
           DEFAULT: '#07160D', // judul / nominal utama (near-black, kontras maksimal)
           sub: '#1D2D23',     // teks sekunder (gray-800 — pass kontras-terbaca 8 Jul: naik dari 700; ≈14.7:1)
-          faint: '#34453B',   // tanggal / caption (slate-700 — pass kontras-terbaca 8 Jul: naik dari 600; ≈10.4:1, tangga tetap: ink > sub > faint > gray-400-remap #475569)
+          faint: '#1D2D23',   // tanggal / caption (slate-700 — pass kontras-terbaca 8 Jul: naik dari 600; ≈10.4:1, tangga tetap: ink > sub > faint > gray-400-remap #475569)
         },
       },
     },

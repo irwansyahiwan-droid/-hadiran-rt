@@ -49,7 +49,7 @@ describe('warnaCetak = cermin token app', () => {
     expect(terangHex(CETAK.line)).toBeLessThanOrEqual(terangHex(c.line));
     expect(CETAK.ink).toBe(c.ink.DEFAULT);
     expect(CETAK.sub).toBe(c.ink.sub);
-    expect(CETAK.faint).toBe(c.ink.faint);
+    expect(terangHex(CETAK.faint)).toBeLessThanOrEqual(terangHex('#34453B')); // layar naik ke #1D2D23 (B, 30 Sep 2026); kertas tak boleh lebih pudar dari nilai lamanya
   });
 
   /* `muted` sengaja TIDAK punya padanan token — app tak mengizinkan teks

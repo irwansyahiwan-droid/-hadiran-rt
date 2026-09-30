@@ -623,7 +623,7 @@ textarea:-webkit-autofill {
    berjenjang: ink #07160D > sub #1D2D23 > faint #34453B (9,14 kanvas) >
    gray-400-remap #41505F (7,30 kanvas). */
 html:not(.dark) .text-gray-400 { color: #3E4F44; }  /* gray-400→slate-ink: nyaman (≈7.3:1 di kanvas) */
-html:not(.dark) .text-gray-500 { color: #34453B; }  /* gray-500→slate-700: tegas (≈10.4:1) */
+html:not(.dark) .text-gray-500 { color: #1D2D23; }  /* gray-500→slate-700: tegas (≈10.4:1) */
 /* `.text-gray-600` TAK PERNAH punya remap, dan akibatnya tangga ini TERBALIK
    persis di anak tangga yang namanya paling gelap: gray-400 dirender #3E4F44,
    gray-500 dirender #34453B, sedangkan gray-600 jatuh ke palet mentah #48594E
@@ -638,7 +638,7 @@ html:not(.dark) .text-gray-500 { color: #34453B; }  /* gray-500→slate-700: teg
    bukan diberi nilai keempat: tangga TEKS light mode app ini memang tiga rung
    (ink > sub > faint), bukan seluruh ramp abu Tailwind — `.text-slate-600`
    sudah dilipat ke sini lebih dulu dgn alasan yang sama. */
-html:not(.dark) .text-gray-600 { color: #34453B; }  /* gray-600→faint: buang tangga terbalik (7,68:1 di kanvas) */
+html:not(.dark) .text-gray-600 { color: #1D2D23; }  /* gray-600→faint: buang tangga terbalik (7,68:1 di kanvas) */
 
 /* ── Kontras teks (DARK MODE) — cermin aturan light di atas ──────────────────
    Pass KONTRAS MAKSIMAL (4 Agu 2026). Sisi TERANG punya remap tangga teks sejak
@@ -711,7 +711,7 @@ html:not(.dark) .text-emerald-700 { color: #064E3B; }  /* 8,57:1 di emerald-100 
 html:not(.dark) .text-emerald-800 { color: #053D2E; }  /* 8,39:1 di kanvas mint Login */
 html:not(.dark) .text-rose-700    { color: #881337; }  /* 8,93:1 di rose-50 */
 html:not(.dark) .text-amber-800   { color: #75320B; }  /* = token `warn`; 8,50:1 di amber-100, 7,14:1 di kanvas */
-html:not(.dark) .text-slate-600   { color: #34453B; }  /* 8,49:1 di tile abu (inisial AvatarPeci) */
+html:not(.dark) .text-slate-600   { color: #1D2D23; }  /* 8,49:1 di tile abu (inisial AvatarPeci) */
 html:not(.dark) .text-blue-700    { color: #1E3A8A; }  /* 8,38:1 di pil "WARGA" */
 /* blue-600 terlewat di pass 4 Agu — satu-satunya literal biru yang tak ikut,
    dan justru yang dipakai StatRow tone `info` (angka "Titip" di Jadwal) plus
