@@ -750,6 +750,22 @@ for (const theme of ['light', 'dark']) {
     await page.goto(URL, { waitUntil: 'networkidle' });
     await page.waitForTimeout(1200);
     await auditPage(page, `${theme}/login`, { fokus: true });
+    /* Panel bendahara dibuka (30 Sep 2026): pass di atas memotret Login dgn
+       panel TERTUTUP, jadi batas kolom email/password, bingkai kartu & cincin
+       fokus emas di dalamnya — semuanya batas KONTROL §1.4.11 — tak pernah
+       masuk populasi sapuan mana pun. Ditunggu sampai MENGAKU terbuka
+       (preseden `audit:masuk`); gagal buka = MELEDAK, bukan dilewati. */
+    const pemicuBendahara = page.getByRole('button', { name: /bendahara/i }).first();
+    for (let i = 0; i < 12 && (await pemicuBendahara.getAttribute('aria-expanded')) !== 'true'; i++) {
+      await pemicuBendahara.click({ timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(600);
+    }
+    if ((await pemicuBendahara.getAttribute('aria-expanded')) !== 'true') {
+      console.log(`PROBE CACAT: panel bendahara Login tak pernah terbuka (${theme})`);
+      await browser.close();
+      process.exit(2);
+    }
+    await auditPage(page, `${theme}/login-bendahara`, { fokus: true });
     if (!(await loginWarga(page))) { console.log('GAGAL login warga', theme); await ctx.close(); continue; }
     await page.waitForTimeout(3000);
     const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);

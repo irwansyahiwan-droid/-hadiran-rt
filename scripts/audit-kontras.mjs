@@ -30,6 +30,11 @@ async function collectTexts(page) {
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.4) return;
       if (el.closest('[aria-hidden="true"]')) return;
+      // `inert` = tak tercat & tak bisa disentuh (collapse panel bendahara Login:
+      // tinggi 0 + opacity 0 di LELUHUR, sedangkan cek opacity di atas cuma
+      // membaca elemennya sendiri). Tanpa ini teksnya diukur lawan hero di
+      // belakangnya — latar yang bukan miliknya (30 Sep 2026).
+      if (el.closest('[inert]')) return;
       if (el.disabled || el.closest('[disabled],[aria-disabled="true"]')) return;
       const r = el.getBoundingClientRect();
       if (r.width < 4 || r.height < 8) return;
@@ -64,6 +69,7 @@ async function collectTexts(page) {
       if (el.value) continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.4) continue;
+      if (el.closest('[inert]')) continue; // lihat walk() di atas
       if (el.disabled || el.closest('[disabled],[aria-disabled="true"]')) continue;
       const r = el.getBoundingClientRect();
       if (r.width < 4 || r.height < 8) continue;
@@ -300,7 +306,38 @@ async function runTheme(theme, results, seen) {
   await page.goto(URL, { waitUntil: 'networkidle' });
 
   // halaman login dulu
-  if (!process.env.SKIP_LOGIN_AUDIT) await auditPage(page, `${theme}/login`, results, seen);
+  if (!process.env.SKIP_LOGIN_AUDIT) {
+    await auditPage(page, `${theme}/login`, results, seen);
+    /* Form bendahara tak pernah diukur sampai 30 Sep 2026: sapuan ini memotret
+       Login dgn panel TERTUTUP, jadi yang terukur cuma placeholder tak kasatmata
+       di dalam collapse (lawan hero di belakangnya) — sementara label, kolom,
+       tombol emas & galat kolom yang benar-benar dibaca bendahara tak pernah
+       masuk populasi. Dua keadaan: terbuka, lalu Masuk ditekan dgn kolom kosong
+       (galat kolom `permukaan="hero"` hanya LAHIR saat galat). Panel ditunggu
+       sampai MENGAKU terbuka (preseden `audit:masuk`), dan kalau tidak pernah,
+       sapuan MELEDAK — form yang tak terbuka = populasi hilang, bukan lulus. */
+    const toggle = page.getByRole('button', { name: /bendahara/i }).first();
+    for (let i = 0; i < 12 && (await toggle.getAttribute('aria-expanded')) !== 'true'; i++) {
+      await toggle.click({ timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(600);
+    }
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') {
+      console.log(`PROBE CACAT: panel bendahara Login tak pernah terbuka (${theme})`);
+      await browser.close();
+      process.exit(2);
+    }
+    await auditPage(page, `${theme}/login-bendahara`, results, seen);
+    await page.locator('#masuk-bendahara').click();
+    try {
+      await page.locator('#login-email-galat').waitFor({ timeout: 5000 });
+    } catch {
+      console.log(`PROBE CACAT: galat kolom Login tak pernah tampil (${theme})`);
+      await browser.close();
+      process.exit(2);
+    }
+    await page.waitForTimeout(300);
+    await auditPage(page, `${theme}/login-galat`, results, seen);
+  }
 
   const pw = page.locator('#masuk-warga');
   await pw.waitFor({ timeout: 15000 });

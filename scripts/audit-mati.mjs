@@ -109,7 +109,26 @@ async function kumpulkan(page) {
       };
       walk(b);
       if (!teks) continue;
-      const tr = teks.getBoundingClientRect();
+      /* Kotak glyph = gabungan rect TEXT NODE-nya lewat Range, BUKAN rect
+         elemennya (30 Sep 2026). Tombol yang teksnya anak LANGSUNG <button>
+         ("Masuk" Login) membuat `teks` = tombolnya sendiri, jadi kisi menutup
+         278×50px fill sementara inti huruf 15px cuma <2% sampel — ekor 2% lalu
+         jatuh di piksel ANTIALIAS (105,97,50) dan label #04180E di #C2A052
+         (≈7,5:1, terbaca jelas di potret) dilaporkan 2,52:1. Itulah "selisih
+         yang belum dijelaskan" 3,45 vs 5,47 di komentar Login.tsx: alat yang
+         benar mengukur piksel, tapi di kotak yang salah. */
+      let tr = null;
+      for (const n of teks.childNodes) {
+        if (n.nodeType !== 3 || !n.textContent.trim()) continue;
+        const rg = document.createRange();
+        rg.selectNodeContents(n);
+        const q = rg.getBoundingClientRect();
+        tr = tr
+          ? { l: Math.min(tr.l, q.left), t: Math.min(tr.t, q.top), r: Math.max(tr.r, q.right), b: Math.max(tr.b, q.bottom) }
+          : { l: q.left, t: q.top, r: q.right, b: q.bottom };
+      }
+      if (!tr) continue;
+      tr = { x: tr.l, y: tr.t, width: tr.r - tr.l, height: tr.b - tr.t };
       if (tr.width < 8 || tr.height < 6) continue;
       const tcs = getComputedStyle(teks);
       const px = parseFloat(tcs.fontSize);
