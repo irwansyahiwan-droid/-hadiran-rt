@@ -986,23 +986,29 @@ export default function KasHadiranPage() {
                               16 dari 21 nama terlipat, kartu 170/192px berseling;
                               di 320px dulu 9 nama terbelah di tengah kata. Kini
                               nama dapat 238px @360 (0 terlipat, kartu rata 196px).
-                              Di <360px nominal turun satu anak tangga (amount 17px
-                              → body 15px): di 320px label + nominal butuh 203px
-                              sedangkan kolomnya 198px, jadi 17px mematahkan SEMUA
-                              21 kartu: nominal jadi baris sendiri (kartu 240px).
-                              `flex-wrap` tetap jaring: nominal yang tetap tak muat
-                              turun ke baris sendiri, bukan elipsis. */}
+                              `flex-wrap`: di 320px (lebar WAJIB §1.4.10) label +
+                              nominal + chevron tak muat sebaris di kolom 198px,
+                              jadi nominal turun ke baris sendiri — bukan elipsis;
+                              kartu tetap tak lebih tinggi dari sebelumnya. */}
+                          {/* Baris "Lihat detail ›" DILEBUR ke sini (30 Sep 2026, kata
+                              disetujui user): sebagai baris ketiga ia membuat 20 dari
+                              21 kartu tumbuh 170 → 196px di 390px begitu nominal
+                              pindah ke kolom nama. Kini chevron di ujung nominal
+                              yang membawa affordance-nya: kartu 172px di semua lebar
+                              (daftar 3.612px, sebelum 3.592 @390 · 3.922 @360).
+                              Kalimatnya tetap ada untuk pembaca layar (`sr-only`),
+                              jadi nama tombol masih menyebut apa yang dibukanya. */}
                           <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
                             <span className="text-caption text-ink-faint dark:text-gray-400">Dapat Arisan</span>
-                            {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
-                            <span className="font-display text-amount max-[359px]:text-body font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">
-                              {formatRupiahPlain(sohibulTerima)}
+                            <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                              {/* Netral (bukan pos/+): uang ini KELUAR ke Sohibul, bukan kas masuk */}
+                              <span className="font-display text-amount font-semibold tabular-nums text-ink dark:text-gray-100">
+                                {formatRupiahPlain(sohibulTerima)}
+                              </span>
+                              <ChevronRight className="w-4 h-4 shrink-0 text-gray-400" />
                             </span>
                           </div>
-                          <span className="inline-flex items-center gap-1 mt-1 text-micro font-medium text-ink-faint dark:text-gray-400">
-                            Lihat detail
-                            <ChevronRight className="w-3 h-3" />
-                          </span>
+                          <span className="sr-only">Lihat detail</span>
                         </div>
                       </button>
 
