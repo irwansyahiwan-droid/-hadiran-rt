@@ -591,8 +591,18 @@ textarea:-webkit-autofill {
      jawaban sebelumnya (16 Jun, 26 Agu) sama-sama menggeser L, dan keluhannya
      kembali. Diukur, layarnya memang bukan kurang kontras melainkan kurang
      WARNA — kroma kanvas 0,0134 lawan hero 0,0883, sekitar 6,6×. Karena L
-     terkunci, tak ada rasio yang turun (lihat body). */
+     terkunci, tak ada rasio yang turun (lihat body).
+     CAHAYA DARI ATAS (1 Okt 2026): 560px pertama memudar dari #E3F5EA
+     (oklch .955/.024/159 — rona SAMA dgn kanvas, cuma lebih terang) ke
+     #CFE6D8. Varian "D" dipilih user dari render berdampingan (A kini ·
+     B kartu mint · C kanvas lebih jenuh · D ini) untuk target "segar,
+     kekinian". Warna dasar TETAP #CFE6D8, jadi sepuluh titik sinkron &
+     splash PNG tak berubah; cahayanya ikut tergulir bersama isi (bukan
+     `fixed`), jadi yang terang hanya layar pertama. Kontras teks di area
+     atas NAIK (sub 11,00 → 12,75). Gelap sengaja tetap rata. */
   background-color: #CFE6D8;
+  background-image: linear-gradient(180deg, #E3F5EA 0px, #CFE6D8 560px);
+  background-repeat: no-repeat;
 }
 /* MATERIAL-FLAT DARK (12 Jul 2026) — menuntaskan keputusan 2 Jul ke sisi gelap.
    Aura radial (emerald .30 + teal .22 + sky .15) DIHAPUS. Kanvas light sudah
@@ -604,6 +614,7 @@ textarea:-webkit-autofill {
    gray-900) + ring cahaya + geometri — sama persis dgn logika sisi light. */
 .dark .app-bg {
   background-color: #001709;
+  background-image: none;
 }
 
 /* ── Kontras teks (LIGHT MODE saja) ──────────────────────────────────
