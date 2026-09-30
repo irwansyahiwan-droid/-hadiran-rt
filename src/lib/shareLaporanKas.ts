@@ -283,12 +283,25 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
 
     let ry = y + PANEL_PAD_T + PANEL_TITLE;
     rows.forEach((r) => {
+      const cy = ry + ROW_H / 2 + 1;
       if (r.saldo) {
+        /* Pita dipusatkan pada HURUFnya, bukan pada kotak baris (30 Sep 2026).
+           Teks panel dicat ber-baseline `alphabetic` di `cy`, jadi hurufnya
+           duduk di ATAS `cy`; pita lama (`ry − 4`, setinggi ROW_H − 6) menyisakan
+           27px di atas huruf & 9px di bawahnya (PNG 3×) — di grup WA "Belum
+           Disetor" & "Saldo akhir" terbaca menempel ke dasar pitanya, sementara
+           pita "Saldo Bersih" di struk (`shareReceipt`, baseline `middle`)
+           seimbang 36/37. Pusat visual = baseline − ½ tinggi huruf kapital,
+           diukur dari font yang BENAR-BENAR dicat (Sora/Inter bisa berganti
+           rupa, dan angka tulis-tangan akan melenceng bersamanya). Baris lain
+           sengaja tak digeser: hanya pitanya yang pindah. */
+        ctx.font = `700 13px ${FONT}`;
+        const tinggiKapital = ctx.measureText('H').actualBoundingBoxAscent || 9.4;
+        const pitaH = ROW_H - 6;
         ctx.fillStyle = r.val < 0 ? CETAK.negTint : CETAK.posTint;
-        roundRect(ctx, IX + 8, ry - 4, IW - 16, ROW_H - 6, 8);
+        roundRect(ctx, IX + 8, cy - tinggiKapital / 2 - pitaH / 2, IW - 16, pitaH, 8);
         ctx.fill();
       }
-      const cy = ry + ROW_H / 2 + 1;
       // label
       ctx.textAlign = 'left';
       ctx.font = `${r.saldo ? '700' : '500'} 13px ${FONT}`;
