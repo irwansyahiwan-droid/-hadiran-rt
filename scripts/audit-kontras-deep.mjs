@@ -174,8 +174,18 @@ function perimeterPoints(r, fontSize) {
      glyph, piksel antialias menang jadi MODUS, dan sapuan melaporkan 3,99:1
      untuk tautan yang sebenarnya 7,20:1 di kanvas krem — lulus AA maupun AAA.
      Kelas yang sama dgn FP ke-11 & ke-12; ketiganya berakhir di "yang menang
-     jadi latar ternyata bukan latar". */
-  if (r.h < fontSize * 3.6) {
+     jadi latar ternyata bukan latar".
+
+     Ambangnya dinaikkan LAGI 3,6 → 7em (30 Sep 2026), dan kali ini sebabnya
+     terukur dari sampel mentah, bukan diduga: paragraf TIGA baris (63px =
+     4,9em, 13px) di overlay Tentang lolos syarat lama, jadi cuma 8 titik tepi
+     kiri-kanan yang dipakai — dua mendarat di piksel antialias (73,86,78) dan
+     dua di putih. Seri di puncak, seri diselesaikan ke KASUS TERBURUK, dan yang
+     menang piksel huruf: dilaporkan 1,88:1 untuk teks yang aslinya ~14:1 di
+     kartu putih. Pemicunya bobot dasar 400 → 500 (lebih banyak piksel antialias
+     di tepi huruf) — alatnya rapuh, bukan app. 7em = empat baris leading
+     lega (4 x 1,65em); di atas itu elemen memang wadah. */
+  if (r.h < fontSize * 7) {
     const n = 6;
     for (let i = 0; i <= n; i++) {
       const x = r.x + inX + (i * (r.w - 2 * inX)) / n;
