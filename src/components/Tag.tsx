@@ -45,10 +45,26 @@ const TONES: Record<Tone, string> = {
   info:    'bg-blue-500/[0.12] text-blue-700 ring-blue-600/20 dark:bg-blue-400/15 dark:text-blue-200 dark:ring-blue-400/25',
 };
 
+/* Isian PADAT untuk Tag yang duduk di permukaan KACA (30 Sep 2026). Isian
+   ber-alpha di atas Header (putih 80–90% + blur) bukan satu warna: ia ikut
+   gelap setiap kali isi halaman di belakang header menggelap. Terukur pada pil
+   WARGA: 8,6:1 saat diam di atas kanvas, 6,19:1 begitu kartu saldo hijau tua
+   digulir ke belakang header (80%), terburuk ~6,0 — di bawah ambang AAA app.
+   Sapuan kontras mana pun hanya melihatnya kalau kebetulan memotret dalam
+   posisi gulir itu. `gray-200` padat = 8,26:1 di mana pun, dan saat diam
+   nyaris sama dgn tint lamanya (232,237,234 → 226,233,229).
+   Hanya `neutral`: `success` (BENDAHARA) terburuk 7,49 — sudah lolos. Sisi
+   GELAP tetap ber-alpha: tak ada sampel gelap di bawah ambang. */
+const TONES_KACA: Partial<Record<Tone, string>> = {
+  neutral: 'bg-gray-200 text-gray-600 ring-gray-500/20 dark:bg-gray-400/15 dark:text-gray-200 dark:ring-gray-400/25',
+};
+
 interface TagProps {
   tone?: Tone;
   children: ReactNode;
   className?: string;
+  /** Tag duduk di permukaan tembus pandang (Header): isian padat, bukan tint. */
+  diAtasKaca?: boolean;
 }
 
 /* `font-bold`, BUKAN `font-semibold` — KOMPENSASI OPTIS, bukan pelanggaran
@@ -60,10 +76,11 @@ interface TagProps {
    tangga IKON menurunkan stroke dari UKURAN. Tebal badge kini mengikuti hal
    yang sama, dan `audit:tebal` menegakkannya (badge/tombol `text-micro` WAJIB
    bold) — jadi ini aturan, bukan izin sekali pakai. */
-export default function Tag({ tone = 'neutral', children, className = '' }: TagProps) {
+export default function Tag({ tone = 'neutral', children, className = '', diAtasKaca = false }: TagProps) {
+  const warna = (diAtasKaca && TONES_KACA[tone]) || TONES[tone];
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold leading-tight whitespace-nowrap ring-1 ring-inset ${TONES[tone]} ${className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold leading-tight whitespace-nowrap ring-1 ring-inset ${warna} ${className}`}
     >
       {children}
     </span>

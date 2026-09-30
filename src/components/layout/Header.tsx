@@ -221,7 +221,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                 bawaan semua orang, bukan peringatan atau capaian — ia tak perlu
                 warna, cukup nama. BENDAHARA tetap `success`: ia jarang, dan
                 hijaunya memang menandai "sesi ini bisa menulis". */}
-            <Tag tone={isBendahara ? 'success' : 'neutral'} className="tracking-wide">
+            <Tag tone={isBendahara ? 'success' : 'neutral'} diAtasKaca className="tracking-wide">
               {isBendahara ? 'BENDAHARA' : 'WARGA'}
             </Tag>
             {!isBendahara && (
