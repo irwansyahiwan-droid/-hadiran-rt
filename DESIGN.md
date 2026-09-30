@@ -262,9 +262,12 @@ sebagai warna kehormatan kultural.
 ### Secondary (scoped, BUKAN accent)
 - **Setor Blue** (`setor` #1E40AF, dengan #2563EB / #3B82F6): SINYAL STATUS. Hidup hanya
   di kartu hero **Kas Hadiran saat sudah disetor**. Jangan perluas biru ke tempat lain.
-- **Emas Songket** (`--gold-songket` #E8B651): Warna HONOR/dekoratif kultural. Hidup
-  HANYA di dua tempat: motif `.songket-weave` pada kartu saldo, dan sorot "Giliran
-  berikutnya" Sohibul Bait (mahkota + cincin avatar) di Beranda. TIDAK PERNAH menyentuh
+- **Emas Songket** (`--gold-songket` #E8B651): Warna HONOR/dekoratif kultural, dgn
+  DUA makna saja: motif `.songket-weave` pada kartu saldo, dan KEHORMATAN SOHIBUL BAIT —
+  sorot "Giliran berikutnya" (mahkota + cincin avatar) di Beranda, cincin avatar
+  penerima tarikan terakhir di Daftar Anggota Jadwal warga (`AvatarPeci sorot`), dan
+  perayaan `honor` sesudah tarikan diproses. Batasnya MAKNA, bukan jumlah tempat: tempat
+  baru boleh selama artinya "Sohibul Bait", makna ketiga tidak. TIDAK PERNAH menyentuh
   uang/status/nav.
 
 ### Neutral (struktur — rona Hutan 158°, L dikunci ke tangga Tailwind asli)
@@ -310,8 +313,8 @@ sama berlaku di layar, PNG, PDF, dan Excel.
 
 ### Named Rules
 **The Satu-Suara Rule.** Hanya ada SATU warna brand: emerald deep. Biru `setor` dan emas
-`gold-songket` adalah pengecualian yang scoped ke satu tempat masing-masing — bukan
-accent tambahan.
+`gold-songket` adalah pengecualian yang scoped ke satu MAKNA masing-masing (biru = sudah
+disetor, emas = kehormatan Sohibul Bait) — bukan accent tambahan.
 
 **The Satu-Hijau-Satu-Merah-Satu-Amber Rule.** Untuk makna uang: satu hijau (`pos`),
 satu merah (`neg`), satu amber (`warn`). Jangan campur red/rose dengan green/emerald di

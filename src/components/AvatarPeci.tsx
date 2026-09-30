@@ -2,8 +2,9 @@ interface AvatarPeciProps {
   nama: string;
   className?: string;
   /**
-   * Sorot "honor" — cincin emas songket. Dipakai untuk Sohibul Bait giliran
-   * berikutnya di Beranda.
+   * Sorot "honor" — cincin emas songket, penanda SOHIBUL BAIT: giliran
+   * berikutnya di Beranda, penerima tarikan terakhir di Daftar Anggota Jadwal
+   * warga. Jangan dipakai untuk makna lain — satu cincin, satu arti.
    *
    * WAJIB lewat prop, JANGAN lewat `className`. Di Tailwind semua utility
    * `ring-*` menulis ke variabel yang sama (`--tw-ring-color` / `--tw-ring-offset-*`),

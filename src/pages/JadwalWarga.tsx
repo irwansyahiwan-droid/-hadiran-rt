@@ -16,6 +16,7 @@ interface JadwalWargaCache {
   talanganLunas: string[]; // Set tak bisa di-JSON-kan → simpan sebagai array
 }
 import Tag from '../components/Tag';
+import AvatarPeci from '../components/AvatarPeci';
 import FilterChips from '../components/FilterChips';
 import StatRow from '../components/StatRow';
 import PageHeader from '../components/layout/PageHeader';
@@ -631,11 +632,6 @@ export default function JadwalWargaPage() {
               filteredWarga.map((w, idx) => {
                 const st = absensiMap[w.id];
                 const isSb = w.id === sbId;
-                const ava =
-                  isSb ? 'bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300'
-                  : st === 'hadir' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                  : st === 'titip' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                  : 'bg-rose-50 dark:bg-rose-900/25 text-rose-700 dark:text-rose-400';
                 return (
                   <div
                     key={w.id}
@@ -662,10 +658,16 @@ export default function JadwalWargaPage() {
                     <span className="text-micro text-ink-faint dark:text-gray-400 font-medium w-5 shrink-0 text-right">
                       {idx + 1}
                     </span>
-                    {/* Avatar */}
-                    <div className={`icon-tile w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-caption font-bold ${ava}`}>
-                      {w.nama.charAt(0)}
-                    </div>
+                    {/* `AvatarPeci`, bukan tile bertint status (30 Sep 2026, varian
+                        dipilih user). Tile lama menyatakan status TIGA kali per
+                        baris — warna avatar, ikon, kata di Tag — dan 56 dari 69
+                        baris hadir, jadi yang terbaca cuma dinding hijau; plus
+                        dialek avatar kedua untuk orang yang SAMA yang berkeping
+                        netral di Kelola Anggota, Talangan & Kas Hadiran (alasan
+                        yang sama persis tertulis di KelolaAnggota.tsx). Status
+                        kini dibawa Tag saja. Sohibul Bait memakai cincin emas
+                        `sorot` — penanda "penerima" yang sama dgn Beranda. */}
+                    <AvatarPeci nama={w.nama} ukuran={8} sorot={isSb} />
                     {/* Nama */}
                     <p className="flex-1 text-body font-semibold text-gray-900 dark:text-gray-100 potong-lentur">{w.nama}</p>
                     {/* Badge — hadir / titip (iuran masuk) / tidak hadir */}

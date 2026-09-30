@@ -26,7 +26,7 @@ Emosi yang dituju: **kepercayaan & transparansi.** Setiap layar harus membuat wa
 ## Anti-references
 
 - **Glassmorphism / glow / noise sebagai dekorasi.** Tim secara eksplisit menolak permukaan kaca, cahaya berpendar, dan tekstur noise. Permukaan harus **flat & tegas ala BYOND**: gradient pekat, hairline, bayangan netral, teks near-putih di permukaan gelap. (Pengecualian sah: efek kaca/gerak yang benar-benar fungsional, dipakai hemat.)
-- **Emas/gold sebagai aksen umum.** "No gold" berlaku app-wide. Satu-satunya pengecualian disengaja: motif songket `--gold-songket` yang bersifat DEKORATIF-only pada kartu saldo & sorot giliran Sohibul Bait — jangan perlakukan ini sebagai pelanggaran, dan jangan perluas gold ke tempat lain.
+- **Emas/gold sebagai aksen umum.** "No gold" berlaku app-wide. Satu-satunya pengecualian disengaja: `--gold-songket` dgn DUA makna saja — motif songket DEKORATIF pada kartu saldo, dan KEHORMATAN SOHIBUL BAIT (sorot giliran berikutnya di Beranda, cincin avatar penerima di Daftar Anggota Jadwal warga, perayaan `honor` sesudah tarikan diproses). Jangan perlakukan ini sebagai pelanggaran, dan jangan beri gold makna ketiga — tak pernah untuk uang, status, atau nav.
 - **Formalitas birokrasi / tampilan aplikasi pemerintahan yang kaku.** Bukan ini — meski mengurus uang resmi, nuansanya tetap hangat dan manusiawi.
 - **Estetika "template AI generik."** Card grid seragam tanpa hierarki, eyebrow uppercase di tiap section, hero-metric kosong tanpa makna.
 
