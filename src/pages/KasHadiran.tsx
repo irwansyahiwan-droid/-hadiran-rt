@@ -346,7 +346,12 @@ export default function KasHadiranPage() {
           { label: 'Kas Terkumpul', value: '+' + formatRupiahPlain(totalKasTerkumpul), tone: 'pos' as const },
           { label: 'Talangan Belum Lunas', value: '-' + formatRupiahPlain(totalTalanganBelum), tone: 'warn' as const },
           { label: 'Setor ke Kas RT', value: '-' + formatRupiahPlain(totalSetor) },
-          { label: 'Saldo Bersih', value: fmtSaldo, tone: saldo < 0 ? ('neg' as const) : ('pos' as const) },
+          /* `kind: 'total'` (30 Sep 2026): baris kesimpulan BERPITA, paritas
+             kartu ringkasan Kas RT & panel "Alur Kas Hadiran" in-app yang
+             menyorot baris totalnya. Dulu satu-satunya kartu ringkasan yang
+             kesimpulannya tampil sbg baris biasa. Warna ikut tanda saldo
+             (lihat cabang `total` di shareReceipt). */
+          { label: 'Saldo Bersih', value: fmtSaldo, kind: 'total' as const },
         ],
         shareText: `Ringkasan Kas Hadiran RT 004/006\nSaldo: ${fmtSaldo} · ${tarikanSelesai.length} tarikan\n— Hadiran RT`,
         namaBerkas: `Ringkasan Kas Hadiran ${tanggalBerkas()}`,

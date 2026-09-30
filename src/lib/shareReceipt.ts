@@ -92,8 +92,10 @@ export function hitungGeometriStruk(data: Pick<ReceiptData, 'rows' | 'list'>): G
   } = STRUK;
 
   // Mode BERSEKSI aktif hanya bila ada baris ber-`kind` (kartu Kas RT dgn
-  // rincian kategori). Tanpa itu → geometri lama PERSIS, supaya struk
-  // Jadwal/Kas Hadiran tidak ikut berubah. Sifat opt-in ini dikunci uji.
+  // rincian kategori; kartu ringkasan Kas Hadiran ikut sejak 30 Sep 2026 lewat
+  // baris `total`-nya — dua kartu ringkasan, satu gaya). Tanpa itu → geometri
+  // lama PERSIS, supaya struk Jadwal tidak ikut berubah. Sifat opt-in ini
+  // dikunci uji.
   const hasGroups = data.rows.some((r) => r.kind);
   const rowH = (r: ReceiptRow) =>
     r.kind === 'section' ? H_SECTION : r.kind === 'total' ? H_TOTAL : H_DETAIL;
@@ -385,15 +387,22 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
            paritas kartu laporan (`shareLaporanKas.ts`). Dulu teksnya yang masuk
            ke 44 / W−44, jadi nominal kesimpulan berhenti 4px sebelum kolom uang
            yang dipakai semua baris di atasnya. */
-        ctx.fillStyle = CETAK.posTint;
+        /* Pita & label ikut TANDA saldonya (30 Sep 2026), kembar baris saldo
+           `shareLaporanKas` (negTint bila minus). Dulu pitanya selalu mint &
+           labelnya selalu hijau — tak pernah terlihat karena satu-satunya
+           pemakai (Kas RT) belum pernah minus. Kas Hadiran kini ikut memakai
+           baris ini, dan saldonya SENGAJA bisa minus (talangan ditutup dari
+           kas): pita mint berisi nominal merah = dua sinyal yang bertabrakan. */
+        const minus = row.value.trim().startsWith('-');
+        ctx.fillStyle = minus ? CETAK.negTint : CETAK.posTint;
         roundRect(ctx, 32, ry + 4, W - 64, h - 10, 12);
         ctx.fill();
         ctx.textAlign = 'left';
-        ctx.fillStyle = CETAK.pos;
+        ctx.fillStyle = minus ? CETAK.neg : CETAK.pos;
         ctx.font = `700 15px ${rupiahFont}`;
         ctx.fillText(row.label, 40, cy);
         ctx.textAlign = 'right';
-        ctx.fillStyle = row.value.trim().startsWith('-') ? CETAK.neg : CETAK.pos;
+        ctx.fillStyle = minus ? CETAK.neg : CETAK.pos;
         ctx.font = `800 17px ${displayFont}`;
         ctx.fillText(row.value, W - 40, cy);
       } else {
