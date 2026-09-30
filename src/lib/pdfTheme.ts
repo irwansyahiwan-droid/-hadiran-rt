@@ -257,9 +257,17 @@ export function sectionLabel(
 
 /** Gaya dasar autoTable: plain, header rule tegas, baris hairline, foot tanpa blok. */
 /** Gaya autoTable pada SKALA tertentu. `TABLE` = varian RAPAT (dipakai 6 laporan lain). */
+/* `rowPageBreak: 'avoid'` di KEDUA gaya (30 Sep 2026). Bawaan autoTable
+   ('auto') membelah baris di pergantian halaman: PDF Kas RT mencetak baris
+   "Suport Acara Tasyakuran 17 Agustusan di Masjid Darul" di halaman 2 lalu
+   "Istiqomah" SENDIRIAN di puncak halaman 3 — tanpa nomor, tanggal, maupun
+   jumlah, terbaca sbg transaksi yatim di laporan pertanggungjawaban. 'avoid'
+   memindahkan baris UTUH ke halaman berikutnya. Satu sumber untuk ketujuh
+   laporan, karena semuanya menyebar salah satu gaya ini. */
 export function tabelSkala(sk: SkalaTeks) {
   return {
     theme: 'plain' as const,
+    rowPageBreak: 'avoid' as const,
     headStyles: {
       fontSize: sk.tabelHead, fontStyle: 'bold' as const, textColor: C.faint,
       cellPadding: { top: sk.tabelPad - 0.6, bottom: sk.tabelPad - 0.6, left: 1, right: 1 },
@@ -280,6 +288,7 @@ export function tabelSkala(sk: SkalaTeks) {
 
 export const TABLE = {
   theme: 'plain' as const,
+  rowPageBreak: 'avoid' as const,
   headStyles: {
     fontSize: 6.5, fontStyle: 'bold' as const, textColor: C.faint,
     cellPadding: { top: 2, bottom: 2, left: 1, right: 1 },
