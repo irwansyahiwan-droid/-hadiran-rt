@@ -44,10 +44,11 @@ Mengikuti palet induk penuh. Yang khas layar ini:
 Ikuti induk (Sora display/amount + Inter body, tabular-nums, final — jangan
 ganti font). Khas layar ini:
 - Total hero: FitAmount 30–48px putih.
-- Nominal tunggakan grup: `font-display text-amount` (Sora 600 17px) amber.
-- Nama warga: `text-body` 15px semibold, **line-clamp-2** (melipat, bukan
-  terpotong — nama panjang tetap utuh).
-- Subtitle grup: `text-caption` 13px ("2 belum lunas · 2× Rp50.000").
+- Nominal tunggakan grup: `font-display text-body` (Sora 600 15px) amber,
+  di baris kedua rata kanan (<380px: baris sendiri, 13px).
+- Nama warga: `text-body` 15px semibold, **tanpa batas baris** (melipat, bukan
+  terpotong — nama panjang tetap utuh; `line-clamp-2` dilepas demi §1.4.12).
+- Subtitle grup: `text-caption` 13px ("2 belum lunas").
 
 ## 4. Component Stylings (anatomi per blok)
 
@@ -75,8 +76,10 @@ ikon segitiga, paling atas — prioritas tagih), **Daftar Talangan** (single),
 **Sudah Lunas** (tone muted). Tiap section = satu kartu putih `rounded-3xl`
 + hairline + `.lift` + `list-inset`.
 
-Baris grup (tappable, `aria-expanded`): AvatarPeci 44px, nama line-clamp-2,
-subtitle hitungan; kanan nominal amber + chevron berputar 180° saat buka;
+Baris grup (tappable, `aria-expanded`): AvatarPeci 36px, nama selebar kolom
+(satu baris di 390px); baris kedua "N belum lunas" kiri + nominal amber rata
+kanan (sejak 30 Sep 2026 — dulu nominal di kanan atas memakan kolom nama jadi
+102px @390 dan 7 dari 23 nama terlipat); kanan chevron berputar 180° saat buka;
 tombol WhatsApp 44px terpisah (emerald, bendahara saja, tunggakan > 0) —
 pesan tagihan tersusun dari entri belum lunas.
 
@@ -87,7 +90,8 @@ bendahara — **Bayar** (`.btn-brand`, dua-ketuk "Yakin?"), **Batalkan**
 rose; pola undo 5 dtk). Semua aksi min 44px.
 
 ### State
-Loading = skeleton berbentuk baris (avatar + dua bar + nominal). Empty =
+Loading = skeleton berbentuk baris (avatar + bar nama + baris kedua
+keterangan & nominal). Empty =
 `EmptyState` kontekstual (beda pesan utk hasil cari kosong / filter kosong /
 memang belum ada talangan) + aksi Reset filter. Error = `ErrorState` retry.
 

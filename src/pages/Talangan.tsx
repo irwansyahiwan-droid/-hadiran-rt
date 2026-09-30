@@ -368,7 +368,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
         {/* `items-start` juga di baris LUAR: tombol WA duduk di sini, di luar
             tombol barisnya. Waktu isi baris dipindah ke perataan atas tapi wadah
             ini masih `items-center`, WA tertinggal mengambang di tengah dan
-            terpisah jauh dari nominal — dua kolom kanan yang tak lagi sejajar. */}
+            terpisah jauh dari chevron — dua kolom kanan yang tak lagi sejajar. */}
         <div className="flex items-start">
           <button
             onClick={() => setExpandedId(isExpanded ? null : g.warga_id)}
@@ -385,9 +385,10 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             className="flex-1 min-w-0 flex items-start gap-3 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/60 active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors text-left cursor-pointer"
           >
             {/* Avatar 36 (bukan 44) & padding 16 (bukan 20): baris ini menanggung
-                5 blok shrink-0 sekaligus (avatar, nominal, chevron, tombol WA).
-                Audit 29 Jul: kolom nama tersisa 76px @390 / 46px @360 → nama DAN
-                caption "N belum lunas" dua-duanya terpotong di semua lebar. */}
+                blok shrink-0 avatar, chevron & tombol WA (nominal dulu juga,
+                sebelum ia pindah ke baris kedua 30 Sep 2026). Audit 29 Jul:
+                kolom nama tersisa 76px @390 / 46px @360 → nama DAN caption
+                "N belum lunas" dua-duanya terpotong di semua lebar. */}
             <AvatarPeci nama={g.nama} ukuran={9} />
             <div className="flex-1 min-w-0">
               {/* TANPA batas baris — dan itu keputusan yang DIUKUR, bukan kelalaian.
@@ -418,26 +419,30 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   `break-words` menahan nama tanpa spasi agar tak meluber. */}
               <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{g.nama}</p>
               {g.countBelum > 0 ? (
-                /* Cukup jumlahnya — "N× Rp50.000" mengulang total di kolom kanan
-                   (dan membocorkan nominal saat mode sembunyi-angka aktif).
-                   Tanpa `truncate`: di 360px kolom ini 80px sedangkan frasanya
-                   butuh ~85px → dulu jadi "2 belum lu…". Melipat ke baris 2 lebih
-                   jujur daripada elipsis pada caption sependek ini. */
-                <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5 leading-snug">
-                  {g.countBelum} belum lunas
-                  {/* Di bawah 380px nominal kelompok PINDAH ke sini (26 Sep
-                      2026). Di kanan ia memakan ~85px + chevron + tombol WA,
-                      dan kolom nama tinggal ~40px @320 / ~79px @360: nama
-                      terbelah per SUKU KATA ("Ust / ad / Saif / ul / Had / i",
-                      12 nama @320, "Syarifu / din" @360) — tak terpotong, tak
-                      meluber, jadi tak satu sapuan pun melihatnya. Di baris
-                      keterangan ia tak menambah tinggi, dan nama dapat lebar
-                      kolom penuh.
-                      BARIS SENDIRI, tanpa " · " (28 Sep 2026): kolom ini tak
-                      pernah memuat "3 belum lunas · Rp150.000" dalam satu baris
-                      di bawah 380px, jadi ia SELALU patah dgn "·" menggantung di
-                      ujung baris pertama — di tiap baris daftar. Tingginya sama. */}
-                  <span className="hidden max-[379px]:block font-display font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
+                /* Nominal kelompok duduk DI SINI, rata kanan sebaris dgn
+                   "N belum lunas" — di SEMUA lebar (30 Sep 2026). Dulu ia di
+                   kanan atas (≥380px) atau baris ketiga (<380px). Di kanan atas
+                   ia memakan ~85px di samping chevron & tombol WA, dan kolom
+                   nama tinggal 102px @390 — lebar iPhone paling umum: 7 dari
+                   23 nama terlipat dua baris, tinggi baris 73/93px berseling.
+                   Di sini nama dapat kolom penuh (196px @390, 0 terlipat) dan
+                   baris rata 75px; nominalnya tetap satu kolom rata kanan.
+
+                   Di bawah 380px nominal tetap BARIS SENDIRI berukuran caption
+                   (`max-[379px]:basis-full`), persis pola lama lebar itu: kolom
+                   166px @360 tak memuat "2 belum lunas" 87px + "Rp100.000" 86px
+                   + jarak 8px (terukur), jadi sebaris hanya membuatnya patah
+                   tak menentu antar-baris — dan baris 96px, bukan 90px.
+                   Tanpa `truncate` di keterangannya: di 360px frasanya pernah
+                   terpotong jadi "2 belum lu…".
+
+                   Cukup jumlahnya — "N× Rp50.000" mengulang nominal di
+                   sebelahnya (dan membocorkannya saat mode sembunyi-angka). */
+                <p className="flex flex-wrap items-baseline justify-between gap-x-2 text-caption text-ink-faint dark:text-gray-400 mt-0.5 leading-snug">
+                  <span>{g.countBelum} belum lunas</span>
+                  {/* text-body, bukan text-amount: ini total kelompok (ringkasan),
+                      nominal per talangan tampil di baris detail saat dibuka. */}
+                  <span className="font-display text-body leading-snug max-[379px]:text-caption max-[379px]:leading-snug max-[379px]:basis-full font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
                     {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
                   </span>
                 </p>
@@ -445,16 +450,9 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                 <p className="text-caption text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
               )}
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              {g.countBelum > 0 && (
-                /* text-body, bukan text-amount: ini total kelompok (ringkasan),
-                   nominal per talangan tetap tampil di baris detail saat dibuka. */
-                <span className="max-[379px]:hidden font-display text-body font-semibold tabular-nums text-warn dark:text-amber-400 whitespace-nowrap">
-                  {maskRp(formatRupiahPlain(g.totalBelum), hidden, 4)}
-                </span>
-              )}
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isExpanded ? 'rotate-180' : ''}`} />
-            </div>
+            {/* `mt-0.5`: sumbu tengah chevron 16px = sumbu baris pertama nama
+                (leading-snug 15px ≈ 20,6px), sama seperti tombol WA di luar. */}
+            <ChevronDown className={`w-4 h-4 mt-0.5 shrink-0 text-gray-400 transition-transform duration-ketuk ${isExpanded ? 'rotate-180' : ''}`} />
           </button>
           {isBendahara && g.countBelum > 0 && (
             <button
@@ -696,11 +694,15 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-4">
                 <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
+                {/* Nominal di baris KEDUA, rata kanan — sama dgn baris asli sejak
+                    30 Sep 2026 (dulu kerangka ini memesan kolom nominal di kanan). */}
                 <div className="flex-1 space-y-2">
                   <div className="h-4 skeleton rounded-lg w-2/3" />
-                  <div className="h-3 skeleton rounded-lg w-1/2" />
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="h-3 skeleton rounded-lg w-1/3" />
+                    <div className="h-4 w-20 skeleton rounded-lg" />
+                  </div>
                 </div>
-                <div className="h-5 w-20 skeleton rounded-lg shrink-0" />
               </div>
             ))}
           </div>
