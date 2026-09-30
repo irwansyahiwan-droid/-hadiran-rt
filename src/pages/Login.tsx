@@ -355,12 +355,14 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
                       Label nonaktif #0A3520 → #04180E (26 Agu 2026). `audit:mati`
                       mengukur 3,45:1 (ambang 4,5) sementara rumus WCAG di atas
-                      pasangan warna TERUKUR (#0A3520 pada #C2A052) memberi 5,47:1.
-                      Selisih itu belum dijelaskan — dan justru karena itu yang
-                      dipakai VONIS ALATNYA, bukan hitungan di atas kertas: alat
-                      membaca piksel yang benar-benar tercat, hitungan membaca
-                      angka yang kita KIRA tercat. Diberi margin lebar (rumus
-                      ~7,4:1) lalu diverifikasi ulang dgn alat yang sama.
+                      pasangan warna yang sama (#0A3520 pada #C2A052) memberi
+                      5,47:1. Selisih itu TERJELASKAN 30 Sep 2026, dan yang salah
+                      alatnya: teks tombol ini anak LANGSUNG <button>, jadi kotak
+                      glyph `audit:mati` = seluruh tombol 278×50px dan ekor 2%
+                      sampelnya jatuh di piksel antialias, bukan inti huruf. Waktu
+                      itu pun #04180E terbaca 2,52:1 padahal ~7,5:1. Kini kotak
+                      glyph diukur lewat `Range` → 7,39:1, cocok dgn rumus.
+                      #04180E tetap dipakai: marginnya lebar dan terbaca jelas.
 
                       Label AKTIF #063A21 → #00351C (30 Sep 2026): 6,88 → 7,37:1,
                       di bawah ambang AAA app selama berbulan-bulan tanpa satu
