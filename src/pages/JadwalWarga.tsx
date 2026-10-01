@@ -676,7 +676,15 @@ export default function JadwalWargaPage() {
                     ) : isSb ? (
                       <Tag tone="neutral" className="shrink-0">Sohibul Bait</Tag>
                     ) : st === 'hadir' ? (
-                      <Tag tone="success" className="shrink-0"><Check className="w-3 h-3" />Hadir</Tag>
+                      /* Hadir = keadaan NORMAL (56 dari 69): cukup centang, tanpa pil.
+                         Pil dipakai pengecualian saja (Tidak, Titip, Sohibul Bait)
+                         supaya yang perlu dilihat tak tenggelam di deretan pil
+                         hijau identik. Varian B dipilih user 1 Okt 2026. Kata
+                         "Hadir" tetap dibacakan pembaca layar. */
+                      <span className="shrink-0 inline-flex items-center justify-center w-6 h-6 text-emerald-700 dark:text-emerald-400">
+                        <Check className="w-4 h-4" aria-hidden="true" />
+                        <span className="sr-only">Hadir</span>
+                      </span>
                     ) : st === 'titip' ? (
                       <Tag tone="info" className="shrink-0"><Coins className="w-3 h-3" />Titip</Tag>
                     ) : (
