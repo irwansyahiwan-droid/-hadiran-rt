@@ -1425,13 +1425,17 @@ export default function JadwalPage() {
                              SETIAP baris memakan ±56px sehingga nama Sohibul tersisa
                              138px @390 / 108px @360 dan nama panjang ("Nisan Nasrullah
                              ( Icang )") terpotong — audit 29 Jul. Ikon Play ≠ ikon ⟳
-                             milik "Hitung Ulang" supaya dua aksi ini tak tertukar. */
+                             milik "Hitung Ulang" supaya dua aksi ini tak tertukar.
+                             POLOS (1 Okt 2026, varian B dipilih user): 50 ubin mint
+                             berderet bersaing dgn satu-satunya aksi yang relevan —
+                             pil "Proses" tarikan berikutnya. Area sentuh tetap 44px;
+                             isian hanya muncul saat hover. */
                           <button
                             onClick={() => { haptic(); setNavigatingId(t.id); setSelectedTarikan(t); }}
                             disabled={navigatingId === t.id}
                             title="Proses tarikan"
                             aria-label={`Proses tarikan #${t.nomor}`}
-                            className="w-11 h-11 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 hover:border-emerald-300 dark:hover:border-emerald-700 text-brand dark:text-emerald-300 inline-flex items-center justify-center active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
+                            className="w-11 h-11 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-brand dark:text-emerald-300 inline-flex items-center justify-center active:scale-[0.97] transition cursor-pointer disabled:opacity-70"
                           >
                             {navigatingId === t.id
                               ? <RefreshCw className="w-5 h-5 animate-spin" />
