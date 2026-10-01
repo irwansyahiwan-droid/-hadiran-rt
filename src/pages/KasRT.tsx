@@ -782,7 +782,7 @@ export default function KasRTPage() {
               {/* Caption dua-ujung grafik tren (saldo awal & akhir periode).
                   `flex-wrap` sbg katup: di 200% kedua ujungnya butuh 162px
                   masing-masing dan mendorong halaman geser samping. */}
-              <div className="flex flex-wrap items-baseline justify-between gap-2 mt-2 font-display text-micro font-medium angka-prosa text-ink-faint dark:text-gray-400">
+              <div className="flex flex-wrap items-baseline justify-between gap-2 mt-2 font-display text-micro font-semibold angka-prosa text-ink-faint dark:text-gray-400">
                 <span>{trenAwal.label} · {maskRp(trenAwal.nilai, hidden, 4)}</span>
                 <span className="text-right">{trenAkhir.label} · {maskRp(trenAkhir.nilai, hidden, 4)}</span>
               </div>
@@ -823,7 +823,7 @@ export default function KasRTPage() {
                 {/* Dot legend sinkron warna bar MonthlyBars — kini token
                     `pos`/`neg` (+ pasangan gelapnya), sama persis dgn warna
                     nominal uang di kartu-kartu halaman ini. */}
-                <div className="flex items-center gap-2 text-micro font-medium mb-2">
+                <div className="flex items-center gap-2 text-micro font-semibold mb-2">
                   <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span data-grafik="legenda-masuk" className="w-2 h-2 rounded-full bg-pos dark:bg-pos-dark-fill" />Masuk</span>
                   <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400"><span data-grafik="legenda-keluar" className="w-2 h-2 rounded-full bg-neg dark:bg-neg-dark-fill" />Keluar</span>
                 </div>

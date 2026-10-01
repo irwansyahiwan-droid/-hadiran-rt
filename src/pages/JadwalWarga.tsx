@@ -655,7 +655,7 @@ export default function JadwalWargaPage() {
                     }`}
                   >
                     {/* No */}
-                    <span className="text-micro text-ink-faint dark:text-gray-400 font-medium w-5 shrink-0 text-right">
+                    <span className="text-micro text-ink-faint dark:text-gray-400 font-semibold w-5 shrink-0 text-right">
                       {idx + 1}
                     </span>
                     {/* `AvatarPeci`, bukan tile bertint status (30 Sep 2026, varian

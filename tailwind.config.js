@@ -171,7 +171,7 @@ export default {
         amount:   ['1.0625rem',{ lineHeight: '1.3',  letterSpacing: '-0.005em' }], // 17px — nominal menonjol
         body:     ['0.9375rem',{ lineHeight: '1.55', letterSpacing: '0'        }], // 15px — isi list/baris
         caption:  ['0.8125rem',{ lineHeight: '1.45', letterSpacing: '0.005em'  }], // 13px — tanggal, teks sekunder
-        micro:    ['0.6875rem',{ lineHeight: '1.35', letterSpacing: '0.06em'   }], // 11px — badge, nomor
+        micro:    ['0.6875rem',{ lineHeight: '1.35', letterSpacing: '0.06em', fontWeight: '600' }], // 11px — badge, nomor. Bobot BAWAAN 600 (1 Okt 2026): di 11px "medium" terbaca memudar — varian C dipilih user. Kelas font-* eksplisit tetap menang.
         overline: ['0.6875rem',{ lineHeight: '1.2',  letterSpacing: '0.14em'   }], // 11px kapital — label eyebrow
       },
       colors: {

@@ -65,7 +65,7 @@ export default function MonthlyBars({ data }: { data: MonthBar[] }) {
           dan sumbu berhenti bisa dibaca; alasan lengkapnya di sana. */}
       <div className="flex justify-between gap-2 mt-2">
         {data.map((d, i) => (
-          <span key={i} className="label-bulan flex-1 min-w-0 truncate text-center text-micro font-medium text-ink-faint dark:text-gray-400">{d.label}</span>
+          <span key={i} className="label-bulan flex-1 min-w-0 truncate text-center text-micro font-semibold text-ink-faint dark:text-gray-400">{d.label}</span>
         ))}
       </div>
     </div>
