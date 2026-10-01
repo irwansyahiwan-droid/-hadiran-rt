@@ -38,7 +38,7 @@ const TONES: Record<Tone, string> = {
      sudah hijau — dan Tag netral ada di mana-mana ("Terjadwal", "—", status
      baris). `gray` kini keluarga Hutan dgn L yang sama persis, jadi rasionya
      tak bergerak. */
-  neutral: 'bg-gray-500/[0.12] text-gray-600 ring-gray-500/20 dark:bg-gray-400/15 dark:text-gray-200 dark:ring-gray-400/25',
+  neutral: 'bg-brand-500/[0.12] text-gray-600 ring-gray-500/20 dark:bg-gray-400/15 dark:text-gray-200 dark:ring-gray-400/25',
   success: 'bg-emerald-500/[0.12] text-emerald-800 ring-emerald-600/20 dark:bg-emerald-400/15 dark:text-emerald-200 dark:ring-emerald-400/25',
   danger:  'bg-rose-500/[0.10] text-rose-700 ring-rose-600/20 dark:bg-rose-400/15 dark:text-rose-200 dark:ring-rose-400/25',
   warning: 'bg-amber-500/[0.14] text-amber-800 ring-amber-600/25 dark:bg-amber-400/15 dark:text-amber-200 dark:ring-amber-400/25',
@@ -59,7 +59,7 @@ const TONES: Record<Tone, string> = {
    Hanya `neutral`: `success` (BENDAHARA) terburuk 7,49 — sudah lolos. Sisi
    GELAP tetap ber-alpha: tak ada sampel gelap di bawah ambang. */
 const TONES_KACA: Partial<Record<Tone, string>> = {
-  neutral: 'bg-gray-100 text-gray-600 ring-gray-500/20 dark:bg-gray-400/15 dark:text-gray-200 dark:ring-gray-400/25',
+  neutral: 'bg-brand-tint text-gray-600 ring-gray-500/20 dark:bg-gray-400/15 dark:text-gray-200 dark:ring-gray-400/25',
 };
 
 interface TagProps {

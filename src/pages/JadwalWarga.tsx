@@ -740,7 +740,7 @@ export default function JadwalWargaPage() {
                         karena nomor tarikan bukan status. Redupnya nama DIPERTAHANKAN
                         (itu hierarki lampau vs mendatang, bukan status), dan pill
                         tetap satu-satunya yang menyebut status dengan kata. */}
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 font-bold text-body bg-gray-100 dark:bg-gray-800 text-ink-sub dark:text-gray-300">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 font-bold text-body bg-brand-tint dark:bg-gray-800 text-ink-sub dark:text-gray-300">
                       {t.nomor}
                     </div>
 

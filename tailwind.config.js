@@ -217,6 +217,11 @@ export default {
            dihitung terhadap KEDUANYA; yang dilaporkan = yang terburuk. */
         brand: {
           DEFAULT: '#0F4C2E', // deep — fill chip aktif, judul kuat, ink tab aktif (8,1:1 di atas pil nav)
+          /* Tile & pil NETRAL (1 Okt 2026): abu gray-100 (C 0,004) terbaca kusam di app
+             yang serba Hutan. Varian "B" dipilih user dari render berdampingan.
+             Rona 158° = kanvas; inisial #1D2D23 di atasnya 12,75:1. HANYA penanda
+             netral (avatar, nomor tarikan, pil WARGA) — bukan status. */
+          tint: '#E6F4EB',
           600: '#145D39',
           500: '#1B7249',
           /* #0D6B5E → #0A5B4E (4 Agu) → #005044 (29 Agu).
