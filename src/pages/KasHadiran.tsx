@@ -579,7 +579,10 @@ export default function KasHadiranPage() {
   const pendapatanKotor = payingCount * SOHIBUL_PER;
   const pendapatanBersih = pendapatanKotor - POTONGAN_ADMIN;
 
-  const sudahSetor = totalSetor > 0;
+  // Hanya saat saldo HABIS karena disetor — chip ini menjelaskan "Rp0", bukan
+  // riwayat setoran. Saldo > 0 + pernah setor = tanpa chip (keputusan user
+  // 1 Okt 2026). Syaratnya kembar dgn kartu saldo Beranda.
+  const sudahSetor = totalSetor > 0 && saldo === 0;
 
   return (
     <>

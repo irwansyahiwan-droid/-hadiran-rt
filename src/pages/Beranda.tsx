@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { tandaiBasi, tandaiSegar } from '../lib/basi';
-import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Eye, EyeOff, ChevronRight, ChevronDown, Crown } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Eye, EyeOff, ChevronRight, ChevronDown, Crown, Check } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import { showToast } from '../lib/toast';
@@ -720,6 +720,15 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                   </span>
                 )}
               </div>
+              {/* Rp0 tanpa keterangan terbaca "kas kosong" — padahal saldonya habis
+                  karena SUDAH disetor. Chip & syaratnya kembar persis tab Kas
+                  Hadiran: ada setoran DAN saldo tepat 0 (keputusan user 1 Okt 2026),
+                  jadi dua layar tak pernah berbeda kabar. Kata disetujui user. */}
+              {setorKasRT > 0 && saldo === 0 && (
+                <span className="mt-2 inline-flex items-center gap-1 self-start rounded-full border border-white/20 bg-black/25 px-3 py-1 text-caption font-semibold text-white">
+                  <Check className="h-3.5 w-3.5" /> Sudah disetor ke Kas RT
+                </span>
+              )}
               {/* Baris delta ("↗ +RpX dari tarikan terakhir") DIBUANG.
                   Anatomi kartu ini kini persis tiga hal: label → nominal → kaki
                   stat. Delta adalah blok keempat, dan ia yang paling murah
