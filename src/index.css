@@ -599,11 +599,24 @@ textarea:-webkit-autofill {
      kekinian". Warna dasar TETAP #CFE6D8, jadi sepuluh titik sinkron &
      splash PNG tak berubah; cahayanya ikut tergulir bersama isi (bukan
      `fixed`), jadi yang terang hanya layar pertama. Kontras teks di area
-     atas NAIK (sub 11,00 → 12,75). Gelap sengaja tetap rata. */
+     atas NAIK (sub 11,00 → 12,75). Gelap sengaja tetap rata.
+     SATU SUMBER: `--kanvas-cahaya` dipakai juga oleh `.kanvas-cahaya` di lima
+     overlay layar penuh — ubah gradasinya di sini, keduanya ikut. */
   background-color: #CFE6D8;
-  background-image: linear-gradient(180deg, #E3F5EA 0px, #CFE6D8 560px);
+  background-image: var(--kanvas-cahaya);
   background-repeat: no-repeat;
 }
+:root { --kanvas-cahaya: linear-gradient(180deg, #E3F5EA 0px, #CFE6D8 560px); }
+/* Overlay layar penuh (Tentang, Kelola Anggota, Riwayat Aktivitas, Laporan
+   Triwulan, Backup) menggulir DIRINYA SENDIRI (`fixed` + `overflow-y-auto`),
+   jadi latar biasa akan diam di tempat sementara isi bergulir. `local`
+   membuat cahayanya tergulir bersama isi — perilaku yang sama dgn tab. */
+.kanvas-cahaya {
+  background-image: var(--kanvas-cahaya);
+  background-repeat: no-repeat;
+  background-attachment: local;
+}
+.dark .kanvas-cahaya { background-image: none; }
 /* MATERIAL-FLAT DARK (12 Jul 2026) — menuntaskan keputusan 2 Jul ke sisi gelap.
    Aura radial (emerald .30 + teal .22 + sky .15) DIHAPUS. Kanvas light sudah
    diratakan 2 Jul dgn alasan tercatat ("hijau di atas abu = zona transisi muddy"),
