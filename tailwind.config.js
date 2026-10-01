@@ -222,6 +222,14 @@ export default {
              Rona 158° = kanvas; inisial #1D2D23 di atasnya 12,75:1. HANYA penanda
              netral (avatar, nomor tarikan, pil WARGA) — bukan status. */
           tint: '#E6F4EB',
+          /* Padanan GELAP tint (1 Okt 2026, rekomendasi yang diterima user): tile hijau
+             Hutan di atas kartu gray-900. L .35 · C .065 · rona 158°. Tinta di atasnya
+             WAJIB gray-200 (8,18:1 terukur): dgn gray-300 sapuan mengukur 6,88 karena
+             lapisan di atas tile mencerahkannya — di bawah AAA. Satu langkah lebih
+             hijau (L .37) ditolak karena alasan yang sama.
+             Kanvas gelap SENGAJA tetap rata: cahaya kanvas menurunkan pemisah
+             kartu ke 1,09 di atas layar — kelas keluhan "redup" yang sudah dua kali. */
+          'tint-gelap': '#17452D',
           600: '#145D39',
           500: '#1B7249',
           /* #0D6B5E → #0A5B4E (4 Agu) → #005044 (29 Agu).

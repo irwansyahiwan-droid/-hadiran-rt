@@ -943,7 +943,7 @@ export default function KasHadiranPage() {
                               "Lunas semua"). Satu fakta dua sandi: warna jadi
                               tebakan, dan ambernya bukan token `warn` mana pun.
                               Kini netral (abu = penanda, sesuai sistem warna). */}
-                          <div className="icon-tile w-7 h-7 rounded-xl flex items-center justify-center text-caption font-bold shrink-0 bg-brand-tint dark:bg-gray-800 text-ink-sub dark:text-gray-300">
+                          <div className="icon-tile w-7 h-7 rounded-xl flex items-center justify-center text-caption font-bold shrink-0 bg-brand-tint dark:bg-brand-tint-gelap text-ink-sub dark:text-gray-200">
                             {t.nomor}
                           </div>
                           <span className="w-1 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
