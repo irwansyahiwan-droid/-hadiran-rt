@@ -56,6 +56,26 @@ const AMBANG = +(process.env.AMBANG || 11);      // px — anak tangga terkecil
 const LANTAI_KERAS = +(process.env.LANTAI_KERAS || 9.6);
 const LEBAR = (process.env.LEBAR || '320,360,390').split(',').map(Number);
 const MUTASI = +(process.env.MUTASI || 0);
+/* TUNDA_DATA_MS — tombol VALIDASI, bukan setelan: memperlambat tiap jawaban
+   rest/v1 sekian ms. Dgn jeda tetap 2,4 dtk (sebelum 1 Okt 2026) tunda 4000 ms
+   membuat probe memotret KERANGKA memuat (hanya header 18px + nav 11px = 2
+   ukuran) dan uji kontrol meneriakkan PROBE CACAT palsu — persis yang terjadi
+   2 dari 3 jalan di Jadwal warga @360 (70 anggota, muatnya paling lambat). */
+const TUNDA_DATA_MS = +(process.env.TUNDA_DATA_MS || 0);
+
+/* TENANG ITU KEADAAN, BUKAN JEDA (pelajaran ke-34, kembaran tungguIsiNyata di
+   audit-gestur.mjs): tunggu sampai kerangka memuat HABIS. Yang tak habis dalam
+   batas waktu dikembalikan false dan dihitung PROBE CACAT bernama — bukan
+   dipotret diam-diam sbg layar sehat yang kebetulan miskin ukuran. */
+async function tungguIsiNyata(page, batasMs = 25000) {
+  const habis = Date.now() + batasMs;
+  while (Date.now() < habis) {
+    const n = await page.locator(".skeleton, .skeleton-bar").count().catch(() => 0);
+    if (n === 0) { await page.waitForTimeout(600); return true; }
+    await page.waitForTimeout(400);
+  }
+  return false;
+}
 
 const PUNGUT = ([ambang, lantaiKeras]) => {
   /* SUSUT-AGAR-MUAT — pengecualian OPT-IN, dan sengaja tidak dipercaya begitu
@@ -119,6 +139,7 @@ for (const bendahara of [false, true]) {
   const peran = bendahara ? 'b' : 'w';
   for (const lebar of LEBAR) {
     const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    if (TUNDA_DATA_MS) await ctx.route("**/rest/v1/**", async (route) => { await new Promise((r) => setTimeout(r, TUNDA_DATA_MS)); return route.fallback(); });
     await page.setViewportSize({ width: lebar, height: 844 });
     await page.goto(URL, { waitUntil: 'networkidle' });
     if (!bendahara) await loginWarga(page);
@@ -127,7 +148,13 @@ for (const bendahara of [false, true]) {
     const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
     for (const tab of tabs) {
       await gotoTab(page, tab);
-      await page.waitForTimeout(2400);
+      if (!(await tungguIsiNyata(page))) { console.log(`  PROBE CACAT: ${peran}-${tab}@${lebar} kerangka memuat tak habis dalam 25 dtk`); cacat++; continue; }
+      /* Kerangka habis BELUM berarti isi tiba: kalau jaringan menyerah (batas
+         fetch app 20 dtk) yang tampil layar GAGAL tanpa satu kerangka pun, dan
+         ragamnya (header + nav + kalimat galat) lolos uji kontrol. Terbukti saat
+         validasi TUNDA_DATA_MS=30000: hijau dari 104 teks di 9 layar galat.
+         Layar KOSONG (`data-keadaan="kosong"`) tetap diukur — itu tampilan sah. */
+      if (await page.locator('[data-keadaan="gagal"]').count()) { console.log(`  PROBE CACAT: ${peran}-${tab}@${lebar} yang tampil layar GAGAL MUAT, bukan isi`); cacat++; continue; }
       if (MUTASI) await page.addStyleTag({ content: MUT_CSS[MUTASI] });
       const { hasil, populasi, maks, ragam, susut, dilewat } = await page.evaluate(PUNGUT, [AMBANG, LANTAI_KERAS]);
       totalPop += populasi; totalSusut += susut;
