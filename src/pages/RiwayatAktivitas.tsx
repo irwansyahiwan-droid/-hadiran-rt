@@ -334,7 +334,20 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                             satu baris judul (15px snug ≈ 20,6px), dan tanpa itu baris KEDUA
                             ikut terjepit di sampingnya — terukur: nol perbaikan di 360px.
                             Rail harus mendahului judul di DOM (syarat float), maka urutan
-                            dengar dikunci lewat `aria-labelledby` di tombol. */}
+                            dengar dikunci lewat `aria-labelledby` di tombol.
+                            Di bawah 360px (5 Okt 2026) apungan itu BALIK merusak: baris
+                            pertama judul di samping "Rp1.035.000" tinggal ±50px, dan
+                            `break-words` mematahkan kata apa pun yang lebih panjang —
+                            "Tarikan # / 22", "Pemas / ukan Kas RT" (10 judul @320px, satu-
+                            satunya layar app dgn kata patah). Di sana `-mb-2` dilepas &
+                            judul tak boleh dipatah: kata yang tak muat turun ke bawah
+                            nominal, nominal tetap di kolom kanan. Varian E, dipilih user.
+                            `-mb-2` tak bisa sekadar dibuang: kotak rail 22px > satu baris
+                            judul 20,6px, jadi baris KEDUA ikut terjepit ("Setor / ke /
+                            Kas RT"). Penggantinya `h-5` (20px) — rail tepat di bawah satu
+                            baris, baris kedua selebar penuh, dan kata yang turun mendarat
+                            di bawah kotak rail yang SEBENARNYA (dgn `-mb-2` ia mendarat
+                            8px lebih tinggi & menimpa nominal — terpotret). */}
                         <div className="flow-root">
                           {/* Rail KANAN mendatar, bukan `flex-col` (2 Sep 2026). Waktu ia
                               kolom, chevron ditumpuk DI BAWAH nominal — jadi letaknya
@@ -356,7 +369,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               dari titik-TENGAH JUDUL memberi TIGA posisi semu (-2 / +17,8 /
                               +28,1) — judul yang membungkus dua baris menggeser acuannya
                               sendiri. Acuan yang sah tepi atas isi baris. */}
-                          <div className="float-right ml-3 -mb-2 flex items-center gap-2">
+                          <div className="float-right ml-3 -mb-2 max-[359px]:mb-0 max-[359px]:h-5 flex items-center gap-2">
                             {punyaNominal && (
                               /* Nominal NETRAL (27 Sep 2026). Warnanya dulu diturunkan dari
                                  JENIS AKSI (tambah = hijau, hapus = merah), padahal di seluruh
@@ -398,7 +411,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
                               <ChevronDown data-penanda className={`w-4 h-4 text-gray-400 transition-transform duration-ketuk ${isOpen ? 'rotate-180' : ''}`} />
                             )}
                           </div>
-                          <p id={`riw-${row.id}-judul`} className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{ikatFrasa(v.title)}</p>
+                          <p id={`riw-${row.id}-judul`} className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words max-[359px]:[overflow-wrap:normal]">{ikatFrasa(v.title)}</p>
                         </div>
                         {/* `ikatFrasa` (26 Sep 2026): 50 dari 81 baris di sini berakhir dgn
                             "#20)" sendirian, lepas dari "(Tarikan". TANPA `text-pretty`: ia
