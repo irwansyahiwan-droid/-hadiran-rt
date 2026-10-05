@@ -56,6 +56,32 @@ const MUTASI = process.env.MUTASI || '';
 const UKURAN = process.env.W && process.env.H
   ? [[+process.env.W, +process.env.H]]
   : [[390, 844], [360, 568]];
+/* TUNDA_DATA_MS — tombol VALIDASI, bukan setelan: memperlambat tiap jawaban
+   rest/v1 sekian ms (kembaran knob yang sama di audit-huruf.mjs). */
+const TUNDA_DATA_MS = +(process.env.TUNDA_DATA_MS || 0);
+
+/* TENANG ITU KEADAAN, BUKAN JEDA (pelajaran ke-34) — 5 Okt 2026. Dulu tiap layar
+   diukur sesudah jeda TETAP (3,5 dtk tab via gotoTab, 1,5 dtk overlay). Saat DB
+   lambat di awal jalan, layar diukur selagi kerangka: dua jalan sendirian
+   berturut-turut kehilangan blok 390px yang BERBEDA (overlay bendahara Riwayat
+   9/209 · Kelola 4/75; lalu warga Kas RT 9/64 · Riwayat 9/209) — total 1700 &
+   1688 di bawah lantai 1860, sementara layar 360px selalu utuh. Vonisnya tetap
+   0 tertutup: populasi separuh, laporan hijau. Kini tunggu kerangka habis; yang
+   tak habis atau berakhir di layar GAGAL MUAT = PROBE CACAT, bukan diukur. */
+async function tungguIsiNyata(page, batasMs = 25000) {
+  const habis = Date.now() + batasMs;
+  while (Date.now() < habis) {
+    const n = await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0);
+    if (n === 0) { await page.waitForTimeout(600); return true; }
+    await page.waitForTimeout(400);
+  }
+  return false;
+}
+async function siapDiukur(page, label) {
+  if (!(await tungguIsiNyata(page))) { console.log(`\n### ${label}   PROBE CACAT: kerangka memuat tak habis dalam 25 dtk`); return false; }
+  if (await page.locator('[data-keadaan="gagal"]').count()) { console.log(`\n### ${label}   PROBE CACAT: yang tampil layar GAGAL MUAT, bukan isi`); return false; }
+  return true;
+}
 /* Batas langkah per arah. Layar terpadat hari ini ~200 titik fokus; batas ini
    hanya jaring untuk fokus yang berputar tanpa pernah kembali ke titik awal. */
 const BATAS = 700;
@@ -208,6 +234,7 @@ for (const [W, H] of UKURAN) {
   for (const bendahara of [false, true]) {
     const peran = bendahara ? 'bendahara' : 'warga';
     const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    if (TUNDA_DATA_MS) await ctx.route('**/rest/v1/**', async (route) => { await new Promise((r) => setTimeout(r, TUNDA_DATA_MS)); return route.fallback(); });
     await page.setViewportSize({ width: W, height: H });
     await page.goto(APP, { waitUntil: 'networkidle' });
     if (!bendahara && !(await loginWarga(page))) { console.log(`PROBE CACAT: ${peran} gagal masuk`); process.exit(2); }
@@ -217,12 +244,14 @@ for (const [W, H] of UKURAN) {
     const tabs = await page.$$eval('nav button', (bs) => bs.map((b) => b.innerText.trim().replace(/\s+/g, ' ')).filter(Boolean));
     for (const t of tabs) {
       await gotoTab(page, t);
+      if (!(await siapDiukur(page, `[${W}x${H} ${peran}/${t}]`))) { cacat++; continue; }
       await ujiLayar(page, `[${W}x${H} ${peran}/${t}]`);
     }
     await gotoTab(page, 'Beranda');
     for (const o of OVERLAY[peran]) {
       if (!(await openMenuItem(page, o))) { console.log(`\n### [${W}x${H} ${peran}/${o}]   PROBE CACAT: overlay tak terbuka`); cacat++; continue; }
       await page.waitForTimeout(1500);
+      if (!(await siapDiukur(page, `[${W}x${H} ${peran}/${o}]`))) { cacat++; await closeLayer(page); continue; }
       await ujiLayar(page, `[${W}x${H} ${peran}/${o}]`);
       await closeLayer(page);
     }
