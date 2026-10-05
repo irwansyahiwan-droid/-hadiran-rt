@@ -26,6 +26,7 @@
     "audit:kontras-nonteks": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kontras-nonteks.mjs",
     "audit:mati": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-mati.mjs",
     "audit:huruf": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-huruf.mjs",
+    "audit:kata-patah": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-kata-patah.mjs",
     "audit:nama": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-nama.mjs",
     "audit:hover": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-hover.mjs",
     "audit:umumkan": "CAP_URL=${CAP_URL:-http://localhost:5199} node scripts/audit-umumkan.mjs",

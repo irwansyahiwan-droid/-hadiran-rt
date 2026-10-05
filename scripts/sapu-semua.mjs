@@ -108,6 +108,10 @@ const VISUAL = [
   ['tautan', 'node scripts/audit-tautan.mjs'],
   ['huruf', 'node scripts/audit-huruf.mjs'],
   ['potong', 'node scripts/audit-potong.mjs'],
+  /* Kata TERBELAH di tengah & awal teks terklip kiri. Lahir & masuk rantai
+     5 Okt 2026, sesudah tiga cacat (label hero, judul Riwayat, MetaPisah)
+     lolos semua sapuan — potong memvonis teks yang HILANG, ini yang terbelah. */
+  ['kata-patah', 'node scripts/audit-kata-patah.mjs'],
   /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
      seperti bagian 200% `audit:potong`/`audit:reflow` (itu ambang APP, di atas
      AA). Keputusan user 2 Sep 2026, dgn mata terbuka: selama sisa temuannya
@@ -239,6 +243,9 @@ const LANTAI = {
   /* 16 -> 20 layar (12 Sep 2026): sheet TUJUAN `data-ringkas` masuk populasi
      — syarat kedua penanda itu. Lantai ~95%. */
   potong:           [/A\. 390px[^:]*:\s*\d+ temuan \/ (\d+) layar/, 19],
+  /* Garis dasar 5 Okt 2026: 16.119 kata di 32 layar (identik di dua jalan).
+     Ikut DATA — Riwayat Aktivitas sendiri ~2.100 kata per peran. Lantai ~95%. */
+  'kata-patah':     [/(\d+) kata diperiksa di \d+ layar/, 15300],
   'jarak-teks':     [/populasi teks terukur\s*:\s*(\d+)/, 5700],
   lebar:            [/(\d+) konteks diperiksa/, 112],
   reflow:           [/(\d+) layar diperiksa/, 9],
