@@ -659,8 +659,14 @@ export default function Beranda({ onNavigate }: BerandaProps) {
                     (dan tracking sedikit dirapatkan) supaya TIGA katanya utuh, lalu
                     kembali ke 11px begitu ada ruang. truncate = jaring pengaman.
                     `ikatFrasa`: kalau melipat (360px), yang turun "KAS HADIRAN"
-                    utuh — dulu "SALDO KAS / HADIRAN" memisah nama kasnya. */}
-                <span className="potong-lentur text-balance text-micro font-bold uppercase tracking-[0.12em] text-white">{ikatFrasa('Saldo Kas Hadiran')}</span>
+                    utuh — dulu "SALDO KAS / HADIRAN" memisah nama kasnya.
+                    5 Okt 2026: ikatan itu kini `whitespace-nowrap` (bukan NBSP)
+                    supaya bisa DILEPAS di bawah 360px. Di 320px kolomnya 80px
+                    sedang "KAS HADIRAN" terikat 125px dan "HADIRAN" sendiri 82px,
+                    jadi `overflow-wrap: anywhere` mematahkannya di tengah kata
+                    ("KAS HADIR" / "AN"). Di sana ikatan dilepas + tracking 0.06em
+                    → "SALDO KAS" / "HADIRAN", 2 baris, semua kata utuh. */}
+                <span className="potong-lentur text-balance text-micro font-bold uppercase tracking-[0.12em] max-[359px]:tracking-[0.06em] text-white">Saldo <span className="whitespace-nowrap max-[359px]:whitespace-normal">Kas Hadiran</span></span>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 {/* Ikon POLOS, tanpa chip lingkaran. Dua kapsul `bg-white/15
