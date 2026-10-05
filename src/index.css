@@ -1354,14 +1354,25 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    (termasuk baris lipatan) terpotong di tepi kiri, jadi titik tak pernah
    menggantung di ujung maupun di awal baris. Lebar pemisah 0,8em ≈ lebar
    " · " yang dulu (spasi–titik–spasi). `content: "·" / ""` = teks alternatif
-   kosong: pembaca layar mendengar pemisah `.sr-only` saja, bukan dua kali. */
+   kosong: pembaca layar mendengar pemisah `.sr-only` saja, bukan dua kali.
+
+   5 Okt 2026 — pemisahnya kini duduk di BANTALAN bagian (`padding-left` +
+   `::before` absolut), bukan sebagai glyph sebaris. Dulu ia `inline-block` di
+   awal teks, jadi geseran -0,8em ikut memakan awal tiap baris LANJUTAN saat
+   SATU bagian melipat sendiri: "Setor ke Kas RT" @320px terbaca "Setor ke" /
+   "as RT" (huruf K terpotong) — tak tertangkap sapuan mana pun, karena
+   `audit:potong` hanya mengukur `truncate`/`line-clamp`. Bagian adalah item
+   flex (sudah ter-blok), jadi bantalannya berlaku untuk SEMUA baris lipatannya.
+   Baris yang tak melipat tak berubah: potret 390px identik per piksel. */
 .meta-pisah { display: block; overflow: hidden; }
 .meta-pisah > span { display: flex; flex-wrap: wrap; margin-left: -0.8em; }
-.meta-pisah > span > span { min-width: 0; overflow-wrap: anywhere; }
+.meta-pisah > span > span { position: relative; min-width: 0; padding-left: 0.8em; overflow-wrap: anywhere; }
 .meta-pisah > span > span::before {
   content: "·";
   content: "·" / "";
-  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 0.8em;
   text-align: center;
 }
