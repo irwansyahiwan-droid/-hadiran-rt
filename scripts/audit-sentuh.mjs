@@ -42,6 +42,29 @@ const TARGET = 44;   // ambang app (Apple HIG) — yang dikejar
 
 const hasil = [];
 const seen = new Set();
+/* TUNDA_DATA_MS — tombol VALIDASI, bukan setelan: memperlambat tiap jawaban
+   rest/v1 sekian ms (kembaran knob di audit-huruf/fokus-tertutup). */
+const TUNDA_DATA_MS = +(process.env.TUNDA_DATA_MS || 0);
+let cacat = 0;
+
+/* TENANG ITU KEADAAN, BUKAN JEDA (pelajaran ke-34) — 5 Okt 2026. Layar dulu
+   diukur sesudah jeda TETAP milik `gotoTab` (3,5 dtk); saat DB lambat ia
+   mengukur kerangka memuat. Rantai 5 Okt: POPULASI TURUN 262 < lantai 365 dgn
+   0 temuan, sendirian 397. Kini tunggu kerangka habis; yang tak habis atau
+   berakhir di layar GAGAL MUAT = PROBE CACAT (exit 2), bukan diukur. */
+async function siapDiukur(page, nama) {
+  const habis = Date.now() + 25000;
+  while (Date.now() < habis) {
+    if (!(await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0))) {
+      await page.waitForTimeout(600);
+      if (await page.locator('[data-keadaan="gagal"]').count()) { console.log(`  PROBE CACAT [${nama}]: yang tampil layar GAGAL MUAT, bukan isi`); cacat++; return false; }
+      return true;
+    }
+    await page.waitForTimeout(400);
+  }
+  console.log(`  PROBE CACAT [${nama}]: kerangka memuat tak habis dalam 25 dtk`); cacat++; return false;
+}
+const tunda = (ctx) => TUNDA_DATA_MS && ctx.route('**/rest/v1/**', async (route) => { await new Promise((r) => setTimeout(r, TUNDA_DATA_MS)); return route.fallback(); });
 
 const UKUR = `
 (() => {
@@ -143,6 +166,7 @@ const theme = 'light';
 
 if (!ONLY || ONLY === 'warga') {
   const { ctx, page } = await newCtx(browser, theme);
+  await tunda(ctx);
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto(URL, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1500);
@@ -152,7 +176,7 @@ if (!ONLY || ONLY === 'warga') {
     await page.waitForTimeout(3000);
     const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
     console.log('[warga] tab:', JSON.stringify(tabs));
-    for (const t of tabs) { await gotoTab(page, t); await ukurPage(page, `w-${t}`); }
+    for (const t of tabs) { await gotoTab(page, t); if (await siapDiukur(page, `w-${t}`)) await ukurPage(page, `w-${t}`); }
     await page.getByRole('button', { name: 'Menu' }).click();
     await page.waitForTimeout(700);
     await ukurView(page, 'w-menu');
@@ -163,6 +187,7 @@ if (!ONLY || ONLY === 'warga') {
 
 if (!ONLY || ONLY === 'bendahara') {
   const { ctx, page } = await newCtx(browser, theme, { bendahara: true });
+  await tunda(ctx);
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto(URL, { waitUntil: 'networkidle' });
   await page.waitForTimeout(4000);
@@ -170,7 +195,7 @@ if (!ONLY || ONLY === 'bendahara') {
   else {
     const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
     console.log('[bendahara] tab:', JSON.stringify(tabs));
-    for (const t of tabs) { await gotoTab(page, t); await ukurPage(page, `b-${t}`); }
+    for (const t of tabs) { await gotoTab(page, t); if (await siapDiukur(page, `b-${t}`)) await ukurPage(page, `b-${t}`); }
     for (const [tab, aria, nama] of [
       ['Hadiran', 'Setor ke Kas RT', 'b-sheet-setor'],
       ['Kas RT', 'Tambah transaksi Kas RT', 'b-sheet-form-kasrt'],
@@ -185,7 +210,7 @@ if (!ONLY || ONLY === 'bendahara') {
     for (const [label, nama] of [['Kelola Anggota', 'b-anggota'], ['Riwayat Aktivitas', 'b-riwayat']]) {
       if (await openMenuItem(page, label)) {
         await page.waitForTimeout(700);
-        await ukurView(page, nama);
+        if (await siapDiukur(page, nama)) await ukurView(page, nama);
         await page.goBack();
         await page.waitForTimeout(900);
       }
@@ -204,4 +229,5 @@ console.log(`  GAGAL §2.5.8 (<${MIN_AA}px, tanpa keringanan): ${gagal.length}`)
 console.log(`  di bawah ambang app ${TARGET}px            : ${kurang.length}`);
 for (const t of gagal) console.log(`  ✗ ${t.w}x${t.h} [${t.ctx}] "${t.nama}" <${t.tag}>`);
 for (const t of kurang) console.log(`  · ${t.w}x${t.h} [${t.ctx}] "${t.nama}" <${t.tag}>`);
+if (cacat) process.exit(2);
 process.exit(gagal.length ? 1 : 0);

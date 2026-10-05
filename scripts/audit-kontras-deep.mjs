@@ -272,6 +272,7 @@ async function auditPage(page, name) {
 // Audit overlay full-screen yang scroll internal (RiwayatAktivitas dst.)
 async function auditOverlay(page, name) {
   await page.waitForTimeout(700);
+  if (!(await siapDiukur(page, name))) return;
   await auditView(page, name);
   const scrolled = await page.evaluate(() => {
     const els = [...document.querySelectorAll('div')].filter((d) => {
@@ -317,6 +318,30 @@ function fakeSession() {
   };
 }
 
+/* TUNDA_DATA_MS — tombol VALIDASI, bukan setelan: memperlambat tiap jawaban
+   rest/v1 sekian ms (kembaran knob di audit-huruf/fokus-tertutup/sentuh). */
+const TUNDA_DATA_MS = +(process.env.TUNDA_DATA_MS || 0);
+let cacat = 0;
+
+/* TENANG ITU KEADAAN, BUKAN JEDA (pelajaran ke-34) — 5 Okt 2026. Tab & overlay
+   dulu diukur sesudah jeda TETAP (3,5 dtk tab · 0,7 dtk overlay); saat DB
+   lambat yang tersampel kerangka memuat. Rantai 5 Okt: POPULASI TURUN 2256 <
+   lantai 2386 dgn 0 gagal, sendirian 2512 (dan 2127 sehari sebelumnya).
+   Kerangka yang tak habis, atau layar GAGAL MUAT, kini PROBE CACAT (exit 2) —
+   bukan disampel. */
+async function siapDiukur(page, nama) {
+  const habis = Date.now() + 25000;
+  while (Date.now() < habis) {
+    if (!(await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0))) {
+      await page.waitForTimeout(600);
+      if (await page.locator('[data-keadaan="gagal"]').count()) { console.log(`  PROBE CACAT [${nama}]: yang tampil layar GAGAL MUAT, bukan isi`); cacat++; return false; }
+      return true;
+    }
+    await page.waitForTimeout(400);
+  }
+  console.log(`  PROBE CACAT [${nama}]: kerangka memuat tak habis dalam 25 dtk`); cacat++; return false;
+}
+
 async function newCtx(browser, theme, { bendahara = false, welcome = false } = {}) {
   const ctx = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -349,6 +374,7 @@ async function newCtx(browser, theme, { bendahara = false, welcome = false } = {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fakeSession()) });
     });
   }
+  if (TUNDA_DATA_MS) await ctx.route('**/rest/v1/**', async (route) => { await new Promise((r) => setTimeout(r, TUNDA_DATA_MS)); return route.fallback(); });
   const page = await ctx.newPage();
   await page.emulateMedia({ reducedMotion: 'reduce' });
   page.on('pageerror', (e) => console.log('  [pageerror]', e.message.slice(0, 150)));
@@ -372,6 +398,7 @@ async function gotoTab(page, label) {
   await page.locator('nav button', { hasText: label }).first().click({ force: true, timeout: 8000 })
     .catch(() => page.locator('nav button', { hasText: label }).first().evaluate((el) => el.click()));
   await page.waitForTimeout(3500);
+  return siapDiukur(page, label);
 }
 
 async function openRowSheet(page, name, theme) {
@@ -415,6 +442,7 @@ for (const theme of ['light', 'dark']) {
     await page.goto(URL, { waitUntil: 'networkidle' });
     if (!(await loginWarga(page))) { console.log('GAGAL login warga', theme); await ctx.close(); continue; }
     await page.waitForTimeout(3500);
+    await siapDiukur(page, `${theme}/w-Beranda`);
     if (await page.locator('[role="dialog"]').count()) {
       await auditView(page, `${theme}/w-welcome`);
       await page.screenshot({ path: `${OUT}/${theme}_w-welcome.png` });
@@ -449,15 +477,17 @@ for (const theme of ['light', 'dark']) {
     console.log(`[${theme}] tab bendahara:`, JSON.stringify(tabs));
     for (const tab of tabs) {
       const label = tab.trim().split('\n')[0];
-      await gotoTab(page, label);
-      await auditPage(page, `${theme}/b-${label}`);
+      if (await gotoTab(page, label)) await auditPage(page, `${theme}/b-${label}`);
     }
     // Sheet form via FAB (buka saja — TIDAK submit)
     for (const [tab, aria, name] of [
       ['Hadiran', 'Setor ke Kas RT', 'b-sheet-setor'],
       ['Kas RT', 'Tambah transaksi Kas RT', 'b-sheet-form-kasrt'],
     ]) {
-      await gotoTab(page, tab);
+      /* Tab yang belum siap sudah dicatat PROBE CACAT — jangan klik FAB-nya:
+         saat muat gagal app (dgn benar) menonaktifkan "Setor ke Kas RT", dan
+         klik ke tombol nonaktif mematikan sapuan sebelum laporannya tercetak. */
+      if (!(await gotoTab(page, tab))) continue;
       const fab = page.getByRole('button', { name: aria });
       if (await fab.count()) {
         await fab.click();
@@ -470,9 +500,9 @@ for (const theme of ['light', 'dark']) {
       }
     }
     // Baris tarikan Jadwal (detail/absensi — TANPA menyentuh toggle status)
-    await gotoTab(page, 'Jadwal');
+    const jadwalSiap = await gotoTab(page, 'Jadwal');
     const rowJ = page.locator('main button').filter({ hasText: /Tarikan|Sohibul|20\d\d/ }).first();
-    if (await rowJ.count()) {
+    if (jadwalSiap && await rowJ.count()) {
       await rowJ.click({ force: true }).catch(() => {});
       await page.waitForTimeout(1500);
       await auditView(page, `${theme}/b-jadwal-detail`);
@@ -527,6 +557,7 @@ const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log(`\n=== TOTAL sampel: ${results.length}, GAGAL AA: ${fails.length} ===`);
 console.log(`tak terukur (semua titik tertutup overlay / di luar viewport): ${buta.length}`);
 if (process.env.SHOW_BUTA) for (const b of [...new Set(buta)]) console.log('  buta:', b);
+if (cacat) { console.log(`PROBE CACAT: ${cacat} layar tak siap diukur — populasi di atas tidak utuh`); process.exitCode = 2; }
 for (const f of fails) {
   console.log(`${f.ratio} (butuh ${f.need}) [${f.ctx}] "${f.text}" fg rgb(${f.color}) a=${f.alpha} bg rgb(${f.bg}) ${f.size}px/${f.weight} <${f.tag}>`);
 }

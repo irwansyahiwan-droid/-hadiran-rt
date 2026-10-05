@@ -167,7 +167,30 @@ const PUNGUT = (mutasi) => {
  *  temuan lama terhitung "baru". */
 const kunci = (f) => `${f.ax}|${f.cls}|${f.t}`;
 
+/* TUNDA_DATA_MS — tombol VALIDASI, bukan setelan: memperlambat tiap jawaban
+   rest/v1 sekian ms (kembaran knob di audit-huruf/fokus-tertutup/sentuh). */
+const TUNDA_DATA_MS = +(process.env.TUNDA_DATA_MS || 0);
+
+/* TENANG ITU KEADAAN, BUKAN JEDA (pelajaran ke-34) — 5 Okt 2026. Layar dulu
+   dipungut sesudah jeda TETAP milik `gotoTab` (3,5 dtk); saat DB lambat yang
+   terpungut kerangka memuat. Rantai 5 Okt: POPULASI TURUN 4694 < lantai 5700
+   dgn 0 temuan, sendirian 6083. Kerangka yang tak habis, atau layar GAGAL
+   MUAT, kini PROBE CACAT (exit 2) — bukan dipungut. */
+async function siapDipungut(page) {
+  const habis = Date.now() + 25000;
+  while (Date.now() < habis) {
+    if (!(await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0))) {
+      await page.waitForTimeout(600);
+      return (await page.locator('[data-keadaan="gagal"]').count()) ? 'yang tampil layar GAGAL MUAT, bukan isi' : '';
+    }
+    await page.waitForTimeout(400);
+  }
+  return 'kerangka memuat tak habis dalam 25 dtk';
+}
+
 async function pungutLayar(page, fase, nama, hasil) {
+  const alasan = await siapDipungut(page);
+  if (alasan) { console.log(`  PROBE CACAT [${fase}/${nama}]: ${alasan}`); process.exitCode = 2; return; }
   /* Gulir sampai DASAR: baris di bawah lipatan tak dirender
      (`content-visibility:auto`) — memungut sekali di puncak = menyempitkan
      populasi tanpa mengaku. */
@@ -318,6 +341,7 @@ const kontrol = {};
 for (const fase of ['dasar', 'pasang']) {
   for (const bendahara of [false, true]) {
     const { ctx, page } = await newCtx(browser, 'light', { bendahara });
+    if (TUNDA_DATA_MS) await ctx.route('**/rest/v1/**', async (route) => { await new Promise((r) => setTimeout(r, TUNDA_DATA_MS)); return route.fallback(); });
     if (fase === 'pasang') {
       await ctx.addInitScript((css) => {
         const pasang = () => {
