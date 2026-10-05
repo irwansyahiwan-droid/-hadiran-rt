@@ -952,7 +952,15 @@ export default function KasHadiranPage() {
                         {talanganInfo.count > 0 ? (
                           <Tag tone="danger" className="angka-prosa">{talanganInfo.count} belum lunas</Tag>
                         ) : (
-                          <Tag tone="success"><Check className="w-3 h-3" /> Lunas semua</Tag>
+                          /* Lunas = keadaan BIASA, jadi tenang: teks + centang, tanpa
+                             pil (5 Okt 2026, varian C dipilih user). Pil hijau dulu
+                             muncul di ~19 dari 22 kartu dan bersaing dgn pil merah
+                             "N belum lunas" — satu-satunya yang perlu menonjol.
+                             Pola yang sama dgn Daftar Anggota: Hadir cukup centang,
+                             pil untuk pengecualian. */
+                          <span className="inline-flex items-center gap-1 text-caption font-semibold text-ink-faint dark:text-gray-400">
+                            <Check className="w-3 h-3" aria-hidden="true" />Lunas
+                          </span>
                         )}
                       </div>
 
