@@ -447,7 +447,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   </span>
                 </p>
               ) : (
-                <p className="text-caption text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Lunas semua</p>
+                /* Di bagian "Sudah Lunas" kata "Lunas semua" hijau di bawah tiap
+                   nama cuma mengulang judul bagiannya (35×). Kini sub-baris
+                   membawa INFO: berapa talangan yang pernah ia lunasi, netral
+                   (5 Okt 2026, varian B dipilih user). */
+                <p className="text-caption angka-prosa text-ink-faint dark:text-gray-400 font-medium mt-0.5">{g.entries.length} talangan · lunas</p>
               )}
             </div>
             {/* `mt-0.5`: sumbu tengah chevron 16px = sumbu baris pertama nama
