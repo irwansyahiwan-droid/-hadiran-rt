@@ -243,9 +243,10 @@ const LANTAI = {
   /* 16 -> 20 layar (12 Sep 2026): sheet TUJUAN `data-ringkas` masuk populasi
      — syarat kedua penanda itu. Lantai ~95%. */
   potong:           [/A\. 390px[^:]*:\s*\d+ temuan \/ (\d+) layar/, 19],
-  /* Garis dasar 5 Okt 2026: 16.119 kata di 32 layar (identik di dua jalan).
-     Ikut DATA — Riwayat Aktivitas sendiri ~2.100 kata per peran. Lantai ~95%. */
-  'kata-patah':     [/(\d+) kata diperiksa di \d+ layar/, 15300],
+  /* Garis dasar 5 Okt 2026: 18.143 kata di 60 layar (tab + overlay + sheet &
+     form, identik di dua jalan). Ikut DATA — Riwayat Aktivitas sendiri ~2.100
+     kata per peran. Lantai ~95%. */
+  'kata-patah':     [/(\d+) kata diperiksa di \d+ layar/, 17200],
   'jarak-teks':     [/populasi teks terukur\s*:\s*(\d+)/, 5700],
   lebar:            [/(\d+) konteks diperiksa/, 112],
   reflow:           [/(\d+) layar diperiksa/, 9],
