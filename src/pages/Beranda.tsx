@@ -67,6 +67,32 @@ function judulSetor(keterangan: string): string {
   return `${bulan} ${m[2]}`;
 }
 
+/**
+ * Judul baris di LAYAR. Judul periode ("September 2026") di bawah 360px
+ * memakai nama bulan SINGKAT: kolom judul @320px cuma 73px, sedang kata
+ * "September" sendiri 79,7px — satu kata tak bisa dilipat `line-clamp-2`, jadi
+ * ia terpotong jadi "Septembe" (audit:potong, 5 Okt 2026 — lahir dari DATA:
+ * setoran September baru tercatat; "Agustus" masih muat). Pembaca layar tetap
+ * mendengar nama PANJANG: yang panjang `sr-only` di sana, yang singkat
+ * `aria-hidden`. Singkatannya sama dgn tanggal app ("Agu", "Sep", "Okt").
+ */
+const BULAN_SINGKAT: Record<string, string> = {
+  Januari: 'Jan', Februari: 'Feb', Maret: 'Mar', April: 'Apr', Mei: 'Mei', Juni: 'Jun',
+  Juli: 'Jul', Agustus: 'Agu', September: 'Sep', Oktober: 'Okt', November: 'Nov', Desember: 'Des',
+};
+function JudulBaris({ teks }: { teks: string }) {
+  const m = teks.match(/^(\S+) (\d{4})$/);
+  const singkat = m && BULAN_SINGKAT[m[1]];
+  if (!m || !singkat) return <>{teks}</>;
+  return (
+    <>
+      <span className="max-[359px]:sr-only">{m[1]}</span>
+      <span aria-hidden="true" className="hidden max-[359px]:inline">{singkat}</span>
+      {' '}{m[2]}
+    </>
+  );
+}
+
 // Jendela fetch Beranda — ringkasan, bukan ledger penuh: ambil N terbaru per
 // sumber (setor & talangan lunas), BUKAN seluruh riwayat → payload dashboard
 // tetap datar saat data bertahun-tahun (skala 300 KK). Riwayat & pencarian
@@ -358,7 +384,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             "-Rp1.380.000" memakan kolom kanan → judul kepotong jadi
             "Setoran kas Ha…". Judul = identitas transaksi, harus utuh;
             sub-baris tetap 1 baris agar tinggi baris tak liar. */}
-        <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2">{trx.judul}</p>
+        <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2"><JudulBaris teks={trx.judul} /></p>
         {/* Baris kedua = konteks (+ tanggal saat daftar tak dikelompokkan).
             mt-1 (bukan mt-0.5): jarak 2px bikin judul & sub nyaris bersentuhan —
             biang rasa "rapat" yang dilaporkan. 4px = dua baris terbaca sebagai
