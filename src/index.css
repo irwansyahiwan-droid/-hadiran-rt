@@ -1034,9 +1034,16 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
          commit yang judulnya soal §1.4.12 — user menemukannya dari layarnya
          sendiri, bukan dari catatan rilis. Bayangan/warna/tipografi tidak
          pernah "ikut" sebuah commit a11y. */
+  /* RING + DALAM (8 Okt 2026, varian "D" dipilih user dari 4 render berdampingan
+     Beranda & Kas RT bendahara): cincin 1px menegaskan TEPI kartu, ambient
+     dipanjangkan (28→32px) supaya kartu tetap terbaca terangkat. Cuma TERANG;
+     blok .dark punya nilainya sendiri. Alpha ambient 0,32 di render DITURUNKAN
+     ke 0,24: diukur piksel, 0,32 memuncak Δ71 — lebih gelap dari `.float` (Δ65),
+     tangga kebalik. 0,24 → Δ63, urutan lift < float terjaga. */
   --shadow-card:
-    0 2px 5px -2px rgba(8, 30, 19, 0.18),
-    0 12px 28px -10px rgba(8, 30, 19, 0.26);
+    0 0 0 1px rgba(8, 30, 19, 0.08),
+    0 3px 6px -2px rgba(8, 30, 19, 0.20),
+    0 16px 32px -10px rgba(8, 30, 19, 0.24);
   /* ALPHA DINAIKKAN (30 Agu 2026) — konsekuensi dari "Bayangan Dipertegas"
      di atas. Diukur pakai canvas shadow rig (sample piksel di bawah tepi
      kartu, delta dari kanvas #CFE6D8): `.lift` yg baru punya PUNCAK 106,8
