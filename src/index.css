@@ -647,7 +647,7 @@ textarea:-webkit-autofill {
    #41505F: 8,28:1 di putih, 7,30:1 di kanvas. Tangga tetap utuh & terbaca
    berjenjang: ink #07160D > sub #1D2D23 > faint #34453B (9,14 kanvas) >
    gray-400-remap #41505F (7,30 kanvas). */
-html:not(.dark) .text-gray-400 { color: #3E4F44; }  /* gray-400→slate-ink: nyaman (≈7.3:1 di kanvas) */
+html:not(.dark) .text-gray-400 { color: #3E4F44; }  /* gray-400→slate-ink: 8,73:1 di kartu putih, 6,63:1 di kanvas #CFE6D8 (angka lama ≈7,3 dihitung lawan kanvas sebelum 30 Agu). Aman: kini dipakai HANYA utk ikon di kartu/kolom isian (diukur audit:kontras-nonteks); TEKS di kanvas telanjang wajib naik ke ink-faint (#34453B, 7,75:1) — 8 Okt 2026 */
 html:not(.dark) .text-gray-500 { color: #1D2D23; }  /* gray-500→slate-700: tegas (≈10.4:1) */
 /* `.text-gray-600` TAK PERNAH punya remap, dan akibatnya tangga ini TERBALIK
    persis di anak tangga yang namanya paling gelap: gray-400 dirender #3E4F44,
