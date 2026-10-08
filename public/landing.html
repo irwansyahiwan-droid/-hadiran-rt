@@ -92,7 +92,7 @@
     --accent: #0F4C2E;
     --canvas: #CFE6D8;
     --surface: #FFFFFF;
-    --line: #B7C8BD;
+    --line: #D3E0D8; /* = token `line` app (hairline whisper; 8 Okt 2026 — dulu #B7C8BD, sebelum app pindah ke mazhab tonal) */
     --control: #66786D; /* = token `control` app, isian bilah alur uang */
     --row: #D2DCD5;
     --ink: #07160D;
@@ -102,7 +102,8 @@
     --tile-ink: #0F4C2E;
     --cell-tint: #EAF7F0;
     --alt-bg: linear-gradient(180deg, #FFFFFF 0%, #CFE6D8 100%);
-    --shadow-card: 0 2px 4px -1px rgba(8, 30, 19, 0.09);
+    /* = `--shadow-card` terang app (8 Okt 2026, varian C dipilih user): ring 1px + ambient dalam. */
+    --shadow-card: 0 0 0 1px rgba(8, 30, 19, 0.08), 0 3px 6px -2px rgba(8, 30, 19, 0.20), 0 16px 32px -10px rgba(8, 30, 19, 0.24);
     --hero-shadow: 0 6px 16px -12px rgba(0, 0, 0, 0.28), 0 18px 40px -22px rgba(15, 40, 30, 0.40);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* token easing app (src/index.css) */
     --maxw: 560px;
