@@ -224,9 +224,12 @@ const LANTAI = {
      Hadiran (21 × 2 peran) & melipat 31 baris "Sudah Lunas" Talangan (+1 tombol
      lipat) — terukur build lama/baru 550 → 478, selisih PERSIS 42 + 30. */
   nama:             [/(\d+) kontrol di \d+ layar/, 455],
-  /* Populasi = kontrol UNIK (nama ternormalisasi × tema). Garis dasar 272–274;
-     lantai ~95%. */
-  hover:            [/(\d+) kontrol unik di \d+ layar/, 258],
+  /* Populasi = kontrol UNIK (nama ternormalisasi × tema). 258 → 244 (9 Okt 2026):
+     garis dasar lama 272–274 (lantai 258 = ~95%) sudah bergeser ke 251–258 antar-
+     jalan di DB hidup. Diukur: build SEBELUM a3ff170/011341b (kartu Hadiran &
+     Talangan) juga 256, jadi turunnya DATA (isi daftar), bukan kode; 0 kontrol
+     tanpa umpan hover di semua jalan. Lantai ~95% dari ~257. */
+  hover:            [/(\d+) kontrol unik di \d+ layar/, 244],
   /* Populasi = PERMUKAAN berdaftar (properti app, bukan data) — lantai persis. */
   umumkan:          [/(\d+) permukaan diperiksa · \d+ bermasalah/, 7],
   /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis, garis
