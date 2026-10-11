@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { hitungGeometriStruk, bagikanFileGambar, warnaTone, perluChipDefisit, namaBerkasPng, tanggalBerkas, STRUK, type ReceiptRow } from './shareReceipt';
+import { hitungGeometriStruk, bagikanFileGambar, warnaTone, perluChipDefisit, namaBerkasPng, tanggalBerkas, pecahHurufI, STRUK, type ReceiptRow } from './shareReceipt';
 import { CETAK } from './warnaCetak';
 
 /**
@@ -190,5 +190,23 @@ describe('namaBerkasPng — nama kartu yang disimpan/diunduh warga', () => {
   it('teks kosong tak menghasilkan ".png" telanjang', () => {
     expect(namaBerkasPng('')).toBe('Hadiran-RT.png');
     expect(namaBerkasPng(' — ')).toBe('Hadiran-RT.png');
+  });
+});
+
+describe('pecahHurufI — "I" besar yang diikuti huruf kecil digambar berkaki', () => {
+  it('memecah kata berawalan I', () => {
+    expect(pecahHurufI('Iuran Warga')).toEqual(['I', 'uran Warga']);
+    expect(pecahHurufI('Irwansyah')).toEqual(['I', 'rwansyah']);
+  });
+  it('I di tengah kata & beberapa I', () => {
+    expect(pecahHurufI('Ibu Ina')).toEqual(['I', 'bu ', 'I', 'na']);
+  });
+  it('TIDAK menyentuh I dalam singkatan kapital atau di akhir teks', () => {
+    expect(pecahHurufI('HUT RI')).toEqual(['HUT RI']);
+    expect(pecahHurufI('RI')).toEqual(['RI']);
+    expect(pecahHurufI('Rawat Inap')).toEqual(['Rawat ', 'I', 'nap']);
+  });
+  it('teks tanpa I utuh', () => {
+    expect(pecahHurufI('Sosial')).toEqual(['Sosial']);
   });
 });

@@ -214,6 +214,60 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number): str
 /** Gambar kartu struk jadi berkas PNG. Dipakai dua jalan: bagikan ke WA
  *  (`shareReceipt`) dan simpan ke perangkat (`simpanReceiptPng`) — keduanya
  *  harus menghasilkan gambar yang SAMA persis, jadi hanya ada satu penggambar. */
+/** Pecah teks di tiap huruf besar "I" yang diikuti huruf kecil ("Iuran",
+ *  "Irwansyah"). MURNI supaya bisa diuji. Hasilnya selang-seling: potongan
+ *  biasa, lalu "I", lalu potongan biasa… (potongan kosong dibuang). */
+export function pecahHurufI(teks: string): string[] {
+  const hasil: string[] = [];
+  let buf = '';
+  const sesudah = Array.from(teks);
+  sesudah.forEach((c, i) => {
+    if (c === 'I' && i + 1 < sesudah.length && /\p{Ll}/u.test(sesudah[i + 1])) {
+      if (buf) hasil.push(buf);
+      hasil.push('I');
+      buf = '';
+    } else {
+      buf += c;
+    }
+  });
+  if (buf) hasil.push(buf);
+  return hasil;
+}
+
+/** Tulis teks rata-kiri; huruf besar "I" gambar BERKAKI.
+ *
+ *  Inter menggambar "I" besar sebagai batang polos — sama dgn "l" kecil — jadi
+ *  "Iuran Warga" terbaca "luran Warga" (dan nama seperti "Irwansyah" "lrwansyah").
+ *  Varian berkaki Inter (`cv08`) tak bisa dinyalakan: berkas font app sudah
+ *  dipangkas tanpa fitur itu & canvas tak punya `font-feature-settings`.
+ *  Maka batangnya digambar langsung, ukurannya dari font yang sedang aktif
+ *  (tinggi huruf kapital diukur dari "H", bukan angka tulis-tangan). */
+function tulisTeksJelasI(ctx: CanvasRenderingContext2D, teks: string, x: number, y: number) {
+  const potongan = pecahHurufI(teks);
+  if (!potongan.includes('I')) { ctx.fillText(teks, x, y); return; }
+  const px = parseFloat(/(\d+(?:\.\d+)?)px/.exec(ctx.font)?.[1] ?? '14');
+  const tebal = Math.max(1, px * 0.1);
+  const kaki = px * 0.34;
+  const tebalKaki = Math.max(1, px * 0.075);
+  const jarak = px * 0.1;
+  const m = ctx.measureText('H');
+  const atas = y - m.actualBoundingBoxAscent;
+  const tinggi = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+  let cx = x;
+  for (const bagian of potongan) {
+    if (bagian === 'I') {
+      const tengah = cx + jarak + kaki / 2;
+      ctx.fillRect(tengah - tebal / 2, atas, tebal, tinggi);
+      ctx.fillRect(tengah - kaki / 2, atas, kaki, tebalKaki);
+      ctx.fillRect(tengah - kaki / 2, atas + tinggi - tebalKaki, kaki, tebalKaki);
+      cx += kaki + jarak * 2;
+    } else {
+      ctx.fillText(bagian, cx, y);
+      cx += ctx.measureText(bagian).width;
+    }
+  }
+}
+
 export async function buatPngStruk(data: ReceiptData): Promise<File> {
   const W = 380;
 
@@ -334,7 +388,7 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
       ctx.fillStyle = CETAK.faint;
       ctx.font = `500 13px ${rupiahFont}`;
       ctx.textAlign = 'left';
-      ctx.fillText(row.label, 40, y);
+      tulisTeksJelasI(ctx, row.label, 40, y);
       ctx.fillStyle = warnaTone(row);
       ctx.font = `700 13px ${rupiahFont}`;
       ctx.textAlign = 'right';
@@ -419,7 +473,7 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
            `faint`) karena ukurannya turun ke bobot reguler. */
         ctx.fillStyle = CETAK.sub;
         ctx.font = `500 15px ${rupiahFont}`;
-        ctx.fillText(fitText(ctx, row.label, W - 156 - xLabel), xLabel, cy); // tepi kanan label tetap W−156
+        tulisTeksJelasI(ctx, fitText(ctx, row.label, W - 156 - xLabel), xLabel, cy); // tepi kanan label tetap W−156
         ctx.textAlign = 'right';
         ctx.fillStyle = warnaTone(row);
         ctx.font = `600 15px ${rupiahFont}`;
@@ -457,7 +511,7 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
       ctx.textAlign = 'left';
       ctx.fillStyle = CETAK.ink;
       ctx.font = `500 13px ${rupiahFont}`;
-      ctx.fillText(fitText(ctx, nama, W - 40 - 64), 64, ly);
+      tulisTeksJelasI(ctx, fitText(ctx, nama, W - 40 - 64), 64, ly);
       ly += LIST_ITEM_H;
     });
   }
