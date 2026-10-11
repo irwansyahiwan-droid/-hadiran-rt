@@ -12,6 +12,19 @@ export const WAKTU_HABIS = 'auth-waktu-habis';
 export const BATAS_MASUK_MS = 20_000;
 
 /**
+ * Batas sabar BOOT saat ada sesi bendahara tersimpan. Splash baru hilang setelah
+ * `getSession()` selesai, dan itu TIDAK terbatas: ia mengambil kunci
+ * `navigator.locks` tanpa batas (acquireTimeout -1) lalu, bila token akses sudah
+ * kedaluwarsa — app terpasang yang lama tak dibuka — memanggil jaringan untuk
+ * memperbaruinya dgn percobaan ulang berlapis (tiap percobaan sampai 20 dtk).
+ * Di sinyal jelek splash bisa tertahan berpuluh detik sampai menit: app terpasang
+ * "muter terus" sementara peramban biasa (tanpa sesi tersimpan) langsung terbuka.
+ * Sesudah batas ini layar Login tampil; bila `getSession()` akhirnya selesai,
+ * sesinya tetap dipasang dan bendahara masuk sendiri.
+ */
+export const BATAS_BOOT_MS = 8_000;
+
+/**
  * Balap `janji` melawan jam. Janji aslinya sengaja TIDAK dibatalkan: kalau
  * server akhirnya menjawab setelah pesan tampil, efek samping di dalamnya
  * (setState sesi) tetap jalan dan bendahara masuk sendiri.

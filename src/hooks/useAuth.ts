@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
 import {
-  BATAS_MASUK_MS, adaSesiTersimpan, batasWaktu, hapusSesiLokal, pesanLogin,
+  BATAS_BOOT_MS, BATAS_MASUK_MS, adaSesiTersimpan, batasWaktu, hapusSesiLokal, pesanLogin,
 } from '../lib/authSesi';
 
 export type Role = 'bendahara' | 'warga';
@@ -65,17 +65,22 @@ export function useAuth(): AuthState & {
       return;
     }
 
-    (async () => {
+    const boot = (async () => {
       const { supabase } = await import('../lib/supabase');
       if (batal) return;
       const { data } = await supabase.auth.getSession();
       if (batal) return;
       setState(sesiKe(data.session));
       pasangListener(supabase);
-    })().catch(() => {
-      // Gagal memuat klien (chunk basi / jaringan putus) — JANGAN biarkan app
-      // tertahan di splash selamanya; jatuhkan ke layar Login.
-      if (!batal) setState(KELUAR);
+    })();
+    /* Gagal memuat klien (chunk basi / jaringan putus) ATAU `getSession()` lewat
+       batas sabar (kunci auth / pembaruan token menggantung — lihat
+       `BATAS_BOOT_MS`) — JANGAN biarkan app tertahan di splash; jatuhkan ke
+       layar Login. `boot` sengaja tidak dibatalkan: kalau akhirnya selesai,
+       sesinya tetap dipasang. Fungsional `s.loading ? KELUAR : s` supaya hasil
+       yang sudah tiba lebih dulu tak tertimpa. */
+    batasWaktu(boot, BATAS_BOOT_MS).catch(() => {
+      if (!batal) setState((s) => (s.loading ? KELUAR : s));
     });
 
     return () => { batal = true; lepasRef.current?.(); lepasRef.current = null; };
