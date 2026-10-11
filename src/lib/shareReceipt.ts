@@ -64,9 +64,9 @@ export function namaBerkasPng(teks: string): string {
 export const STRUK = {
   W: 380,
   rowsCardTop: 250,
-  H_SECTION: 34,
-  H_DETAIL: 32,
-  H_TOTAL: 46,
+  H_SECTION: 42,
+  H_DETAIL: 36,
+  H_TOTAL: 52,
   LIST_GAP: 14,
   LIST_TOP_PAD: 18,
   LIST_HEAD_H: 22,
@@ -377,13 +377,13 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
         }
         ctx.textAlign = 'left';
         ctx.fillStyle = CETAK.muted;
-        ctx.font = `700 12px ${rupiahFont}`;
+        ctx.font = `700 13px ${rupiahFont}`;
         try { ctx.letterSpacing = '1px'; } catch { /* browser lama */ }
         ctx.fillText(row.label.toUpperCase(), 40, cy);
         try { ctx.letterSpacing = '0px'; } catch { /* noop */ }
         ctx.textAlign = 'right';
         ctx.fillStyle = warnaTone(row);
-        ctx.font = `700 14px ${rupiahFont}`;
+        ctx.font = `800 16px ${rupiahFont}`;
         ctx.fillText(row.value, W - 40, cy);
       } else if (row.kind === 'total') {
         /* Pita MELEBAR 8px keluar kolom, teks TETAP di kolom (x=40 / W−40) —
@@ -402,22 +402,27 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
         ctx.fill();
         ctx.textAlign = 'left';
         ctx.fillStyle = minus ? CETAK.neg : CETAK.pos;
-        ctx.font = `700 15px ${rupiahFont}`;
+        ctx.font = `700 16px ${rupiahFont}`;
         ctx.fillText(row.label, 40, cy);
         ctx.textAlign = 'right';
         ctx.fillStyle = minus ? CETAK.neg : CETAK.pos;
-        ctx.font = `800 17px ${displayFont}`;
+        ctx.font = `800 19px ${displayFont}`;
         ctx.fillText(row.value, W - 40, cy);
       } else {
         // Detail kategori — diindent 12px supaya jelas "milik" kelompok di atasnya.
         const xLabel = sudahBerkelompok ? 52 : 40;
         ctx.textAlign = 'left';
-        ctx.fillStyle = CETAK.faint;
-        ctx.font = `500 14px ${rupiahFont}`;
+        /* Rincian DILEMBUTKAN satu tingkat di bawah kepala kelompok: label
+           reguler (500) & nominal semi-tebal (600), 15px. Dulu nominal rincian
+           & nominal kelompok sama-sama 700 — semua baris setebal judul, jadi
+           mata tak punya tempat berhenti. Label memakai `sub` (lebih gelap dari
+           `faint`) karena ukurannya turun ke bobot reguler. */
+        ctx.fillStyle = CETAK.sub;
+        ctx.font = `500 15px ${rupiahFont}`;
         ctx.fillText(fitText(ctx, row.label, W - 156 - xLabel), xLabel, cy); // tepi kanan label tetap W−156
         ctx.textAlign = 'right';
         ctx.fillStyle = warnaTone(row);
-        ctx.font = `700 14px ${rupiahFont}`;
+        ctx.font = `600 15px ${rupiahFont}`;
         ctx.fillText(row.value, W - 40, cy);
       }
       ctx.textAlign = 'left';
@@ -459,8 +464,8 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
 
   // Footer
   const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  ctx.fillStyle = CETAK.muted; // tangga kontras: footer minimal setara gray-400 remap
-  ctx.font = `500 11px ${rupiahFont}`;
+  ctx.fillStyle = CETAK.faint; // 12px (dulu 11px muted): dibaca warga lansia di HP, bukan catatan kaki
+  ctx.font = `500 12px ${rupiahFont}`;
   ctx.textAlign = 'center';
   ctx.fillText(`Dibuat ${tgl} · Hadiran RT`, W / 2, H - 28);
   ctx.textAlign = 'left';
