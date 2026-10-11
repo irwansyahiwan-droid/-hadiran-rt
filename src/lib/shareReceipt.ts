@@ -211,7 +211,10 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number): str
   return t + '…';
 }
 
-export async function shareReceipt(data: ReceiptData): Promise<void> {
+/** Gambar kartu struk jadi berkas PNG. Dipakai dua jalan: bagikan ke WA
+ *  (`shareReceipt`) dan simpan ke perangkat (`simpanReceiptPng`) — keduanya
+ *  harus menghasilkan gambar yang SAMA persis, jadi hanya ada satu penggambar. */
+export async function buatPngStruk(data: ReceiptData): Promise<File> {
   const W = 380;
 
   // Pastikan Sora/Inter siap sebelum menggambar — tanpa ini canvas diam-diam
@@ -465,6 +468,26 @@ export async function shareReceipt(data: ReceiptData): Promise<void> {
   const blob: Blob = await new Promise((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob gagal'))), 'image/png')
   );
-  const file = new File([blob], namaBerkasPng(data.namaBerkas), { type: 'image/png' });
-  await bagikanFileGambar(file, data.shareText);
+  return new File([blob], namaBerkasPng(data.namaBerkas), { type: 'image/png' });
+}
+
+/** Render kartu struk lalu bagikan (Web Share API + fallback WA). */
+export async function shareReceipt(data: ReceiptData): Promise<void> {
+  await bagikanFileGambar(await buatPngStruk(data), data.shareText);
+}
+
+/** Unduh berkas gambar ke perangkat (menu Ekspor). Tanpa dialog bagikan dan
+ *  tanpa membuka WhatsApp — beda dgn jalur fallback `bagikanFileGambar`. */
+export function unduhFileGambar(file: File): void {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/** Render kartu struk lalu simpan sbg PNG. */
+export async function simpanReceiptPng(data: ReceiptData): Promise<void> {
+  unduhFileGambar(await buatPngStruk(data));
 }

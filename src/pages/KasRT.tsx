@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { tandaiBasi, tandaiSegar } from '../lib/basi';
-import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, Flag, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2 } from 'lucide-react';
+import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, Flag, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2, Image as ImageIcon } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
 import ClearButton from '../components/ClearButton';
 import FilterChips from '../components/FilterChips';
@@ -38,7 +38,7 @@ import TargetKasRT from '../components/TargetKasRT';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { urutKasRT } from '../lib/laporan';
 import { kategoriOpsi, kategoriDefault, labelKategori, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
-import type { ReceiptRow } from '../lib/shareReceipt';
+import type { ReceiptData, ReceiptRow } from '../lib/shareReceipt';
 import type { KasRT } from '../lib/types';
 import { useKolomNominal } from '../lib/kolomNominal';
 import MetaPisah from '../components/MetaPisah';
@@ -398,45 +398,52 @@ export default function KasRTPage() {
   const [eksporSibuk, jalankanEkspor] = useAksiBerat();
   const [bagiSibuk, jalankanBagi] = useAksiBerat();
 
+  /* Satu penyusun kartu ringkasan untuk DUA jalan — bagikan ke WA dan simpan
+     PNG dari menu Ekspor — supaya gambar yang tersimpan sama persis dgn yang
+     dibagikan. */
+  function susunStruk(tanggal: string): ReceiptData {
+    // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
+    const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
+    // Kartu warga dulu hanya memuat TOTAL (masuk/keluar/saldo) → pertanyaan
+    // paling sering di grup WA, "uang RT dipakai untuk apa?", tak terjawab;
+    // jawabannya cuma ada di PDF A4 yang justru payah dibaca di HP. Kini
+    // rincian per kategori (taksonomi yang sama dgn rekap in-app & PDF)
+    // ikut di kartu → transparansi tanpa memaksa warga membuka PDF.
+    const rows: ReceiptRow[] = [
+      { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
+      { label: 'Penerimaan', value: '+' + formatRupiahPlain(totalMasuk), kind: 'section', tone: 'pos' },
+    ];
+    /* Baris kategori TANPA nada (tinta biasa), warna hanya di judul kelompok
+       — sama dgn rekap kategori in-app (26 Sep 2026). Dulu tiap baris ikut
+       hijau/merah, jadi kartu yang dibagikan ke grup WA terbaca "dinding
+       merah" sementara layar yang sama tenang. Tanda +/− tetap membawa arah. */
+    for (const o of KATEGORI_MASUK) {
+      const n = rekapKategori.masuk[o.key] ?? 0;
+      if (n > 0) rows.push({ label: o.short, value: '+' + formatRupiahPlain(n) });
+    }
+    rows.push({ label: 'Pengeluaran', value: '-' + formatRupiahPlain(totalKeluar), kind: 'section', tone: 'neg' });
+    for (const o of KATEGORI_KELUAR) {
+      const n = rekapKategori.keluar[o.key] ?? 0;
+      if (n > 0) rows.push({ label: o.short, value: '-' + formatRupiahPlain(n) });
+    }
+    rows.push({ label: 'Saldo Bersih', value: fmtSaldo, kind: 'total' });
+
+    return {
+      title: 'Ringkasan Kas Besar RT 004 / RW 006',
+      amountLabel: 'Saldo Bersih Kas RT',
+      amount: fmtSaldo,
+      rows,
+      shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${fmtSaldo}\n— Hadiran RT`,
+      namaBerkas: `Ringkasan Kas RT ${tanggal}`,
+    };
+  }
+
   // Bagikan ringkasan Kas RT sbg kartu PNG bermerek → grup WA warga.
   async function handleShareReceipt() {
     haptic(12);
-    // formatRupiahPlain pakai Math.abs → tambahkan tanda minus sendiri utk saldo negatif.
-    const fmtSaldo = (saldo < 0 ? '-' : '') + formatRupiahPlain(saldo);
     await jalankanBagi(async () => {
       const { shareReceipt, tanggalBerkas } = await import('../lib/shareReceipt');
-      // Kartu warga dulu hanya memuat TOTAL (masuk/keluar/saldo) → pertanyaan
-      // paling sering di grup WA, "uang RT dipakai untuk apa?", tak terjawab;
-      // jawabannya cuma ada di PDF A4 yang justru payah dibaca di HP. Kini
-      // rincian per kategori (taksonomi yang sama dgn rekap in-app & PDF)
-      // ikut di kartu → transparansi tanpa memaksa warga membuka PDF.
-      const rows: ReceiptRow[] = [
-        { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
-        { label: 'Penerimaan', value: '+' + formatRupiahPlain(totalMasuk), kind: 'section', tone: 'pos' },
-      ];
-      /* Baris kategori TANPA nada (tinta biasa), warna hanya di judul kelompok
-         — sama dgn rekap kategori in-app (26 Sep 2026). Dulu tiap baris ikut
-         hijau/merah, jadi kartu yang dibagikan ke grup WA terbaca "dinding
-         merah" sementara layar yang sama tenang. Tanda +/− tetap membawa arah. */
-      for (const o of KATEGORI_MASUK) {
-        const n = rekapKategori.masuk[o.key] ?? 0;
-        if (n > 0) rows.push({ label: o.short, value: '+' + formatRupiahPlain(n) });
-      }
-      rows.push({ label: 'Pengeluaran', value: '-' + formatRupiahPlain(totalKeluar), kind: 'section', tone: 'neg' });
-      for (const o of KATEGORI_KELUAR) {
-        const n = rekapKategori.keluar[o.key] ?? 0;
-        if (n > 0) rows.push({ label: o.short, value: '-' + formatRupiahPlain(n) });
-      }
-      rows.push({ label: 'Saldo Bersih', value: fmtSaldo, kind: 'total' });
-
-      await shareReceipt({
-        title: 'Ringkasan Kas Besar RT 004 / RW 006',
-        amountLabel: 'Saldo Bersih Kas RT',
-        amount: fmtSaldo,
-        rows,
-        shareText: `Ringkasan Kas RT 004/006\nSaldo bersih: ${fmtSaldo}\n— Hadiran RT`,
-        namaBerkas: `Ringkasan Kas RT ${tanggalBerkas()}`,
-      });
+      await shareReceipt(susunStruk(tanggalBerkas()));
     }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
   }
 
@@ -615,6 +622,16 @@ export default function KasRTPage() {
                     const { generateKasRTExcel } = await import('../lib/generateKasRTExcel');
                     await generateKasRTExcel(displayList, { saldo, totalMasuk, totalKeluar, saldoAwal });
                   }, { mulai: 'Menyiapkan Excel…', gagal: 'Gagal membuat file Excel. Coba muat ulang aplikasi.' }),
+                },
+                {
+                  label: 'Simpan PNG',
+                  icon: ImageIcon,
+                  /* Kartu ringkasan yang SAMA dgn tombol Bagikan di hero, tapi
+                     disimpan ke perangkat — tanpa dialog bagikan. */
+                  onClick: () => jalankanEkspor(async () => {
+                    const { simpanReceiptPng, tanggalBerkas } = await import('../lib/shareReceipt');
+                    await simpanReceiptPng(susunStruk(tanggalBerkas()));
+                  }, { mulai: 'Menyiapkan PNG…', gagal: 'Gagal membuat gambar. Coba lagi.' }),
                 },
               ]}
             />
