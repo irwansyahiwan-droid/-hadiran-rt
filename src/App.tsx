@@ -31,6 +31,7 @@ const LaporanTriwulan = lazy(() => import('./pages/LaporanTriwulan'));
 const BackupRestore = lazy(() => import('./pages/BackupRestore'));
 const KelolaAnggota = lazy(() => import('./pages/KelolaAnggota'));
 const TentangApp = lazy(() => import('./pages/TentangApp'));
+const KartuWarga = lazy(() => import('./pages/KartuWarga'));
 
 // Fallback ringan saat chunk halaman dimuat (spinner brand, sinkron dgn loader auth).
 function PageFallback() {
@@ -106,6 +107,7 @@ export default function App() {
   const [backupOpen, setBackupOpen] = useState(false);
   const [anggotaOpen, setAnggotaOpen] = useState(false);
   const [tentangOpen, setTentangOpen] = useState(false);
+  const [kartuOpen, setKartuOpen] = useState(false);
 
   // Diturunkan dari daftar tab (tabs.ts), BUKAN disalin — dulu baris ini
   // menuliskan ulang kelima id-nya, jadi menggeser urutan tab di nav diam-diam
@@ -320,6 +322,7 @@ export default function App() {
           onOpenBackup={ctxValue.isBendahara ? () => setBackupOpen(true) : undefined}
           onOpenAnggota={ctxValue.isBendahara ? () => setAnggotaOpen(true) : undefined}
           onOpenTentang={() => setTentangOpen(true)}
+          onOpenKartu={() => setKartuOpen(true)}
           onBagikan={() => bagikanHalaman(labelTab(activeTab), pathTab(activeTab))}
         />
         {/* Nav = bar DOK bawah (h-[70px] + safe-area di dalam bar) → beri ruang
@@ -365,6 +368,9 @@ export default function App() {
           )}
           {ctxValue.isBendahara && anggotaOpen && (
             <KelolaAnggota open onClose={() => setAnggotaOpen(false)} />
+          )}
+          {kartuOpen && (
+            <KartuWarga open onClose={() => setKartuOpen(false)} />
           )}
           {tentangOpen && (
             <TentangApp open onClose={() => setTentangOpen(false)} />

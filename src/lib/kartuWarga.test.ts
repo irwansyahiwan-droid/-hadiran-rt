@@ -1,0 +1,72 @@
+import { describe, it, expect, vi } from 'vitest';
+
+// Perhitungan murni — klien Supabase tak dipakai, tapi modulnya diimpor dan
+// membutuhkan env yang tak ada di mesin uji.
+vi.mock('./supabase', () => ({ supabase: {} }));
+import { susunKartu, type TarikanRingkas } from './kartuWarga';
+
+/**
+ * Aturan Kartu Warga. Tiap uji memuat kasus PENYANGKALNYA (tarikan belum
+ * selesai, talangan lunas, Sohibul Bait warga lain) — data yang hanya berisi
+ * kasus benar meluluskan perhitungan yang salah.
+ */
+
+const T = (nomor: number, status: TarikanRingkas['status'], sohibul: string | null): TarikanRingkas => ({
+  id: `t${nomor}`,
+  nomor,
+  tanggal: `2026-0${nomor}-10`,
+  status,
+  sohibul_bait_id: sohibul,
+});
+
+const tarikan: TarikanRingkas[] = [
+  T(1, 'selesai', 'w9'),
+  T(2, 'selesai', 'w1'),
+  T(3, 'selesai', 'w9'),
+  T(4, 'dijadwalkan', 'w9'),
+  T(5, 'dijadwalkan', 'w1'),
+];
+
+describe('susunKartu', () => {
+  it('menghitung kehadiran hanya dari tarikan SELESAI', () => {
+    const k = susunKartu('w1', tarikan, [
+      { tarikan_id: 't1', status: 'hadir' },
+      { tarikan_id: 't2', status: 'hadir' },
+      { tarikan_id: 't3', status: 'titip' },
+      { tarikan_id: 't4', status: 'tidak_hadir' },   // belum final → diabaikan
+    ], []);
+    expect(k).toMatchObject({ hadir: 2, titip: 1, tidakHadir: 0 });
+  });
+
+  it('talangan: hanya yang BELUM lunas, diurut nomor, dijumlah', () => {
+    const k = susunKartu('w1', tarikan, [], [
+      { tarikan_id: 't3', nominal: 50000, status_lunas: false },
+      { tarikan_id: 't1', nominal: 50000, status_lunas: false },
+      { tarikan_id: 't2', nominal: 50000, status_lunas: true },
+    ]);
+    expect(k.tunggakan.map((t) => t.nomor)).toEqual([1, 3]);
+    expect(k.totalTunggakan).toBe(100000);
+  });
+
+  it('talangan ke tarikan yang tak dikenal dilewati, bukan salah hitung', () => {
+    const k = susunKartu('w1', tarikan, [], [{ tarikan_id: 'hantu', nominal: 50000, status_lunas: false }]);
+    expect(k.tunggakan).toEqual([]);
+    expect(k.totalTunggakan).toBe(0);
+  });
+
+  it('giliran: tarikan belum selesai terdekat milik warga ini + sisa sebelumnya', () => {
+    const k = susunKartu('w1', tarikan, [], []);
+    expect(k.giliran).toEqual({ nomor: 5, tanggal: '2026-05-10', sisaSebelum: 1 });   // t4 milik w9 masih di depan
+    expect(k.sudahMenerima).toEqual([{ nomor: 2, tanggal: '2026-02-10' }]);
+  });
+
+  it('giliran 0 sisa = tarikan berikutnya', () => {
+    const k = susunKartu('w9', tarikan, [], []);
+    expect(k.giliran).toMatchObject({ nomor: 4, sisaSebelum: 0 });
+    expect(k.sudahMenerima.map((t) => t.nomor)).toEqual([3, 1]);   // terbaru di depan
+  });
+
+  it('tanpa jadwal tersisa → giliran null', () => {
+    expect(susunKartu('w-lain', tarikan, [], []).giliran).toBeNull();
+  });
+});
