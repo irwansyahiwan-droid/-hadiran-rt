@@ -40,7 +40,7 @@ vi.mock('./supabase', () => ({
   supabase: { from: (t: string) => builder(t) },
 }));
 
-const { fetchRekapTriwulan, fetchSnapshotKas, urutKasRT } = await import('./laporan');
+const { fetchRekapTriwulan, fetchRekapBulanan, fetchRekapLengkap, fetchSnapshotKas, urutKasRT } = await import('./laporan');
 
 const ok = (data: unknown): Res => ({ data, error: null });
 const kosong = () => { jawab = {}; };
@@ -226,6 +226,120 @@ describe('Rekap triwulan — kegagalan query tidak boleh jadi laporan nol', () =
     it(`melempar saat query ${tabel} gagal`, async () => {
       jawab = { [tabel]: { data: null, error: { message: `${tabel} 500` } } };
       await expect(fetchRekapTriwulan()).rejects.toBeTruthy();
+    });
+  }
+});
+
+// ── fetchRekapBulanan ───────────────────────────────────────────────
+
+/* Rekap bulanan memakai aturan uang YANG SAMA dgn triwulan — hanya kunci
+   periodenya yang beda. Karena itu pengujinya bukan menyalin ulang tiap aturan
+   (sudah dikunci di atas), melainkan INVARIAN antar-granularitas: apa pun yang
+   dijumlah per bulan harus kembali ke angka triwulannya, dan saldo kumulatif
+   bulan terakhir harus sama dgn triwulan terakhir. Kalau salah satunya
+   melenceng, laporan bulanan & triwulan yang dibagikan bendahara ke grup WA
+   akan menyebut dua saldo berbeda untuk kas yang sama. */
+describe('Rekap bulanan', () => {
+  const DATA = () => ({
+    tarikan: ok([
+      { tanggal: '2026-07-04', total_terkumpul: 300_000 },
+      { tanggal: '2026-08-08', total_terkumpul: 200_000 },
+      { tanggal: '2026-10-03', total_terkumpul: 150_000 },
+    ]),
+    transaksi_kas: ok([
+      { tipe: 'setor_kas_rt', nominal: 100_000, tanggal: '2026-08-31' },
+      { tipe: 'setor_kas_rt', nominal: 50_000, tanggal: '2026-10-20' },
+    ]),
+    kas_rt: ok([
+      { tipe: 'masuk', nominal: 80_000, tanggal: '2026-07-10' },
+      { tipe: 'keluar', nominal: 30_000, tanggal: '2026-09-12' },
+      { tipe: 'keluar', nominal: 10_000, tanggal: '2026-10-05' },
+    ]),
+  });
+
+  it('mengelompokkan per bulan, terbaru dulu, dgn label & rentang bahasa Indonesia', async () => {
+    jawab = DATA();
+    const hasil = await fetchRekapBulanan();
+    // September tak punya tarikan/setoran tapi punya pengeluaran Kas RT → tetap ada.
+    expect(hasil.map((r) => r.key)).toEqual(['2026-10', '2026-09', '2026-08', '2026-07']);
+    expect(hasil[0]).toMatchObject({ label: 'Oktober 2026', rentang: '1–31 Okt 2026', bulan: 10, triwulan: 4, romawi: 'IV' });
+    expect(hasil[1]).toMatchObject({ label: 'September 2026', rentang: '1–30 Sep 2026', bulan: 9, triwulan: 3 });
+  });
+
+  it('Februari memakai hari terakhir yang benar (kabisat & bukan)', async () => {
+    jawab = { tarikan: ok([{ tanggal: '2028-02-10', total_terkumpul: 1 }, { tanggal: '2026-02-10', total_terkumpul: 1 }]) };
+    const hasil = await fetchRekapBulanan();
+    expect(hasil.find((r) => r.tahun === 2028)!.rentang).toBe('1–29 Feb 2028');
+    expect(hasil.find((r) => r.tahun === 2026)!.rentang).toBe('1–28 Feb 2026');
+  });
+
+  it('urutan kronologis memakai kunci dua digit: September < Oktober', async () => {
+    jawab = DATA();
+    const hasil = await fetchRekapBulanan();
+    const sep = hasil.find((r) => r.bulan === 9)!, okt = hasil.find((r) => r.bulan === 10)!;
+    // Oktober membawa sisa September — kalau kuncinya '2026-9' vs '2026-10',
+    // urut teks menaruh Oktober SEBELUM September dan saldonya salah.
+    expect(okt.rtSaldoAkhir).toBe(sep.rtSaldoAkhir - 10_000);
+  });
+
+  it('INVARIAN: jumlah bulanan dalam satu triwulan = angka triwulannya', async () => {
+    jawab = DATA();
+    const bulan = await fetchRekapBulanan();
+    jawab = DATA();
+    const tw = await fetchRekapTriwulan();
+    for (const q of tw) {
+      const anak = bulan.filter((b) => b.tahun === q.tahun && b.triwulan === q.triwulan);
+      const jml = (f: (r: typeof q) => number) => anak.reduce((n, r) => n + f(r), 0);
+      expect(jml((r) => r.hadiranMasuk), `hadiranMasuk ${q.label}`).toBe(q.hadiranMasuk);
+      expect(jml((r) => r.hadiranSetor), `hadiranSetor ${q.label}`).toBe(q.hadiranSetor);
+      expect(jml((r) => r.rtMasuk), `rtMasuk ${q.label}`).toBe(q.rtMasuk);
+      expect(jml((r) => r.rtKeluar), `rtKeluar ${q.label}`).toBe(q.rtKeluar);
+      expect(jml((r) => r.tarikanSelesai), `tarikanSelesai ${q.label}`).toBe(q.tarikanSelesai);
+    }
+  });
+
+  it('INVARIAN: saldo kumulatif bulan terakhir = saldo triwulan terakhir', async () => {
+    jawab = DATA();
+    const [bulanTerbaru] = await fetchRekapBulanan();
+    jawab = DATA();
+    const [twTerbaru] = await fetchRekapTriwulan();
+    expect(bulanTerbaru.rtSaldoAkhir).toBe(twTerbaru.rtSaldoAkhir);
+    expect(bulanTerbaru.hadiranBelumSetor).toBe(twTerbaru.hadiranBelumSetor);
+  });
+
+  it('talangan belum lunas dibebankan ke BULAN tarikannya; lunas dihitung di bulan pelunasan', async () => {
+    jawab = {
+      talangan: ok([
+        { nominal: 50_000, status_lunas: false, tanggal_lunas: null, tarikan: { tanggal: '2026-08-08' } },
+        { nominal: 50_000, status_lunas: true, tanggal_lunas: '2026-09-02', tarikan: { tanggal: '2026-08-08' } },
+      ]),
+    };
+    const hasil = await fetchRekapBulanan();
+    expect(hasil.find((r) => r.bulan === 8)!.hadiranTalangan).toBe(50_000);
+    expect(hasil.find((r) => r.bulan === 9)!.talanganLunas).toBe(1);
+    expect(hasil.find((r) => r.bulan === 9)!.hadiranTalangan).toBe(0);
+  });
+
+  it('Saldo Awal Kas RT dikecualikan dari rtMasuk bulannya tapi ikut saldo', async () => {
+    jawab = { kas_rt: ok([{ tipe: 'masuk', nominal: 8_134_000, tanggal: '2026-01-31', keterangan: 'Saldo Awal Kas RT' }]) };
+    const [jan] = await fetchRekapBulanan();
+    expect(jan.rtSaldoAwal).toBe(8_134_000);
+    expect(jan.rtMasuk).toBe(0);
+    expect(jan.rtSaldoAkhir).toBe(8_134_000);
+  });
+
+  it('fetchRekapLengkap memberi keduanya dari SATU kali ambil data', async () => {
+    jawab = DATA();
+    const { triwulan, bulan } = await fetchRekapLengkap();
+    expect(triwulan.length).toBe(2);
+    expect(bulan.length).toBe(4);
+  });
+
+  for (const tabel of ['transaksi_kas', 'kas_rt', 'tarikan', 'talangan']) {
+    it(`melempar saat query ${tabel} gagal — bukan laporan bulanan nol`, async () => {
+      jawab = { [tabel]: { data: null, error: { message: `${tabel} 500` } } };
+      await expect(fetchRekapBulanan()).rejects.toBeTruthy();
+      await expect(fetchRekapLengkap()).rejects.toBeTruthy();
     });
   }
 });

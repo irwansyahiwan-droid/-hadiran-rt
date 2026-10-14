@@ -90,3 +90,30 @@ describe('PDF Laporan Triwulan — isi dokumen', () => {
     expect(buildLaporanTriwulanPDF({ ...REKAP, rtSaldoAwal: 8_000_000 }).doc.getNumberOfPages()).toBe(1);
   });
 });
+
+describe('PDF Laporan BULANAN — generator yang sama, kata & kode periode berbeda', () => {
+  const BULANAN: RekapTriwulan = {
+    ...REKAP, key: '2026-09', bulan: 9, label: 'September 2026', rentang: '1–30 Sep 2026',
+  };
+
+  it('memakai kata "bulan", bukan "triwulan", dan label periode tercetak', () => {
+    const t = teksPdf(buildLaporanTriwulanPDF(BULANAN).doc);
+    expect(punya(t, 'Selisih bulan'), 'label "Selisih bulan" hilang').toBe(true);
+    expect(t.join(' | '), 'kata triwulan bocor ke laporan bulanan').not.toMatch(/triwulan/i);
+    expect(t.join(' | ')).toContain('September 2026');
+  });
+
+  it('kode dokumen & nama berkas membawa bulan dua digit; triwulan tak berubah', () => {
+    expect(buildLaporanTriwulanPDF(BULANAN).filename).toBe('Laporan-Keuangan-BL09-2026.pdf');
+    expect(buildLaporanTriwulanPDF({ ...BULANAN, bulan: 12 }).filename).toBe('Laporan-Keuangan-BL12-2026.pdf');
+    expect(buildLaporanTriwulanPDF(REKAP).filename).toBe('Laporan-Keuangan-TW3-2026.pdf');
+  });
+
+  it('selisih & seluruh nilai tercetak sama dgn triwulan (rumus tak bercabang)', () => {
+    const t = teksPdf(buildLaporanTriwulanPDF(BULANAN).doc);
+    expect(punya(t, rp(BULANAN.hadiranMasuk - BULANAN.hadiranSetor))).toBe(true);
+    expect(punya(t, rp(BULANAN.rtMasuk - BULANAN.rtKeluar))).toBe(true);
+    expect(punya(t, rp(BULANAN.rtSaldoAkhir))).toBe(true);
+    expect(buildLaporanTriwulanPDF(BULANAN).doc.getNumberOfPages()).toBe(1);
+  });
+});

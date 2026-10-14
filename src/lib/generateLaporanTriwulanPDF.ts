@@ -63,6 +63,10 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
   // "Selisih triwulan"/"Belum disetor". Lihat komentar `laporan.ts`.
   const hadiranNet = r.hadiranMasuk - r.hadiranSetor;
   const rtNet = r.rtMasuk - r.rtKeluar;
+  /* Rekap BULANAN memakai generator yang sama (`r.bulan` terisi): hanya kata
+     periode, kode dokumen, dan nama berkas yang berbeda — rumus & susunannya
+     identik dgn triwulan, jadi dua dokumen itu tak bisa saling menyimpang. */
+  const kata = r.bulan ? 'bulan' : 'triwulan';
 
   type Baris = { label: string; nilai: string; tone?: keyof typeof C; saldo?: boolean; neg?: boolean };
   const seksi: { judul: string; rows: Baris[] }[] = [
@@ -71,7 +75,7 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
       rows: [
         { label: 'Kas Terkumpul', nilai: rp(r.hadiranMasuk), tone: 'pos' },
         { label: 'Setor ke Kas RT', nilai: `-${rp(r.hadiranSetor)}` },
-        { label: 'Selisih triwulan', nilai: rp(hadiranNet) },
+        { label: `Selisih ${kata}`, nilai: rp(hadiranNet) },
         { label: 'Belum disetor', nilai: rp(r.hadiranBelumSetor), saldo: true, neg: r.hadiranBelumSetor < 0 },
         { label: 'Talangan belum lunas', nilai: `-${rp(r.hadiranTalangan)}`, tone: 'warn' },
       ],
@@ -85,7 +89,7 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
         ...(r.rtSaldoAwal > 0 ? [{ label: 'Saldo Awal', nilai: rp(r.rtSaldoAwal) }] : []),
         { label: 'Pemasukan', nilai: rp(r.rtMasuk), tone: 'pos' as const },
         { label: 'Pengeluaran', nilai: `-${rp(r.rtKeluar)}`, tone: 'neg' as const },
-        { label: 'Selisih triwulan', nilai: rp(rtNet) },
+        { label: `Selisih ${kata}`, nilai: rp(rtNet) },
         { label: 'Saldo akhir', nilai: rp(r.rtSaldoAkhir), saldo: true, neg: r.rtSaldoAkhir < 0 },
       ],
     },
@@ -104,7 +108,8 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
   const now = new Date();
-  const docCode = `LK-TW${r.triwulan}-${r.tahun}`;
+  const kodePeriode = r.bulan ? `BL${String(r.bulan).padStart(2, '0')}` : `TW${r.triwulan}`;
+  const docCode = `LK-${kodePeriode}-${r.tahun}`;
   const tanggalCetak = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const ink  = (c: readonly number[]) => doc.setTextColor(c[0], c[1], c[2]);
@@ -144,7 +149,7 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
 
   drawFooter(doc, W, H, tanggalCetak, M, SK);
 
-  return { doc, filename: `Laporan-Keuangan-TW${r.triwulan}-${r.tahun}.pdf` };
+  return { doc, filename: `Laporan-Keuangan-${kodePeriode}-${r.tahun}.pdf` };
 }
 
 export function generateLaporanTriwulanPDF(r: RekapTriwulan) {

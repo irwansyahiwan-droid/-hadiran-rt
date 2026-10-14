@@ -28,6 +28,9 @@ export interface RekapTriwulan {
   tarikanSelesai: number;
   talanganLunas: number;
   jumlahTransaksi: number;
+  /** 1–12. Ada = rekap BULANAN (`triwulan`/`romawi` tetap diisi dgn triwulan yang
+   *  memuat bulan itu, supaya tipenya tak bercabang); tak ada = rekap triwulan. */
+  bulan?: number;
 }
 
 // Pendapatan Kas Hadiran = SUM(tarikan.total_terkumpul) tarikan SELESAI — sumber
@@ -98,32 +101,70 @@ interface TalanganRow {
 const ROMAWI = ['I', 'II', 'III', 'IV'];
 const BULAN_SINGKAT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-interface Bagian { tahun: number; q: number; key: string }
+const BULAN_PENUH = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-function bagianOf(dateStr: string | null | undefined): Bagian | null {
+/** Granularitas rekap. Aturan uangnya SAMA PERSIS untuk keduanya — yang beda
+ *  hanya cara mengelompokkan tanggal (kunci periode) dan labelnya. */
+export type PeriodeRekap = 'triwulan' | 'bulan';
+
+interface Bagian { tahun: number; q: number; bulan: number; key: string }
+
+function bagianOf(dateStr: string | null | undefined, periode: PeriodeRekap): Bagian | null {
   if (!dateStr) return null;
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return null;
-  const q = Math.floor(d.getMonth() / 3); // 0..3
-  return { tahun: d.getFullYear(), q, key: `${d.getFullYear()}-Q${q + 1}` };
+  const bulan = d.getMonth();            // 0..11
+  const q = Math.floor(bulan / 3);       // 0..3
+  /* Bulan berkunci DUA digit ('2026-09'), supaya urut leksikografis = urut
+     kronologis — saldo kumulatif di bawah bergantung pada urutan itu. */
+  const key = periode === 'bulan'
+    ? `${d.getFullYear()}-${String(bulan + 1).padStart(2, '0')}`
+    : `${d.getFullYear()}-Q${q + 1}`;
+  return { tahun: d.getFullYear(), q, bulan, key };
 }
 
-function buat(b: Bagian): RekapTriwulan {
-  const start = b.q * 3;
-  return {
-    key: b.key,
-    tahun: b.tahun,
-    triwulan: (b.q + 1) as 1 | 2 | 3 | 4,
-    romawi: ROMAWI[b.q],
-    label: `Triwulan ${ROMAWI[b.q]} ${b.tahun}`,
-    rentang: `${BULAN_SINGKAT[start]}–${BULAN_SINGKAT[start + 2]} ${b.tahun}`,
+function buat(b: Bagian, periode: PeriodeRekap): RekapTriwulan {
+  const kosong = {
     hadiranMasuk: 0, hadiranSetor: 0, hadiranBelumSetor: 0, hadiranTalangan: 0,
     rtSaldoAwal: 0, rtMasuk: 0, rtKeluar: 0, rtSaldoAkhir: 0,
     tarikanSelesai: 0, talanganLunas: 0, jumlahTransaksi: 0,
   };
+  const triwulan = (b.q + 1) as 1 | 2 | 3 | 4;
+  if (periode === 'bulan') {
+    const akhir = new Date(b.tahun, b.bulan + 1, 0).getDate();   // hari terakhir bulan itu
+    return {
+      key: b.key,
+      tahun: b.tahun,
+      triwulan,
+      romawi: ROMAWI[b.q],
+      bulan: b.bulan + 1,
+      label: `${BULAN_PENUH[b.bulan]} ${b.tahun}`,
+      rentang: `1–${akhir} ${BULAN_SINGKAT[b.bulan]} ${b.tahun}`,
+      ...kosong,
+    };
+  }
+  const start = b.q * 3;
+  return {
+    key: b.key,
+    tahun: b.tahun,
+    triwulan,
+    romawi: ROMAWI[b.q],
+    label: `Triwulan ${ROMAWI[b.q]} ${b.tahun}`,
+    rentang: `${BULAN_SINGKAT[start]}–${BULAN_SINGKAT[start + 2]} ${b.tahun}`,
+    ...kosong,
+  };
 }
 
-export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
+interface Mentah {
+  trx: { tipe: string; nominal: number; tanggal: string }[];
+  rt: { tipe: string; nominal: number; tanggal: string; keterangan: string | null }[];
+  tarikan: { tanggal: string; total_terkumpul: number | null }[];
+  talangan: TalanganRow[];
+}
+
+/** Satu kali ambil data untuk SEMUA granularitas — halaman Tutup Buku memuat
+ *  triwulan DAN bulanan, dan empat query yang sama tak perlu dijalankan dua kali. */
+async function muatMentah(): Promise<Mentah> {
   const [trxRes, rtRes, tarikanRes, talanganRes] = await Promise.all([
     supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
     supabase.from('kas_rt').select('tipe, nominal, tanggal, keterangan'),
@@ -140,25 +181,34 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
   const gagal = trxRes.error ?? rtRes.error ?? tarikanRes.error ?? talanganRes.error;
   if (gagal) throw gagal;
 
+  return {
+    trx: (trxRes.data as Mentah['trx'] | null) ?? [],
+    rt: (rtRes.data as Mentah['rt'] | null) ?? [],
+    tarikan: (tarikanRes.data as Mentah['tarikan'] | null) ?? [],
+    talangan: (talanganRes.data as unknown as TalanganRow[] | null) ?? [],
+  };
+}
+
+function susunRekap(m: Mentah, periode: PeriodeRekap): RekapTriwulan[] {
   const map = new Map<string, RekapTriwulan>();
   const get = (b: Bagian): RekapTriwulan => {
     let r = map.get(b.key);
-    if (!r) { r = buat(b); map.set(b.key, r); }
+    if (!r) { r = buat(b, periode); map.set(b.key, r); }
     return r;
   };
 
   // Setor ke Kas RT dari ledger transaksi_kas. kas_masuk SENGAJA diabaikan di
   // sini — pendapatan diambil dari total_terkumpul.
-  for (const t of (trxRes.data as { tipe: string; nominal: number; tanggal: string }[] ?? [])) {
-    const b = bagianOf(t.tanggal); if (!b) continue;
+  for (const t of m.trx) {
+    const b = bagianOf(t.tanggal, periode); if (!b) continue;
     if (!HADIRAN_SETOR.has(t.tipe)) continue;
     const r = get(b);
     r.hadiranSetor += t.nominal;
     r.jumlahTransaksi += 1;
   }
 
-  for (const t of (rtRes.data as { tipe: string; nominal: number; tanggal: string; keterangan: string | null }[] ?? [])) {
-    const b = bagianOf(t.tanggal); if (!b) continue;
+  for (const t of m.rt) {
+    const b = bagianOf(t.tanggal, periode); if (!b) continue;
     const r = get(b);
     if (t.keterangan === SALDO_AWAL_KETERANGAN) r.rtSaldoAwal += t.nominal;
     else if (t.tipe === 'keluar') r.rtKeluar += t.nominal;
@@ -166,22 +216,22 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     r.jumlahTransaksi += 1;
   }
 
-  for (const t of (tarikanRes.data as { tanggal: string; total_terkumpul: number | null }[] ?? [])) {
-    const b = bagianOf(t.tanggal); if (!b) continue;
+  for (const t of m.tarikan) {
+    const b = bagianOf(t.tanggal, periode); if (!b) continue;
     const r = get(b);
     r.tarikanSelesai += 1;
     r.hadiranMasuk += t.total_terkumpul ?? 0; // pendapatan = iuran tarikan
     r.jumlahTransaksi += 1;
   }
 
-  for (const t of (talanganRes.data as unknown as TalanganRow[] ?? [])) {
+  for (const t of m.talangan) {
     if (!t.status_lunas) {
-      // Talangan masih nyangkut = kas keluar di triwulan tarikannya (full nominal).
-      const b = bagianOf(t.tarikan?.tanggal);
+      // Talangan masih nyangkut = kas keluar di periode tarikannya (full nominal).
+      const b = bagianOf(t.tarikan?.tanggal, periode);
       if (b) get(b).hadiranTalangan += t.nominal ?? 0;
     } else {
       // Sudah lunas = uang balik (net nol); hanya untuk badge hitungan.
-      const b = bagianOf(t.tanggal_lunas);
+      const b = bagianOf(t.tanggal_lunas, periode);
       if (b) get(b).talanganLunas += 1;
     }
   }
@@ -198,6 +248,20 @@ export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
     r.rtSaldoAkhir = rtRun;
   }
   return asc.reverse();
+}
+
+export async function fetchRekapTriwulan(): Promise<RekapTriwulan[]> {
+  return susunRekap(await muatMentah(), 'triwulan');
+}
+
+export async function fetchRekapBulanan(): Promise<RekapTriwulan[]> {
+  return susunRekap(await muatMentah(), 'bulan');
+}
+
+/** Triwulan + bulanan dari SATU kali ambil data. */
+export async function fetchRekapLengkap(): Promise<{ triwulan: RekapTriwulan[]; bulan: RekapTriwulan[] }> {
+  const m = await muatMentah();
+  return { triwulan: susunRekap(m, 'triwulan'), bulan: susunRekap(m, 'bulan') };
 }
 
 /** Snapshot "tutup buku sekarang" — kumulatif SELURUH kas s/d hari ini. */

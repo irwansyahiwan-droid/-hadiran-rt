@@ -7,7 +7,7 @@ import ErrorState from '../components/ErrorState';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
-import { fetchRekapTriwulan, fetchSnapshotKas } from '../lib/laporan';
+import { fetchRekapLengkap, fetchSnapshotKas } from '../lib/laporan';
 import { formatRupiahPlain, haptic } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat } from '../lib/hooks';
@@ -16,6 +16,8 @@ import { tanggalBerkas } from '../lib/shareReceipt';
 import type { LaporanKasCard } from '../lib/shareLaporanKas';
 import type { RekapTriwulan, SnapshotKas } from '../lib/laporan';
 import MetaPisah from '../components/MetaPisah';
+import FilterChips from '../components/FilterChips';
+import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
 
 interface Props {
   open: boolean;
@@ -191,8 +193,22 @@ function TriwulanKerangka() {
   );
 }
 
+/* Dua granularitas, SATU daftar kartu: bulanan memakai kartu, kartu PNG, dan
+   PDF yang sama dgn triwulan (`RekapTriwulan.bulan` terisi). Judul layar
+   mengikuti pilihan, tapi item Menu tetap "Tutup Buku Triwulan" — pilihan awal
+   selalu triwulan, jadi bendahara yang sudah hafal tak menemukan apa pun
+   bergeser. */
+type Mode = 'triwulan' | 'bulan';
+const PILIHAN_MODE = [
+  { id: 'triwulan', label: 'Triwulan' },
+  { id: 'bulan', label: 'Bulanan' },
+] as const;
+const KOSONG = ['Belum ada data', 'Laporan akan muncul setelah ada transaksi kas tercatat.'] as const;
+
 export default function LaporanTriwulan({ open, onClose }: Props) {
-  const [rows, setRows] = useState<RekapTriwulan[]>([]);
+  const [mode, setMode] = useState<Mode>('triwulan');
+  const [rowsTriwulan, setRowsTriwulan] = useState<RekapTriwulan[]>([]);
+  const [rowsBulan, setRowsBulan] = useState<RekapTriwulan[]>([]);
   const [snap, setSnap] = useState<SnapshotKas | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -204,8 +220,9 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   async function load() {
     setError(false);
     try {
-      const [rekap, snapshot] = await Promise.all([fetchRekapTriwulan(), fetchSnapshotKas()]);
-      setRows(rekap);
+      const [rekap, snapshot] = await Promise.all([fetchRekapLengkap(), fetchSnapshotKas()]);
+      setRowsTriwulan(rekap.triwulan);
+      setRowsBulan(rekap.bulan);
       setSnap(snapshot);
     } catch {
       setError(true);
@@ -226,7 +243,13 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
   // mundur ke kanan (page-out-right) baru unmount.
   const exit = useClosePhase(onClose, 160);
   useBackDismiss(open, exit.requestClose);
-  const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Tutup buku triwulan' });
+  const judul = mode === 'bulan' ? 'Tutup Buku Bulanan' : 'Tutup Buku Triwulan';
+  const dlg = useDialog(open, { onClose: exit.requestClose, label: judul.toLowerCase() });
+  const rows = mode === 'bulan' ? rowsBulan : rowsTriwulan;
+
+  /* Pilihan Triwulan/Bulanan mengubah daftar tanpa suara — pembaca layar
+     perlu tahu hasilnya (WCAG §4.1.3), pola yang sama dgn semua daftar app. */
+  useUmumkanHasil(rows.length, mode === 'bulan' ? 'laporan bulanan' : 'laporan triwulan', [mode], KOSONG.join('. '));
 
   /* Chunk PDF triwulan 399 kB — jalur terberat kedua sesudah Excel. Kuncinya
      per-BARIS (`cetakKey`) supaya yang mengaku sibuk cuma triwulan yang diketuk;
@@ -291,15 +314,19 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
     <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken kanvas-cahaya dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
       <OverlayHeader
         icon={FileText}
-        title="Tutup Buku Triwulan"
+        title={judul}
         onBack={exit.requestClose}
         actions={<OverlayAction icon={RefreshCw} label="Muat ulang" onClick={() => { setLoading(true); load(); }} spinning={loading} />}
       />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         <p className="text-pretty text-caption text-gray-500 dark:text-gray-400">
-          Tutup buku <span className="font-semibold">sekarang</span> untuk posisi kas terkini, atau pilih per triwulan. Bagikan sebagai gambar (PNG) langsung ke grup WhatsApp, atau unduh PDF.
+          Tutup buku <span className="font-semibold">sekarang</span> untuk posisi kas terkini, atau pilih per triwulan atau per bulan. Bagikan sebagai gambar (PNG) langsung ke grup WhatsApp, atau unduh PDF.
         </p>
+
+        {/* Selalu tampil (tak bergantung data) — chip muncul bersama kerangka,
+            jadi tak ada geseran saat daftar selesai dimuat. */}
+        <FilterChips options={PILIHAN_MODE} value={mode} onChange={setMode} />
 
         {/* Tutup Buku Sekarang — snapshot posisi kas s/d hari ini */}
         {!loading && snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
@@ -386,8 +413,8 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift">
             <EmptyState
               icon={FileText}
-              title="Belum ada data"
-              subtitle="Laporan triwulan akan muncul setelah ada transaksi kas tercatat."
+              title={KOSONG[0]}
+              subtitle={KOSONG[1]}
             />
           </div>
         ) : (
