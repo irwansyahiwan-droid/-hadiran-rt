@@ -210,6 +210,14 @@ interface KasHadiranCache {
   talanganMap: Record<string, { count: number; total: number }>;
 }
 
+/* Nama + label status (Titip / Lunas / Belum lunas) di sheet detail tarikan.
+   Di bawah 360px label turun ke BAWAH nama, di kolom yang sama: sebaris, label
+   "⚠ Belum lunas" (±104px) menyisakan 87px untuk nama @320px, dan nama satu
+   kata seperti "Robyansyah" patah di tengah ("Robyansya" / "h") — `audit:kata-
+   patah` (15 Okt 2026, data Tarikan #23). Bertumpuk, kolom nama ±204px. Di
+   360/390px tetap sebaris, tak berubah. */
+const KOLOM_NAMA_LABEL = 'flex-1 min-w-0 flex items-center gap-3 max-[359px]:flex-col max-[359px]:items-start max-[359px]:gap-1';
+
 export default function KasHadiranPage() {
   const { isBendahara } = useAuthContext();
   // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
@@ -1326,8 +1334,10 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
-                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 potong-lentur">{p.nama}</span>
-                            <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
+                            <span className={KOLOM_NAMA_LABEL}>
+                              <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 potong-lentur">{p.nama}</span>
+                              <Tag tone="info"><Coins className="w-3 h-3" />Titip</Tag>
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -1341,12 +1351,14 @@ export default function KasHadiranPage() {
                           <div key={p.id} className="flex items-center gap-3 py-2">
                             <span className="w-5 text-right text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400 shrink-0">{i + 1}</span>
                             <AvatarPeci nama={p.nama} ukuran={8} />
-                            <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 potong-lentur">{p.nama}</span>
-                            {p.lunas ? (
-                              <Tag tone="success"><Check className="w-3 h-3" />Lunas</Tag>
-                            ) : (
-                              <Tag tone="danger"><AlertTriangle className="w-3 h-3" />Belum lunas</Tag>
-                            )}
+                            <span className={KOLOM_NAMA_LABEL}>
+                              <span className="flex-1 text-body font-medium text-gray-800 dark:text-gray-200 potong-lentur">{p.nama}</span>
+                              {p.lunas ? (
+                                <Tag tone="success"><Check className="w-3 h-3" />Lunas</Tag>
+                              ) : (
+                                <Tag tone="danger"><AlertTriangle className="w-3 h-3" />Belum lunas</Tag>
+                              )}
+                            </span>
                           </div>
                         ))}
                       </div>
