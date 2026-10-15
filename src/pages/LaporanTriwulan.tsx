@@ -324,15 +324,9 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           Tutup buku <span className="font-semibold">sekarang</span> untuk posisi kas terkini, atau pilih per triwulan atau per bulan. Bagikan sebagai gambar (PNG) langsung ke grup WhatsApp, atau unduh PDF.
         </p>
 
-        {/* Tampil bersama kerangka (tak bergantung data) — jadi tak ada geseran
-            saat daftar selesai dimuat. DISEMBUNYIKAN saat muat gagal: daftar
-            diganti ErrorState, jadi pilihan Triwulan/Bulanan tak punya apa pun
-            untuk dipilih — mengetuknya cuma mengganti judul layar. Kanon yang
-            sama dgn kolom cari & chip di tab-tab lain (29 Sep 2026). */}
-        {!error && <FilterChips options={PILIHAN_MODE} value={mode} onChange={setMode} />}
-
-        {/* Tutup Buku Sekarang — snapshot posisi kas s/d hari ini */}
-        {!loading && snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
+        {/* Tutup Buku Sekarang — snapshot posisi kas s/d hari ini. Kerangkanya
+            duduk di tempat yang sama, jadi pilihan di bawahnya tak bergeser. */}
+        {loading ? <HeroKerangka /> : snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
           <div className="rise relative overflow-hidden rounded-3xl hero-emerald" style={{ padding: '18px 20px 16px', boxShadow: 'var(--hero-shadow)' }}>
             {/* Permukaan `hero-emerald` (30 Agu 2026) — sebelumnya `.hero-card
                 hero-noise`, gradient BERBEDA dari hero se-app lainnya. Bersama
@@ -394,6 +388,16 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           </div>
         )}
 
+        {/* Pilihan Triwulan | Bulanan duduk TEPAT di atas daftar yang ia saring
+            (15 Okt 2026) — dulu di atas hero "Tutup Buku Sekarang", yang tak
+            ikut berubah saat dipilih, jadi ketukan pertama tak mengubah apa pun
+            yang terlihat di dekat jempol. Tampil bersama kerangka (tak bergantung
+            data) — tak ada geseran saat daftar selesai dimuat. DISEMBUNYIKAN saat
+            muat gagal: daftar diganti ErrorState, jadi pilihan ini tak punya apa
+            pun untuk dipilih. Kanon yang sama dgn kolom cari & chip di tab-tab
+            lain (29 Sep 2026). */}
+        {!error && <FilterChips options={PILIHAN_MODE} value={mode} onChange={setMode} />}
+
         {loading ? (
           /* Kerangka mencermin SUSUNAN asli (30 Sep 2026). Yang lama tiga kartu
              putih 178px ber-DUA kolom — padahal (a) layar termuat dibuka hero
@@ -405,7 +409,6 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
              Hero hanya tampil bila ada transaksi/tarikan — di RT yang berjalan
              itu selalu. Tinggi tiap blok LAHIR dari kotak baris yang sama. */
           <div className="space-y-4">
-            <HeroKerangka />
             {[0, 1].map((i) => <TriwulanKerangka key={i} />)}
           </div>
         ) : error ? (
