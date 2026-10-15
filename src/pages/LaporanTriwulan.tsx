@@ -324,9 +324,12 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
           Tutup buku <span className="font-semibold">sekarang</span> untuk posisi kas terkini, atau pilih per triwulan atau per bulan. Bagikan sebagai gambar (PNG) langsung ke grup WhatsApp, atau unduh PDF.
         </p>
 
-        {/* Selalu tampil (tak bergantung data) — chip muncul bersama kerangka,
-            jadi tak ada geseran saat daftar selesai dimuat. */}
-        <FilterChips options={PILIHAN_MODE} value={mode} onChange={setMode} />
+        {/* Tampil bersama kerangka (tak bergantung data) — jadi tak ada geseran
+            saat daftar selesai dimuat. DISEMBUNYIKAN saat muat gagal: daftar
+            diganti ErrorState, jadi pilihan Triwulan/Bulanan tak punya apa pun
+            untuk dipilih — mengetuknya cuma mengganti judul layar. Kanon yang
+            sama dgn kolom cari & chip di tab-tab lain (29 Sep 2026). */}
+        {!error && <FilterChips options={PILIHAN_MODE} value={mode} onChange={setMode} />}
 
         {/* Tutup Buku Sekarang — snapshot posisi kas s/d hari ini */}
         {!loading && snap && (snap.jumlahTransaksi > 0 || snap.tarikanSelesai > 0) && (
