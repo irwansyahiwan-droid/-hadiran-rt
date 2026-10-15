@@ -95,10 +95,14 @@ export default function KartuWarga({ open, onClose }: Props) {
     return (daftar?.warga ?? []).filter((w) => !q || w.nama.toLowerCase().includes(q));
   }, [daftar, search]);
 
+  /* Kolom cari sudah hidup selama daftar dimuat (kanon Kelola Anggota), jadi
+     pemicunya ditahan '' sampai daftar ada — kalau tidak, ketikan selagi memuat
+     diumumkan "Tidak ada hasil" untuk daftar yang belum tiba. Ketikan itu
+     diumumkan begitu daftarnya datang. */
   useUmumkanHasil(
     hasil.length,
     'warga',
-    [search],
+    [daftar ? search : ''],
     (daftar && daftar.warga.length === 0 ? KOSONG_BELUM : KOSONG_CARI).join('. '),
   );
 
@@ -134,10 +138,22 @@ export default function KartuWarga({ open, onClose }: Props) {
         {errorDaftar ? (
           <ErrorState onRetry={coba} />
         ) : !daftar ? (
-          <div className="space-y-3" aria-hidden="true">
-            <div className="skeleton h-12 rounded-2xl" />
-            <div className="skeleton h-48 rounded-3xl" />
-          </div>
+          /* Kerangka mengikuti layar yang AKAN tampil: kartu kalau nama sudah
+             diingat di HP ini, daftar nama kalau belum. */
+          pilihanId ? (
+            <>
+              <IdentitasKerangka />
+              <KartuKerangka />
+            </>
+          ) : (
+            <PilihNama
+              warga={null}
+              hasil={hasil}
+              search={search}
+              setSearch={setSearch}
+              onPilih={pilih}
+            />
+          )
         ) : !pilihanId || !warga ? (
           <PilihNama
             warga={daftar.warga}
@@ -154,10 +170,7 @@ export default function KartuWarga({ open, onClose }: Props) {
         ) : !kartu ? (
           <>
             <Identitas warga={warga} onGanti={ganti} />
-            <div className="space-y-3" aria-hidden="true">
-              <div className="skeleton h-24 rounded-3xl" />
-              <div className="skeleton h-32 rounded-3xl" />
-            </div>
+            <KartuKerangka />
           </>
         ) : (
           <>
@@ -252,6 +265,61 @@ export default function KartuWarga({ open, onClose }: Props) {
   );
 }
 
+/* ── Kerangka ───────────────────────────────────────────────────────────────
+   Meniru PERMUKAAN tujuannya (kartu putih ber-hairline, bukan blok abu di atas
+   kanvas) DAN kotak barisnya: tiap batang duduk di dalam baris teks berkelas
+   peran yang sama dgn isinya, jadi tingginya lahir dari line-height yang sama.
+   Sebelumnya dua blok abu polos: daftar nama meloncat 65px saat tiba, dan
+   kerangka kartu 224px lawan isi 557px. Varian kartu yang ditiru = TANPA
+   talangan (bentuk paling umum); kartu bertalangan memang lebih tinggi. */
+const bar = 'inline-block align-middle rounded-lg skeleton';
+const KARTU = 'rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift';
+const LEBAR_NAMA = ['w-2/5', 'w-1/2', 'w-1/3', 'w-3/5', 'w-2/5', 'w-1/2', 'w-1/3', 'w-2/5'];
+
+function IdentitasKerangka() {
+  return (
+    <div aria-hidden="true" className={`flex items-center gap-3 ${KARTU} p-5`}>
+      <span className="w-12 h-12 rounded-2xl skeleton shrink-0" />
+      <div className="min-w-0 flex-1">
+        <p className="text-subtitle"><span className={`${bar} h-4 w-36 max-w-full`} /></p>
+      </div>
+      <span className={`${bar} h-3 w-20 shrink-0 mr-3`} />
+    </div>
+  );
+}
+
+function KartuKerangka() {
+  return (
+    <>
+      <div aria-hidden="true" className={`flex items-center gap-3 ${KARTU} p-5`}>
+        <span className="w-10 h-10 rounded-xl skeleton shrink-0" />
+        <div className="min-w-0 flex-1">
+          <p className="text-body"><span className={`${bar} h-4 w-36`} /></p>
+          <p className="text-caption mt-0.5"><span className={`${bar} h-3 w-48 max-w-full`} /></p>
+        </div>
+      </div>
+      <div aria-hidden="true">
+        <StatRow
+          items={['Hadir', 'Titip', 'Tidak'].map((label) => ({
+            label,
+            value: <span className={`${bar} h-5 w-8`} />,
+          }))}
+        />
+      </div>
+      <div aria-hidden="true" className={`${KARTU} p-5`}>
+        <div className="flex items-center gap-3">
+          <span className="w-10 h-10 rounded-xl skeleton shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-caption"><span className={`${bar} h-3 w-32`} /></p>
+            <p className="text-body"><span className={`${bar} h-4 w-52 max-w-full`} /></p>
+          </div>
+        </div>
+        <p className="text-caption mt-3"><span className={`${bar} h-3 w-56 max-w-full`} /></p>
+      </div>
+    </>
+  );
+}
+
 function Identitas({ warga, onGanti }: { warga: Warga; onGanti: () => void }) {
   return (
     <div className="flex items-center gap-3 rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5">
@@ -277,7 +345,9 @@ function PilihNama({
   setSearch,
   onPilih,
 }: {
-  warga: Warga[];
+  /** null = daftar masih dimuat: kepala & kolom cari tetap tampil (keduanya
+   *  tak bergantung data), hanya isi kartu yang jadi kerangka. */
+  warga: Warga[] | null;
   hasil: Warga[];
   search: string;
   setSearch: (s: string) => void;
@@ -308,7 +378,16 @@ function PilihNama({
       </div>
 
       <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
-        {hasil.length === 0 ? (
+        {!warga ? (
+          <ul aria-hidden="true" className="list-inset [--di-l:4.25rem] [--di-r:1rem]">
+            {LEBAR_NAMA.map((w, i) => (
+              <li key={i} className="flex items-center gap-3 min-h-[44px] px-4 py-3">
+                <span className="w-10 h-10 rounded-xl skeleton shrink-0" />
+                <span className="min-w-0 flex-1 text-body"><span className={`${bar} h-4 ${w}`} /></span>
+              </li>
+            ))}
+          </ul>
+        ) : hasil.length === 0 ? (
           <EmptyState
             icon={Users}
             title={(warga.length === 0 ? KOSONG_BELUM : KOSONG_CARI)[0]}
