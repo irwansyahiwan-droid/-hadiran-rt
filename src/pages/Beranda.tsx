@@ -417,7 +417,13 @@ export default function Beranda({ onNavigate }: BerandaProps) {
   const trxFoldRow = (run: { key: string; sub: string; items: TrxItem[]; total: number }, idx: number, lastInGroup: boolean) => {
     const open = openFold.has(run.key);
     const seg = run.sub.split(' · ');
-    const judul = seg.length > 1 ? seg[seg.length - 1] : run.sub;
+    /* Spasi tak-putus "Tarikan #N" milik baris SUB (menjaga nomor tetap
+       bersama katanya di "Talangan · Tarikan #N"). Sebagai JUDUL lipatan ia
+       justru mematahkan angkanya: @320px kolom judul tinggal 86px di sebelah
+       nominal gabungan "+Rp200.000", dan "Tarikan #22" (±95px) patah jadi
+       "Tarikan #2" / "2" (`audit:kata-patah`, 15 Okt 2026). Spasi biasa →
+       "Tarikan" / "#22"; di 360/390px tetap satu baris. */
+    const judul = (seg.length > 1 ? seg[seg.length - 1] : run.sub).replace(/\u00A0/g, ' ');
     const jenis = seg.length > 1 ? seg.slice(0, -1).join(' · ') : null;
     // "warga" hanya benar untuk talangan (satu baris = satu orang); pos lain
     // dihitung sebagai transaksi supaya subnya tak pernah bohong.
