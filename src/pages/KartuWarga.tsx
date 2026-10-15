@@ -7,6 +7,7 @@ import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import StatRow from '../components/StatRow';
 import Tag from '../components/Tag';
+import MetaPisah from '../components/MetaPisah';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
@@ -219,9 +220,13 @@ export default function KartuWarga({ open, onClose }: Props) {
                 <div className="min-w-0">
                   <p className="text-caption text-ink-sub dark:text-gray-400">Giliran Sohibul Bait</p>
                   {kartu.giliran ? (
-                    <p className="text-body font-semibold text-ink dark:text-gray-100">
-                      Tarikan #{kartu.giliran.nomor} · {formatTanggal(kartu.giliran.tanggal)}
-                    </p>
+                    /* MetaPisah: @320px baris ini melipat — digabung jadi satu
+                       teks ia patah jadi "Tarikan #30 · Sab," / "21 Nov 2026",
+                       memisahkan tanggal dari harinya & menggantung titiknya. */
+                    <MetaPisah
+                      className="text-body font-semibold text-ink dark:text-gray-100"
+                      bagian={[`Tarikan #${kartu.giliran.nomor}`, formatTanggal(kartu.giliran.tanggal)]}
+                    />
                   ) : (
                     <p className="text-body font-semibold text-ink dark:text-gray-100">Belum ada jadwal</p>
                   )}
@@ -310,7 +315,10 @@ function PilihNama({
             subtitle={(warga.length === 0 ? KOSONG_BELUM : KOSONG_CARI)[1]}
           />
         ) : (
-          <ul className="divide-y divide-line dark:divide-gray-800">
+          /* Pemisah INSET, sejajar awal teks nama (px-4 + avatar 40 + gap-3 =
+             4.25rem) — kanon daftar app (Kelola Anggota, Talangan). Garis selebar
+             kartu memotong kolom avatar dan terbaca sbg tabel, bukan daftar. */
+          <ul className="list-inset [--di-l:4.25rem] [--di-r:1rem]">
             {hasil.map((w) => (
               <li key={w.id}>
                 <button
