@@ -31,6 +31,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { newCtx, loginWarga, gotoTab, closeLayer, openMenuItem } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
 const OUT = process.env.OUT_DIR || '.audit-sentuh';
@@ -181,6 +182,11 @@ if (!ONLY || ONLY === 'warga') {
     await page.waitForTimeout(700);
     await ukurView(page, 'w-menu');
     await closeLayer(page);
+    /* Kartu Warga (15 Okt 2026): daftar nama ("Bukan saya?", baris nama, kolom
+       cari) + kartu warga bertalangan terbanyak. scripts/lib/kartu-warga.mjs. */
+    for (const alasan of await jelajahKartuWarga(page, async (l) => {
+      if (await siapDiukur(page, `w-kartu-${l}`)) await ukurView(page, `w-kartu-${l}`);
+    })) { console.log(`  PROBE CACAT [${alasan}]`); cacat++; }
   }
   await ctx.close();
 }

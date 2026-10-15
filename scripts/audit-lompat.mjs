@@ -29,6 +29,7 @@
 //                                            sapuan lama akan hijau & yang baru merah)
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const APP = process.env.CAP_URL || 'http://localhost:5199';
 const CPU = +(process.env.CPU || 4);
@@ -222,7 +223,7 @@ function lapor(nama, entri) {
    mati time-out — populasi salah yang menyamar jadi kegagalan app. */
 const bacaTab = (page) => page.$$eval('nav button', (bs) => bs.map((b) => b.innerText.trim().replace(/\s+/g, ' ')).filter(Boolean));
 const browser = await chromium.launch();
-let gagal = 0, diukur = 0;
+let gagal = 0, diukur = 0, cacat = 0;
 
 for (const bendahara of [false, true]) {
   const peran = bendahara ? 'b' : 'w';
@@ -256,10 +257,25 @@ for (const bendahara of [false, true]) {
     const { entri, tandaBaru: tb } = await panen(page, tanda); tanda = tb;
     diukur++; if (lapor(`${peran}-${t}`, entri)) gagal++;
   }
+  /* Kartu Warga (15 Okt 2026, izin user membuka kunci), sisi WARGA: geseran
+     sejak Menu diketuk sampai daftar nama tenang, lalu sejak nama diketuk
+     sampai kartunya tenang. 4 dtk sesudah layar MENGAKU tiba (pembantu
+     menunggu tombol nama / kartu giliran) supaya geseran susulan ikut. */
+  if (!bendahara) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(400);
+    { const { tandaBaru } = await panen(page, tanda); tanda = tandaBaru; }
+    for (const alasan of await jelajahKartuWarga(page, async (l) => {
+      await page.waitForTimeout(4000);
+      const { entri, tandaBaru } = await panen(page, tanda); tanda = tandaBaru;
+      diukur++; if (lapor(`w-kartu-${l}`, entri)) gagal++;
+    })) { console.log(`  PROBE CACAT [${alasan}]`); cacat++; }
+  }
   await ctx.close();
 }
 
 await browser.close();
 console.log(`\n=== ${diukur} layar diukur @390px · CPU ${CPU}x · ${KBPS}kbps · ambang skor ${AMBANG} + piksel ${AMBANG_PX}px · ${gagal} melompat ===`);
 if (MUTASI && gagal === 0) { console.log(`\nPROBE CACAT: MUTASI=${MUTASI} tapi nol temuan — ${MUTASI === 1 ? 'observer tak terpasang' : 'vonis PIKSEL tak bergigi'}.`); process.exit(2); }
+if (cacat) { console.log(`\nPROBE CACAT: ${cacat} layar Kartu Warga tak tercapai — populasi tidak utuh`); process.exit(2); }
 process.exit(gagal ? 1 : 0);

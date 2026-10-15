@@ -194,6 +194,31 @@ for (const mode of MODES) {
       await periksa(page, `${peran}-${tab.replace(/\s+/g, '-')}`, mode);
     }
 
+    if (!bendahara) {
+      /* Kartu Warga (15 Okt 2026, izin user membuka kunci). Dua wujud: daftar
+         "Cari nama Anda", dan — dgn nama yang sudah DIINGAT di HP ini — kartu.
+         Semua GET dijawab rute di atas (kosong / 500 / ditahan), jadi "pilih
+         lalu ketuk" mustahil; ingatannya dipasang langsung lewat kuncinya.
+         Saat memuat, kartu-diingat = kerangka kartu: label "Hadir · Titip ·
+         Tidak" tanpa satu angka pun. */
+      for (const [label, ingat] of [['Kartu-Warga', false], ['Kartu-Warga-diingat', true]]) {
+        await page.evaluate((v) => {
+          try { if (v) localStorage.setItem('hadiran-kartu-warga', 'audit-diingat'); else localStorage.removeItem('hadiran-kartu-warga'); } catch { /* storage diblokir */ }
+        }, ingat);
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForTimeout(300);
+        await page.getByRole('button', { name: 'Menu' }).click();
+        await page.waitForTimeout(600);
+        const item = page.getByRole('menu').getByText('Kartu Warga', { exact: false });
+        if (!(await item.count())) { console.log(`\n### ${mode}/overlay-${label}  PROBE CACAT: item Menu tak ada`); gagalTotal++; await page.keyboard.press('Escape'); continue; }
+        await item.first().click();
+        await page.waitForTimeout(2800);
+        await periksa(page, `overlay-${label}`, mode);
+        await page.goBack();
+        await page.waitForTimeout(1200);
+      }
+    }
+
     if (bendahara) {
       for (const label of ['Tutup Buku Triwulan', 'Riwayat Aktivitas', 'Kelola Anggota']) {
         await page.evaluate(() => window.scrollTo(0, 0));

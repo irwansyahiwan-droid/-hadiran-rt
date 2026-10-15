@@ -50,6 +50,7 @@
 //   Nol temuan di bawah mutasi mana pun = PROBE CACAT (exit 2).
 import { chromium } from 'playwright';
 import { newCtx, loginWarga, gotoTab, openMenuItem, closeLayer } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const APP = process.env.CAP_URL || 'http://localhost:5199';
 const MUTASI = process.env.MUTASI || '';
@@ -254,6 +255,14 @@ for (const [W, H] of UKURAN) {
       if (!(await siapDiukur(page, `[${W}x${H} ${peran}/${o}]`))) { cacat++; await closeLayer(page); continue; }
       await ujiLayar(page, `[${W}x${H} ${peran}/${o}]`);
       await closeLayer(page);
+    }
+    /* Kartu Warga (15 Okt 2026), sisi WARGA: ~70 baris nama di bawah
+       OverlayHeader sticky, lalu kartu warga bertalangan terbanyak. */
+    if (peran === 'warga') {
+      for (const alasan of await jelajahKartuWarga(page, async (l) => {
+        const n = `[${W}x${H} ${peran}/Kartu Warga · ${l}]`;
+        if (await siapDiukur(page, n)) await ujiLayar(page, n); else cacat++;
+      })) { console.log(`\n### [${W}x${H} ${peran}/${alasan}]   PROBE CACAT`); cacat++; }
     }
     await ctx.close();
   }

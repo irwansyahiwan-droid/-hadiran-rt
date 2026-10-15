@@ -95,6 +95,10 @@ import {
   ratio, blend, parseColor, modusBg, samplePixels,
   newCtx, loginWarga, gotoTab, closeLayer, openMenuItem,
 } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
+
+/* Kartu Warga yang tak tercapai = PROBE CACAT di akhir (exit 2), bukan dilewati. */
+const cacatKartu = [];
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
 const OUT = process.env.OUT_DIR || '.audit-kontras-nonteks';
@@ -778,6 +782,11 @@ for (const theme of ['light', 'dark']) {
     await page.waitForTimeout(700);
     await auditView(page, `${theme}/w-menu`, { fokus: true });
     await closeLayer(page);
+    /* Kartu Warga (15 Okt 2026): kolom cari + ikon + baris nama, lalu kartu
+       warga bertalangan terbanyak (ubin ikon, pil nominal). */
+    for (const alasan of await jelajahKartuWarga(page, (l) => auditView(page, `${theme}/w-kartu-${l}`, { fokus: l === 'pilih' }))) {
+      cacatKartu.push(`[${theme}] ${alasan}`);
+    }
     await ctx.close();
   }
 
@@ -935,6 +944,10 @@ if (goyah.length) {
 console.log('');
 for (const f of fails) {
   console.log(`${String(f.ratio).padStart(5)} [${f.jenis}] [${f.ctx}] "${f.nama}" ${f.asal || f.lewat || ''} fg(${f.fg}) bg(${f.bg}) <${f.tag}>`);
+}
+if (cacatKartu.length) {
+  for (const c of cacatKartu) console.log(`PROBE CACAT: ${c}`);
+  process.exit(2);
 }
 /* F tanpa satu pun sakelar terukur = alatnya yang gagal membuka sheet, bukan
    app yang lulus (hanya berlaku kalau peran bendahara memang dijalankan). */

@@ -41,6 +41,7 @@
 //   TUNDA_DATA_MS=4000 → tombol VALIDASI: perlambat rest/v1 (penantian kerangka)
 import { chromium } from 'playwright';
 import { newCtx, loginWarga, gotoTab, openMenuItem, closeLayer } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const APP = process.env.CAP_URL || 'http://localhost:5199';
 const MUTASI = process.env.MUTASI || '';
@@ -203,6 +204,11 @@ for (const L of LEBAR) {
         else { console.log(`  PROBE CACAT [${L} ${peran}/sheet-anggota]: pemicu tak ada`); cacat++; }
       }
       await closeLayer(page);
+    }
+    /* Kartu Warga (15 Okt 2026) — dua layar: daftar nama & kartu warga
+       bertalangan terbanyak. Lihat scripts/lib/kartu-warga.mjs. */
+    for (const alasan of await jelajahKartuWarga(page, (l) => ukur(`Kartu Warga · ${l}`))) {
+      console.log(`  PROBE CACAT [${L} ${peran}/${alasan}]`); cacat++;
     }
 
     if (peran === 'bendahara') {

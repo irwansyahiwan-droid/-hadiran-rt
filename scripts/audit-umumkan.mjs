@@ -41,6 +41,11 @@ const PERMUKAAN = [
   { peran: 'bendahara', nama: 'Editor Absensi', tab: 'Jadwal', buka: /^Proses/i, benda: 'anggota', cari: true, chip: true },
   { peran: 'bendahara', nama: 'Kelola Anggota', menu: 'Kelola Anggota', benda: 'anggota', cari: true, chip: false },
   { peran: 'bendahara', nama: 'Riwayat Aktivitas', menu: 'Riwayat Aktivitas', benda: 'aktivitas', cari: true, chip: true },
+  /* 15 Okt 2026 — dua daftar baru dari sesi lain. Kartu Warga: daftar "Cari nama
+     Anda" (warga, pemakai utamanya). Tutup Buku: chip Triwulan | Bulanan; chip
+     yang belum aktif = Bulanan, jadi bendanya "laporan bulanan". */
+  { peran: 'warga', nama: 'Kartu Warga', menu: 'Kartu Warga', benda: 'warga', cari: true, chip: false },
+  { peran: 'bendahara', nama: 'Tutup Buku', menu: 'Tutup Buku Triwulan', benda: 'laporan bulanan', cari: false, chip: true },
 ];
 
 const temuan = [];

@@ -8,6 +8,7 @@
 // Interaksi hanya: buka sheet/halaman + Escape/back. Tak ada klik Simpan/Hapus.
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5174';
 const OUT = process.env.OUT_DIR || '.audit-kontras-deep';
@@ -463,6 +464,11 @@ for (const theme of ['light', 'dark']) {
     await openRowSheet(page, 'w-sheet-tarikan', theme);
     await gotoTab(page, 'Kas RT');
     await openRowSheet(page, 'w-sheet-kasrt', theme);
+    /* Kartu Warga (15 Okt 2026, izin user membuka kunci): daftar "Cari nama
+       Anda" + kartu warga bertalangan terbanyak. scripts/lib/kartu-warga.mjs. */
+    for (const alasan of await jelajahKartuWarga(page, (l) => auditOverlay(page, `${theme}/w-kartu-${l}`))) {
+      console.log(`  PROBE CACAT [${theme}/${alasan}]`); cacat++;
+    }
     await ctx.close();
   }
 

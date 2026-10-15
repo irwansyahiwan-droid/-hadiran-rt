@@ -46,6 +46,7 @@
  */
 import { chromium } from 'playwright';
 import { newCtx, loginWarga, gotoTab } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const AMBANG = +(process.env.AMBANG || 11);      // px — anak tangga terkecil
@@ -77,7 +78,7 @@ async function tungguIsiNyata(page, batasMs = 25000) {
   return false;
 }
 
-const PUNGUT = ([ambang, lantaiKeras]) => {
+const PUNGUT = ([ambang, lantaiKeras, akar]) => {
   /* SUSUT-AGAR-MUAT — pengecualian OPT-IN, dan sengaja tidak dipercaya begitu
      saja. Sebuah nilai boleh turun di bawah anak tangga HANYA kalau (a) ia
      menyatakannya lewat `data-susut` di call-site, dan (b) ia tetap di atas
@@ -89,7 +90,10 @@ const PUNGUT = ([ambang, lantaiKeras]) => {
   let populasi = 0, maks = 0, susut = 0;
   const dilewat = { srOnly: 0, takTerlihat: 0 };
 
-  document.querySelectorAll('*').forEach((el) => {
+  /* `akar` = lapisan teratas (overlay). Tanpa itu halaman di BELAKANG overlay
+     — tak di-unmount — ikut terhitung lagi di tiap overlay. */
+  const wadah = akar ? [...document.querySelectorAll(akar)].pop() : document;
+  (wadah ?? document).querySelectorAll('*').forEach((el) => {
     /* DAUN TEKS saja: elemen yang punya text node sendiri yang tak kosong.
        Tanpa saringan ini tiap leluhur ikut terhitung dan satu teks dilaporkan
        berkali-kali dgn ukuran yang diwarisi — populasi salah, bukan temuan. */
@@ -146,17 +150,19 @@ for (const bendahara of [false, true]) {
     if (MUTASI) await page.addStyleTag({ content: MUT_CSS[MUTASI] });
 
     const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
-    for (const tab of tabs) {
-      await gotoTab(page, tab);
-      if (!(await tungguIsiNyata(page))) { console.log(`  PROBE CACAT: ${peran}-${tab}@${lebar} kerangka memuat tak habis dalam 25 dtk`); cacat++; continue; }
+    /* Satu layar = satu panggilan (15 Okt 2026): tab, dan — sisi warga — kedua
+       layar Kartu Warga dgn akar lapisan dialognya. Isi fungsinya = isi loop
+       tab yang lama apa adanya; `continue` jadi `return`. */
+    const ukurLayar = async (nama, akar) => {
+      if (!(await tungguIsiNyata(page))) { console.log(`  PROBE CACAT: ${nama} kerangka memuat tak habis dalam 25 dtk`); cacat++; return; }
       /* Kerangka habis BELUM berarti isi tiba: kalau jaringan menyerah (batas
          fetch app 20 dtk) yang tampil layar GAGAL tanpa satu kerangka pun, dan
          ragamnya (header + nav + kalimat galat) lolos uji kontrol. Terbukti saat
          validasi TUNDA_DATA_MS=30000: hijau dari 104 teks di 9 layar galat.
          Layar KOSONG (`data-keadaan="kosong"`) tetap diukur — itu tampilan sah. */
-      if (await page.locator('[data-keadaan="gagal"]').count()) { console.log(`  PROBE CACAT: ${peran}-${tab}@${lebar} yang tampil layar GAGAL MUAT, bukan isi`); cacat++; continue; }
+      if (await page.locator('[data-keadaan="gagal"]').count()) { console.log(`  PROBE CACAT: ${nama} yang tampil layar GAGAL MUAT, bukan isi`); cacat++; return; }
       if (MUTASI) await page.addStyleTag({ content: MUT_CSS[MUTASI] });
-      const { hasil, populasi, maks, ragam, susut, dilewat } = await page.evaluate(PUNGUT, [AMBANG, LANTAI_KERAS]);
+      const { hasil, populasi, maks, ragam, susut, dilewat } = await page.evaluate(PUNGUT, [AMBANG, LANTAI_KERAS, akar]);
       totalPop += populasi; totalSusut += susut;
 
       /* Uji KONTROL — menguji PROBE, bukan menebak isi layar. Probe yang rusak
@@ -164,14 +170,21 @@ for (const bendahara of [false, true]) {
          akan melaporkan satu nilai saja; app yang sehat selalu punya beberapa
          peran tipografi di layar yang sama. Ambangnya sengaja rendah (3) supaya
          ia menguji probe, bukan kekayaan halaman. */
-      if (populasi === 0) { console.log(`  PROBE CACAT: ${peran}-${tab}@${lebar} populasi 0`); cacat++; continue; }
-      if (ragam < 3) { console.log(`  PROBE CACAT: ${peran}-${tab}@${lebar} cuma ${ragam} ukuran berbeda — probe membaca nilai yang sama untuk semua`); cacat++; continue; }
+      if (populasi === 0) { console.log(`  PROBE CACAT: ${nama} populasi 0`); cacat++; return; }
+      if (ragam < 3) { console.log(`  PROBE CACAT: ${nama} cuma ${ragam} ukuran berbeda — probe membaca nilai yang sama untuk semua`); cacat++; return; }
 
       const uniq = new Map();
       for (const h of hasil) uniq.set(`${h.px}|${h.cls}|${h.teks}`, h);
       const item = [...uniq.values()].sort((a, b) => a.px - b.px);
-      ringkas.push({ nama: `${peran}-${tab}@${lebar}`, populasi, dilewat, item });
+      ringkas.push({ nama, populasi, dilewat, item });
       if (item.length) gagal++;
+    };
+    for (const tab of tabs) { await gotoTab(page, tab); await ukurLayar(`${peran}-${tab}@${lebar}`); }
+    /* Kartu Warga (15 Okt 2026, izin user membuka kunci): sisi warga, tiap lebar. */
+    if (!bendahara) {
+      for (const alasan of await jelajahKartuWarga(page, (l) => ukurLayar(`w-kartu-${l}@${lebar}`, '[role="dialog"]'))) {
+        console.log(`  PROBE CACAT: ${alasan}@${lebar}`); cacat++;
+      }
     }
     await ctx.close();
   }

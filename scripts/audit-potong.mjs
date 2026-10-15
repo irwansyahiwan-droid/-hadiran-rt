@@ -41,6 +41,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { newCtx, loginWarga, gotoTab, closeLayer, openMenuItem } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 /* EKSTREM=1 → jawaban rest/v1 ditekan bentuknya (nama panjang, nominal 10
@@ -287,6 +288,11 @@ async function jelajahWarga(page, bag, hasil) {
   const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);
   for (const tab of tabs) { await gotoTab(page, tab); await pungutLayar(page, bag, `w-${tab}`, hasil); }
   await bukaDetail(page, bag, hasil, 'w');
+  /* Kartu Warga (15 Okt 2026): daftar nama + kartu warga bertalangan terbanyak.
+     Diukur di sisi WARGA — pemakai utamanya; isinya sama untuk bendahara. */
+  for (const alasan of await jelajahKartuWarga(page, (l) => pungutLayar(page, bag, `w-kartu-${l}`, hasil))) {
+    console.log(`  PROBE CACAT [${bag}/${alasan}]`); process.exitCode = 2;
+  }
 }
 
 async function jelajahBendahara(page, bag, hasil, { dalam = true } = {}) {
