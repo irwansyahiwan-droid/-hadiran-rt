@@ -31,7 +31,8 @@
 //   MUTASI=1  → kembalikan geometri Riwayat pra-9556fe6 (rail -mb-2 setinggi
 //               aslinya + break-words) — PATAH WAJIB merah
 //   MUTASI=2  → kembalikan MetaPisah pra-6720094 (pemisah inline-block tanpa
-//               bantalan) — KLIP-KIRI WAJIB merah
+//               bantalan) + lebar maks 4em per bagian supaya syarat "bagian
+//               melipat" ada di data apa pun — KLIP-KIRI WAJIB merah
 //   MUTASI=3  → teks di dalam dialog dipaksa `break-all` + lebar maks 60px —
 //               PATAH WAJIB merah di SETIAP sheet. (Versi pertama tanpa lebar
 //               maks cuma menggigit 4/10: form berlabel pendek tak pernah
@@ -54,8 +55,13 @@ const OVERLAY = {
 const MUT_CSS = {
   1: `.flow-root > .float-right { height: auto !important; margin-bottom: -0.5rem !important; }
       p[id^="riw-"][id$="-judul"] { overflow-wrap: break-word !important; }`,
-  2: `.meta-pisah > span > span { padding-left: 0 !important; }
-      .meta-pisah > span > span::before { position: static !important; display: inline-block !important; }`,
+  /* `max-width` (15 Okt 2026): cacat aslinya hanya muncul pada bagian meta yang
+     MELIPAT di dalam dirinya ("Setor ke Kas RT" @320, 5 Okt). Hari datanya tak
+     memuat bagian sepanjang itu, mutasi ini keluar "tak menggigit" — gigi yang
+     bergantung pada data hari ini bukan penjaga. Lebar maks 4em memaksa syarat
+     itu terpenuhi di data apa pun (preseden MUTASI=3). */
+  2: `.meta-pisah > span > span { padding-left: 0 !important; max-width: 4em !important; }
+      .meta-pisah > span > span::before { position: static !important; display: inline-block !important; margin-left: 0 !important; }`,
   3: `[role="dialog"] :is(p, h2, h3, label, span, li, dt, dd) { word-break: break-all !important; max-width: 60px !important; }`,
 };
 
@@ -132,7 +138,7 @@ for (const L of LEBAR) {
       // Mendarat = gaya TERHITUNG elemen sasaran benar-benar berubah di layar ini.
       if (MUTASI && (await page.evaluate((m) => m === '1'
         ? [...document.querySelectorAll('.flow-root > .float-right')].some((e) => getComputedStyle(e).marginBottom === '-8px')
-        : m === '2' ? [...document.querySelectorAll('.meta-pisah > span > span')].some((e) => getComputedStyle(e).paddingLeft === '0px' && getComputedStyle(e, '::before').position === 'static')
+        : m === '2' ? [...document.querySelectorAll('.meta-pisah > span > span')].some((e) => getComputedStyle(e).paddingLeft === '0px' && getComputedStyle(e, '::before').marginLeft === '0px')
         : [...document.querySelectorAll('[role="dialog"] *')].some((e) => getComputedStyle(e).wordBreak === 'break-all'), MUTASI))) mutasiMendarat++;
       const { out, kata } = await page.evaluate(PROBE);
       total += kata; layar++;

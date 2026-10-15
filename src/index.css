@@ -1370,17 +1370,29 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    "as RT" (huruf K terpotong) — tak tertangkap sapuan mana pun, karena
    `audit:potong` hanya mengukur `truncate`/`line-clamp`. Bagian adalah item
    flex (sudah ter-blok), jadi bantalannya berlaku untuk SEMUA baris lipatannya.
-   Baris yang tak melipat tak berubah: potret 390px identik per piksel. */
+   Baris yang tak melipat tak berubah: potret 390px identik per piksel.
+
+   15 Okt 2026 — titiknya kini SEBARIS lagi (`inline-block` 0,8em yang ditarik
+   `margin-left: -0,8em` ke dalam bantalan), bukan `position: absolute`.
+   WebKit (Safari iPhone) menghitung lebar intrinsik bagian yang memuat
+   `::before` absolut sedikit LEBIH SEMPIT dari teksnya ber-angka tabular
+   (98,58 lawan 98,83px untuk "Tarikan #30"), jadi bagian itu melipat di dalam
+   dirinya sendiri: Kartu Warga di iPhone user tercetak "Tarikan / #30" dgn
+   "· Sab, 21 Nov 2026" di sebelahnya. Chromium tak terkena, jadi tak satu pun
+   sapuan (semuanya Chromium) melihatnya — ketahuan dari potret HP user.
+   Diukur di WebKit 26.4: cacat 0 di 320/360/390px pada 60 baris meta (Beranda,
+   Kas RT, Kartu Warga); Chromium 229/232 potret identik per piksel, 3 sisanya
+   bayangan bar nav yang ikut terpotret, bukan baris metanya. Bantalan tetap
+   memikul baris lipatan, jadi kelas "as RT" di atas tak kembali. */
 .meta-pisah { display: block; overflow: hidden; }
 .meta-pisah > span { display: flex; flex-wrap: wrap; margin-left: -0.8em; }
 .meta-pisah > span > span { position: relative; min-width: 0; padding-left: 0.8em; overflow-wrap: anywhere; }
 .meta-pisah > span > span::before {
   content: "·";
   content: "·" / "";
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: inline-block;
   width: 0.8em;
+  margin-left: -0.8em;
   text-align: center;
 }
 
