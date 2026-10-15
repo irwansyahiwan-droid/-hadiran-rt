@@ -246,10 +246,19 @@ function tulisTeksJelasI(ctx: CanvasRenderingContext2D, teks: string, x: number,
   const potongan = pecahHurufI(teks);
   if (!potongan.includes('I')) { ctx.fillText(teks, x, y); return; }
   const px = parseFloat(/(\d+(?:\.\d+)?)px/.exec(ctx.font)?.[1] ?? '14');
-  const tebal = Math.max(1, px * 0.1);
+  /* Tebal batang = lebar TINTA "I" Inter itu sendiri (glyph-nya batang polos),
+     jadi ikut ukuran DAN bobot font yang aktif. Dulu `px × 0,1` — tebakan dari
+     ukuran saja: di label 500/15px batangnya terukur 3,82 lawan 4,65 px tinta
+     "I" Inter di baris yang sama ("HUT RI"), 18% lebih tipis, jadi "Iuran" &
+     "Rawat Inap" tampak lebih pucat dari kata di sebelahnya (15 Okt 2026). */
+  const mI = ctx.measureText('I');
+  const tintaI = mI.actualBoundingBoxLeft + mI.actualBoundingBoxRight;
+  const tebal = Math.max(1, tintaI > 0 ? tintaI : px * 0.1);
   const kaki = px * 0.34;
-  const tebalKaki = Math.max(1, px * 0.075);
-  const jarak = px * 0.1;
+  const tebalKaki = Math.max(1, tebal * 0.75);
+  /* Jarak sisi = jarak sisi "I" Inter sendiri (±0,08em) — dulu 0,1em tetap,
+     jadi celah sebelum "Inap" di "Rawat Inap" lebih lebar dari spasi kata. */
+  const jarak = tintaI > 0 ? Math.max(0, (mI.width - tintaI) / 2) : px * 0.1;
   const m = ctx.measureText('H');
   const atas = y - m.actualBoundingBoxAscent;
   const tinggi = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
