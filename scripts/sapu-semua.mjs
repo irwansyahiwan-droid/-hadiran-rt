@@ -112,6 +112,11 @@ const VISUAL = [
      5 Okt 2026, sesudah tiga cacat (label hero, judul Riwayat, MetaPisah)
      lolos semua sapuan — potong memvonis teks yang HILANG, ini yang terbelah. */
   ['kata-patah', 'node scripts/audit-kata-patah.mjs'],
+  /* WebKit (Safari iPhone) lawan Chromium — jumlah BARIS tiap teks. Lahir &
+     masuk rantai 16 Okt 2026: semua sapuan lain Chromium, sedangkan user
+     memakai iPhone, dan potretnya membongkar "Tarikan / #30" (eee911a) yang
+     tak terlihat satu alat pun. */
+  ['mesin', 'node scripts/audit-mesin.mjs'],
   /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
      seperti bagian 200% `audit:potong`/`audit:reflow` (itu ambang APP, di atas
      AA). Keputusan user 2 Sep 2026, dgn mata terbuka: selama sisa temuannya
@@ -250,6 +255,10 @@ const LANTAI = {
      form, identik di dua jalan). Ikut DATA — Riwayat Aktivitas sendiri ~2.100
      kata per peran. Lantai ~95%. */
   'kata-patah':     [/(\d+) kata diperiksa di \d+ layar/, 17200],
+  /* Garis dasar 16 Okt 2026: 8.344 teks berpasangan di 44 layar (2 mesin ×
+     390/375 × warga/bendahara). Ikut DATA (Riwayat Aktivitas ~630 teks per
+     peran). Lantai ~95%. */
+  mesin:            [/MESIN: (\d+) teks berpasangan/, 7900],
   'jarak-teks':     [/populasi teks terukur\s*:\s*(\d+)/, 5700],
   lebar:            [/(\d+) konteks diperiksa/, 112],
   reflow:           [/(\d+) layar diperiksa/, 9],
