@@ -17,6 +17,7 @@ const T = (nomor: number, status: TarikanRingkas['status'], sohibul: string | nu
   tanggal: `2026-0${nomor}-10`,
   status,
   sohibul_bait_id: sohibul,
+  sohibul_bait: sohibul ? { nama: `Nama ${sohibul}` } : null,
 });
 
 const tarikan: TarikanRingkas[] = [
@@ -46,6 +47,14 @@ describe('susunKartu', () => {
     ]);
     expect(k.tunggakan.map((t) => t.nomor)).toEqual([1, 3]);
     expect(k.totalTunggakan).toBe(100000);
+  });
+
+  it('talangan membawa nama PENARIK tarikannya (Sohibul Bait), bukan nama warga ini', () => {
+    const k = susunKartu('w1', [...tarikan, { ...T(6, 'selesai', null), sohibul_bait: null }], [], [
+      { tarikan_id: 't3', nominal: 50000, status_lunas: false },
+      { tarikan_id: 't6', nominal: 50000, status_lunas: false },
+    ]);
+    expect(k.tunggakan.map((t) => t.penarik)).toEqual(['Nama w9', null]);   // t6 tanpa penarik → null, bukan nama palsu
   });
 
   it('talangan ke tarikan yang tak dikenal dilewati, bukan salah hitung', () => {

@@ -21,12 +21,19 @@ export interface BarisTalangan {
   status_lunas: boolean;
 }
 
-export type TarikanRingkas = Pick<Tarikan, 'id' | 'nomor' | 'tanggal' | 'status' | 'sohibul_bait_id'>;
+export type TarikanRingkas = Pick<Tarikan, 'id' | 'nomor' | 'tanggal' | 'status' | 'sohibul_bait_id'> & {
+  /** Nama penarik (Sohibul Bait) lewat relasi — ikut terbawa walau wargaNYA
+   *  sudah tak aktif (daftar nama kartu hanya memuat warga aktif). */
+  sohibul_bait?: { nama: string } | null;
+};
 
 export interface TunggakanKartu {
   nomor: number;
   tanggal: string;
   nominal: number;
+  /** Sohibul Bait tarikan itu — warga mengingat tarikan lewat siapa penariknya,
+   *  bukan lewat nomornya (permintaan user, 15 Okt 2026). null = tak diketahui. */
+  penarik: string | null;
 }
 
 export interface GiliranKartu {
@@ -73,7 +80,7 @@ export function susunKartu(
     if (t.status_lunas) continue;
     const tr = dataTarikan.get(t.tarikan_id);
     if (!tr) continue;
-    tunggakan.push({ nomor: tr.nomor, tanggal: tr.tanggal, nominal: t.nominal });
+    tunggakan.push({ nomor: tr.nomor, tanggal: tr.tanggal, nominal: t.nominal, penarik: tr.sohibul_bait?.nama ?? null });
   }
   tunggakan.sort((a, b) => a.nomor - b.nomor);
 
@@ -109,11 +116,14 @@ export function susunKartu(
 export async function ambilDaftarKartu(): Promise<{ warga: Warga[]; tarikan: TarikanRingkas[] }> {
   const [w, t] = await Promise.all([
     supabase.from('warga').select('*').eq('status_aktif', true).order('nama', { ascending: true }),
-    supabase.from('tarikan').select('id, nomor, tanggal, status, sohibul_bait_id').order('nomor', { ascending: true }),
+    supabase.from('tarikan').select('id, nomor, tanggal, status, sohibul_bait_id, sohibul_bait:warga!sohibul_bait_id(nama)').order('nomor', { ascending: true }),
   ]);
   if (w.error) throw w.error;
   if (t.error) throw t.error;
-  return { warga: (w.data as Warga[]) ?? [], tarikan: (t.data as TarikanRingkas[]) ?? [] };
+  /* `as unknown`: supabase-js mengetik relasi `sohibul_bait` sbg ARRAY, padahal
+     relasi banyak-ke-satu (FK `sohibul_bait_id`) dijawab PostgREST sbg OBJEK —
+     terukur lawan DB hidup 15 Okt 2026 (#21 → {nama: "Carduki"}). */
+  return { warga: (w.data as Warga[]) ?? [], tarikan: (t.data as unknown as TarikanRingkas[]) ?? [] };
 }
 
 /** Absensi + talangan satu warga. Melempar saat gagal. */

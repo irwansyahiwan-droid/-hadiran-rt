@@ -205,7 +205,13 @@ export default function KartuWarga({ open, onClose }: Props) {
                     <li key={t.nomor} className="flex items-center justify-between gap-3 py-3">
                       <div className="min-w-0">
                         <p className="text-body font-medium text-ink dark:text-gray-100">Tarikan #{t.nomor}</p>
-                        <p className="text-caption text-ink-sub dark:text-gray-400">{formatTanggal(t.tanggal)}</p>
+                        {/* Tanggal · penarik — pola sheet detail tarikan ("Sab, 10 Okt
+                            2026 · Wawan R Irawan"). Warga mengingat tarikan lewat
+                            SIAPA penariknya; nomor saja tak menjawab "yang mana?". */}
+                        <MetaPisah
+                          className="text-caption text-ink-sub dark:text-gray-400"
+                          bagian={[formatTanggal(t.tanggal), t.penarik]}
+                        />
                       </div>
                       <Tag tone="danger">{formatRupiahPlain(t.nominal)}</Tag>
                     </li>
