@@ -6,7 +6,6 @@ import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
 import StatRow from '../components/StatRow';
-import Tag from '../components/Tag';
 import MetaPisah from '../components/MetaPisah';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
@@ -213,7 +212,13 @@ export default function KartuWarga({ open, onClose }: Props) {
                           bagian={[formatTanggal(t.tanggal), t.penarik]}
                         />
                       </div>
-                      <Tag tone="danger">{formatRupiahPlain(t.nominal)}</Tag>
+                      {/* Angka biasa, bukan pil (16 Okt 2026) — pola baris per tarikan
+                          di Talangan. Kartu ini satu-satunya tempat app menaruh UANG
+                          di dalam pil 11px: angka terpenting baris tercetak di anak
+                          tangga huruf terkecil. Merahnya cukup di total kepala kartu. */}
+                      <span className="text-caption font-display font-semibold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">
+                        {formatRupiahPlain(t.nominal)}
+                      </span>
                     </li>
                   ))}
                 </ul>
