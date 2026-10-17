@@ -81,6 +81,11 @@ const PROBE = () => {
     if (!s || !/\d/.test(s)) continue;
     const el = n.parentElement;
     if (!el || !el.offsetParent) continue;                 // tak terlihat
+    /* `visibility:hidden` tetap punya offsetParent, jadi ia lolos baris di atas.
+       Kerangka Kas RT (17 Okt 2026) mencetak teks CONTOH `invisible` supaya bar
+       memuat melipat persis seperti isinya ("3 bln", "HUT RI 17 Agustusan") —
+       teks itu tak tercat & duduk di aria-hidden: bukan klaim, bukan angka. */
+    if (getComputedStyle(el).visibility !== 'visible') continue;
     if (nav?.contains(el) || header?.contains(el)) continue; // chrome tetap
     if (el.closest('[data-keadaan]')) continue;             // isi Error/EmptyState
     const baris = (el.closest('p, div, span, li, h1, h2, h3')?.innerText || s).trim();
