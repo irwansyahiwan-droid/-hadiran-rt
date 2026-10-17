@@ -417,7 +417,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
                   terbatas panjangnya; keterangan bebas tidak.
 
                   `break-words` menahan nama tanpa spasi agar tak meluber. */}
-              <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{g.nama}</p>
+              <p className="text-pretty text-body font-semibold text-ink dark:text-gray-100 leading-snug break-words">{g.nama}</p>
               {g.countBelum > 0 ? (
                 /* Nominal kelompok duduk DI SINI, rata kanan sebaris dgn
                    "N belum lunas" — di SEMUA lebar (30 Sep 2026). Dulu ia di

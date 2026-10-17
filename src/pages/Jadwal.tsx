@@ -1348,7 +1348,7 @@ export default function JadwalPage() {
                       nama ber-nickname ("Nisan Nasrullah ( Icang )") butuh ~200px.
                       Nickname justru bagian yang dikenal warga — lebih baik baris
                       tumbuh 1 baris daripada nama dipotong elipsis. */}
-                  <p className={`text-body font-semibold line-clamp-2 leading-snug break-words ${isSelesai ? 'text-ink-sub dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                  <p className={`text-pretty text-body font-semibold line-clamp-2 leading-snug break-words ${isSelesai ? 'text-ink-sub dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
                     {t.sohibul_bait?.nama ?? '—'}
                   </p>
                   <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">

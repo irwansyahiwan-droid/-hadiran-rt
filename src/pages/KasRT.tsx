@@ -1071,7 +1071,13 @@ export default function KasRTPage() {
                         elemennya duduk di dalam kontrol yang bisa diaktifkan —
                         jadi baris "Saldo Awal" yang bukan tombol TIDAK ikut
                         dimaafkan — dan sapuan itu ikut MENGUKUR sheet tujuannya. */}
-                    <p data-ringkas className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2">
+                    {/* `text-pretty` (17 Okt 2026): baris akhir tak lagi satu kata
+                        yatim — "…Inap Bpk / Mudi" jadi "…Inap / Bpk Mudi", nama
+                        tetap utuh. Terukur WebKit 390+360: yatim di judul baris
+                        Kas RT, Beranda, Jadwal & Talangan 16 → 0, jumlah baris 600
+                        teks TAK berubah (pretty cuma memindah kata, tak menambah
+                        baris). Riwayat SENGAJA tidak — lihat catatan di sana. */}
+                    <p data-ringkas className="text-pretty text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2">
                       {ikatFrasa(k.keterangan || (isMasuk ? 'Pemasukan' : 'Pengeluaran'))}
                     </p>
                     {/* Meta = dialek baris KANONIK Beranda: satu <p>, bagian

@@ -384,7 +384,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
             "-Rp1.380.000" memakan kolom kanan → judul kepotong jadi
             "Setoran kas Ha…". Judul = identitas transaksi, harus utuh;
             sub-baris tetap 1 baris agar tinggi baris tak liar. */}
-        <p className="text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2"><JudulBaris teks={trx.judul} /></p>
+        <p className="text-pretty text-body font-semibold text-ink dark:text-gray-100 leading-snug line-clamp-2"><JudulBaris teks={trx.judul} /></p>
         {/* Baris kedua = konteks (+ tanggal saat daftar tak dikelompokkan).
             mt-1 (bukan mt-0.5): jarak 2px bikin judul & sub nyaris bersentuhan —
             biang rasa "rapat" yang dilaporkan. 4px = dua baris terbaca sebagai
