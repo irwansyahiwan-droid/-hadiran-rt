@@ -1,20 +1,24 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Lock, Mail, Eye, EyeOff, ArrowRight, ChevronDown } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 /* Foto pengurus (Pak RT & bendahara) — foto yang SAMA dgn kartu struktur di
-   carousel Beranda (`rt-bendahara.jpg`), diturunkan jadi 360×319 abu-abu WebP
-   mutu 40 (3,1 kB; aslinya 82 kB). DITANAM di JS sbg data URI lewat
+   carousel Beranda (`rt-bendahara.jpg`), diturunkan jadi 330×292 abu-abu WebP
+   mutu 40 (2,7 kB; aslinya 82 kB). DITANAM di JS sbg data URI lewat
    `build.assetsInlineLimit` di vite.config.ts, BUKAN berkas terpisah: Login
    layar PERTAMA, dan SHELL service worker hanya memungut chunk & CSS — berkas
    gambar terpisah tak akan tersedia luring di kunjungan pertama. Ukurannya
    ditentukan ANGGARAN `audit:unduh` U (200 kB): tanpa foto jalur kunjungan
-   pertama sudah 196,6 kB, versi 560 px (6,2 kB) membuatnya 202,9 kB. Pada
-   transparansi 34% versi 360 px tak terbedakan dari 560 px (dipotret di WebKit
+   pertama sudah 196,6 kB, versi 560 px (6,2 kB) membuatnya 202,9 kB, dan
+   penambat-logo menghabiskan 0,3 kB sisanya (360 px → 200,0 kB). Pada
+   transparansi 34% versi 330 px tak terbedakan dari 560 px (dipotret di WebKit
    DPR 3). Abu-abu karena ia memang dicat `luminosity` di atas hijau. */
 import fotoPengurus from '../assets/login-pengurus.webp';
 import { haptic } from '../lib/utils';
 import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from '../components/GalatKolom';
+
+const MASK_FOTO_LINGKAR = 'radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)';
+const MASK_FOTO_TEGAK = 'linear-gradient(180deg, transparent 0%, #000 22%, #000 70%, transparent 100%)';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
@@ -53,6 +57,36 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   const [loading, setLoading] = useState(false);
   const [bendaharaOpen, setBendaharaOpen] = useState(false);
   const [shakeAdmin, setShakeAdmin] = useState(false);
+
+  /* Foto pengurus DITAMBATKAN KE LOGO, bukan ke atas layar (17 Okt 2026).
+     Versi pertama `top-0`: isi Login diletakkan di TENGAH layar, foto di ATAS
+     — jadi jarak keduanya berubah ikut tinggi layar, safe-area, & panel
+     bendahara. Di iPhone user (app terpasang, 390×844 + poni) lencana
+     "RT 004/006" menutupi wajah bertopi putih; diukur di 6 ukuran layar:
+     18 tumpang-tindih wajah × lencana/logo. Kini titik tengah wajah
+     (0,434 tinggi foto — wajah bertopi putih di y≈330 dari 760) disejajarkan
+     dgn titik tengah logo, dihitung dari tata letak NYATA (offsetTop, kebal
+     transform animasi `pop`/`rise`) dan diulang tiap ukuran isi berubah.
+     Diatur lewat style langsung di useLayoutEffect: sebelum cat pertama,
+     tanpa render ulang. */
+  const mainRef = useRef<HTMLElement>(null);
+  const isiRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const fotoRef = useRef<HTMLImageElement>(null);
+  useLayoutEffect(() => {
+    const main = mainRef.current, isi = isiRef.current, logo = logoRef.current, foto = fotoRef.current;
+    if (!main || !isi || !logo || !foto) return;
+    const atur = () => {
+      let y = 0;
+      for (let el: HTMLElement | null = logo; el && el !== main; el = el.offsetParent as HTMLElement | null) y += el.offsetTop;
+      foto.style.top = `${Math.round(y + logo.offsetHeight / 2 - foto.offsetHeight * 0.434)}px`;
+    };
+    atur();
+    const ro = new ResizeObserver(atur);
+    ro.observe(isi);
+    ro.observe(main);
+    return () => ro.disconnect();
+  }, []);
   const galat = useGalatKolom();
 
   // Lepas dulu, pasang lagi di frame berikutnya — kalau kelas `shake` masih
@@ -117,6 +151,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
   return (
     <main
+      ref={mainRef}
       /* `min-h-dvh` + `overflow-x-hidden`, BUKAN `h-dvh overflow-hidden`: begitu
          panel bendahara terbuka, isinya lebih tinggi dari layar HP pendek — dgn
          tinggi terkunci, tombol "Masuk" berada di luar kotak dan tak pernah bisa
@@ -125,8 +160,8 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       style={{ background: 'var(--hero-glow), var(--hero-gradient)' }}
     >
       {/* Foto pengurus (16 Okt 2026, permintaan user; varian F1 dipilih dari
-          prototipe). Pojok kanan atas, 70% lebar: KEDUA wajah duduk di kanan
-          logo di 320–430px — varian lain menaruh satu wajah di belakang logo
+          prototipe). Pojok kanan, ≤70% lebar, sejajar LOGO (bukan atas layar —
+          lihat `fotoRef`): KEDUA wajah duduk di kanan logo di 320–430px — varian lain menaruh satu wajah di belakang logo
           (atas, selebar layar) atau di belakang tombol Bendahara (bawah).
           `luminosity` mewarnainya dgn hijau hero di bawahnya, jadi ia latar
           yang senada, bukan foto yang ditempel. Kontras teks terukur TAK
@@ -134,22 +169,34 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           320/360/390/430 & panel bendahara terbuka) — di varian bawah ia turun
           2,5 karena langit foto jatuh di belakang "Lihat saldo…". */}
       <img
+        ref={fotoRef}
         src={fotoPengurus}
         alt=""
         aria-hidden="true"
-        width={360}
-        height={319}
+        width={330}
+        height={292}
         decoding="async"
         draggable={false}
-        className="pointer-events-none select-none absolute right-0 top-0 w-[70%] h-auto"
+        className="pointer-events-none select-none absolute right-0 top-0 h-auto"
         style={{
+          /* Lebar dibatasi supaya tepi kiri wajah bertopi putih (x 360/859 =
+             0,419 lebar foto) tak pernah masuk ke logo (88px di tengah):
+             vw − W + 0,419W ≥ vw/2 + 48 → W ≤ (vw/2 − 48) × 1,72. Di 390px
+             253px (65%), di 320px 193px (60%); di layar lebar tetap 70%. */
+          width: 'min(70%, calc((50vw - 48px) * 1.72))',
           opacity: 0.34,
           mixBlendMode: 'luminosity',
           filter: 'contrast(1.15)',
-          WebkitMaskImage:
-            'radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)',
-          maskImage:
-            'radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)',
+          /* Dua pudaran DIIRIS (intersect): melingkar untuk tepi kiri, tegak
+             untuk tepi atas & bawah. Waktu foto masih `top-0` tepi atasnya
+             tersembunyi di atas layar; sejak ditambatkan ke logo ia jatuh di
+             tengah layar dan pudaran melingkar saja meninggalkan GARIS keras
+             (lompatan luminans 40 antar baris @390×844). 22% atas = sebelum
+             puncak topi tergelap (y 170/760). */
+          WebkitMaskImage: `${MASK_FOTO_LINGKAR}, ${MASK_FOTO_TEGAK}`,
+          maskImage: `${MASK_FOTO_LINGKAR}, ${MASK_FOTO_TEGAK}`,
+          WebkitMaskComposite: 'source-in',
+          maskComposite: 'intersect',
         }}
       />
 
@@ -183,6 +230,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       />
 
       <div
+        ref={isiRef}
         className="relative z-10 flex-1 flex flex-col justify-center w-full max-w-sm mx-auto
                    px-6 pt-[calc(env(safe-area-inset-top)+2rem)]
                    pb-[calc(env(safe-area-inset-bottom)+2rem)]"
@@ -208,7 +256,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             RT&nbsp;004/006 · Tanah Baru, Beji
           </span>
 
-          <div className="pop relative mx-auto mt-8 w-[5.5rem] h-[5.5rem]">
+          <div ref={logoRef} className="pop relative mx-auto mt-8 w-[5.5rem] h-[5.5rem]">
             <img
               src={logoRt}
               alt="Logo RT 004/006"

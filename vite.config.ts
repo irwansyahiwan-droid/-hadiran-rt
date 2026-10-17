@@ -316,7 +316,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     /* Bentuk FUNGSI (Vite 5): SATU aset dipaksa ditanam sbg data URI, sisanya
        tetap ambang bawaan 4 kB (`undefined` = keputusan bawaan Vite). Foto
-       pengurus di Login (3,1 kB) layar PERTAMA — sbg berkas terpisah ia
+       pengurus di Login (2,7 kB) layar PERTAMA — sbg berkas terpisah ia
        menambah berkas ke jalur kunjungan pertama (`audit:unduh` U) DAN tak
        pernah masuk SHELL service worker (pemungutnya hanya membaca chunk & CSS),
        jadi luring di kunjungan pertama Login tampil tanpa foto. `?inline` untuk
