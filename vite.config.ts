@@ -314,6 +314,15 @@ export default defineConfig({
     // exceljs & html2canvas adalah chunk lazy (hanya dimuat saat ekspor) —
     // wajar besar; naikkan ambang agar warning tidak menutupi masalah nyata.
     chunkSizeWarningLimit: 1000,
+    /* Bentuk FUNGSI (Vite 5): SATU aset dipaksa ditanam sbg data URI, sisanya
+       tetap ambang bawaan 4 kB (`undefined` = keputusan bawaan Vite). Foto
+       pengurus di Login (3,1 kB) layar PERTAMA — sbg berkas terpisah ia
+       menambah berkas ke jalur kunjungan pertama (`audit:unduh` U) DAN tak
+       pernah masuk SHELL service worker (pemungutnya hanya membaca chunk & CSS),
+       jadi luring di kunjungan pertama Login tampil tanpa foto. `?inline` untuk
+       gambar baru ada di Vite 6 — di 5.4 query itu diam-diam jadi berkas biasa
+       ber-URL `…webp?inline` (terukur 17 Okt 2026). */
+    assetsInlineLimit: (berkas) => (berkas.endsWith('/login-pengurus.webp') ? true : undefined),
     rollupOptions: {
       output: {
         // Pisah vendor stabil (React, Supabase) dari kode app → hash-nya jarang

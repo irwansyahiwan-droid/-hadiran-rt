@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import { Lock, Mail, Eye, EyeOff, ArrowRight, ChevronDown } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
+/* Foto pengurus (Pak RT & bendahara) — foto yang SAMA dgn kartu struktur di
+   carousel Beranda (`rt-bendahara.jpg`), diturunkan jadi 360×319 abu-abu WebP
+   mutu 40 (3,1 kB; aslinya 82 kB). DITANAM di JS sbg data URI lewat
+   `build.assetsInlineLimit` di vite.config.ts, BUKAN berkas terpisah: Login
+   layar PERTAMA, dan SHELL service worker hanya memungut chunk & CSS — berkas
+   gambar terpisah tak akan tersedia luring di kunjungan pertama. Ukurannya
+   ditentukan ANGGARAN `audit:unduh` U (200 kB): tanpa foto jalur kunjungan
+   pertama sudah 196,6 kB, versi 560 px (6,2 kB) membuatnya 202,9 kB. Pada
+   transparansi 34% versi 360 px tak terbedakan dari 560 px (dipotret di WebKit
+   DPR 3). Abu-abu karena ia memang dicat `luminosity` di atas hijau. */
+import fotoPengurus from '../assets/login-pengurus.webp';
 import { haptic } from '../lib/utils';
 import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from '../components/GalatKolom';
@@ -113,6 +124,35 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
       className="hero-noise relative min-h-dvh overflow-x-hidden flex flex-col"
       style={{ background: 'var(--hero-glow), var(--hero-gradient)' }}
     >
+      {/* Foto pengurus (16 Okt 2026, permintaan user; varian F1 dipilih dari
+          prototipe). Pojok kanan atas, 70% lebar: KEDUA wajah duduk di kanan
+          logo di 320–430px — varian lain menaruh satu wajah di belakang logo
+          (atas, selebar layar) atau di belakang tombol Bendahara (bawah).
+          `luminosity` mewarnainya dgn hijau hero di bawahnya, jadi ia latar
+          yang senada, bukan foto yang ditempel. Kontras teks terukur TAK
+          berubah (terburuk 6,86 lawan 6,90 tanpa foto, sampel piksel WebKit
+          320/360/390/430 & panel bendahara terbuka) — di varian bawah ia turun
+          2,5 karena langit foto jatuh di belakang "Lihat saldo…". */}
+      <img
+        src={fotoPengurus}
+        alt=""
+        aria-hidden="true"
+        width={360}
+        height={319}
+        decoding="async"
+        draggable={false}
+        className="pointer-events-none select-none absolute right-0 top-0 w-[70%] h-auto"
+        style={{
+          opacity: 0.34,
+          mixBlendMode: 'luminosity',
+          filter: 'contrast(1.15)',
+          WebkitMaskImage:
+            'radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)',
+          maskImage:
+            'radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)',
+        }}
+      />
+
       {/* Motif anyaman ketupat — identitas RT.
           Mask & opacity bawaan `.songket-weave` disetel untuk KARTU saldo ~180px;
           dipasang polos di layar penuh 844px ia melebar ke dua pertiga layar dan
@@ -158,8 +198,11 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
               sementara `ring-[rgb(…)]` jadi — gagal diam-diam yang sama, sekali
               lagi. Periksa computed style-nya, jangan percaya kelasnya. */}
           <span
+            /* `/35`, bukan `/25` (17 Okt 2026): sejak foto pengurus dipasang,
+               panel bendahara yang terbuka menggeser lencana ke depan foto dan
+               teksnya turun ke 6,77:1 (`audit:kontras`, di bawah AAA app). */
             className="inline-flex items-center px-4 py-2 rounded-full
-                       bg-black/25 border border-[color:rgb(232_182_81/0.4)]
+                       bg-black/35 border border-[color:rgb(232_182_81/0.4)]
                        text-caption font-semibold text-[#F1E3C0]"
           >
             RT&nbsp;004/006 · Tanah Baru, Beji
