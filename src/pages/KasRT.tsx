@@ -302,6 +302,37 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
    keuntungan yang hilang. WAJIB diukur ulang tiap anatomi hero berubah. */
 const HERO_MIN_H = 269;
 
+/* Kerangka bertinggi KOTAK BARIS, bukan px: bar `inline-block` di dalam teks
+   (preseden Kartu Warga), dan untuk label yang bisa MELIPAT, teks aslinya dicetak
+   `invisible` dgn bar di atasnya — jadi pelipatannya identik dgn isi.
+   Ditumpuk lewat GRID (satu sel), BUKAN `absolute inset-0`: di WebKit anak
+   absolut di dalam item flex menyempitkan lebar intrinsiknya, dan "Masuk vs
+   Keluar" kerangka melipat dua baris (+23px) padahal judul aslinya tidak —
+   kelas cacat yang sama dgn titik `MetaPisah` (eee911a). */
+const BAR_KERANGKA = 'inline-block align-middle rounded-lg skeleton';
+/* Di permukaan REDUP (`inset-soft` Rekap) `.skeleton` sewarna latarnya dan bar
+   lenyap — wajib `.skeleton-bar` SENDIRIAN (lihat catatan nada bar di index.css). */
+const BAR_KERANGKA_REDUP = 'inline-block align-middle rounded-lg skeleton-bar';
+const TEKS_KERANGKA = 'grid';
+/* Kategori yang SUDAH terpakai di buku Kas RT ini (17 Okt 2026). Rekap per
+   kategori dijumlah sepanjang masa, jadi himpunan ini hanya bisa bertambah:
+   begitu "Lainnya" (masuk) atau "Setor Kas Musholah" pertama kali dipakai,
+   kerangka kurang satu baris (~27px) sampai daftar ini ikut diperbarui. */
+const REKAP_KERANGKA = {
+  masuk: KATEGORI_MASUK.filter((o) => o.key !== 'lainnya'),
+  keluar: KATEGORI_KELUAR.filter((o) => o.key !== 'musholah_al_jihad'),
+};
+/** Teks kerangka: teks CONTOH `invisible` (memberi lebar, pelipatan & tinggi
+ *  baris yang asli) + bar di baris pertamanya. Induknya wajib `TEKS_KERANGKA`. */
+function TeksKerangka({ teks, bar = 'h-3 w-full', redup = false }: { teks: React.ReactNode; bar?: string; redup?: boolean }) {
+  return (
+    <>
+      <span className="invisible col-start-1 row-start-1">{teks}</span>
+      <span className="col-start-1 row-start-1"><span className={`${redup ? BAR_KERANGKA_REDUP : BAR_KERANGKA} ${bar}`} /></span>
+    </>
+  );
+}
+
 export default function KasRTPage() {
   const { isBendahara } = useAuthContext();
   // SWR: render dari snapshot terakhir, revalidate diam-diam (lihat lib/pageCache).
@@ -735,9 +766,12 @@ export default function KasRTPage() {
         {loading && (
           <div aria-hidden="true" className="flex items-center gap-3 rounded-3xl border border-line dark:border-gray-800/60 bg-white dark:bg-gray-900 lift px-4 py-3">
             <div className="skeleton w-9 h-9 rounded-xl shrink-0" />
-            <div className="min-w-0 flex-1 space-y-1">
-              <div className="skeleton h-[15px] w-2/5 rounded-full" />
-              <div className="skeleton h-[15px] w-3/5 rounded-full" />
+            {/* Dua baris berkotak-baris SAMA dgn SmartInsight (bukan bar 15px yang
+                kalah tinggi dari tile 36px): baris pertama teks contoh `invisible`
+                supaya melipat di 320px persis seperti aslinya. */}
+            <div className="min-w-0 flex-1">
+              <p className={`${TEKS_KERANGKA} text-caption font-bold leading-tight`}><TeksKerangka teks={<>Kas masuk bulan ini <span className="font-display tabular-nums">Rp0.000.000</span></>} bar="h-3 w-2/5" /></p>
+              <p className="text-caption mt-0.5"><span className={`${BAR_KERANGKA} h-3 w-3/5`} /></p>
             </div>
           </div>
         )}
@@ -755,27 +789,47 @@ export default function KasRTPage() {
             Skeletonnya BERBENTUK isi aslinya (bukan slab abu setinggi tetap):
             tinggi tetap akan salah begitu `sm:` mengubah grid jadi 2 kolom.
             Dengan struktur yang sama, ia reflow persis seperti yang digantikan. */}
+        {/* Kerangka grafik — dicetak ulang 17 Okt 2026: terukur @390px 392px
+            lawan 459px isinya (judul bar 16px lawan kotak baris 23px, kaki &
+            legenda 12 lawan 15px, label bulan MonthlyBars tak terwakili, dan
+            chip periode yang MELIPAT ke baris kedua di 390px). Label & chip
+            kini teks ASLI yang tak terlihat (`invisible`) dgn bar di atasnya:
+            lebar, pelipatan & tinggi baris lahir dari mesin yang sama dgn isinya,
+            jadi ikut lebar layar, font, dan setelan jarak teks. */}
         {loading && (
           <div className="grid grid-cols-1 gap-3 mt-4 sm:grid-cols-2" aria-hidden="true">
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
-              <div className="skeleton h-4 w-24 rounded-lg mb-2" />
+              <p className={`${TEKS_KERANGKA} text-body font-bold mb-2`}><TeksKerangka teks="Tren Saldo" bar="h-4 w-24" /></p>
               {/* 84px = tinggi default AreaTrend */}
               <div className="skeleton rounded-xl" style={{ height: 84 }} />
-              <div className="mt-2 flex justify-between gap-2">
-                <div className="skeleton h-3 w-20 rounded-full" />
-                <div className="skeleton h-3 w-20 rounded-full" />
+              {/* Kaki dua-ujung: contoh berbentuk "Bln Thn · Rp…" supaya ia MELIPAT
+                  di lebar yang sama dgn aslinya (360px: dua baris). */}
+              <div className="flex flex-wrap items-baseline justify-between gap-2 mt-2 font-display text-micro font-semibold angka-prosa">
+                {/* Angka contoh = saldo NYATA buku ini (awal Jan 2026 & 17 Okt 2026),
+                    bukan nol: `angka-prosa` = angka proporsional ("0" jauh lebih
+                    lebar dari "1"), dan baris ini PAS-PASAN satu baris di 390px —
+                    contoh nol melipat di sana, contoh "8.130.000" melipat di WebKit
+                    padahal isinya tidak. Begitu saldo tumbuh satu digit, ia bisa
+                    meleset satu baris (~23px) — diterima, isinya sendiri ikut. */}
+                <span className={TEKS_KERANGKA}><TeksKerangka teks="Jan 2026 · Rp8.134.000" /></span>
+                <span className={TEKS_KERANGKA}><TeksKerangka teks="Okt 2026 · Rp16.352.000" /></span>
               </div>
             </div>
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <div className="skeleton h-4 w-28 rounded-lg" />
-                <div className="flex gap-1">
-                  {[0, 1, 2].map((i) => <div key={i} className="skeleton h-11 w-14 rounded-full" />)}
+              <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+                <p className={`${TEKS_KERANGKA} text-body font-bold`}><TeksKerangka teks="Masuk vs Keluar" bar="h-4 w-28" /></p>
+                <div className="flex flex-wrap items-center gap-1">
+                  {[3, 6, 12].map((p) => (
+                    <span key={p} className="shrink-0 min-h-[44px] px-3 inline-flex items-center justify-center rounded-full text-caption font-semibold whitespace-nowrap bg-white dark:bg-gray-800 border border-control dark:border-control-dark">
+                      <span className="invisible">{p} bln</span>
+                    </span>
+                  ))}
                 </div>
               </div>
-              <div className="skeleton h-3 w-32 rounded-full mb-2" />
-              {/* 96px = tinggi area bar MonthlyBars */}
+              <div className="text-micro mb-2"><span className={`${BAR_KERANGKA} h-3 w-32`} /></div>
+              {/* 96px = tinggi area bar MonthlyBars, lalu baris label bulannya */}
               <div className="skeleton rounded-xl" style={{ height: 96 }} />
+              <div className="mt-2 text-micro"><span className={`${BAR_KERANGKA} h-3 w-full`} /></div>
             </div>
           </div>
         )}
@@ -850,22 +904,26 @@ export default function KasRTPage() {
           </div>
         )}
 
-        {/* Rekap per kategori — skeleton sebentuk isinya (lihat alasan di atas). */}
+        {/* Rekap per kategori — kerangka sebentuk isinya. Barisnya kategori yang
+            SUDAH terpakai di buku RT ini (REKAP_KERANGKA), dgn label asli tak
+            terlihat: rekap itu kumulatif sepanjang masa, jadi himpunannya cuma
+            bisa BERTAMBAH. Terukur @390px 274px lawan 440px isinya sebelum ini
+            (3 baris tetap per sisi, label 2 baris tak terwakili). */}
         {loading && (
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5 mt-4" aria-hidden="true">
-            <div className="skeleton h-4 w-36 rounded-lg mb-3" />
+            <p className={`${TEKS_KERANGKA} text-body font-bold mb-3`}><TeksKerangka teks="Rekap per Kategori" bar="h-4 w-36" /></p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[0, 1].map((k) => (
+              {[REKAP_KERANGKA.masuk, REKAP_KERANGKA.keluar].map((opsi, k) => (
                 <div key={k} className="inset-soft rounded-xl p-3">
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="skeleton h-3 w-20 rounded-full" />
-                    <div className="skeleton h-3 w-24 rounded-full" />
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <span className="text-micro"><span className={`${BAR_KERANGKA_REDUP} h-3 w-20`} /></span>
+                    <span className={`${TEKS_KERANGKA} text-caption font-display font-semibold tabular-nums shrink-0`}><TeksKerangka teks="+Rp00.000.000" redup /></span>
                   </div>
                   <div className="space-y-2">
-                    {[0, 1, 2].map((i) => (
-                      <div key={i} className="flex items-center justify-between gap-2">
-                        <div className="skeleton h-3 w-28 rounded-full" />
-                        <div className="skeleton h-3 w-16 rounded-full" />
+                    {opsi.map((o) => (
+                      <div key={o.key} className="flex items-start justify-between gap-2 text-caption">
+                        <span className={`${TEKS_KERANGKA} min-w-0 flex-1 angka-prosa text-balance leading-snug`}><TeksKerangka teks={o.label} bar="h-3 w-3/4" redup /></span>
+                        <span className={`${TEKS_KERANGKA} font-display font-semibold tabular-nums shrink-0`}><TeksKerangka teks="-Rp0.000.000" redup /></span>
                       </div>
                     ))}
                   </div>
@@ -939,20 +997,48 @@ export default function KasRTPage() {
         )}
 
         <CrossFade loading={loading} skeleton={(
-          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className={`flex items-center gap-2 px-4 py-4 [--di-l:3.75rem]${i < 4 ? ' divide-inset' : ''}`}>
-                <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 skeleton rounded-lg w-3/4" />
-                  <div className="h-3 skeleton rounded-lg w-1/3" />
-                </div>
-                <div className="text-right space-y-2">
-                  <div className="h-4 w-20 skeleton rounded-lg" />
-                  <div className="h-3 w-16 skeleton rounded-lg" />
-                </div>
+          /* Kerangka mencermin ISI, bukan bentuk lama (17 Okt 2026). Diukur
+             @390px relatif ke judul seksi: kerangka langsung membuka kartu,
+             sedangkan isinya membuka kolom cari + chip lebih dulu (keduanya
+             DI DALAM CrossFade) → kartu turun 115px saat data datang; baris
+             kerangka 68px (dua bar kanan = saldo berjalan yang sudah pindah ke
+             sheet detail, `items-center`) lawan 108px baris asli (judul dua
+             baris, `items-start`, satu nominal). Permukaan ikut aslinya —
+             kolom & chip PUTIH berbingkai, bukan slab abu di atas kanvas —
+             dan tinggi lahir dari kotak baris tipografi yang sama, bukan px. */
+          <div aria-hidden="true">
+            <div className="space-y-2 mb-3">
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                {/* `<input disabled>` asli, bukan div: kolom cari app 16px (anti-zoom
+                    iOS, aturan global `input`), jadi div ber-`text-body` 2px lebih
+                    pendek. `disabled` = tak bisa difokus di dalam aria-hidden. */}
+                <input disabled tabIndex={-1} className="field-search pr-11" />
               </div>
-            ))}
+              {/* Tiga chip + tombol urut RINGKAS (bulat 44px): satu baris di 320px,
+                  sama seperti FilterChips asli yang meringkas urutannya di sana. */}
+              <div className="flex flex-wrap items-center gap-2">
+                {[0, 1, 2].map((i) => (
+                  <span key={i} className="inline-flex items-center min-h-[44px] px-4 rounded-full text-caption bg-white dark:bg-gray-800 border border-control dark:border-control-dark">
+                    <span className="inline-block align-middle h-3 w-8 rounded-lg skeleton" />
+                  </span>
+                ))}
+                <span className="w-11 h-11 rounded-full bg-white dark:bg-gray-800 border border-control dark:border-control-dark" />
+              </div>
+            </div>
+            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className={`flex items-start gap-2 px-4 py-4 [--di-l:3.75rem]${i < 4 ? ' divide-inset' : ''}`}>
+                  <div className="w-9 h-9 rounded-xl skeleton shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-body leading-snug"><span className="inline-block align-middle h-4 w-full rounded-lg skeleton" /></p>
+                    <p className="text-body leading-snug"><span className="inline-block align-middle h-4 w-2/3 rounded-lg skeleton" /></p>
+                    <p className="text-caption mt-1"><span className="inline-block align-middle h-3 w-1/2 rounded-lg skeleton" /></p>
+                  </div>
+                  <p className="text-amount shrink-0"><span className="inline-block align-middle h-4 w-24 rounded-lg skeleton" /></p>
+                </div>
+              ))}
+            </div>
           </div>
         )}>
           {error ? (
