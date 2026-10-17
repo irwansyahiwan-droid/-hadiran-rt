@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Lock, Mail, Eye, EyeOff, ArrowRight, ChevronDown } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 /* Foto pengurus (Pak RT & bendahara) — foto yang SAMA dgn kartu struktur di
@@ -17,7 +17,12 @@ import { haptic } from '../lib/utils';
 import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from '../components/GalatKolom';
 
-const MASK_FOTO_LINGKAR = 'radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)';
+/* Warna TEPI ATAS Login = henti PERTAMA `--hero-gradient` di index.css (terang
+   & `.dark`). Dikunci `statusBar.test.ts` — kalau gradiennya digeser, uji itu
+   merah, bukan bar status yang diam-diam belang lagi. */
+const TEPI_LOGIN = { terang: '#063A21', gelap: '#042716' } as const;
+
+const MASK_FOTO_LINGKAR ='radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)';
 const MASK_FOTO_TEGAK = 'linear-gradient(180deg, transparent 0%, #000 22%, #000 70%, transparent 100%)';
 
 interface LoginProps {
@@ -86,6 +91,37 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
     ro.observe(isi);
     ro.observe(main);
     return () => ro.disconnect();
+  }, []);
+
+  /* Bar status HP ikut HIJAU Login, bukan kanvas mint app (17 Okt 2026).
+     Potret iPhone user (app terpasang): pita mint #C8DCCF ~45px di atas layar
+     hijau tua, memudar ke hijau — dan jamnya hitam. Pitanya BUKAN `theme-color`
+     (yang sesudah React bernilai #FFFFFF), melainkan latar `body` #CFE6D8: iOS
+     mewarnai area bar status dari latar halaman. Login satu-satunya layar
+     tanpa Header sticky di atasnya, jadi yang terambil kanvas yang tak pernah
+     tampak di layar ini. Android memakai `theme-color` — di sana barnya PUTIH
+     di atas hijau. Keduanya disetel ke tepi atas Login selama layar ini hidup,
+     lalu DIKEMBALIKAN apa adanya (nilai `useTheme`) begitu warga masuk. */
+  const tepi = () => (document.documentElement.classList.contains('dark') ? TEPI_LOGIN.gelap : TEPI_LOGIN.terang);
+  useLayoutEffect(() => {
+    const html = document.documentElement, body = document.body;
+    const semula = { html: html.style.backgroundColor, body: body.style.backgroundColor };
+    html.style.backgroundColor = body.style.backgroundColor = tepi();
+    return () => {
+      html.style.backgroundColor = semula.html;
+      body.style.backgroundColor = semula.body;
+    };
+  }, []);
+  /* Meta SENGAJA lewat efek PASIF: `useTheme` (di App, INDUK) juga menulis meta
+     ini di efek layout-nya, dan efek layout anak jalan LEBIH DULU — kalau Login
+     terpasang di commit yang sama dgn App, nilainya ditimpa #FFFFFF dan yang
+     "dikembalikan" saat warga masuk justru meta statis. Efek pasif jalan
+     sesudah SELURUH efek layout, jadi yang tersimpan nilai `useTheme`. */
+  useEffect(() => {
+    const meta = [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')];
+    const semula = meta.map((m) => m.content);
+    meta.forEach((m) => m.setAttribute('content', tepi()));
+    return () => meta.forEach((m, i) => m.setAttribute('content', semula[i]));
   }, []);
   const galat = useGalatKolom();
 

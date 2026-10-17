@@ -59,6 +59,22 @@ describe('bar status OS', () => {
     expect(luminansi(pasangan![1]), `useTheme (gelap) = ${pasangan![1]} terlalu terang`).toBeLessThan(0.5);
   });
 
+  /* Login satu-satunya layar BERLATAR GELAP di mode terang, dan ia menimpa
+     latar halaman + `theme-color` selama hidup (iOS mewarnai bar status dari
+     latar halaman — potret iPhone 17 Okt 2026: pita mint di atas hijau tua).
+     Nilainya WAJIB = henti pertama `--hero-gradient` di kedua tema; begitu
+     gradiennya digeser tanpa nilai ini, pitanya kembali belang. */
+  it('Login: tepi atas = henti pertama `--hero-gradient`, dan cukup gelap untuk ikon terang', () => {
+    const login = readFileSync(new URL('../pages/Login.tsx', import.meta.url), 'utf8');
+    const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8');
+    const tepi = login.match(/TEPI_LOGIN = \{ terang: '(#[0-9A-Fa-f]{6})', gelap: '(#[0-9A-Fa-f]{6})' \}/);
+    expect(tepi, 'konstanta TEPI_LOGIN di Login.tsx tak ketemu').not.toBeNull();
+    const henti = [...css.matchAll(/--hero-gradient: linear-gradient\(\d+deg, (#[0-9A-Fa-f]{6}) 0%/g)].map((m) => m[1].toUpperCase());
+    expect(henti, 'dua deklarasi --hero-gradient (terang & .dark) di index.css').toHaveLength(2);
+    expect([tepi![1].toUpperCase(), tepi![2].toUpperCase()]).toEqual(henti);
+    for (const w of [tepi![1], tepi![2]]) expect(luminansi(w), `${w} terlalu terang untuk bar status Login`).toBeLessThan(0.5);
+  });
+
   it('iOS diminta memakai ikon gelap (`default`), BUKAN `black-translucent`', () => {
     const gaya = html.match(/name="apple-mobile-web-app-status-bar-style" content="([a-z-]+)"/)?.[1];
     /* `black-translucent` menaruh isi halaman DI BAWAH bar status dan memaksa
