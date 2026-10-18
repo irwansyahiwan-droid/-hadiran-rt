@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
+import { KAS_PER_PEMBAYAR, SOHIBUL_PER_PEMBAYAR } from './absensiHitung';
 
 /**
  * Kartu Warga ("Status Saya") — ringkasan satu warga: kehadiran, talangan, dan
@@ -19,9 +20,10 @@ export interface BarisTalangan {
   tarikan_id: string;
   nominal: number;
   status_lunas: boolean;
+  tanggal_lunas?: string | null;
 }
 
-export type TarikanRingkas = Pick<Tarikan, 'id' | 'nomor' | 'tanggal' | 'status' | 'sohibul_bait_id'> & {
+export type TarikanRingkas = Pick<Tarikan, 'id' | 'nomor' | 'tanggal' | 'status' | 'sohibul_bait_id'> & Partial<Pick<Tarikan, 'total_terkumpul'>> & {
   /** Nama penarik (Sohibul Bait) lewat relasi — ikut terbawa walau wargaNYA
    *  sudah tak aktif (daftar nama kartu hanya memuat warga aktif). */
   sohibul_bait?: { nama: string } | null;
@@ -34,6 +36,21 @@ export interface TunggakanKartu {
   /** Sohibul Bait tarikan itu — warga mengingat tarikan lewat siapa penariknya,
    *  bukan lewat nomornya (permintaan user, 15 Okt 2026). null = tak diketahui. */
   penarik: string | null;
+}
+
+/** Talangan yang SUDAH lunas — riwayat, bukan kewajiban. */
+export interface TalanganLunasKartu extends TunggakanKartu {
+  tanggalLunas: string | null;
+}
+
+/** Satu tarikan SELESAI di jejak kehadiran. `sohibul` = warga ini penerimanya
+ *  (absensinya tercatat 'hadir', dikunci); `kosong` = tak ada catatan absen
+ *  (mis. anggota susulan sebelum ia bergabung). */
+export type StatusJejak = AbsensiStatus | 'sohibul' | 'kosong';
+export interface JejakKartu {
+  nomor: number;
+  tanggal: string;
+  status: StatusJejak;
 }
 
 export interface GiliranKartu {
@@ -50,8 +67,15 @@ export interface KartuWarga {
   tidakHadir: number;
   tunggakan: TunggakanKartu[];
   totalTunggakan: number;
-  /** Tarikan selesai tempat warga ini jadi Sohibul Bait, terbaru di depan. */
-  sudahMenerima: { nomor: number; tanggal: string }[];
+  /** Tarikan selesai tempat warga ini jadi Sohibul Bait, terbaru di depan.
+   *  `pendapatanKotor` diturunkan dari `total_terkumpul` (porsi kas, pembayar ×
+   *  Rp5.000) → pembayar × Rp45.000 — rumus yang SAMA dgn "Pendapatan Kotor SB"
+   *  di Jadwal & PDF Pendapatan. null = total tak tersedia (jangan karang angka). */
+  sudahMenerima: { nomor: number; tanggal: string; pendapatanKotor: number | null }[];
+  /** Talangan yang sudah lunas, terbaru di depan. */
+  talanganLunas: TalanganLunasKartu[];
+  /** Semua tarikan SELESAI, urut nomor — satu titik per tarikan di jejak. */
+  jejak: JejakKartu[];
   /** Giliran terdekat yang belum selesai; null = tak ada jadwal. */
   giliran: GiliranKartu | null;
 }
@@ -76,19 +100,38 @@ export function susunKartu(
   }
 
   const tunggakan: TunggakanKartu[] = [];
+  const talanganLunas: TalanganLunasKartu[] = [];
   for (const t of talangan) {
-    if (t.status_lunas) continue;
     const tr = dataTarikan.get(t.tarikan_id);
     if (!tr) continue;
-    tunggakan.push({ nomor: tr.nomor, tanggal: tr.tanggal, nominal: t.nominal, penarik: tr.sohibul_bait?.nama ?? null });
+    const baris = { nomor: tr.nomor, tanggal: tr.tanggal, nominal: t.nominal, penarik: tr.sohibul_bait?.nama ?? null };
+    if (t.status_lunas) talanganLunas.push({ ...baris, tanggalLunas: t.tanggal_lunas ?? null });
+    else tunggakan.push(baris);
   }
   tunggakan.sort((a, b) => a.nomor - b.nomor);
+  talanganLunas.sort((a, b) => b.nomor - a.nomor);
+
+  const statusPer = new Map(absensi.map((a) => [a.tarikan_id, a.status]));
+  const jejak: JejakKartu[] = tarikan
+    .filter((t) => t.status === 'selesai')
+    .sort((a, b) => a.nomor - b.nomor)
+    .map((t) => ({
+      nomor: t.nomor,
+      tanggal: t.tanggal,
+      status: t.sohibul_bait_id === wargaId ? 'sohibul' : (statusPer.get(t.id) ?? 'kosong'),
+    }));
 
   const milikSaya = tarikan.filter((t) => t.sohibul_bait_id === wargaId);
   const sudahMenerima = milikSaya
     .filter((t) => t.status === 'selesai')
     .sort((a, b) => b.nomor - a.nomor)
-    .map((t) => ({ nomor: t.nomor, tanggal: t.tanggal }));
+    .map((t) => ({
+      nomor: t.nomor,
+      tanggal: t.tanggal,
+      pendapatanKotor: typeof t.total_terkumpul === 'number' && t.total_terkumpul > 0
+        ? Math.round(t.total_terkumpul / KAS_PER_PEMBAYAR) * SOHIBUL_PER_PEMBAYAR
+        : null,
+    }));
 
   const berikut = milikSaya
     .filter((t) => t.status !== 'selesai')
@@ -108,6 +151,8 @@ export function susunKartu(
     tunggakan,
     totalTunggakan: tunggakan.reduce((n, t) => n + t.nominal, 0),
     sudahMenerima,
+    talanganLunas,
+    jejak,
     giliran,
   };
 }
@@ -116,7 +161,7 @@ export function susunKartu(
 export async function ambilDaftarKartu(): Promise<{ warga: Warga[]; tarikan: TarikanRingkas[] }> {
   const [w, t] = await Promise.all([
     supabase.from('warga').select('*').eq('status_aktif', true).order('nama', { ascending: true }),
-    supabase.from('tarikan').select('id, nomor, tanggal, status, sohibul_bait_id, sohibul_bait:warga!sohibul_bait_id(nama)').order('nomor', { ascending: true }),
+    supabase.from('tarikan').select('id, nomor, tanggal, status, sohibul_bait_id, total_terkumpul, sohibul_bait:warga!sohibul_bait_id(nama)').order('nomor', { ascending: true }),
   ]);
   if (w.error) throw w.error;
   if (t.error) throw t.error;
@@ -130,7 +175,7 @@ export async function ambilDaftarKartu(): Promise<{ warga: Warga[]; tarikan: Tar
 export async function ambilDataWarga(wargaId: string): Promise<{ absensi: BarisAbsensi[]; talangan: BarisTalangan[] }> {
   const [a, t] = await Promise.all([
     supabase.from('absensi').select('tarikan_id, status').eq('warga_id', wargaId),
-    supabase.from('talangan').select('tarikan_id, nominal, status_lunas').eq('warga_id', wargaId),
+    supabase.from('talangan').select('tarikan_id, nominal, status_lunas, tanggal_lunas').eq('warga_id', wargaId),
   ]);
   if (a.error) throw a.error;
   if (t.error) throw t.error;

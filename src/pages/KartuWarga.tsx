@@ -1,21 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, Search, UserRound, Users, AlertTriangle } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Contact, Search, UserRound, Users, AlertTriangle } from 'lucide-react';
 import OverlayHeader from '../components/layout/OverlayHeader';
 import AvatarPeci from '../components/AvatarPeci';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
 import ErrorState from '../components/ErrorState';
-import StatRow from '../components/StatRow';
+import { HeroStats } from '../components/HeroSaldo';
 import MetaPisah from '../components/MetaPisah';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
 import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
-import { haptic, formatRupiahPlain, formatTanggal } from '../lib/utils';
+import { haptic, formatRupiahPlain, formatTanggal, formatTanggalRingkas } from '../lib/utils';
 import {
   ambilDaftarKartu,
   ambilDataWarga,
   susunKartu,
+  type KartuWarga as DataKartu,
+  type StatusJejak,
   type BarisAbsensi,
   type BarisTalangan,
   type TarikanRingkas,
@@ -41,6 +43,22 @@ function simpanPilihan(id: string | null) {
     if (id) localStorage.setItem(KUNCI, id);
     else localStorage.removeItem(KUNCI);
   } catch { /* abaikan (storage diblokir) */ }
+}
+
+/* BENTUK kartu terakhir (jumlah tunggakan & talangan lunas) untuk warga yang
+   diingat — HANYA petunjuk tata letak kerangka, tak pernah ditampilkan sbg
+   angka. Kartu ini hampir selalu dibuka untuk nama yang SAMA, jadi kunjungan
+   berikutnya kerangkanya setinggi isinya (terukur +271…+338px tanpa ini).
+   Data talangan semua warga demi kerangka saja sudah diukur & DITOLAK: 304
+   baris / 22,8 kB hari ini dan tumbuh tiap tarikan. */
+const KUNCI_BENTUK = 'hadiran-kartu-bentuk';
+interface BentukKartu { id: string; belum: number; lunas: number }
+function bacaBentuk(id: string | null): BentukKartu | null {
+  if (!id) return null;
+  try { const b = JSON.parse(localStorage.getItem(KUNCI_BENTUK) || 'null'); return b && b.id === id ? b : null; } catch { return null; }
+}
+function simpanBentuk(b: BentukKartu) {
+  try { localStorage.setItem(KUNCI_BENTUK, JSON.stringify(b)); } catch { /* abaikan */ }
 }
 
 const KOSONG_BELUM = ['Belum ada anggota', 'Daftar anggota muncul setelah bendahara menambahkan warga.'] as const;
@@ -110,6 +128,17 @@ export default function KartuWarga({ open, onClose }: Props) {
     [daftar, data, pilihanId],
   );
 
+  useEffect(() => {
+    if (kartu && pilihanId) simpanBentuk({ id: pilihanId, belum: kartu.tunggakan.length, lunas: kartu.talanganLunas.length });
+  }, [kartu, pilihanId]);
+
+  /* Bentuk kartu yang SUDAH bisa diketahui dari daftar tarikan saja — untuk
+     kerangka (jumlah bulatan jejak & baris "Sudah menerima"), tak pernah tampil. */
+  const perkiraan = useMemo(
+    () => (daftar && pilihanId ? susunKartu(pilihanId, daftar.tarikan, [], []) : null),
+    [daftar, pilihanId],
+  );
+
   function pilih(w: Warga) {
     haptic();
     simpanPilihan(w.id);
@@ -142,7 +171,7 @@ export default function KartuWarga({ open, onClose }: Props) {
           pilihanId ? (
             <>
               <IdentitasKerangka />
-              <KartuKerangka />
+              <KartuKerangka perkiraan={null} bentuk={bacaBentuk(pilihanId)} />
             </>
           ) : (
             <PilihNama
@@ -163,112 +192,21 @@ export default function KartuWarga({ open, onClose }: Props) {
           />
         ) : errorData ? (
           <>
-            <Identitas warga={warga} onGanti={ganti} />
+            <KepalaKartu warga={warga} kartu={null} onGanti={ganti} />
             <ErrorState onRetry={coba} />
           </>
         ) : !kartu ? (
           <>
-            <Identitas warga={warga} onGanti={ganti} />
-            <KartuKerangka />
+            <KepalaKartu warga={warga} kartu={null} onGanti={ganti} />
+            <KartuKerangka perkiraan={perkiraan} bentuk={bacaBentuk(pilihanId)} />
           </>
         ) : (
           <>
-            <Identitas warga={warga} onGanti={ganti} />
-
+            <KepalaKartu warga={warga} kartu={kartu} onGanti={ganti} />
             {/* Talangan di atas: ini yang paling dicari warga ("sudah lunas belum?"). */}
-            {kartu.tunggakan.length === 0 ? (
-              <div className="flex items-center gap-3 rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5">
-                <span className="icon-tile w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-body font-semibold text-ink dark:text-gray-100">Tidak ada talangan</p>
-                  <p className="text-caption text-ink-sub dark:text-gray-400 mt-0.5">Semua kewajiban sudah lunas.</p>
-                </div>
-              </div>
-            ) : (
-              <section aria-label="Talangan belum lunas" className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5">
-                <div className="flex items-center gap-3">
-                  <span className="icon-tile w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
-                    <AlertTriangle className="w-5 h-5 text-neg dark:text-rose-400" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-caption text-ink-sub dark:text-gray-400">Talangan belum lunas</p>
-                    <p className="font-display text-title font-bold text-neg dark:text-rose-400 tabular-nums">
-                      {formatRupiahPlain(kartu.totalTunggakan)}
-                    </p>
-                  </div>
-                </div>
-                <ul className="mt-4 divide-y divide-line dark:divide-gray-800">
-                  {kartu.tunggakan.map((t) => (
-                    <li key={t.nomor} className="flex items-center justify-between gap-3 py-3">
-                      <div className="min-w-0">
-                        <p className="text-body font-medium text-ink dark:text-gray-100">Tarikan #{t.nomor}</p>
-                        {/* Tanggal · penarik — pola sheet detail tarikan ("Sab, 10 Okt
-                            2026 · Wawan R Irawan"). Warga mengingat tarikan lewat
-                            SIAPA penariknya; nomor saja tak menjawab "yang mana?". */}
-                        <MetaPisah
-                          className="text-caption text-ink-sub dark:text-gray-400"
-                          bagian={[formatTanggal(t.tanggal), t.penarik]}
-                        />
-                      </div>
-                      {/* Angka biasa, bukan pil (16 Okt 2026) — pola baris per tarikan
-                          di Talangan. Kartu ini satu-satunya tempat app menaruh UANG
-                          di dalam pil 11px: angka terpenting baris tercetak di anak
-                          tangga huruf terkecil. Merahnya cukup di total kepala kartu. */}
-                      <span className="text-caption font-display font-semibold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">
-                        {formatRupiahPlain(t.nominal)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-caption text-ink-sub dark:text-gray-400 mt-3">
-                  Hubungi bendahara untuk melunasi. Hanya bendahara yang bisa menandai lunas.
-                </p>
-              </section>
-            )}
-
-            <StatRow
-              items={[
-                { label: 'Hadir', value: kartu.hadir, tone: 'pos' },
-                { label: 'Titip', value: kartu.titip, tone: 'info' },
-                { label: 'Tidak', value: kartu.tidakHadir, tone: 'neg' },
-              ]}
-            />
-
-            <section aria-label="Giliran Sohibul Bait" className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5">
-              <div className="flex items-center gap-3">
-                <span className="icon-tile w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                  <CalendarDays className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-caption text-ink-sub dark:text-gray-400">Giliran Sohibul Bait</p>
-                  {kartu.giliran ? (
-                    /* MetaPisah: @320px baris ini melipat — digabung jadi satu
-                       teks ia patah jadi "Tarikan #30 · Sab," / "21 Nov 2026",
-                       memisahkan tanggal dari harinya & menggantung titiknya. */
-                    <MetaPisah
-                      className="text-body font-semibold text-ink dark:text-gray-100"
-                      bagian={[`Tarikan #${kartu.giliran.nomor}`, formatTanggal(kartu.giliran.tanggal)]}
-                    />
-                  ) : (
-                    <p className="text-body font-semibold text-ink dark:text-gray-100">Belum ada jadwal</p>
-                  )}
-                </div>
-              </div>
-              {kartu.giliran && (
-                <p className="text-caption text-ink-sub dark:text-gray-400 mt-3">
-                  {kartu.giliran.sisaSebelum === 0
-                    ? 'Ini tarikan berikutnya.'
-                    : `${kartu.giliran.sisaSebelum} tarikan lagi sebelum giliran ini.`}
-                </p>
-              )}
-              {kartu.sudahMenerima.length > 0 && (
-                <p className="text-caption text-ink-sub dark:text-gray-400 mt-2">
-                  Sudah menerima: {kartu.sudahMenerima.map((t) => `#${t.nomor}`).join(', ')}.
-                </p>
-              )}
-            </section>
+            <KartuTalangan kartu={kartu} />
+            <JejakKehadiran kartu={kartu} />
+            <KartuSohibul kartu={kartu} />
           </>
         )}
       </main>
@@ -287,36 +225,122 @@ const bar = 'inline-block align-middle rounded-lg skeleton';
 const KARTU = 'rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift';
 const LEBAR_NAMA = ['w-2/5', 'w-1/2', 'w-1/3', 'w-3/5', 'w-2/5', 'w-1/2', 'w-1/3', 'w-2/5'];
 
+/** Kepala kerangka = hero yang sama, nama & rumah jadi batang; teks statis
+ *  (eyebrow, label kaki, "Bukan saya?") tetap teks supaya tingginya identik. */
 function IdentitasKerangka() {
   return (
-    <div aria-hidden="true" className={`flex items-center gap-3 ${KARTU} p-5`}>
-      <span className="w-12 h-12 rounded-2xl skeleton shrink-0" />
-      <div className="min-w-0 flex-1">
-        <p className="text-subtitle"><span className={`${bar} h-4 w-36 max-w-full`} /></p>
+    <div aria-hidden="true" className="relative overflow-hidden rounded-3xl hero-emerald" style={{ boxShadow: 'var(--hero-shadow)' }}>
+      <div className="relative p-6">
+        <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
+          <Contact className="h-4 w-4 shrink-0 text-white/80" />
+          <span className="potong-lentur">Anggota Hadiran · RT 004/006</span>
+        </p>
+        <div className="mt-4 flex items-center gap-3">
+          <span className="w-12 h-12 rounded-2xl skeleton skeleton-hero shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-title leading-tight"><span className={`${bar} skeleton-hero h-5 w-36 max-w-full`} /></p>
+            <p className="mt-0.5 text-caption"><span className={`${bar} skeleton-hero h-3 w-20`} /></p>
+          </div>
+          <span className="shrink-0 min-h-[44px] px-3 rounded-xl inline-flex items-center text-caption font-semibold bg-white/10"><span className="invisible">Bukan saya?</span></span>
+        </div>
+        <HeroStats className="mt-5 pt-5" items={[
+          { icon: CheckCircle2, label: 'Hadir', value: '—' },
+          { icon: AlertTriangle, label: 'Talangan', value: '—' },
+          { icon: CalendarDays, label: 'Giliran', value: '—' },
+        ]} />
       </div>
-      <span className={`${bar} h-3 w-20 shrink-0 mr-3`} />
     </div>
   );
 }
 
-function KartuKerangka() {
+/* Varian talangan yang ditiru = varian TUNGGAL paling umum: tanpa tunggakan &
+   tanpa riwayat (21 dari 70, 18 Okt 2026; sisanya tersebar 1/2/3+ baris lunas
+   dan 13 menunggak). Kartu warga lain hanya TUMBUH ke bawah, tak pernah
+   menciut — data talangan baru ada sesudah datanya tiba. Jejak & Sohibul Bait
+   memakai `perkiraan` (susunKartu tanpa absen/talangan — daftar tarikan SUDAH
+   dimuat): jumlah bulatan & baris "Sudah menerima" tepat, tanpa satu angka pun
+   dinyatakan sebelum datanya tiba. */
+const JEJAK_KIRA = 24;
+/** Satu baris daftar talangan di kerangka: "Tarikan #N" + tanggal · penarik. */
+function BarisKerangka() {
+  return (
+    <div className="flex items-center justify-between gap-3 py-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-body"><span className={`${bar} h-4 w-24`} /></p>
+        <p className="text-caption"><span className={`${bar} h-3 w-40 max-w-full`} /></p>
+      </div>
+      <span className="text-caption"><span className={`${bar} h-3 w-16`} /></span>
+    </div>
+  );
+}
+
+function KartuKerangka({ perkiraan, bentuk }: { perkiraan: DataKartu | null; bentuk: BentukKartu | null }) {
+  const nJejak = perkiraan?.jejak.length ?? JEJAK_KIRA;
+  const belum = bentuk?.belum ?? 0, lunas = bentuk?.lunas ?? 0;
   return (
     <>
-      <div aria-hidden="true" className={`flex items-center gap-3 ${KARTU} p-5`}>
-        <span className="w-10 h-10 rounded-xl skeleton shrink-0" />
-        <div className="min-w-0 flex-1">
-          <p className="text-body"><span className={`${bar} h-4 w-36`} /></p>
-          <p className="text-caption mt-0.5"><span className={`${bar} h-3 w-48 max-w-full`} /></p>
+      <div aria-hidden="true" className={`${KARTU} p-5`}>
+        <div className="flex items-center gap-3">
+          <span className="w-10 h-10 rounded-xl skeleton shrink-0" />
+          {belum > 0 ? (
+            <div className="min-w-0 flex-1">
+              <p className="text-caption"><span className={`${bar} h-3 w-32`} /></p>
+              <p className="text-title"><span className={`${bar} h-5 w-28`} /></p>
+            </div>
+          ) : (
+            <div className="min-w-0 flex-1">
+              <p className="text-body"><span className={`${bar} h-4 w-36`} /></p>
+              {/* Kalimat ASLI `invisible` (ia melipat 2 baris @390 kalau ada riwayat). */}
+              <p className="text-caption mt-0.5 grid">
+                <span className="invisible col-start-1 row-start-1">{lunas > 0 ? `Pernah ditalangi ${lunas}×, semuanya sudah lunas.` : 'Belum pernah kena talangan.'}</span>
+                <span className="col-start-1 row-start-1"><span className={`${bar} h-3 w-52 max-w-full`} /></span>
+              </p>
+            </div>
+          )}
         </div>
+        {belum > 0 && (
+          <>
+            <div className="mt-4">{Array.from({ length: belum }, (_, i) => <BarisKerangka key={i} />)}</div>
+            {/* Petunjuk melunasi = teks statis 2 baris @390 — dicetak `invisible`
+                supaya pelipatannya sama, batang di baris pertamanya. */}
+            <p className="text-caption mt-3 grid">
+              <span className="invisible col-start-1 row-start-1">Hubungi bendahara untuk melunasi. Hanya bendahara yang bisa menandai lunas.</span>
+              <span className="col-start-1 row-start-1"><span className={`${bar} h-3 w-4/5`} /></span>
+            </p>
+          </>
+        )}
+        {lunas > 0 && (
+          <div className="mt-4 border-t border-line dark:border-gray-800 pt-4">
+            <p className="text-micro"><span className={`${bar} h-3 w-20`} /></p>
+            <div className="mt-1">{Array.from({ length: Math.min(lunas, LUNAS_RINGKAS) }, (_, i) => <BarisKerangka key={i} />)}</div>
+            {lunas > LUNAS_RINGKAS && <p className="mt-1 min-h-[44px] flex items-center text-caption"><span className={`${bar} h-3 w-24`} /></p>}
+          </div>
+        )}
       </div>
-      <div aria-hidden="true">
-        <StatRow
-          items={['Hadir', 'Titip', 'Tidak'].map((label) => ({
-            label,
-            value: <span className={`${bar} h-5 w-8`} />,
-          }))}
-        />
-      </div>
+      {nJejak > 0 && (
+        <div aria-hidden="true" className={`${KARTU} p-5`}>
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-body"><span className={`${bar} h-4 w-32`} /></p>
+            <p className="text-caption"><span className={`${bar} h-3 w-16`} /></p>
+          </div>
+          <ol className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2">
+            {Array.from({ length: nJejak }, (_, i) => (
+              <li key={i} className="flex justify-center"><span className="w-8 h-8 rounded-full skeleton" /></li>
+            ))}
+          </ol>
+          {/* Legenda = label ASLI (kata statis, bukan klaim) + batang di tempat
+              hitungannya, jadi ia melipat di titik yang sama. "Sohibul Bait"
+              ikut kalau `perkiraan` tahu warga ini pernah menerima. */}
+          <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
+            {(['hadir', 'tidak_hadir', ...(perkiraan?.jejak.some((j) => j.status === 'sohibul') ? ['sohibul' as const] : [])] as StatusJejak[]).map((st) => (
+              <li key={st} className="flex items-center gap-2 text-caption text-ink-sub dark:text-gray-400">
+                <span className="w-3 h-3 rounded-full skeleton" />
+                {LABEL_JEJAK[st]} <span className={`${bar} h-3 w-4`} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div aria-hidden="true" className={`${KARTU} p-5`}>
         <div className="flex items-center gap-3">
           <span className="w-10 h-10 rounded-xl skeleton shrink-0" />
@@ -325,27 +349,261 @@ function KartuKerangka() {
             <p className="text-body"><span className={`${bar} h-4 w-52 max-w-full`} /></p>
           </div>
         </div>
-        <p className="text-caption mt-3"><span className={`${bar} h-3 w-56 max-w-full`} /></p>
+        {(perkiraan ? perkiraan.giliran : true) && <p className="text-caption mt-3"><span className={`${bar} h-3 w-56 max-w-full`} /></p>}
+        {perkiraan && perkiraan.sudahMenerima.length > 0 && (
+          <div className="mt-4 border-t border-line dark:border-gray-800 pt-4">
+            <p className="text-micro"><span className={`${bar} h-3 w-24`} /></p>
+            <div className="mt-1">
+              {perkiraan.sudahMenerima.map((t) => (
+                <div key={t.nomor} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-body"><span className={`${bar} h-4 w-24`} /></p>
+                    <p className="text-caption"><span className={`${bar} h-3 w-32`} /></p>
+                  </div>
+                  <span className="text-body"><span className={`${bar} h-4 w-24`} /></span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
 }
 
-function Identitas({ warga, onGanti }: { warga: Warga; onGanti: () => void }) {
+/* ── Isi kartu ─────────────────────────────────────────────────────────────
+   Dicetak ulang 18 Okt 2026 ("maksimalkan isi & tampilan"). Dulu empat kartu
+   putih bertumpuk; datanya justru jauh lebih kaya dari yang tampil — 49 warga
+   punya riwayat talangan LUNAS dan 24 sudah pernah jadi Sohibul Bait, tapi
+   kartu cuma menulis "Sudah menerima: #19". Kini: kepala = hero (permukaan
+   yang sama dgn hero Jadwal & carousel Beranda), lalu talangan (+ riwayat
+   lunas), jejak kehadiran per tarikan, dan Sohibul Bait (+ pendapatan kotor). */
+
+/** Kepala kartu: hero. `kartu` null = data warga masih dimuat/gagal — kaki
+ *  statistik "—" (app dilarang menyatakan angka yang belum ia ketahui). */
+function KepalaKartu({ warga, kartu, onGanti }: { warga: Warga; kartu: DataKartu | null; onGanti: () => void }) {
+  const tercatat = kartu ? kartu.hadir + kartu.titip + kartu.tidakHadir : 0;
   return (
-    <div className="flex items-center gap-3 rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift p-5">
-      <AvatarPeci nama={warga.nama} ukuran={12} />
-      <div className="min-w-0 flex-1">
-        <p className="text-subtitle font-bold text-ink dark:text-gray-100 break-words">{warga.nama}</p>
-        {warga.no_rumah && <p className="text-caption text-ink-sub dark:text-gray-400">Rumah {warga.no_rumah}</p>}
+    <div className="relative overflow-hidden rounded-3xl hero-emerald" style={{ boxShadow: 'var(--hero-shadow)' }}>
+      <div className="hero-sheen pointer-events-none absolute inset-0" />
+      <div className="relative p-6">
+        <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
+          <Contact className="h-4 w-4 shrink-0 text-white/80" />
+          <span className="potong-lentur">Anggota Hadiran · RT 004/006</span>
+        </p>
+        <div className="mt-4 flex items-center gap-3">
+          <AvatarPeci nama={warga.nama} ukuran={12} sorot />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-title font-bold leading-tight text-white break-words">{warga.nama}</h2>
+            {warga.no_rumah && <p className="mt-0.5 text-caption text-white/90">Rumah {warga.no_rumah}</p>}
+          </div>
+          <button
+            onClick={onGanti}
+            className="press shrink-0 min-h-[44px] px-3 rounded-xl text-caption font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            Bukan saya?
+          </button>
+        </div>
+        <HeroStats
+          className="mt-5 pt-5"
+          items={[
+            { icon: CheckCircle2, label: 'Hadir', value: kartu ? `${kartu.hadir}/${tercatat}` : '—' },
+            { icon: AlertTriangle, label: 'Talangan', value: kartu ? (kartu.totalTunggakan > 0 ? formatRupiahPlain(kartu.totalTunggakan) : 'Lunas') : '—' },
+            { icon: CalendarDays, label: 'Giliran', value: kartu ? (kartu.giliran ? `#${kartu.giliran.nomor}` : kartu.sudahMenerima.length > 0 ? 'Selesai' : '—') : '—' },
+          ]}
+        />
       </div>
-      <button
-        onClick={onGanti}
-        className="press shrink-0 min-h-[44px] px-3 rounded-xl text-caption font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      >
-        Bukan saya?
-      </button>
     </div>
+  );
+}
+
+const JUDUL_KARTU = '[font-family:inherit] [letter-spacing:normal] text-body font-bold text-ink dark:text-gray-100';
+const SUB_JUDUL = 'text-micro font-bold uppercase tracking-wide text-ink-faint dark:text-gray-400';
+
+/* Riwayat lunas bisa panjang (terukur 8 baris untuk satu warga — selayar
+   penuh yang mendorong jejak kehadiran ke bawah lipatan). Tampil 3 terbaru;
+   sisanya di balik satu ketukan. */
+const LUNAS_RINGKAS = 3;
+
+function KartuTalangan({ kartu }: { kartu: DataKartu }) {
+  const [semua, setSemua] = useState(false);
+  const belum = kartu.tunggakan.length > 0;
+  const lunas = kartu.talanganLunas;
+  const tampil = semua ? lunas : lunas.slice(0, LUNAS_RINGKAS);
+  return (
+    <section aria-label="Talangan" className={`${KARTU} p-5`}>
+      <div className="flex items-center gap-3">
+        {belum ? (
+          <span className="icon-tile w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5 text-neg dark:text-rose-400" aria-hidden="true" />
+          </span>
+        ) : (
+          <span className="icon-tile w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          </span>
+        )}
+        {belum ? (
+          <div className="min-w-0">
+            <p className="text-caption text-ink-sub dark:text-gray-400">Talangan belum lunas</p>
+            <p className="font-display text-title font-bold text-neg dark:text-rose-400 tabular-nums">
+              {formatRupiahPlain(kartu.totalTunggakan)}
+            </p>
+          </div>
+        ) : (
+          <div className="min-w-0">
+            <p className="text-body font-semibold text-ink dark:text-gray-100">Tidak ada talangan</p>
+            <p className="text-caption text-ink-sub dark:text-gray-400 mt-0.5">
+              {lunas.length > 0 ? `Pernah ditalangi ${lunas.length}×, semuanya sudah lunas.` : 'Belum pernah kena talangan.'}
+            </p>
+          </div>
+        )}
+      </div>
+      {belum && (
+        <>
+          <ul className="mt-4 divide-y divide-line dark:divide-gray-800">
+            {kartu.tunggakan.map((t) => (
+              <li key={t.nomor} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="text-body font-medium text-ink dark:text-gray-100">Tarikan #{t.nomor}</p>
+                  {/* Tanggal · penarik — warga mengingat tarikan lewat SIAPA penariknya. */}
+                  <MetaPisah className="text-caption text-ink-sub dark:text-gray-400" bagian={[formatTanggal(t.tanggal), t.penarik]} />
+                </div>
+                {/* Angka biasa, bukan pil (16 Okt 2026) — merahnya cukup di total kepala. */}
+                <span className="text-caption font-display font-semibold tabular-nums text-ink-sub dark:text-gray-300 whitespace-nowrap">
+                  {formatRupiahPlain(t.nominal)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-caption text-ink-sub dark:text-gray-400 mt-3">
+            Hubungi bendahara untuk melunasi. Hanya bendahara yang bisa menandai lunas.
+          </p>
+        </>
+      )}
+      {lunas.length > 0 && (
+        <div className="mt-4 border-t border-line dark:border-gray-800 pt-4">
+          <p className={SUB_JUDUL}>Sudah lunas</p>
+          <ul id="talangan-lunas" className="mt-1 divide-y divide-line dark:divide-gray-800">
+            {tampil.map((t) => (
+              <li key={t.nomor} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="text-body font-medium text-ink dark:text-gray-100">Tarikan #{t.nomor}</p>
+                  <MetaPisah className="text-caption text-ink-sub dark:text-gray-400" bagian={[formatTanggal(t.tanggal), t.penarik]} />
+                </div>
+                <span className="text-caption font-semibold text-pos dark:text-emerald-400 whitespace-nowrap">
+                  {t.tanggalLunas ? `Lunas ${formatTanggalRingkas(t.tanggalLunas)}` : 'Lunas'}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {lunas.length > LUNAS_RINGKAS && (
+            <button
+              onClick={() => { haptic(); setSemua((x) => !x); }}
+              aria-expanded={semua}
+              aria-controls="talangan-lunas"
+              className="press mt-1 -mx-3 min-h-[44px] px-3 rounded-xl text-caption font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              {semua ? 'Ringkas' : `Lihat semua (${lunas.length})`}
+            </button>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* Satu bulatan per tarikan SELESAI. Warna + nomor + teks sr-only (warna tak
+   pernah jadi satu-satunya penanda). Hadir & tidak = isian penuh (putih di
+   atas pos/neg: 8,96 & 8,78:1); titip = cincin biru; Sohibul Bait = cincin
+   emas songket (sorot dekoratif, artinya ditulis di legenda); tanpa catatan =
+   abu putus-putus. */
+const GAYA_JEJAK: Record<StatusJejak, string> = {
+  hadir: 'bg-pos text-white dark:bg-emerald-400 dark:text-gray-950',
+  titip: 'bg-white text-blue-600 ring-2 ring-inset ring-blue-600 dark:bg-gray-900 dark:text-blue-400 dark:ring-blue-400',
+  tidak_hadir: 'bg-neg text-white dark:bg-rose-400 dark:text-gray-950',
+  sohibul: 'bg-white text-ink ring-2 ring-inset ring-[var(--gold-songket)] dark:bg-gray-900 dark:text-gray-100',
+  kosong: 'bg-gray-50 text-ink-faint ring-1 ring-inset ring-line dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700',
+};
+const LABEL_JEJAK: Record<StatusJejak, string> = {
+  hadir: 'Hadir', titip: 'Titip', tidak_hadir: 'Tidak hadir', sohibul: 'Sohibul Bait', kosong: 'Belum tercatat',
+};
+const URUT_LEGENDA: StatusJejak[] = ['hadir', 'titip', 'tidak_hadir', 'sohibul', 'kosong'];
+
+function JejakKehadiran({ kartu }: { kartu: DataKartu }) {
+  if (kartu.jejak.length === 0) return null;
+  const jumlah = (st: StatusJejak) => kartu.jejak.filter((j) => j.status === st).length;
+  return (
+    <section aria-label="Jejak kehadiran" className={`${KARTU} p-5`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className={JUDUL_KARTU}>Jejak Kehadiran</h2>
+        <p className="text-caption text-ink-sub dark:text-gray-400 whitespace-nowrap">{kartu.jejak.length} tarikan</p>
+      </div>
+      <ol className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2">
+        {kartu.jejak.map((j) => (
+          <li key={j.nomor} className="flex justify-center">
+            <span title={`Tarikan #${j.nomor} · ${LABEL_JEJAK[j.status]}`} className={`w-8 h-8 rounded-full inline-flex items-center justify-center text-micro font-bold tabular-nums ${GAYA_JEJAK[j.status]}`}>
+              <span aria-hidden="true">{j.nomor}</span>
+              <span className="sr-only">Tarikan #{j.nomor}: {LABEL_JEJAK[j.status]}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2" aria-label="Keterangan warna">
+        {URUT_LEGENDA.filter((st) => jumlah(st) > 0 || st === 'hadir' || st === 'tidak_hadir').map((st) => (
+          <li key={st} className="flex items-center gap-2 text-caption text-ink-sub dark:text-gray-400">
+            <span aria-hidden="true" className={`w-3 h-3 rounded-full ${GAYA_JEJAK[st]}`} />
+            {LABEL_JEJAK[st]} <span className="font-semibold tabular-nums text-ink dark:text-gray-100">{jumlah(st)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function KartuSohibul({ kartu }: { kartu: DataKartu }) {
+  return (
+    <section aria-label="Giliran Sohibul Bait" className={`${KARTU} p-5`}>
+      <div className="flex items-center gap-3">
+        <span className="icon-tile w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+          <CalendarDays className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-caption text-ink-sub dark:text-gray-400">Giliran Sohibul Bait</p>
+          {kartu.giliran ? (
+            /* MetaPisah: @320px baris ini melipat — tanggal tak terpisah dari harinya. */
+            <MetaPisah className="text-body font-semibold text-ink dark:text-gray-100" bagian={[`Tarikan #${kartu.giliran.nomor}`, formatTanggal(kartu.giliran.tanggal)]} />
+          ) : (
+            <p className="text-body font-semibold text-ink dark:text-gray-100">Belum ada jadwal</p>
+          )}
+        </div>
+      </div>
+      {kartu.giliran && (
+        <p className="text-caption text-ink-sub dark:text-gray-400 mt-3">
+          {kartu.giliran.sisaSebelum === 0 ? 'Ini tarikan berikutnya.' : `${kartu.giliran.sisaSebelum} tarikan lagi sebelum giliran ini.`}
+        </p>
+      )}
+      {kartu.sudahMenerima.length > 0 && (
+        <div className="mt-4 border-t border-line dark:border-gray-800 pt-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className={SUB_JUDUL}>Sudah menerima</p>
+            <p className={SUB_JUDUL}>Pendapatan kotor</p>
+          </div>
+          <ul className="mt-1 divide-y divide-line dark:divide-gray-800">
+            {kartu.sudahMenerima.map((t) => (
+              <li key={t.nomor} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="text-body font-medium text-ink dark:text-gray-100">Tarikan #{t.nomor}</p>
+                  <p className="text-caption text-ink-sub dark:text-gray-400">{formatTanggal(t.tanggal)}</p>
+                </div>
+                <span className="font-display text-body font-semibold tabular-nums text-ink dark:text-gray-100 whitespace-nowrap">
+                  {t.pendapatanKotor !== null ? formatRupiahPlain(t.pendapatanKotor) : '—'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
   );
 }
 

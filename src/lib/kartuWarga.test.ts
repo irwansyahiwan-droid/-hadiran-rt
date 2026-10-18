@@ -66,7 +66,7 @@ describe('susunKartu', () => {
   it('giliran: tarikan belum selesai terdekat milik warga ini + sisa sebelumnya', () => {
     const k = susunKartu('w1', tarikan, [], []);
     expect(k.giliran).toEqual({ nomor: 5, tanggal: '2026-05-10', sisaSebelum: 1 });   // t4 milik w9 masih di depan
-    expect(k.sudahMenerima).toEqual([{ nomor: 2, tanggal: '2026-02-10' }]);
+    expect(k.sudahMenerima).toEqual([{ nomor: 2, tanggal: '2026-02-10', pendapatanKotor: null }]);   // total tak ada → null, bukan 0
   });
 
   it('giliran 0 sisa = tarikan berikutnya', () => {
@@ -77,5 +77,37 @@ describe('susunKartu', () => {
 
   it('tanpa jadwal tersisa → giliran null', () => {
     expect(susunKartu('w-lain', tarikan, [], []).giliran).toBeNull();
+  });
+
+  it('jejak: satu titik per tarikan SELESAI, urut nomor — penerima = sohibul, tanpa catatan = kosong', () => {
+    const k = susunKartu('w1', tarikan, [
+      { tarikan_id: 't1', status: 'tidak_hadir' },
+      { tarikan_id: 't2', status: 'hadir' },        // w1 penerima t2 → 'sohibul', bukan 'hadir'
+      { tarikan_id: 't4', status: 'hadir' },        // belum selesai → tak masuk jejak
+    ], []);
+    expect(k.jejak).toEqual([
+      { nomor: 1, tanggal: '2026-01-10', status: 'tidak_hadir' },
+      { nomor: 2, tanggal: '2026-02-10', status: 'sohibul' },
+      { nomor: 3, tanggal: '2026-03-10', status: 'kosong' },
+    ]);
+  });
+
+  it('pendapatan kotor Sohibul Bait = pembayar (total_terkumpul ÷ 5.000) × 45.000', () => {
+    const k = susunKartu('w9', tarikan.map((t) => (t.nomor === 3 ? { ...t, total_terkumpul: 345000 } : t)), [], []);
+    expect(k.sudahMenerima).toEqual([
+      { nomor: 3, tanggal: '2026-03-10', pendapatanKotor: 69 * 45000 },   // 69 pembayar → Rp3.105.000
+      { nomor: 1, tanggal: '2026-01-10', pendapatanKotor: null },        // total tak dimuat → tak dikarang
+    ]);
+  });
+
+  it('talangan lunas jadi RIWAYAT (terbaru di depan), tak ikut total tunggakan', () => {
+    const k = susunKartu('w1', tarikan, [], [
+      { tarikan_id: 't1', nominal: 50000, status_lunas: true, tanggal_lunas: '2026-01-20' },
+      { tarikan_id: 't3', nominal: 50000, status_lunas: true, tanggal_lunas: null },
+      { tarikan_id: 't2', nominal: 50000, status_lunas: false },
+    ]);
+    expect(k.talanganLunas.map((t) => [t.nomor, t.tanggalLunas])).toEqual([[3, null], [1, '2026-01-20']]);
+    expect(k.tunggakan.map((t) => t.nomor)).toEqual([2]);
+    expect(k.totalTunggakan).toBe(50000);
   });
 });
