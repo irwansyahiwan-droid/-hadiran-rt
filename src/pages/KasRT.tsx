@@ -1128,8 +1128,20 @@ export default function KasRTPage() {
                      dan 2 — tak sejajar dgn apa pun. Baris Beranda boleh tetap
                      `items-center` karena judulnya `truncate` (selalu satu
                      baris). Nominal & ikon kini bertumpu pada baris PERTAMA
-                     judul, sama seperti kolom angka Rekap per Kategori. */
-                  className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_76px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-ketuk ${!isLast ? 'divide-inset' : ''}`}
+                     judul, sama seperti kolom angka Rekap per Kategori.
+
+                     Tinggi cadangan `contain-intrinsic-block-size` = tinggi ISI,
+                     TANPA padding (17 Okt 2026). Nilai lama 76px adalah tinggi
+                     baris UTUH satu-baris, padahal peramban menambahkan py-4 di
+                     atasnya → baris yang belum pernah tercat dicadangkan 108px
+                     lawan 96px tercat, dan halaman Kas RT 604px terlalu panjang
+                     sampai digulir habis. 64 = isi dua baris judul (48 dari 49
+                     baris @390). Di layar sempit sebagian baris melipat meta-nya
+                     (isi 83px), jadi nilainya RATA-RATA isi per pita lebar, diukur
+                     365–320px: ≥370 hampir semua 64 · 345–369 ±69 (360: 37×64 +
+                     12×83) · <345 ±79 (320: 11×64 + 38×83). Kesalahan panjang
+                     halaman sisa ±20px lawan 357/604px dulu. */
+                  className={`rise w-full text-left flex items-start gap-2 px-4 py-4 [--di-l:3.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_64px] max-[369px]:[contain-intrinsic-block-size:auto_69px] max-[344px]:[contain-intrinsic-block-size:auto_79px]${bisaDetail ? ' cursor-pointer hover:bg-gray-50/60 dark:hover:bg-gray-800/40 active:bg-gray-50/80 dark:active:bg-gray-800/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40' : ''} transition-colors duration-ketuk ${!isLast ? 'divide-inset' : ''}`}
                 >
                   {/* Saldo Awal NETRAL (27 Sep 2026): ia titik mulai, bukan
                       pemasukan — tak ikut Penerimaan di rekap, dan hero, rekap &

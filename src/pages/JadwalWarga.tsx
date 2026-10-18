@@ -649,8 +649,11 @@ export default function JadwalWargaPage() {
                     /* gap-2, bukan gap-3: baris ini punya EMPAT kolom (nomor ·
                        avatar · nama · chip), bukan dua seperti baris Jadwal.
                        Tiga celah × 4px selisih = 12px yang diambil dari nama —
-                       persis yang bikin "Nisan Nasrullah ( Icang )" terpotong. */
-                    className={`rise flex flex-wrap items-center gap-2 p-3 [--di-l:5rem] [--di-r:0.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_60px] ${
+                       persis yang bikin "Nisan Nasrullah ( Icang )" terpotong.
+                       Tinggi cadangan = ISI tanpa p-3 (56 − 24 = 32). Nilai lama
+                       60 menjadi 84px setelah padding → daftar 1.232px terlalu
+                       panjang sampai digulir habis (17 Okt 2026). */
+                    className={`rise flex flex-wrap items-center gap-2 p-3 [--di-l:5rem] [--di-r:0.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_32px] ${
                       idx < filteredWarga.length - 1 ? 'divide-inset' : ''
                     }`}
                   >

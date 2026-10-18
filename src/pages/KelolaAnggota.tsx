@@ -470,9 +470,12 @@ export default function KelolaAnggota({ open, onClose }: Props) {
                 /* Stagger masuk — dialek gerak bersama (lihat Jadwal.tsx). `.rise`
                    duduk di elemen yang SAMA dgn `content-visibility:auto`, persis
                    pola KasRT.tsx: animasi elemen itu sendiri tetap jalan, yang
-                   dilewati cuma render ISI baris di luar layar. */
+                   dilewati cuma render ISI baris di luar layar.
+                   Tinggi cadangan = ISI tanpa py-4 (72 − 32 = 40). Nilai lama 76
+                   menjadi 108px setelah padding → daftar 1.584px terlalu panjang
+                   sampai digulir habis (17 Okt 2026). */
                 style={{ animationDelay: `${Math.min(idx, 10) * 0.035}s` }}
-                className={`rise w-full flex items-center gap-3 px-4 py-4 text-left [--di-l:4.25rem] [--di-r:1rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_76px] active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
+                className={`rise w-full flex items-center gap-3 px-4 py-4 text-left [--di-l:4.25rem] [--di-r:1rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_40px] active:bg-gray-50 dark:active:bg-gray-800/60 transition-colors ${
                   idx < filtered.length - 1 ? 'divide-inset' : ''
                 }`}
               >

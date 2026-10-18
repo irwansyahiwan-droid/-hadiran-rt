@@ -484,8 +484,10 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
               key={w.id}
               onClick={() => toggle(w.id)}
               aria-label={`${w.nama} — ${ui.label}. Ketuk untuk ganti status`}
-              // ~79 baris: content-visibility lewati render baris di luar layar
-              className={`w-full flex items-center gap-3 p-3 text-left [--di-l:3.5rem] [--di-r:0.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_60px] transition-colors ${
+              // ~79 baris: content-visibility lewati render baris di luar layar.
+              // Tinggi cadangan = ISI tanpa p-3 (66 − 24 = 42); nilai lama 60
+              // menjadi 84px setelah padding → editor 860px terlalu panjang.
+              className={`w-full flex items-center gap-3 p-3 text-left [--di-l:3.5rem] [--di-r:0.75rem] [content-visibility:auto] [contain-intrinsic-block-size:auto_42px] transition-colors ${
                 idx < filtered.length - 1 ? 'divide-inset' : ''
               } ${ui.hover}`}
             >

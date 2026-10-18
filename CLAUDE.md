@@ -460,6 +460,17 @@ ketiganya tak dijaga sapuan mana pun, jadi harus diingat: `[--di-l:*]` /
 `[contain-intrinsic-block-size:auto_*px]` (tinggi cadangan), dan bantalan
 KERANGKA yang harus mencerminkan baris aslinya (beda = `audit:lompat`).
 
+**Tinggi cadangan = tinggi ISI, TANPA padding** (17 Okt 2026). Peramban
+menambahkan padding baris DI ATAS nilai itu. Keempat daftar ber-
+`content-visibility` (Kas RT, Jadwal warga, Kelola Anggota, editor Absensi)
+memakai tinggi baris UTUH, jadi tiap baris yang belum pernah tercat
+dicadangkan 24–36px terlalu tinggi dan halaman 604 / 1.232 / 1.584 / 860px
+terlalu panjang sampai digulir habis. Tak terlihat di baris mana pun (yang
+tercat identik), hanya di bilah gulir & lompatan jauh. Ukur lewat
+`checkVisibility({ contentVisibilityAuto: true })` pada anak baris (false =
+dilewati) dan panjang gulir sebelum/sesudah digulir habis; **probe yang
+mengukur baris di luar layar membaca PLACEHOLDER, bukan barisnya.**
+
 Baris daftar padat memakai anak tangga RINGKAS (`p-3`), bukan anak tangga
 kartu (`p-5`). Waktu p-3.5 dinaikkan ke p-4 di Jadwal, dua nama warga
 terpotong 10–14px @390px — bukti bahwa "lebih lapang" bukan aturan buta:
