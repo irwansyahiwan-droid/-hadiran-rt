@@ -69,7 +69,11 @@ const MUTASI = +(process.env.MUTASI || 0);
    diberi kelonggaran satu langkah, dengan disiplin yang sama seperti lantai
    populasi `sapu-semua`: KETAT, karena populasi app ini stabil antar-jalan.
    Kalau app memang tumbuh, PERBARUI angkanya — jangan longgarkan diam-diam. */
-const ANGGARAN_KB = 200;   // jalur kunjungan pertama, di kabel (brotli)
+/* 200 → 201 kB (19 Okt 2026, KEPUTUSAN USER: "naikan anggaran agar kartu warga
+   bisa dibuka lewat jalan masuk Beranda"). Slide Kartu Warga di carousel
+   membeli +0,5 kB (199,8 → 200,3). Sisa ±0,7 kB SENGAJA tipis: tambahan
+   berikutnya ke layar pertama wajib berhenti di sini & jadi keputusan lagi. */
+const ANGGARAN_KB = 201;   // jalur kunjungan pertama, di kabel (brotli)
 const ANGGARAN_BERKAS = 22;
 const KEDIP_MS = 400;      // jarak "layar dipakai" -> "font tiba"
 const LANTAI_BERKAS = 14;  // populasi separuh = laporan hijau palsu (cacat ke-23)
