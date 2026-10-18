@@ -78,7 +78,11 @@ const PROBE = () => {
   let n;
   while ((n = w.nextNode())) {
     const s = (n.textContent || '').trim();
-    if (!s || !/\d/.test(s)) continue;
+    /* Identitas RT ("RT 004/006") itu NAMA, bukan klaim data — kelas yang sama
+       dgn tanggal/jam/versi di bawah (18 Okt 2026, eyebrow hero Kartu Warga,
+       izin user). Hanya TOKEN-nya yang dibuang: digit lain di teks yang sama
+       tetap dihitung, jadi "RT 004/006 · Rp5.000" masih merah. */
+    if (!s || !/\d/.test(s.replace(/\bRT\s*\d{3}\/\d{3}\b/g, ''))) continue;
     const el = n.parentElement;
     if (!el || !el.offsetParent) continue;                 // tak terlihat
     /* `visibility:hidden` tetap punya offsetParent, jadi ia lolos baris di atas.
