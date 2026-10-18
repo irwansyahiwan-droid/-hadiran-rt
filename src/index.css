@@ -1956,6 +1956,18 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
    membaca "sapuan hijau" sebagai bukti `vh` aman; buktinya ada di HP asli. */
 .sheet-panel    { animation: sheetUp var(--dur-lapisan) var(--ease-out-expo) backwards; overscroll-behavior: contain; }
 
+/* Dasar SHEET BAWAH (17 Okt 2026): 40px di atas tepi layar, DITAMBAH home
+   indicator iPhone (`env(safe-area-inset-bottom)`, 34px di app terpasang —
+   `viewport-fit=cover`). Satu resep, dimiliki kelas ini, bukan call-site:
+   terukur ada EMPAT resep — `pb-10` tanpa env (7 sheet, 40px di iPhone = 6px
+   di atas zona gestur), `p-5` saja (Tambah & Revisi jadwal: 20px, tombol
+   Batal/Simpan DI DALAM zona home indicator), dan dua versi ber-env (detail
+   transaksi Beranda 74px, tambah anggota 114px). Di Android env = 0, jadi
+   tetap 40px. Tak terlihat sapuan mana pun: Playwright tak punya safe-area
+   — buktinya `env()` di sumber + HP asli. Tanpa lapisan (sesudah
+   `@tailwind utilities`) supaya menang atas `p-5` di elemen yang sama. */
+.pb-sheet { padding-bottom: calc(2.5rem + env(safe-area-inset-bottom)); }
+
 /* Toast — masuk turun dari atas, keluar NAIK ke atas (arah yg sama → konsisten
    spasial; elemen hilang tanpa transisi terasa "rusak"). Exit lebih cepat &
    ease-out: sistem merespons, bukan menunda. */

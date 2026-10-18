@@ -1008,7 +1008,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         <div
           ref={trxDlg.panelRef}
           {...trxDlg.panelProps}
-          className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-[calc(2.5rem+env(safe-area-inset-bottom))] float"
+          className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-sheet float"
           onClick={e => e.stopPropagation()}
           style={trxDrag.style}
           {...trxDrag.handlers}

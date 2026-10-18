@@ -810,7 +810,7 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
     <>
     <div className="fixed inset-0 z-overlay flex items-end sm:items-center justify-center">
       <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={jaga.mintaTutup} />
-      <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90dvh] overflow-y-auto">
+      <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 pb-sheet float max-h-[90dvh] overflow-y-auto">
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
@@ -931,7 +931,7 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
     <>
     <div className="fixed inset-0 z-overlay flex items-end sm:items-center justify-center">
       <div aria-hidden="true" className={`sheet-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm ${drag.dismissing ? 'sheet-backdrop-out' : ''}`} onClick={jaga.mintaTutup} />
-      <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 float max-h-[90dvh] overflow-y-auto">
+      <div ref={dlg.panelRef} {...dlg.panelProps} style={drag.style} className="sheet-panel relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-3xl p-5 pb-sheet float max-h-[90dvh] overflow-y-auto">
         <div className="-mt-2 mb-1 py-2 flex justify-center touch-none cursor-grab active:cursor-grabbing" {...drag.handlers}>
           <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
         </div>
@@ -1503,7 +1503,7 @@ export default function JadwalPage() {
           <div
             ref={rowDlg.panelRef}
             {...rowDlg.panelProps}
-            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
+            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-sheet"
             onClick={(e) => e.stopPropagation()}
             style={rowDrag.style}
           >

@@ -128,7 +128,7 @@ export default function InstallPrompt() {
           <div
             ref={guideDlg.panelRef}
             {...guideDlg.panelProps}
-            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
+            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-sheet"
             onClick={(e) => e.stopPropagation()}
             style={guideDrag.style}
             {...guideDrag.handlers}

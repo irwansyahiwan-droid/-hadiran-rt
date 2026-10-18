@@ -120,7 +120,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
       <div
         ref={dlg.panelRef}
         {...dlg.panelProps}
-        className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10 space-y-4 max-h-[90dvh] overflow-y-auto"
+        className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-sheet space-y-4 max-h-[90dvh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         style={drag.style}
       >
@@ -1231,7 +1231,7 @@ export default function KasRTPage() {
           <div
             ref={rowDlg.panelRef}
             {...rowDlg.panelProps}
-            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-10"
+            className="sheet-panel float relative w-full max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-t-3xl p-5 pb-sheet"
             onClick={(e) => e.stopPropagation()}
             style={rowDrag.style}
           >
