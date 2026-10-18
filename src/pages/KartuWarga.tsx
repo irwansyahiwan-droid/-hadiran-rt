@@ -233,15 +233,15 @@ function IdentitasKerangka() {
       <div className="relative p-6">
         <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
           <Contact className="h-4 w-4 shrink-0 text-white/80" />
-          <span className="potong-lentur">Anggota Hadiran · RT 004/006</span>
+          <span className="potong-lentur">{'Anggota Hadiran · RT\u00A0004/006'}</span>
         </p>
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <span className="w-12 h-12 rounded-2xl skeleton skeleton-hero shrink-0" />
           <div className="min-w-0 flex-1">
             <p className="text-title leading-tight"><span className={`${bar} skeleton-hero h-5 w-36 max-w-full`} /></p>
             <p className="mt-0.5 text-caption"><span className={`${bar} skeleton-hero h-3 w-20`} /></p>
           </div>
-          <span className="shrink-0 min-h-[44px] px-3 rounded-xl inline-flex items-center text-caption font-semibold bg-white/10"><span className="invisible">Bukan saya?</span></span>
+          <span className="shrink-0 ml-auto min-h-[44px] px-3 rounded-xl inline-flex items-center text-caption font-semibold bg-white/10"><span className="invisible">Bukan saya?</span></span>
         </div>
         <HeroStats className="mt-5 pt-5" items={[
           { icon: CheckCircle2, label: 'Hadir', value: '—' },
@@ -389,17 +389,22 @@ function KepalaKartu({ warga, kartu, onGanti }: { warga: Warga; kartu: DataKartu
       <div className="relative p-6">
         <p className="flex min-w-0 items-center gap-2 text-micro font-semibold uppercase tracking-[0.12em] text-white/90">
           <Contact className="h-4 w-4 shrink-0 text-white/80" />
-          <span className="potong-lentur">Anggota Hadiran · RT 004/006</span>
+          <span className="potong-lentur">{'Anggota Hadiran · RT\u00A0004/006'}</span>
         </p>
-        <div className="mt-4 flex items-center gap-3">
+        {/* `flex-wrap` + kolom nama `min-w-min` (19 Okt 2026): @320px kolom nama
+            tinggal ±68px di antara avatar & "Bukan saya?", dan `break-words`
+            membelah "Niman" jadi "Nim/an" (audit:kata-patah). Kini kolom tak
+            pernah lebih sempit dari KATA terpanjangnya; kalau tak muat, tombolnya
+            yang turun sebaris. 360/390px tak berubah untuk nama yang ada. */}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <AvatarPeci nama={warga.nama} ukuran={12} sorot />
-          <div className="min-w-0 flex-1">
+          <div className="min-w-min flex-1">
             <h2 className="text-title font-bold leading-tight text-white break-words">{warga.nama}</h2>
             {warga.no_rumah && <p className="mt-0.5 text-caption text-white/90">Rumah {warga.no_rumah}</p>}
           </div>
           <button
             onClick={onGanti}
-            className="press shrink-0 min-h-[44px] px-3 rounded-xl text-caption font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors"
+            className="press shrink-0 ml-auto min-h-[44px] px-3 rounded-xl text-caption font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors"
           >
             Bukan saya?
           </button>
