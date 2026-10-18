@@ -117,6 +117,7 @@ const VISUAL = [
      memakai iPhone, dan potretnya membongkar "Tarikan / #30" (eee911a) yang
      tak terlihat satu alat pun. */
   ['mesin', 'node scripts/audit-mesin.mjs'],
+  ['tepi-aman', 'node scripts/audit-tepi-aman.mjs'],
   /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
      seperti bagian 200% `audit:potong`/`audit:reflow` (itu ambang APP, di atas
      AA). Keputusan user 2 Sep 2026, dgn mata terbuka: selama sisa temuannya
@@ -259,6 +260,10 @@ const LANTAI = {
      390/375 × warga/bendahara). Ikut DATA (Riwayat Aktivitas ~630 teks per
      peran). Lantai ~95%. */
   mesin:            [/MESIN: (\d+) teks berpasangan/, 7900],
+  /* Garis dasar 18 Okt 2026: 233 kontrol tetap (chrome, FAB, sheet, overlay)
+     di 41 layar @390×844, safe-area 47/34 lewat CDP. Populasi ini STRUKTUR,
+     bukan data (kontrol fixed/sticky), jadi stabil. Lantai ~95%. */
+  'tepi-aman':      [/TEPI AMAN: (\d+) kontrol tetap/, 220],
   'jarak-teks':     [/populasi teks terukur\s*:\s*(\d+)/, 5700],
   lebar:            [/(\d+) konteks diperiksa/, 112],
   reflow:           [/(\d+) layar diperiksa/, 9],
