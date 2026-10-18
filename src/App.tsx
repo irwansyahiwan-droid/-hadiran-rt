@@ -333,7 +333,7 @@ export default function App() {
             <div {...swipe}>
               <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>
                 <Suspense fallback={<PageFallback />}>
-                  {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} />}
+                  {activeTab === 'beranda'  && <Beranda onNavigate={(tab) => changeTab(tab as TabName)} onOpenKartu={() => setKartuOpen(true)} />}
                   {activeTab === 'jadwal'   && (isWargaMode ? <JadwalWargaPage /> : <JadwalPage />)}
                   {activeTab === 'talangan' && <TalanganPage onBack={isWargaMode ? () => changeTab('beranda') : undefined} />}
                   {activeTab === 'kas'      && <KasHadiranPage />}

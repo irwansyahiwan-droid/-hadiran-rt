@@ -44,7 +44,7 @@ const PERMUKAAN = [
   /* 15 Okt 2026 — dua daftar baru dari sesi lain. Kartu Warga: daftar "Cari nama
      Anda" (warga, pemakai utamanya). Tutup Buku: chip Triwulan | Bulanan; chip
      yang belum aktif = Bulanan, jadi bendanya "laporan bulanan". */
-  { peran: 'warga', nama: 'Kartu Warga', menu: 'Kartu Warga', benda: 'warga', cari: true, chip: false },
+  { peran: 'warga', nama: 'Kartu Saya', menu: 'Kartu Saya', benda: 'warga', cari: true, chip: false },
   { peran: 'bendahara', nama: 'Tutup Buku', menu: 'Tutup Buku Triwulan', benda: 'laporan bulanan', cari: false, chip: true },
 ];
 

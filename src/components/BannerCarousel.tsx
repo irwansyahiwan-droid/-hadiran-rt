@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  Target, Coins,
+  Target, Coins, UserRound,
   ChevronRight, Crown, Check, X,
   type LucideIcon,
 } from 'lucide-react';
@@ -212,14 +212,15 @@ const TEXT_SHADOW = '0 1px 3px rgba(2,12,8,.34)';
 /** Slide promo/panduan (kartu non-saldo). Kartu saldo masuk lewat prop `heroSlide`. */
 interface PromoSlide {
   id: string;
-  kind: 'target' | 'app' | 'absensi' | 'tarikan' | 'talangan' | 'kasrt';
+  kind: 'target' | 'app' | 'absensi' | 'tarikan' | 'talangan' | 'kasrt' | 'kartu';
   eyebrow: string;
   judul: string;
   desc?: string;
   icon: LucideIcon;
   grad: string;
   glow: string;
-  cta?: { label: string; tab: TabName };
+  /** `kartu: true` = membuka LAPISAN Kartu Warga (bukan tab — ia tak punya alamat). */
+  cta?: { label: string; tab: TabName } | { label: string; kartu: true };
 }
 
 /* ------------------------------------------------------------------ */
@@ -306,6 +307,29 @@ function AbsensiArt() {
   );
 }
 
+/** Kartu mini: avatar bercincin emas + dua baris nama + bulatan jejak kehadiran
+ *  (bahasa yang SAMA dgn Kartu Warga: putih = hadir, merah muda = tidak hadir,
+ *  cincin emas = Sohibul Bait). Dekoratif; hanya kelas tangga, tanpa px. */
+function KartuArt() {
+  const titik: ('h' | 't' | 's')[] = ['h', 'h', 't', 'h', 's', 'h', 'h', 'h', 't', 'h'];
+  return (
+    <div aria-hidden className="pointer-events-none absolute bottom-4 right-3 w-28 rotate-6 rounded-2xl bg-white/15 p-2 ring-1 ring-inset ring-white/25">
+      <div className="flex items-center gap-2">
+        <span className="h-5 w-5 shrink-0 rounded-full bg-white/90 ring-2 ring-[var(--gold-songket)]" />
+        <div className="min-w-0 flex-1 space-y-1">
+          <span className="block h-2 w-4/5 rounded-full bg-white/70" />
+          <span className="block h-1 w-1/2 rounded-full bg-white/40" />
+        </div>
+      </div>
+      <div className="mt-2 grid grid-cols-5 gap-1">
+        {titik.map((t, i) => (
+          <span key={i} className={`h-4 w-4 rounded-full ${t === 'h' ? 'bg-white/85' : t === 't' ? 'bg-rose-300' : 'ring-2 ring-inset ring-[var(--gold-songket)]'}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Penerima bermahkota + tumpukan koin → iuran terkumpul untuk satu Sohibul Bait. */
 function TarikanArt() {
   return (
@@ -376,6 +400,10 @@ interface Props {
   heroSlide?: React.ReactNode;
   /** Sapuan sheen sekali-muat pada kartu saldo (kunjungan pertama sesi). */
   heroSweep?: boolean;
+  /** Membuka lapisan Kartu Warga (slide Kartu Warga). */
+  onOpenKartu?: () => void;
+  /** Nama warga yang diingat HP ini (`lib/kartuIngat`) → slide menyapanya. */
+  namaKartu?: string | null;
 }
 
 /* Di tingkat MODUL (29 Sep 2026), bukan di dalam komponen: `BannerSkeleton`
@@ -403,6 +431,19 @@ const PROMOS: PromoSlide[] = [
        yang SEDANG membuka app itu.
        Yang tersisa satu, dan ia satu-satunya yang membawa keadaan HIDUP
        (progres target kas RT), bukan penjelasan yang tak pernah berubah. */
+    {
+      /* Jalan masuk Kartu Warga di Beranda (19 Okt 2026, keputusan user —
+         anggaran unduh dinaikkan untuk ini). Dulu kartu itu cuma di menu ⋮,
+         padahal isinya yang paling PRIBADI di app. Kalau HP ini sudah
+         memilih nama, judulnya = nama itu (lihat render). Gradien coklat-emas
+         songket: beda dari saldo (hijau) & target (teal); ujung terangnya
+         #74500f = 7,25:1 lawan putih — AAA di seluruh kartu, tanpa bersandar
+         pada scrim. */
+      id: 'kartu-warga', kind: 'kartu', eyebrow: 'KARTU SAYA',
+      judul: 'Cek status Anda', desc: 'Talangan, kehadiran & giliran Anda dalam satu kartu.', icon: UserRound,
+      grad: 'linear-gradient(150deg,#74500f 0%,#3a2403 100%)', glow: 'rgba(232,182,81,0.5)',
+      cta: { label: 'Buka Kartu Saya', kartu: true },
+    },
 ];
 
 /** Ruang samping tiap tombol indikator — satu aturan untuk carousel & kerangkanya.
@@ -410,7 +451,7 @@ const PROMOS: PromoSlide[] = [
  *  deretannya ringkas, kembali ke 9px di atas 3 slide. */
 const padIndikator = (count: number) => (count <= 3 ? 19 : 9);
 
-export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Props) {
+export default function BannerCarousel({ onNavigate, heroSlide, heroSweep, onOpenKartu, namaKartu }: Props) {
   const promos = PROMOS;
   const hasHero = heroSlide != null;
   const count = promos.length + (hasHero ? 1 : 0);
@@ -666,8 +707,9 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
           // Lebar kolom teks (judul+desc) per kartu → selalu bersih dari dekorasi kanan.
           const tw = isSaldo ? '' : ({
             target: 'max-w-[56%]', app: 'max-w-[54%]', absensi: 'max-w-[74%]',
-            tarikan: 'max-w-[66%]', talangan: 'max-w-[64%]', kasrt: 'max-w-[76%]',
+            tarikan: 'max-w-[66%]', talangan: 'max-w-[64%]', kasrt: 'max-w-[76%]', kartu: 'max-w-[54%]',
           } as const)[promo!.kind];
+          const judul = promo?.kind === 'kartu' && namaKartu ? namaKartu : promo?.judul;
 
           return (
             <div
@@ -749,11 +791,22 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
               ) : (
                 <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW, opacity: contentOpacity, transition: dragging ? 'none' : `opacity 0.42s ${EASE}` }}>
                   {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
-                  {promo!.cta && onNavigate && (
+                  {promo!.cta && 'kartu' in promo!.cta && onOpenKartu && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); haptic(); onOpenKartu(); }}
+                      aria-label={promo!.cta.label}
+                      tabIndex={active ? 0 : -1}
+                      className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
+                    >
+                      <ChevronRight className="h-5 w-5" strokeWidth={2.2} />
+                    </button>
+                  )}
+                  {promo!.cta && 'tab' in promo!.cta && onNavigate && (
                     <a
                       href={pathTab(promo!.cta.tab)}
                       draggable={false}
-                      onClick={(e) => { e.stopPropagation(); klikTautanSpa(e, () => { haptic(); onNavigate(promo!.cta!.tab); }); }}
+                      onClick={(e) => { e.stopPropagation(); const c = promo!.cta; if (c && 'tab' in c) klikTautanSpa(e, () => { haptic(); onNavigate(c.tab); }); }}
                       aria-label={promo!.cta.label}
                       tabIndex={active ? 0 : -1}
                       className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
@@ -774,7 +827,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   </div>
 
                   {/* Judul + deskripsi — lebar di-clamp per kartu agar tak tertimpa dekorasi kanan. */}
-                  <div className={`mt-4 text-balance font-bold ${promoRingkas ? 'text-subtitle' : 'text-title'} ${tw}`}>{promo!.judul}</div>
+                  <div className={`mt-4 text-balance font-bold ${promoRingkas ? 'text-subtitle' : 'text-title'} ${tw}`}>{judul}</div>
                   {promo!.desc && !promoRingkas && (
                     <div className={`mt-3 text-pretty text-body font-medium leading-relaxed text-white ${tw}`}>{promo!.desc}</div>
                   )}
@@ -807,6 +860,9 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep }: Pro
                   {promo!.kind === 'tarikan' && <TarikanArt />}
                   {promo!.kind === 'talangan' && <TalanganArt />}
                   {promo!.kind === 'kasrt' && <KasrtArt />}
+                  {/* Kartu RINGKAS (layar pendek/sempit, tanpa deskripsi) tak punya
+                      ruang kanan-bawah: ornamen menimpa judul @320px. */}
+                  {promo!.kind === 'kartu' && !promoRingkas && <KartuArt />}
                 </div>
               )}
 

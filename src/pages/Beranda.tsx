@@ -21,6 +21,7 @@ import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
 import SectionTitle from '../components/SectionTitle';
 import { pathTab, klikTautanSpa } from '../lib/tautanTab';
+import { bacaNamaKartu } from '../lib/kartuIngat';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 import MetaPisah from '../components/MetaPisah';
 
@@ -108,9 +109,13 @@ interface BerandaCache {
 
 interface BerandaProps {
   onNavigate: (tab: string) => void;
+  /** Membuka lapisan Kartu Warga (slide Kartu Warga di carousel). */
+  onOpenKartu?: () => void;
 }
 
-export default function Beranda({ onNavigate }: BerandaProps) {
+export default function Beranda({ onNavigate, onOpenKartu }: BerandaProps) {
+  /* Dibaca sekali per pasang — sapaan slide Kartu Warga, tanpa jaringan. */
+  const [namaKartu] = useState(bacaNamaKartu);
   const { isBendahara, isWargaMode } = useAuthContext();
   // Tinggi layar (ikut rotasi) → kartu saldo & skeleton-nya membaca angka yang SAMA.
   const { vh, vw } = useUkuranLayar();
@@ -674,6 +679,8 @@ export default function Beranda({ onNavigate }: BerandaProps) {
           Container bawa --hero-shadow → semua slide naik kelas. */}
       <BannerCarousel
         onNavigate={onNavigate}
+        onOpenKartu={onOpenKartu}
+        namaKartu={namaKartu}
         heroSweep={firstHero}
         heroSlide={
           <>

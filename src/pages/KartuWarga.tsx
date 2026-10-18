@@ -23,28 +23,15 @@ import {
   type TarikanRingkas,
 } from '../lib/kartuWarga';
 import type { Warga } from '../lib/types';
+import { bacaPilihan, simpanPilihan } from '../lib/kartuIngat';
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-/* Pilihan nama diingat di perangkat ini saja — kartu ini tanpa akun dan tanpa
-   PIN (keputusan user: data yang tampil memang sudah terbuka untuk semua warga
-   di Jadwal, Hadiran, dan Talangan). Storage bisa diblokir: semua akses
-   dibungkus try/catch dan kartu tetap jalan tanpa ingatan. */
-const KUNCI = 'hadiran-kartu-warga';
-
-function bacaPilihan(): string | null {
-  try { return localStorage.getItem(KUNCI); } catch { return null; }
-}
-function simpanPilihan(id: string | null) {
-  try {
-    if (id) localStorage.setItem(KUNCI, id);
-    else localStorage.removeItem(KUNCI);
-  } catch { /* abaikan (storage diblokir) */ }
-}
-
+/* Pilihan nama diingat di perangkat ini saja — lihat `lib/kartuIngat.ts`
+   (sumber bersama dgn slide Kartu Warga di carousel Beranda). */
 /* BENTUK kartu terakhir (jumlah tunggakan & talangan lunas) untuk warga yang
    diingat — HANYA petunjuk tata letak kerangka, tak pernah ditampilkan sbg
    angka. Kartu ini hampir selalu dibuka untuk nama yang SAMA, jadi kunjungan
@@ -67,7 +54,7 @@ const KOSONG_CARI = ['Tidak ada hasil', 'Coba kata kunci lain.'] as const;
 export default function KartuWarga({ open, onClose }: Props) {
   const exit = useClosePhase(onClose, 160);
   useBackDismiss(open, exit.requestClose);
-  const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Kartu warga' });
+  const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Kartu saya' });
 
   const [daftar, setDaftar] = useState<{ warga: Warga[]; tarikan: TarikanRingkas[] } | null>(null);
   const [errorDaftar, setErrorDaftar] = useState(false);
@@ -101,6 +88,11 @@ export default function KartuWarga({ open, onClose }: Props) {
     () => daftar?.warga.find((w) => w.id === pilihanId) ?? null,
     [daftar, pilihanId],
   );
+
+  /* Nama ikut diingat (untuk sapaan slide Kartu Warga di Beranda) dan
+     DISEGARKAN tiap kartu terbuka — warga yang memilih sebelum 19 Okt 2026
+     belum punya nama tersimpan, dan bendahara bisa mengganti ejaan nama. */
+  useEffect(() => { if (warga) simpanPilihan(warga.id, warga.nama); }, [warga]);
 
   // Ingatan menunjuk warga yang sudah tak aktif/terhapus → lupakan, tampilkan pencarian.
   useEffect(() => {
@@ -141,7 +133,7 @@ export default function KartuWarga({ open, onClose }: Props) {
 
   function pilih(w: Warga) {
     haptic();
-    simpanPilihan(w.id);
+    simpanPilihan(w.id, w.nama);
     setSearch('');
     setPilihanId(w.id);
   }
@@ -158,7 +150,7 @@ export default function KartuWarga({ open, onClose }: Props) {
 
   return (
     <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken kanvas-cahaya dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
-      <OverlayHeader icon={UserRound} title="Kartu Warga" onBack={exit.requestClose} />
+      <OverlayHeader icon={UserRound} title="Kartu Saya" onBack={exit.requestClose} />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* App kas dilarang menyatakan angka saat gagal muat: tak ada kartu,

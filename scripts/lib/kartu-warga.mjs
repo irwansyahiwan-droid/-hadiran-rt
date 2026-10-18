@@ -37,7 +37,9 @@ export async function namaKartuTerkaya() {
 
 /* Kaitnya label dialognya sendiri (`useDialog` label "Kartu warga"), bukan
    "dialog terakhir" — dialog lain yang masih beranimasi keluar bisa ada di DOM. */
-const SELEKTOR = '[role="dialog"][aria-label="Kartu warga"]';
+/* Label "Kartu saya" sejak 19 Okt 2026 (keputusan user: fitur ini bernama
+   "Kartu Saya" di menu, judul & slide Beranda). Nama fungsi/berkas tetap. */
+const SELEKTOR = '[role="dialog"][aria-label="Kartu saya"]';
 const lapisan = (page) => page.locator(SELEKTOR);
 
 /** Dari layar "Cari nama Anda" yang sudah terbuka: tunggu daftar nyata (baris
@@ -70,7 +72,7 @@ export async function tungguDaftarKartu(page) {
  *  lalu tutup. Mengembalikan daftar alasan PROBE CACAT (kosong = keduanya
  *  terukur). Layar yang tak tercapai dilaporkan, tak pernah dilewati diam-diam. */
 export async function jelajahKartuWarga(page, ukur) {
-  if (!(await openMenuItem(page, 'Kartu Warga'))) return ['Kartu Warga: item Menu tak ada'];
+  if (!(await openMenuItem(page, 'Kartu Saya'))) return ['Kartu Warga: item Menu tak ada'];
   const cacat = [];
   let siap = await tungguDaftarKartu(page);
   /* Lapisan yang TERTUTUP SENDIRI sebelum daftarnya tampil. Terjadi sekali di
@@ -82,7 +84,7 @@ export async function jelajahKartuWarga(page, ukur) {
      hanya kalau lapisannya hilang; gagal lagi tetap PROBE CACAT, dan pesannya
      menyebut keadaan layar (`keadaanLapisan`) supaya kali berikutnya terbaca. */
   if (!siap && !(await lapisan(page).count())) {
-    if (await openMenuItem(page, 'Kartu Warga')) siap = await tungguDaftarKartu(page);
+    if (await openMenuItem(page, 'Kartu Saya')) siap = await tungguDaftarKartu(page);
   }
   if (siap) await ukur('pilih');
   else cacat.push(`Kartu Warga: daftar nama tak tampil (${await keadaanLapisan(page)})`);

@@ -218,7 +218,7 @@ for (const mode of MODES) {
         await page.waitForTimeout(300);
         await page.getByRole('button', { name: 'Menu' }).click();
         await page.waitForTimeout(600);
-        const item = page.getByRole('menu').getByText('Kartu Warga', { exact: false });
+        const item = page.getByRole('menu').getByText('Kartu Saya', { exact: false });   // nama fitur sejak 19 Okt 2026 (izin user, pemilih saja)
         if (!(await item.count())) { console.log(`\n### ${mode}/overlay-${label}  PROBE CACAT: item Menu tak ada`); gagalTotal++; await page.keyboard.press('Escape'); continue; }
         await item.first().click();
         await page.waitForTimeout(2800);

@@ -282,7 +282,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
                     <MenuItem icon={Share2} label="Bagikan halaman ini" onClick={onBagikan} />
                   )}
                   {onOpenKartu && (
-                    <MenuItem icon={UserRound} label="Kartu Warga" onClick={onOpenKartu} />
+                    <MenuItem icon={UserRound} label="Kartu Saya" onClick={onOpenKartu} />
                   )}
                   {onOpenRiwayat && (
                     <MenuItem icon={History} label="Riwayat Aktivitas" onClick={onOpenRiwayat} />

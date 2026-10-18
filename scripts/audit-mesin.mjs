@@ -118,7 +118,7 @@ for (const [mn, mesin] of [['webkit', webkit], ['chromium', chromium]]) {
       await page.waitForTimeout(1500);
       await catat(o); await closeLayer(page);
     }
-    if (await openMenuItem(page, 'Kartu Warga')) {
+    if (await openMenuItem(page, 'Kartu Saya')) {
       if (await tungguDaftarKartu(page)) await catat('Kartu Warga · pilih'); else cacat.push(`${mn} ${lebar} ${peran}: daftar Kartu Warga tak tampil`);
       if (await pilihKartuWarga(page)) await catat('Kartu Warga · kartu'); else cacat.push(`${mn} ${lebar} ${peran}: kartu tak terbuka`);
       await closeLayer(page);
