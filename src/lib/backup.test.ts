@@ -39,13 +39,21 @@ let rpcRes: Res = { data: [], error: null };
 
 function builder(t: string): Record<string, unknown> {
   const b: Record<string, unknown> = {};
-  const balas = (jenis: 'select' | 'delete' | 'insert') => {
+  const balas = (jenis: 'select' | 'delete' | 'insert', dari = 0, sampai = Infinity) => {
     ops.push({ tabel: t, jenis });
     const error = errPer[t]?.[jenis] ?? null;
-    const res: Res = { data: jenis === 'select' ? (dataPer[t] ?? []) : null, error };
-    return { then: (r: (v: Res) => unknown) => Promise.resolve(res).then(r) };
+    /* Seperti PostgREST: tiap jawaban dipotong di max_rows 1000, TANPA galat. */
+    const semua = dataPer[t] ?? [];
+    const data = jenis === 'select' ? semua.slice(dari, Math.min(sampai + 1, dari + 1000)) : null;
+    /* `count`: Backup membaca berhalaman & KETAT (bacaSemua) — hitungan server
+       wajib ada dan wajib sama dgn jumlah baris terbaca. */
+    const res = { data: error ? null : data, error, count: error || !data ? null : semua.length };
+    return { then: (r: (v: typeof res) => unknown) => Promise.resolve(res).then(r) };
   };
-  b.select = () => balas('select');
+  b.select = () => {
+    const rantai: Record<string, unknown> = { order: () => rantai, range: (a: number, z: number) => balas('select', a, z) };
+    return rantai;
+  };
   b.delete = () => ({ not: () => balas('delete') });
   b.insert = () => balas('insert');
   return b;
@@ -129,6 +137,14 @@ describe('kegagalan wajib MELEDAK, bukan pulang diam-diam', () => {
   it('fetchBackup: satu tabel gagal dibaca → melempar, bukan backup separuh isi', async () => {
     errPer = { tarikan: { select: { message: 'timeout' } } };
     await expect(fetchBackup()).rejects.toThrow(/tarikan/);
+  });
+
+  it('fetchBackup: tabel > 1000 baris terbaca UTUH (Supabase memotong di 1000 tanpa galat)', async () => {
+    // 19 Okt 2026: absensi 1680 baris, backup lama memuat 1000 → Restore menghapus 680.
+    dataPer = { absensi: Array.from({ length: 1680 }, (_, i) => ({ id: `a${i}` })) };
+    const b = await fetchBackup();
+    expect(b.tables.absensi).toHaveLength(1680);
+    expect(new Set(b.tables.absensi.map((r) => r.id)).size).toBe(1680);
   });
 
   it('fetchBackup: mengambil KETUJUH tabel dan menandai app+versi', async () => {

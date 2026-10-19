@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { bacaSemua } from './bacaSemua';
 
 /**
  * Backup & Restore data Hadiran RT.
@@ -31,9 +32,12 @@ export interface BackupFile {
 export async function fetchBackup(): Promise<BackupFile> {
   const tables: Record<string, Record<string, unknown>[]> = {};
   for (const t of TABLES) {
-    const { data, error } = await supabase.from(t).select('*');
-    if (error) throw new Error(`Gagal membaca ${t}: ${error.message}`);
-    tables[t] = (data as Record<string, unknown>[]) ?? [];
+    /* BERHALAMAN & KETAT (19 Okt 2026). `select('*')` polos dipotong Supabase
+       di 1000 baris tanpa galat: backup hari itu memuat 1000 dari 1680 baris
+       absensi, dan Restore ("ganti TOTAL") akan menghapus 680 catatan
+       kehadiran. `ketat` menolak file yang jumlah barisnya tak sama dgn
+       hitungan server — backup separuh lebih buruk daripada backup gagal. */
+    tables[t] = await bacaSemua<Record<string, unknown>>(t, '*', { ketat: true, urut: t === 'pengaturan' ? 'key' : 'id' });
   }
   return { app: 'hadiran-rt', version: 1, exportedAt: new Date().toISOString(), tables };
 }

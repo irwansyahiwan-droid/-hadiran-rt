@@ -35,6 +35,7 @@ function builder(nama: string): Record<string, unknown> {
   b.select = () => b;
   b.eq = () => b;
   b.order = () => b;
+  b.range = () => b; // baca berhalaman (bacaSemua)
   b.then = (resolve: (v: Res) => unknown) =>
     Promise.resolve(meja[nama] ?? { data: [], error: null, count: 0 }).then(resolve);
   return b;

@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { bacaSemuaRes } from './bacaSemua';
 
 /**
  * Rekap "tutup buku" per TRIWULAN (3 bulan) — dihitung langsung dari ledger
@@ -166,10 +166,10 @@ interface Mentah {
  *  triwulan DAN bulanan, dan empat query yang sama tak perlu dijalankan dua kali. */
 async function muatMentah(): Promise<Mentah> {
   const [trxRes, rtRes, tarikanRes, talanganRes] = await Promise.all([
-    supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
-    supabase.from('kas_rt').select('tipe, nominal, tanggal, keterangan'),
-    supabase.from('tarikan').select('tanggal, status, total_terkumpul').eq('status', 'selesai'),
-    supabase.from('talangan').select('nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
+    bacaSemuaRes('transaksi_kas', 'tipe, nominal, tanggal'),
+    bacaSemuaRes('kas_rt', 'tipe, nominal, tanggal, keterangan'),
+    bacaSemuaRes('tarikan', 'tanggal, status, total_terkumpul', { saring: (q) => q.eq('status', 'selesai') }),
+    bacaSemuaRes('talangan', 'nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
   ]);
 
   // Supabase TIDAK melempar saat gagal → tanpa cek ini, HTTP 500 pulang sebagai
@@ -292,10 +292,10 @@ export async function fetchSnapshotKas(): Promise<SnapshotKas> {
   };
 
   const [trxRes, rtRes, tarikanRes, talanganRes] = await Promise.all([
-    supabase.from('transaksi_kas').select('tipe, nominal, tanggal'),
-    supabase.from('kas_rt').select('tipe, nominal, tanggal, keterangan'),
-    supabase.from('tarikan').select('tanggal, status, total_terkumpul').eq('status', 'selesai'),
-    supabase.from('talangan').select('nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
+    bacaSemuaRes('transaksi_kas', 'tipe, nominal, tanggal'),
+    bacaSemuaRes('kas_rt', 'tipe, nominal, tanggal, keterangan'),
+    bacaSemuaRes('tarikan', 'tanggal, status, total_terkumpul', { saring: (q) => q.eq('status', 'selesai') }),
+    bacaSemuaRes('talangan', 'nominal, status_lunas, tanggal_lunas, tarikan(tanggal)'),
   ]);
 
   // Supabase TIDAK melempar saat gagal → tanpa cek ini, HTTP 500 pulang sebagai

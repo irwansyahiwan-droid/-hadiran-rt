@@ -29,6 +29,9 @@ const h = vi.hoisted(() => {
     let countOpt = false;
     let orderCol: string | null = null;
     let orderAsc = true;
+    /* `range` + `count` seperti PostgREST: baca berhalaman (lib/bacaSemua.ts). */
+    let rangeDari: number | null = null;
+    let rangeSampai: number | null = null;
 
     const matched = () => store[table].filter(r => filters.every(([c, v]) => r[c] === v));
 
@@ -40,6 +43,7 @@ const h = vi.hoisted(() => {
       eq(col: string, val: unknown) { filters.push([col, val]); return builder; },
       not() { return builder; },
       order(col: string, opt?: { ascending?: boolean }) { orderCol = col; orderAsc = opt?.ascending ?? true; return builder; },
+      range(dari: number, sampai: number) { rangeDari = dari; rangeSampai = sampai; return builder; },
       then(resolve: (res: unknown) => void) {
         let result: unknown;
         if (action === 'select') {
@@ -50,7 +54,9 @@ const h = vi.hoisted(() => {
               ? Number(a[col]) - Number(b[col])
               : Number(b[col]) - Number(a[col]));
           }
-          result = { data: clone(data), count: countOpt ? data.length : null, error: null };
+          const total = data.length;
+          if (rangeDari !== null && rangeSampai !== null) data = data.slice(rangeDari, rangeSampai + 1);
+          result = { data: clone(data), count: countOpt ? total : null, error: null };
         } else if (action === 'insert') {
           const rows = payload as Row[];
           const inserted = rows.map(r => ({ id: r.id ?? `id_${idSeq++}`, ...r }));

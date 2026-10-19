@@ -30,7 +30,7 @@ let jawab: Record<string, Res> = {};
 
 function builder(table: string): Record<string, unknown> {
   const b: Record<string, unknown> = {};
-  for (const m of ['select', 'eq', 'in', 'not', 'order', 'limit']) b[m] = () => b;
+  for (const m of ['select', 'eq', 'in', 'not', 'order', 'limit', 'range']) b[m] = () => b; // `range`: baca berhalaman (bacaSemua)
   b.then = (resolve: (v: Res) => unknown) =>
     Promise.resolve(jawab[table] ?? { data: [], error: null }).then(resolve);
   return b;

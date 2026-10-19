@@ -791,6 +791,20 @@ tanpa syarat.
 `{data: null, error}`. Tiap `?? []` tanpa cek `res.error` mengubah kegagalan jadi "tidak ada
 data". Cek di halaman TIDAK cukup; helper di `src/lib/` juga wajib melempar.
 
+**Jebakan Supabase kedua: tiap baca DIPOTONG di 1000 baris (`max_rows`) — TANPA
+galat, tanpa tanda di `data`.** Terukur 19 Okt 2026: `absensi` 1680 baris,
+`select('*')` polos menjawab tepat 1000. Akibatnya file **Backup memuat 1000 dari
+1680 baris absensi** dan Restore ("ganti TOTAL") akan menghapus 680 catatan
+kehadiran; saldo Kas Hadiran, total talangan & laporan triwulan menjumlah tabel
+utuh (`transaksi_kas` & `talangan` tumbuh ±14 per tarikan) dan akan salah
+diam-diam ±setahun lagi. Obatnya `bacaSemua()` / `bacaSemuaRes()` di
+`src/lib/bacaSemua.ts`: berhalaman, berhenti lewat HITUNGAN server
+(`count: 'exact'`, bukan "halaman tak penuh" — itu meleset begitu `max_rows`
+diturunkan), urutan pemutus `id` selalu ditambahkan, dan mode `ketat` (Backup)
+menolak hasil yang jumlahnya tak sama dgn hitungan server. **Baca tabel UTUH yang
+bisa tumbuh lewat 1000 (absensi, transaksi_kas, talangan) WAJIB lewat
+`bacaSemua`**; baca bersaring per tarikan / per warga atau ber-`.limit()` aman.
+
 Yang ke-35 (5 Sep 2026) — **tangga yang ditegakkan di CSS tapi tidak di
 BERKASNYA cuma setengah ditegakkan.**
 

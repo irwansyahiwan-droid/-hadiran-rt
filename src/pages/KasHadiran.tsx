@@ -27,6 +27,7 @@ import ExportMenu from '../components/ExportMenu';
 import { showToast, showUndo } from '../lib/toast';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
 import { supabase } from '../lib/supabase';
+import { bacaSemuaRes } from '../lib/bacaSemua';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
@@ -252,13 +253,15 @@ export default function KasHadiranPage() {
     setError(false);
     try {
     const [txRes, tarRes, talRes, wargaRes] = await Promise.all([
-      supabase.from('transaksi_kas').select('*').order('tanggal', { ascending: true }),
+      /* Berhalaman: Supabase memotong di 1000 baris tanpa galat (lihat
+         lib/bacaSemua.ts) — ledger ini tumbuh ±14 baris per tarikan. */
+      bacaSemuaRes('transaksi_kas', '*', { saring: (q) => q.order('tanggal', { ascending: true }) }),
       supabase
         .from('tarikan')
         .select('*, sohibul_bait:warga!sohibul_bait_id(*)')
         .eq('status', 'selesai')
         .order('nomor', { ascending: true }),
-      supabase.from('talangan').select('tarikan_id, nominal').eq('status_lunas', false),
+      bacaSemuaRes('talangan', 'tarikan_id, nominal', { saring: (q) => q.eq('status_lunas', false) }),
       supabase.from('warga').select('*').eq('status_aktif', true).order('nama', { ascending: true }),
     ]);
     // Supabase tak melempar — cek error per hasil; tanpa ini fetch gagal jadi

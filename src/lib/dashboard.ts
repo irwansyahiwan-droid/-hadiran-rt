@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { bacaSemuaRes } from './bacaSemua';
 import { hitungSaldoHadiran } from './utils';
 import type { DashboardSummary } from './types';
 
@@ -15,8 +16,11 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
   const [wargaRes, tarikanRes, talanganRes, transaksiRes] = await Promise.all([
     supabase.from('warga').select('id', { count: 'exact' }).eq('status_aktif', true),
     supabase.from('tarikan').select('*').order('nomor', { ascending: false }),
-    supabase.from('talangan').select('nominal, status_lunas'),
-    supabase.from('transaksi_kas').select('tipe, nominal'),
+    /* Berhalaman (19 Okt 2026): Supabase memotong di 1000 baris tanpa galat,
+       dan kedua tabel ini tumbuh ±14 baris per tarikan — saldo hero Beranda
+       akan salah diam-diam begitu salah satunya lewat 1000. Lihat bacaSemua.ts. */
+    bacaSemuaRes<{ nominal: number; status_lunas: boolean }>('talangan', 'nominal, status_lunas'),
+    bacaSemuaRes<{ tipe: string; nominal: number }>('transaksi_kas', 'tipe, nominal'),
   ]);
 
   // Sama seperti helper laporan: `.select()` tak melempar, jadi tanpa cek ini

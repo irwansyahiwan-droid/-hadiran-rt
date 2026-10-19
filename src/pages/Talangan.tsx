@@ -4,6 +4,7 @@ import { AlertTriangle, CheckCircle2, ChevronDown, RefreshCw, RotateCcw, Search,
 import ClearButton from '../components/ClearButton';
 import { useCountUp, useHideAmount, toggleHideAmount, useKembaliDariLatar, usePerTanggal } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
+import { bacaSemuaRes } from '../lib/bacaSemua';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
 import { formatTanggalShort, formatRupiahPlain, haptic, maskRp, pesanError } from '../lib/utils';
@@ -78,10 +79,11 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     if (!silent) setLoading(true);
     setError(false);
     try {
-      const { data, error: eLoad } = await supabase
-        .from('talangan')
-        .select('*, warga(*), tarikan(*)')
-        .order('created_at', { ascending: true });
+      /* Berhalaman: Supabase memotong di 1000 baris tanpa galat (lihat
+         lib/bacaSemua.ts) — daftar & total tunggakan akan diam-diam kurang. */
+      const { data, error: eLoad } = await bacaSemuaRes(
+        'talangan', '*, warga(*), tarikan(*)', { saring: (q) => q.order('created_at', { ascending: true }) },
+      );
       // Supabase tak melempar — tanpa cek ini fetch gagal jadi "Semua Talangan
       // Lunas" / daftar kosong palsu + cache tertimpa.
       if (eLoad) throw eLoad;
