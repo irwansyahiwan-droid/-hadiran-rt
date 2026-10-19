@@ -217,7 +217,7 @@ function analyse(el, samples) {
     const r = ratio(fg, bg);
     if (r < worst) { worst = r; worstBg = bg; }
   }
-  return { ratio: worst, bg: worstBg };
+  return { ratio: worst, bg: worstBg, bukti: topN };
 }
 
 const results = [];
@@ -242,6 +242,16 @@ async function auditView(page, ctxName) {
     if (!samples.length) { buta.push(`${ctxName}|${el.text.slice(0, 40)}`); continue; }
     const res = analyse(el, samples);
     if (!res) continue;
+    /* Elemen TERPOTONG TEPI LAYAR dgn latar terbanyak yang cuma muncul SEKALI =
+       bukti terlalu tipis untuk memvonis (19 Okt 2026, izin user). "Rp50.000"
+       Riwayat di y=827..849 (layar 844): baris bawah sampelnya di luar layar,
+       sisanya hampir semua glyph, dan EMPAT warna latar masing-masing 1× → seri,
+       seri diselesaikan ke terburuk, yang menang tepi huruf (81,92,86) → 2,67:1
+       palsu (aslinya ±17:1), dua jalan berturut-turut. Sengaja SEMPIT: syarat
+       terpotong-tepi + 1× bersamaan, supaya teks di atas GRADIEN (latar yang
+       memang beda tiap titik) tetap divonis. Diakui sbg `tak terukur`. */
+    const terpotongTepi = el.rect.y < 0 || el.rect.y + el.rect.h > VH;
+    if (terpotongTepi && res.bukti < 2) { buta.push(`${ctxName}|${el.text.slice(0, 40)} (terpotong tepi, latar 1×)`); continue; }
     const large = el.size >= 24 || (el.size >= 18.66 && el.weight >= 700);
     const need = large ? 3 : 4.5;
     const key = `${ctxName}|${el.text}|${el.color.join()}|${res.bg.join()}`;
@@ -330,11 +340,27 @@ let cacat = 0;
    lantai 2386 dgn 0 gagal, sendirian 2512 (dan 2127 sehari sebelumnya).
    Kerangka yang tak habis, atau layar GAGAL MUAT, kini PROBE CACAT (exit 2) —
    bukan disampel. */
+/* Animasi masuk WAJIB selesai sebelum piksel dipotret (19 Okt 2026, izin user).
+   Jeda tetap 600 ms di bawah cuma 10 ms di atas animasi baris Riwayat (`.rise`
+   0,24 dtk + stagger s/d 0,35 dtk); di mesin yang sedikit sibuk teks terpotret
+   di opasitas ±70%, dan tinta pudar (81,92,86) — = (7,22,13) ×0,7 di atas putih —
+   menang jadi "latar": 2,67:1 palsu untuk "Rp50.000" yang aslinya ±17:1, dua
+   jalan berturut-turut. TENANG itu keadaan, bukan jeda (pelajaran ke-34): tunggu
+   sampai tak ada animasi/transisi TERBATAS yang berjalan (loop abadi dekoratif
+   tak dihitung), batas 3 dtk. */
+async function tungguTenang(page) {
+  await page.waitForFunction(
+    () => !document.getAnimations().some((a) => a.playState === 'running' && a.effect && a.effect.getTiming().iterations !== Infinity),
+    null, { timeout: 3000 },
+  ).catch(() => {});
+}
+
 async function siapDiukur(page, nama) {
   const habis = Date.now() + 25000;
   while (Date.now() < habis) {
     if (!(await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0))) {
       await page.waitForTimeout(600);
+      await tungguTenang(page);
       if (await page.locator('[data-keadaan="gagal"]').count()) { console.log(`  PROBE CACAT [${nama}]: yang tampil layar GAGAL MUAT, bukan isi`); cacat++; return false; }
       return true;
     }
