@@ -79,6 +79,13 @@ const STATIS = [
    ke-2, sumbu (2) yang salah — kembalikan urutannya dan cari sebab lain. */
 const VISUAL = [
   ['keadaan', 'node scripts/audit-keadaan.mjs'],
+  /* Gagal-SEBAGIAN (25 Sep 2026, masuk main 19 Okt 2026 — sebelumnya hanya
+     hidup di cabang worktree e845d27, jadi rantai ini tak pernah menjalankannya):
+     satu tabel rest/v1 gagal, sisanya sehat. `keadaan` menggagalkan SEMUA
+     request sekaligus, jadi komponen ber-fetch SENDIRI ikut gagal lalu
+     `return null` — "0% terkumpul · Rp0" milik TargetKasRT tak pernah masuk
+     populasinya. Butuh DB HIDUP (vonisnya selisih lawan garis dasar sehat). */
+  ['keadaan-sebagian', 'node scripts/audit-keadaan-sebagian.mjs'],
   /* `fallback-sora` menuntut DATA NYATA, bukan cuma preview hidup: dua
      permukaannya (target Kas RT, revisi jadwal) hanya ADA kalau DB-nya
      berisi, dan luapan teks bergantung pada STRING nyata — nama warga,
@@ -291,6 +298,10 @@ const LANTAI = {
   /* Populasi = item Menu ber-overlay × 3 cara tutup — properti APP, bukan data,
      jadi lantainya PERSIS (9 overlay × 3 = 27). Overlay baru = naikkan. */
   'fokus-pulang':   [/(\d+) penutupan diuji/, 27],
+  /* Populasi = pasangan tabel×layar, ditemukan dari garis dasar (tabel yang
+     benar-benar diminta) — properti APP, stabil antar-jalan. 84 (19 Okt
+     2026: warga 7×4 + bendahara 7×8); lantai ~95%. Tabel/layar baru → naikkan. */
+  'keadaan-sebagian': [/(\d+) pasangan tabel×layar diperiksa/, 80],
   lompat:           [/(\d+) layar diukur/, 8],
   publik:           [/(\d+) halaman diperiksa/, 7],
   /* Populasi = berkas yang benar-benar diminta di kunjungan pertama.
