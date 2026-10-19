@@ -30,7 +30,7 @@ import { supabase } from '../lib/supabase';
 import { bacaSemuaRes } from '../lib/bacaSemua';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, tanggalHariIni } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, tanggalHariIni, formatRupiahBertanda } from '../lib/utils';
 import CrossFade from '../components/CrossFade';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
@@ -96,7 +96,10 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
         <div>
           <h2 className="text-balance text-subtitle font-bold text-ink dark:text-gray-100">Setor ke Kas Besar RT</h2>
           <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
-            Saldo hadiran: <span className="font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{formatRupiahPlain(saldoHadiran)}</span>
+            {/* Saldo BERTANDA & berwarna sesuai tandanya (19 Okt 2026): dulu
+                `formatRupiahPlain` (Math.abs) + hijau tetap → "Rp450.000" hijau
+                saat saldo −Rp450.000, tepat di form untuk memutuskan setoran. */}
+            Saldo hadiran: <span className={`font-display font-semibold tabular-nums ${saldoHadiran < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-pos-dark'}`}>{formatRupiahBertanda(saldoHadiran)}</span>
           </p>
         </div>
         <form onSubmit={submit} noValidate className="space-y-3">

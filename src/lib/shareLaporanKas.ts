@@ -1,7 +1,7 @@
 import { LOGO_DATA_URL } from './logoBase64';
 import { bagikanFileGambar, namaBerkasPng } from './shareReceipt';
 import { CETAK } from './warnaCetak';
-import { formatRupiahPlain } from './utils';
+import { formatRupiahBertanda } from './utils';
 
 /**
  * Data satu kartu laporan kas (dipakai untuk "Tutup Buku Sekarang" maupun
@@ -49,7 +49,7 @@ const FONT = rupiahFont;
  *  punya satu sumber; berkas ini dulu menyalin rumusnya sendiri. Diekspor demi
  *  uji: tanda minus di kartu yang beredar di WA tak boleh salah. */
 export function rpBertanda(n: number): string {
-  return (n < 0 ? '-' : '') + formatRupiahPlain(n);
+  return formatRupiahBertanda(n); // satu sumber di lib/utils
 }
 
 /** Nominal yang jadi ANGKA UTAMA kartu.

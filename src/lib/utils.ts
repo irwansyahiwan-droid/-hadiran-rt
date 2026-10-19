@@ -11,6 +11,16 @@ export function formatRupiahPlain(amount: number): string {
   return `Rp${Math.abs(amount).toLocaleString('id-ID')}`;
 }
 
+/** Nominal BERTANDA untuk SALDO yang bisa minus ("-Rp450.000"). `formatRupiahPlain`
+ *  sengaja `Math.abs` (dipakai baris yang tandanya ditulis sendiri: "+…" masuk,
+ *  "-…" keluar) — jadi SALDO yang lewat sana tanpa tanda tampil POSITIF. Terjadi
+ *  19 Okt 2026: sheet "Setor ke Kas Besar RT" menulis "Saldo hadiran: Rp450.000"
+ *  berwarna hijau saat saldo −Rp450.000 — bendahara membaca ada sisa untuk
+ *  disetor padahal kasnya defisit. Saldo apa pun WAJIB lewat sini. */
+export function formatRupiahBertanda(amount: number): string {
+  return (amount < 0 ? '-' : '') + formatRupiahPlain(amount);
+}
+
 /**
  * Ubah error Supabase/Postgres jadi pesan yang manusiawi (Bahasa Indonesia),
  * dan catat detail mentahnya ke console untuk debug. JANGAN tampilkan

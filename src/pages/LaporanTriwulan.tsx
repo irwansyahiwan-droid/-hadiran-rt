@@ -8,7 +8,7 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
 import { fetchRekapLengkap, fetchSnapshotKas } from '../lib/laporan';
-import { formatRupiahPlain, haptic } from '../lib/utils';
+import { formatRupiahPlain, haptic, formatRupiahBertanda } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat } from '../lib/hooks';
 import { shareLaporanKas, rpBertanda } from '../lib/shareLaporanKas';
@@ -49,7 +49,7 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
         {!!saldoAwal && (
           <div className="flex items-center justify-between text-caption">
             <span className="text-gray-500 dark:text-gray-400">Saldo Awal</span>
-            <span className="font-display font-semibold text-gray-700 dark:text-gray-300 tabular-nums">{formatRupiahPlain(saldoAwal)}</span>
+            <span className={`font-display font-semibold tabular-nums ${saldoAwal < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-700 dark:text-gray-300'}`}>{formatRupiahBertanda(saldoAwal)}</span>
           </div>
         )}
         <div className="flex items-center justify-between text-caption">
@@ -288,7 +288,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       hadiranMasuk: r.hadiranMasuk, hadiranSetor: r.hadiranSetor, hadiranBelumSetor: r.hadiranBelumSetor, hadiranTalangan: r.hadiranTalangan,
       rtSaldoAwal: r.rtSaldoAwal, rtMasuk: r.rtMasuk, rtKeluar: r.rtKeluar, rtSaldoAkhir: r.rtSaldoAkhir,
       tarikanSelesai: r.tarikanSelesai, talanganLunas: r.talanganLunas, jumlahTransaksi: r.jumlahTransaksi,
-      shareText: `*Tutup Buku ${r.label}* (${r.rentang})\n*Total Kas RT: ${formatRupiahPlain(r.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(r.hadiranBelumSetor)}\n— Hadiran RT 004/006`,
+      shareText: `*Tutup Buku ${r.label}* (${r.rentang})\n*Total Kas RT: ${rpBertanda(r.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(r.hadiranBelumSetor)}\n— Hadiran RT 004/006`,
       namaBerkas: `Laporan Kas ${r.label}`,
     };
   }
@@ -303,7 +303,7 @@ export default function LaporanTriwulan({ open, onClose }: Props) {
       hadiranMasuk: s.hadiranMasuk, hadiranSetor: s.hadiranSetor, hadiranBelumSetor: s.hadiranBelumSetor, hadiranTalangan: s.hadiranTalangan,
       rtSaldoAwal: s.rtSaldoAwal, rtMasuk: s.rtMasuk, rtKeluar: s.rtKeluar, rtSaldoAkhir: s.rtSaldoAkhir,
       tarikanSelesai: s.tarikanSelesai, talanganLunas: s.talanganLunas, jumlahTransaksi: s.jumlahTransaksi,
-      shareText: `*Tutup Buku — Kas RT 004/006*\n${s.tanggal}\n*Total Kas RT: ${formatRupiahPlain(s.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(s.hadiranBelumSetor)}\n— Hadiran RT`,
+      shareText: `*Tutup Buku — Kas RT 004/006*\n${s.tanggal}\n*Total Kas RT: ${rpBertanda(s.rtSaldoAkhir)}*\nKas Hadiran belum disetor: ${rpBertanda(s.hadiranBelumSetor)}\n— Hadiran RT`,
       namaBerkas: `Tutup Buku ${tanggalBerkas()}`,
     };
   }
