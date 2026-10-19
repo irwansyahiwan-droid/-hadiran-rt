@@ -79,6 +79,7 @@ const IZIN_CSS = [
   // ── MEDIA LAIN: Login punya kanvas hijau gelap sendiri ───────────────────
   ['var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 16px 38px -12px rgba(0, 0, 0, 0.60)', '.login-lift-logo — lihat blok "Login = MEDIA TERSENDIRI" di index.css'],
   ['var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 12px 32px -12px rgba(0, 0, 0, 0.65)', '.login-lift-cta — idem'],
+  ['var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 18px 40px -12px rgba(0, 0, 0, 0.80)', '.login-lift-cta:hover — kursor laptop, sepasang dgn panah yang bergeser (19 Okt 2026)'],
   ['0 2px 0 0 rgba(255, 255, 255, 0.90) inset, 0 8px 32px -8px rgba(11, 80, 50, 0.18), 0 24px 56px -16px rgba(4, 50, 30, 0.22)',
    '.login-card — glassmorphism yang sudah dideklarasikan "KHUSUS Login, tidak boleh di tempat lain"'],
   ['0 1px 0 0 rgba(255, 255, 255, 0.10) inset, 0 8px 32px -8px rgba(0, 0, 0, 0.50), 0 24px 56px -16px rgba(0, 0, 0, 0.60)',

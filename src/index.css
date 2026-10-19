@@ -506,6 +506,13 @@ textarea:-webkit-autofill {
    className tak bisa dijaga alat mana pun & tak punya pasangan gelap. */
 .login-lift-logo { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 16px 38px -12px rgba(0, 0, 0, 0.60); }
 .login-lift-cta  { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 12px 32px -12px rgba(0, 0, 0, 0.65); }
+/* Foto pengurus Login di layar lebar: tepi kanannya tak lagi tepi layar,
+   jadi dipudarkan (Login.tsx `MASK_FOTO_KANAN`). Di HP tetap 0%. */
+@media (min-width: 433px) { .login-foto { --tepi-kanan: 38%; } }
+/* Kursor laptop: bayangan menguat, sepasang dgn panah yang bergeser (Login). */
+@media (hover: hover) and (pointer: fine) {
+  .login-lift-cta:hover { box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), 0 18px 40px -12px rgba(0, 0, 0, 0.80); }
+}
 
 /* Glassmorphism card — KHUSUS Login, tidak boleh di tempat lain */
 .login-card {

@@ -24,6 +24,10 @@ const TEPI_LOGIN = { terang: '#063A21', gelap: '#042716' } as const;
 
 const MASK_FOTO_LINGKAR ='radial-gradient(75% 70% at 66% 42%, #000 35%, rgba(0,0,0,0.5) 62%, transparent 92%)';
 const MASK_FOTO_TEGAK = 'linear-gradient(180deg, transparent 0%, #000 22%, #000 70%, transparent 100%)';
+/* Tepi KANAN baru terlihat sesudah foto dibingkai di layar lebar (lihat
+   `right` di bawah): di HP tepi itu = tepi layar. `--tepi-kanan` 0% di HP
+   (pudaran ini tak melakukan apa pun), dinyalakan `.login-foto` ≥433px. */
+const MASK_FOTO_KANAN = 'linear-gradient(90deg, #000 calc(100% - var(--tepi-kanan, 0%)), transparent)';
 
 interface LoginProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
@@ -125,6 +129,26 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
   }, []);
   const galat = useGalatKolom();
 
+  /* Panel bendahara DIUNGKAP sesudah dibuka (19 Okt 2026). Kartunya tumbuh ke
+     BAWAH dari tempatnya, jadi tombol "Masuk" lahir di luar layar: 2px
+     terpotong di app terpasang 390×844, 182px di Safari iPhone (390×664),
+     270px di iPhone SE — bendahara mengisi email & password lalu harus
+     mencari tombolnya sendiri. Kini kartu digulir seperlunya (`nearest`:
+     yang sudah utuh tak bergerak) begitu transisinya selesai.
+     Kolom email ikut difokus HANYA untuk papan ketik (`detail === 0`) &
+     penunjuk laptop — di HP sentuh fokus memunculkan papan ketik layar
+     sebelum diminta (preseden `ClearButton`). */
+  const kartuRef = useRef<HTMLDivElement>(null);
+  const ungkap = useRef<{ fokus: boolean } | null>(null);
+  function selesaiBuka() {
+    const u = ungkap.current;
+    ungkap.current = null;
+    if (!u) return;
+    if (u.fokus) document.getElementById('login-email')?.focus({ preventScroll: true });
+    const halus = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    kartuRef.current?.scrollIntoView({ block: 'nearest', behavior: halus ? 'smooth' : 'auto' });
+  }
+
   // Lepas dulu, pasang lagi di frame berikutnya — kalau kelas `shake` masih
   // menempel (dua kali salah beruntun) animasi tak akan restart sendiri.
   function goyang(set: (v: boolean) => void) {
@@ -213,13 +237,21 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         height={292}
         decoding="async"
         draggable={false}
-        className="pointer-events-none select-none absolute right-0 top-0 h-auto"
+        className="login-foto pointer-events-none select-none absolute top-0 h-auto"
         style={{
           /* Lebar dibatasi supaya tepi kiri wajah bertopi putih (x 360/859 =
              0,419 lebar foto) tak pernah masuk ke logo (88px di tengah):
              vw − W + 0,419W ≥ vw/2 + 48 → W ≤ (vw/2 − 48) × 1,72. Di 390px
-             253px (65%), di 320px 193px (60%); di layar lebar tetap 70%. */
-          width: 'min(70%, calc((50vw - 48px) * 1.72))',
+             253px (65%), di 320px 193px (60%).
+             Di atas 432px komposisinya DIBINGKAI, bukan direntang (19 Okt
+             2026): rumus lama menulis "di layar lebar tetap 70%", dan itu
+             membuat sumber 330px tercat 538px di tablet & 896px di laptop
+             1280 — 5,4× piksel perangkat, kotak-kotak terlihat, dan wajahnya
+             duduk di belakang judul. Bendahara membuka app di LAPTOP. Kini
+             layar lebar mendapat komposisi HP 432px yang sama persis, dipusatkan
+             (tepi kanan foto = tengah + 216px); ≤432px tak berubah satu piksel. */
+          width: 'min(calc(min(100%, 432px) * 0.7), calc((min(50%, 216px) - 48px) * 1.72))',
+          right: 'max(0px, calc(50% - 216px))',
           opacity: 0.34,
           mixBlendMode: 'luminosity',
           filter: 'contrast(1.15)',
@@ -229,8 +261,8 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
              tengah layar dan pudaran melingkar saja meninggalkan GARIS keras
              (lompatan luminans 40 antar baris @390×844). 22% atas = sebelum
              puncak topi tergelap (y 170/760). */
-          WebkitMaskImage: `${MASK_FOTO_LINGKAR}, ${MASK_FOTO_TEGAK}`,
-          maskImage: `${MASK_FOTO_LINGKAR}, ${MASK_FOTO_TEGAK}`,
+          WebkitMaskImage: `${MASK_FOTO_LINGKAR}, ${MASK_FOTO_TEGAK}, ${MASK_FOTO_KANAN}`,
+          maskImage: `${MASK_FOTO_LINGKAR}, ${MASK_FOTO_TEGAK}, ${MASK_FOTO_KANAN}`,
           WebkitMaskComposite: 'source-in',
           maskComposite: 'intersect',
         }}
@@ -269,8 +301,16 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         ref={isiRef}
         className="relative z-10 flex-1 flex flex-col justify-center w-full max-w-sm mx-auto
                    px-6 pt-[calc(env(safe-area-inset-top)+2rem)]
-                   pb-[calc(env(safe-area-inset-bottom)+2rem)]"
+                   pb-[calc(env(safe-area-inset-bottom)+2rem)]
+                   [@media(max-height:640px)]:pt-[calc(env(safe-area-inset-top)+1.25rem)]
+                   [@media(max-height:640px)]:pb-[calc(env(safe-area-inset-bottom)+1.25rem)]"
       >
+        {/* LAYAR PENDEK (19 Okt 2026): isi Login tertutup 609px, jadi tiap
+            layar yang lebih pendek menggulir dan pemicu Bendahara terpotong
+            di tepi bawah — iPhone SE di Safari (375×553) 56px, Android 360px
+            di Chrome (~560) 49px, 320×568 41px. Di bawah 640px lima jarak
+            irama 32px turun ke 20px (anak tangga 5) dan bantalan atas-bawah
+            ikut — hemat 84px, isi utuh di ketiganya. Layar normal tak berubah. */}
         {/* ── Identitas ────────────────────────────────────────────── */}
         <div className="rise text-center">
           {/* Emas beralfa ditulis `[color:rgb(232_182_81/…)]` = `--gold-songket`
@@ -292,7 +332,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             RT&nbsp;004/006 · Tanah Baru, Beji
           </span>
 
-          <div ref={logoRef} className="pop relative mx-auto mt-8 w-[5.5rem] h-[5.5rem]">
+          <div ref={logoRef} className="pop relative mx-auto mt-8 [@media(max-height:640px)]:mt-5 w-[5.5rem] h-[5.5rem]">
             <img
               src={logoRt}
               alt="Logo RT 004/006"
@@ -317,7 +357,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
           {/* Benang emas + satu belah-ketupat — motif songket yang sama dgn latar,
               dikecilkan jadi satu detail. Justru detail sekecil ini yang terbaca
               "dikerjakan orang", bukan "keluaran generator". */}
-          <span aria-hidden="true" className="mt-8 flex items-center justify-center gap-3">
+          <span aria-hidden="true" className="mt-8 [@media(max-height:640px)]:mt-5 flex items-center justify-center gap-3">
             <span
               className="h-px w-14"
               style={{ background: 'linear-gradient(90deg, transparent, var(--gold-songket))' }}
@@ -334,7 +374,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         </div>
 
         {/* ── Aksi utama — SATU ketukan, tanpa gerbang ─────────────── */}
-        <div className="rise mt-8">
+        <div className="rise mt-8 [@media(max-height:640px)]:mt-5">
           <button
             type="button"
             /* `id` ini KONTRAK, bukan hiasan: seluruh sapuan audit masuk lewat
@@ -344,12 +384,16 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                `loginWarga()` di scripts/lib/audit-harness.mjs. */
             id="masuk-warga"
             onClick={() => { haptic(12); onWargaMode(); }}
-            className="press w-full min-h-[56px] px-6 rounded-2xl bg-white text-[#063A21]
+            /* `group` + panah bergeser: jawaban kursor di laptop (19 Okt 2026 —
+               tiga dari empat kontrol Login tak berubah sama sekali saat
+               ditunjuk). Latar SENGAJA tetap putih: hover wajib menaikkan
+               kontras, dan mewarnai putih ini justru menurunkannya. */
+            className="press group w-full min-h-[56px] px-6 rounded-2xl bg-white text-[#063A21]
                        font-bold text-subtitle flex items-center justify-center gap-3
                        login-lift-cta"
           >
             Masuk sebagai Warga
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 transition-transform duration-ketuk group-hover:translate-x-1" />
           </button>
           <p className="mt-3 text-center text-caption text-white/80">
             Lihat saldo, jadwal, absensi &amp; talangan
@@ -357,7 +401,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
         </div>
 
         {/* ── Pemisah ──────────────────────────────────────────────── */}
-        <div className="flex items-center gap-3 my-8">
+        <div className="flex items-center gap-3 my-8 [@media(max-height:640px)]:my-5">
           <span className="h-px flex-1 bg-white/20" />
           {/* /55 → /75: `audit:kontras` mengukur 4,13:1 di atas hijau hero —
               di bawah AA 4,5 untuk teks 11px/600. Nilai /55 warisan pass
@@ -378,12 +422,20 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
             Goyangan galat ikut di kartu: di wrapper collapse `overflow-hidden`
             geseran 4px terpotong di tepi. */}
         <div
-          className={`rounded-2xl bg-black/20 border border-white/45 ${shakeAdmin ? 'shake' : ''}`}
+          ref={kartuRef}
+          className={`rounded-2xl bg-black/20 border border-white/45 scroll-mb-[calc(env(safe-area-inset-bottom)+1rem)] ${shakeAdmin ? 'shake' : ''}`}
           onAnimationEnd={() => setShakeAdmin(false)}
         >
           <button
             type="button"
-            onClick={() => { haptic(); setBendaharaOpen((o) => !o); }}
+            onClick={(e) => {
+              haptic();
+              const buka = !bendaharaOpen;
+              setBendaharaOpen(buka);
+              ungkap.current = buka ? { fokus: e.detail === 0 || window.matchMedia('(pointer: fine)').matches } : null;
+              // Jaring: `transitionend` tak datang kalau transisinya batal.
+              if (buka) window.setTimeout(selesaiBuka, 400);
+            }}
             aria-expanded={bendaharaOpen}
             /* Tanpa `.press`: skala 0,97 menciutkan kepala DI DALAM bingkai
                kartu yang diam. Umpan baliknya lewat latar. `max-[359px]:px-3`
@@ -404,6 +456,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
 
           <div
             className={`grid transition-[grid-template-rows,opacity] duration-masuk ease-out ${bendaharaOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+            onTransitionEnd={(e) => { if (e.target === e.currentTarget && e.propertyName === 'grid-template-rows') selesaiBuka(); }}
             // Collapse = tinggi 0, tapi email/password/submit di dalam TETAP fokusabel
             // via Tab & terbaca screen reader. `inert` mengeluarkannya dari tab-order
             // sekaligus a11y tree sampai panel dibuka. (React 18 belum punya tipe
@@ -462,7 +515,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                         type="button"
                         onClick={() => setShowPassword((p) => !p)}
                         aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-                        className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-white/65 transition-colors"
+                        className="press-icon absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-white/65 hover:text-white transition-colors"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -495,7 +548,12 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                       di bawah ambang AAA app selama berbulan-bulan tanpa satu
                       laporan — `audit:kontras` memotret Login dgn panel TERTUTUP,
                       jadi tombol ini tak pernah masuk populasinya. Rona & kroma
-                      dikunci di OKLab, cuma L turun 0,02 (tak terpotong gamut). */}
+                      dikunci di OKLab, cuma L turun 0,02 (tak terpotong gamut).
+
+                      Hover #F5C35F (19 Okt 2026): emas yang sama, L naik 0,04
+                      dgn rona & kroma dikunci — label 7,37 → 8,42:1. BUKAN
+                      resep `brightness(1.15)`: di emas itu kanal merah terpotong
+                      di 255 dan ronanya lari 82° → 87°, terbaca kuning lemon. */}
                   <button
                     type="submit"
                     /* KONTRAK, sepasang dgn `id="masuk-warga"` di atas — dan ini
@@ -513,7 +571,7 @@ export default function Login({ onLogin, onWargaMode }: LoginProps) {
                     id="masuk-bendahara"
                     disabled={loading}
                     className="press w-full min-h-[50px] rounded-xl font-semibold text-body
-                               bg-[var(--gold-songket)] text-[#00351C]
+                               bg-[var(--gold-songket)] hover:bg-[#F5C35F] text-[#00351C]
                                disabled:bg-[#C2A052] disabled:text-[#04180E]
                                transition-colors"
                   >
