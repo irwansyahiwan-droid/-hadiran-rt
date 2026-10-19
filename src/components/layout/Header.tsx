@@ -96,7 +96,12 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
     <button
       role="menuitem"
       tabIndex={-1}
-      onClick={() => { haptic(); setMenuOpen(false); onClick(); }}
+      /* Fokus pulang ke tombol Menu SEBELUM aksinya jalan (pola WAI-ARIA menu
+         button). Overlay yang dibuka item ini (Kartu Saya, Tentang, Riwayat…)
+         mencatat `activeElement` sbg pemicu lewat `useDialog`; dulu itu item
+         menu ini sendiri, yang lenyap bersama menunya → saat overlay ditutup
+         `focus()` diam-diam gagal dan fokus jatuh ke <body> (19 Okt 2026). */
+      onClick={() => { haptic(); setMenuOpen(false); triggerRef.current?.focus(); onClick(); }}
       className={`w-full flex items-center gap-3 min-h-[44px] px-4 py-3 text-body font-medium transition-colors ${
         danger
           ? 'text-neg dark:text-rose-400 hover:bg-rose-50 active:bg-rose-100 dark:hover:bg-rose-900/20 dark:active:bg-rose-900/35'

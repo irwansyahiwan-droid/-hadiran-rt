@@ -151,6 +151,9 @@ const VISUAL = [
      tetap di urutan Tab, dan FAB — semuanya ditutup `useCadanganGulir`.
      Sendirian ~5 menit (Tab maju + mundur, 32 layar, dua ukuran). */
   ['fokus-tertutup', 'node scripts/audit-fokus-tertutup.mjs'],
+  /* §2.4.3: overlay dari Menu mengembalikan fokus ke tombol Menu (19 Okt 2026).
+     Masuk rantai di hari lahirnya; ~2 menit. Sebelum obatnya 24/24 jatuh ke <body>. */
+  ['fokus-pulang', 'node scripts/audit-fokus-pulang.mjs'],
   ['lompat', 'node scripts/audit-lompat.mjs'],
   ['gerak', 'node scripts/audit-gerak.mjs'],
   ['publik', 'node scripts/audit-publik.mjs'],
@@ -285,6 +288,9 @@ const LANTAI = {
      per layar PERSIS −21 Hadiran warga, −21 Hadiran bendahara, −30 Talangan,
      × 2 ukuran. (Rantai yang sama sempat membaca 1684 — flake, sendirian 1954.) */
   'fokus-tertutup': [/(\d+) titik fokus diperiksa/, 1860],
+  /* Populasi = item Menu ber-overlay × 3 cara tutup — properti APP, bukan data,
+     jadi lantainya PERSIS (9 overlay × 3 = 27). Overlay baru = naikkan. */
+  'fokus-pulang':   [/(\d+) penutupan diuji/, 27],
   lompat:           [/(\d+) layar diukur/, 8],
   publik:           [/(\d+) halaman diperiksa/, 7],
   /* Populasi = berkas yang benar-benar diminta di kunjungan pertama.
