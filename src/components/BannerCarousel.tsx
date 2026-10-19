@@ -794,14 +794,22 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep, onOpe
                 </div>
               ) : (
                 <div className="relative z-[3] flex h-full flex-col" style={{ textShadow: TEXT_SHADOW, opacity: contentOpacity, transition: dragging ? 'none' : `opacity 0.42s ${EASE}` }}>
-                  {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). */}
+                  {/* Chevron CTA mid-kanan (slide dengan tujuan navigasi). Hover =
+                      cincin MENGUAT, latar tak disentuh (resep `.pilihan-hover`):
+                      menaikkan fill putih justru menurunkan kontras chevron putih.
+                      Tanpa hover sampai 19 Okt 2026 — slide belakang tak pernah
+                      di depan saat `audit:hover` memotret Beranda.
+                      Dipusatkan lewat `top: calc(50% - 19px)`, BUKAN
+                      `-translate-y-1/2`: `.press:active` memasang `transform:
+                      scale()` yang MENIMPA translate → chevron meloncat 19,6px
+                      ke bawah tiap ditekan (terukur 19 Okt 2026). */}
                   {promo!.cta && 'kartu' in promo!.cta && onOpenKartu && (
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); haptic(); onOpenKartu(); }}
                       aria-label={promo!.cta.label}
                       tabIndex={active ? 0 : -1}
-                      className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
+                      className="press absolute right-[-4px] top-[calc(50%-19px)] z-10 grid h-[38px] w-[38px] place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 hover:ring-2 hover:ring-white/60 before:absolute before:-inset-[3px] before:content-['']"
                     >
                       <ChevronRight className="h-5 w-5" strokeWidth={2.2} />
                     </button>
@@ -813,7 +821,7 @@ export default function BannerCarousel({ onNavigate, heroSlide, heroSweep, onOpe
                       onClick={(e) => { e.stopPropagation(); const c = promo!.cta; if (c && 'tab' in c) klikTautanSpa(e, () => { haptic(); onNavigate(c.tab); }); }}
                       aria-label={promo!.cta.label}
                       tabIndex={active ? 0 : -1}
-                      className="press absolute right-[-4px] top-1/2 z-10 grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 before:absolute before:-inset-[3px] before:content-['']"
+                      className="press absolute right-[-4px] top-[calc(50%-19px)] z-10 grid h-[38px] w-[38px] place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/15 hover:ring-2 hover:ring-white/60 before:absolute before:-inset-[3px] before:content-['']"
                     >
                       <ChevronRight className="h-5 w-5" strokeWidth={2.2} />
                     </a>
