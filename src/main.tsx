@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 import App from './App.tsx';
 import ErrorBoundary from './components/ErrorBoundary';
 // Inter & Sora self-hosted: @font-face-nya kini hidup di index.css dan menunjuk
@@ -31,9 +30,13 @@ if (rootEl) {
       <ErrorBoundary>
         <App />
       </ErrorBoundary>
-      {/* Observability: traffic (Analytics) + Core Web Vitals (Speed Insights) */}
+      {/* Observability: traffic (Analytics) saja. Speed Insights DIBUANG
+          19 Okt 2026: ±5,9 kB per kunjungan pertama di HP warga (1,2 kB di
+          bundel + 4,7 kB skrip /_vercel/speed-insights) plus kiriman tiap
+          kunjungan, untuk angka yang sudah dijaga lebih ketat oleh sapuan
+          repo (`audit:muat` · `lompat` · `respon`). Analytics dipertahankan:
+          murah, dan satu-satunya yang menjawab "apakah warga membuka app". */}
       <Analytics />
-      <SpeedInsights />
     </StrictMode>
   );
 }
