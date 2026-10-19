@@ -51,6 +51,8 @@ export interface JejakKartu {
   nomor: number;
   tanggal: string;
   status: StatusJejak;
+  /** Sohibul Bait tarikan itu (rincian saat bulatan diketuk). */
+  penarik: string | null;
 }
 
 export interface GiliranKartu {
@@ -119,6 +121,7 @@ export function susunKartu(
       nomor: t.nomor,
       tanggal: t.tanggal,
       status: t.sohibul_bait_id === wargaId ? 'sohibul' : (statusPer.get(t.id) ?? 'kosong'),
+      penarik: t.sohibul_bait?.nama ?? null,
     }));
 
   const milikSaya = tarikan.filter((t) => t.sohibul_bait_id === wargaId);

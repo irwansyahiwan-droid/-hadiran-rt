@@ -24,6 +24,7 @@ import {
 } from '../lib/kartuWarga';
 import type { Warga } from '../lib/types';
 import { bacaPilihan, simpanPilihan } from '../lib/kartuIngat';
+import { umumkanSaja } from '../lib/toast';
 
 interface Props {
   open: boolean;
@@ -315,11 +316,12 @@ function KartuKerangka({ perkiraan, bentuk }: { perkiraan: DataKartu | null; ben
             <p className="text-body"><span className={`${bar} h-4 w-32`} /></p>
             <p className="text-caption"><span className={`${bar} h-3 w-16`} /></p>
           </div>
-          <ol className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2">
+          <ol className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(2.25rem,1fr))] gap-2">
             {Array.from({ length: nJejak }, (_, i) => (
-              <li key={i} className="flex justify-center"><span className="w-8 h-8 rounded-full skeleton" /></li>
+              <li key={i} className="flex justify-center"><span className="w-9 h-9 rounded-full skeleton" /></li>
             ))}
           </ol>
+          <p className="mt-3 text-caption"><span className={`${bar} h-3 w-48 max-w-full`} /></p>
           {/* Legenda = label ASLI (kata statis, bukan klaim) + batang di tempat
               hitungannya, jadi ia melipat di titik yang sama. "Sohibul Bait"
               ikut kalau `perkiraan` tahu warga ini pernah menerima. */}
@@ -526,25 +528,59 @@ const LABEL_JEJAK: Record<StatusJejak, string> = {
 };
 const URUT_LEGENDA: StatusJejak[] = ['hadir', 'titip', 'tidak_hadir', 'sohibul', 'kosong'];
 
+/* Bulatan bisa DIKETUK (19 Okt 2026, permintaan user): di iPhone `title`
+   tak pernah tampil, jadi "#20 merah" tak menjawab "kapan & tarikan siapa?".
+   Rincian muncul di SATU slot di bawah kisi (menggantikan petunjuknya) dan
+   diumumkan lewat region polite Toaster (`umumkanSaja`), bukan region baru.
+   Target sentuh 44px tanpa tumpang-tindih: bulatan 36px + `before:-inset-1`
+   (4px tiap sisi) dgn celah 8px — dua pelebaran bertetangga bertemu PERSIS.
+   Tanda terpilih = `outline`, BUKAN `ring`: cincin status (titip/Sohibul
+   Bait) sudah memakai ring, dan ring kedua menimpanya. */
 function JejakKehadiran({ kartu }: { kartu: DataKartu }) {
+  const [pilih, setPilih] = useState<number | null>(null);
   if (kartu.jejak.length === 0) return null;
   const jumlah = (st: StatusJejak) => kartu.jejak.filter((j) => j.status === st).length;
+  const terpilih = kartu.jejak.find((j) => j.nomor === pilih) ?? null;
+  const rincian = (j: (typeof kartu.jejak)[number]) => [
+    `Tarikan #${j.nomor}`,
+    formatTanggal(j.tanggal),
+    j.status === 'sohibul' ? 'Anda Sohibul Bait' : j.penarik ? `Sohibul Bait ${j.penarik}` : null,
+    j.status === 'sohibul' ? null : LABEL_JEJAK[j.status],
+  ];
+  function ketuk(n: number) {
+    haptic();
+    const baru = pilih === n ? null : n;
+    setPilih(baru);
+    const j = kartu.jejak.find((x) => x.nomor === baru);
+    if (j) umumkanSaja(rincian(j).filter(Boolean).join(', '));
+  }
   return (
     <section aria-label="Jejak kehadiran" className={`${KARTU} p-5`}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className={JUDUL_KARTU}>Jejak Kehadiran</h2>
         <p className="text-caption text-ink-sub dark:text-gray-400 whitespace-nowrap">{kartu.jejak.length} tarikan</p>
       </div>
-      <ol className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2">
+      <ol className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(2.25rem,1fr))] gap-2">
         {kartu.jejak.map((j) => (
           <li key={j.nomor} className="flex justify-center">
-            <span title={`Tarikan #${j.nomor} · ${LABEL_JEJAK[j.status]}`} className={`w-8 h-8 rounded-full inline-flex items-center justify-center text-micro font-bold tabular-nums ${GAYA_JEJAK[j.status]}`}>
-              <span aria-hidden="true">{j.nomor}</span>
-              <span className="sr-only">Tarikan #{j.nomor}: {LABEL_JEJAK[j.status]}</span>
-            </span>
+            <button
+              type="button"
+              onClick={() => ketuk(j.nomor)}
+              aria-pressed={pilih === j.nomor}
+              aria-label={`Tarikan #${j.nomor}: ${LABEL_JEJAK[j.status]}`}
+              className={`press pilihan-isi-hover relative w-9 h-9 rounded-full inline-flex items-center justify-center text-micro font-bold tabular-nums before:absolute before:-inset-1 before:content-[''] ${GAYA_JEJAK[j.status]} ${pilih === j.nomor ? 'outline outline-2 outline-offset-2 outline-ink dark:outline-gray-100' : ''}`}
+            >
+              {j.nomor}
+            </button>
           </li>
         ))}
       </ol>
+      {/* Slot tetap: petunjuk ↔ rincian. */}
+      {terpilih ? (
+        <MetaPisah className="mt-3 text-caption font-semibold text-ink dark:text-gray-100" bagian={rincian(terpilih)} />
+      ) : (
+        <p className="mt-3 text-caption text-ink-sub dark:text-gray-400">Ketuk bulatan untuk melihat rinciannya.</p>
+      )}
       <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2" aria-label="Keterangan warna">
         {URUT_LEGENDA.filter((st) => jumlah(st) > 0 || st === 'hadir' || st === 'tidak_hadir').map((st) => (
           <li key={st} className="flex items-center gap-2 text-caption text-ink-sub dark:text-gray-400">

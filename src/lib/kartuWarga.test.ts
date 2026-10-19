@@ -86,9 +86,9 @@ describe('susunKartu', () => {
       { tarikan_id: 't4', status: 'hadir' },        // belum selesai → tak masuk jejak
     ], []);
     expect(k.jejak).toEqual([
-      { nomor: 1, tanggal: '2026-01-10', status: 'tidak_hadir' },
-      { nomor: 2, tanggal: '2026-02-10', status: 'sohibul' },
-      { nomor: 3, tanggal: '2026-03-10', status: 'kosong' },
+      { nomor: 1, tanggal: '2026-01-10', status: 'tidak_hadir', penarik: 'Nama w9' },
+      { nomor: 2, tanggal: '2026-02-10', status: 'sohibul', penarik: 'Nama w1' },
+      { nomor: 3, tanggal: '2026-03-10', status: 'kosong', penarik: 'Nama w9' },
     ]);
   });
 
