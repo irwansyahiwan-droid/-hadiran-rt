@@ -23,7 +23,17 @@ export default function ClearButton({ onClick, label = 'Bersihkan pencarian' }: 
   return (
     <button
       type="button"
-      onClick={onClick}
+      /* Fokus pulang ke kolomnya (19 Okt 2026): tombol ini LENYAP begitu kolom
+         kosong, jadi fokus jatuh ke <body> — dan di overlay (Riwayat, Kelola
+         Anggota, Kartu Saya) keluar dari dialog ke halaman di belakangnya.
+         Hanya untuk papan ketik (`detail === 0`) & penunjuk laptop: di HP
+         sentuh memfokuskan kolom memunculkan papan ketik layar yang menutupi
+         daftar yang justru ingin dilihat utuh. */
+      onClick={(e) => {
+        const kolom = e.currentTarget.parentElement?.querySelector('input');
+        onClick();
+        if (e.detail === 0 || window.matchMedia('(pointer: fine)').matches) kolom?.focus({ preventScroll: true });
+      }}
       aria-label={label}
       className="press-icon reveal-fade absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center"
     >

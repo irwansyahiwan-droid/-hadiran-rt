@@ -178,6 +178,33 @@ export default function App() {
     document.title = nama ? `${nama} · ${dasar}` : dasar;
   }, [activeTab, cangkangTampil]);
 
+  /* Fokus YATIM sesudah pindah tab → judul halaman baru (19 Okt 2026). Tautan
+     di konten ("Lihat semua", kaki hero, CTA carousel) ikut lenyap bersama
+     halamannya, jadi fokus jatuh ke <body> dan pengguna papan ketik / pembaca
+     layar mulai lagi dari puncak dokumen. Hanya bila fokus memang yatim —
+     tombol bar nav tetap memegang fokusnya. Ditunggu sampai judulnya ada
+     (halaman lazy), maksimal ±2 dtk. Lewati muat pertama: app yang baru dibuka
+     tak boleh merebut fokus. */
+  const tabPertama = useRef(true);
+  useEffect(() => {
+    if (tabPertama.current) { tabPertama.current = false; return; }
+    let n = 0;
+    let raf = 0;
+    const coba = () => {
+      const a = document.activeElement;
+      if (a && a !== document.body && a.isConnected) return;
+      const judul = document.querySelector<HTMLElement>('main h1');
+      if (judul) {
+        if (!judul.hasAttribute('tabindex')) judul.tabIndex = -1;
+        judul.focus({ preventScroll: true });
+        return;
+      }
+      if (++n < 120) raf = requestAnimationFrame(coba);
+    };
+    raf = requestAnimationFrame(coba);
+    return () => cancelAnimationFrame(raf);
+  }, [activeTab]);
+
   // Restorasi posisi scroll saat pindah tab (best-effort untuk konten yang dimuat async).
   useEffect(() => {
     const target = scrollPos.current[activeTab] ?? 0;

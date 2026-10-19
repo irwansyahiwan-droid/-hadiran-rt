@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, CheckCircle2, Contact, Loader2, Search, Share2, UserRound, Users, AlertTriangle } from 'lucide-react';
 import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import AvatarPeci from '../components/AvatarPeci';
@@ -133,16 +133,31 @@ export default function KartuWarga({ open, onClose }: Props) {
     [daftar, pilihanId],
   );
 
+  /* Fokus sesudah berganti layar di dalam lapisan ini (19 Okt 2026): tombol
+     yang diketuk (baris nama / "Bukan saya?") LENYAP bersama layarnya, jadi
+     fokus jatuh ke <body> — di luar dialog. Diarahkan ke judul layar barunya
+     (`tabIndex=-1`: bisa difokus, tak masuk urutan Tab), begitu judul itu ada. */
+  const fokusBerikut = useRef<string | null>(null);
+  useEffect(() => {
+    const id = fokusBerikut.current;
+    const el = id ? document.getElementById(id) : null;
+    if (!el) return;
+    fokusBerikut.current = null;
+    el.focus({ preventScroll: true });
+  });
+
   function pilih(w: Warga) {
     haptic();
     simpanPilihan(w.id, w.nama);
     setSearch('');
+    fokusBerikut.current = 'kartu-saya-nama';
     setPilihanId(w.id);
   }
 
   function ganti() {
     haptic();
     simpanPilihan(null);
+    fokusBerikut.current = 'kartu-saya-cari';
     setPilihanId(null);
   }
 
@@ -416,7 +431,7 @@ function KepalaKartu({ warga, kartu, onGanti }: { warga: Warga; kartu: DataKartu
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <AvatarPeci nama={warga.nama} ukuran={12} sorot />
           <div className="min-w-min flex-1">
-            <h2 className="text-title font-bold leading-tight text-white break-words">{warga.nama}</h2>
+            <h2 id="kartu-saya-nama" tabIndex={-1} className="text-title font-bold leading-tight text-white break-words">{warga.nama}</h2>
             {warga.no_rumah && <p className="mt-0.5 text-caption text-white/90">Rumah {warga.no_rumah}</p>}
           </div>
           <button
@@ -681,7 +696,7 @@ function PilihNama({
   return (
     <div className="space-y-3">
       <div>
-        <h2 className="text-title font-bold text-ink dark:text-gray-100">Cari nama Anda</h2>
+        <h2 id="kartu-saya-cari" tabIndex={-1} className="text-title font-bold text-ink dark:text-gray-100">Cari nama Anda</h2>
         <p className="text-caption text-ink-sub dark:text-gray-400 mt-1">
           Pilih sekali, lain kali kartu Anda langsung tampil di HP ini.
         </p>
