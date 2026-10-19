@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { bacaSemua } from './bacaSemua';
+import { tanggalHariIni } from './utils';
 
 /**
  * Backup & Restore data Hadiran RT.
@@ -45,7 +46,7 @@ export async function fetchBackup(): Promise<BackupFile> {
 export function downloadBackup(backup: BackupFile) {
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const tgl = backup.exportedAt.slice(0, 10);
+  const tgl = tanggalHariIni(); // zona perangkat — `exportedAt` (ISO) itu UTC: backup dini hari bertanggal kemarin
   const a = document.createElement('a');
   a.href = url;
   a.download = `hadiran-rt-backup-${tgl}.json`;

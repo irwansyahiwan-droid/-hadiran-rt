@@ -9,7 +9,7 @@ import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from './GalatKolom';
 import ConfirmDestruktif from './ConfirmDestruktif';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, haptic, ikatFrasa, tanggalUtuh } from '../lib/utils';
+import { formatRupiahPlain, haptic, ikatFrasa, tanggalUtuh, selisihHari } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { getTargetKasRT, setTargetKasRT, clearTargetKasRT, type TargetKasRT as Target_ } from '../lib/pengaturan';
 import { useKolomNominal } from '../lib/kolomNominal';
@@ -126,7 +126,7 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
   let deadlineLewat = false;
   if (target.tanggal) {
     const d = new Date(target.tanggal);
-    const hari = Math.ceil((d.getTime() - Date.now()) / 86400000);
+    const hari = selisihHari(target.tanggal); // hari KALENDER, zona perangkat (lihat utils)
     const tgl = tanggalUtuh(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }));
     deadlineLewat = hari < 0 && !tercapai;
     /* Tanggal & "N hari lagi" masing-masing satu kesatuan (spasi tak-putus):

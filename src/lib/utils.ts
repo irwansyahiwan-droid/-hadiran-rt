@@ -154,6 +154,17 @@ export function tanggalHariIni(d: Date = new Date()): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+/** Selisih HARI KALENDER dari hari ini (zona perangkat) ke kolom `date`
+ *  "YYYY-MM-DD": 0 = hari ini, negatif = sudah lewat (19 Okt 2026).
+ *  Dulu `Math.ceil((new Date(tgl) - Date.now()) / 86400000)` — `new Date(tgl)`
+ *  itu 07.00 WIB, jadi hitungannya berganti di jam 7 pagi, bukan tengah malam:
+ *  "74 hari lagi" sebelum 07.00 lalu "73" sesudahnya, dan tenggat 31 Des
+ *  masih "0 hari lagi" pada 1 Jan pukul 06.00 alih-alih "lewat". */
+export function selisihHari(tanggal: string, kini: Date = new Date()): number {
+  const [y, m, d] = tanggal.slice(0, 10).split('-').map(Number);
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(kini.getFullYear(), kini.getMonth(), kini.getDate())) / 86400000);
+}
+
 export function formatTanggal(dateStr: string): string {
   const date = new Date(dateStr);
   return tanggalUtuh(date.toLocaleDateString('id-ID', {
