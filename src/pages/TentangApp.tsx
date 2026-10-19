@@ -40,6 +40,10 @@ const KEAMANAN = [
   { b: 'Transparan secara sengaja', t: 'kas RT memang terbuka untuk seluruh warga — keterbukaan ini tujuan, bukan kebocoran' },
 ];
 
+/* Judul kartu = huruf awal KALIMAT (19 Okt 2026, pilihan user). Dulu HURUF
+   BESAR semua — satu-satunya halaman yang begitu. Kapital tiap kata ditolak:
+   di Sora "I" kapital nyaris sama dgn "l" kecil, jadi "Logika Iuran" terbaca
+   "Logika luran" (terpotret). */
 function Section({ icon: Icon, title, children }: { icon: typeof BookOpen; title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift p-5">
@@ -74,7 +78,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </div>
 
         {/* Tentang */}
-        <Section icon={BookOpen} title="TENTANG APLIKASI">
+        <Section icon={BookOpen} title="Tentang aplikasi">
           <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
             Aplikasi Hadiran RT&nbsp;004/006 adalah sistem digital untuk mengelola iuran tarikan bergilir antar warga
             (sistem <b>Sohibul Bait</b>), kas hadiran, talangan anggota, serta sinkronisasi setoran ke Kas Besar RT&nbsp;004/006.
@@ -83,7 +87,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </Section>
 
         {/* Logika Iuran */}
-        <Section icon={Coins} title="LOGIKA IURAN">
+        <Section icon={Coins} title="Logika iuran">
           <ul className="space-y-3">
             {IURAN.map((i) => (
               <li key={i.b} className="flex gap-3">
@@ -97,7 +101,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </Section>
 
         {/* Pengurus */}
-        <Section icon={Users} title="STRUKTUR PENGURUS RT&nbsp;004/006">
+        <Section icon={Users} title="Struktur pengurus RT&nbsp;004/006">
           <div className="space-y-2">
             {PENGURUS.map((p) => (
               <div key={p.jabatan} className="flex items-center gap-3 rounded-2xl inset-soft p-3">
@@ -112,7 +116,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </Section>
 
         {/* Sumber Data */}
-        <Section icon={Link2} title="SUMBER DATA">
+        <Section icon={Link2} title="Sumber data">
           <ul className="space-y-3">
             {SUMBER.map((s) => (
               <li key={s.b} className="flex gap-3">
@@ -126,7 +130,7 @@ export default function TentangApp({ open, onClose }: Props) {
         </Section>
 
         {/* Model Keamanan & Data */}
-        <Section icon={ShieldCheck} title="MODEL KEAMANAN & DATA">
+        <Section icon={ShieldCheck} title="Model keamanan & data">
           <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300 mb-3">
             Keamanan data dirancang sejak awal, bukan tambalan:
           </p>
