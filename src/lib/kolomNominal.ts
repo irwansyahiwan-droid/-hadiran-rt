@@ -40,6 +40,17 @@ export function suntingNominal(
       teks = teks.slice(0, kursor) + teks.slice(kursor + 1);
     }
   }
+  /* TEMPEL nominal ber-SEN dari bukti transfer / WA (19 Okt 2026): "Rp1.500.000,00"
+     atau "IDR 1,500,000.00". Membuang semua non-digit menjadikannya
+     "150000000" — Rp150.000.000, SERATUS kali lipat (terukur di form Kas RT &
+     setor). Pemisah RIBUAN selalu diikuti tiga digit, jadi pemisah yang
+     diikuti tepat 1–2 digit di ujung adalah SEN — Rupiah tak bersen, buang.
+     HANYA saat menempel/seret: saat mengetik/menghapus, Backspace di "1.500"
+     menghasilkan "1.50" yang WAJIB tetap terbaca 150. */
+  if (jenis === 'insertFromPaste' || jenis === 'insertFromDrop') {
+    const tanpaSen = teks.replace(/[.,]\d{1,2}(?=\D*$)/, '');
+    if (tanpaSen !== teks) { kursor = Math.min(kursor, tanpaSen.length); teks = tanpaSen; }
+  }
   const angka = digit(teks);
   const sebelum = digit(teks.slice(0, kursor)).length;
   // Nol di depan dibuang `Number` — kursor ikut mundur sebanyak yang terbuang.

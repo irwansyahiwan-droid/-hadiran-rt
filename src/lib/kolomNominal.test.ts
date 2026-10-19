@@ -55,3 +55,23 @@ describe('kolom nominal — kursor tak melompat ke ujung', () => {
     expect(sunting('5', '', 0, 'deleteContentBackward')).toEqual({ teks: '', kursor: 0 });
   });
 });
+
+describe('tempel nominal ber-sen dari bukti transfer / WA', () => {
+  const tempel = (t: string) => suntingNominal(t, t.length, '', 'insertFromPaste').nilai;
+  it('",00" & ".00" = sen, dibuang — bukan seratus kali lipat', () => {
+    expect(tempel('Rp1.500.000,00')).toBe(1_500_000);
+    expect(tempel('IDR 1,500,000.00')).toBe(1_500_000);
+    expect(tempel('1500000.00')).toBe(1_500_000);
+    expect(tempel('Rp 50.000,5')).toBe(50_000);
+  });
+  it('tanpa sen tak berubah', () => {
+    expect(tempel('Rp50.000')).toBe(50_000);
+    expect(tempel('Rp 1.500.000,-')).toBe(1_500_000);
+    expect(tempel('1.500.000')).toBe(1_500_000);
+  });
+  it('MENGETIK/MENGHAPUS tak tersentuh: Backspace di "1.500" → "1.50" = 150', () => {
+    expect(suntingNominal('1.50', 4, '1.500', 'deleteContentBackward').nilai).toBe(150);
+    expect(suntingNominal('1.50', 4, '1.5', 'insertText').nilai).toBe(150);
+  });
+});
+
