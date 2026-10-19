@@ -3,6 +3,10 @@ import { CETAK, rgb, argb } from './warnaCetak';
 // @ts-expect-error — config Tailwind JS polos, tanpa deklarasi tipe.
 import tw from '../../tailwind.config.js';
 import stok from 'tailwindcss/colors';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const indexCss = readFileSync(resolve(__dirname, '../index.css'), 'utf8');
 
 /**
  * Penjaga DRIFT palet keluaran.
@@ -80,6 +84,15 @@ describe('warnaCetak = cermin token app', () => {
 
     expect(CETAK.posTint.toUpperCase()).toBe(efektif('emerald'));
     expect(CETAK.negTint.toUpperCase()).toBe(efektif('rose'));
+  });
+
+  /* Warna status jejak di kartu Kartu Saya PNG — cermin bulatan jejak in-app.
+     `emas` dibaca dari index.css (variabel CSS, bukan token Tailwind), `titip`
+     dari utility blue-600 EFEKTIF (extend menang, stok cadangan). */
+  it('warna status jejak persis blue-600 & --gold-songket app', () => {
+    expect(CETAK.titip.toUpperCase()).toBe(String(c.blue?.[600] ?? stok.blue[600]).toUpperCase());
+    const emas = /--gold-songket:\s*(#[0-9A-Fa-f]{6})/.exec(indexCss)?.[1];
+    expect(emas?.toUpperCase()).toBe(CETAK.emas.toUpperCase());
   });
 
   it('semua nilai berupa hex 6 digit (bukan rgb()/nama warna)', () => {

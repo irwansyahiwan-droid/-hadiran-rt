@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, Contact, Search, UserRound, Users, AlertTriangle } from 'lucide-react';
-import OverlayHeader from '../components/layout/OverlayHeader';
+import { CalendarDays, CheckCircle2, Contact, Loader2, Search, Share2, UserRound, Users, AlertTriangle } from 'lucide-react';
+import OverlayHeader, { OverlayAction } from '../components/layout/OverlayHeader';
 import AvatarPeci from '../components/AvatarPeci';
 import ClearButton from '../components/ClearButton';
 import EmptyState from '../components/EmptyState';
@@ -25,6 +25,7 @@ import {
 import type { Warga } from '../lib/types';
 import { bacaPilihan, simpanPilihan } from '../lib/kartuIngat';
 import { umumkanSaja } from '../lib/toast';
+import { useAksiBerat } from '../lib/hooks';
 
 interface Props {
   open: boolean;
@@ -145,13 +146,35 @@ export default function KartuWarga({ open, onClose }: Props) {
     setPilihanId(null);
   }
 
+  /* Bagikan kartu sbg gambar PNG (kembaran kartu ringkasan Kas RT/Hadiran).
+     `useAksiBerat`: chunk penggambar diunduh SAAT diketuk — latch sinkron
+     menahan ketukan ganda (= dua berkas) & tanda sibuk muncul kalau lama. */
+  const [bagiSibuk, jalankanBagi] = useAksiBerat();
+  async function bagikan() {
+    if (!warga || !kartu) return;
+    const d = { nama: warga.nama, noRumah: warga.no_rumah, kartu };
+    await jalankanBagi(async () => {
+      const { bagikanKartuSaya } = await import('../lib/shareKartuSaya');
+      await bagikanKartuSaya(d);
+    }, { mulai: 'Menyiapkan kartu…', gagal: 'Gagal membuat gambar. Coba lagi.' });
+  }
+
   if (!open) return null;
 
   const coba = () => setPercobaan((n) => n + 1);
 
   return (
     <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken kanvas-cahaya dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
-      <OverlayHeader icon={UserRound} title="Kartu Saya" onBack={exit.requestClose} />
+      <OverlayHeader
+        icon={UserRound}
+        title="Kartu Saya"
+        onBack={exit.requestClose}
+        /* Hanya saat kartu UTUH: gambar yang beredar di grup tak boleh lahir
+           dari kerangka atau muat yang gagal. */
+        actions={warga && kartu && !errorData
+          ? <OverlayAction icon={bagiSibuk ? Loader2 : Share2} label="Bagikan Kartu Saya" onClick={bagikan} spinning={bagiSibuk} />
+          : undefined}
+      />
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 2rem)' }}>
         {/* App kas dilarang menyatakan angka saat gagal muat: tak ada kartu,

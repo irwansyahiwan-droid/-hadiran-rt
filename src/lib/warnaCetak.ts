@@ -56,6 +56,12 @@ export const CETAK = {
   posTint: '#ECFDF5', // emerald-50 — fill baris saldo di kartu PNG
   negTint: '#FFF1F2', // rose-50 — fill baris saldo NEGATIF (paritas bg-rose-50 KasHadiran.tsx)
 
+  /* Dua warna STATUS jejak kehadiran — kartu Kartu Saya PNG (19 Okt 2026).
+     Cermin bulatan jejak in-app: titip = `ring-blue-600`, Sohibul Bait =
+     cincin `--gold-songket` (dekoratif; artinya ditulis di legenda). */
+  titip: '#2563EB', // blue-600
+  emas:  '#E8B651', // = --gold-songket di index.css
+
   /** Ramp kartu hero — cermin `.hero-emerald` di index.css (pass 4 Agu). */
   heroRamp: ['#0A5230', '#08492B', '#032A17'] as const,
   /** Scrim pojok kiri-atas hero — paritas `.hero-emerald`. */

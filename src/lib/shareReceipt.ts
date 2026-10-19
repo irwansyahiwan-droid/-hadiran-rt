@@ -178,12 +178,12 @@ export async function bagikanFileGambar(
   return 'fallback';
 }
 
-const rupiahFont = "'Inter Variable', Inter, system-ui, -apple-system, sans-serif";
+export const rupiahFont = "'Inter Variable', Inter, system-ui, -apple-system, sans-serif";
 // Nominal & brand memakai Sora (font-display app) → struk share = suara visual
 // yang sama dgn hero in-app, bukan Inter polos.
-const displayFont = `'Sora Variable', Sora, ${rupiahFont}`;
+export const displayFont = `'Sora Variable', Sora, ${rupiahFont}`;
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -193,7 +193,7 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath();
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+export function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
@@ -204,7 +204,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 /** Render kartu receipt bermerek jadi PNG lalu bagikan (Web Share API + fallback WA). */
 /** Potong teks dgn elipsis agar muat dalam lebar maksimum (canvas). */
-function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
+export function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
   if (ctx.measureText(text).width <= maxW) return text;
   let t = text;
   while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
@@ -242,7 +242,7 @@ export function pecahHurufI(teks: string): string[] {
  *  dipangkas tanpa fitur itu & canvas tak punya `font-feature-settings`.
  *  Maka batangnya digambar langsung, ukurannya dari font yang sedang aktif
  *  (tinggi huruf kapital diukur dari "H", bukan angka tulis-tangan). */
-function tulisTeksJelasI(ctx: CanvasRenderingContext2D, teks: string, x: number, y: number) {
+export function tulisTeksJelasI(ctx: CanvasRenderingContext2D, teks: string, x: number, y: number) {
   const potongan = pecahHurufI(teks);
   if (!potongan.includes('I')) { ctx.fillText(teks, x, y); return; }
   const px = parseFloat(/(\d+(?:\.\d+)?)px/.exec(ctx.font)?.[1] ?? '14');

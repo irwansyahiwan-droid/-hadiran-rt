@@ -65,6 +65,7 @@ export const CETAK = {
   ink: hex('ink'), sub: hex('sub'), faint: hex('faint'), muted: hex('muted'),
   brand: hex('brand'), pos: hex('pos'), neg: hex('neg'), warn: hex('warn'),
   posTint: hex('posTint'), negTint: hex('negTint'),
+  titip: hex('titip'), emas: hex('emas'),
   heroRamp: ramp(),
   heroScrim: scrim(),
 };
