@@ -438,9 +438,13 @@ const PROMOS: PromoSlide[] = [
          memilih nama, judulnya = nama itu (lihat render). Gradien coklat-emas
          songket: beda dari saldo (hijau) & target (teal); ujung terangnya
          #74500f = 7,25:1 lawan putih — AAA di seluruh kartu, tanpa bersandar
-         pada scrim. */
+         pada scrim. Deskripsi PENDEK (19 Okt 2026, disetujui user): versi
+         "…dalam satu kartu." membuat nama terpanjang ("Saman Suryadi ( Mono )",
+         3 baris @360px) mendorong teks sampai tepi bawah kartu — 1 dari 70
+         nama; versi ini 0 dari 70 di 320/360/390. Kartu bertinggi TETAP:
+         judulnya nama warga dari DB, jadi panjangnya bukan milik kita. */
       id: 'kartu-warga', kind: 'kartu', eyebrow: 'KARTU SAYA',
-      judul: 'Cek status Anda', desc: 'Talangan, kehadiran & giliran Anda dalam satu kartu.', icon: UserRound,
+      judul: 'Cek status Anda', desc: 'Talangan, kehadiran & giliran Anda.', icon: UserRound,
       grad: 'linear-gradient(150deg,#74500f 0%,#3a2403 100%)', glow: 'rgba(232,182,81,0.5)',
       cta: { label: 'Buka Kartu Saya', kartu: true },
     },
