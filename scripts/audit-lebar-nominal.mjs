@@ -227,6 +227,19 @@ async function newCtx(browser, { bendahara = false } = {}) {
       if (b) localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(sess));
     } catch {}
   }, { b: bendahara, ref: REF, sess: fakeSession() });
+  /* MUTASI=1 (19 Okt 2026): nominal ber-angka tabular direnggangkan sampai
+     meluber dari kolomnya → sapuan WAJIB mencetak temuan DAN keluar 1. Bukti
+     bahwa vonis kode keluarnya (di ekor berkas) benar-benar menggigit. */
+  if (process.env.MUTASI === '1') {
+    await ctx.addInitScript(() => {
+      const pasang = () => {
+        const s = document.createElement('style');
+        s.textContent = '.tabular-nums{letter-spacing:.5em!important;white-space:nowrap!important}';
+        document.head.appendChild(s);
+      };
+      if (document.head) pasang(); else document.addEventListener('DOMContentLoaded', pasang);
+    });
+  }
 
   if (bendahara) {
     await ctx.route('**/rest/v1/**', (route) => {
@@ -401,3 +414,10 @@ for (const f of findings) {
      kolom mana pun — persis jenis laporan yang bikin temuan asli dikira palsu. */
   else console.log(`[${f.w}px ${f.ctx}] "${f.text}" clip=${f.clip} bleed=${f.bleed ?? '?'} kanan=${f.overflowRight} kiri=${f.overflowLeft} ${f.font} ${f.size}px <${f.tag}> .${f.cls}`);
 }
+
+/* Vonis lewat KODE KELUAR (19 Okt 2026, izin user). Sampai hari ini sapuan
+   ini TAK PUNYA satu pun `process.exit` — nominal yang meluber/terpotong di
+   320 & 360px tetap keluar 0, dan `sapu-semua` memvonis dari kode keluar,
+   jadi temuannya tercetak HIJAU di rantai. Kembaran `audit:kontras` &
+   `-deep` yang ditutup di hari yang sama. */
+process.exit(findings.length ? 1 : 0);
