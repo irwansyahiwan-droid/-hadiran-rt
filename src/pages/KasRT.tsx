@@ -9,7 +9,7 @@ import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, ikatFrasa, maskRp, pesanError, tanggalUtuh } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, ikatFrasa, maskRp, pesanError, tanggalUtuh, tanggalHariIni } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import EmptyState from '../components/EmptyState';
@@ -61,7 +61,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
   // Kursor tak melompat ke ujung saat digit di tengah dikoreksi (lihat kolomNominal).
   const kolomNominal = useKolomNominal(nominal, setNominal);
   const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
-  const [tanggal, setTanggal] = useState(() => (initial?.tanggal ?? new Date().toISOString()).split('T')[0]);
+  const [tanggal, setTanggal] = useState(() => (initial?.tanggal ?? tanggalHariIni()).split('T')[0]);
   const [kategori, setKategori] = useState<string>(initial?.kategori ?? kategoriDefault(initial?.tipe ?? 'masuk'));
   const [saving, setSaving, sedangSimpan] = useSaving();
   const galat = useGalatKolom();

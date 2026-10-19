@@ -18,7 +18,7 @@ import CrossFade from '../components/CrossFade';
 import PageHeader from '../components/layout/PageHeader';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic, tanggalHariIni } from '../lib/utils';
 import { ringkasAbsensi } from '../lib/absensiHitung';
 import { simpanTarikanSelesai } from '../lib/simpanTarikan';
 import { fetchAbsensiTersimpan } from '../lib/absensiTersimpan';
@@ -888,7 +888,7 @@ interface TambahTarikanModalProps {
 }
 
 function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
-  const [tanggal, setTanggal] = useState(() => new Date().toISOString().slice(0, 10));
+  const [tanggal, setTanggal] = useState(() => tanggalHariIni());
   const [sohibulId, setSohibulId] = useState('');
   const [saving, setSaving, sedangSimpan] = useSaving();
   const galat = useGalatKolom();

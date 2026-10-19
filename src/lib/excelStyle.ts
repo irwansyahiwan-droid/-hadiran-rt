@@ -1,3 +1,4 @@
+import { tanggalHariIni } from './utils';
 import type { Workbook, Worksheet, Borders, Cell } from 'exceljs';
 import { CETAK, argb } from './warnaCetak';
 
@@ -146,7 +147,7 @@ export async function downloadWorkbook(wb: Workbook, filename: string): Promise<
 }
 
 export function stamp(): string {
-  return new Date().toISOString().slice(0, 10);
+  return tanggalHariIni(); // zona perangkat, bukan UTC
 }
 
 export function stampLong(): string {

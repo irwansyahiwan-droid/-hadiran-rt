@@ -30,7 +30,7 @@ import { supabase } from '../lib/supabase';
 import { bacaSemuaRes } from '../lib/bacaSemua';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, tanggalHariIni } from '../lib/utils';
 import CrossFade from '../components/CrossFade';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
@@ -53,7 +53,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
   // Kursor tak melompat ke ujung saat digit di tengah dikoreksi (lihat kolomNominal).
   const kolomNominal = useKolomNominal(nominal, setNominal);
   const [keterangan, setKeterangan] = useState('');
-  const [tanggal, setTanggal] = useState(() => new Date().toISOString().split('T')[0]);
+  const [tanggal, setTanggal] = useState(() => tanggalHariIni());
   // Default = tarikan paling baru. WAJIB diisi → setoran selalu ter-link ke tarikan
   // (kalau tidak, kolom SETOR di PDF alur kas kosong & total tak rekonsiliasi).
   const [tarikanId, setTarikanId] = useState<string>(() => tarikanOpsi[0]?.id ?? '');

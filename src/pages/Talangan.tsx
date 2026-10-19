@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import { bacaSemuaRes } from '../lib/bacaSemua';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggalShort, formatRupiahPlain, haptic, maskRp, pesanError } from '../lib/utils';
+import { formatTanggalShort, formatRupiahPlain, haptic, maskRp, pesanError, tanggalHariIni } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import { openWa, pesanTalangan } from '../lib/waReminder';
@@ -115,7 +115,7 @@ export default function TalanganPage({ onBack }: { onBack?: () => void }) {
     setProcessingId(t.id);
     setConfirmId(null);
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = tanggalHariIni(); // zona perangkat, bukan UTC (lihat utils)
       // Supabase TIDAK melempar saat gagal — tanpa cek error, koneksi putus
       // tetap toast "Ditandai lunas" padahal data tak berubah (toast bohong).
       /* `.eq('status_lunas', false)` bukan hiasan — ITU penjaganya.

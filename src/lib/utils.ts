@@ -141,6 +141,19 @@ export function ikatFrasa(teks: string): string {
  * tanggal sungguhan (`selTanggal` di `excelStyle.ts`), jadi opsi `polos`
  * (teks tanpa spasi tak-putus, khusus sel Excel) dibuang bersama pemakainya.
  */
+/** Tanggal HARI INI di zona waktu PERANGKAT, "YYYY-MM-DD" — untuk kolom
+ *  `date` (19 Okt 2026). BUKAN `new Date().toISOString().slice(0, 10)`: itu
+ *  tanggal UTC, dan WIB = UTC+7, jadi antara 00:00–07:00 WIB "hari ini"
+ *  versi UTC masih KEMARIN. Bukan hipotesis — data produksi memuat empat
+ *  pembayaran talangan pukul ±05.00 WIB yang tercatat sehari terlalu awal,
+ *  dan pembayaran dini hari tanggal 1 jatuh ke bulan/triwulan sebelumnya di
+ *  laporan. Warga & bendahara memakai HP ber-zona WIB, jadi zona perangkat
+ *  = zona RT. */
+export function tanggalHariIni(d: Date = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
 export function formatTanggal(dateStr: string): string {
   const date = new Date(dateStr);
   return tanggalUtuh(date.toLocaleDateString('id-ID', {
