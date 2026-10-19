@@ -85,11 +85,12 @@ Kanvas punya **sepuluh titik sinkron** — berhenti di CSS berarti gagal:
 mencetak seksi terpisah "AMBANG APP · AAA" — dilaporkan tapi TIDAK menggagalkan
 rantai (disiplin sama bagian 200% di `audit:potong`). Garis dasar warga
 **19 Okt 2026: 0 dari 1391** (slide carousel 2 & 3 masuk populasi — teks di atas
-foto & ramp emas tak pernah terukur sebelumnya); bendahara **12 Sep 2026: 0 dari
-2533**. Kalau angka GAGAL itu naik dari nol, sesuatu baru saja mundur.
-**AA di `audit:kontras` kini MENGGAGALKAN (exit 1)** — sampai 19 Okt ia selalu
-keluar 0, jadi regresi AA warga tercetak hijau di `sapu-semua`. `audit:kontras-deep`
-masih bercacat sama (terkunci; belum dibuka).
+foto & ramp emas tak pernah terukur sebelumnya); `-deep` (sheet warga + seluruh
+bendahara + halaman publik) **19 Okt 2026: 0 dari 2808**. Kalau angka GAGAL itu
+naik dari nol, sesuatu baru saja mundur.
+**AA di `audit:kontras` & `-deep` kini MENGGAGALKAN (exit 1)** — sampai 19 Okt
+keduanya selalu keluar 0, jadi regresi AA tercetak hijau di `sapu-semua`.
+Divalidasi mutasi (`MUTASI=1` di masing-masing → exit 1).
 
 **Garis dasar lama (1 Sep: 0/1216 · 0/2256) SEMPAT BASI selama seminggu, dan
 begitulah lubang ini terbuka.** 5 Sep `/warta` masuk populasi `kontras-deep`

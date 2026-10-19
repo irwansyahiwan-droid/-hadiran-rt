@@ -383,6 +383,19 @@ async function newCtx(browser, theme, { bendahara = false, welcome = false } = {
       if (b) localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(sess));
     } catch {}
   }, { t: theme, w: welcome, b: bendahara, ref: REF, sess: fakeSession() });
+  /* MUTASI=1 (19 Okt 2026): teks `text-caption` dipudarkan ke abu pucat →
+     sapuan WAJIB mencetak GAGAL AA dan keluar 1. Bukti bahwa vonis kode
+     keluarnya (di ekor berkas) benar-benar menggigit. */
+  if (process.env.MUTASI === '1') {
+    await ctx.addInitScript(() => {
+      const pasang = () => {
+        const s = document.createElement('style');
+        s.textContent = '.text-caption{color:#A9B5AE!important}';
+        document.head.appendChild(s);
+      };
+      if (document.head) pasang(); else document.addEventListener('DOMContentLoaded', pasang);
+    });
+  }
 
   if (bendahara) {
     // Gembok anti-tulis + paksa anon utk read (JWT palsu ditolak PostgREST)
@@ -622,3 +635,10 @@ for (const f of aaa.slice(0, 12)) {
 }
 if (aaa.length > 12) console.log(`   … ${aaa.length - 12} lagi — rinci lengkap di ${OUT}/hasil.json`);
 
+/* Vonis lewat KODE KELUAR (19 Okt 2026, izin user). Sampai hari ini sapuan
+   ini keluar 0 meski GAGAL AA (hanya PROBE CACAT yang memberi 2), sedangkan
+   `sapu-semua` memvonis dari kode keluar — jadi regresi AA di sheet warga &
+   SELURUH permukaan bendahara tercetak hijau di rantai. Kembaran
+   `audit:kontras` ditutup di hari yang sama. PROBE CACAT (2) tetap menang;
+   AAA tetap laporan. */
+if (fails.length && !process.exitCode) process.exitCode = 1;

@@ -217,7 +217,8 @@ const LANTAI = {
      (panduan-install & warta belum pernah diukur sekali pun), dan perbaikan
      sampling titik atas/bawah membuat lebih banyak elemen cukup titik untuk
      TERUKUR sama sekali. Garis dasar baru 2512; lantai ~95%. */
-  'kontras-deep':   [/TOTAL sampel:\s*(\d+)/, 2386],
+  /* 2386 → 2660 (19 Okt 2026): garis dasar 2808 (Kartu Saya & sheet baru masuk sejak lantai lama). */
+  'kontras-deep':   [/TOTAL sampel:\s*(\d+)/, 2660],
   'kontras-nonteks':[/TOTAL\s+(\d+) sampel/, 700],
   /* 140 → 82 (30 Sep 2026): putaran 32 (0865f5e) memindahkan "PDF" dari tiap
      kartu Kas Hadiran ke kaki sheet detail. Build lama (3461835) & HEAD diukur
