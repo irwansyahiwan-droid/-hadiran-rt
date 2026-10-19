@@ -211,7 +211,8 @@ const LANTAI = {
   tebal:            [/(\d+) pemakaian tebal diperiksa/, 244],
   ikon:             [/(\d+) pemakaian ikon diperiksa/, 163],
   keadaan:          [/(\d+) layar diperiksa/, 34],
-  kontras:          [/TOTAL sampel:\s*(\d+)/, 1140],
+  /* 1140 → 1320 (19 Okt 2026): slide carousel 2 & 3 masuk populasi; garis dasar 1391. */
+  kontras:          [/TOTAL sampel:\s*(\d+)/, 1320],
   /* 2140 → 2386 (5 Sep 2026): PART L naik dari 1 halaman publik jadi 3
      (panduan-install & warta belum pernah diukur sekali pun), dan perbaikan
      sampling titik atas/bawah membuat lebih banyak elemen cukup titik untuk

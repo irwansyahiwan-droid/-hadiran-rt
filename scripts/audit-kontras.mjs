@@ -362,18 +362,50 @@ async function runTheme(theme, results, seen) {
     await page.waitForTimeout(4500);
     await auditPage(page, `${theme}/${label}`, results, seen);
   }
+
+  /* Slide carousel 2 & 3 (19 Okt 2026). Slide belakang tak pernah di DEPAN
+     saat Beranda dipotret, jadi teksnya — di atas FOTO (Target Kas RT) & ramp
+     EMAS (Kartu Saya, lahir 19 Okt) — tak pernah terukur sekali pun. Pemicu
+     yang hilang = PROBE CACAT, bukan dilewati. `MUTASI=1` meredupkan teks
+     putih carousel ke 45% SESUDAH tab diukur → slide WAJIB merah. */
+  await page.locator('nav button', { hasText: 'Beranda' }).first().click({ force: true });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(2500);
+  if (process.env.MUTASI === '1') {
+    await page.addStyleTag({ content: 'section[aria-roledescription="carousel"] .text-white{color:rgba(255,255,255,.45)!important}' });
+  }
+  for (const n of [2, 3]) {
+    const tbl = page.getByRole('button', { name: `Ke slide ${n}` });
+    if (!(await tbl.count())) {
+      console.log(`PROBE CACAT: tombol "Ke slide ${n}" tak ada (${theme})`);
+      await browser.close();
+      process.exit(2);
+    }
+    await tbl.click();
+    await page.waitForTimeout(1500);
+    const sebelum = results.length;
+    await auditCurrentView(page, `${theme}/Beranda-slide-${n}`, results, seen);
+    slideTerukur.push(`${theme}/slide-${n}: ${results.length - sebelum}`);
+    if (results.length === sebelum) {
+      console.log(`PROBE CACAT: slide ${n} tak menyumbang satu sampel pun (${theme})`);
+      await browser.close();
+      process.exit(2);
+    }
+  }
   await browser.close();
 }
 
 const results = [];
 const seen = new Set();
 const buta = []; // elemen yang SEMUA titik sampelnya tertutup overlay — tak terukur
+const slideTerukur = [];
 for (const theme of ['light', 'dark']) await runTheme(theme, results, seen);
 
 writeFileSync(`${OUT}/hasil.json`, JSON.stringify(results, null, 1));
 const fails = results.filter((r) => !r.pass).sort((a, b) => a.ratio - b.ratio);
 console.log(`\n=== TOTAL sampel: ${results.length}, GAGAL AA: ${fails.length} ===`);
 console.log(`tak terukur (semua titik tertutup overlay / di luar viewport): ${buta.length}`);
+console.log(`sampel slide carousel: ${slideTerukur.join(' · ')}`);
 if (process.env.SHOW_BUTA) for (const b of [...new Set(buta)]) console.log('  buta:', b);
 for (const f of fails) {
   console.log(`${f.ratio} (butuh ${f.need}) [${f.ctx}] "${f.text}" fg rgb(${f.color}) a=${f.alpha} bg rgb(${f.bg}) ${f.size}px/${f.weight} <${f.tag}>`);
@@ -407,3 +439,11 @@ for (const f of aaa.slice(0, 12)) {
 }
 if (aaa.length > 12) console.log(`   … ${aaa.length - 12} lagi — rinci lengkap di ${OUT}/hasil.json`);
 
+
+/* Vonis lewat KODE KELUAR (19 Okt 2026). Sampai hari ini sapuan ini selalu
+   keluar 0, dan `sapu-semua` memvonis dari kode keluar — jadi regresi AA di
+   tab warga tercetak "hijau" di rantai. Terbukti saat memvalidasi mutasi slide
+   carousel: "GAGAL AA: 10" dgn EXIT=0. Kembaran `audit:kontras-nonteks` &
+   `audit:mati` sudah lama keluar 1 saat gagal. AAA tetap TIDAK menggagalkan
+   (lihat seksinya di atas). */
+process.exit(fails.length ? 1 : 0);
