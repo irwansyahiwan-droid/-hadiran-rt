@@ -133,16 +133,22 @@ export default function KartuWarga({ open, onClose }: Props) {
     [daftar, pilihanId],
   );
 
-  /* Fokus sesudah berganti layar di dalam lapisan ini (19 Okt 2026): tombol
-     yang diketuk (baris nama / "Bukan saya?") LENYAP bersama layarnya, jadi
-     fokus jatuh ke <body> — di luar dialog. Diarahkan ke judul layar barunya
-     (`tabIndex=-1`: bisa difokus, tak masuk urutan Tab), begitu judul itu ada. */
+  /* Berganti layar di dalam lapisan ini (pilih nama ↔ "Bukan saya?") —
+     19 Okt 2026, dua hal sekaligus:
+     · GULIR ke atas. Lapisan ini menggulir dirinya sendiri, jadi posisi gulir
+       daftar nama TERBAWA ke kartu: memilih "Saman Suryadi" (di bawah daftar)
+       membuka kartu di scrollTop 187 dgn hero di −102px — nama & statistiknya
+       tersembunyi di atas layar, yang pertama terlihat tengah kartu.
+     · FOKUS ke judul layar baru. Tombol yang diketuk lenyap bersama layarnya,
+       jadi fokus jatuh ke <body> — di luar dialog (`tabIndex=-1`: bisa
+       difokus, tak masuk urutan Tab). */
   const fokusBerikut = useRef<string | null>(null);
   useEffect(() => {
     const id = fokusBerikut.current;
     const el = id ? document.getElementById(id) : null;
     if (!el) return;
     fokusBerikut.current = null;
+    dlg.panelRef.current?.scrollTo({ top: 0 });
     el.focus({ preventScroll: true });
   });
 
