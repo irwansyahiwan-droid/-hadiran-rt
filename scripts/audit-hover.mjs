@@ -34,6 +34,7 @@
 //              dan sapuan wajib keluar PROBE CACAT (bukti penjaganya menggigit).
 import { chromium } from 'playwright';
 import { newCtx, loginWarga, gotoTab } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const MUTASI = process.env.MUTASI === '1';
@@ -44,6 +45,14 @@ let pemeriksaan = 0;
 const catatan = []; // { tema, kunci, nama, layar, status: 'berubah'|'diam'|'bergerak' }
 
 async function periksa(page, cdp, tema, layar) {
+  /* Penunjuk DIPARKIR di pojok dulu (19 Okt 2026). Sesudah klik, penunjuk
+     Playwright tinggal di titik itu — dan kontrol yang kebetulan bergulir ke
+     bawahnya sudah ber-:hover SUNGGUHAN saat "diam" dibaca, jadi :hover
+     paksaan tak mengubah apa pun dan ia terbaca "tanpa hover". Terjadi pada
+     dua baris daftar Kartu Saya, keduanya persis di y=115 = titik item Menu
+     "Kartu Saya" yang baru diketuk. (1,1) jatuh di latar header selebar layar,
+     di luar kolom isi max-w-lg. */
+  await page.mouse.move(1, 1);
   await page.evaluate((sel) => {
     for (const e of document.querySelectorAll('[data-hv]')) e.removeAttribute('data-hv');
     let i = 0;
@@ -97,6 +106,7 @@ async function periksa(page, cdp, tema, layar) {
 
 const browser = await chromium.launch();
 const layarDiperiksa = new Set();
+const cacatPopulasi = [];
 for (const tema of ['light', 'dark']) {
   for (const peran of ['bendahara', 'warga']) {
     const { ctx, page } = await newCtx(browser, tema, { bendahara: peran === 'bendahara' });
@@ -126,6 +136,35 @@ for (const tema of ['light', 'dark']) {
     layarDiperiksa.add(`${tema}/${peran}/menu`);
     await page.keyboard.press('Escape');
     await page.waitForTimeout(500);
+    /* Slide carousel 2 & 3 + Kartu Saya (19 Okt 2026). Slide belakang tak
+       pernah di DEPAN saat sapuan memotret Beranda, jadi CTA-nya ("Buka Kartu
+       Saya") tak pernah dihover; Kartu Saya lahir sesudah sapuan ini. Pemicu
+       yang hilang = PROBE CACAT, bukan dilewati. */
+    if (peran === 'warga') {
+      await gotoTab(page, 'Beranda');
+      await page.evaluate(() => window.scrollTo(0, 0));
+      for (const n of [2, 3]) {
+        const tbl = page.getByRole('button', { name: `Ke slide ${n}` });
+        if (!(await tbl.count())) { cacatPopulasi.push(`[${tema}] slide ${n}: tombol "Ke slide ${n}" tak ada`); continue; }
+        await tbl.click();
+        await page.waitForTimeout(1200);
+        await periksa(page, cdp, tema, `${peran}/slide-${n}`);
+        layarDiperiksa.add(`${tema}/${peran}/slide-${n}`);
+      }
+      const cacat = await jelajahKartuWarga(page, async (bagian) => {
+        /* Lapisan ini MENGGULIR SENDIRI (fixed inset-0 overflow-y-auto), jadi
+           yang digulir dialognya, bukan window. */
+        const dlg = page.locator('[role="dialog"][aria-label="Kartu saya"]');
+        const tinggi = await dlg.evaluate((d) => d.scrollHeight);
+        for (let y = 0; y < Math.min(tinggi, 2700); y += 800) {
+          await dlg.evaluate((d, yy) => d.scrollTo(0, yy), y);
+          await page.waitForTimeout(300);
+          await periksa(page, cdp, tema, `${peran}/kartu-saya-${bagian}`);
+        }
+        layarDiperiksa.add(`${tema}/${peran}/kartu-saya-${bagian}`);
+      });
+      cacatPopulasi.push(...cacat.map((c) => `[${tema}] ${c}`));
+    }
     if (peran === 'bendahara') {
       for (const [tab, pemicu, nama] of [
         ['Kas RT', 'Tambah transaksi Kas RT', 'sheet-kasrt'],
@@ -172,6 +211,10 @@ for (const tema of ['light', 'dark']) {
   t.sort((a, b) => a.kunci.localeCompare(b.kunci)).forEach((u) => console.log(`   "${u.contoh}"  (${[...u.layar].join(', ')})`));
 }
 
+if (cacatPopulasi.length) {
+  console.log(`\nPROBE CACAT: ${cacatPopulasi.length} layar tak tercapai — ${cacatPopulasi.join(' · ')}`);
+  process.exit(2);
+}
 if (!layarDiperiksa.size || berubah.length < semua.length * 0.3) {
   console.log(`\nPROBE CACAT: hanya ${berubah.length} dari ${semua.length} kontrol berubah — pemaksaan :hover tak menggigit, vonis tak berlaku`);
   process.exit(2);

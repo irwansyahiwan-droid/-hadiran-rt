@@ -38,6 +38,7 @@
 //   MUTASI=1 → semua `aria-label` dicabut; bagian A WAJIB merah.
 import { chromium } from 'playwright';
 import { newCtx, loginWarga, gotoTab } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const MUTASI = process.env.MUTASI === '1';
@@ -49,7 +50,7 @@ const IZIN = [
 ];
 const berizin = (layar, nama) => IZIN.some(([l, n]) => l === layar && n === nama);
 
-const namaKontrol = () => {
+const namaKontrol = (lingkup) => {
   const nama = (el) => {
     const al = el.getAttribute('aria-label');
     if (al && al.trim()) return al.trim();
@@ -71,7 +72,9 @@ const namaKontrol = () => {
     return '';
   };
   const out = [];
-  document.querySelectorAll('button,a[href],[role="button"],[role="menuitem"],[role="tab"],input,select,textarea,summary').forEach((el) => {
+  /* `lingkup` = lapisan teratas saja (Kartu Saya): halaman di belakang
+     overlay tetap terpasang, dan kontrolnya bukan bagian layar ini. */
+  ((lingkup && document.querySelector(lingkup)) || document).querySelectorAll('button,a[href],[role="button"],[role="menuitem"],[role="tab"],input,select,textarea,summary').forEach((el) => {
     const r = el.getBoundingClientRect();
     if (r.width < 2 || r.height < 2) return;
     const cs = getComputedStyle(el);
@@ -84,8 +87,12 @@ const namaKontrol = () => {
 
 const browser = await chromium.launch();
 const perLayar = {};
+const cacatPopulasi = [];
 const kumpul = async (page, layar) => { perLayar[layar] = await page.evaluate(namaKontrol); };
-const cabut = (page) => page.evaluate(() => document.querySelectorAll('[aria-label]').forEach((e) => e.removeAttribute('aria-label')));
+/* Label DIALOG tidak dicabut: yang dimutasi nama KONTROL, dan label dialog
+   adalah kait lingkup (Kartu Saya) — tanpa itu mutasi melumpuhkan probenya
+   sendiri alih-alih menguji vonisnya. */
+const cabut = (page) => page.evaluate(() => document.querySelectorAll('[aria-label]:not([role="dialog"])').forEach((e) => e.removeAttribute('aria-label')));
 
 {
   const { ctx, page } = await newCtx(browser, 'light', {});
@@ -100,6 +107,16 @@ const cabut = (page) => page.evaluate(() => document.querySelectorAll('[aria-lab
     if (MUTASI) await cabut(page);
     await kumpul(page, `w-${t}`);
   }
+  /* Kartu Saya (19 Okt 2026): 70 baris nama + bulatan jejak "Tarikan #N: …"
+     + "Bagikan Kartu Saya" — kontrol berulang yang paling mungkin kembar. */
+  /* MUTASI sudah mencabut label "Menu" di tab sebelumnya — muat ulang dulu
+     (gate warga di sessionStorage, jadi tetap masuk). */
+  if (MUTASI) { await page.reload({ waitUntil: 'domcontentloaded' }); await page.locator('nav button', { hasText: 'Beranda' }).waitFor({ timeout: 30000 }); await page.waitForTimeout(1500); }
+  await gotoTab(page, 'Beranda');
+  cacatPopulasi.push(...await jelajahKartuWarga(page, async (bagian) => {
+    if (MUTASI) await cabut(page);
+    perLayar[`w-kartu-saya-${bagian}`] = await page.evaluate(namaKontrol, '[role="dialog"][aria-label="Kartu saya"]');
+  }));
   await ctx.close();
 }
 {
@@ -133,5 +150,6 @@ kembar.forEach((x) => console.log('  ⚠ ' + x));
 gagal = kosong.length + kembar.length;
 console.log(`\n=== NAMA KONTROL · ${total} kontrol di ${Object.keys(perLayar).length} layar · ${gagal} bermasalah ===`);
 if (!total) { console.log('PROBE CACAT: populasi kosong — sapuan tak menguji apa pun.'); process.exit(2); }
+if (cacatPopulasi.length) { console.log(`PROBE CACAT: ${cacatPopulasi.join(' · ')}`); process.exit(2); }
 if (MUTASI && !kosong.length) { console.log('PROBE CACAT: MUTASI=1 tapi bagian A nol — aria-label tak benar-benar tercabut.'); process.exit(2); }
 process.exit(gagal ? 1 : 0);

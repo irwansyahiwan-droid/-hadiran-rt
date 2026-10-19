@@ -229,13 +229,17 @@ const LANTAI = {
   /* 500 → 455 (28 Sep 2026): putaran 32 membuang tombol "PDF" di tiap kartu Kas
      Hadiran (21 × 2 peran) & melipat 31 baris "Sudah Lunas" Talangan (+1 tombol
      lipat) — terukur build lama/baru 550 → 478, selisih PERSIS 42 + 30. */
-  nama:             [/(\d+) kontrol di \d+ layar/, 455],
+  /* 455 → 535 (19 Okt 2026): Kartu Saya masuk populasi (daftar 70 nama + kartu
+     ber-bulatan jejak) — dua jalan terukur 566 & 597 (selisih = lipatan data). */
+  nama:             [/(\d+) kontrol di \d+ layar/, 535],
   /* Populasi = kontrol UNIK (nama ternormalisasi × tema). 258 → 244 (9 Okt 2026):
      garis dasar lama 272–274 (lantai 258 = ~95%) sudah bergeser ke 251–258 antar-
      jalan di DB hidup. Diukur: build SEBELUM a3ff170/011341b (kartu Hadiran &
      Talangan) juga 256, jadi turunnya DATA (isi daftar), bukan kode; 0 kontrol
      tanpa umpan hover di semua jalan. Lantai ~95% dari ~257. */
-  hover:            [/(\d+) kontrol unik di \d+ layar/, 244],
+  /* 244 → 348 (19 Okt 2026): slide carousel 2 & 3 + Kartu Saya (daftar &
+     kartu, digulir) masuk populasi — 26 → 34 layar, 252 → 366 kontrol unik. */
+  hover:            [/(\d+) kontrol unik di \d+ layar/, 348],
   /* Populasi = PERMUKAAN berdaftar (properti app, bukan data) — lantai persis. */
   umumkan:          [/(\d+) permukaan diperiksa · \d+ bermasalah/, 7],
   /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis, garis
