@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { AlertTriangle, RefreshCw, ArrowUpRight, ArrowDownLeft, Wallet, ArrowLeftRight, CalendarDays, Receipt, Eye, EyeOff, ChevronRight, ChevronDown, Crown, Check } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
@@ -21,7 +21,7 @@ import AvatarPeci from '../components/AvatarPeci';
 import Tag from '../components/Tag';
 import SectionTitle from '../components/SectionTitle';
 import { pathTab, klikTautanSpa } from '../lib/tautanTab';
-import { bacaNamaKartu } from '../lib/kartuIngat';
+import { bacaNamaKartu, langgananKartuIngat } from '../lib/kartuIngat';
 import type { DashboardSummary, Tarikan } from '../lib/types';
 import MetaPisah from '../components/MetaPisah';
 
@@ -114,8 +114,9 @@ interface BerandaProps {
 }
 
 export default function Beranda({ onNavigate, onOpenKartu }: BerandaProps) {
-  /* Dibaca sekali per pasang — sapaan slide Kartu Warga, tanpa jaringan. */
-  const [namaKartu] = useState(bacaNamaKartu);
+  /* Nama yang dipilih di Kartu Saya (HP ini) — sapaan & slide carousel, tanpa
+     jaringan. Berlangganan: memilih nama terjadi di lapisan DI ATAS Beranda. */
+  const namaKartu = useSyncExternalStore(langgananKartuIngat, bacaNamaKartu, () => null);
   const { isBendahara, isWargaMode } = useAuthContext();
   // Tinggi layar (ikut rotasi) → kartu saldo & skeleton-nya membaca angka yang SAMA.
   const { vh, vw } = useUkuranLayar();
@@ -594,7 +595,10 @@ export default function Beranda({ onNavigate, onOpenKartu }: BerandaProps) {
               terbaca sebagai dua judul SEDERAJAT, bukan induk & anak. 24 vs 18
               memberi satu langkah yang benar-benar terlihat tanpa menambah token
               baru — 2xl sudah dipakai angka StatRow. */}
-          <h1 className="text-title font-bold text-ink dark:text-gray-100 leading-tight">{roleLabel}</h1>
+          {/* Nama dari Kartu Saya kalau HP ini sudah memilihnya (permintaan user
+              19 Okt 2026: "Selamat pagi, <nama di kartu>"), selain itu perannya.
+              Peran tetap terbaca di chip Header. */}
+          <h1 className="text-title font-bold text-ink dark:text-gray-100 leading-tight">{namaKartu ?? roleLabel}</h1>
         </div>
       </div>
   );

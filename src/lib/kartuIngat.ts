@@ -12,6 +12,17 @@
 const KUNCI = 'hadiran-kartu-warga';
 const KUNCI_NAMA = 'hadiran-kartu-nama';
 
+/* Pendengar perubahan di TAB INI — `storage` event cuma datang dari tab lain.
+   Beranda tetap terpasang di belakang lapisan Kartu Saya, jadi tanpa kabar ini
+   sapaan "Selamat pagi, <nama>" & slide carousel basi sampai Beranda dipasang
+   ulang. Dipakai lewat `useSyncExternalStore`. */
+const pendengar = new Set<() => void>();
+export function langgananKartuIngat(cb: () => void): () => void {
+  pendengar.add(cb);
+  return () => { pendengar.delete(cb); };
+}
+const kabari = () => pendengar.forEach((cb) => cb());
+
 export function bacaPilihan(): string | null {
   try { return localStorage.getItem(KUNCI); } catch { return null; }
 }
@@ -32,4 +43,5 @@ export function simpanPilihan(id: string | null, nama?: string) {
       localStorage.removeItem(KUNCI_NAMA);
     }
   } catch { /* abaikan (storage diblokir) */ }
+  kabari();
 }
