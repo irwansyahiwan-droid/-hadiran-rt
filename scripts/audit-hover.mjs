@@ -95,10 +95,16 @@ async function periksa(page, cdp, tema, layar) {
   const info = await page.evaluate(() => [...document.querySelectorAll('[data-hv]')].map((el) => ({
     id: el.getAttribute('data-hv'),
     nama: (el.getAttribute('aria-label') || el.innerText || el.getAttribute('title') || el.tagName).trim().replace(/\s+/g, ' ').slice(0, 60),
+    kelas: `${el.tagName}.${(el.getAttribute('class') || '').trim().split(/\s+/).sort().join('.')}`,
   })));
   for (const e of info) {
     pemeriksaan++;
-    const kunci = e.nama.replace(/[+-]?Rp[\d.]+/g, 'Rp…').replace(/\d+/g, 'N');
+    /* Kunci = NAMA + RESEP kelas (19 Okt 2026). Kunci nama saja menyatukan
+       kontrol BERBEDA yang kebetulan senama di seluruh app: tombol "Masuk"
+       Login (tanpa hover) tertutupi chip "Masuk" (Pemasukan) di sheet Kas RT
+       yang ber-hover, jadi temuannya hilang. Kelas yang sama tetap menyatukan
+       13 "Proses tarikan #N" jadi satu. */
+    const kunci = `${e.nama.replace(/[+-]?Rp[\d.]+/g, 'Rp…').replace(/\d+/g, 'N')}¦${e.kelas}`;
     const status = diam1[e.id] !== diam2[e.id] ? 'bergerak' : diam1[e.id] !== hover[e.id] ? 'berubah' : 'diam';
     catatan.push({ tema, kunci, nama: e.nama, layar, status });
   }
@@ -115,7 +121,29 @@ for (const tema of ['light', 'dark']) {
     await cdp.send('DOM.enable');
     await cdp.send('CSS.enable');
     await page.goto(URL, { waitUntil: 'networkidle' });
-    if (peran === 'warga') await loginWarga(page);
+    if (peran === 'warga') {
+      /* Login (19 Okt 2026): layar PERTAMA bendahara di laptop, dan tiga dari
+         empat kontrolnya tak berubah sama sekali di bawah kursor — "Masuk
+         sebagai Warga", "Tampilkan password", "Masuk". Sapuan ini dulu langsung
+         masuk sbg warga, jadi Login tak pernah dihover. Panel bendahara dibuka
+         supaya kolom & tombolnya ikut; gagal buka = PROBE CACAT. */
+      await page.locator('#masuk-warga').waitFor({ timeout: 30000 });
+      await page.waitForTimeout(1500);
+      await periksa(page, cdp, tema, 'login');
+      layarDiperiksa.add(`${tema}/login`);
+      const pemicu = page.locator('button[aria-expanded]', { hasText: 'Bendahara' });
+      for (let i = 0; i < 8 && (await pemicu.getAttribute('aria-expanded')) !== 'true'; i++) {
+        await pemicu.click().catch(() => {});
+        await page.waitForTimeout(500);
+      }
+      if ((await pemicu.getAttribute('aria-expanded')) !== 'true') cacatPopulasi.push(`[${tema}] login: panel bendahara tak pernah terbuka`);
+      else {
+        await page.waitForTimeout(500);
+        await periksa(page, cdp, tema, 'login-bendahara');
+        layarDiperiksa.add(`${tema}/login-bendahara`);
+      }
+      await loginWarga(page);
+    }
     await page.locator('nav button', { hasText: 'Beranda' }).waitFor({ timeout: 30000 });
     await page.waitForTimeout(2500);
     const tabs = (await page.locator('nav button').allInnerTexts()).map((t) => t.trim().split('\n')[0]);

@@ -251,7 +251,9 @@ const LANTAI = {
      tanpa umpan hover di semua jalan. Lantai ~95% dari ~257. */
   /* 244 → 348 (19 Okt 2026): slide carousel 2 & 3 + Kartu Saya (daftar &
      kartu, digulir) masuk populasi — 26 → 34 layar, 252 → 366 kontrol unik. */
-  hover:            [/(\d+) kontrol unik di \d+ layar/, 348],
+  /* 348 → 368 (19 Okt 2026): Login (+panel bendahara) masuk populasi & kunci
+     kini NAMA + resep kelas — 34 → 38 layar, 366 → 388 kontrol unik. */
+  hover:            [/(\d+) kontrol unik di \d+ layar/, 368],
   /* Populasi = PERMUKAAN berdaftar (properti app, bukan data) — lantai persis. */
   umumkan:          [/(\d+) permukaan diperiksa · \d+ bermasalah/, 7],
   /* Populasi = pemeriksaan (skenario tetap, bukan data) — lantai persis, garis

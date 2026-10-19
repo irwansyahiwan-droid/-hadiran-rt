@@ -769,6 +769,14 @@ for (const theme of ['light', 'dark']) {
       await browser.close();
       process.exit(2);
     }
+    /* Panel yang dibuka penunjuk memfokus kolom email (19 Okt 2026). Tanpa
+       blur, keadaan DIAM kolom itu terbaca DENGAN cincin emasnya → "TAK BERUBAH
+       saat fokus" palsu, dan batas kolomnya terukur bingkai fokus, bukan /45.
+       Sengaja HANYA di sini, bukan di `auditFokus`: blur di dalam menu Header
+       menutup menunya (pola WAI-ARIA), dan `closeLayer` sesudahnya lalu
+       menekan Back di layar tanpa lapisan. */
+    await page.evaluate(() => document.activeElement?.blur?.());
+    await page.waitForTimeout(300);
     await auditPage(page, `${theme}/login-bendahara`, { fokus: true });
     if (!(await loginWarga(page))) { console.log('GAGAL login warga', theme); await ctx.close(); continue; }
     await page.waitForTimeout(3000);
