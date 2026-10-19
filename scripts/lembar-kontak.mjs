@@ -26,6 +26,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { newCtx, loginWarga, gotoTab, openMenuItem, fakeSession, REF, ANON } from './lib/audit-harness.mjs';
+import { jelajahKartuWarga } from './lib/kartu-warga.mjs';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const OUT = '.lembar-kontak';
@@ -139,6 +140,19 @@ for (const bagian of BAGIAN.filter((b) => b !== 'ekstra' && b !== 'luring')) {
               await page.keyboard.press('Escape'); await page.waitForTimeout(700);
             }
           }
+        }
+        /* Normal saja (19 Okt 2026): slide carousel di BELAKANG kartu saldo &
+           Kartu Saya tak pernah ada di lembar ini — dua-duanya permukaan warga
+           yang paling pribadi, dan slide belakang tak pernah di depan saat
+           sapuan mana pun memotret. */
+        if (mode === null) {
+          await gotoTab(page, 'Beranda');
+          for (const n of [2, 3]) {
+            const tbl = page.getByRole('button', { name: `Ke slide ${n}` });
+            if (await tbl.count()) { await tbl.click(); await page.waitForTimeout(1200); await ambil(page, `${bagian}-${t}`, `warga · Beranda slide ${n}`); }
+            else process.stdout.write('!');
+          }
+          for (const _ of await jelajahKartuWarga(page, (fase) => ambil(page, `${bagian}-${t}`, `warga · Kartu Saya ${fase}`))) process.stdout.write('!');
         }
       } else process.stdout.write('!');
       await ctx.close();
