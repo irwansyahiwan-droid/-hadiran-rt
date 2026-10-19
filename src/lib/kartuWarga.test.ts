@@ -111,3 +111,12 @@ describe('susunKartu', () => {
     expect(k.totalTunggakan).toBe(50000);
   });
 });
+
+describe('sohibulTercatatHadir — syarat keterangan "(dihitung hadir)"', () => {
+  it('menghitung tarikan Sohibul Bait yang absensinya hadir saja', () => {
+    const tarikan = [T(1, 'selesai', 'w1'), T(2, 'selesai', 'w1'), T(3, 'dijadwalkan', 'w1')];
+    const k = susunKartu('w1', tarikan, [{ tarikan_id: 't1', status: 'hadir' }], []);
+    expect(k.jejak.filter((j) => j.status === 'sohibul')).toHaveLength(2);
+    expect(k.sohibulTercatatHadir).toBe(1); // t2 tanpa baris absensi → keterangan tak boleh tampil
+  });
+});

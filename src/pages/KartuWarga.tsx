@@ -630,6 +630,13 @@ function JejakKehadiran({ kartu }: { kartu: DataKartu }) {
           <li key={st} className="flex items-center gap-2 text-caption text-ink-sub dark:text-gray-400">
             <span aria-hidden="true" className={`w-3 h-3 rounded-full ${GAYA_JEJAK[st]}`} />
             {LABEL_JEJAK[st]} <span className="font-semibold tabular-nums text-ink dark:text-gray-100">{jumlah(st)}</span>
+            {/* Hero menghitung "Hadir" dari absensi, bulatan Sohibul Bait menimpa
+                statusnya — tanpa keterangan ini layar yang sama menulis "Hadir
+                24/24" & "Hadir 23" (19 Okt 2026, kata disetujui user). Dipasang
+                HANYA bila tiap tarikan Sohibul Bait memang tercatat hadir. */}
+            {st === 'sohibul' && kartu.sohibulTercatatHadir === jumlah('sohibul') && (
+              <span>(dihitung hadir)</span>
+            )}
           </li>
         ))}
       </ul>

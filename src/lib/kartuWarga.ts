@@ -80,6 +80,11 @@ export interface KartuWarga {
   jejak: JejakKartu[];
   /** Giliran terdekat yang belum selesai; null = tak ada jadwal. */
   giliran: GiliranKartu | null;
+  /** Tarikan tempat warga ini Sohibul Bait DAN tercatat `hadir` di absensinya.
+   *  Bulatan jejaknya berstatus 'sohibul' (menimpa absensi), sedangkan `hadir`
+   *  dihitung dari absensi — jadi legenda boleh menulis "(dihitung hadir)"
+   *  HANYA bila angka ini = jumlah bulatan 'sohibul' (19 Okt 2026). */
+  sohibulTercatatHadir: number;
 }
 
 export function susunKartu(
@@ -157,6 +162,7 @@ export function susunKartu(
     talanganLunas,
     jejak,
     giliran,
+    sohibulTercatatHadir: milikSaya.filter((t) => t.status === 'selesai' && statusPer.get(t.id) === 'hadir').length,
   };
 }
 

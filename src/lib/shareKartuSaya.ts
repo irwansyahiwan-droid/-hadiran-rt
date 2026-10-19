@@ -111,7 +111,7 @@ export const LABEL_STATUS: Record<StatusJejak, string> = {
 };
 const URUT_LEGENDA: StatusJejak[] = ['hadir', 'titip', 'tidak_hadir', 'sohibul', 'kosong'];
 
-export interface ItemLegenda { st: StatusJejak; n: number; x: number; baris: number }
+export interface ItemLegenda { st: StatusJejak; n: number; x: number; baris: number; catatan?: string }
 
 /** Butir legenda + posisinya, melipat di lebar kolom. Paritas layar: hadir &
  *  tidak hadir selalu tampil, status lain hanya kalau ada. `ukur(teks, tebal)`
@@ -120,15 +120,19 @@ export function susunLegenda(
   jejak: { status: StatusJejak }[],
   ukur: (teks: string, tebal: 500 | 700) => number,
   lebar: number,
+  /** Paritas layar: "(dihitung hadir)" di butir Sohibul Bait — hanya bila
+   *  tiap tarikan Sohibul Bait tercatat hadir (`sohibulTercatatHadir`). */
+  sohibulDihitungHadir = false,
 ): ItemLegenda[] {
   const hasil: ItemLegenda[] = [];
   let x = 0, baris = 0;
   for (const st of URUT_LEGENDA) {
     const n = jejak.filter((j) => j.status === st).length;
     if (n === 0 && st !== 'hadir' && st !== 'tidak_hadir') continue;
-    const w = 10 + 6 + ukur(`${LABEL_STATUS[st]} `, 500) + ukur(String(n), 700);
+    const catatan = st === 'sohibul' && sohibulDihitungHadir ? ' (dihitung hadir)' : undefined;
+    const w = 10 + 6 + ukur(`${LABEL_STATUS[st]} `, 500) + ukur(String(n), 700) + (catatan ? ukur(catatan, 500) : 0);
     if (x > 0 && x + w > lebar) { x = 0; baris++; }
-    hasil.push({ st, n, x, baris });
+    hasil.push({ st, n, x, baris, ...(catatan ? { catatan } : {}) });
     x += w + 16;
   }
   return hasil;
@@ -285,7 +289,10 @@ export async function buatPngKartuSaya(d: DataKartuSaya): Promise<File> {
   const legenda = susunLegenda(kartu.jejak, (t, tebal) => {
     ukurCanvas.font = `${tebal} 13px ${rupiahFont}`;
     return ukurCanvas.measureText(t).width;
-  }, W - 2 * X);
+  }, W - 2 * X, (() => {
+    const nSb = kartu.jejak.filter((j) => j.status === 'sohibul').length;
+    return nSb > 0 && kartu.sohibulTercatatHadir === nSb;
+  })());
   const barisLegenda = legenda.length ? legenda[legenda.length - 1].baris + 1 : 0;
 
   const g = hitungGeometriKartuSaya({
@@ -471,6 +478,12 @@ export async function buatPngKartuSaya(d: DataKartuSaya): Promise<File> {
       ctx.fillStyle = CETAK.ink;
       ctx.font = `700 13px ${rupiahFont}`;
       ctx.fillText(String(l.n), x + 16 + wTeks, cy);
+      if (l.catatan) {
+        const wN = ctx.measureText(String(l.n)).width;
+        ctx.fillStyle = CETAK.sub;
+        ctx.font = `500 13px ${rupiahFont}`;
+        ctx.fillText(l.catatan, x + 16 + wTeks + wN, cy);
+      }
     });
   }
 
