@@ -131,7 +131,9 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
     deadlineLewat = hari < 0 && !tercapai;
     /* Tanggal & "N hari lagi" masing-masing satu kesatuan (spasi tak-putus):
        di 320px baris ini dulu patah jadi "…96 hari" + "lagi" sendirian. */
-    deadline = [tgl, hari >= 0 ? `${hari}\u00A0hari\u00A0lagi` : 'lewat'];
+    /* Hari tenggat = "hari ini", bukan "0 hari lagi" (20 Okt 2026, persetujuan
+       user; terlihat lewat sapuan ber-JAM 31 Des). */
+    deadline = [tgl, hari > 0 ? `${hari}\u00A0hari\u00A0lagi` : hari === 0 ? 'hari\u00A0ini' : 'lewat'];
   }
 
   return (
