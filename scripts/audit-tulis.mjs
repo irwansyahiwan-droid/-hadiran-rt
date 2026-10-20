@@ -367,7 +367,12 @@ await ujiTulis(
     await page.waitForTimeout(800);
     return page.locator('body');
   },
-  async () => { /* default "tidak hadir" untuk semua sudah sah — tak ada field wajib */ },
+  /* Tandai hadir dulu, seperti bendahara sungguhan (20 Okt 2026). Default "tidak
+     hadir" untuk semua dulu sah dipakai di sini — sejak simpan dgn NOL hadir &
+     NOL titip ditanya lewat dialog, tombol itu tak lagi langsung menulis. Kalau
+     "Semua Hadir" hilang, langkah ini MELEDAK (bukan dilewati): sapuan yang
+     menekan Simpan lalu tersangkut di dialog akan salah menuduh tombolnya. */
+  async (wadah) => { await wadah.getByRole('button', { name: 'Semua Hadir' }).click({ timeout: 10000 }); await wadah.page().waitForTimeout(400); },
   /^(Simpan & Hitung Iuran|Menghitung…|Menyimpan…)$/,
   bacaanAbsensi,
 );
