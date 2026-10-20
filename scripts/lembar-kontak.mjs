@@ -62,7 +62,23 @@ const OVERLAY_B = ['Kelola Anggota', 'Riwayat Aktivitas'];
 const MODE_OVERLAY = [null, 'kosong', 'gagal'];
 
 const shots = [];   // { grup, label, b64 }
+/* Tunggu kerangka HABIS sebelum memotret (20 Okt 2026). Jeda tetap dulu cukup
+   untuk warga, tidak untuk bendahara: empat layar bendahara terang (Hadiran,
+   Kas RT, Kelola Anggota, Riwayat) terpotret masih kerangka di bagian NORMAL —
+   lembar yang dibuat untuk DILIHAT malah menyembunyikan layarnya. Yang tak
+   habis dalam batas waktu tetap dipotret, tapi labelnya MENGAKU. `memuat`
+   sengaja dilewati: kerangka itulah yang mau dipotret. */
+async function tungguIsiNyata(page, batasMs = 20000) {
+  const habis = Date.now() + batasMs;
+  while (Date.now() < habis) {
+    const n = await page.locator('.skeleton, .skeleton-bar').count().catch(() => 0);
+    if (n === 0) { await page.waitForTimeout(500); return true; }
+    await page.waitForTimeout(400);
+  }
+  return false;
+}
 const ambil = async (page, grup, label) => {
+  if (!grup.startsWith('memuat') && !(await tungguIsiNyata(page))) label += ' (MASIH KERANGKA)';
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(450);
   const b64 = (await page.screenshot()).toString('base64');
