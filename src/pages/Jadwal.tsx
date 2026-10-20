@@ -124,6 +124,12 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
   const [saving, setSaving, sedangSimpan] = useSaving();
   const [cancelling, setCancelling, sedangBatalkan] = useSaving();
   const [confirmCancel, setConfirmCancel] = useState(false);
+  /* Simpan dgn NOL hadir & NOL titip ditanya dulu (20 Okt 2026, kata disetujui
+     user). Tarikan baru dibuka dgn SEMUA anggota 'tidak_hadir', dan tombol
+     simpannya melayang di zona jempol: satu sentuhan sebelum menandai siapa pun
+     mencatat talangan ke seluruh anggota (69 × Rp50.000) di 4 tabel. Jalur
+     gagal-muat di bawah sudah dijaga dari akibat yang SAMA; jalur normal belum. */
+  const [tanyaKosong, setTanyaKosong] = useState(false);
   const [loadingAbsensi, setLoadingAbsensi] = useState(true);
   const [absensiError, setAbsensiError] = useState(false);
   const [muatUlang, setMuatUlang] = useState(0);
@@ -540,7 +546,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
       >
         <div className="max-w-lg mx-auto space-y-2">
           <button
-            onClick={() => { haptic(12); simpan(); }}
+            onClick={() => { haptic(12); if (hadirCount === 0 && titipCount === 0) setTanyaKosong(true); else simpan(); }}
             disabled={saving || cancelling}
             className="btn-brand w-full py-4 text-body flex items-center justify-center gap-2"
           >
@@ -581,6 +587,15 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
         loading={cancelling}
         onClose={() => setConfirmCancel(false)}
         onConfirm={batalkan}
+      />
+      <ConfirmDestruktif
+        open={tanyaKosong}
+        title={`Semua ${tidakCount} anggota tidak hadir?`}
+        description={`Belum ada yang ditandai hadir. Kalau disimpan, ke-${tidakCount} anggota tercatat tidak hadir dan kena talangan ${formatRupiahPlain(talanganTotal)}.`}
+        confirmLabel="Simpan"
+        batalLabel="Kembali menandai"
+        onClose={() => setTanyaKosong(false)}
+        onConfirm={() => { setTanyaKosong(false); simpan(); }}
       />
       <ConfirmDestruktif
         open={jaga.tanya}
