@@ -3,7 +3,8 @@ import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { FileText, Search, X, Check, Coins, Users, CalendarDays, RotateCcw, RefreshCw, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
-import { formatTanggal, formatRupiahPlain, haptic, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic, labelHariTarikan, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
+import LabelHari from '../components/LabelHari';
 import { showToast } from '../lib/toast';
 import { useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
@@ -737,6 +738,7 @@ export default function JadwalWargaPage() {
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
               {allTarikan.map((t, idx) => {
                 const isSelesai = t.status === 'selesai';
+                const lh = labelHariTarikan(t);
                 const isLast = idx === allTarikan.length - 1;
                 return (
                   <div
@@ -762,6 +764,7 @@ export default function JadwalWargaPage() {
                       </p>
                       <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
                         {formatTanggal(t.tanggal)}
+                        {lh && <> · <LabelHari label={lh} /></>}
                         {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
                           <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>
                         )}

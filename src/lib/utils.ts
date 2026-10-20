@@ -195,6 +195,22 @@ export function selisihHari(tanggal: string, kini: Date = new Date()): number {
   return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(kini.getFullYear(), kini.getMonth(), kini.getDate())) / 86400000);
 }
 
+/** Label WAKTU tarikan yang belum selesai (20 Okt 2026, kata disetujui user):
+ *  "Hari ini" · "Besok" · "Belum dicatat" (tanggal lewat, belum diproses).
+ *  Hari lain `null` — tanggalnya sudah cukup. Dulu daftar memajang tanggal
+ *  saja di keempat keadaan: Jumat & Sabtu tak menyebut "Besok"/"Hari ini",
+ *  dan Selasa sesudahnya #25 masih tampil sbg "Jadwal Berikutnya" bertanggal
+ *  lampau tanpa tanda apa pun. Hari KALENDER zona perangkat (`selisihHari`). */
+export type LabelHari = { teks: 'Hari ini' | 'Besok' | 'Belum dicatat'; nada: 'pos' | 'warn' };
+export function labelHariTarikan(t: { tanggal: string; status?: string | null }, kini: Date = new Date()): LabelHari | null {
+  if (!t.tanggal || t.status === 'selesai') return null;
+  const h = selisihHari(t.tanggal, kini);
+  if (h === 0) return { teks: 'Hari ini', nada: 'pos' };
+  if (h === 1) return { teks: 'Besok', nada: 'pos' };
+  if (h < 0) return { teks: 'Belum dicatat', nada: 'warn' };
+  return null;
+}
+
 export function formatTanggal(dateStr: string): string {
   const date = new Date(dateStr);
   return tanggalUtuh(date.toLocaleDateString('id-ID', {

@@ -18,7 +18,8 @@ import CrossFade from '../components/CrossFade';
 import PageHeader from '../components/layout/PageHeader';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggal, formatRupiahPlain, haptic, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic, labelHariTarikan, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
+import LabelHari from '../components/LabelHari';
 import { ringkasAbsensi } from '../lib/absensiHitung';
 import { simpanTarikanSelesai } from '../lib/simpanTarikan';
 import { fetchAbsensiTersimpan } from '../lib/absensiTersimpan';
@@ -1360,6 +1361,7 @@ export default function JadwalPage() {
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-line dark:border-gray-800/60 lift overflow-hidden">
           {tarikanList.map((t, idx) => {
+            const lh = labelHariTarikan(t);
             const isLast    = idx === tarikanList.length - 1;
             const isSelesai = t.status === 'selesai';
             const isNext    = t.id === nextDijadwal?.id;
@@ -1411,6 +1413,7 @@ export default function JadwalPage() {
                   </p>
                   <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">
                     {formatTanggal(t.tanggal)}
+                    {lh && <> · <LabelHari label={lh} /></>}
                     {t.sohibul_bait && t.sohibul_bait.status_aktif === false && (
                       <span className="text-rose-500 dark:text-rose-400 font-semibold"> · Sohibul nonaktif</span>
                     )}

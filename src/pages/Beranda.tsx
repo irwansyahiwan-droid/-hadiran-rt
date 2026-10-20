@@ -13,7 +13,8 @@ import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay, heroRingkas, useUkuranLayar, useKembaliDariLatar } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
-import { formatRupiah, formatRupiahPlain, formatTanggal, haptic, ikatFrasa, labelTanggalRelatif, maskRp, SOHIBUL_KOSONG } from '../lib/utils';
+import { formatRupiah, formatRupiahPlain, formatTanggal, haptic, ikatFrasa, labelHariTarikan, labelTanggalRelatif, maskRp, SOHIBUL_KOSONG } from '../lib/utils';
+import LabelHari from '../components/LabelHari';
 import { fetchDashboardSummary } from '../lib/dashboard';
 import BannerCarousel, { BannerSkeleton } from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
@@ -897,6 +898,7 @@ export default function Beranda({ onNavigate, onOpenKartu }: BerandaProps) {
               // adalah giliran siapa. Sohibul Bait berikutnya dapat mahkota + cincin
               // emas songket (selaras motif hero), sisanya tetap baris netral.
               const next = idx === 0;
+              const lh = labelHariTarikan(j);
               return (
               <div key={j.id} style={{ animationDelay: `${idx * 0.05}s` }} className={`rise flex items-center gap-2 px-4 py-4 ${next ? 'bg-emerald-50/50 dark:bg-emerald-900/10' : ''} ${idx < jadwalList.length - 1 ? 'divide-inset' : ''}`}>
                 {/* Avatar + badge nomor */}
@@ -959,7 +961,7 @@ export default function Beranda({ onNavigate, onOpenKartu }: BerandaProps) {
                         dan tak satu nama pun terpotong karenanya. */}
                     {!next && <Tag tone="neutral" className="shrink-0">Terjadwal</Tag>}
                   </div>
-                  <MetaPisah className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-0.5" bagian={[`Tarikan ke-${j.nomor}`, formatTanggal(j.tanggal)]} />
+                  <MetaPisah className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-0.5" bagian={[`Tarikan ke-${j.nomor}`, formatTanggal(j.tanggal), lh && <LabelHari label={lh} />]} />
                 </div>
               </div>
               );
