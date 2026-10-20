@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, History, Plus, Pencil, Trash2,
   CheckCircle2, RotateCcw, ArrowRight, RefreshCw, FileText,
@@ -13,7 +13,7 @@ import { useRealtime } from '../hooks/useRealtime';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
-import { fetchAktivitas, fetchKamus, formatAktivitas, formatWaktu, formatWaktuRelatif } from '../lib/aktivitas';
+import { fetchAktivitas, fetchKamus, fetchSemuaAktivitas, formatAktivitas, formatWaktu, formatWaktuRelatif, gabungAktivitas, hitungAktivitas } from '../lib/aktivitas';
 import type { KamusNama } from '../lib/aktivitas';
 import { formatRupiahPlain, haptic, ikatFrasa, labelTanggalRelatif } from '../lib/utils';
 import { showToast } from '../lib/toast';
@@ -62,6 +62,36 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
+  /* CAKUPAN (20 Okt 2026): buka memuat 200 terbaru — cepat di sinyal lemah —
+     tapi layar & PDF WAJIB mengaku itu bukan seluruh riwayat. Begitu warga
+     mencari atau memilih chip, SELURUH riwayat dimuat supaya "Tidak ada hasil"
+     berarti memang tak ada, bukan "tak termuat". Sesudah lengkap, muat ulang
+     (tombol & realtime) cuma MENGGABUNGKAN halaman terbaru — audit_log hanya
+     bertambah — alih-alih mengunduh ulang semuanya tiap ada aktivitas. */
+  const [total, setTotal] = useState<number | null>(null);
+  const [lengkap, setLengkap] = useState(false);
+  const [memuatSemua, setMemuatSemua] = useState(false);
+  const lengkapRef = useRef(false);
+  const memuatRef = useRef(false);
+
+  async function muatSemua() {
+    if (lengkapRef.current || memuatRef.current) return;
+    memuatRef.current = true;
+    setMemuatSemua(true);
+    try {
+      const semua = await fetchSemuaAktivitas();
+      lengkapRef.current = true;
+      setLengkap(true);
+      setRows(semua);
+      setTotal((t) => Math.max(t ?? 0, semua.length));
+    } catch {
+      showToast('Gagal memuat aktivitas yang lebih lama. Cek koneksi lalu coba lagi.', 'error');
+    } finally {
+      memuatRef.current = false;
+      setMemuatSemua(false);
+    }
+  }
+
   async function load() {
     setError(false);
     try {
@@ -71,12 +101,15 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
          datanya UUID. Kalau ia gagal, barisnya kembali seperti sebelum
          2 Sep 2026 (tanpa nama) sementara sisa riwayat tetap utuh. Menjatuhkan
          seluruh layar demi pelengkap = menukar kerugian kecil dgn besar. */
-      const [data, k] = await Promise.all([
+      const [data, k, n] = await Promise.all([
         fetchAktivitas(),
         fetchKamus().catch(() => null),
+        hitungAktivitas().catch(() => null),
       ]);
-      setRows(data);
+      setRows((lama) => (lengkapRef.current ? gabungAktivitas(data, lama) : data));
       setKamus(k);
+      if (n != null) setTotal(n);
+      if (n != null && data.length >= n) { lengkapRef.current = true; setLengkap(true); }
     } catch {
       setError(true);
     } finally {
@@ -97,6 +130,16 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
 
   // Tombol Back HP menutup overlay (bukan keluar app). Semua jalur tutup
   // lewat requestClose → mundur ke kanan (page-out-right) baru unmount.
+  /* Mencari / memilih chip = minta jawaban LENGKAP. */
+  const menyaring = search.trim() !== '' || filter !== 'semua';
+  useEffect(() => {
+    if (open && !loading && !error && menyaring) muatSemua();
+  }, [open, loading, error, menyaring]);
+  const sejak = rows.length
+    ? new Date(rows[rows.length - 1].created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+    : '';
+  const sebagian = !lengkap && total != null && total > rows.length;
+
   const exit = useClosePhase(onClose, 160);
   useBackDismiss(open, exit.requestClose);
   const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Riwayat aktivitas' });
@@ -151,7 +194,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
     const label = FILTERS.find((f) => f.id === filter)?.label ?? 'Semua';
     await jalankanPdf(async () => {
       const { generateAktivitasPDF } = await import('../lib/generateAktivitasPDF');
-      generateAktivitasPDF(flat, label);
+      generateAktivitasPDF(flat, label, sebagian ? sejak : null);
       showToast('PDF riwayat dibuat');
     }, { mulai: 'Menyiapkan PDF…', gagal: 'Gagal membuat PDF. Coba muat ulang aplikasi.' });
   }
@@ -227,7 +270,7 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
         {!loading && rows.length > 0 && petunjuk}
 
         {/* List */}
-        {loading ? (
+        {loading || (memuatSemua && grouped.length === 0) ? (
           /* Kerangka mencermin SUSUNAN asli (30 Sep 2026): petunjuk → label hari
              → SATU kartu per hari berisi baris-baris. Dulu enam kartu terpisah
              mulai y=195 @390px, sedangkan kartu pertama asli di y=267 — turun
@@ -459,6 +502,25 @@ export default function RiwayatAktivitas({ open, onClose }: Props) {
               </div>
             </div>
           ))
+        )}
+
+        {/* Kaki CAKUPAN: hanya selama riwayat belum lengkap. Tombolnya juga
+            jalan keluar kalau pemuatan otomatis (saat mencari) gagal. */}
+        {!loading && !error && sebagian && (
+          <div className="pt-2 flex flex-col items-center gap-3 text-center">
+            <p className="text-caption text-ink-faint dark:text-gray-400 text-balance">
+              Menampilkan {rows.length.toLocaleString('id-ID')} aktivitas terbaru, sejak {sejak}.
+            </p>
+            <button
+              type="button"
+              onClick={() => { haptic(); muatSemua(); }}
+              disabled={memuatSemua}
+              className="btn-secondary press min-h-[44px] px-5 py-3 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-60"
+            >
+              {memuatSemua && <Loader2 className="w-4 h-4 animate-spin" />}
+              {memuatSemua ? 'Memuat…' : `Muat semua ${total!.toLocaleString('id-ID')} aktivitas`}
+            </button>
+          </div>
         )}
       </main>
     </div>

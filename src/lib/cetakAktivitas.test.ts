@@ -36,4 +36,13 @@ describe('PDF Riwayat Aktivitas — isi dokumen', () => {
     expect(teks, 'label filter hilang — dokumen tersaring menyamar jadi lengkap')
       .toContain(`Kategori: Kas RT · ${ROWS.length} aktivitas tercatat`);
   });
+
+  it('CAKUPAN: halaman terbaru saja TAK boleh mengaku "tercatat" (20 Okt 2026)', () => {
+    /* Riwayat memuat 200 terbaru sementara 951 tercatat; PDF dulu menulis
+       "200 aktivitas tercatat" — klaim yang menghapus 751 jejak dari dokumen
+       audit tanpa satu kata pun. */
+    const teks = teksPdf(buildAktivitasPDF(ROWS, 'Semua', '30 Sep 2026').doc);
+    expect(teks).toContain(`Kategori: Semua · ${ROWS.length} aktivitas terbaru · sejak 30 Sep 2026`);
+    expect(teks.join(' ')).not.toContain('aktivitas tercatat');
+  });
 });

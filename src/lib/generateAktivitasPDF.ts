@@ -11,7 +11,9 @@ import type { AktivitasLog } from './types';
 
 /** Ekspor daftar riwayat aktivitas (audit log) ke PDF untuk arsip / lampiran LPJ. */
 /* Seam `build*` — pola sama dgn generator lain (4 Sep 2026). Murni ekstraksi. */
-export function buildAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'): { doc: jsPDF; filename: string } {
+/** `sejak` diisi kalau `rows` BUKAN seluruh riwayat (cuma halaman terbaru yang
+ *  termuat): kepala dokumen lalu menyebut cakupannya, bukan "N tercatat". */
+export function buildAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua', sejak: string | null = null): { doc: jsPDF; filename: string } {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   amankanPdf(doc);
   const W = doc.internal.pageSize.getWidth();
@@ -22,7 +24,9 @@ export function buildAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'): 
 
   const IDENT = {
     title: 'Riwayat Aktivitas',
-    subtitle: `Kategori: ${filterLabel} · ${rows.length} aktivitas tercatat`,
+    subtitle: sejak
+      ? `Kategori: ${filterLabel} · ${rows.length} aktivitas terbaru · sejak ${sejak}`
+      : `Kategori: ${filterLabel} · ${rows.length} aktivitas tercatat`,
   };
   const Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT });
 
@@ -64,7 +68,7 @@ export function buildAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua'): 
   return { doc, filename: `Riwayat-Aktivitas-${docCode}.pdf` };
 }
 
-export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua') {
-  const { doc, filename } = buildAktivitasPDF(rows, filterLabel);
+export function generateAktivitasPDF(rows: AktivitasLog[], filterLabel = 'Semua', sejak: string | null = null) {
+  const { doc, filename } = buildAktivitasPDF(rows, filterLabel, sejak);
   return outputPdf(doc, filename);
 }

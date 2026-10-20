@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { bacaSemua } from './bacaSemua';
 import { formatRupiahPlain } from './utils';
 import type { AktivitasLog } from './types';
 
@@ -367,12 +368,44 @@ export async function fetchKamus(): Promise<KamusNama> {
   return { warga, tarikan };
 }
 
+const KOLOM_AKTIVITAS = 'id, table_name, record_id, action, actor_name, old_data, new_data, created_at';
+
+/** Halaman PERTAMA riwayat: `limit` aktivitas terbaru. BUKAN seluruh riwayat —
+ *  pemanggil yang menyatakan jumlah wajib memakai `hitungAktivitas()`. */
 export async function fetchAktivitas(limit = 200): Promise<AktivitasLog[]> {
   const { data, error } = await supabase
     .from('audit_log')
-    .select('id, table_name, record_id, action, actor_name, old_data, new_data, created_at')
+    .select(KOLOM_AKTIVITAS)
     .order('created_at', { ascending: false })
     .limit(limit);
   if (error) throw error;
   return (data as AktivitasLog[]) ?? [];
+}
+
+/** Jumlah SELURUH aktivitas tercatat (20 Okt 2026). Riwayat dulu cuma memuat
+ *  200 terbaru — terukur hari itu 951 tercatat sejak 5 Jun, jadi daftar
+ *  berhenti di 30 Sep, pencarian nama untuk kejadian Agustus menjawab "Tidak
+ *  ada hasil", dan PDF-nya menulis "200 aktivitas tercatat". */
+export async function hitungAktivitas(): Promise<number> {
+  const { count, error } = await supabase.from('audit_log').select('id', { count: 'exact', head: true });
+  if (error) throw error;
+  return count ?? 0;
+}
+
+/** SELURUH riwayat, terbaru dulu — berhalaman lewat `bacaSemua` (Supabase
+ *  memotong tiap jawaban di 1000 baris). ±86 kB terkompresi per 950 baris,
+ *  jadi dimuat hanya saat diminta (mencari, memilih chip, atau tombolnya). */
+export function fetchSemuaAktivitas(): Promise<AktivitasLog[]> {
+  return bacaSemua<AktivitasLog>('audit_log', KOLOM_AKTIVITAS, {
+    saring: (q) => q.order('created_at', { ascending: false }),
+  });
+}
+
+/** Gabung halaman terbaru ke riwayat yang sudah lengkap. `audit_log` hanya
+ *  bertambah (trigger INSERT), jadi cukup menambahkan id yang belum ada. */
+export function gabungAktivitas(baru: AktivitasLog[], lama: AktivitasLog[]): AktivitasLog[] {
+  const ada = new Set(lama.map((r) => r.id));
+  const tambahan = baru.filter((r) => !ada.has(r.id));
+  if (tambahan.length === 0) return lama;
+  return [...tambahan, ...lama].sort((a, b) => (a.created_at < b.created_at ? 1 : a.created_at > b.created_at ? -1 : 0));
 }
