@@ -49,7 +49,7 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
         {!!saldoAwal && (
           <div className="flex items-center justify-between text-caption">
             <span className="text-gray-500 dark:text-gray-400">Saldo Awal</span>
-            <span className={`font-display font-semibold tabular-nums ${saldoAwal < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-700 dark:text-gray-300'}`}>{formatRupiahBertanda(saldoAwal)}</span>
+            <span className={`shrink-0 whitespace-nowrap font-display font-semibold tabular-nums ${saldoAwal < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-700 dark:text-gray-300'}`}>{formatRupiahBertanda(saldoAwal)}</span>
           </div>
         )}
         <div className="flex items-center justify-between text-caption">
@@ -61,7 +61,7 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
                 DESIGN.stitch §7. Berkas ini terlewat waktu sweep kemarin. */}
             <ArrowDownLeft className="w-3.5 h-3.5 text-pos dark:text-pos-dark" /> Masuk
           </span>
-          <span className="font-display font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
+          <span className="shrink-0 whitespace-nowrap font-display font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
         </div>
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
@@ -74,11 +74,11 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
                 melihat dua versi fakta yang sama. */}
             <ArrowUpRight className={`w-3.5 h-3.5 ${keluarTransfer ? 'text-blue-700 dark:text-blue-400' : 'text-neg dark:text-neg-dark'}`} /> {keluarLabel}
           </span>
-          <span className={`font-display font-semibold tabular-nums ${keluarTransfer ? 'text-gray-900 dark:text-gray-100' : 'text-neg dark:text-rose-400'}`}>{formatRupiahArah(keluar, '-')}</span>
+          <span className={`shrink-0 whitespace-nowrap font-display font-semibold tabular-nums ${keluarTransfer ? 'text-gray-900 dark:text-gray-100' : 'text-neg dark:text-rose-400'}`}>{formatRupiahArah(keluar, '-')}</span>
         </div>
         <div className="flex items-center justify-between text-caption pt-2 border-t border-control dark:border-control-dark">
           <span className="font-semibold text-gray-700 dark:text-gray-300">{saldoLabel}</span>
-          <span className={`font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
+          <span className={`shrink-0 whitespace-nowrap font-display font-semibold tabular-nums ${saldo < 0 ? 'text-neg dark:text-rose-400' : 'text-gray-900 dark:text-gray-100'}`}>
             {saldo < 0 ? '-' : ''}{formatRupiahPlain(saldo)}
           </span>
         </div>
@@ -87,7 +87,11 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
             <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" /> Talangan belum lunas
             </span>
-            <span className="font-display font-semibold text-warn dark:text-amber-400 tabular-nums">{formatRupiahArah(talangan, '-')}</span>
+            {/* Nominal ledger ini `shrink-0 whitespace-nowrap` (20 Okt 2026), resep
+                panel Alur Kas Hadiran: @320px "-Rp1.400.000" patah SESUDAH tanda
+                minus — "-" tertinggal sendirian di baris atas. Dulu tak terlihat
+                `audit:kata-patah` karena tandanya simpul teks terpisah. */}
+            <span className="shrink-0 whitespace-nowrap font-display font-semibold text-warn dark:text-amber-400 tabular-nums">{formatRupiahArah(talangan, '-')}</span>
           </div>
         )}
       </div>
