@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { BookOpen, Coins, Users, Link2, Heart, ShieldCheck } from 'lucide-react';
 import OverlayHeader from '../components/layout/OverlayHeader';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
 import { haptic, ikatFrasa } from '../lib/utils';
+import { supabase } from '../lib/supabase';
 import AvatarPeci from '../components/AvatarPeci';
 import logoRt from '../assets/logo-rt.svg';
 
@@ -25,12 +27,18 @@ const PENGURUS = [
   { jabatan: 'Bendahara', nama: 'Irwansyah' },
 ];
 
-const SUMBER = [
-  // \u00A0 eksplisit, BUKAN &nbsp;: ini string JS biasa, entity HTML hanya
-  // diterjemahkan di dalam JSX. "70 KK" & "RT 004/006" jangan pecah antar baris.
-  { b: 'Master Anggota', t: '70\u00A0KK aktif RT\u00A0004/006' },
-  { b: 'Spreadsheet Hadiran', t: 'Jadwal, Absensi, Kas, Talangan' },
-  { b: 'Spreadsheet Laporan Kas RT', t: 'sinkron real-time; sumber dana setoran = Iuran Anggota Hadiran' },
+/* `jumlahAktif` DIHITUNG dari data (20 Okt 2026, persetujuan user) — dulu
+   "70 KK aktif" ditulis mati di sini: benar hari itu, salah begitu satu anggota
+   bergabung/nonaktif, di app yang menargetkan 300 KK. Selama memuat/gagal
+   jumlahnya TIDAK disebut (app tak menyatakan angka yang tak ia ketahui).
+   \u00A0 eksplisit, BUKAN &nbsp;: ini string JS biasa, entity HTML hanya
+   diterjemahkan di dalam JSX. "70 KK" & "RT 004/006" jangan pecah antar baris. */
+const sumber = (jumlahAktif: number | null) => [
+  { b: 'Master Anggota', t: `${jumlahAktif != null ? `${jumlahAktif}\u00A0` : ''}KK aktif RT\u00A0004/006` },
+  /* Spreadsheet SUDAH MATI (keterangan user 20 Okt 2026) — dua baris lama
+     menyebut "Spreadsheet Hadiran" & "sinkron real-time". Kata disetujui user. */
+  { b: 'Kas Hadiran', t: 'jadwal, absensi, kas & talangan dicatat bendahara langsung di aplikasi ini' },
+  { b: 'Kas RT', t: 'dicatat di aplikasi ini; sumber dana setoran = iuran anggota Hadiran' },
 ];
 
 const KEAMANAN = [
@@ -63,6 +71,14 @@ export default function TentangApp({ open, onClose }: Props) {
   const exit = useClosePhase(onClose, 160);
   useBackDismiss(open, exit.requestClose);
   const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Tentang aplikasi' });
+  const [jumlahAktif, setJumlahAktif] = useState<number | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    let batal = false;
+    supabase.from('warga').select('id', { count: 'exact', head: true }).eq('status_aktif', true)
+      .then(({ count, error }) => { if (!batal && !error && typeof count === 'number') setJumlahAktif(count); });
+    return () => { batal = true; };
+  }, [open]);
   if (!open) return null;
 
   return (
@@ -118,7 +134,7 @@ export default function TentangApp({ open, onClose }: Props) {
         {/* Sumber Data */}
         <Section icon={Link2} title="Sumber data">
           <ul className="space-y-3">
-            {SUMBER.map((s) => (
+            {sumber(jumlahAktif).map((s) => (
               <li key={s.b} className="flex gap-3">
                 <span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                 <p className="text-pretty text-caption leading-relaxed text-gray-600 dark:text-gray-300">
@@ -149,8 +165,11 @@ export default function TentangApp({ open, onClose }: Props) {
         {/* Footer */}
         <div className="text-center pt-2 pb-1 space-y-2">
           <p className="text-balance text-micro text-ink-faint dark:text-gray-400">© 2026 RT&nbsp;004/006 Tanah Baru, Beji, Kota&nbsp;Depok</p>
+          {/* Teks dibungkus SATU span (20 Okt 2026): tiap potongan teks di dalam
+              flex jadi item sendiri, dan `gap-1` menyisipkan 4px SEBELUM koma —
+              tercetak "Irwansyah (Bendahara) , untuk warga". */}
           <p className="text-caption text-gray-500 dark:text-gray-400 inline-flex items-center justify-center gap-1">
-            Dibuat oleh <b className="text-gray-700 dark:text-gray-200">Irwansyah (Bendahara)</b>, untuk warga
+            <span>Dibuat oleh <b className="text-gray-700 dark:text-gray-200">Irwansyah (Bendahara)</b>, untuk warga</span>
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
           </p>
         </div>
