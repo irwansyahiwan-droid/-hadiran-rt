@@ -114,12 +114,20 @@ export function buildKasHadiranPDF(
 
      Sisanya jatuh ke SOHIBUL BAIT (±44mm), lega untuk nama terpanjang yang
      terukur (40,3mm). Nama berspasi sehingga membungkus dengan anggun kalau
-     pun lewat; angka tidak — itu sebabnya angka yang dapat jatah pasti. */
+     pun lewat; angka tidak — itu sebabnya angka yang dapat jatah pasti.
+
+     TARIKAN 30 → 32mm, KAS MASUK 25 → 24mm (20 Okt 2026). Diukur @11pt:
+     "#14 · 01 Agu 26" 27,2mm di kolom bersih 28mm — sisa 0,8mm, jadi mulai
+     tarikan #10 tanggalnya MENEMPEL ke nama Sohibul Bait — dan "#100 · 28 Agu
+     27" 29,3mm PATAH dua baris (±awal 2028, tabel ini kumulatif). Ruangnya
+     diambil dari KAS MASUK, satu-satunya kolom uang yang tak pernah minus:
+     TOTAL terlebar "999.999.999" bold = 23,4mm berikut bantalan. Sohibul cuma
+     menyerahkan 1mm (±43mm, nama terpanjang 40,3mm). */
   const KAS_COL = {
     0: { cellWidth: 8,  halign: 'center' as const },
-    1: { cellWidth: 30 },
+    1: { cellWidth: 32 },
     2: { cellWidth: 'auto' as const },
-    3: { cellWidth: 25, halign: 'right' as const },
+    3: { cellWidth: 24, halign: 'right' as const },
     4: { cellWidth: 25, halign: 'right' as const },
     5: { cellWidth: 25, halign: 'right' as const },
     6: { cellWidth: 25, halign: 'right' as const },

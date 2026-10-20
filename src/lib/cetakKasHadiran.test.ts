@@ -136,3 +136,19 @@ describe('PDF Kas Hadiran — isi dokumen', () => {
     expect(t, 'kepala kolom').toContain('SALDO (Rp)');
   });
 });
+
+/* Kolom TARIKAN (20 Okt 2026): "#14 · 01 Agu 26" menempel ke nama Sohibul Bait
+   (sisa 0,8mm) dan nomor tiga digit PATAH dua baris. Tabelnya kumulatif, jadi
+   #100 pasti datang. Teks yang patah tercetak sbg DUA run — "#100 · 28 Agu" lalu
+   "26" — jadi cukup menuntut run utuhnya ada. Bulan dipilih yang terlebar. */
+describe('PDF Kas Hadiran — kolom tarikan tak patah', () => {
+  const tiga = (nomor: number, tanggal: string): Tarikan => ({ ...tarikan(1, 3_000_000), id: `n${nomor}`, nomor, tanggal });
+  it('nomor tiga digit + tanggal muat SATU baris', () => {
+    const list = [tiga(100, '2027-08-28'), tiga(288, '2028-05-28'), tiga(999, '2031-12-28')];
+    const t = teksPdf(buildKasHadiranPDF(list, {}, {}, konsisten).doc);
+    for (const n of list) {
+      const label = `#${n.nomor} · ${new Date(n.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}`;
+      expect(t, `"${label}" patah / hilang`).toContain(label);
+    }
+  });
+});
