@@ -30,7 +30,7 @@ import { supabase } from '../lib/supabase';
 import { bacaSemuaRes } from '../lib/bacaSemua';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, tanggalHariIni, formatRupiahBertanda } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, tanggalHariIni, formatRupiahBertanda, formatRupiahArah } from '../lib/utils';
 import CrossFade from '../components/CrossFade';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
@@ -357,9 +357,9 @@ export default function KasHadiranPage() {
            "Setor ke Kas RT" sengaja TETAP netral — di layar pun begitu (biru
            `setor` tak boleh menyentuh nilai uang, lihat catatan di panel). */
         rows: [
-          { label: 'Kas Terkumpul', value: '+' + formatRupiahPlain(totalKasTerkumpul), tone: 'pos' as const },
-          { label: 'Talangan Belum Lunas', value: '-' + formatRupiahPlain(totalTalanganBelum), tone: 'warn' as const },
-          { label: 'Setor ke Kas RT', value: '-' + formatRupiahPlain(totalSetor) },
+          { label: 'Kas Terkumpul', value: formatRupiahArah(totalKasTerkumpul, '+'), tone: 'pos' as const },
+          { label: 'Talangan Belum Lunas', value: formatRupiahArah(totalTalanganBelum, '-'), tone: 'warn' as const },
+          { label: 'Setor ke Kas RT', value: formatRupiahArah(totalSetor, '-') },
           /* `kind: 'total'` (30 Sep 2026): baris kesimpulan BERPITA, paritas
              kartu ringkasan Kas RT & panel "Alur Kas Hadiran" in-app yang
              menyorot baris totalnya. Dulu satu-satunya kartu ringkasan yang
@@ -826,14 +826,14 @@ export default function KasHadiranPage() {
                 <TrendingUp className="w-3.5 h-3.5 text-pos dark:text-pos-dark" />
                 <span className="text-body text-balance text-ink-sub dark:text-gray-400">Kas Hadiran Terkumpul</span>
               </div>
-              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(`+${formatRupiahPlain(totalKasTerkumpul)}`, hidden, 4)}</span>
+              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-pos dark:text-pos-dark">{maskRp(formatRupiahArah(totalKasTerkumpul, '+'), hidden, 4)}</span>
             </div>
             <div className="divide-inset [--di-l:1.25rem] [--di-r:0px] flex items-center justify-between gap-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
                 <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" />
                 <span className="text-body text-balance text-ink-sub dark:text-gray-400">Talangan Belum Lunas</span>
               </div>
-              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(`-${formatRupiahPlain(totalTalanganBelum)}`, hidden, 4)}</span>
+              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-warn dark:text-amber-400">{maskRp(formatRupiahArah(totalTalanganBelum, '-'), hidden, 4)}</span>
             </div>
             <div className="flex items-center justify-between gap-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
@@ -851,7 +851,7 @@ export default function KasHadiranPage() {
                   menyentuh nilai uang, kalau tidak panel ini punya 4 keluarga
                   warna (hijau/amber/biru/rose) dan biru diam-diam jadi aksen
                   kedua. Ikon biru dipertahankan sbg penanda kategori "transfer". */}
-              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(`-${formatRupiahPlain(totalSetor)}`, hidden, 4)}</span>
+              <span className="shrink-0 whitespace-nowrap text-body font-display font-semibold tabular-nums text-ink dark:text-gray-100">{maskRp(formatRupiahArah(totalSetor, '-'), hidden, 4)}</span>
             </div>
             {/* `-mx-3` mengimbangi `p-3`: panel melebar 12px ke kiri & kanan
                 supaya ISInya kembali sejajar tepi isi kartu. Tanpa itu bantalan

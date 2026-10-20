@@ -6,7 +6,7 @@ import {
   tabelSkala, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, signH, C, fmtNum,
   alignHeadFoot, drawContinuationHeaders, LANJUT_TOP, sectionLabel, LANSIA,
 } from './pdfTheme';
-import { hitungSaldoHadiran } from './utils';
+import { formatRupiahArah, hitungSaldoHadiran } from './utils';
 import type { Tarikan } from './types';
 
 interface TalanganInfo { count: number; total: number; }
@@ -239,8 +239,8 @@ export function buildKasHadiranPDF(
        (pindahan ke Kas RT, bukan kerugian). Dulu keduanya TERTUKAR di sini —
        talangan merah, setoran amber — sementara PDF triwulan, panel Alur Kas
        Hadiran & kartu PNG memakai aturan di atas. */
-    { label: 'Total Talangan Belum Lunas', value: `-${rp(stats.totalTalanganBelum)}`, tone: 'warn' },
-    { label: 'Total Setor ke Kas RT',      value: `-${rp(stats.totalSetor)}` },
+    { label: 'Total Talangan Belum Lunas', value: formatRupiahArah(stats.totalTalanganBelum, '-'), tone: 'warn' },
+    { label: 'Total Setor ke Kas RT',      value: formatRupiahArah(stats.totalSetor, '-') },
   ];
   const saldoBersih = {
     label: 'Saldo Bersih Kas', value: saldoText,

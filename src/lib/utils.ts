@@ -21,6 +21,17 @@ export function formatRupiahBertanda(amount: number): string {
   return (amount < 0 ? '-' : '') + formatRupiahPlain(amount);
 }
 
+/** Nominal ber-ARAH: `arah` dipasang di depan BESARAN — "+Rp…" masuk, "-Rp…"
+ *  keluar/pengurang. NOL tak punya arah: "Rp0", bukan "-Rp0" (20 Okt 2026).
+ *  Dua puluh call-site menulis tandanya sendiri (`'-' + formatRupiahPlain(n)`),
+ *  jadi baris yang SAH bernilai nol — "Talangan Belum Lunas" tiap kali semua
+ *  lunas, yang justru keadaan yang diminta aturan RT — tercetak "-Rp0" amber,
+ *  seolah masih ada yang terutang. Preseden: tabel PDF Kas Hadiran (NIHIL)
+ *  & kartu ringkasan (`val > 0`) sudah menolak tanda di nol. */
+export function formatRupiahArah(besaran: number, arah: '+' | '-'): string {
+  return (besaran === 0 ? '' : arah) + formatRupiahPlain(besaran);
+}
+
 /**
  * Ubah error Supabase/Postgres jadi pesan yang manusiawi (Bahasa Indonesia),
  * dan catat detail mentahnya ke console untuk debug. JANGAN tampilkan

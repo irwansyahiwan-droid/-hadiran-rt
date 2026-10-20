@@ -13,7 +13,7 @@ import { useDialog } from '../hooks/useDialog';
 import { useCountUp, useHideAmount, toggleHideAmount, useFirstPlay, heroRingkas, useUkuranLayar, useKembaliDariLatar } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
-import { formatRupiahPlain, formatTanggal, haptic, ikatFrasa, labelTanggalRelatif, maskRp } from '../lib/utils';
+import { formatRupiah, formatRupiahPlain, formatTanggal, haptic, ikatFrasa, labelTanggalRelatif, maskRp } from '../lib/utils';
 import { fetchDashboardSummary } from '../lib/dashboard';
 import BannerCarousel, { BannerSkeleton } from '../components/BannerCarousel';
 import { useAuthContext } from '../context/AuthContext';
@@ -375,7 +375,7 @@ export default function Beranda({ onNavigate, onOpenKartu }: BerandaProps) {
   const warnaNominal = (tipe: TrxItem['tipe'], nominal: number) =>
     tipe === 'setor' ? 'text-ink dark:text-gray-100' : nominal < 0 ? 'text-neg dark:text-rose-400' : 'text-pos dark:text-emerald-400';
   const teksNominal = (nominal: number) =>
-    maskRp(`${nominal < 0 ? '-' : '+'}Rp${Math.abs(nominal).toLocaleString('id-ID')}`, hidden, 4);
+    maskRp(formatRupiah(nominal), hidden, 4);
 
   const trxRow = (trx: TrxItem, idx: number, lastInGroup: boolean, showDate: boolean, hideSub = false) => (
     <button
@@ -558,7 +558,7 @@ export default function Beranda({ onNavigate, onOpenKartu }: BerandaProps) {
               merah di sini selalu berarti "hari ada setoran" — pindahan, bukan
               kerugian. Tandanya tetap tercetak. */}
           <span className="font-display text-micro font-semibold tabular-nums text-ink-faint dark:text-gray-400">
-            {maskRp(`${g.net < 0 ? '-' : '+'}Rp${Math.abs(g.net).toLocaleString('id-ID')}`, hidden, 4)}
+            {maskRp(formatRupiah(g.net), hidden, 4)}
           </span>
         </div>
         {buildRuns(g.items, g.key).map((r, ri, arr) => {

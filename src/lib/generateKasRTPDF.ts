@@ -9,6 +9,7 @@ import {
 import type { KasRT } from './types';
 import { KATEGORI_MASUK, KATEGORI_KELUAR } from './kategoriKasRt';
 import { urutKasRT } from './laporan';
+import { formatRupiahArah } from './utils';
 
 interface KasRTStats {
   saldo: number;
@@ -188,8 +189,8 @@ export function buildKasRTPDF(list: KasRT[], stats: KasRTStats): { doc: jsPDF; f
   // pos yang sama — auditor membacanya sebagai dua hal berbeda.
   const ringkasan: Parameters<typeof drawSummary>[2] = [
     { label: 'Saldo Awal',        value: rp(stats.saldoAwal) },
-    { label: 'Total Penerimaan',  value: `+${rp(stats.totalMasuk)}`,  tone: 'pos' },
-    { label: 'Total Pengeluaran', value: `-${rp(stats.totalKeluar)}`, tone: 'neg' },
+    { label: 'Total Penerimaan',  value: formatRupiahArah(stats.totalMasuk, '+'),  tone: 'pos' },
+    { label: 'Total Pengeluaran', value: formatRupiahArah(stats.totalKeluar, '-'), tone: 'neg' },
   ];
   const saldoBersih = { label: 'Saldo Bersih', value: rp(stats.saldo) };
   Y = drawSummary(doc, ensureSpace(doc, Y + 6, 52), ringkasan, saldoBersih, W, M, undefined, SK);

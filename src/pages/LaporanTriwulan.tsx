@@ -8,7 +8,7 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
 import { fetchRekapLengkap, fetchSnapshotKas } from '../lib/laporan';
-import { formatRupiahPlain, haptic, formatRupiahBertanda } from '../lib/utils';
+import { formatRupiahPlain, haptic, formatRupiahBertanda, formatRupiahArah } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat } from '../lib/hooks';
 import { shareLaporanKas, rpBertanda } from '../lib/shareLaporanKas';
@@ -74,7 +74,7 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
                 melihat dua versi fakta yang sama. */}
             <ArrowUpRight className={`w-3.5 h-3.5 ${keluarTransfer ? 'text-blue-700 dark:text-blue-400' : 'text-neg dark:text-neg-dark'}`} /> {keluarLabel}
           </span>
-          <span className={`font-display font-semibold tabular-nums ${keluarTransfer ? 'text-gray-900 dark:text-gray-100' : 'text-neg dark:text-rose-400'}`}>-{formatRupiahPlain(keluar)}</span>
+          <span className={`font-display font-semibold tabular-nums ${keluarTransfer ? 'text-gray-900 dark:text-gray-100' : 'text-neg dark:text-rose-400'}`}>{formatRupiahArah(keluar, '-')}</span>
         </div>
         <div className="flex items-center justify-between text-caption pt-2 border-t border-control dark:border-control-dark">
           <span className="font-semibold text-gray-700 dark:text-gray-300">{saldoLabel}</span>
@@ -87,7 +87,7 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
             <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <AlertTriangle className="w-3.5 h-3.5 text-warn dark:text-warn-dark" /> Talangan belum lunas
             </span>
-            <span className="font-display font-semibold text-warn dark:text-amber-400 tabular-nums">-{formatRupiahPlain(talangan)}</span>
+            <span className="font-display font-semibold text-warn dark:text-amber-400 tabular-nums">{formatRupiahArah(talangan, '-')}</span>
           </div>
         )}
       </div>

@@ -9,7 +9,7 @@ import SectionTitle from '../components/SectionTitle';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, ikatFrasa, maskRp, pesanError, tanggalUtuh, tanggalHariIni } from '../lib/utils';
+import { formatRupiahArah, formatRupiahPlain, formatTanggal, formatTanggalRingkas, haptic, ikatFrasa, maskRp, pesanError, tanggalUtuh, tanggalHariIni } from '../lib/utils';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
 import EmptyState from '../components/EmptyState';
@@ -442,7 +442,7 @@ export default function KasRTPage() {
     // ikut di kartu → transparansi tanpa memaksa warga membuka PDF.
     const rows: ReceiptRow[] = [
       { label: 'Saldo Awal', value: formatRupiahPlain(saldoAwal) },
-      { label: 'Penerimaan', value: '+' + formatRupiahPlain(totalMasuk), kind: 'section', tone: 'pos' },
+      { label: 'Penerimaan', value: formatRupiahArah(totalMasuk, '+'), kind: 'section', tone: 'pos' },
     ];
     /* Baris kategori TANPA nada (tinta biasa), warna hanya di judul kelompok
        — sama dgn rekap kategori in-app (26 Sep 2026). Dulu tiap baris ikut
@@ -452,7 +452,7 @@ export default function KasRTPage() {
       const n = rekapKategori.masuk[o.key] ?? 0;
       if (n > 0) rows.push({ label: o.short, value: '+' + formatRupiahPlain(n) });
     }
-    rows.push({ label: 'Pengeluaran', value: '-' + formatRupiahPlain(totalKeluar), kind: 'section', tone: 'neg' });
+    rows.push({ label: 'Pengeluaran', value: formatRupiahArah(totalKeluar, '-'), kind: 'section', tone: 'neg' });
     for (const o of KATEGORI_KELUAR) {
       const n = rekapKategori.keluar[o.key] ?? 0;
       if (n > 0) rows.push({ label: o.short, value: '-' + formatRupiahPlain(n) });
@@ -744,8 +744,8 @@ export default function KasRTPage() {
             </>
           }
           stats={[
-            { icon: TrendingUp, label: 'Total Masuk', value: maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4) },
-            { icon: TrendingDown, label: 'Total Keluar', value: maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4) },
+            { icon: TrendingUp, label: 'Total Masuk', value: maskRp(formatRupiahArah(totalMasuk, '+'), hidden, 4) },
+            { icon: TrendingDown, label: 'Total Keluar', value: maskRp(formatRupiahArah(totalKeluar, '-'), hidden, 4) },
           ]}
         />
         </CrossFade>
@@ -948,7 +948,7 @@ export default function KasRTPage() {
                     geser samping 117px halaman Kas RT. */}
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <span className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400">Penerimaan</span>
-                  <span className="text-caption font-display font-semibold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(`+${formatRupiahPlain(totalMasuk)}`, hidden, 4)}</span>
+                  <span className="text-caption font-display font-semibold text-pos dark:text-emerald-400 tabular-nums shrink-0">{maskRp(formatRupiahArah(totalMasuk, '+'), hidden, 4)}</span>
                 </div>
                 {/* Label BOLEH membungkus (`min-w-0 flex-1`), nominalnya TIDAK ikut
                     turun. `flex-wrap` sempat dipasang di baris ini 17 Agu untuk
@@ -971,7 +971,7 @@ export default function KasRTPage() {
               <div className="inset-soft rounded-xl p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <span className="text-micro font-semibold uppercase tracking-wide text-ink-faint dark:text-gray-400">Pengeluaran</span>
-                  <span className="text-caption font-display font-semibold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(`-${formatRupiahPlain(totalKeluar)}`, hidden, 4)}</span>
+                  <span className="text-caption font-display font-semibold text-neg dark:text-rose-400 tabular-nums shrink-0">{maskRp(formatRupiahArah(totalKeluar, '-'), hidden, 4)}</span>
                 </div>
                 <div className="space-y-2">
                   {KATEGORI_KELUAR.filter((o) => (rekapKategori.keluar[o.key] ?? 0) > 0).map((o) => (

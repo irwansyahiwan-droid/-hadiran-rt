@@ -3,6 +3,7 @@ import { amankanPdf } from './pdfTeks';
 import { outputPdf } from './pdfOut';
 import { C, LANSIA, drawMasthead, sectionLabel, drawSignatures, drawFooter, signH, ensureSpace } from './pdfTheme';
 import type { RekapTriwulan } from './laporan';
+import { formatRupiahArah } from './utils';
 
 function rp(n: number) {
   const s = `Rp${Math.abs(n).toLocaleString('id-ID')}`;
@@ -74,10 +75,10 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
       judul: 'KAS HADIRAN',
       rows: [
         { label: 'Kas Terkumpul', nilai: rp(r.hadiranMasuk), tone: 'pos' },
-        { label: 'Setor ke Kas RT', nilai: `-${rp(r.hadiranSetor)}` },
+        { label: 'Setor ke Kas RT', nilai: formatRupiahArah(r.hadiranSetor, '-') },
         { label: `Selisih ${kata}`, nilai: rp(hadiranNet) },
         { label: 'Belum disetor', nilai: rp(r.hadiranBelumSetor), saldo: true, neg: r.hadiranBelumSetor < 0 },
-        { label: 'Talangan belum lunas', nilai: `-${rp(r.hadiranTalangan)}`, tone: 'warn' },
+        { label: 'Talangan belum lunas', nilai: formatRupiahArah(r.hadiranTalangan, '-'), tone: 'warn' },
       ],
     },
     {
@@ -88,7 +89,7 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
         // pengeluaran/pemasukan periode ini, jadi TIDAK ikut "Selisih triwulan".
         ...(r.rtSaldoAwal > 0 ? [{ label: 'Saldo Awal', nilai: rp(r.rtSaldoAwal) }] : []),
         { label: 'Pemasukan', nilai: rp(r.rtMasuk), tone: 'pos' as const },
-        { label: 'Pengeluaran', nilai: `-${rp(r.rtKeluar)}`, tone: 'neg' as const },
+        { label: 'Pengeluaran', nilai: formatRupiahArah(r.rtKeluar, '-'), tone: 'neg' as const },
         { label: `Selisih ${kata}`, nilai: rp(rtNet) },
         { label: 'Saldo akhir', nilai: rp(r.rtSaldoAkhir), saldo: true, neg: r.rtSaldoAkhir < 0 },
       ],
