@@ -18,7 +18,7 @@ import CrossFade from '../components/CrossFade';
 import PageHeader from '../components/layout/PageHeader';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggal, formatRupiahPlain, haptic, tanggalHariIni, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
 import { ringkasAbsensi } from '../lib/absensiHitung';
 import { simpanTarikanSelesai } from '../lib/simpanTarikan';
 import { fetchAbsensiTersimpan } from '../lib/absensiTersimpan';
@@ -28,6 +28,7 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useJagaIsian } from '../hooks/useJagaIsian';
 import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from '../components/GalatKolom';
+import { bentrokSohibul, bentrokTanggal, tanggalBawaanBerikut } from '../lib/bentrokJadwal';
 
 /* Lantai tinggi hero (px) — pola HERO_MIN_H KasHadiran/KasRT/Talangan/JadwalWarga.
    WAJIB diukur ulang tiap anatomi hero berubah: ia menahan tinggi saat isinya
@@ -755,18 +756,42 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
   );
 }
 
+// ── Petunjuk bentrok (Tambah & Revisi jadwal) ───────────────
+/* 20 Okt 2026, kata disetujui user. Amber & TIDAK menghalangi simpan — aturan
+   RT lentur, menukar dua jadwal melewati bentrok sesaat (lib/bentrokJadwal).
+   Pasangan `GalatKolom`: bentuk sama, tinta peringatan, bukan galat. */
+function PetunjukBentrok({ id, teks }: { id: string; teks: string | null }) {
+  if (!teks) return null;
+  return (
+    <p id={id} className="mt-2 flex items-start gap-1 text-caption font-medium text-warn dark:text-amber-400">
+      <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+      <span>{teks}</span>
+    </p>
+  );
+}
+/** `aria-describedby` galat + petunjuk — keduanya dibacakan bersama kolomnya. */
+function denganPetunjuk(aria: { 'aria-describedby'?: string }, petunjukId: string | null) {
+  const ids = [aria['aria-describedby'], petunjukId].filter(Boolean).join(' ');
+  return { ...aria, 'aria-describedby': ids || undefined };
+}
+const teksBentrokTanggal = (t: Tarikan | null) => (t ? `Tanggal ini sudah dipakai Tarikan #${t.nomor} · ${namaSohibul(t)}.` : null);
+const teksBentrokSohibul = (t: Tarikan | null) => (t ? `${namaSohibul(t)} sudah dapat giliran di Tarikan #${t.nomor}.` : null);
+
 // ── Edit Tarikan Modal ──────────────────────────────────────
 
 interface EditTarikanModalProps {
   tarikan: Tarikan;
+  tarikanList: Tarikan[];
   wargaList: Warga[];
   onClose: () => void;
   onSaved: () => void;
 }
 
-function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanModalProps) {
+function EditTarikanModal({ tarikan, tarikanList, wargaList, onClose, onSaved }: EditTarikanModalProps) {
   const [tanggal, setTanggal] = useState((tarikan.tanggal ?? '').slice(0, 10));
   const [sohibulId, setSohibulId] = useState(tarikan.sohibul_bait_id ?? '');
+  const tglBentrok = teksBentrokTanggal(bentrokTanggal(tarikanList, tanggal, tarikan.id));
+  const sbBentrok = teksBentrokSohibul(bentrokSohibul(tarikanList, sohibulId, tarikan.id));
   const [saving, setSaving, sedangSimpan] = useSaving();
   const galat = useGalatKolom();
   // Revisi yang sudah diubah tak terbuang tanpa tanya — lihat useJagaIsian.
@@ -843,10 +868,13 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           type="date"
           value={tanggal}
           onChange={e => { setTanggal(e.target.value); galat.hapus('jadwal-edit-tanggal'); }}
-          {...galat.aria('jadwal-edit-tanggal')}
+          {...denganPetunjuk(galat.aria('jadwal-edit-tanggal'), tglBentrok ? 'jadwal-edit-tanggal-bentrok' : null)}
           className="field"
         />
-        <div className="mb-4"><GalatKolom id="jadwal-edit-tanggal-galat" pesan={galat.pesan('jadwal-edit-tanggal')} /></div>
+        <div className="mb-4">
+          <GalatKolom id="jadwal-edit-tanggal-galat" pesan={galat.pesan('jadwal-edit-tanggal')} />
+          <PetunjukBentrok id="jadwal-edit-tanggal-bentrok" teks={tglBentrok} />
+        </div>
 
         <label htmlFor="jadwal-edit-sohibul" className="label-field">Sohibul Bait</label>
         <select
@@ -854,13 +882,15 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
           name="sohibul-bait"
           value={sohibulId}
           onChange={e => setSohibulId(e.target.value)}
-          className="field mb-5"
+          aria-describedby={sbBentrok ? 'jadwal-edit-sohibul-bentrok' : undefined}
+          className="field"
         >
           <option value="">— Belum ditentukan —</option>
           {options.map(w => (
             <option key={w.id} value={w.id}>{w.nama}</option>
           ))}
         </select>
+        <div className="mb-5"><PetunjukBentrok id="jadwal-edit-sohibul-bentrok" teks={sbBentrok} /></div>
 
         <div className="flex gap-3">
           <button
@@ -896,15 +926,21 @@ function EditTarikanModal({ tarikan, wargaList, onClose, onSaved }: EditTarikanM
 // ── Tambah Tarikan Modal ────────────────────────────────────
 
 interface TambahTarikanModalProps {
+  tarikanList: Tarikan[];
   nextNomor: number;
   wargaList: Warga[];
   onClose: () => void;
   onSaved: () => void;
 }
 
-function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
-  const [tanggal, setTanggal] = useState(() => tanggalHariIni());
+function TambahTarikanModal({ nextNomor, tarikanList, wargaList, onClose, onSaved }: TambahTarikanModalProps) {
+  /* Bawaan = seminggu sesudah tarikan terakhir (20 Okt 2026, persetujuan
+     user): arisan mingguan, sedangkan "hari ini" biasanya jatuh di tengah
+     jadwal yang sudah terisi. */
+  const [tanggal, setTanggal] = useState(() => tanggalBawaanBerikut(tarikanList));
   const [sohibulId, setSohibulId] = useState('');
+  const tglBentrok = teksBentrokTanggal(bentrokTanggal(tarikanList, tanggal));
+  const sbBentrok = teksBentrokSohibul(bentrokSohibul(tarikanList, sohibulId));
   const [saving, setSaving, sedangSimpan] = useSaving();
   const galat = useGalatKolom();
   // Exit meluncur + penjaga isian — pola sama dgn EditTarikanModal di atas.
@@ -964,10 +1000,13 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           type="date"
           value={tanggal}
           onChange={e => { setTanggal(e.target.value); galat.hapus('jadwal-add-tanggal'); }}
-          {...galat.aria('jadwal-add-tanggal')}
+          {...denganPetunjuk(galat.aria('jadwal-add-tanggal'), tglBentrok ? 'jadwal-add-tanggal-bentrok' : null)}
           className="field"
         />
-        <div className="mb-4"><GalatKolom id="jadwal-add-tanggal-galat" pesan={galat.pesan('jadwal-add-tanggal')} /></div>
+        <div className="mb-4">
+          <GalatKolom id="jadwal-add-tanggal-galat" pesan={galat.pesan('jadwal-add-tanggal')} />
+          <PetunjukBentrok id="jadwal-add-tanggal-bentrok" teks={tglBentrok} />
+        </div>
 
         <label htmlFor="jadwal-add-sohibul" className="label-field">Sohibul Bait</label>
         <select
@@ -975,13 +1014,15 @@ function TambahTarikanModal({ nextNomor, wargaList, onClose, onSaved }: TambahTa
           name="sohibul-bait"
           value={sohibulId}
           onChange={e => setSohibulId(e.target.value)}
-          className="field mb-5"
+          aria-describedby={sbBentrok ? 'jadwal-add-sohibul-bentrok' : undefined}
+          className="field"
         >
           <option value="">— Belum ditentukan —</option>
           {wargaList.map(w => (
             <option key={w.id} value={w.id}>{w.nama}</option>
           ))}
         </select>
+        <div className="mb-5"><PetunjukBentrok id="jadwal-add-sohibul-bentrok" teks={sbBentrok} /></div>
 
         <div className="flex gap-3">
           <button
@@ -1496,6 +1537,7 @@ export default function JadwalPage() {
       {editingTarikan && (
         <EditTarikanModal
           tarikan={editingTarikan}
+          tarikanList={tarikanList}
           wargaList={wargaList}
           onClose={() => setEditingTarikan(null)}
           onSaved={() => { setEditingTarikan(null); load(); }}
@@ -1505,6 +1547,7 @@ export default function JadwalPage() {
       {creatingTarikan && (
         <TambahTarikanModal
           nextNomor={nextNomor}
+          tarikanList={tarikanList}
           wargaList={wargaList}
           onClose={() => setCreatingTarikan(false)}
           onSaved={() => { setCreatingTarikan(false); load(); }}
