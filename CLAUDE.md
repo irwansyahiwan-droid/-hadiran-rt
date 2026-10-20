@@ -101,6 +101,17 @@ npm run audit        # keadaan + sheet + publik + masuk + tulis + potong + respo
 
 **Lantai populasi di `sapu-semua` (3 Sep 2026).** Rantai ini pernah mencetak **24 hijau** dari jalan yang diam-diam mengukur SEPARUH populasinya — `sentuh` 410 → 360 kontrol, `sheet` 13 → 7 permukaan — dan tiap sapuan tetap keluar 0 karena memang tak ada temuan pada apa pun yang sempat diukur. Diperiksa ulang satu per satu, keduanya pulih; itu flake mesin, dan justru itu masalahnya: tak ada yang memberi tahu pembacanya bahwa laporan itu berdiri di atas populasi separuh. Cacat ke-23 dulu menutup populasi KOSONG (`PROBE CACAT`); populasi SEPARUH lolos sampai hari ini. Kini tiap sapuan punya pola + lantai (~95% garis dasar terukur) dan turun di bawahnya = MERAH. **Ketat, bukan longgar** — populasi app ini stabil antar-jalan (`sentuh` 410/412/410, `sheet` 13 selalu), jadi toleransi 15% justru meloloskan penurunan 12% yang memicu penjaga ini dibuat; kalau data memang bertambah, PERBARUI lantainya. **Pola yang tak cocok juga MERAH** (`POLA POPULASI HILANG`): keluaran sapuan yang berubah bentuk membuat penjaga ini buta, dan penjaga buta yang diam persis kelas cacat yang mau ditutup. Tiga sapuan sempat TANPA lantai — `lebar`, `reflow`, `gerak` — karena keluarannya tak menyebut satu pun angka populasi; **ditutup di hari yang sama** dgn menambahkan penghitung ke masing-masing (`118 konteks diperiksa` · `10 layar diperiksa` · `14 tab diperiksa`). Daftar `TANPA_LANTAI` sengaja DIPERTAHANKAN meski kosong: sapuan BARU yang belum mencetak populasinya ditaruh di sana supaya celahnya tercetak tiap jalan, bukan jadi catatan yang nyaman. **Sapuan yang tak mencetak berapa yang diukurnya TIDAK BISA dijaga** — ia boleh mengukur separuh lalu tetap melapor 0 temuan, dan itu persis bentuk cacat yang lantai ini dibuat untuk menangkap. Divalidasi MUTASI (`MUTASI=1` menaikkan tiap lantai 10× → semua sapuan berlantai WAJIB melapor POPULASI TURUN; terbukti 5/5 di jalur statis).
 
+**Sumbu WAKTU (`JAM=…`, 20 Okt 2026).** Semua sapuan berjalan "hari ini", jadi
+keadaan yang hanya lahir di hari tertentu tak pernah masuk populasi siapa pun.
+`JAM=2026-10-24T15:00:00+07:00 npm run audit:kontras` memaku jam peramban
+(harness `newCtx` → `ctx.clock.setFixedTime`); tanggal tak terbaca MELEDAK.
+Lahir bersama label jadwal "Besok" · "Hari ini" · "Belum dicatat" — empat
+tanggal disimulasikan dulu dan keempatnya menampilkan baris YANG SAMA, termasuk
+#25 bertanggal lampau yang masih dipajang sbg "Jadwal Berikutnya". Uji kontrol:
+tanpa JAM nol label, dgn JAM Sabtu "Hari ini", dgn JAM Selasa sesudahnya "Belum
+dicatat". **UI yang bergantung TANGGAL wajib lewat sapuan ber-JAM** (H-1, hari-H,
+sesudah lewat) — kalau tidak, hijaunya cuma berlaku untuk hari sapuan dijalankan.
+
 **Populasi EKSTREM (`EKSTREM=1`).** Tiap sapuan geometri mengukur DATA HARI INI
 — 69 warga, nama pendek, nominal 6 digit — jadi "0 temuan" berarti "tak ada yang
 patah untuk data yang kebetulan ada sekarang", bukan "tata letaknya tahan".

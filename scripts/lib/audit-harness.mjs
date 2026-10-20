@@ -122,6 +122,15 @@ const KUNCI_NAMA = /^(nama|name|nama_lengkap|nama_warga|nama_sohibul)$/i;
 const KUNCI_TEKS = /^(keterangan|catatan|deskripsi|judul|alamat|no_rumah)$/i;
 const KUNCI_UANG = /(nominal|jumlah|total|saldo|iuran|terkumpul|talangan|setor|target)/i;
 const SKALA_UANG = +(process.env.EKSTREM_SKALA || 100);
+/* SUMBU WAKTU (20 Okt 2026): `JAM=2026-10-24T15:00+07:00 npm run audit:xxx`
+   memaku jam peramban ke tanggal itu. Semua sapuan berjalan "hari ini", jadi
+   keadaan yang cuma lahir di hari tertentu — label "Besok"/"Hari ini"/"Belum
+   dicatat" di jadwal, countdown target — tak pernah masuk populasi siapa pun.
+   Tanpa JAM perilaku identik. Tanggal yang tak terbaca MELEDAK, bukan diam-diam
+   jadi "sekarang" (kait yang hilang harus meledak). */
+const JAM = process.env.JAM ? new Date(process.env.JAM) : null;
+if (JAM && Number.isNaN(JAM.getTime())) throw new Error(`JAM tak terbaca: "${process.env.JAM}" — pakai ISO, mis. 2026-10-24T15:00:00+07:00`);
+if (JAM) console.log(`  [JAM] jam peramban dipaku ke ${JAM.toISOString()}`);
 
 function ekstremkan(v) {
   if (Array.isArray(v)) return v.map(ekstremkan);
@@ -171,6 +180,7 @@ export async function newCtx(browser, theme, { bendahara = false, welcome = fals
        mengirim satu sentuhan pun (lalu melaporkan semuanya "aman"). */
     hasTouch: sentuh || undefined,
   });
+  if (JAM) await ctx.clock.setFixedTime(JAM);
   await ctx.addInitScript(({ t, w, b, ref, sess }) => {
     try {
       localStorage.setItem('hadiran-theme', t);
