@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs';
 import type { Tarikan } from './types';
 import { border, titleBlock, headerRow, downloadWorkbook, stamp, stampLong, warnaiUang, ZEBRA, FMT_TANGGAL, selTanggal, siapCetak } from './excelStyle';
+import { namaSohibul } from './utils';
 
 interface TalanganInfo { count: number; total: number }
 interface Stats {
@@ -72,7 +73,7 @@ export function buildKasHadiranExcel(
     const r = ws.addRow([
       t.nomor,
       selTanggal(t.tanggal),
-      t.sohibul_bait?.nama ?? '-',
+      namaSohibul(t),
       t.total_hadir,
       t.total_warga,
       t.total_terkumpul ?? 0,

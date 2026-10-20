@@ -7,6 +7,7 @@ import {
   drawContinuationHeaders, LANJUT_TOP, teksKananBerspasi,
 } from './pdfTheme';
 import type { AbsensiStatus, Tarikan, Warga } from './types';
+import { namaSohibul } from './utils';
 
 function rp(n: number) { return `Rp${n.toLocaleString('id-ID')}`; }
 const DASH = '—';
@@ -49,7 +50,7 @@ export function buildPendapatanPDF(
 
   const IDENT = {
     title: `Rincian Pendapatan Tarikan ke-${tarikan.nomor}`,
-    subtitle: `${tglTarikan} · Sohibul Bait: ${tarikan.sohibul_bait?.nama ?? '—'}`,
+    subtitle: `${tglTarikan} · Sohibul Bait: ${namaSohibul(tarikan)}`,
   };
   let Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT });
 

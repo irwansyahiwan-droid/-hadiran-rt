@@ -7,6 +7,7 @@ import {
   drawContinuationHeaders, LANJUT_TOP,
 } from './pdfTheme';
 import type { Tarikan } from './types';
+import { namaSohibul } from './utils';
 
 const STATUS: Record<string, string> = {
   dijadwalkan: 'Terjadwal',   // = kata layar & subjudul dokumen ini ("50 terjadwal")
@@ -42,7 +43,7 @@ export function buildJadwalPDF(list: Tarikan[]): { doc: jsPDF; filename: string 
 
   const rows = sorted.map((t) => [
     String(t.nomor),
-    t.sohibul_bait?.nama ?? '—',
+    namaSohibul(t),
     tgl(t.tanggal),
     STATUS[t.status] ?? t.status,
   ]);

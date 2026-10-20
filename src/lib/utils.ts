@@ -28,6 +28,15 @@ export function formatRupiahBertanda(amount: number): string {
  *  lunas, yang justru keadaan yang diminta aturan RT — tercetak "-Rp0" amber,
  *  seolah masih ada yang terutang. Preseden: tabel PDF Kas Hadiran (NIHIL)
  *  & kartu ringkasan (`val > 0`) sudah menolak tanda di nol. */
+/** Tarikan TANPA Sohibul Bait itu keadaan SAH (form tambah/revisi jadwal
+ *  memberi pilihan kosong) — dan namanya kata yang SAMA dgn pilihan itu,
+ *  bukan "—" / "-" yang terbaca seperti data hilang (20 Okt 2026, persetujuan
+ *  user; terukur: tarikan #71 tercetak "—" di daftar Jadwal, PDF, Excel & WA). */
+export const SOHIBUL_KOSONG = 'Belum ditentukan';
+export function namaSohibul(t: { sohibul_bait?: { nama: string } | null }): string {
+  return t.sohibul_bait?.nama ?? SOHIBUL_KOSONG;
+}
+
 export function formatRupiahArah(besaran: number, arah: '+' | '-'): string {
   return (besaran === 0 ? '' : arah) + formatRupiahPlain(besaran);
 }

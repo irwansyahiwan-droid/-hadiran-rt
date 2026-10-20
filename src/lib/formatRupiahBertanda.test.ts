@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatRupiah, formatRupiahArah, formatRupiahBertanda, formatRupiahPlain } from './utils';
+import { formatRupiah, formatRupiahArah, formatRupiahBertanda, formatRupiahPlain, namaSohibul } from './utils';
 
 /* 19 Okt 2026: sheet setor menulis "Saldo hadiran: Rp450.000" (hijau) saat saldo
    −Rp450.000 — `formatRupiahPlain` sengaja Math.abs. Saldo WAJIB bertanda. */
@@ -29,5 +29,14 @@ describe('formatRupiahArah — nol tak punya arah', () => {
     expect(formatRupiah(0)).toBe('Rp0');
     expect(formatRupiah(-345_000)).toBe('-Rp345.000');
     expect(formatRupiah(50_000)).toBe('+Rp50.000');
+  });
+});
+
+/* 20 Okt 2026: tarikan tanpa Sohibul tercetak "—" (daftar, PDF, Excel, WA). */
+describe('namaSohibul — kata yang sama dgn pilihan kosong di form', () => {
+  it('ada nama → nama; tak ada → "Belum ditentukan"', () => {
+    expect(namaSohibul({ sohibul_bait: { nama: 'Dhiman' } })).toBe('Dhiman');
+    expect(namaSohibul({ sohibul_bait: null })).toBe('Belum ditentukan');
+    expect(namaSohibul({})).toBe('Belum ditentukan');
   });
 });

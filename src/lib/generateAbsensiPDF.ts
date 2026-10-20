@@ -7,6 +7,7 @@ import {
   drawContinuationHeaders, LANJUT_TOP,
 } from './pdfTheme';
 import type { Tarikan } from './types';
+import { namaSohibul } from './utils';
 
 /* `id` opsional: dipakai hanya untuk mengenali Sohibul Bait (lihat di bawah).
    Pemanggil yang cuma mengirim nama tetap berperilaku seperti dulu. */
@@ -43,7 +44,7 @@ export function buildAbsensiPDF(tarikan: Tarikan, hadir: Hadir[], tidak: Tidak[]
 
   const IDENT = {
     title: `Daftar Hadir Tarikan ke-${tarikan.nomor}`,
-    subtitle: `${tglTarikan} · Sohibul Bait: ${tarikan.sohibul_bait?.nama ?? '—'}`,
+    subtitle: `${tglTarikan} · Sohibul Bait: ${namaSohibul(tarikan)}`,
   };
   let Y = drawMasthead(doc, { W, M, docCode, tanggalCetak, ...IDENT });
 

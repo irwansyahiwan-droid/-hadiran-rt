@@ -6,7 +6,7 @@ import {
   tabelSkala, drawMasthead, drawSummary, drawSignatures, drawFooter, ensureSpace, signH, C, fmtNum,
   alignHeadFoot, drawContinuationHeaders, LANJUT_TOP, sectionLabel, LANSIA,
 } from './pdfTheme';
-import { formatRupiahArah, hitungSaldoHadiran } from './utils';
+import { formatRupiahArah, hitungSaldoHadiran, namaSohibul } from './utils';
 import type { Tarikan } from './types';
 
 interface TalanganInfo { count: number; total: number; }
@@ -172,7 +172,7 @@ export function buildKasHadiranPDF(
     return [
       String(i + 1),
       `#${t.nomor} · ${new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}`,
-      t.sohibul_bait?.nama ?? '—',
+      namaSohibul(t),
       fmtNum(kasIn),
       tal.total > 0 ? `-${fmtNum(tal.total)}` : NIHIL,
       setor > 0 ? `-${fmtNum(setor)}` : NIHIL,

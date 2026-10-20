@@ -18,7 +18,7 @@ import CrossFade from '../components/CrossFade';
 import PageHeader from '../components/layout/PageHeader';
 import { supabase } from '../lib/supabase';
 import { useAuthContext } from '../context/AuthContext';
-import { formatTanggal, formatRupiahPlain, haptic, tanggalHariIni } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic, tanggalHariIni, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
 import { ringkasAbsensi } from '../lib/absensiHitung';
 import { simpanTarikanSelesai } from '../lib/simpanTarikan';
 import { fetchAbsensiTersimpan } from '../lib/absensiTersimpan';
@@ -342,7 +342,7 @@ function AbsensiView({ tarikan, wargaList, onBack, onSaved, onCancelled }: Absen
           <h2 className="text-subtitle font-bold text-gray-900 dark:text-gray-100">
             Absensi Tarikan #{tarikan.nomor}
           </h2>
-          <p className="text-caption text-ink-faint dark:text-gray-400">{tarikan.sohibul_bait?.nama ?? '—'} · {formatTanggal(tarikan.tanggal)}</p>
+          <p className="text-caption text-ink-faint dark:text-gray-400">{namaSohibul(tarikan)} · {formatTanggal(tarikan.tanggal)}</p>
         </div>
       </div>
 
@@ -1257,7 +1257,7 @@ export default function JadwalPage() {
                 /* Tanpa titik dua, nama dibedakan lewat tebal — sama dgn hero
                    Jadwal warga (keputusan user 26 Sep 2026). WA & PDF tetap
                    memakai titik dua: di teks polos & kertas itulah pemisahnya. */
-                ? <>Sohibul Bait <span className="font-semibold text-white">{nextDijadwal.sohibul_bait?.nama ?? '—'}</span></>
+                ? <>Sohibul Bait <span className="font-semibold text-white">{namaSohibul(nextDijadwal)}</span></>
                 : 'Tambahkan tarikan lewat tombol di atas.'}
           </p>
           <HeroStats
@@ -1351,7 +1351,7 @@ export default function JadwalPage() {
                       Nickname justru bagian yang dikenal warga — lebih baik baris
                       tumbuh 1 baris daripada nama dipotong elipsis. */}
                   <p className={`text-pretty text-body font-semibold line-clamp-2 leading-snug break-words ${isSelesai ? 'text-ink-sub dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
-                    {t.sohibul_bait?.nama ?? '—'}
+                    {t.sohibul_bait ? t.sohibul_bait.nama : <span className="font-medium text-ink-faint dark:text-gray-400">{SOHIBUL_KOSONG}</span>}
                   </p>
                   <p className="text-caption font-medium text-ink-faint dark:text-gray-400 mt-0.5">
                     {formatTanggal(t.tanggal)}
@@ -1511,7 +1511,7 @@ export default function JadwalPage() {
               <div className="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
             <h2 className="text-subtitle font-bold text-ink dark:text-gray-100 leading-snug">
-              Tarikan #{rowTarikan.nomor} · {rowTarikan.sohibul_bait?.nama ?? '—'}
+              Tarikan #{rowTarikan.nomor} · {namaSohibul(rowTarikan)}
             </h2>
             <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">{formatTanggal(rowTarikan.tanggal)}</p>
             <div className="space-y-2 mt-4">
@@ -1519,7 +1519,7 @@ export default function JadwalPage() {
                 <button
                   onClick={() => {
                     haptic();
-                    openWa(null, pesanTarikan(rowTarikan.nomor, rowTarikan.tanggal, rowTarikan.sohibul_bait?.nama ?? '—', rowTarikan.jumlah_per_orang));
+                    openWa(null, pesanTarikan(rowTarikan.nomor, rowTarikan.tanggal, namaSohibul(rowTarikan), rowTarikan.jumlah_per_orang));
                     setRowTarikan(null);
                   }}
                   className="press w-full flex items-center gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300 text-body font-semibold"

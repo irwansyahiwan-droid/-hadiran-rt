@@ -3,7 +3,7 @@ import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { FileText, Search, X, Check, Coins, Users, CalendarDays, RotateCcw, RefreshCw, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getPageCache, setPageCache } from '../lib/pageCache';
-import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useAksiBerat, useKembaliDariLatar } from '../lib/hooks';
 import type { AbsensiStatus, Tarikan, Warga } from '../lib/types';
@@ -460,7 +460,7 @@ export default function JadwalWargaPage() {
                 <InfoTip label="Sohibul Bait" tone="onDark" className="mx-1">
                   Anggota penerima arisan pada giliran ini: Rp45.000 dari tiap anggota lain (pendapatan kotor), dipotong admin Rp60.000 (diterima bersih).
                 </InfoTip>
-                <span className="font-semibold text-white">{lastTarikan.sohibul_bait?.nama ?? '—'}</span>
+                <span className="font-semibold text-white">{namaSohibul(lastTarikan)}</span>
               </p>
             </div>
 
@@ -758,7 +758,7 @@ export default function JadwalWargaPage() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className={`text-body font-semibold truncate ${isSelesai ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
-                        {t.sohibul_bait?.nama ?? '—'}
+                        {t.sohibul_bait ? t.sohibul_bait.nama : <span className="font-medium text-ink-faint dark:text-gray-400">{SOHIBUL_KOSONG}</span>}
                       </p>
                       <p className="text-caption text-ink-faint dark:text-gray-400 mt-0.5">
                         {formatTanggal(t.tanggal)}

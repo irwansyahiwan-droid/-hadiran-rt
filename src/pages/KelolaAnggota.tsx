@@ -18,7 +18,7 @@ import {
   fetchAnggota, tambahAnggota, updateAnggota, backfillAnggotaSusulan,
   jadwalSohibulMendatang,
 } from '../lib/anggota';
-import { formatTanggal, formatRupiahPlain, haptic } from '../lib/utils';
+import { formatTanggal, formatRupiahPlain, haptic, namaSohibul } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
@@ -251,7 +251,7 @@ function AnggotaFormModal({ mode, initial, selesaiTarikan, onClose, onSaved }: F
                             Tarikan #{t.nomor}
                           </span>
                           <span className="block text-micro text-ink-faint dark:text-gray-400">
-                            {t.sohibul_bait?.nama ?? '—'} · {formatTanggal(t.tanggal)}
+                            {namaSohibul(t)} · {formatTanggal(t.tanggal)}
                           </span>
                         </span>
                       </button>

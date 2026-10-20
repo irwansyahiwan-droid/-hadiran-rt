@@ -30,7 +30,7 @@ import { supabase } from '../lib/supabase';
 import { bacaSemuaRes } from '../lib/bacaSemua';
 import { getPageCache, setPageCache } from '../lib/pageCache';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, tanggalHariIni, formatRupiahBertanda, formatRupiahArah } from '../lib/utils';
+import { formatRupiahPlain, formatTanggal, haptic, hitungSaldoHadiran, maskRp, tanggalHariIni, formatRupiahBertanda, formatRupiahArah, namaSohibul, SOHIBUL_KOSONG } from '../lib/utils';
 import CrossFade from '../components/CrossFade';
 import HeroSaldo, { HeroAction } from '../components/HeroSaldo';
 import PageHeader from '../components/layout/PageHeader';
@@ -111,7 +111,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
               {tarikanOpsi.length === 0 && <option value="">— belum ada tarikan selesai —</option>}
               {tarikanOpsi.map(t => (
                 <option key={t.id} value={t.id}>
-                  #{t.nomor} · {t.sohibul_bait?.nama ?? '—'} · {new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}
+                  #{t.nomor} · {namaSohibul(t)} · {new Date(t.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' })}
                 </option>
               ))}
             </select>
@@ -1001,7 +1001,7 @@ export default function KasHadiranPage() {
                               bisa diaktifkan (di sini tombol pembuka sheet Detail
                               tarikan), dan sapuan itu ikut MENGUKUR sheet tujuannya. */}
                           <p data-ringkas className="text-subtitle font-bold text-ink dark:text-gray-100 leading-tight line-clamp-2 break-words">
-                            {t.sohibul_bait?.nama ?? '—'}
+                            {t.sohibul_bait ? t.sohibul_bait.nama : <span className="font-medium text-ink-faint dark:text-gray-400">{SOHIBUL_KOSONG}</span>}
                           </p>
                           {/* Nominal di baris KEDUA, rata kanan, di SEMUA lebar
                               (30 Sep 2026) — pola yang sama dgn baris Talangan.
@@ -1251,7 +1251,7 @@ export default function KasHadiranPage() {
                       KETIGA, kurang 20px. `break-words` = penjaga token panjang;
                       tingginya dibiarkan bebas karena isinya cuma tanggal +
                       satu nama. */}
-                  <p className="text-caption text-ink-faint dark:text-gray-400 break-words">{formatTanggal(detailTarikan.tanggal)} · {detailTarikan.sohibul_bait?.nama ?? '—'}</p>
+                  <p className="text-caption text-ink-faint dark:text-gray-400 break-words">{formatTanggal(detailTarikan.tanggal)} · {namaSohibul(detailTarikan)}</p>
                 </div>
                 {/* Ruang untuk ✕ (`absolute` di pojok). "PDF Absensi" dulu duduk
                     DI SINI dan kotak sentuhnya bertumpuk 32×16px dgn ✕ (terukur
