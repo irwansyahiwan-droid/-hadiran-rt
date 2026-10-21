@@ -1190,7 +1190,14 @@ export default function KasRTPage() {
                         baris kedua, membuat chip menggantung sendirian. */}
                     <MetaPisah
                       className="text-caption font-medium angka-prosa text-ink-faint dark:text-gray-400 mt-1"
-                      bagian={[ikatFrasa(formatTanggalRingkas(k.tanggal)), k.kategori ? ikatFrasa(labelKategoriSingkat(k.tipe, k.kategori)) : null]}
+                      /* Tanggal: hanya "28 Agu" yang diikat, TAHUN boleh turun
+                         utuh ke baris kedua (21 Okt 2026). Tahun cuma dicetak
+                         untuk tahun LAMPAU, dan baris bernominal lebar
+                         menyisakan ±88px di 320px: "28 Agu 2026" yang diikat
+                         utuh patah di tengah ANGKA — "28 Agu 202" / "6",
+                         terbaca tahun 202. Tak terlihat sebelum 1 Jan 2027;
+                         ditemukan `audit:kata-patah` ber-JAM 15 Jan 2027. */
+                      bagian={[formatTanggalRingkas(k.tanggal).replace(/^(\d{1,2}) (\S+)/, '$1 $2'), k.kategori ? ikatFrasa(labelKategoriSingkat(k.tipe, k.kategori)) : null]}
                     />
                   </div>
 
