@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { X, Download, Share, Plus, ExternalLink } from 'lucide-react';
+import { X, Download, MoreHorizontal, Plus, ExternalLink } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 import { useDialog } from '../hooks/useDialog';
 import { useDragDismiss } from '../hooks/useDragDismiss';
@@ -77,9 +77,14 @@ export default function InstallPrompt() {
     : `intent://${location.host}${location.pathname}${location.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(location.href)};end`;
   const kelasAksi = 'press shrink-0 inline-flex min-h-[44px] items-center gap-2 bg-brand text-white text-caption font-bold px-4 py-2 rounded-xl';
 
+  /* iOS 26 (Sep 2025) menyembunyikan Bagikan di balik ⋯ pada bar "Ringkas"
+     bawaan Safari — "ketuk ikon Bagikan di bar" membuat warga buntu di
+     langkah pertama. Bar Atas/Bawah & iPhone lama masih menampilkannya,
+     jadi itu cadangan di bawah daftar (kata disetujui user 21 Okt 2026;
+     kembarannya di public/panduan-install.html). */
   const steps = [
-    { icon: Share, text: 'Ketuk ikon Bagikan di bar Safari' },
-    { icon: Plus, text: 'Pilih “Tambahkan ke Layar Utama”' },
+    { icon: MoreHorizontal, text: 'Ketuk ⋯ di sebelah alamat, lalu\u00A0“Bagikan”' },
+    { icon: Plus, text: 'Gulir, pilih “Tambahkan\u00A0ke\u00A0Layar\u00A0Utama”' },
     { icon: Download, text: 'Ketuk “Tambah” di kanan atas' },
   ];
 
@@ -153,6 +158,7 @@ export default function InstallPrompt() {
                 );
               })}
             </ol>
+            <p className="mt-3 text-caption text-gray-500 dark:text-gray-400">Ikon Bagikan sudah ada di bar? Langsung ketuk&nbsp;itu.</p>
             <button
               onClick={guideDrag.dismiss}
               className="press w-full mt-5 py-3 rounded-xl bg-brand text-white font-semibold text-body"
