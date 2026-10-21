@@ -302,6 +302,11 @@
   .fcell .fi svg { width: 20px; height: 20px; }
   .fcell h3 { font-family: 'Sora', sans-serif; font-size: 14.5px; font-weight: 700; margin-bottom: 3px; letter-spacing: -.01em; }
   .fcell p { font-size: 12.8px; color: var(--ink-faint); line-height: 1.45; }
+  /* Sel LEBAR (21 Okt 2026): sel ke-7 di grid 2/3 kolom akan yatim sendirian
+     di baris terakhir — jadi Kartu Saya menutup grid selebar penuh, ikon di
+     kiri. Bentuk & tinta sama dgn .fcell; cuma susunannya yang mendatar. */
+  .fcell.fwide { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 14px; }
+  .fcell.fwide .fi { margin-bottom: 0; flex-shrink: 0; }
 
   /* ─────────── SHOWCASE — tangkapan layar asli app ───────────
      Frame HP bezel `--ink` + strip scroll-snap (peek, mask fade, dots).
@@ -606,7 +611,7 @@
     </figure>
   </div>
   <div class="bn-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
-  <p class="shots-note" data-hero style="animation-delay:.44s">Tangkapan layar asli mode Warga. Datanya tampil apa adanya.</p>
+  <p class="shots-note" data-hero style="animation-delay:.44s">Tangkapan layar asli mode Warga, diambil 29 Sep 2026.</p>
 </section>
 
 <!-- ══════════ ALUR UANG ══════════ -->
@@ -680,6 +685,10 @@
       <div class="fcell rv" style="--d:260ms">
         <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg></div>
         <h3>Laporan &amp; PDF</h3><p>Laporan triwulan siap diunduh untuk arsip dan rapat warga.</p>
+      </div>
+      <div class="fcell fwide rv" style="--d:300ms">
+        <div class="fi"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10h2"/><path d="M16 14h2"/><path d="M6.17 15a3 3 0 0 1 5.66 0"/><circle cx="9" cy="11" r="2"/><rect x="2" y="5" width="20" height="14" rx="2"/></svg></div>
+        <div><h3>Kartu Saya</h3><p>Status hadir, talangan &amp; giliran Sohibul Bait Anda dalam satu kartu, bisa dibagikan sebagai gambar.</p></div>
       </div>
     </div>
   </div>
