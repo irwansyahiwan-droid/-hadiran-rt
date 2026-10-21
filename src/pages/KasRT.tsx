@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { tandaiBasi, tandaiSegar } from '../lib/basi';
 import { RefreshCw, Landmark, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft, Flag, FileText, Search, Download, Pencil, Plus, Trash2, Eye, EyeOff, Share2, RotateCcw, Loader2, Image as ImageIcon } from 'lucide-react';
 import { useCountUp, useHideAmount, toggleHideAmount, useSaving, useAksiBerat, useKembaliDariLatar, usePerTanggal} from '../lib/hooks';
@@ -36,7 +36,7 @@ import MonthlyBars from '../components/charts/MonthlyBars';
 import AreaTrend from '../components/charts/AreaTrend';
 import TargetKasRT from '../components/TargetKasRT';
 import { recomputeKasRTSaldo } from '../lib/kasRt';
-import { urutKasRT } from '../lib/laporan';
+import { urutKasRT, saldoKasRTPer } from '../lib/laporan';
 import { kategoriOpsi, kategoriDefault, labelKategori, labelKategoriSingkat, KATEGORI_MASUK, KATEGORI_KELUAR } from '../lib/kategoriKasRt';
 import type { ReceiptData, ReceiptRow } from '../lib/shareReceipt';
 import type { KasRT } from '../lib/types';
@@ -420,6 +420,9 @@ export default function KasRTPage() {
       saldo: awal + masuk - keluar,
     };
   }, [list]);
+  /* Kartu target menilai target yang tenggatnya LEWAT dgn saldo per tenggat,
+     bukan saldo hari ini (lihat `saldoKasRTPer`). */
+  const saldoPada = useCallback((tgl: string) => saldoKasRTPer(list, tgl), [list]);
   const animatedSaldo = useCountUp(saldo);
   const hidden = useHideAmount();
   /* Ekspor & bagikan = aksi BERAT (chunk diunduh saat diketuk + berkas dirender
@@ -753,7 +756,7 @@ export default function KasRTPage() {
 
         {/* Target & progres Kas RT — syaratnya CERMIN hero: gagal tanpa cache =
             tak dirender; masih memuat = kerangka (saldo `null`), bukan "0%". */}
-        {!(error && list.length === 0) && <TargetKasRT saldo={loading ? null : saldo} />}
+        {!(error && list.length === 0) && <TargetKasRT saldo={loading ? null : saldo} saldoPada={saldoPada} />}
 
         {/* Insight ringkas: kas masuk bulan ini vs bulan lalu.
             Syaratnya dihitung dari `list`, yang saat memuat masih kosong → dua

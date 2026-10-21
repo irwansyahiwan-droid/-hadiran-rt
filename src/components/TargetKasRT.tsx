@@ -21,7 +21,7 @@ import MetaPisah from './MetaPisah';
  *  Rp0 / Rp25.000.000 · Kurang Rp25.000.000" — nol yang lahir dari list kosong,
  *  terbaca sbg fakta (terukur 25 Sep 2026). Saat gagal tanpa cache, KasRT tak
  *  merender kartu ini sama sekali, sama dgn hero. */
-export default function TargetKasRT({ saldo }: { saldo: number | null }) {
+export default function TargetKasRT({ saldo, saldoPada }: { saldo: number | null; saldoPada?: (tanggal: string) => number }) {
   const { isBendahara } = useAuthContext();
   const [target, setTarget] = useState<Target_ | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -118,22 +118,31 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
     );
   }
 
-  const tercapai = saldo >= target.nominal;
-  const pct = target.nominal > 0 ? Math.min(100, Math.max(0, (saldo / target.nominal) * 100)) : 0;
-  const sisa = Math.max(0, target.nominal - saldo);
+  const hari = target.tanggal ? selisihHari(target.tanggal) : null; // hari KALENDER, zona perangkat (lihat utils)
+  /* Tenggat LEWAT → target dinilai dgn saldo PER TENGGAT, bukan saldo hari
+     ini (21 Okt 2026, kata disetujui user). Dulu iuran Januari bisa mencetak
+     "Target tercapai!" untuk target akhir tahun lalu yang gagal — dan
+     pengeluaran Januari membalik target yang tercapai jadi "Kurang …".
+     Terlihat lewat sapuan ber-JAM 2 Jan 2027; tak satu pun sapuan "hari ini"
+     bisa melihatnya karena semuanya berjalan sebelum tenggat. */
+  const berakhir = hari !== null && hari < 0;
+  const nilai = berakhir && saldoPada ? saldoPada(target.tanggal!) : saldo;
+  const tercapai = nilai >= target.nominal;
+  const pct = target.nominal > 0 ? Math.min(100, Math.max(0, (nilai / target.nominal) * 100)) : 0;
+  const sisa = Math.max(0, target.nominal - nilai);
 
   let deadline: string[] | null = null;
-  let deadlineLewat = false;
-  if (target.tanggal) {
+  const deadlineLewat = berakhir && !tercapai;
+  if (target.tanggal && hari !== null) {
     const d = new Date(target.tanggal);
-    const hari = selisihHari(target.tanggal); // hari KALENDER, zona perangkat (lihat utils)
     const tgl = tanggalUtuh(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }));
-    deadlineLewat = hari < 0 && !tercapai;
     /* Tanggal & "N hari lagi" masing-masing satu kesatuan (spasi tak-putus):
        di 320px baris ini dulu patah jadi "…96 hari" + "lagi" sendirian. */
     /* Hari tenggat = "hari ini", bukan "0 hari lagi" (20 Okt 2026, persetujuan
-       user; terlihat lewat sapuan ber-JAM 31 Des). */
-    deadline = [tgl, hari > 0 ? `${hari}\u00A0hari\u00A0lagi` : hari === 0 ? 'hari\u00A0ini' : 'lewat'];
+       user; terlihat lewat sapuan ber-JAM 31 Des). Sesudahnya SATU bagian
+       "Berakhir <tgl>": angka kartu kini milik tanggal itu, bukan hari ini. */
+    deadline = berakhir ? [`Berakhir\u00A0${tgl}`]
+      : [tgl, hari > 0 ? `${hari}\u00A0hari\u00A0lagi` : 'hari\u00A0ini'];
   }
 
   return (
@@ -245,7 +254,7 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
               {tercapai ? <><PartyPopper className="w-3.5 h-3.5" /> Target tercapai!</> : `${Math.round(pct)}% terkumpul`}
             </span>
             <span className="font-display text-micro text-gray-500 dark:text-gray-400 tabular-nums max-[379px]:order-3 max-[379px]:basis-full">
-              {formatRupiahPlain(Math.max(0, saldo))} / {formatRupiahPlain(target.nominal)}
+              {formatRupiahPlain(Math.max(0, nilai))} / {formatRupiahPlain(target.nominal)}
             </span>
           </div>
 
@@ -253,7 +262,7 @@ export default function TargetKasRT({ saldo }: { saldo: number | null }) {
             <span className="max-[379px]:order-2">
               {tercapai ? 'Lebih ' : 'Kurang '}
               <span className="font-display tabular-nums">
-                {formatRupiahPlain(tercapai ? saldo - target.nominal : sisa)}
+                {formatRupiahPlain(tercapai ? nilai - target.nominal : sisa)}
               </span>
             </span>
             {deadline && (

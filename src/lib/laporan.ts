@@ -82,6 +82,25 @@ export const SALDO_AWAL_KETERANGAN = 'Saldo Awal Kas RT';
  *  ber-`created_at` IDENTIK dan `id` setoran lebih kecil, jadi tanpa aturan ini
  *  saldo berjalan dibuka dgn 936.000, bukan 8.134.000. Pembanding biasa (`<`),
  *  bukan `localeCompare` — urutan `id` harus sama dgn `ORDER BY id` Postgres. */
+/** Saldo Kas RT pada AKHIR hari `tanggal` (YYYY-MM-DD, inklusif): semua masuk
+ *  — termasuk Saldo Awal — dikurangi semua keluar yang bertanggal <= itu.
+ *  Aturan uangnya sama dgn saldo hero KasRT; bedanya cuma batas tanggal.
+ *
+ *  Lahir 21 Okt 2026 untuk kartu target yang tenggatnya SUDAH LEWAT: ia dulu
+ *  membandingkan saldo HARI INI dgn target, jadi iuran Januari bisa mencetak
+ *  "Target tercapai!" untuk target akhir tahun lalu yang gagal (terlihat lewat
+ *  sapuan ber-JAM 2 Jan 2027). Perbandingan string aman karena kolom `tanggal`
+ *  bertipe `date` (selalu YYYY-MM-DD). */
+export function saldoKasRTPer(rows: readonly { tanggal: string; tipe: string; nominal: number }[], tanggal: string): number {
+  let saldo = 0;
+  for (const r of rows) {
+    if (r.tanggal > tanggal) continue;
+    if (r.tipe === 'masuk') saldo += r.nominal;
+    else if (r.tipe === 'keluar') saldo -= r.nominal;
+  }
+  return saldo;
+}
+
 export function urutKasRT<T extends { id: string; tanggal: string; keterangan?: string | null; created_at?: string | null }>(rows: readonly T[]): T[] {
   const banding = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
   const awal = (r: T) => (r.keterangan === SALDO_AWAL_KETERANGAN ? 0 : 1);

@@ -40,7 +40,7 @@ vi.mock('./supabase', () => ({
   supabase: { from: (t: string) => builder(t) },
 }));
 
-const { fetchRekapTriwulan, fetchRekapBulanan, fetchRekapLengkap, fetchSnapshotKas, urutKasRT } = await import('./laporan');
+const { fetchRekapTriwulan, fetchRekapBulanan, fetchRekapLengkap, fetchSnapshotKas, urutKasRT, saldoKasRTPer } = await import('./laporan');
 
 const ok = (data: unknown): Res => ({ data, error: null });
 const kosong = () => { jawab = {}; };
@@ -452,5 +452,28 @@ describe('urutKasRT — Saldo Awal selalu membuka buku', () => {
     const salinan = [...asal];
     expect(urutKasRT(asal).map((r) => r.id)).toEqual(['c', 'a', 'b']);
     expect(asal).toEqual(salinan);
+  });
+});
+
+/* Kartu target yang tenggatnya LEWAT dinilai dgn saldo per tenggat, bukan
+   saldo hari ini — kalau tidak, iuran Januari mencetak "Target tercapai!"
+   untuk target akhir tahun lalu yang gagal. */
+describe('saldoKasRTPer — saldo pada akhir hari tertentu', () => {
+  const rows = [
+    { tanggal: '2026-01-31', tipe: 'masuk', nominal: 8_134_000 },   // Saldo Awal
+    { tanggal: '2026-06-10', tipe: 'keluar', nominal: 1_000_000 },
+    { tanggal: '2026-12-31', tipe: 'masuk', nominal: 500_000 },     // TEPAT di tenggat
+    { tanggal: '2027-01-05', tipe: 'masuk', nominal: 20_000_000 },  // sesudah tenggat
+    { tanggal: '2027-01-06', tipe: 'keluar', nominal: 300_000 },
+  ];
+  it('menghitung baris PADA tanggal batas, membuang yang sesudahnya', () => {
+    expect(saldoKasRTPer(rows, '2026-12-31')).toBe(8_134_000 - 1_000_000 + 500_000);
+  });
+  it('sebelum baris pertama = 0; sesudah baris terakhir = saldo penuh', () => {
+    expect(saldoKasRTPer(rows, '2026-01-30')).toBe(0);
+    expect(saldoKasRTPer(rows, '2027-12-31')).toBe(8_134_000 - 1_000_000 + 500_000 + 20_000_000 - 300_000);
+  });
+  it('tipe tak dikenal tak menggeser saldo', () => {
+    expect(saldoKasRTPer([...rows, { tanggal: '2026-05-01', tipe: 'lain', nominal: 99 }], '2026-12-31')).toBe(7_634_000);
   });
 });
