@@ -391,7 +391,7 @@ function EditSheet({ initial, bawaan, onClose, onSaved }: { initial?: Target_; b
               className="field"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 max-[359px]:grid-cols-1 gap-3">
             <div>
               <label htmlFor="target-nominal" className="label-field">Nominal Target</label>
               <div className="relative">

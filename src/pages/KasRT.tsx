@@ -181,7 +181,7 @@ function TambahModal({ saldoSekarang, initial, onSave, onClose }: ModalProps) {
             <GalatKolom id="kasrt-keterangan-galat" pesan={galat.pesan('kasrt-keterangan')} />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 max-[359px]:grid-cols-1 gap-3">
             <div>
               <label htmlFor="kasrt-nominal" className="label-field">Nominal</label>
               <div className="relative">

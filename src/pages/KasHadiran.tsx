@@ -125,7 +125,7 @@ function SetorModal({ saldoHadiran, tarikanList, onSave, onClose }: SetorModalPr
               className="field" />
             <GalatKolom id="kashadiran-keterangan-galat" pesan={galat.pesan('kashadiran-keterangan')} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 max-[359px]:grid-cols-1 gap-3">
             <div>
               <label htmlFor="kashadiran-nominal" className="label-field">Nominal</label>
               <div className="relative">

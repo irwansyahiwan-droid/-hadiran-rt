@@ -332,6 +332,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           mask-repeat: no-repeat;
 }
 .dark input[type="date"]::-webkit-calendar-picker-indicator { background-color: #B4C9BB; }
+/* Ruang TEKS kolom tanggal (21 Okt 2026). Indikator di atas memakan ±26px
+   isi kolom, dan di grid dua kolom @360px (nominal + tanggal: tambah Kas RT,
+   setor Kas Hadiran, target) kolomnya 154px — "31/12/2026" terpotong jadi
+   "31/12/202", tahun yang justru membedakan tenggat. Bantalan kanan 16 → 8px
+   cukup di 360px; di bawah 360px gridnya turun satu kolom (`max-[359px]:`
+   di ketiga call-site) karena 134px tak cukup dgn bantalan berapa pun.
+   Glyph tetap di pita 6..40px dari tepi kanan (`kontras-nonteks` E). */
+input[type="date"].field { padding-inline-end: 0.5rem; }
 
 /* ── Panah `<select>` — lucide chevron-down, bukan glyph bawaan (26 Sep 2026)
    Kembaran persis ikon kalender di atas, untuk kontrol native KEDUA di form
