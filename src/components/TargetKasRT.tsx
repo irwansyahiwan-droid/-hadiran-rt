@@ -9,7 +9,7 @@ import { useGalatKolom } from '../hooks/useGalatKolom';
 import GalatKolom from './GalatKolom';
 import ConfirmDestruktif from './ConfirmDestruktif';
 import { useAuthContext } from '../context/AuthContext';
-import { formatRupiahPlain, haptic, ikatFrasa, tanggalUtuh, selisihHari } from '../lib/utils';
+import { formatRupiahPlain, haptic, ikatFrasa, tanggalUtuh, selisihHari, tanggalSetahunLagi } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import { getTargetKasRT, setTargetKasRT, clearTargetKasRT, type TargetKasRT as Target_ } from '../lib/pengaturan';
 import { useKolomNominal } from '../lib/kolomNominal';
@@ -27,6 +27,7 @@ export default function TargetKasRT({ saldo, saldoPada }: { saldo: number | null
   const [loaded, setLoaded] = useState(false);
   const [gagal, setGagal] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [baru, setBaru] = useState(false);   // "Tetapkan target <tahun>" sesudah berakhir
 
   async function load() {
     try {
@@ -133,6 +134,8 @@ export default function TargetKasRT({ saldo, saldoPada }: { saldo: number | null
 
   let deadline: string[] | null = null;
   const deadlineLewat = berakhir && !tercapai;
+  const bawaanBaru: Target_ | null = berakhir && target.tanggal
+    ? { ...target, tanggal: tanggalSetahunLagi(target.tanggal) } : null;
   if (target.tanggal && hari !== null) {
     const d = new Date(target.tanggal);
     const tgl = tanggalUtuh(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }));
@@ -270,6 +273,26 @@ export default function TargetKasRT({ saldo, saldoPada }: { saldo: number | null
             )}
           </div>
         </div>
+
+        {/* Ajakan target BARU sesudah tenggat (21 Okt 2026, kata & isian
+            bawaan disetujui user). Tanpa ini tiap 1 Januari kartu cuma
+            berkata "Berakhir …" dan bendahara harus INGAT sendiri bahwa
+            target tahun ini belum ada. Isian bawaan = target lama dgn batas
+            waktu maju ke tahun pertama sesudah hari ini; menyimpannya
+            menimpa target lama (app memang menyimpan SATU target). Warga tak
+            melihatnya — mereka tetap membaca hasil akhir target lama.
+            Kerangka tak meniru tombol ini: keadaannya baru diketahui sesudah
+            target termuat, jadi bendahara mendapat satu geseran ±60px di
+            muat pertama sesudah tenggat, sekali setahun. */}
+        {berakhir && isBendahara && bawaanBaru && (
+          <button
+            onClick={() => { haptic(); setBaru(true); }}
+            className="btn-secondary mt-4 w-full min-h-[44px] inline-flex items-center justify-center gap-2 py-3"
+          >
+            <Plus className="w-4 h-4" />
+            Tetapkan target {bawaanBaru.tanggal!.slice(0, 4)}
+          </button>
+        )}
       </div>
 
       {editing && (
@@ -279,17 +302,27 @@ export default function TargetKasRT({ saldo, saldoPada }: { saldo: number | null
           onSaved={() => { setEditing(false); load(); }}
         />
       )}
+      {baru && bawaanBaru && (
+        <EditSheet
+          bawaan={bawaanBaru}
+          onClose={() => setBaru(false)}
+          onSaved={() => { setBaru(false); load(); }}
+        />
+      )}
     </>
   );
 }
 
 // ── Sheet edit/set target ──────────────────────────────────
-function EditSheet({ initial, onClose, onSaved }: { initial?: Target_; onClose: () => void; onSaved: () => void }) {
-  const [nominal, setNominal] = useState(initial?.nominal ?? 0);
+/** `initial` = mode UBAH (judul "Ubah", ada Hapus). `bawaan` = mode TETAPKAN
+ *  dgn isian awal (target baru sesudah yang lama berakhir). */
+function EditSheet({ initial, bawaan, onClose, onSaved }: { initial?: Target_; bawaan?: Target_; onClose: () => void; onSaved: () => void }) {
+  const isi = initial ?? bawaan;
+  const [nominal, setNominal] = useState(isi?.nominal ?? 0);
   // Kursor tak melompat ke ujung saat digit di tengah dikoreksi (lihat kolomNominal).
   const kolomNominal = useKolomNominal(nominal, setNominal);
-  const [keterangan, setKeterangan] = useState(initial?.keterangan ?? '');
-  const [tanggal, setTanggal] = useState(initial?.tanggal ?? '');
+  const [keterangan, setKeterangan] = useState(isi?.keterangan ?? '');
+  const [tanggal, setTanggal] = useState(isi?.tanggal ?? '');
   const [saving, setSaving, sedangSimpan] = useSaving();
   const galat = useGalatKolom();
   /* Hapus target lewat ConfirmDestruktif (14 Sep 2026) — dulu tombolnya

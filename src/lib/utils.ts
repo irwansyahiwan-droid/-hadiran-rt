@@ -184,6 +184,23 @@ export function tanggalHariIni(d: Date = new Date()): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+/** Tanggal yang SAMA (bulan & hari) di tahun pertama yang jatuh SESUDAH
+ *  `hariIni` — isian bawaan "Tetapkan target <tahun>" sesudah target lama
+ *  berakhir (21 Okt 2026): 31 Des 2026 dibuka 15 Jan 2027 → 31 Des 2027.
+ *  29 Feb di tahun bukan kabisat jadi 28 Feb. Semua "YYYY-MM-DD". */
+export function tanggalSetahunLagi(tanggal: string, hariIni: string = tanggalHariIni()): string {
+  const [y0, m, d] = tanggal.split('-').map(Number);
+  const p = (n: number) => String(n).padStart(2, '0');
+  const kabisat = (y: number) => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+  let y = y0;
+  let hasil: string;
+  do {
+    y++;
+    hasil = `${y}-${p(m)}-${p(m === 2 && d === 29 && !kabisat(y) ? 28 : d)}`;
+  } while (hasil <= hariIni);
+  return hasil;
+}
+
 /** Selisih HARI KALENDER dari hari ini (zona perangkat) ke kolom `date`
  *  "YYYY-MM-DD": 0 = hari ini, negatif = sudah lewat (19 Okt 2026).
  *  Dulu `Math.ceil((new Date(tgl) - Date.now()) / 86400000)` — `new Date(tgl)`

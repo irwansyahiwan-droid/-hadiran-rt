@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   formatRupiah, formatRupiahPlain, maskRp, hitungSaldoHadiran, pesanError,
-  formatTanggalRingkas, ukuranMuat, tanggalUtuh, formatTanggal, sisiPopover, ikatFrasa } from './utils';
+  formatTanggalRingkas, ukuranMuat, tanggalUtuh, formatTanggal, sisiPopover, ikatFrasa, tanggalSetahunLagi } from './utils';
 
 /**
  * Formatter uang & penerjemah error — dipakai hampir di setiap layar, dan
@@ -238,5 +238,23 @@ describe('ikatFrasa — frasa tak terbelah di teks bebas layar', () => {
   });
   it('teks lain tak berubah', () => {
     expect(ikatFrasa('Donasi Rawat Inap')).toBe('Donasi Rawat Inap');
+  });
+});
+
+/* Isian bawaan "Tetapkan target <tahun>" sesudah target lama berakhir. */
+describe('tanggalSetahunLagi — bulan & hari sama, tahun pertama SESUDAH hari ini', () => {
+  it('31 Des 2026 dibuka 15 Jan 2027 → 31 Des 2027', () => {
+    expect(tanggalSetahunLagi('2026-12-31', '2027-01-15')).toBe('2027-12-31');
+  });
+  it('tenggat yang sudah lewat >1 tahun melompat sampai sesudah hari ini', () => {
+    expect(tanggalSetahunLagi('2025-08-17', '2027-01-15')).toBe('2027-08-17');
+  });
+  it('tanggal yang SAMA dgn hari ini bukan "sesudah" — maju setahun lagi', () => {
+    expect(tanggalSetahunLagi('2026-01-15', '2027-01-15')).toBe('2028-01-15');
+  });
+  it('29 Feb di tahun bukan kabisat jadi 28 Feb; kabisat tetap 29', () => {
+    expect(tanggalSetahunLagi('2024-02-29', '2025-01-01')).toBe('2025-02-28');
+    expect(tanggalSetahunLagi('2027-02-28', '2028-01-01')).toBe('2028-02-28');
+    expect(tanggalSetahunLagi('2024-02-29', '2027-06-01')).toBe('2028-02-29');
   });
 });
