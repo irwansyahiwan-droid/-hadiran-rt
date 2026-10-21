@@ -1402,6 +1402,13 @@ html .bg-rose-700      { background-color: #941136; }  /* putih 6,29 → 8,78:1 
   margin-left: -0.8em;
   text-align: center;
 }
+/* Bagian yang memuat label waktu jadwal TAK BOLEH patah di dalam (20 Okt 2026):
+   WebKit menakar lebarnya 0,25px kurang, lalu mematahkan di antara titik
+   `::before` & label. Disasar sempit lewat `:has` — bagian lain tetap boleh
+   melipat (`overflow-wrap: anywhere` di atas menjaga nama panjang). Bagian ini
+   pendek ("Hari ini" · "Belum dicatat"), jadi kalau tak muat ia pindah baris
+   UTUH. Lihat LabelHari.tsx. */
+.meta-pisah > span > span:has(.label-hari) { white-space: nowrap; }
 
 .potong-lentur {
   display: -webkit-box;
