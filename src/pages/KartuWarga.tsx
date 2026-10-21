@@ -11,7 +11,8 @@ import { useBackDismiss } from '../hooks/useBackDismiss';
 import { useDialog } from '../hooks/useDialog';
 import { useClosePhase } from '../hooks/useClosePhase';
 import { useUmumkanHasil } from '../hooks/useUmumkanHasil';
-import { haptic, formatRupiahPlain, formatTanggal, formatTanggalRingkas } from '../lib/utils';
+import { haptic, formatRupiahPlain, formatTanggal, formatTanggalRingkas, labelHariTarikan } from '../lib/utils';
+import LabelHari from '../components/LabelHari';
 import {
   ambilDaftarKartu,
   ambilDataWarga,
@@ -645,6 +646,9 @@ function JejakKehadiran({ kartu }: { kartu: DataKartu }) {
 }
 
 function KartuSohibul({ kartu }: { kartu: DataKartu }) {
+  /* Label waktu giliran (20 Okt 2026, persetujuan user) — di LAYAR saja: kartu
+     PNG dibaca berhari-hari kemudian di WA, dan "Besok" di dalamnya akan basi. */
+  const lh = kartu.giliran ? labelHariTarikan(kartu.giliran) : null;
   return (
     <section aria-label="Giliran Sohibul Bait" className={`${KARTU} p-5`}>
       <div className="flex items-center gap-3">
@@ -655,7 +659,7 @@ function KartuSohibul({ kartu }: { kartu: DataKartu }) {
           <p className="text-caption text-ink-sub dark:text-gray-400">Giliran Sohibul Bait</p>
           {kartu.giliran ? (
             /* MetaPisah: @320px baris ini melipat — tanggal tak terpisah dari harinya. */
-            <MetaPisah className="text-body font-semibold text-ink dark:text-gray-100" bagian={[`Tarikan #${kartu.giliran.nomor}`, formatTanggal(kartu.giliran.tanggal)]} />
+            <MetaPisah className="text-body font-semibold text-ink dark:text-gray-100" bagian={[`Tarikan #${kartu.giliran.nomor}`, formatTanggal(kartu.giliran.tanggal), lh && <LabelHari label={lh} />]} />
           ) : (
             <p className="text-body font-semibold text-ink dark:text-gray-100">Belum ada jadwal</p>
           )}
