@@ -35,6 +35,9 @@ interface Props {
  *  hero `KasRT.tsx` (`saldoAwal > 0 && …`). Ditampilkan di ATAS "Masuk" &
  *  BUKAN pengurang: `masuk` di sini sudah pemasukan NYATA saja (Saldo Awal
  *  dikecualikan sebelum sampai ke komponen ini, lihat `laporan.ts`). */
+/** Tinta nominal tanpa arah: transfer antar-kas & nominal NOL. */
+const NETRAL = 'text-gray-900 dark:text-gray-100';
+
 function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', keluarTransfer = false, saldo, saldoLabel = 'Saldo akhir', talangan }: {
   judul: string; saldoAwal?: number; masuk: number; keluar: number; keluarLabel?: string;
   /** Baris keluar = PINDAHAN antar-kas (Setor ke Kas RT), bukan uang hilang →
@@ -61,7 +64,11 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
                 DESIGN.stitch §7. Berkas ini terlewat waktu sweep kemarin. */}
             <ArrowDownLeft className="w-3.5 h-3.5 text-pos dark:text-pos-dark" /> Masuk
           </span>
-          <span className="shrink-0 whitespace-nowrap font-display font-semibold text-pos dark:text-emerald-400 tabular-nums">{formatRupiahPlain(masuk)}</span>
+          {/* NOL tak punya arah (21 Okt 2026, disetujui user): tinta netral
+              untuk Rp0, persis `formatRupiahArah` yang membuang tandanya.
+              Ikon tetap berwarna — ia menandai JENIS baris, bukan nilainya.
+              Kembarannya di kartu PNG (`shareLaporanKas`) & PDF triwulan. */}
+          <span className={`shrink-0 whitespace-nowrap font-display font-semibold tabular-nums ${masuk === 0 ? NETRAL : 'text-pos dark:text-emerald-400'}`}>{formatRupiahPlain(masuk)}</span>
         </div>
         <div className="flex items-center justify-between text-caption">
           <span className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400">
@@ -74,7 +81,7 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
                 melihat dua versi fakta yang sama. */}
             <ArrowUpRight className={`w-3.5 h-3.5 ${keluarTransfer ? 'text-blue-700 dark:text-blue-400' : 'text-neg dark:text-neg-dark'}`} /> {keluarLabel}
           </span>
-          <span className={`shrink-0 whitespace-nowrap font-display font-semibold tabular-nums ${keluarTransfer ? 'text-gray-900 dark:text-gray-100' : 'text-neg dark:text-rose-400'}`}>{formatRupiahArah(keluar, '-')}</span>
+          <span className={`shrink-0 whitespace-nowrap font-display font-semibold tabular-nums ${keluarTransfer || keluar === 0 ? NETRAL : 'text-neg dark:text-rose-400'}`}>{formatRupiahArah(keluar, '-')}</span>
         </div>
         <div className="flex items-center justify-between text-caption pt-2 border-t border-control dark:border-control-dark">
           <span className="font-semibold text-gray-700 dark:text-gray-300">{saldoLabel}</span>
@@ -91,7 +98,7 @@ function Ledger({ judul, saldoAwal, masuk, keluar, keluarLabel = 'Keluar', kelua
                 panel Alur Kas Hadiran: @320px "-Rp1.400.000" patah SESUDAH tanda
                 minus — "-" tertinggal sendirian di baris atas. Dulu tak terlihat
                 `audit:kata-patah` karena tandanya simpul teks terpisah. */}
-            <span className="shrink-0 whitespace-nowrap font-display font-semibold text-warn dark:text-amber-400 tabular-nums">{formatRupiahArah(talangan, '-')}</span>
+            <span className={`shrink-0 whitespace-nowrap font-display font-semibold tabular-nums ${talangan === 0 ? NETRAL : 'text-warn dark:text-amber-400'}`}>{formatRupiahArah(talangan, '-')}</span>
           </div>
         )}
       </div>

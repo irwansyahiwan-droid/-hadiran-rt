@@ -117,3 +117,39 @@ describe('PDF Laporan BULANAN — generator yang sama, kata & kode periode berbe
     expect(buildLaporanTriwulanPDF(BULANAN).doc.getNumberOfPages()).toBe(1);
   });
 });
+
+/* NOL tak punya arah (21 Okt 2026, disetujui user): "Rp0" dicetak dgn tinta
+   baris NETRAL, bukan hijau/merah/amber — kembaran layar Tutup Buku & kartu
+   PNG. Dibaca dari operator warna isi (`r g b rg`) terakhir SEBELUM teksnya. */
+function warnaSebelum(doc: unknown, teks: string): string {
+  const isi = (doc as { internal: { pages: string[][] } }).internal.pages.flat().filter(Boolean).join('\n');
+  const i = isi.indexOf(`(${teks}) Tj`);
+  expect(i, `"${teks}" tak tercetak`).toBeGreaterThan(-1);
+  const semua = [...isi.slice(0, i).matchAll(/([\d.]+ [\d.]+ [\d.]+) rg/g)];
+  return semua[semua.length - 1][1];
+}
+
+describe('PDF Laporan Triwulan — nominal NOL bertinta netral', () => {
+  const NOL = { ...REKAP, hadiranTalangan: 0, rtKeluar: 0, rtMasuk: 0 };
+  it('Rp0 di baris bernada (talangan, pemasukan, pengeluaran) = tinta "Setor ke Kas RT"', () => {
+    const doc = buildLaporanTriwulanPDF(NOL).doc;
+    const netral = warnaSebelum(doc, neg(NOL.hadiranSetor));
+    const isi = (doc as unknown as { internal: { pages: string[][] } }).internal.pages.flat().join('\n');
+    const nol = [...isi.matchAll(/\(Rp0\) Tj/g)].length;
+    // talangan · pemasukan · pengeluaran · + "Selisih triwulan" Kas RT (0 − 0, baris netral)
+    expect(nol, 'fixture: empat Rp0 wajib tercetak').toBe(4);
+    // Tiap kemunculan Rp0 dicek sendiri — potong isi sesudah kemunculan sebelumnya.
+    let sisa = isi;
+    for (let k = 0; k < nol; k++) {
+      const j = sisa.indexOf('(Rp0) Tj');
+      const w = [...sisa.slice(0, j).matchAll(/([\d.]+ [\d.]+ [\d.]+) rg/g)].pop()![1];
+      expect(w, `Rp0 ke-${k + 1} bernada, bukan netral`).toBe(netral);
+      sisa = sisa.slice(j + 8);
+    }
+  });
+  it('nominal BUKAN nol tetap bernada (talangan amber ≠ netral)', () => {
+    const doc = buildLaporanTriwulanPDF(REKAP).doc;
+    expect(warnaSebelum(doc, neg(REKAP.hadiranTalangan))).not.toBe(warnaSebelum(doc, neg(REKAP.hadiranSetor)));
+    expect(warnaSebelum(doc, rp(REKAP.rtMasuk))).not.toBe(warnaSebelum(doc, neg(REKAP.hadiranSetor)));
+  });
+});

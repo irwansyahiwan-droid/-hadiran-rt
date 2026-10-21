@@ -70,15 +70,18 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
   const kata = r.bulan ? 'bulan' : 'triwulan';
 
   type Baris = { label: string; nilai: string; tone?: keyof typeof C; saldo?: boolean; neg?: boolean };
+  /* NOL tak punya arah (21 Okt 2026, disetujui user): Rp0 dicetak tinta
+     netral, kembaran layar Tutup Buku & kartu PNG. */
+  const nada = (nilai: number, t: keyof typeof C): keyof typeof C | undefined => (nilai === 0 ? undefined : t);
   const seksi: { judul: string; rows: Baris[] }[] = [
     {
       judul: 'KAS HADIRAN',
       rows: [
-        { label: 'Kas Terkumpul', nilai: rp(r.hadiranMasuk), tone: 'pos' },
+        { label: 'Kas Terkumpul', nilai: rp(r.hadiranMasuk), tone: nada(r.hadiranMasuk, 'pos') },
         { label: 'Setor ke Kas RT', nilai: formatRupiahArah(r.hadiranSetor, '-') },
         { label: `Selisih ${kata}`, nilai: rp(hadiranNet) },
         { label: 'Belum disetor', nilai: rp(r.hadiranBelumSetor), saldo: true, neg: r.hadiranBelumSetor < 0 },
-        { label: 'Talangan belum lunas', nilai: formatRupiahArah(r.hadiranTalangan, '-'), tone: 'warn' },
+        { label: 'Talangan belum lunas', nilai: formatRupiahArah(r.hadiranTalangan, '-'), tone: nada(r.hadiranTalangan, 'warn') },
       ],
     },
     {
@@ -88,8 +91,8 @@ export function buildLaporanTriwulanPDF(r: RekapTriwulan): { doc: jsPDF; filenam
         // triwulan yg benar-benar memilikinya (mis. Triwulan I 2026) — bukan
         // pengeluaran/pemasukan periode ini, jadi TIDAK ikut "Selisih triwulan".
         ...(r.rtSaldoAwal > 0 ? [{ label: 'Saldo Awal', nilai: rp(r.rtSaldoAwal) }] : []),
-        { label: 'Pemasukan', nilai: rp(r.rtMasuk), tone: 'pos' as const },
-        { label: 'Pengeluaran', nilai: formatRupiahArah(r.rtKeluar, '-'), tone: 'neg' as const },
+        { label: 'Pemasukan', nilai: rp(r.rtMasuk), tone: nada(r.rtMasuk, 'pos') },
+        { label: 'Pengeluaran', nilai: formatRupiahArah(r.rtKeluar, '-'), tone: nada(r.rtKeluar, 'neg') },
         { label: `Selisih ${kata}`, nilai: rp(rtNet) },
         { label: 'Saldo akhir', nilai: rp(r.rtSaldoAkhir), saldo: true, neg: r.rtSaldoAkhir < 0 },
       ],

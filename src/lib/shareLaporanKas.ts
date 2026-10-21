@@ -264,6 +264,10 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   // ── Panel ledger ────────────────────────────────────────────
   function warnaTone(r: PanelRow): string {
     if (r.saldo) return r.val < 0 ? CETAK.neg : CETAK.pos;
+    /* NOL tak punya arah (21 Okt 2026, disetujui user) — kembaran layar Tutup
+       Buku (`LaporanTriwulan.tsx`). Baris SALDO tak ikut: warnanya status
+       hasil akhir (≥ 0 aman / < 0 minus), bukan arah uang. */
+    if (r.val === 0) return CETAK.ink;
     return r.tone === 'pos' ? CETAK.pos : r.tone === 'neg' ? CETAK.neg : r.tone === 'warn' ? CETAK.warn : CETAK.ink;
   }
 
