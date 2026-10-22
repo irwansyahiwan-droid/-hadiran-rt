@@ -124,7 +124,11 @@ export default function ConfirmDestruktif({
               autoComplete="off"
               value={ketik}
               onChange={(e) => setKetik(e.target.value)}
-              placeholder={typeToConfirm.value}
+              /* TANPA placeholder (22 Okt 2026, disetujui user). Dulu
+                 placeholder-nya = jawabannya sendiri ("24"), dicat #48594E —
+                 nyaris setinta isian sungguhan, jadi kolom KOSONG terbaca
+                 sudah terisi dan tombol merah yang mati tampak rusak. Angkanya
+                 sudah tertulis merah di label tepat di atas. */
               disabled={loading}
               className="field"
             />
