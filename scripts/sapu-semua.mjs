@@ -287,15 +287,19 @@ const LANTAI = {
   /* Garis dasar 5 Okt 2026: 18.143 kata di 60 layar (tab + overlay + sheet &
      form, identik di dua jalan). Ikut DATA — Riwayat Aktivitas sendiri ~2.100
      kata per peran. Lantai ~95%. */
-  'kata-patah':     [/(\d+) kata diperiksa di \d+ layar/, 17200],
+  /* 17200 → 18750 (22 Okt 2026): editor Absensi DISIMPAN (tulis lokal) &
+     kartu HASIL TARIKAN masuk populasi — 19.745 kata · 70 layar. */
+  'kata-patah':     [/(\d+) kata diperiksa di \d+ layar/, 18750],
   /* Garis dasar 16 Okt 2026: 8.344 teks berpasangan di 44 layar (2 mesin ×
      390/375 × warga/bendahara). Ikut DATA (Riwayat Aktivitas ~630 teks per
      peran). Lantai ~95%. */
-  mesin:            [/MESIN: (\d+) teks berpasangan/, 7900],
+  /* 7900 → 8890 (22 Okt 2026): editor Absensi & kartu HASIL TARIKAN masuk
+     populasi — 9.356 teks · 48 layar. */
+  mesin:            [/MESIN: (\d+) teks berpasangan/, 8890],
   /* Kembaran ber-JAM Januari: populasinya praktis sama (label tanggal cuma
      bertambah tahun), jadi lantainya sama dgn yang hari ini. */
-  'kata-patah@jan': [/(\d+) kata diperiksa di \d+ layar/, 17200],
-  'mesin@jan':      [/MESIN: (\d+) teks berpasangan/, 7900],
+  'kata-patah@jan': [/(\d+) kata diperiksa di \d+ layar/, 18750],
+  'mesin@jan':      [/MESIN: (\d+) teks berpasangan/, 8890],
   /* Garis dasar 22 Okt 2026: 12 kartu (6 kartu × data hari ini & EKSTREM —
      Hasil Tarikan masuk sore itu, tulisnya dijawab LOKAL), 321 teks kanvas.
      Ikut DATA (baris kategori Kas RT, jejak Kartu Saya). Lantai ~95%. */

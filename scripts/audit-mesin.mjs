@@ -27,6 +27,9 @@
 //   PERAN=warga | bendahara
 //   MUTASI=1  → kembalikan titik MetaPisah absolut pra-eee911a DI WEBKIT saja —
 //               WAJIB merah ("Tarikan #30" di Kartu Warga).
+//   MUTASI=2  → kartu HASIL TARIKAN (masuk populasi 22 Okt 2026) dipersempit
+//               DI WEBKIT saja — WAJIB merah di `hasil-tarikan`, kalau tidak
+//               probe tak membaca kartunya (populasi baru wajib terbukti bergigi).
 import { webkit, chromium } from 'playwright';
 import { newCtx, loginWarga, gotoTab, openMenuItem, closeLayer } from './lib/audit-harness.mjs';
 import { pilihKartuWarga, tungguDaftarKartu } from './lib/kartu-warga.mjs';
@@ -37,6 +40,9 @@ const PERAN = (process.env.PERAN || 'warga,bendahara').split(',');
 const MUTASI = process.env.MUTASI || '';
 const MUT_CSS = {
   1: `.meta-pisah > span > span::before { display: inline !important; position: absolute !important; top: 0 !important; left: 0 !important; margin-left: 0 !important; }`,
+  /* Kartu ber-ikon bagikan di `main` (kartu hasil; Tutup Buku duduk di dialog
+     & tak tersentuh). App tak punya penanda — jangan menambahnya demi alat. */
+  2: `main .rounded-3xl:has(.lucide-share2) p { max-width: 60px !important; word-break: break-all !important; }`,
 };
 
 /** Daun teks di lapisan TERATAS (dialog kalau ada), baris terlihat tiap daun. */
@@ -94,6 +100,20 @@ for (const [mn, mesin] of [['webkit', webkit], ['chromium', chromium]]) {
   for (const lebar of LEBAR) for (const peran of PERAN) {
     const { ctx, page } = await newCtx(browser, 'light', { bendahara: peran === 'bendahara' });
     await page.setViewportSize({ width: lebar, height: 844 });
+    /* Kartu HASIL TARIKAN cuma ada sesudah absensi DISIMPAN (22 Okt 2026):
+       sisi bendahara menjawab SETIAP tulis secara LOKAL di atas mock harness —
+       tak satu pun `continue` ke jaringan (pola `audit:kartu-png`). */
+    let tulisLokal = 0;
+    if (peran === 'bendahara') await ctx.route('**/rest/v1/**', (route) => {
+      const req = route.request();
+      if (['GET', 'HEAD', 'OPTIONS'].includes(req.method())) return route.fallback();
+      tulisLokal++;
+      if (req.method() === 'DELETE') return route.fulfill({ status: 204, body: '' });
+      let isi = [];
+      try { const b = req.postDataJSON(); isi = Array.isArray(b) ? b : b ? [b] : []; } catch { /* tanpa badan */ }
+      return route.fulfill({ status: req.method() === 'POST' ? 201 : 200, contentType: 'application/json',
+        body: JSON.stringify(isi.map((r, i) => ({ id: `ffffffff-0000-4000-8000-${String(i).padStart(12, '0')}`, ...r }))) });
+    });
     if (MUTASI && mn === 'webkit') await ctx.addInitScript((css) => {
       const pasang = () => { const s = document.createElement('style'); s.textContent = css; document.head.append(s); };
       if (document.head) pasang(); else document.addEventListener('DOMContentLoaded', pasang);
@@ -130,6 +150,35 @@ for (const [mn, mesin] of [['webkit', webkit], ['chromium', chromium]]) {
         if (await f.count()) { await f.click(); await page.waitForTimeout(1200); await catat(nama); await closeLayer(page); }
         else cacat.push(`${mn} ${lebar} ${peran}: pemicu ${nama} tak ada`);
       }
+      /* Editor Absensi (69 nama di kolom sempit) lalu kartu HASIL TARIKAN —
+         dua layar yang dipakai bendahara di iPhone tapi tak pernah dibanding
+         antar-mesin. Dua warga ditandai tidak hadir supaya daftar nama & pita
+         talangan ikut tampil. Tulis dijawab LOKAL (route di atas). */
+      await gotoTab(page, 'Jadwal');
+      const proses = page.getByRole('button', { name: /^Proses/i }).first();
+      if (await proses.count()) {
+        try {
+          await proses.click();
+          const simpan = page.getByRole('button', { name: /^Simpan & Hitung Iuran$/ });
+          await simpan.waitFor({ timeout: 20000 });
+          await page.getByRole('button', { name: 'Semua Hadir' }).click({ timeout: 10000 });
+          await page.waitForTimeout(400);
+          for (let i = 0; i < 2; i++) {
+            for (let k = 0; k < 4; k++) {
+              const b = page.getByRole('button', { name: /Ketuk untuk ganti status/ }).nth(i);
+              if (/Tidak hadir/.test(await b.getAttribute('aria-label'))) break;
+              await b.click(); await page.waitForTimeout(150);
+            }
+          }
+          await catat('absensi');
+          const sebelum = tulisLokal;
+          await simpan.click();
+          await page.getByRole('button', { name: /Bagikan PNG/ }).first().waitFor({ timeout: 20000 });
+          await page.waitForTimeout(3500);   // animasi perayaan habis
+          if (tulisLokal === sebelum) cacat.push(`${mn} ${lebar} ${peran}: simpan absensi tak memicu satu tulis pun`);
+          else await catat('hasil-tarikan');
+        } catch (e) { cacat.push(`${mn} ${lebar} ${peran}: hasil-tarikan ${String(e.message).split('\n')[0].slice(0, 80)}`); }
+      } else cacat.push(`${mn} ${lebar} ${peran}: pemicu Proses tak ada`);
     }
     await ctx.close();
   }
@@ -158,5 +207,6 @@ console.log(`\n=== MESIN: ${pasangan} teks berpasangan di ${layar} layar · beda
 beda.forEach((b) => console.log('  ' + b));
 cacat.forEach((c) => console.log('  PROBE CACAT ' + c));
 if (MUTASI && !beda.length) { console.log(`\nPROBE CACAT: MUTASI=${MUTASI} tapi nol beda — probe tak menggigit.`); process.exit(2); }
+if (MUTASI === '2' && !beda.some((b) => b.includes('|hasil-tarikan]'))) { console.log('\nPROBE CACAT: MUTASI=2 tapi kartu hasil tarikan tak satu pun beda — probe tak membacanya.'); process.exit(2); }
 if (cacat.length) process.exit(2);
 process.exit(beda.length ? 1 : 0);
