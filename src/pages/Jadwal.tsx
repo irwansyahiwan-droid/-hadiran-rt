@@ -710,8 +710,13 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> {result.titipCount} Titip
             </span>
           )}
-          <span className="inline-flex items-center gap-2 font-semibold text-neg dark:text-rose-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> {result.tidakCount} Tidak hadir
+          {/* NOL tak punya arah (22 Okt 2026, disetujui user): "0 Tidak hadir"
+              dulu tetap merah saat semua hadir — sinyal masalah untuk keadaan
+              terbaik. Tetap TAMPIL (kabar "tak ada yang absen" berguna saat
+              mencocokkan uang), tapi netral; ada yang absen = merah seperti dulu.
+              Kembaran aturan nol Tutup Buku & Alur Kas Hadiran. */}
+          <span className={`inline-flex items-center gap-2 font-semibold ${result.tidakCount === 0 ? 'text-ink-sub dark:text-gray-300' : 'text-neg dark:text-rose-400'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${result.tidakCount === 0 ? 'bg-gray-400 dark:bg-gray-500' : 'bg-rose-500'}`} /> {result.tidakCount} Tidak hadir
           </span>
         </div>
 
