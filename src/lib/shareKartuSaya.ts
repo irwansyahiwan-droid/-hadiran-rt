@@ -359,7 +359,10 @@ export async function buatPngKartuSaya(d: DataKartuSaya): Promise<File> {
   if (h.rumahY !== null) {
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.font = `500 13px ${rupiahFont}`;
-    ctx.fillText(`Rumah ${d.noRumah}`, X, h.rumahY);
+    /* `no_rumah` teks bebas dari Kelola Anggota — kata panjang dulu lari keluar
+       kartu hijau (`audit:kartu-png`, data EKSTREM, 22 Okt 2026). Elipsis,
+       pola yang sama dgn baris tunggakan & giliran di bawah. */
+    ctx.fillText(fitText(ctx, `Rumah ${d.noRumah}`, W - 2 * X), X, h.rumahY);
   }
 
   // Kaki statistik — paritas HeroStats di layar (Hadir · Talangan · Giliran).
