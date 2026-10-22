@@ -296,10 +296,10 @@ const LANTAI = {
      bertambah tahun), jadi lantainya sama dgn yang hari ini. */
   'kata-patah@jan': [/(\d+) kata diperiksa di \d+ layar/, 17200],
   'mesin@jan':      [/MESIN: (\d+) teks berpasangan/, 7900],
-  /* Garis dasar 22 Okt 2026: 10 kartu (5 kartu × data hari ini & EKSTREM),
-     297 teks kanvas. Ikut DATA (baris kategori Kas RT, jejak Kartu Saya).
-     Lantai ~95%. */
-  'kartu-png':      [/KARTU PNG: \d+ kartu · (\d+) teks diukur/, 282],
+  /* Garis dasar 22 Okt 2026: 12 kartu (6 kartu × data hari ini & EKSTREM —
+     Hasil Tarikan masuk sore itu, tulisnya dijawab LOKAL), 321 teks kanvas.
+     Ikut DATA (baris kategori Kas RT, jejak Kartu Saya). Lantai ~95%. */
+  'kartu-png':      [/KARTU PNG: \d+ kartu · (\d+) teks diukur/, 305],
   /* Garis dasar 18 Okt 2026: 233 kontrol tetap (chrome, FAB, sheet, overlay)
      di 41 layar @390×844, safe-area 47/34 lewat CDP. Populasi ini STRUKTUR,
      bukan data (kontrol fixed/sticky), jadi stabil. Lantai ~95%. */

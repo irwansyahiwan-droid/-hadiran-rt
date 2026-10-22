@@ -28,11 +28,19 @@
 // ×100 — skala 300 KK). Data hari ini saja = "tak ada yang patah UNTUK angka
 // yang kebetulan ada sekarang" — justru begitulah cacat Rp100 juta lolos.
 //
-// POPULASI (5 kartu × 2 data): ringkasan Kas Hadiran, ringkasan Kas RT, Tutup
-// Buku "sekarang", Tutup Buku per triwulan (kartu terbaru), Kartu Saya.
-// BATAS, diakui: kartu "Hasil Tarikan" (Jadwal) baru ada SESUDAH absensi
-// disimpan — tak terjangkau tanpa menulis data. Kartu PNG BARU wajib masuk
-// daftar `KARTU` di bawah.
+// POPULASI (6 kartu × 2 data): ringkasan Kas Hadiran, ringkasan Kas RT, Tutup
+// Buku "sekarang", Tutup Buku per triwulan (kartu terbaru), Kartu Saya, dan
+// Hasil Tarikan (Jadwal). Kartu PNG BARU wajib masuk daftar `KARTU` di bawah.
+//
+// HASIL TARIKAN baru ada SESUDAH absensi disimpan (22 Okt 2026 masuk populasi;
+// sebelumnya diakui sbg batas). Jalur simpannya (`simpanTarikanSelesai`) murni
+// tulis tabel — absensi/talangan/transaksi_kas delete+insert, tarikan update
+// ber-`.select('id')` — jadi SETIAP permintaan tulis di sapuan ini DIJAWAB
+// LOKAL oleh route di atas mock harness: tak satu byte pun ke jaringan.
+// Termasuk `POST /rpc/*`, yang di harness terhitung BACA dan diteruskan — app
+// punya dua RPC yang MENULIS (`batalkan_tarikan`, `pulihkan_backup`). Jumlah
+// tulis yang dijawab lokal SELALU dicetak; kartu Hasil Tarikan yang tak
+// memicu satu tulis pun = PROBE CACAT (simpannya tak pernah terjadi).
 //
 // KONTROL: kartu yang gagal ditangkap / nol teks / nol wadah = PROBE CACAT
 // (exit 2). `MUTASI=1` menambahkan 12 huruf "W" ke tiap teks nominal "Rp…"
@@ -115,6 +123,26 @@ const KARTU = [
   ['Tutup Buku sekarang', async (p) => { await lapis(p, 'Tutup Buku Triwulan'); return p.getByRole('dialog').getByRole('button', { name: /Bagikan ke WhatsApp/ }).first(); }],
   ['Tutup Buku triwulan terbaru', async (p) => { await lapis(p, 'Tutup Buku Triwulan'); return p.getByRole('dialog').getByRole('button', { name: /PNG/ }).first(); }],
   ['Kartu Saya', async (p) => { await lapis(p, 'Kartu Saya'); if (!(await pilihKartuWarga(p))) return null; return p.getByRole('dialog').getByRole('button', { name: /^Bagikan/ }).first(); }],
+  /* TERAKHIR: editor Absensi = view penuh & menyimpan (dijawab LOKAL), jadi ia
+     tak boleh mengotori keadaan kartu lain. Langkahnya = `audit:tulis` jalur
+     Absensi (Proses → Semua Hadir → Simpan & Hitung Iuran). */
+  ['Hasil Tarikan', async (p) => {
+    await tab(p, 'Jadwal');
+    const proses = p.getByRole('button', { name: /^Proses/i }).first();
+    if (!(await proses.count())) return null;
+    await proses.click();
+    const simpan = p.getByRole('button', { name: /^Simpan & Hitung Iuran$/ });
+    await simpan.waitFor({ timeout: 15000 });
+    await p.waitForTimeout(600);
+    await p.getByRole('button', { name: 'Semua Hadir' }).click({ timeout: 10000 });
+    await p.waitForTimeout(400);
+    const sebelum = tulisLokal;
+    await simpan.click();
+    const bagi = p.getByRole('button', { name: /Bagikan PNG/ }).first();
+    await bagi.waitFor({ timeout: 20000 });
+    if (tulisLokal === sebelum) return null;   // simpan tak pernah terjadi
+    return bagi;
+  }],
 ];
 
 async function tab(page, label) {
@@ -134,10 +162,25 @@ async function lapis(page, item) {
 
 const browser = await chromium.launch();
 const temuan = [], cacat = [];
+let tulisLokal = 0;
 let kartuN = 0, teksN = 0, kartuBerRp = 0, kartuMerah = 0;
 for (const [label, ekstrem] of [['hari ini', false], ['ekstrem', true]]) {
   const { ctx, page } = await newCtx(browser, 'light', { bendahara: true, ekstrem });
   await ctx.addInitScript(sadap, { mutasi: MUTASI });
+  /* Didaftarkan SESUDAH mock harness → dijalankan LEBIH DULU. Baca diteruskan ke
+     handler harness (anon paksa); TULIS apa pun — termasuk RPC — dijawab di sini
+     dan tak pernah `continue`. PATCH/POST memantulkan isinya sbg array (jalur
+     `wajibBerubah` menuntut baris kembali), DELETE dijawab 204. */
+  await ctx.route('**/rest/v1/**', (route) => {
+    const req = route.request();
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method())) return route.fallback();
+    tulisLokal++;
+    if (req.method() === 'DELETE') return route.fulfill({ status: 204, body: '' });
+    let isi = [];
+    try { const b = req.postDataJSON(); isi = Array.isArray(b) ? b : b ? [b] : []; } catch { /* tanpa badan */ }
+    return route.fulfill({ status: req.method() === 'POST' ? 201 : 200, contentType: 'application/json',
+      body: JSON.stringify(isi.map((r, i) => ({ id: `ffffffff-0000-4000-8000-${String(i).padStart(12, '0')}`, ...r }))) });
+  });
   try {
     await page.goto(URL, { waitUntil: 'domcontentloaded' });
     await page.locator('nav button').first().waitFor({ timeout: 20000 });
@@ -175,7 +218,7 @@ for (const [label, ekstrem] of [['hari ini', false], ['ekstrem', true]]) {
 await browser.close();
 
 console.log(`\n=== KARTU PNG: ${kartuN} kartu · ${teksN} teks diukur · ${temuan.length} luber${MUTASI ? ' · MUTASI=1' : ''} ===`);
-console.log('  BATAS: kartu "Hasil Tarikan" (Jadwal) tak terjangkau tanpa menyimpan absensi.');
+console.log(`  tulis dijawab LOKAL: ${tulisLokal} (nol diteruskan ke jaringan)`);
 for (const t of temuan) console.log(`  LUBER ${t}`);
 if (cacat.length) { console.log(`PROBE CACAT: ${cacat.join(' · ')}`); process.exit(2); }
 if (MUTASI && kartuMerah < kartuBerRp) { console.log(`PROBE CACAT: MUTASI=1 tapi hanya ${kartuMerah} dari ${kartuBerRp} kartu ber-nominal merah`); process.exit(2); }
