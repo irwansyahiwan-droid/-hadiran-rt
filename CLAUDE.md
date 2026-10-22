@@ -1171,7 +1171,32 @@ memanggil `closeBundle` JUGA saat build gagal; plugin itu lalu meledak sendiri
 tak pernah tercetak. Validasi mutasi pertamaku nyaris membacanya sbg "gerbang
 ledak plugin tak bekerja". Kelas pelajaran ke-40 persis.
 
-**GARIS DASAR SAPUAN — 6 Sep 2026 · app pada `1dbb865`**
+**GARIS DASAR SAPUAN — 22 Okt 2026 · app pada `5c12e13`**
+
+Rantai `sapu-semua` PENUH, sekali duduk di mesin dev lawan **DB HIDUP**, nol
+durasi melar (tak ada sapuan >10× normalnya — pelajaran ke-40):
+
+    41 sapuan · 41 HIJAU · 0 MERAH · 0 dilewat · 112 menit
+
+Pagi yang sama 15 sapuan PERILAKU di luar rantai (tulis, mundur, gestur,
+papan-ketik, kembali, masuk, respon, toast, tautan, umumkan, fokus-pulang,
+fokus-tertutup, tepi-aman, luring, luring-pertama) dijalankan terpisah: semua
+hijau. Populasi: keadaan 42 layar · keadaan-sebagian 84 pasangan ·
+fallback-sora 40 permukaan / 825 teks terkurung / 567 Sora · kontras 1412
+(AAA 0) · kontras-deep 2781 (AAA 0) · kontras-nonteks 825 · mati 92 · nama 599
+· hover 388 unik · huruf 33 layar-lebar · kata-patah 18.963 kata / 68 layar
+(`@jan` 19.863) · mesin 8.402 (`@jan` 8.434) · kartu-png 10 kartu / 297 teks ·
+tepi-aman 291 · sentuh 406 · sheet 13 (+pendek 13) · fokus-tertutup 2.208 ·
+fokus-pulang 27 + 24 · lompat 11 layar · publik 8 · unduh 198,1 / 201 kB ·
+muat +1.252 ms / 1.400.
+
+**Rantai kini ±2 jam, bukan ±25 menit.** Terberat: mesin 611 dtk (×2 dgn
+`@jan`), fallback-sora 494, potong 414, kata-patah 366 (×2), mati 339, jarak-teks
+329. Sumbu waktu (`@jan`) sendiri menambah ±16 menit. Jalankan saat Mac bisa
+terjaga sekali duduk; merah di dalamnya tetap wajib diulang SENDIRIAN.
+
+**GARIS DASAR LAMA — 6 Sep 2026 · app pada `1dbb865`** (digantikan di atas;
+dipertahankan karena penjelasan merah-di-rantai di bawahnya masih berlaku)
 
 Dijalankan di mesin dev lawan **DB HIDUP** (container CI/dev memakai `.env`
 dummy dan menstarve 13 sapuan — angkanya tak berlaku, lihat di bawah). Kode APP
