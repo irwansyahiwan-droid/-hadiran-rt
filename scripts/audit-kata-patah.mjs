@@ -212,6 +212,24 @@ for (const L of LEBAR) {
     ];
     for (const [tab, nama, pemicu] of SHEET) { if (await bukaSheet(tab, nama, pemicu)) await closeLayer(page); }
     if (peran === 'bendahara') {
+      /* Dialog KETIK-ULANG (22 Okt 2026) — gerbang aksi paling merusak di app,
+         dan tak satu sapuan pun pernah membukanya: begitu dibuka, kolomnya
+         ternyata berplaceholder jawabannya sendiri (`851858e`). Tombolnya baru
+         ada sesudah baris Rekap Per Tarikan dibuka; konfirmasi TAK diketuk. */
+      await gotoTab(page, 'Hadiran');
+      for (const [nama, re] of [['konfirmasi-batalkan-hasil', /^Batalkan hasil tarikan #/], ['konfirmasi-hapus-tarikan', /^Hapus tarikan #/]]) {
+        if (!(await page.getByRole('button', { name: re }).first().isVisible().catch(() => false))) {
+          const lipat = page.locator('main button[aria-expanded="false"]').filter({ hasText: /Tarikan/ }).first();
+          if (await lipat.count()) { await lipat.click().catch(() => {}); await page.waitForTimeout(700); }
+        }
+        const b = page.getByRole('button', { name: re }).first();
+        if (!(await b.count())) { console.log(`  PROBE CACAT [${L} ${peran}/${nama}]: pemicu tak ada`); cacat++; continue; }
+        await b.scrollIntoViewIfNeeded().catch(() => {}); await b.click().catch(() => {}); await page.waitForTimeout(1100);
+        if (!(await page.locator('[role="dialog"]').count())) { console.log(`  PROBE CACAT [${L} ${peran}/${nama}]: dialog tak terbuka`); cacat++; continue; }
+        await ukur(nama, 5); await closeLayer(page);
+      }
+    }
+    if (peran === 'bendahara') {
       // Dua langkah: menu aksi baris → Revisi jadwal (pola audit:fallback-sora).
       if (await bukaSheet('Jadwal', 'menu-aksi-tarikan', () => page.getByRole('button', { name: /Aksi lainnya tarikan/i }).first())) {
         const rev = page.locator('[role="dialog"] button, [role="menu"] button').filter({ hasText: /Revisi jadwal/i }).first();
@@ -254,6 +272,16 @@ for (const L of LEBAR) {
         await ukur('absensi');
         const sebelum = tulisLokal;
         try {
+          /* Simpan TANPA menandai siapa pun → dialog "Semua N anggota tidak
+             hadir?" (gerbang nol hadir, 20 Okt) — dialog ketiga yang tak pernah
+             dibuka sapuan mana pun. Dibatalkan lewat "Kembali menandai". */
+          await page.getByRole('button', { name: /^Simpan & Hitung Iuran$/ }).click();
+          await page.waitForTimeout(900);
+          if (await page.locator('[role="dialog"]').count()) {
+            await ukur('konfirmasi-semua-tidak-hadir', 5);
+            await page.getByRole('button', { name: 'Kembali menandai' }).click({ timeout: 5000 });
+            await page.waitForTimeout(600);
+          } else { console.log(`  PROBE CACAT [${L} ${peran}/konfirmasi-semua-tidak-hadir]: dialog tak muncul`); cacat++; }
           await page.getByRole('button', { name: 'Semua Hadir' }).click({ timeout: 10000 });
           await page.waitForTimeout(400);
           for (let i = 0; i < 2; i++) {
