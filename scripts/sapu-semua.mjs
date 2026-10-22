@@ -20,6 +20,8 @@ import { spawnSync } from 'node:child_process';
 
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const CEPAT = !!process.env.CEPAT;
+/* Jam sumbu waktu: 15 Januari tahun DEPAN, 19.00 WIB (lihat entri `@jan`). */
+const JAM_JANUARI = `${new Date().getFullYear() + 1}-01-15T19:00:00+07:00`;
 
 const STATIS = [
   ['typecheck', 'tsc --noEmit -p tsconfig.app.json'],
@@ -124,6 +126,18 @@ const VISUAL = [
      memakai iPhone, dan potretnya membongkar "Tarikan / #30" (eee911a) yang
      tak terlihat satu alat pun. */
   ['mesin', 'node scripts/audit-mesin.mjs'],
+  /* Kartu PNG yang dibagikan ke WA — digambar di KANVAS, jadi buta bagi semua
+     sapuan geometri di atas. Lahir & masuk rantai 22 Okt 2026 sesudah nominal
+     hero struk ringkasan terpotong mulai Rp100.000.000 (`df2ceba`). */
+  ['kartu-png', 'node scripts/audit-kartu-png.mjs'],
+  /* SUMBU WAKTU di rantai (22 Okt 2026). Semua sapuan lain berjalan "hari ini",
+     jadi keadaan yang cuma lahir sesudah pergantian TAHUN tak pernah terukur —
+     21 Okt dua cacat ditemukan begitu jam dipaku ke Januari (tanggal tahun lalu
+     patah "28 Agu 202/6" @320px, target lewat dinilai saldo hari ini). Jamnya
+     DIHITUNG: 15 Januari tahun DEPAN, supaya ia tetap "sesudah tahun berganti"
+     di tahun berapa pun rantai ini dijalankan. */
+  ['kata-patah@jan', 'node scripts/audit-kata-patah.mjs', { JAM: JAM_JANUARI }],
+  ['mesin@jan', 'node scripts/audit-mesin.mjs', { JAM: JAM_JANUARI }],
   ['tepi-aman', 'node scripts/audit-tepi-aman.mjs'],
   /* §1.4.12 itu AA WAJIB, jadi ia MENGGAGALKAN rantai — bukan dilaporkan saja
      seperti bagian 200% `audit:potong`/`audit:reflow` (itu ambang APP, di atas
@@ -278,6 +292,14 @@ const LANTAI = {
      390/375 × warga/bendahara). Ikut DATA (Riwayat Aktivitas ~630 teks per
      peran). Lantai ~95%. */
   mesin:            [/MESIN: (\d+) teks berpasangan/, 7900],
+  /* Kembaran ber-JAM Januari: populasinya praktis sama (label tanggal cuma
+     bertambah tahun), jadi lantainya sama dgn yang hari ini. */
+  'kata-patah@jan': [/(\d+) kata diperiksa di \d+ layar/, 17200],
+  'mesin@jan':      [/MESIN: (\d+) teks berpasangan/, 7900],
+  /* Garis dasar 22 Okt 2026: 10 kartu (5 kartu × data hari ini & EKSTREM),
+     297 teks kanvas. Ikut DATA (baris kategori Kas RT, jejak Kartu Saya).
+     Lantai ~95%. */
+  'kartu-png':      [/KARTU PNG: \d+ kartu · (\d+) teks diukur/, 282],
   /* Garis dasar 18 Okt 2026: 233 kontrol tetap (chrome, FAB, sheet, overlay)
      di 41 layar @390×844, safe-area 47/34 lewat CDP. Populasi ini STRUKTUR,
      bukan data (kontrol fixed/sticky), jadi stabil. Lantai ~95%. */
