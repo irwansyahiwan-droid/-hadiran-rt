@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { hitungGeometriStruk, bagikanFileGambar, warnaTone, perluChipDefisit, namaBerkasPng, tanggalBerkas, pecahHurufI, STRUK, type ReceiptRow } from './shareReceipt';
+import { hitungGeometriStruk, bagikanFileGambar, warnaTone, perluChipDefisit, namaBerkasPng, tanggalBerkas, pecahHurufI, STRUK, type ReceiptRow, ukuranNominalMuat } from './shareReceipt';
 import { CETAK } from './warnaCetak';
 
 /**
@@ -208,5 +208,25 @@ describe('pecahHurufI — "I" besar yang diikuti huruf kecil digambar berkaki', 
   });
   it('teks tanpa I utuh', () => {
     expect(pecahHurufI('Sosial')).toEqual(['Sosial']);
+  });
+});
+
+/* Nominal hero kartu PNG menyusut seperlunya (22 Okt 2026). Lebar per px
+   meniru Sora 800 yang TERUKUR di peramban: "Rp100.000.000" 343px @40px,
+   "Rp19.567.000" 296px @40px — ruang struk 300px. */
+describe('ukuranNominalMuat — nominal hero muat di kartu', () => {
+  const lebar40 = { 'Rp19.567.000': 296, 'Rp100.000.000': 343, 'Rp1.000.000.000': 385 } as const;
+  const ukur = (t: keyof typeof lebar40) => (px: number) => (lebar40[t] * px) / 40;
+  it('yang SUDAH muat tetap 40px — kartu hari ini tak berubah', () => {
+    expect(ukuranNominalMuat(ukur('Rp19.567.000'), 300)).toBe(40);
+  });
+  it('Rp100.000.000 menyusut sampai muat 300px (dulu terpotong di 343px)', () => {
+    const px = ukuranNominalMuat(ukur('Rp100.000.000'), 300);
+    expect(px).toBeLessThan(40);
+    expect(ukur('Rp100.000.000')(px)).toBeLessThanOrEqual(300);
+    expect(ukur('Rp100.000.000')(px + 1), 'menyusut lebih dari perlu').toBeGreaterThan(300);
+  });
+  it('tak pernah di bawah lantai 22px', () => {
+    expect(ukuranNominalMuat(ukur('Rp1.000.000.000'), 50)).toBe(22);
   });
 });

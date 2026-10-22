@@ -203,6 +203,21 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /** Render kartu receipt bermerek jadi PNG lalu bagikan (Web Share API + fallback WA). */
+/** Ukuran huruf nominal hero kartu: turun dari `mulai` px seperlunya sampai
+ *  `ukur(px)` muat di `maxW`, tak pernah di bawah `lantai`. SATU sumber untuk
+ *  struk ini & kartu Tutup Buku (`shareLaporanKas`) — dulu hanya yang kedua
+ *  menyusut, dan struk memaku 40px sehingga ringkasan Kas RT mulai Rp100.000.000
+ *  (343px di ruang 300px) terpotong di tepi kartu hijau yang beredar di grup WA
+ *  (terukur 22 Okt 2026, data `EKSTREM=1`). Nominal yang SUDAH muat tetap
+ *  `mulai` px, jadi kartu hari ini tak berubah sepiksel pun.
+ *  `ukur` menerima ukuran huruf supaya pengukuran memakai font yang SAMA dgn
+ *  yang akhirnya dicat (mengukur Inter lalu mencat Sora meleset). */
+export function ukuranNominalMuat(ukur: (px: number) => number, maxW: number, mulai = 40, lantai = 22): number {
+  let px = mulai;
+  while (px > lantai && ukur(px) > maxW) px -= 1;
+  return px;
+}
+
 /** Potong teks dgn elipsis agar muat dalam lebar maksimum (canvas). */
 export function fitText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
   if (ctx.measureText(text).width <= maxW) return text;
@@ -351,7 +366,10 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
   ctx.fillText(data.amountLabel.toUpperCase(), 40, 120);
   try { ctx.letterSpacing = '0px'; } catch { /* noop */ }
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = `800 40px ${displayFont}`;
+  /* Muat di dalam kartu (x 40 … W-40, bantalan 20px kanan-kiri) — lihat
+     `ukuranNominalMuat`. */
+  const pxNominal = ukuranNominalMuat((px) => { ctx.font = `800 ${px}px ${displayFont}`; return ctx.measureText(data.amount).width; }, W - 80);
+  ctx.font = `800 ${pxNominal}px ${displayFont}`;
   ctx.fillText(data.amount, 40, 158);
 
   /* Chip "DEFISIT" — paritas HeroSaldo in-app. Nominalnya TETAP putih (aturan

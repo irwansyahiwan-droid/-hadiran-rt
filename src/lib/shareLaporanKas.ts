@@ -1,5 +1,5 @@
 import { LOGO_DATA_URL } from './logoBase64';
-import { bagikanFileGambar, namaBerkasPng } from './shareReceipt';
+import { bagikanFileGambar, namaBerkasPng, ukuranNominalMuat } from './shareReceipt';
 import { CETAK } from './warnaCetak';
 import { formatRupiahBertanda } from './utils';
 
@@ -231,15 +231,12 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
   try { ctx.letterSpacing = '0px'; } catch { /* noop */ }
 
   const amountStr = rpBertanda(heroAmount);
-  let fs = 40;
   /* Nominal hero = Sora (font-display app), paritas struk & hero in-app.
      Penyusutan WAJIB mengukur dgn font yang sama dgn yang akhirnya dicat —
-     mengukur pakai Inter lalu mencat pakai Sora membuat lebarnya meleset. */
+     mengukur pakai Inter lalu mencat pakai Sora membuat lebarnya meleset.
+     Rumus penyusutnya kini SATU sumber dgn struk (`ukuranNominalMuat`). */
+  const fs = ukuranNominalMuat((px) => { ctx.font = `800 ${px}px ${displayFont}`; return ctx.measureText(amountStr).width; }, hw - 40);
   ctx.font = `800 ${fs}px ${displayFont}`;
-  while (ctx.measureText(amountStr).width > hw - 40 && fs > 22) {
-    fs -= 1;
-    ctx.font = `800 ${fs}px ${displayFont}`;
-  }
   /* Nominal TETAP putih walau minus — DESIGN.stitch §7 melarang mewarnai
      nominal hero salmon/merah ("saldo minus disengaja"; sinyalnya chip KATA,
      bukan rona, karena rona lemah bagi mata yang sulit membedakan warna).
