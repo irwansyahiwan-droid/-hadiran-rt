@@ -115,7 +115,17 @@ describe('backup_snapshot — arsip sebelum seluruh data ditimpa', () => {
   });
 
   it('tanggal file backup ikut disebut — dua arsip beruntun harus bisa dibedakan', () => {
-    expect(formatAktivitas(snap()).penjelasan).toMatch(/bertanggal 2026-07-30/);
+    expect(formatAktivitas(snap()).penjelasan).toMatch(/bertanggal 30\u00A0Jul\u00A02026/);
+  });
+
+  it('tanggal file = tanggal LOKAL, bukan potongan ISO UTC', () => {
+    const TZ = process.env.TZ;
+    try {
+      process.env.TZ = 'Asia/Jakarta';
+      const v = formatAktivitas(snap({ exportedAt: '2026-10-22T23:30:00.000Z' }));
+      expect(v.penjelasan).toMatch(/bertanggal 23\u00A0Okt\u00A02026\./);
+      expect(v.penjelasan).not.toMatch(/2026-10-22/);
+    } finally { process.env.TZ = TZ; }
   });
 
   it('tanpa exportedAt tetap berkalimat wajar, bukan "bertanggal undefined"', () => {

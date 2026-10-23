@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { bacaSemua } from './bacaSemua';
 import { formatRupiahPlain } from './utils';
+import { tanggalCadangan } from './backup';
 import type { AktivitasLog } from './types';
 
 /**
@@ -181,7 +182,10 @@ export function formatAktivitas(row: AktivitasLog, kamus?: KamusNama): Aktivitas
       const tabel = snap.tables ?? {};
       const cacah = (k: string) => (Array.isArray(tabel[k]) ? (tabel[k] as unknown[]).length : 0);
       const total = Object.keys(tabel).reduce((n, k) => n + cacah(k), 0);
-      const tglFile = str(snap.exportedAt).slice(0, 10);
+      /* Tanggal LOKAL berkas, satu sumber dgn panel Pulihkan (23 Okt 2026,
+         disetujui user). Dulu `slice(0, 10)` atas ISO UTC: "2026-10-22" untuk
+         cadangan 06.30 WIB 23 Okt. */
+      const tglFile = tanggalCadangan(str(snap.exportedAt));
       return {
         title: 'Arsip Sebelum Pemulihan Backup',
         detail: `${total} baris data lama terarsip · ${cacah('warga')} anggota`,
