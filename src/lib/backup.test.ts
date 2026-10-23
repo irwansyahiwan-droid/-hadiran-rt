@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 /**
  * `restoreBackup` adalah operasi paling merusak di app ini: HAPUS TOTAL seluruh
@@ -69,7 +69,7 @@ vi.mock('./supabase', () => ({
   },
 }));
 
-const { fetchBackup, restoreBackup, validasiBackup, ringkasBackup, TABEL_BACKUP } = await import('./backup');
+const { fetchBackup, restoreBackup, validasiBackup, ringkasBackup, tanggalCadangan, TABEL_BACKUP } = await import('./backup');
 
 const URUT_INSERT = ['warga', 'tarikan', 'absensi', 'talangan', 'transaksi_kas', 'kas_rt', 'pengaturan'];
 const file = (tables: Record<string, Record<string, unknown>[]> = {}) =>
@@ -182,5 +182,26 @@ describe('ringkasBackup', () => {
     expect(r.map((x) => x.table)).toEqual(URUT_INSERT);
     expect(r.find((x) => x.table === 'warga')!.count).toBe(2);
     expect(r.find((x) => x.table === 'kas_rt')!.count).toBe(0);
+  });
+  it('tiap tabel bernama untuk mata, bukan nama tabel mentah', () => {
+    const r = ringkasBackup(file());
+    expect(r.map((x) => x.nama)).toEqual(['Warga', 'Tarikan', 'Absensi', 'Talangan', 'Kas Hadiran', 'Kas RT', 'Pengaturan']);
+    for (const x of r) expect(x.nama).not.toMatch(/_/);
+  });
+});
+
+describe('tanggalCadangan — tanggal LOKAL berkas dibuat', () => {
+  const TZ = process.env.TZ;
+  afterEach(() => { process.env.TZ = TZ; });
+  it('06.30 WIB 23 Okt → "23 Okt 2026" (cara lama `slice(0,10)`: 2026-10-22)', () => {
+    process.env.TZ = 'Asia/Jakarta';
+    expect(tanggalCadangan('2026-10-22T23:30:00.000Z')).toBe('23\u00A0Okt\u00A02026');
+  });
+  it('siang hari tak bergeser', () => {
+    process.env.TZ = 'Asia/Jakarta';
+    expect(tanggalCadangan('2026-08-04T05:00:00.000Z')).toBe('4\u00A0Agu\u00A02026');
+  });
+  it('tanggal rusak → kosong, bukan "Invalid Date"', () => {
+    expect(tanggalCadangan('bukan-tanggal')).toBe('');
   });
 });

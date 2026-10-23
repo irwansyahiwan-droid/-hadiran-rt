@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { bacaSemua } from './bacaSemua';
-import { tanggalHariIni } from './utils';
+import { tanggalHariIni, tanggalUtuh } from './utils';
 
 /**
  * Backup & Restore data Hadiran RT.
@@ -22,6 +22,15 @@ import { tanggalHariIni } from './utils';
  *  urutan ini supaya menambah tabel di salah satu tempat langsung terlihat. */
 export const TABEL_BACKUP = ['warga', 'tarikan', 'absensi', 'talangan', 'transaksi_kas', 'kas_rt', 'pengaturan'] as const;
 const TABLES = TABEL_BACKUP;
+
+/** Nama tabel untuk MATA bendahara — chip jumlah di halaman Backup & Restore.
+ *  Dulu chip mencetak nama tabel mentah ("transaksi_kas: 341", "kas_rt: 120");
+ *  disetujui user 23 Okt 2026. `Record` atas `TABEL_BACKUP` membuat tabel baru
+ *  tanpa nama gagal typecheck, bukan tampil mentah diam-diam. */
+const NAMA_TABEL: Record<(typeof TABEL_BACKUP)[number], string> = {
+  warga: 'Warga', tarikan: 'Tarikan', absensi: 'Absensi', talangan: 'Talangan',
+  transaksi_kas: 'Kas Hadiran', kas_rt: 'Kas RT', pengaturan: 'Pengaturan',
+};
 
 export interface BackupFile {
   app: 'hadiran-rt';
@@ -56,8 +65,18 @@ export function downloadBackup(backup: BackupFile) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function ringkasBackup(b: BackupFile): { table: string; count: number }[] {
-  return TABLES.map((t) => ({ table: t, count: b.tables[t]?.length ?? 0 }));
+export function ringkasBackup(b: BackupFile): { table: string; nama: string; count: number }[] {
+  return TABLES.map((t) => ({ table: t, nama: NAMA_TABEL[t], count: b.tables[t]?.length ?? 0 }));
+}
+
+/** "23 Okt 2026" — tanggal LOKAL berkas cadangan dibuat. `exportedAt` itu ISO
+ *  UTC: memotong 10 karakter pertamanya (cara lama, 23 Okt 2026) memberi tanggal
+ *  KEMARIN untuk cadangan 00.00–07.00 WIB, dan "2026-10-22" patah di tanda
+ *  hubung pada 320px. Tanggal rusak → kosong, bukan "Invalid Date". */
+export function tanggalCadangan(exportedAt: string): string {
+  const d = new Date(exportedAt);
+  if (Number.isNaN(d.getTime())) return '';
+  return tanggalUtuh(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }));
 }
 
 /** Validasi bentuk file backup. Lempar error bila tidak valid. */

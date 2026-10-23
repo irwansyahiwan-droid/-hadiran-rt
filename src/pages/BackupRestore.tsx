@@ -9,7 +9,7 @@ import { useClosePhase } from '../hooks/useClosePhase';
 import { haptic, formatTanggal } from '../lib/utils';
 import { showToast } from '../lib/toast';
 import {
-  fetchBackup, downloadBackup, ringkasBackup, validasiBackup, restoreBackup, type BackupFile,
+  fetchBackup, downloadBackup, ringkasBackup, validasiBackup, restoreBackup, tanggalCadangan, type BackupFile,
 } from '../lib/backup';
 
 interface Props {
@@ -26,7 +26,7 @@ export default function BackupRestore({ open, onClose }: Props) {
   const dlg = useDialog(open, { onClose: exit.requestClose, label: 'Backup & restore data' });
   const fileRef = useRef<HTMLInputElement>(null);
   const [backingUp, setBackingUp] = useState(false);
-  const [lastBackup, setLastBackup] = useState<{ table: string; count: number }[] | null>(null);
+  const [lastBackup, setLastBackup] = useState<ReturnType<typeof ringkasBackup> | null>(null);
   const [pending, setPending] = useState<BackupFile | null>(null);
   const [konfirmasi, setKonfirmasi] = useState('');
   const [restoring, setRestoring] = useState(false);
@@ -78,6 +78,7 @@ export default function BackupRestore({ open, onClose }: Props) {
   }
 
   if (!open) return null;
+  const dibuat = pending?.exportedAt ? tanggalCadangan(pending.exportedAt) : '';
 
   return (
     <div ref={dlg.panelRef} {...dlg.panelProps} className={`fixed inset-0 z-overlay bg-sunken kanvas-cahaya dark:bg-gray-950 ${exit.closing ? 'page-out-right' : 'page-in-right'} overflow-y-auto [overscroll-behavior:contain]`}>
@@ -103,8 +104,8 @@ export default function BackupRestore({ open, onClose }: Props) {
           {lastBackup && (
             <div className="mt-3 flex flex-wrap gap-2">
               {lastBackup.map((r) => (
-                <span key={r.table} className="text-micro px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
-                  {r.table}: {r.count}
+                <span key={r.table} className="text-micro font-bold tabular-nums px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
+                  {r.nama} {r.count.toLocaleString('id-ID')}
                 </span>
               ))}
             </div>
@@ -136,12 +137,12 @@ export default function BackupRestore({ open, onClose }: Props) {
           ) : (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-caption text-emerald-700 dark:text-emerald-400 font-semibold">
-                <CheckCircle2 className="w-4 h-4" /> File backup terbaca {pending.exportedAt ? `(${pending.exportedAt.slice(0, 10)})` : ''}
+                <CheckCircle2 className="w-4 h-4" /> File backup terbaca{dibuat && ` · dibuat ${dibuat}`}
               </div>
               <div className="flex flex-wrap gap-2">
                 {ringkasBackup(pending).map((r) => (
-                  <span key={r.table} className="text-micro px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
-                    {r.table}: {r.count}
+                  <span key={r.table} className="text-micro font-bold tabular-nums px-2 py-1 rounded-lg inset-soft text-gray-500 dark:text-gray-400">
+                    {r.nama} {r.count.toLocaleString('id-ID')}
                   </span>
                 ))}
               </div>
@@ -157,9 +158,14 @@ export default function BackupRestore({ open, onClose }: Props) {
                   type="text"
                   value={konfirmasi}
                   onChange={(e) => setKonfirmasi(e.target.value)}
-                  placeholder={KATA_KONFIRMASI}
                   autoCapitalize="characters"
-                  className="w-full px-3 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-control dark:border-control-dark text-body dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-neg dark:focus:ring-rose-400 transition"
+                  /* TANPA placeholder & resep `.field` (23 Okt 2026, disetujui
+                     user) — kembaran `ConfirmDestruktif`. Placeholder-nya dulu
+                     jawabannya sendiri ("PULIHKAN") dan, karena kolom ini menulis
+                     kelasnya sendiri, dicat #95A89C = 2,40:1 di terang (di bawah
+                     AA) dgn tinta isian hitam murni. Katanya sudah tertulis merah
+                     di label tepat di atas. */
+                  className="field"
                 />
               </div>
               <div className="flex items-center gap-2">
