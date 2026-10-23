@@ -55,6 +55,12 @@ const OVERLAY = {
   warga: ['Riwayat Aktivitas', 'Tentang Aplikasi'],
   bendahara: ['Riwayat Aktivitas', 'Kelola Anggota', 'Tutup Buku Triwulan', 'Backup & Restore', 'Tentang Aplikasi'],
 };
+/* Berkas cadangan PALSU untuk panel Pulihkan (lihat di bawah). `exportedAt`
+   sengaja 06.30 WIB — tanggal UTC-nya kemarin, jadi jebakan zona tetap hidup —
+   dan satu tabel >1000 baris supaya titik ribuan ikut tercetak. */
+const BERKAS_UJI = { app: 'hadiran-rt', version: 1, exportedAt: '2026-10-22T23:30:00.000Z',
+  tables: Object.fromEntries([['warga', 79], ['tarikan', 30], ['absensi', 1680], ['talangan', 304], ['transaksi_kas', 341], ['kas_rt', 120], ['pengaturan', 3]]
+    .map(([t, n]) => [t, Array.from({ length: n }, (_, i) => ({ id: `uji-${i}` }))])) };
 const MUT_CSS = {
   1: `.flow-root > .float-right { height: auto !important; margin-bottom: -0.5rem !important; }
       p[id^="riw-"][id$="-judul"] { overflow-wrap: break-word !important; }`,
@@ -244,6 +250,20 @@ for (const L of LEBAR) {
       if (!(await openMenuItem(page, o))) { console.log(`  PROBE CACAT [${L} ${peran}/${o}]: overlay tak terbuka`); cacat++; continue; }
       await page.waitForTimeout(1200);
       await ukur(o);
+      if (o === 'Backup & Restore') {
+        /* Panel PULIHKAN (23 Okt 2026) cuma lahir sesudah berkas cadangan
+           DIPILIH — tak satu sapuan pun pernah membukanya, dan begitu dibuka
+           tanggalnya patah "(2026-10-" / "22)" @320 (`215f00a`). Berkasnya
+           PALSU & lokal (setInputFiles); "Pulihkan Sekarang" tak pernah
+           diketuk, dan tulis bendahara dijawab lokal di atas. */
+        const berkas = page.locator('[role="dialog"] input[type="file"]');
+        if (!(await berkas.count())) { console.log(`  PROBE CACAT [${L} ${peran}/restore-pratinjau]: kolom berkas tak ada`); cacat++; }
+        else {
+          await berkas.setInputFiles({ name: 'hadiran-rt-backup-uji.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(BERKAS_UJI)) });
+          if (await page.getByText('File backup terbaca').first().waitFor({ timeout: 5000 }).then(() => true, () => false)) await ukur('restore-pratinjau', 5);
+          else { console.log(`  PROBE CACAT [${L} ${peran}/restore-pratinjau]: berkas uji tak terbaca`); cacat++; }
+        }
+      }
       if (o === 'Kelola Anggota') {
         const tbh = page.getByRole('button', { name: /Tambah [Aa]nggota/ }).first();
         if (await tbh.count()) { await tbh.click({ force: true }).catch(() => {}); await page.waitForTimeout(1000); await ukur('sheet-anggota', 5); await closeLayer(page); }
