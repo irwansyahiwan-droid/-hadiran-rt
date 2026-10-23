@@ -84,9 +84,17 @@ const PROBE = (sel) => {
     const luber = Math.max(rr.right - Math.min(wr.right, innerWidth, kr.right), Math.max(wr.left, 0, kr.left) - rr.left);
     teks.push({ s: s.slice(0, 50), color: cs.color, op, fs: parseFloat(cs.fontSize), patah, luber, box: [rr.left, rr.top, rr.width, rr.height] });
   }
+  const ukuranSentuh = (b) => {
+    /* Hit-test dari sumbu tengah, ala audit:sentuh — kotak CSS tak tahu
+       pelebaran `before:-inset-*`. Batas 26px/sisi cukup membuktikan 44. */
+    const r = b.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const milik = (x, y) => { const h = document.elementFromPoint(Math.round(x), Math.round(y)); return !!h && (h === b || b.contains(h)); };
+    const rambat = (dx, dy) => { let n = 0; while (n < 26 && milik(cx + dx * (n + 1), cy + dy * (n + 1))) n++; return n; };
+    return { w: rambat(1, 0) + rambat(-1, 0) + 1, h: rambat(0, 1) + rambat(0, -1) + 1 };
+  };
   const kontrol = [...wadah.querySelectorAll('button, a')].map((b) => {
     const r = b.getBoundingClientRect();
-    return { nama: (b.getAttribute('aria-label') || b.innerText || '').trim().slice(0, 20), w: r.width, h: r.height, order: getComputedStyle(b).order };
+    return { nama: (b.getAttribute('aria-label') || b.innerText || '').trim().slice(0, 20), ...ukuranSentuh(b), lebarKotak: r.width, order: getComputedStyle(b).order };
   });
   return { teks, kontrol, tinggi: wr.height };
 };
@@ -114,7 +122,7 @@ async function ukur(page, label, sel) {
     for (const p of t.patah) catat(label, `PATAH "${p}" dlm «${t.s}»`);
   }
   for (const k of r.kontrol) if (k.w < 43.5 || k.h < 43.5) catat(label, `KONTROL ${k.w.toFixed(0)}×${k.h.toFixed(0)} «${k.nama}»`);
-  if (MUTASI === '1' && r.kontrol.some((k) => /^(Pasang|Buka di Chrome)/.test(k.nama) && k.order === '0' && k.w < 200)) mendarat++;
+  if (MUTASI === '1' && r.kontrol.some((k) => /^(Pasang|Buka di Chrome)/.test(k.nama) && k.order === '0' && k.lebarKotak < 200)) mendarat++;
   console.log(`${label.padEnd(36)} ${r.teks.length} teks · terburuk ${terburuk.toFixed(2)} · tinggi ${r.tinggi.toFixed(0)}px`);
   return r;
 }

@@ -20,6 +20,10 @@
 //                  disuntik, Date.now dimajukan 70 dtk — penyegaran senyap gagal)
 //   toast-urungkan bendahara mock: editor Absensi → "Semua Hadir" (state lokal;
 //                  tiap tulis dijawab LOKAL, Simpan tak diketuk)
+//   strip-versi    bendahara mock: `navigator.serviceWorker` PALSU (`waiting` +
+//                  `controller`) disuntik sebelum boot → strip "Versi baru
+//                  tersedia" (23 Okt 2026, `f5e9104`: dulu kartu mengapung yang
+//                  tertutup kartu Pasang & menutup FAB). Muat ulang tak diketuk.
 // Toast DITAHAN kursor selama diukur (Toaster menjeda jamnya di bawah penunjuk
 // halus), lalu dilepas & ditunggu pergi sebelum permukaan berikutnya.
 //
@@ -31,6 +35,9 @@
 //   IKON   glyph status lawan titiknya ≥ 3:1 (§1.4.11) — dari warna terhitung.
 //   PATAH  token tanpa spasi biasa yang tercetak di >1 baris.
 //   HURUF  < 11px (lantai app).   LUBER  teks keluar wadah / layar.
+//   KONTROL tombol di dalam permukaan < 44px (kontrak sentuh app), lewat
+//          HIT-TEST seperti audit:sentuh — kartu versi lama menaruh "Muat
+//          ulang" di 117×35, dan "Urungkan" toast 95×39 (kini before:-inset-1).
 //
 // KONTROL: permukaan yang tak muncul = PROBE CACAT (exit 2).
 //   MUTASI=1  glyph & titik toast disamakan abu (#9CA3AF di #A1A1AA) → tiap
@@ -87,10 +94,20 @@ const PROBE = (sel) => {
       luber: rr.right > Math.min(wr.right, innerWidth) + 0.5 || rr.left < Math.max(wr.left, 0) - 0.5,
     });
   }
+  const ukuranSentuh = (b) => {
+    /* Hit-test dari sumbu tengah, ala audit:sentuh — kotak CSS tak tahu
+       pelebaran `before:-inset-*`. Batas 26px/sisi cukup membuktikan 44. */
+    const r = b.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const milik = (x, y) => { const h = document.elementFromPoint(Math.round(x), Math.round(y)); return !!h && (h === b || b.contains(h)); };
+    const rambat = (dx, dy) => { let n = 0; while (n < 26 && milik(cx + dx * (n + 1), cy + dy * (n + 1))) n++; return n; };
+    return { w: rambat(1, 0) + rambat(-1, 0) + 1, h: rambat(0, 1) + rambat(0, -1) + 1 };
+  };
+  const kontrol = [...wadah.querySelectorAll('button, a')].map((b) => ({ nama: b.innerText.trim().slice(0, 20), ...ukuranSentuh(b) }));
   const titik = wadah.querySelector(':scope > span:first-child');
   const ikon = titik?.querySelector('svg');
   return {
     teks,
+    kontrol,
     rect: [wr.left, wr.top, wr.width, wr.height],
     titik: titik && ikon ? { bg: getComputedStyle(titik).backgroundColor, glyph: getComputedStyle(ikon).color, r: titik.getBoundingClientRect().toJSON() } : null,
   };
@@ -130,6 +147,7 @@ async function ukur(page, label, sel, harusIkon) {
     for (const p of t.patah) temuan.push(`${label} PATAH "${p}" dlm «${t.s}»`);
     baris.push(terburuk.toFixed(2));
   }
+  for (const k of r.kontrol) if (k.w < 43.5 || k.h < 43.5) temuan.push(`${label} KONTROL ${k.w.toFixed(0)}×${k.h.toFixed(0)} «${k.nama}»`);
   let ik = '';
   if (r.titik) {
     const g = parseColor(r.titik.glyph).rgb, d = parseColor(r.titik.bg).rgb;
@@ -138,6 +156,16 @@ async function ukur(page, label, sel, harusIkon) {
     if (ri < 3) { temuan.push(`${label} IKON ${ri.toFixed(2)} glyph rgb(${g}) di titik rgb(${d})`); kenaMutasi.add(label); }
   }
   console.log(`${label.padEnd(30)} ${r.teks.length} teks · terburuk ${Math.min(...baris.map(Number)).toFixed(2)}${ik}`);
+}
+
+/** Kerangka memuat habis — TENANG itu keadaan, bukan jeda. Pemicu galat-segar
+ *  WAJIB menunggunya: kalau GET mulai dibalas 500 saat muat PERTAMA belum
+ *  selesai, yang gagal muat pertama (ErrorState), bukan penyegaran senyap —
+ *  jalan validasi 23 Okt kehilangan toast-galat & strip-basi persis begitu. */
+async function tungguIsi(page) {
+  return page.waitForFunction(() => ![...document.querySelectorAll('.skeleton, .skeleton-bar')]
+    .some((e) => e.getBoundingClientRect().width > 0 && getComputedStyle(e).visibility !== 'hidden'), null, { timeout: 25000 })
+    .then(() => true, () => false);
 }
 
 /** Tahan toast di bawah kursor, tunggu animasi masuknya selesai, ukur, lepas, tunggu pergi. */
@@ -176,6 +204,7 @@ try {
       await ukur(page, `${tag} warga] strip-luring`, 'header [role="status"]', false);
       await ctx.setOffline(false); await page.waitForTimeout(700);
       await gotoTab(page, 'Kas RT');
+      if (!(await tungguIsi(page))) { console.log(`  PROBE CACAT ${tag}]: Kas RT tak selesai memuat dalam 25 dtk`); cacat++; }
       await ctx.route('**/rest/v1/**', (r) => (r.request().method() === 'GET' ? r.fulfill({ status: 500, contentType: 'application/json', body: '{}' }) : r.fallback()));
       await page.evaluate(() => {
         let vis = 'hidden';
@@ -193,6 +222,12 @@ try {
     // ── BENDAHARA (mock) ─────────────────────────────────────────────────
     {
       const { ctx, page } = await newCtx(browser, theme, { bendahara: true });
+      await page.addInitScript(() => {
+        const waiting = { postMessage() {}, state: 'installed', addEventListener() {} };
+        const reg = { waiting, installing: null, addEventListener() {}, update: async () => {} };
+        const sw = { controller: { state: 'activated' }, register: async () => reg, addEventListener() {}, ready: Promise.resolve(reg) };
+        Object.defineProperty(navigator, 'serviceWorker', { get: () => sw, configurable: true });
+      });
       let tulis = 0;
       await ctx.route('**/rest/v1/**', (r) => {
         if (['GET', 'HEAD', 'OPTIONS'].includes(r.request().method())) return r.fallback();
@@ -202,6 +237,9 @@ try {
       await page.goto(APP, { waitUntil: 'networkidle', timeout: 60000 });
       await page.locator('nav button', { hasText: 'Beranda' }).first().waitFor({ timeout: 90000 });
       if (MUTASI) await page.addStyleTag({ content: MUT_CSS[MUTASI] });
+      await page.waitForTimeout(800);
+      if (!(await page.locator('header [role="status"]', { hasText: 'Versi baru' }).count())) { console.log(`  PROBE CACAT ${tag}]: strip VERSI BARU tak muncul (SW palsu tak terbaca?)`); cacat++; }
+      else await ukur(page, `${tag} bendahara] strip-versi`, 'header [role="status"]', false);
       await gotoTab(page, 'Jadwal');
       const proses = page.getByRole('button', { name: /^Proses/i }).first();
       if (!(await proses.count())) { console.log(`  PROBE CACAT ${tag}]: pemicu Proses tak ada`); cacat++; }
