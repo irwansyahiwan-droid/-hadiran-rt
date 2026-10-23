@@ -130,6 +130,10 @@ const VISUAL = [
      sapuan geometri di atas. Lahir & masuk rantai 22 Okt 2026 sesudah nominal
      hero struk ringkasan terpotong mulai Rp100.000.000 (`df2ceba`). */
   ['kartu-png', 'node scripts/audit-kartu-png.mjs'],
+  /* Permukaan SEMENTARA — toast & strip Header LURING/BASI. Lahir & masuk
+     rantai 23 Okt 2026: semua sapuan visual memotret layar yang sudah tenang,
+     jadi tak satu pun pernah melihatnya — ikon status toast 2,54:1 (`6a6dd62`). */
+  ['sementara', 'node scripts/audit-sementara.mjs'],
   /* SUMBU WAKTU di rantai (22 Okt 2026). Semua sapuan lain berjalan "hari ini",
      jadi keadaan yang cuma lahir sesudah pergantian TAHUN tak pernah terukur —
      21 Okt dua cacat ditemukan begitu jam dipaku ke Januari (tanggal tahun lalu
@@ -304,6 +308,9 @@ const LANTAI = {
      Hasil Tarikan masuk sore itu, tulisnya dijawab LOKAL), 321 teks kanvas.
      Ikut DATA (baris kategori Kas RT, jejak Kartu Saya). Lantai ~95%. */
   'kartu-png':      [/KARTU PNG: \d+ kartu · (\d+) teks diukur/, 305],
+  /* Garis dasar 23 Okt 2026: 20 permukaan (5 × 320/360 × terang/gelap) —
+     STRUKTUR, bukan data, jadi tetap. Satu permukaan hilang = merah. */
+  sementara:        [/SEMENTARA: (\d+) permukaan/, 20],
   /* Garis dasar 18 Okt 2026: 233 kontrol tetap (chrome, FAB, sheet, overlay)
      di 41 layar @390×844, safe-area 47/34 lewat CDP. Populasi ini STRUKTUR,
      bukan data (kontrol fixed/sticky), jadi stabil. Lantai ~95%. */
