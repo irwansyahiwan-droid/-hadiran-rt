@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, Download, MoreHorizontal, Plus, ExternalLink } from 'lucide-react';
 import logoRt from '../assets/logo-rt.svg';
 import { useDialog } from '../hooks/useDialog';
@@ -12,10 +12,19 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DISMISS_KEY = 'hadiran-install-dismissed';
 
-export default function InstallPrompt() {
+/** Ruang bawah yang disisakan `<main>` (App.tsx) selama kartu tampil — tanpa
+ *  ini baris terakhir halaman tak pernah bisa digulir keluar dari bawahnya. */
+const VAR_RUANG = '--ruang-pasang';
+
+/** `aktif` = tab Beranda saja (23 Okt 2026, disetujui user). Di tab lain kartu
+ *  yang mengapung menutup FAB bendahara (Tambah transaksi Kas RT, Setor ke Kas
+ *  RT) di setiap lebar — aksi BUAT utama yang tak bisa diketuk sampai kartunya
+ *  ditutup. Beranda tak punya FAB di peran mana pun. */
+export default function InstallPrompt({ aktif = true }: { aktif?: boolean }) {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showGuide, setShowGuide] = useState(false);
   const [hidden, setHidden] = useState(true);
+  const kartuRef = useRef<HTMLDivElement>(null);
   // Exit meluncur + drag beneran (konten pendek, aman handlers di panel penuh).
   const guideDrag = useDragDismiss(() => setShowGuide(false));
   const guideDlg = useDialog(showGuide, { onClose: guideDrag.dismiss, label: 'Panduan pasang aplikasi di iPhone' });
@@ -71,6 +80,16 @@ export default function InstallPrompt() {
     setHidden(true);
   };
 
+  const tampil = !hidden && !isStandalone && aktif;
+  useEffect(() => {
+    const el = kartuRef.current;
+    const akar = document.documentElement;
+    if (!tampil || !el) { akar.style.removeProperty(VAR_RUANG); return; }
+    const ro = new ResizeObserver(() => akar.style.setProperty(VAR_RUANG, `${el.offsetHeight + 12}px`));
+    ro.observe(el);
+    return () => { ro.disconnect(); akar.style.removeProperty(VAR_RUANG); };
+  }, [tampil]);
+
   if (hidden || isStandalone) return null;
 
   const keChrome = typeof window === 'undefined' ? '#'
@@ -90,12 +109,18 @@ export default function InstallPrompt() {
 
   return (
     <>
+      {tampil && (
       <div
+        ref={kartuRef}
         className="fixed inset-x-4 mx-auto z-banner w-auto max-w-sm rise"
         style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
       >
+        {/* Tombol aksi di BARIS SENDIRI, selebar kartu, di kedua varian (23 Okt
+            2026, disetujui user). Dulu cuma Samsung: sebaris dgn teks, tombol
+            "Pasang" 101px + Tutup menggencet kolom judul iPhone jadi ±55px @320
+            — "Akses / cepat / dari / layar / utama / HP", kartu 169px tinggi. */}
         <div
-          className={`flex items-center gap-3 px-4 py-3 rounded-2xl${isSamsung ? ' flex-wrap' : ''} bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800`}
+          className="flex flex-wrap items-center gap-3 px-4 py-3 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ring-1 ring-gray-100 dark:ring-gray-800"
           style={{ boxShadow: 'var(--shadow-float)' }}
         >
           <img src={logoRt} alt="" width={40} height={40} className="w-10 h-10 rounded-xl object-cover shrink-0" />
@@ -104,8 +129,6 @@ export default function InstallPrompt() {
             <p className="text-micro text-gray-500 dark:text-gray-400">{isSamsung ? 'Samsung Internet diblokir saat memasang' : 'Akses cepat dari layar utama HP'}</p>
           </div>
           {isSamsung ? (
-            /* Baris SENDIRI, selebar spanduk: sebaris dgn teks ia menggencet
-               kolom judul jadi satu kata per baris & menimpanya @360px. */
             <a href={keChrome} className={`${kelasAksi} order-last w-full justify-center`}>
               <ExternalLink className="w-3.5 h-3.5" />
               Buka di Chrome
@@ -115,7 +138,7 @@ export default function InstallPrompt() {
             onClick={isIos ? () => setShowGuide(true) : install}
             /* min-h 44: aksi UTAMA banner ini sempat 32px tinggi — di bawah
                kontrak 44px yang dipatuhi seluruh app (lihat FilterChips). */
-            className={kelasAksi}
+            className={`${kelasAksi} order-last w-full justify-center`}
           >
             <Download className="w-3.5 h-3.5" />
             Pasang
@@ -126,6 +149,7 @@ export default function InstallPrompt() {
           </button>
         </div>
       </div>
+      )}
 
       {showGuide && (
         <div className="fixed inset-0 z-modal flex items-end" onClick={guideDrag.dismiss}>

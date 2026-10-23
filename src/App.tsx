@@ -355,7 +355,7 @@ export default function App() {
         {/* Nav = bar DOK bawah (h-[70px] + safe-area di dalam bar) → beri ruang
             agar konten tak ngumpet di belakangnya: 4.5rem bar + 1.75rem napas.
             Nilai sinkron dgn offset FAB & tombol sticky absensi (satu sistem). */}
-        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem)' }}>
+        <main className="max-w-lg mx-auto px-4 pt-4" style={{ paddingBottom: 'calc(4.5rem + env(safe-area-inset-bottom) + 1.75rem + var(--ruang-pasang, 0px))' }}>
           <PullToRefresh onRefresh={handleRefresh}>
             <div {...swipe}>
               <div key={`${activeTab}-${refreshKey}`} className={dir > 0 ? 'page-in-right' : 'page-in-left'}>
@@ -374,7 +374,7 @@ export default function App() {
         {/* Toast "versi baru tersedia" + registrasi service worker */}
         <PwaUpdatePrompt />
         {/* Banner pasang app (Android prompt / panduan iOS) */}
-        <InstallPrompt />
+        <InstallPrompt aktif={activeTab === 'beranda'} />
         {/* Sambutan orientasi sekali-lihat (warga baru) — self-gate via localStorage */}
         <WelcomeSheet />
         {/* Overlay bendahara/umum — chunk dimuat saat pertama dibuka (gate by state).
