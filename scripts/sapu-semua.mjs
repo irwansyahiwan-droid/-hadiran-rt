@@ -134,6 +134,11 @@ const VISUAL = [
      rantai 23 Okt 2026: semua sapuan visual memotret layar yang sudah tenang,
      jadi tak satu pun pernah melihatnya — ikon status toast 2,54:1 (`6a6dd62`). */
   ['sementara', 'node scripts/audit-sementara.mjs'],
+  /* Kartu "Pasang Hadiran RT" — cuma lahir di UA iPhone/Samsung/Chrome Android
+     yang belum memasang app, jadi tak pernah dirender sapuan mana pun. Lahir &
+     masuk rantai 23 Okt 2026: kartunya menutup FAB bendahara & baris terakhir
+     halaman, dan judulnya terjepit satu kata per baris @320 (`1f6f0c4`). */
+  ['pasang', 'node scripts/audit-pasang.mjs'],
   /* SUMBU WAKTU di rantai (22 Okt 2026). Semua sapuan lain berjalan "hari ini",
      jadi keadaan yang cuma lahir sesudah pergantian TAHUN tak pernah terukur —
      21 Okt dua cacat ditemukan begitu jam dipaku ke Januari (tanggal tahun lalu
@@ -311,6 +316,9 @@ const LANTAI = {
   /* Garis dasar 23 Okt 2026: 20 permukaan (5 × 320/360 × terang/gelap) —
      STRUKTUR, bukan data, jadi tetap. Satu permukaan hilang = merah. */
   sementara:        [/SEMENTARA: (\d+) permukaan/, 20],
+  /* Garis dasar 23 Okt 2026: 18 kartu (3 varian UA × 320/360 × warga
+     terang/gelap + bendahara terang) — STRUKTUR, bukan data. */
+  pasang:           [/PASANG: (\d+) kartu/, 18],
   /* Garis dasar 18 Okt 2026: 233 kontrol tetap (chrome, FAB, sheet, overlay)
      di 41 layar @390×844, safe-area 47/34 lewat CDP. Populasi ini STRUKTUR,
      bukan data (kontrol fixed/sticky), jadi stabil. Lantai ~95%. */
