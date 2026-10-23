@@ -237,7 +237,10 @@ function ToastStack({
             {t.actionLabel && (
               <button
                 onClick={() => onAction(t)}
-                className="press shrink-0 -mr-1 px-3 py-2 rounded-xl text-body font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                /* Kotak 39px tinggi; area SENTUH 47px lewat `before:-inset-1`
+                   (pola tombol muat-ulang Jadwal) — tanpa menebalkan toast.
+                   Terukur `audit:sementara` 23 Okt 2026: 95×39. */
+                className="press relative shrink-0 -mr-1 px-3 py-2 rounded-xl text-body font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors before:absolute before:-inset-1 before:content-['']"
               >
                 {t.actionLabel}
               </button>
