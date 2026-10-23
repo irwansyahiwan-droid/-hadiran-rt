@@ -371,7 +371,7 @@ export default function App() {
           </PullToRefresh>
         </main>
         <BottomNav active={activeTab} onChange={changeTab} isWargaMode={isWargaMode} />
-        {/* Toast "versi baru tersedia" + registrasi service worker */}
+        {/* Registrasi service worker; kabar versi baru = strip di Header (lib/versiBaru.ts) */}
         <PwaUpdatePrompt />
         {/* Banner pasang app (Android prompt / panduan iOS) */}
         <InstallPrompt aktif={activeTab === 'beranda'} />

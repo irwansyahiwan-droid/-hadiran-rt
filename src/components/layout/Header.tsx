@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, AlertTriangle, Share2, UserRound, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, AlertTriangle, Share2, UserRound, Sparkles, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
 import { useBasi } from '../../lib/basi';
+import { useVersiBaru, muatVersiBaru } from '../../lib/versiBaru';
 import { useBackDismiss } from '../../hooks/useBackDismiss';
 import { useScrolledPast } from '../../hooks/useScrollDirection';
 import { useCadanganGulir } from '../../hooks/useCadanganGulir';
@@ -37,6 +38,7 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
   const scrolled = useScrolledPast(6);
   const online = useOnline();
   const basi = useBasi();
+  const versiBaru = useVersiBaru();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuMounted = useExitAnim(menuOpen);
   /* Tombol Back HP menutup menu ini — bukan meninggalkan app. Warga app ini
@@ -351,6 +353,31 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             Gagal memperbarui — angka yang tampil salinan terakhir
           </p>
+        </div>
+      )}
+
+      {/* Strip VERSI BARU (23 Okt 2026) — dulu kartu mengapung di bawah layar,
+          di bawah kartu Pasang (iPhone) & di atas FAB bendahara. Kini kembaran
+          strip LURING/BASI: status yang bertahan sampai warga memuat ulang.
+          Kata tetap ("Versi baru tersedia" · "Muat ulang"); tombolnya 44px. */}
+      {versiBaru && (
+        <div
+          role="status"
+          className="border-t border-emerald-200/70 bg-emerald-50 px-5 dark:border-emerald-800/40 dark:bg-emerald-900/25"
+        >
+          <div className="mx-auto flex max-w-lg flex-wrap items-center justify-center gap-x-2 text-center">
+            <p className="flex items-center gap-2 py-2 text-micro font-semibold text-pos dark:text-emerald-300">
+              <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              Versi baru tersedia
+            </p>
+            <button
+              type="button"
+              onClick={() => { haptic(); muatVersiBaru(); }}
+              className="press min-h-[44px] px-2 text-micro font-bold text-pos underline decoration-1 underline-offset-2 hover:decoration-2 dark:text-emerald-300"
+            >
+              Muat ulang
+            </button>
+          </div>
         </div>
       )}
 
