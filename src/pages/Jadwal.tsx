@@ -668,7 +668,8 @@ function ResultCard({ result, onDismiss }: { result: AbsensiResult; onDismiss: (
       <div className="rounded-3xl bg-white dark:bg-gray-900 border border-line dark:border-gray-800/60 lift overflow-hidden">
         {/* Header — badge sukses + judul + tutup */}
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-          <span className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+          {/* Resep jejak Kartu Saya — dulu `bg-emerald-500` + putih 2,54:1. */}
+          <span className="w-9 h-9 rounded-xl bg-pos text-white dark:bg-emerald-400 dark:text-gray-950 flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </span>
           <div className="min-w-0 flex-1">

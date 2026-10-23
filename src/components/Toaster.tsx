@@ -4,9 +4,14 @@ import { durasiTampil, subscribeToast, subscribeUmum, type ToastItem } from '../
 import { haptic } from '../lib/utils';
 
 const STYLES = {
-  success: { icon: Check, ring: 'ring-emerald-200 dark:ring-emerald-800/50', dot: 'bg-emerald-500', text: 'text-emerald-600 dark:text-emerald-400' },
-  error: { icon: AlertCircle, ring: 'ring-rose-200 dark:ring-rose-800/50', dot: 'bg-rose-500', text: 'text-neg dark:text-rose-400' },
-  info: { icon: Info, ring: 'ring-gray-200 dark:ring-gray-700', dot: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-300' },
+  /* Titik status = resep jejak Kartu Saya (`GAYA_JEJAK`): isian PEKAT + glyph
+     putih di terang, isian terang + glyph gray-950 di gelap. Dulu `emerald-500`
+     / `rose-500` / `slate-400` mentah dgn glyph putih SELALU: 2,54 / 3,67 /
+     2,56:1 (§1.4.11 menuntut 3:1), dan `slate` = abu BIRU sisa sebelum rona
+     Hutan. Kini glyph 8,96 / 8,78 / 7,46 (terang) · 10,44 / 7,46 / 7,99 (gelap). */
+  success: { icon: Check, ring: 'ring-emerald-200 dark:ring-emerald-800/50', dot: 'bg-pos text-white dark:bg-emerald-400 dark:text-gray-950', text: 'text-emerald-600 dark:text-emerald-400' },
+  error: { icon: AlertCircle, ring: 'ring-rose-200 dark:ring-rose-800/50', dot: 'bg-neg text-white dark:bg-rose-400 dark:text-gray-950', text: 'text-neg dark:text-rose-400' },
+  info: { icon: Info, ring: 'ring-gray-200 dark:ring-gray-700', dot: 'bg-gray-600 text-white dark:bg-gray-400 dark:text-gray-950', text: 'text-gray-600 dark:text-gray-300' },
 } as const;
 
 const EXIT_MS = 200; // selaras durasi .toast-out
@@ -226,7 +231,7 @@ function ToastStack({
             style={{ boxShadow: 'var(--shadow-float)' }}
           >
             <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${s.dot}`}>
-              <Icon className="w-3.5 h-3.5 text-white" />
+              <Icon className="w-3.5 h-3.5" />
             </span>
             <p className="flex-1 text-body font-semibold text-gray-800 dark:text-gray-100">{t.message}</p>
             {t.actionLabel && (
