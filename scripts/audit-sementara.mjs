@@ -20,6 +20,12 @@
 //                  disuntik, Date.now dimajukan 70 dtk — penyegaran senyap gagal)
 //   toast-urungkan bendahara mock: editor Absensi → "Semua Hadir" (state lokal;
 //                  tiap tulis dijawab LOKAL, Simpan tak diketuk)
+//   overlay-sukses bendahara mock: sesudah toast-urungkan, "Simpan & Hitung
+//                  Iuran" DITEKAN — tiap tulis dijawab LOKAL & memantulkan
+//                  barisnya (pola audit:kata-patah; `wajibBerubah` menuntut
+//                  baris kembali) → overlay "Tarikan #N selesai" (2,1 dtk).
+//                  Latar teksnya diambil dari PIL-nya sendiri (24 Okt 2026,
+//                  `4ec6f38`: pil tembus pandang → kalimat uang 4,46:1).
 //   strip-versi    bendahara mock: `navigator.serviceWorker` PALSU (`waiting` +
 //                  `controller`) disuntik sebelum boot → strip "Versi baru
 //                  tersedia" (23 Okt 2026, `f5e9104`: dulu kartu mengapung yang
@@ -51,9 +57,14 @@ import { newCtx, loginWarga, gotoTab, openMenuItem, ratio, parseColor, blend, mo
 const APP = process.env.CAP_URL || 'http://localhost:5199';
 const MUTASI = process.env.MUTASI || '';
 const LEBAR = (process.env.LEBAR || '320,360').split(',').map(Number);
+/* Sisi bendahara ikut 390px (24 Okt 2026): kalimat uang overlay sukses gagal AA
+   TEPAT di 390 (4,46) sementara 320/360 lolos (4,87/5,36) — latarnya halaman
+   yang dikaburkan, jadi tiap lebar membaca isi berbeda di belakang pil. Satu
+   lebar = satu titik sampel (pelajaran audit:lebar). */
+const LEBAR_SEMUA = [...new Set([...LEBAR, 390])];
 const MUT_CSS = {
   1: '[data-toast] > span:first-child { background-color: #A1A1AA !important; color: #9CA3AF !important; }',
-  2: '[data-toast] > p, [data-toast] > button, header [role="status"] p { opacity: .2 !important; }',
+  2: '[data-toast] > p, [data-toast] > button, header [role="status"] p, .z-modal[role="status"] p { opacity: .2 !important; }',
 };
 
 const temuan = [];
@@ -89,8 +100,10 @@ const PROBE = (sel) => {
       const r2 = document.createRange(); r2.setStart(n, j); r2.setEnd(n, j + tok.length);
       if (new Set([...r2.getClientRects()].map((x) => Math.round(x.top))).size > 1) patah.push(tok);
     }
+    const kotak = el.getBoundingClientRect();
     teks.push({
       s: s.slice(0, 60), color: cs.color, op, fs: parseFloat(cs.fontSize), patah,
+      kotak: [kotak.left, kotak.top, kotak.width, kotak.height],
       luber: rr.right > Math.min(wr.right, innerWidth) + 0.5 || rr.left < Math.max(wr.left, 0) - 0.5,
     });
   }
@@ -113,7 +126,10 @@ const PROBE = (sel) => {
   };
 };
 
-async function ukur(page, label, sel, harusIkon) {
+/** `latarElemen`: latar tiap teks = modus piksel di CINCIN DALAM elemennya
+ *  sendiri (pil ber-bantalan), bukan kisi wadah — wadah overlay selebar layar
+ *  dan kisinya mendarat di scrim, bukan di pil yang benar-benar dibaca. */
+async function ukur(page, label, sel, harusIkon, { latarElemen = false } = {}) {
   if (MUTASI) await page.waitForTimeout(150);
   const r = await page.evaluate(PROBE, sel);
   if (!r) { console.log(`  PROBE CACAT ${label}: permukaan tak muncul (${sel})`); cacat++; return; }
@@ -136,7 +152,14 @@ async function ukur(page, label, sel, harusIkon) {
   for (const t of r.teks) {
     teksDiukur++;
     const c = parseColor(t.color);
-    const bgC = modusBg(sampel, c.rgb) ?? modusBg(sampel);
+    let sampelT = sampel;
+    if (latarElemen) {
+      const [ex, ey, ew, eh] = t.kotak; const cincin = [];
+      for (let k = 1; k < 12; k++) cincin.push([ex + (ew * k) / 12, ey + 2.5], [ex + (ew * k) / 12, ey + eh - 2.5]);
+      cincin.push([ex + 6, ey + eh / 2], [ex + ew - 6, ey + eh / 2]);
+      sampelT = await samplePixels(page, shot, cincin);
+    }
+    const bgC = modusBg(sampelT, c.rgb) ?? modusBg(sampelT);
     // Seri di puncak modus → ambil yang TERBURUK (disiplin audit:kontras).
     let terburuk = Infinity;
     for (const bg of bgC) terburuk = Math.min(terburuk, ratio(blend(c.rgb, c.a * t.op, bg), bg));
@@ -182,10 +205,10 @@ async function ukurToast(page, label, w) {
 
 const browser = await chromium.launch();
 try {
-  for (const w of LEBAR) for (const theme of ['light', 'dark']) {
+  for (const w of LEBAR_SEMUA) for (const theme of ['light', 'dark']) {
     const tag = `[${w} ${theme === 'light' ? 'terang' : 'gelap'}`;
     // ── WARGA ────────────────────────────────────────────────────────────
-    {
+    if (LEBAR.includes(w)) {
       const { ctx, page } = await newCtx(browser, theme, {});
       await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(APP).origin });
       await page.setViewportSize({ width: w, height: 844 });
@@ -229,9 +252,15 @@ try {
         Object.defineProperty(navigator, 'serviceWorker', { get: () => sw, configurable: true });
       });
       let tulis = 0;
-      await ctx.route('**/rest/v1/**', (r) => {
-        if (['GET', 'HEAD', 'OPTIONS'].includes(r.request().method())) return r.fallback();
-        tulis++; return r.fulfill({ status: 204, body: '' });
+      await ctx.route('**/rest/v1/**', (route) => {
+        const req = route.request();
+        if (['GET', 'HEAD', 'OPTIONS'].includes(req.method())) return route.fallback();
+        tulis++;
+        if (req.method() === 'DELETE') return route.fulfill({ status: 204, body: '' });
+        let isi = [];
+        try { const b = req.postDataJSON(); isi = Array.isArray(b) ? b : b ? [b] : []; } catch { /* tanpa badan */ }
+        return route.fulfill({ status: req.method() === 'POST' ? 201 : 200, contentType: 'application/json',
+          body: JSON.stringify(isi.map((x, i) => ({ id: `ffffffff-0000-4000-8000-${String(i).padStart(12, '0')}`, ...x }))) });
       });
       await page.setViewportSize({ width: w, height: 844 });
       await page.goto(APP, { waitUntil: 'networkidle', timeout: 60000 });
@@ -250,6 +279,15 @@ try {
           await semua.waitFor({ timeout: 15000 }); await page.waitForTimeout(500);
           await semua.click();
           await ukurToast(page, `${tag} bendahara] toast-urungkan`, w);
+          const sebelum = tulis;
+          await page.getByRole('button', { name: /^Simpan & Hitung Iuran$/ }).click();
+          const ov = page.locator('.z-modal[role="status"]');
+          if (!(await ov.waitFor({ timeout: 15000 }).then(() => true, () => false))) { console.log(`  PROBE CACAT ${tag}]: overlay sukses tak muncul (tulis lokal: ${tulis - sebelum})`); cacat++; }
+          else {
+            await page.waitForTimeout(650); // animasi masuk (reduced-motion) selesai; overlay hidup 2,1 dtk
+            await ukur(page, `${tag} bendahara] overlay-sukses`, '.z-modal[role="status"]', false, { latarElemen: true });
+            if (tulis === sebelum) { console.log(`  PROBE CACAT ${tag}]: simpan tak memicu satu tulis pun`); cacat++; }
+          }
         } catch (e) { console.log(`  PROBE CACAT ${tag}]: editor Absensi — ${String(e.message).split('\n')[0].slice(0, 80)}`); cacat++; }
       }
       if (tulis) console.log(`  tulis dijawab LOKAL: ${tulis}`);
