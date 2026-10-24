@@ -15,6 +15,11 @@
 //   toast-sukses   warga: Menu → "Bagikan halaman ini" tanpa navigator.share
 //                  (jalur salin → toast "…disalin")
 //   strip-luring   warga: ctx.setOffline(true)
+//   strip-luring-overlay  warga: Riwayat Aktivitas dibuka ONLINE (chunk-nya
+//                  harus sudah termuat — sapuan memblokir SW), lalu sinyal
+//                  diputus. Overlay menutup Header layar penuh, jadi strip di
+//                  dalam header OVERLAY wajib ada; tak ada = TEMUAN (`7ae5ab8`:
+//                  dulu 0/8 overlay ber-strip, Riwayat memajang 94 nominal).
 //   toast-galat +  warga: GET rest/v1 dibalas 500 LOKAL, lalu "kembali dari
 //   strip-basi     latar" >60 dtk (pola `audit:kembali`: getter visibilitas
 //                  disuntik, Date.now dimajukan 70 dtk — penyegaran senyap gagal)
@@ -226,6 +231,20 @@ try {
       await ctx.setOffline(true); await page.waitForTimeout(700);
       await ukur(page, `${tag} warga] strip-luring`, 'header [role="status"]', false);
       await ctx.setOffline(false); await page.waitForTimeout(700);
+      if (!(await openMenuItem(page, 'Riwayat Aktivitas'))) { console.log(`  PROBE CACAT ${tag}]: overlay Riwayat tak terbuka`); cacat++; }
+      else {
+        await page.waitForTimeout(1500);
+        await ctx.setOffline(true); await page.waitForTimeout(800);
+        const label = `${tag} warga] strip-luring-overlay`;
+        if (!(await page.locator('[role="dialog"] header [role="status"]', { hasText: 'Tanpa sinyal' }).count())) {
+          permukaan++; temuan.push(`${label} OVERLAY LURING tanpa strip — angka di overlay tak mengaku basi`); kenaMutasi.add(label);
+          console.log(`${label.padEnd(30)} TANPA STRIP`);
+        } else await ukur(page, label, '[role="dialog"] header [role="status"]', false);
+        await ctx.setOffline(false); await page.waitForTimeout(600);
+        const kembali = page.locator('[role="dialog"] header button[aria-label="Kembali"]').last();
+        if (await kembali.count()) await kembali.click().catch(() => {}); else await page.keyboard.press('Escape');
+        await page.waitForTimeout(900);
+      }
       await gotoTab(page, 'Kas RT');
       if (!(await tungguIsi(page))) { console.log(`  PROBE CACAT ${tag}]: Kas RT tak selesai memuat dalam 25 dtk`); cacat++; }
       await ctx.route('**/rest/v1/**', (r) => (r.request().method() === 'GET' ? r.fulfill({ status: 500, contentType: 'application/json', body: '{}' }) : r.fallback()));

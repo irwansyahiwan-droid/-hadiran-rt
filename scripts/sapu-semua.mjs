@@ -313,10 +313,11 @@ const LANTAI = {
      Hasil Tarikan masuk sore itu, tulisnya dijawab LOKAL), 321 teks kanvas.
      Ikut DATA (baris kategori Kas RT, jejak Kartu Saya). Lantai ~95%. */
   'kartu-png':      [/KARTU PNG: \d+ kartu · (\d+) teks diukur/, 305],
-  /* Garis dasar 24 Okt 2026: 34 permukaan — warga 4 × 320/360 × terang/gelap,
+  /* Garis dasar 24 Okt 2026: 38 permukaan — warga 5 (toast sukses · galat ·
+     strip luring · strip luring OVERLAY · strip basi) × 320/360 × terang/gelap,
      bendahara 3 (versi · urungkan · overlay sukses) × 320/360/390 × tema.
      STRUKTUR, bukan data. Satu hilang = merah. */
-  sementara:        [/SEMENTARA: (\d+) permukaan/, 34],
+  sementara:        [/SEMENTARA: (\d+) permukaan/, 38],
   /* Garis dasar 23 Okt 2026: 18 kartu (3 varian UA × 320/360 × warga
      terang/gelap + bendahara terang) — STRUKTUR, bukan data. */
   pasang:           [/PASANG: (\d+) kartu/, 18],
