@@ -53,6 +53,15 @@ import { pilihKartuWarga } from './lib/kartu-warga.mjs';
 const URL = process.env.CAP_URL || 'http://localhost:5199';
 const MUTASI = process.env.MUTASI === '1';
 const AMBANG = 0.5;
+/* HURUF (24 Okt 2026). Sora app ber-`font-display: optional`; kalau tiba
+   >±100 ms peramban menolaknya untuk sisa kunjungan — dan penolakan itu ikut ke
+   KANVAS. Di localhost Sora selalu menang balapan, jadi sapuan ini dulu tak
+   pernah melihat keadaan itu; terukur dgn tunda 2,5 dtk: tiap kartu dicat INTER
+   walau `document.fonts.load()`. Kini woff2 Sora DITUNDA secara bawaan — kartu
+   PNG paling rawan justru di jaringan lambat — dan tiap `fillText` yang meminta
+   Sora diukur ulang dgn tumpukan TANPA Sora: lebar sama = dicat cadangan.
+   `SORA_TELAT_MS=0` mematikan tunda. */
+const SORA_TELAT_MS = +(process.env.SORA_TELAT_MS ?? 2500);
 
 function sadap({ mutasi }) {
   const P = CanvasRenderingContext2D.prototype;
@@ -90,6 +99,14 @@ function sadap({ mutasi }) {
     const teks = mutasi && /^[-+]?Rp/.test(String(t)) ? `${t}WWWWWWWWWWWW` : String(t);
     const s = S(this);
     const m = this.measureText(teks);
+    let huruf = '-';
+    if (/Sora/.test(this.font) && /[A-Za-z0-9]{3}/.test(teks)) {
+      const asliFont = this.font;
+      this.font = asliFont.replace(/["']?Sora(?: Kanvas| Variable)?["']?,\s*/g, '');
+      const w2 = this.measureText(teks).width;
+      this.font = asliFont;
+      huruf = Math.abs(m.width - w2) < 0.01 ? 'cadangan' : 'sora';
+    }
     let kiri = x - m.actualBoundingBoxLeft, kanan = x + m.actualBoundingBoxRight;
     if (maxW !== undefined && m.width > maxW) { const k = maxW / m.width; kiri = x - m.actualBoundingBoxLeft * k; kanan = x + m.actualBoundingBoxRight * k; }
     const [a, b] = tf(this, kiri, y - m.actualBoundingBoxAscent);
@@ -107,7 +124,7 @@ function sadap({ mutasi }) {
        walau "wadahnya" (mis. gradien yang dicat melebihi kanvas) lebih lebar. */
     const W = { x0: Math.max(0, wadah.x0), y0: Math.max(0, wadah.y0), x1: Math.min(s.w, wadah.x1), y1: Math.min(s.h, wadah.y1) };
     const luber = Math.max(W.x0 - kotak.x0, kotak.x1 - W.x1, W.y0 - kotak.y0, kotak.y1 - W.y1);
-    s.teks.push({ t: teks, luber, kanan: kotak.x1, batas: W.x1, kanvas: !!wadah.kanvas });
+    s.teks.push({ t: teks, luber, kanan: kotak.x1, batas: W.x1, kanvas: !!wadah.kanvas, huruf });
     return asliTeks.call(this, teks, x, y, maxW);
   };
   Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true });
@@ -163,10 +180,12 @@ async function lapis(page, item) {
 const browser = await chromium.launch();
 const temuan = [], cacat = [];
 let tulisLokal = 0;
-let kartuN = 0, teksN = 0, kartuBerRp = 0, kartuMerah = 0;
+let kartuN = 0, teksN = 0, kartuBerRp = 0, kartuMerah = 0, teksSora = 0, soraDitunda = 0;
+const cadangan = [];
 for (const [label, ekstrem] of [['hari ini', false], ['ekstrem', true]]) {
   const { ctx, page } = await newCtx(browser, 'light', { bendahara: true, ekstrem });
   await ctx.addInitScript(sadap, { mutasi: MUTASI });
+  if (SORA_TELAT_MS) await ctx.route(/sora-latin[^/]*\.woff2/, async (r) => { soraDitunda++; await new Promise((ok) => setTimeout(ok, SORA_TELAT_MS)); return r.fallback(); });
   /* Didaftarkan SESUDAH mock harness → dijalankan LEBIH DULU. Baca diteruskan ke
      handler harness (anon paksa); TULIS apa pun — termasuk RPC — dijawab di sini
      dan tak pernah `continue`. PATCH/POST memantulkan isinya sbg array (jalur
@@ -204,7 +223,11 @@ for (const [label, ekstrem] of [['hari ini', false], ['ekstrem', true]]) {
       if (berRp) kartuBerRp++;
       const lub = utama.teks.filter((t) => t.luber > AMBANG);
       if (lub.length) kartuMerah++;
-      console.log(`${lub.length ? '  ⚠' : '  ok'}  ${id.padEnd(40)} ${String(utama.teks.length).padStart(3)} teks · kanvas ${utama.w}×${utama.h} · luber ${lub.length}`);
+      const sora = utama.teks.filter((t) => t.huruf !== '-');
+      const cad = sora.filter((t) => t.huruf === 'cadangan');
+      teksSora += sora.length;
+      for (const t of cad) cadangan.push(`${id}: "${t.t.slice(0, 40)}"`);
+      console.log(`${lub.length || cad.length ? '  ⚠' : '  ok'}  ${id.padEnd(40)} ${String(utama.teks.length).padStart(3)} teks · kanvas ${utama.w}×${utama.h} · luber ${lub.length} · Sora ${sora.length - cad.length}/${sora.length}`);
       for (const t of lub) {
         temuan.push(`${id}: "${t.t.slice(0, 50)}" lewat ${t.luber.toFixed(1)}px${t.kanvas ? ' (keluar gambar)' : ''}`);
         console.log(`        "${t.t.slice(0, 50)}" lewat wadahnya ${t.luber.toFixed(1)}px kanvas${t.kanvas ? ' — keluar gambar' : ''}`);
@@ -217,9 +240,13 @@ for (const [label, ekstrem] of [['hari ini', false], ['ekstrem', true]]) {
 }
 await browser.close();
 
-console.log(`\n=== KARTU PNG: ${kartuN} kartu · ${teksN} teks diukur · ${temuan.length} luber${MUTASI ? ' · MUTASI=1' : ''} ===`);
+console.log(`\n=== KARTU PNG: ${kartuN} kartu · ${teksN} teks diukur · ${temuan.length} luber · ${cadangan.length} huruf cadangan${MUTASI ? ' · MUTASI=1' : ''} ===`);
 console.log(`  tulis dijawab LOKAL: ${tulisLokal} (nol diteruskan ke jaringan)`);
+console.log(`  Sora ditunda ${SORA_TELAT_MS} ms: ${soraDitunda} permintaan · ${teksSora} teks kanvas meminta Sora`);
 for (const t of temuan) console.log(`  LUBER ${t}`);
+for (const t of cadangan) console.log(`  HURUF CADANGAN ${t}`);
+if (SORA_TELAT_MS && !soraDitunda) cacat.push('tunda Sora tak pernah mendarat (pola woff2 meleset?)');
+if (!teksSora) cacat.push('nol teks kanvas meminta Sora — vonis HURUF tak punya populasi');
 if (cacat.length) { console.log(`PROBE CACAT: ${cacat.join(' · ')}`); process.exit(2); }
 if (MUTASI && kartuMerah < kartuBerRp) { console.log(`PROBE CACAT: MUTASI=1 tapi hanya ${kartuMerah} dari ${kartuBerRp} kartu ber-nominal merah`); process.exit(2); }
-process.exit(temuan.length ? 1 : 0);
+process.exit(temuan.length || cadangan.length ? 1 : 0);
