@@ -1,5 +1,6 @@
 import { LOGO_DATA_URL } from './logoBase64';
 import { CETAK } from './warnaCetak';
+import soraKanvasUrl from '../fonts/sora-latin.woff2?url';
 
 export interface ReceiptRow {
   label: string;
@@ -180,8 +181,30 @@ export async function bagikanFileGambar(
 
 export const rupiahFont = "'Inter Variable', Inter, system-ui, -apple-system, sans-serif";
 // Nominal & brand memakai Sora (font-display app) → struk share = suara visual
-// yang sama dgn hero in-app, bukan Inter polos.
-export const displayFont = `'Sora Variable', Sora, ${rupiahFont}`;
+// yang sama dgn hero in-app, bukan Inter polos. 'Sora Kanvas' di DEPAN —
+// lihat `siapkanHurufKanvas`.
+export const displayFont = `'Sora Kanvas', 'Sora Variable', Sora, ${rupiahFont}`;
+
+/**
+ * Sora yang PASTI dipakai kanvas (24 Okt 2026). Sora app ber-`font-display:
+ * optional`: kalau tiba >±100 ms, peramban menolaknya untuk SISA kunjungan —
+ * dan penolakan itu ikut ke kanvas. Terukur: Sora ditunda 2,5 dtk → status
+ * `loaded`, tapi tiap kartu PNG dicat INTER (lebar sama persis dgn Inter),
+ * bahkan sesudah `document.fonts.load()`. Di DOM itu pertukaran yang disengaja
+ * (tak ada kedip); di kartu yang beredar di grup WA tak ada kedip yang perlu
+ * dihindari. FontFace TERPISAH ber-`display: block` atas BERKAS YANG SAMA
+ * (`?url` = aset ber-hash yang sama dgn CSS → dari cache, nol byte baru) tak
+ * terkena penolakan itu. Gagal → tumpukan jatuh ke Sora/Inter seperti dulu.
+ */
+let hurufKanvas: Promise<void> | null = null;
+export function siapkanHurufKanvas(): Promise<void> {
+  if (typeof FontFace === 'undefined' || typeof document === 'undefined') return Promise.resolve();
+  hurufKanvas ??= new FontFace('Sora Kanvas', `url(${soraKanvasUrl}) format('woff2')`, { weight: '400 800', display: 'block' })
+    .load()
+    .then((f) => { document.fonts.add(f); })
+    .catch(() => { hurufKanvas = null; });
+  return hurufKanvas;
+}
 
 export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
@@ -297,6 +320,7 @@ export async function buatPngStruk(data: ReceiptData): Promise<File> {
 
   // Pastikan Sora/Inter siap sebelum menggambar — tanpa ini canvas diam-diam
   // jatuh ke font sistem (struk terlihat "bukan app kita").
+  await siapkanHurufKanvas();
   try { await document.fonts.ready; } catch { /* lanjut dgn fallback */ }
 
   // Geometri dari satu sumber murni (teruji) — bukan hitungan tulis-tangan.

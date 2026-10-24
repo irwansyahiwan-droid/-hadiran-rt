@@ -1,5 +1,5 @@
 import { LOGO_DATA_URL } from './logoBase64';
-import { bagikanFileGambar, namaBerkasPng, ukuranNominalMuat } from './shareReceipt';
+import { bagikanFileGambar, namaBerkasPng, ukuranNominalMuat, displayFont, siapkanHurufKanvas } from './shareReceipt';
 import { CETAK } from './warnaCetak';
 import { formatRupiahBertanda } from './utils';
 
@@ -41,7 +41,6 @@ export interface LaporanKasCard {
    sini pada 13px yang sama dgn tetangganya akan terbaca sbg ketidakkonsistenan,
    bukan sbg tekanan. */
 const rupiahFont = "'Inter Variable', Inter, system-ui, -apple-system, sans-serif";
-const displayFont = `'Sora Variable', Sora, ${rupiahFont}`;
 const FONT = rupiahFont;
 
 /** Nominal BERTANDA untuk kartu ("-Rp390.000"). Dibangun di atas
@@ -128,6 +127,7 @@ export async function shareLaporanKas(d: LaporanKasCard): Promise<void> {
      jatuh ke font sistem, kartunya tetap tercetak rapi, dan tak ada satu pun
      tanda bahwa Sora tak pernah terpakai. Kegagalan senyap semacam itu justru
      yang paling lama hidup. */
+  await siapkanHurufKanvas();
   try { await document.fonts.ready; } catch { /* lanjut dgn fallback */ }
 
   // Kas RT = pool final/akumulasi → jadi angka utama. "Belum Disetor" Kas

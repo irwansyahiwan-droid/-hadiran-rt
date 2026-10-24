@@ -26,6 +26,7 @@ import {
   loadImage,
   fitText,
   tulisTeksJelasI,
+  siapkanHurufKanvas,
 } from './shareReceipt';
 import { formatRupiahPlain, formatTanggal } from './utils';
 import type { KartuWarga as DataKartu, StatusJejak } from './kartuWarga';
@@ -275,6 +276,7 @@ export async function buatPngKartuSaya(d: DataKartuSaya): Promise<File> {
      pertama di jaringan lambat menggambar nama dgn huruf sistem. */
   try {
     await Promise.all([
+      siapkanHurufKanvas(),
       document.fonts.load(`800 30px ${displayFont}`),
       document.fonts.load(`500 13px ${rupiahFont}`),
     ]);
