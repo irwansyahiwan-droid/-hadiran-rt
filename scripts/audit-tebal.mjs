@@ -64,7 +64,7 @@ const KOMPONEN = ['Tag', 'SectionTitle'];
    alasannya wajib ditinjau ulang), cocok LEBIH DARI SATU baris = "terlalu
    longgar" (MERAH — izin membebaskan call-site yang tak pernah ditimbang). */
 const IZIN = [
-  ['components/SuccessOverlay.tsx', 'text-white/95 font-medium text-caption bg-black/35', 'pil ber-`rounded-full` tapi isinya KALIMAT di atas scrim, bukan badge — prosa tetap medium'],
+  ['components/SuccessOverlay.tsx', 'text-white/95 font-medium text-caption bg-black/65', 'pil ber-`rounded-full` tapi isinya KALIMAT di atas scrim, bukan badge — prosa tetap medium'],
   ['components/BannerCarousel.tsx', 'text-[9px] font-extrabold uppercase tracking-[0.12em]', 'GAMBAR — teks di dalam ilustrasi "nota talangan", bukan teks app (disiplin izin `audit:spasi`)'],
 ];
 const berizin = (nama, baris) => IZIN.some(([b, kunci]) => nama.endsWith(b) && baris.includes(kunci));
