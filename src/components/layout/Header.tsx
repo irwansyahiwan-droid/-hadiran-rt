@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, WifiOff, AlertTriangle, Share2, UserRound, Sparkles, type LucideIcon } from 'lucide-react';
+import { LogOut, Sun, Moon, History, FileText, MoreVertical, DatabaseBackup, Info, Users, AlertTriangle, Share2, UserRound, Sparkles, type LucideIcon } from 'lucide-react';
 import logoRT from '../../assets/logo-rt.svg';
 import { haptic } from '../../lib/utils';
 import { useExitAnim } from '../../lib/hooks';
@@ -10,6 +10,7 @@ import { useBackDismiss } from '../../hooks/useBackDismiss';
 import { useScrolledPast } from '../../hooks/useScrollDirection';
 import { useCadanganGulir } from '../../hooks/useCadanganGulir';
 import { useOnline } from '../../hooks/useOnline';
+import StripLuring from './StripLuring';
 import Tag from '../Tag';
 import InfoTip from '../InfoTip';
 import type { Role } from '../../hooks/useAuth';
@@ -309,24 +310,8 @@ export default function Header({ role, onLogout, isDark, onToggleTheme, onOpenRi
           </div>
         </div>
       </div>
-      {/* Strip LURING — hanya ada saat perangkat benar-benar terputus, jadi nol
-          biaya ruang ketika online. Kenapa perlu: app ini merender dari snapshot
-          (pola SWR pageCache), sehingga tanpa sinyal layar tetap menampilkan
-          nominal LAMA yang terlihat persis seperti data terkini — terukur 31 Jul:
-          Rp4.485.000 tampil sama saja offline maupun online, tanpa satu pun tanda.
-          Untuk app kas, angka yang mungkin basi wajib mengaku. Tidak bisa
-          ditutup: begitu sinyal kembali, strip ini hilang sendiri. */}
-      {!online && (
-        <div
-          role="status"
-          className="border-t border-amber-200/70 bg-amber-50 px-5 py-2 dark:border-amber-800/40 dark:bg-amber-900/25"
-        >
-          <p className="mx-auto flex max-w-lg items-center justify-center gap-2 text-center text-balance text-micro font-semibold text-warn dark:text-amber-300">
-            <WifiOff className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            Tanpa sinyal — angka yang tampil salinan terakhir
-          </p>
-        </div>
-      )}
+      {/* Strip LURING — lihat `StripLuring` (satu sumber dgn OverlayHeader). */}
+      <StripLuring />
 
       {/* Strip BASI — kembaran strip LURING di atasnya, untuk sebab yang BERBEDA:
           di sana sinyalnya hilang, di sini sinyalnya ADA tapi penyegaran ditolak

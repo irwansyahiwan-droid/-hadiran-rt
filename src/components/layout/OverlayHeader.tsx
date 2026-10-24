@@ -3,6 +3,7 @@ import { useRef, type ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { haptic } from '../../lib/utils';
 import { useCadanganGulir } from '../../hooks/useCadanganGulir';
+import StripLuring from './StripLuring';
 
 /**
  * Header satu-baris untuk halaman OVERLAY (Riwayat Aktivitas, Kelola Anggota,
@@ -63,6 +64,9 @@ export default function OverlayHeader({
         </div>
         {actions && <div className="flex items-center -mr-2 shrink-0">{actions}</div>}
       </div>
+      {/* Overlay menutup Header layar penuh — tanpa ini angka di overlay tak
+          pernah mengaku basi saat sinyal hilang. */}
+      <StripLuring />
     </header>
   );
 }
