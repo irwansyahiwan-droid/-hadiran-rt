@@ -21,6 +21,7 @@
 // kanan-bawah tempat URL duduk, dan stop paling terang di balik koin.
 //
 //   OUT=path.jpg   (default public/og-hadiran.jpg)
+import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { CETAK, rgba } from './lib/palet.mjs';
 
@@ -45,9 +46,18 @@ const OUT = process.env.OUT || 'public/og-hadiran.jpg';
    Aksen "RT" wajib menggemakan lambang, bukan memperkenalkan warna. */
 const GOLD = '#FFD22B';
 
+/* Huruf app SENDIRI, disematkan (24 Okt 2026). Dulu Google Fonts lewat
+   jaringan + jeda tetap 600 ms — dan og-hadiran.jpg yang beredar di tiap
+   pratinjau tautan WA ternyata tercetak huruf CADANGAN (Arial-ish), bukan
+   Sora/Inter: generatornya tak pernah tahu fontnya gagal. Kini berkas yang
+   sama dgn app (src/fonts, sumbu 400..800) & pembuktian lebar tercat di bawah. */
+const fontData = (f) => 'data:font/woff2;base64,' + readFileSync(new URL(`../src/fonts/${f}`, import.meta.url)).toString('base64');
+const FONT_FACE = `
+  @font-face{font-family:'Sora';src:url(${fontData('sora-latin.woff2')}) format('woff2');font-weight:400 800;font-display:block}
+  @font-face{font-family:'Inter';src:url(${fontData('inter-latin.woff2')}) format('woff2');font-weight:400 800;font-display:block}`;
+
 const html = `<!doctype html><html><head><meta charset="utf-8"/>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@500;600&display=swap" rel="stylesheet"/>
-<style>
+<style>${FONT_FACE}
   *{margin:0;padding:0;box-sizing:border-box}
   body{width:1200px;height:630px;font-family:'Inter',sans-serif;overflow:hidden}
   .card{position:relative;width:1200px;height:630px;color:#fff;overflow:hidden;
@@ -112,8 +122,25 @@ const browser = await chromium.launch();
 // dpr 1.6 → render tajam (~1920px) tapi file tetap ringan setelah kompresi JPEG;
 // WhatsApp menolak/melewati gambar besar, jadi JPEG q80 jauh lebih aman dari PNG.
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1.6 });
-await page.setContent(html, { waitUntil: 'networkidle' });
-await page.waitForTimeout(600); // pastikan webfont selesai dimuat
+await page.setContent(html, { waitUntil: 'load' });
+/* MELEDAK kalau huruf app tak terpakai. `document.fonts.check()` TAK bisa
+   dipercaya (pelajaran ke-42: ia menjawab true walau peramban mencetak
+   cadangan) — yang membuktikan cuma LEBAR TERCAT: judul ber-Sora wajib beda
+   dari string yang sama dlm cadangan, begitu juga Inter. */
+const bukti = await page.evaluate(async () => {
+  await document.fonts.ready;
+  /* Pembandingnya TUMPUKAN yang sama dgn CSS ('Sora', sans-serif) lawan
+     cadangannya saja — BUKAN 'Sora' polos lawan sans-serif. Mutasi pertama
+     (nama keluarga dibuat salah) LOLOS dgn bentuk itu: 'Sora' yang tak ada
+     jatuh ke huruf bawaan (serif), yang tentu beda lebar dari sans-serif. */
+  const lebar = (fam, w, s) => { const c = document.createElement('canvas').getContext('2d'); c.font = `${w} 78px ${fam}`; return c.measureText(s).width; };
+  const s = 'Hadiran RT transparan dalam genggaman';
+  return { sora: lebar("'Sora', sans-serif", 800, s), inter: lebar("'Inter', sans-serif", 500, s), cadangan: lebar('sans-serif', 800, s), cadanganInter: lebar('sans-serif', 500, s) };
+});
+if (Math.abs(bukti.sora - bukti.cadangan) < 2 || Math.abs(bukti.inter - bukti.cadanganInter) < 2) {
+  await browser.close();
+  throw new Error(`gen-og: huruf app TAK terpakai (Sora ${bukti.sora.toFixed(1)} vs cadangan ${bukti.cadangan.toFixed(1)}px · Inter ${bukti.inter.toFixed(1)} vs ${bukti.cadanganInter.toFixed(1)}px)`);
+}
 await page.locator('.card').screenshot({ path: OUT, type: 'jpeg', quality: 82 });
 await browser.close();
 console.log(`ok → ${OUT}  (ramp ${T0}→${T1}→${T2} dari warnaCetak.ts)`);
